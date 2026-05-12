@@ -3,7 +3,7 @@
 import { CornerDownRight } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 
-export function ChatSuggestions({ suggestions }: { suggestions: string[] }) {
+export function SuggestedQuestions({ suggestions }: { suggestions: string[] }) {
   const { sendMessage } = useAskNanci()
   if (!suggestions.length) return null
 

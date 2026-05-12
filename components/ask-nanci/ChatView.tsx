@@ -1,9 +1,10 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { ScrollArea } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { UserMessage, BotMessage } from "./ChatMessage"
-import { ChatThinking } from "./ChatThinking"
+import { ThinkingIndicator } from "./ThinkingIndicator"
 
 export function ChatView() {
   const { messages, chatState, pendingBot } = useAskNanci()
@@ -14,8 +15,8 @@ export function ChatView() {
   }, [messages, pendingBot?.content, chatState])
 
   return (
-    <div className="flex flex-1 flex-col overflow-y-auto">
-      <div className="mx-auto w-full max-w-[800px] flex flex-1 flex-col gap-0 py-4">
+    <ScrollArea className="flex-1">
+      <div className="mx-auto w-full max-w-[800px] flex flex-col gap-0 py-4">
         {messages.map((msg) =>
           msg.role === "user" ? (
             <UserMessage key={msg.id} message={msg} />
@@ -29,7 +30,7 @@ export function ChatView() {
           ),
         )}
 
-        {chatState === "thinking" && <ChatThinking />}
+        {chatState === "thinking" && <ThinkingIndicator />}
 
         {chatState === "streaming" && pendingBot && (
           <BotMessage
@@ -41,6 +42,6 @@ export function ChatView() {
 
         <div ref={bottomRef} />
       </div>
-    </div>
+    </ScrollArea>
   )
 }

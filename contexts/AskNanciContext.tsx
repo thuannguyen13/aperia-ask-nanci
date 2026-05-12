@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useCallback, useRef, useEffect } from "react"
-import type { Message, Session, PinnedWidget, Source } from "@/lib/ask-nanci/types"
+import type { Message, Session, Source, UsageData } from "@/lib/ask-nanci/types"
 import {
   fetchSessions,
   persistSession,
@@ -11,6 +11,7 @@ import {
   persistSources,
   streamChat,
 } from "@/lib/ask-nanci/api"
+import { MOCK_USAGE } from "@/lib/ask-nanci/mock-data"
 
 type ChatView = "welcome" | "chat"
 type ChatState = "idle" | "thinking" | "streaming"
@@ -22,25 +23,25 @@ interface AskNanciCtx {
   sessions: Session[]
   activeSessionId: string | null
   pendingBot: Message | null
-  setPendingBot: (m: Message | null) => void
   sendMessage: (text: string) => void
   stopAnimation: () => void
   startNewChat: () => void
   resumeSession: (id: string) => void
   deleteSessionById: (id: string) => void
-  appendBotMessage: (msg: Message) => void
-  appendToken: (token: string) => void
-  pinnedWidgets: PinnedWidget[]
-  pinWidget: (widget: PinnedWidget) => void
-  unpinWidget: (id: string) => void
   sources: Source[]
   setSources: (sources: Source[]) => void
-  stopRef: React.RefObject<boolean>
   kbOpen: boolean
   setKbOpen: (open: boolean) => void
   draft: string
   setDraft: (text: string) => void
   error: string | null
+  usage: UsageData
+  tokenLimitReached: boolean
+  setTokenLimitReached: (v: boolean) => void
+  settingsOpen: boolean
+  settingsTab: string
+  openSettings: (tab?: string) => void
+  setSettingsOpen: (open: boolean) => void
 }
 
 const Ctx = createContext<AskNanciCtx | null>(null)
@@ -58,12 +59,14 @@ export function AskNanciProvider({ children }: { children: React.ReactNode }) {
   const [sessions, setSessions] = useState<Session[]>([])
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null)
   const [pendingBot, setPendingBot] = useState<Message | null>(null)
-  const [pinnedWidgets, setPinnedWidgets] = useState<PinnedWidget[]>([])
   const [sources, setSources_] = useState<Source[]>([])
   const [kbOpen, setKbOpen] = useState(false)
   const [draft, setDraft] = useState("")
   const [error, setError] = useState<string | null>(null)
-  const stopRef = useRef(false)
+  const [tokenLimitReached, setTokenLimitReached] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [settingsTab, setSettingsTab] = useState("usage")
+  const stopRef = useRef<boolean>(false)
   const sessionIdRef = useRef<string>(newSessionId())
 
   useEffect(() => {
@@ -90,15 +93,6 @@ export function AskNanciProvider({ children }: { children: React.ReactNode }) {
     setPendingBot(null)
   }, [persistAndReload])
 
-  // Appends a streaming token to the in-progress pendingBot message.
-  // Called once per token chunk while chatState === "streaming".
-  const appendToken = useCallback((token: string) => {
-    setPendingBot((prev) => {
-      if (!prev) return prev
-      return { ...prev, content: prev.content + token }
-    })
-  }, [])
-
   const sendMessage = useCallback((text: string) => {
     if (!text.trim() || chatState !== "idle") return
     const userMsg: Message = { id: newSessionId(), role: "user", content: text.trim() }
@@ -114,7 +108,6 @@ export function AskNanciProvider({ children }: { children: React.ReactNode }) {
       return next
     })
 
-    // Start streaming — transition to "streaming" once first token arrives
     const run = async () => {
       const activeSources = (await fetchSources()).filter((s) => s.active)
       const allMsgs = await new Promise<Message[]>((resolve) => {
@@ -205,32 +198,29 @@ export function AskNanciProvider({ children }: { children: React.ReactNode }) {
     if (activeSessionId === id) startNewChat()
   }, [activeSessionId, startNewChat, reloadSessions])
 
-  const pinWidget = useCallback((widget: PinnedWidget) => {
-    setPinnedWidgets((prev) => prev.some((w) => w.id === widget.id) ? prev : [...prev, widget])
-  }, [])
-
-  const unpinWidget = useCallback((id: string) => {
-    setPinnedWidgets((prev) => prev.filter((w) => w.id !== id))
-  }, [])
-
   const handleSetSources = useCallback((next: Source[]) => {
     setSources_(next)
     persistSources(next)
   }, [])
 
+  const openSettings = useCallback((tab = "usage") => {
+    setSettingsTab(tab)
+    setSettingsOpen(true)
+  }, [])
+
   return (
     <Ctx.Provider value={{
       view, messages, chatState, sessions, activeSessionId,
-      pendingBot, setPendingBot,
+      pendingBot,
       sendMessage, stopAnimation, startNewChat, resumeSession,
       deleteSessionById: deleteSessionByIdCb,
-      appendBotMessage, appendToken,
-      pinnedWidgets, pinWidget, unpinWidget,
       sources, setSources: handleSetSources,
-      stopRef,
       kbOpen, setKbOpen,
       draft, setDraft,
       error,
+      usage: MOCK_USAGE,
+      tokenLimitReached, setTokenLimitReached,
+      settingsOpen, settingsTab, openSettings, setSettingsOpen,
     }}>
       {children}
     </Ctx.Provider>

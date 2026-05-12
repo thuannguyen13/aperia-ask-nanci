@@ -1,11 +1,16 @@
 "use client"
 
 import { useState } from "react"
-import { MessageCirclePlus, PieChart, LifeBuoy, Send, ChevronsUpDown, PanelLeft } from "lucide-react"
+import { MessageCirclePlus, PieChart, LifeBuoy, Send, PanelLeft, Settings, ArrowUpRight, CircleHelp, LogOut } from "lucide-react"
 import Image from "next/image"
-import { Avatar, AvatarFallback, Button, Tooltip, TooltipTrigger, TooltipContent } from "aperia-ds5"
+import {
+  Avatar, AvatarFallback, Button, Tooltip, TooltipTrigger, TooltipContent,
+  DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
+  DropdownMenuLabel, DropdownMenuItem, DropdownMenuSeparator,
+} from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
+import { UsageCard } from "./UsageCard"
 
 const footerNav = [
   { icon: LifeBuoy, label: "Support" },
@@ -49,8 +54,8 @@ function SidebarItem({
   )
 }
 
-export function AskNanciSidebar() {
-  const { sessions, activeSessionId, startNewChat, resumeSession, deleteSessionById, sources, kbOpen, setKbOpen } = useAskNanci()
+export function Sidebar() {
+  const { sessions, activeSessionId, startNewChat, resumeSession, deleteSessionById, sources, kbOpen, setKbOpen, openSettings } = useAskNanci()
   const [collapsed, setCollapsed] = useState(false)
 
   const activeCount = sources.filter((s) => s.active).length
@@ -154,30 +159,34 @@ export function AskNanciSidebar() {
           collapsed ? "w-12" : "w-64",
         )}
       >
-        {/* KB card — hidden when collapsed */}
+        {/* Cards — hidden when collapsed */}
         {!collapsed && (
-          <div className="relative mb-1 overflow-hidden rounded-[10px] border p-4 shadow-sm">
-            <div className="pointer-events-none absolute right-2 top-0 flex h-20 w-20 items-center justify-center">
-              <div style={{ transform: "rotate(-12.88deg)" }}>
-                <svg viewBox="0 0 30 37.5" className="h-16 w-12 opacity-60" fill="none">
-                  <path d="M2 0h18l10 10v25.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2Z" fill="#dbeafe" stroke="#93c5fd" strokeWidth="1" />
-                  <path d="M20 0l10 10H22a2 2 0 0 1-2-2V0Z" fill="#93c5fd" />
-                  <rect x="5" y="14" width="16" height="2" rx="1" fill="#3b82f6" opacity=".5" />
-                  <rect x="5" y="19" width="10" height="2" rx="1" fill="#3b82f6" opacity=".5" />
-                </svg>
+          <div className="flex flex-col gap-2 mb-1">
+            {/* Usage card */}
+            <UsageCard />
+
+            {/* KB card */}
+            <div className="relative overflow-hidden rounded-[10px] border p-4 shadow-sm">
+              <div className="pointer-events-none absolute right-2 top-0 flex h-20 w-20 items-center justify-center">
+                <div style={{ transform: "rotate(-12.88deg)" }}>
+                  <svg viewBox="0 0 30 37.5" className="h-16 w-12 opacity-60" fill="none">
+                    <path d="M2 0h18l10 10v25.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2Z" fill="#dbeafe" stroke="#93c5fd" strokeWidth="1" />
+                    <path d="M20 0l10 10H22a2 2 0 0 1-2-2V0Z" fill="#93c5fd" />
+                    <rect x="5" y="14" width="16" height="2" rx="1" fill="#3b82f6" opacity=".5" />
+                    <rect x="5" y="19" width="10" height="2" rx="1" fill="#3b82f6" opacity=".5" />
+                  </svg>
+                </div>
               </div>
+              <div className="mb-3 pr-12">
+                <p className="text-sm font-semibold leading-5 text-foreground">Knowledge Base</p>
+                <p className="text-xs font-medium leading-4 text-muted-foreground">
+                  Add your own data and documents to improve your Nanci.
+                </p>
+              </div>
+              <Button className="w-full" size="sm" onClick={() => setKbOpen(!kbOpen)}>
+                {kbOpen ? "Close Knowledge Base" : "Teach Nanci"}
+              </Button>
             </div>
-            <div className="mb-3 pr-12">
-              <p className="text-sm font-semibold leading-5 text-foreground">Knowledge Base</p>
-              <p className="text-xs font-medium leading-4 text-muted-foreground">
-                {activeCount > 0
-                  ? `${activeCount} active source${activeCount !== 1 ? "s" : ""} connected`
-                  : "Add your own data and documents to improve your Nanci."}
-              </p>
-            </div>
-            <Button className="w-full" size="sm" onClick={() => setKbOpen(!kbOpen)}>
-              {kbOpen ? "Close Knowledge Base" : "Manage Nanci Knowledge"}
-            </Button>
           </div>
         )}
 
@@ -187,30 +196,51 @@ export function AskNanciSidebar() {
           ))}
         </div>
 
-        {/* User row */}
-        {collapsed ? (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <div className="mt-1 flex cursor-pointer items-center justify-center rounded-md px-2 py-1.5 hover:bg-muted transition-colors">
+        {/* User row with dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            {collapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="mt-1 flex cursor-pointer items-center justify-center rounded-md px-2 py-1.5 hover:bg-muted transition-colors">
+                    <Avatar className="size-7 shrink-0">
+                      <AvatarFallback className="text-xs">TR</AvatarFallback>
+                    </Avatar>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="right">Teresa R. · teresa@example.com</TooltipContent>
+              </Tooltip>
+            ) : (
+              <div className="mt-1 flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted transition-colors">
                 <Avatar className="size-7 shrink-0">
                   <AvatarFallback className="text-xs">TR</AvatarFallback>
                 </Avatar>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold leading-none text-foreground">Teresa R.</p>
+                  <p className="truncate text-xs leading-none text-muted-foreground mt-1">teresa@example.com</p>
+                </div>
               </div>
-            </TooltipTrigger>
-            <TooltipContent side="right">Teresa R. · teresa@example.com</TooltipContent>
-          </Tooltip>
-        ) : (
-          <div className="mt-1 flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted transition-colors">
-            <Avatar className="size-7 shrink-0">
-              <AvatarFallback className="text-xs">TR</AvatarFallback>
-            </Avatar>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-semibold leading-none text-foreground">Teresa R.</p>
-              <p className="truncate text-xs leading-none text-muted-foreground mt-1">teresa@example.com</p>
-            </div>
-            <ChevronsUpDown className="size-4 shrink-0 text-muted-foreground" />
-          </div>
-        )}
+            )}
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="top" align="start" className="w-52">
+            <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
+              teresawalker@titan.com
+            </DropdownMenuLabel>
+            <DropdownMenuItem onSelect={() => openSettings("account")}>
+              <Settings className="size-4" /> Settings
+            </DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => openSettings("usage")}>
+              <ArrowUpRight className="size-4" /> Upgrade Plan
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <CircleHelp className="size-4" /> Get Help
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <LogOut className="size-4" /> Log Out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </aside>
   )

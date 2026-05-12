@@ -26,7 +26,7 @@ export function addFileSource(name: string, mimeType: string): Source {
   return source
 }
 
-export function addBankSource(name: string, opts?: { institution?: string; color?: string; initials?: string }): Source {
+export function addBankSource(name: string, opts?: { institution?: string; color?: string; initials?: string; logo?: string }): Source {
   const sources = readSources()
   const source: Source = { id: generateId(), name, kind: "bank", active: true, addedAt: Date.now(), ...opts }
   writeSources([source, ...sources])

@@ -1,10 +1,11 @@
 "use client"
 
+import Image from "next/image"
 import { useRef, useState } from "react"
 import { X, Link2, Upload } from "lucide-react"
-import { Button, Switch, Separator, Card, CardContent } from "aperia-ds5"
+import { Button, Switch, Separator, Card, CardContent, ScrollArea } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { addFileSource, toggleSource, removeSource, readSources } from "@/lib/ask-nanci/source-store"
+import { addFileSource, toggleSource, removeSource, readSources } from "@/lib/ask-nanci/sourceStore"
 import type { Source } from "@/lib/ask-nanci/types"
 import { ConnectWizard } from "./ConnectWizard"
 
@@ -38,6 +39,13 @@ function FileTypeIcon({ name }: { name: string }) {
 }
 
 function BankIcon({ source }: { source: Source }) {
+  if (source.logo) {
+    return (
+      <div className="flex size-9 shrink-0 items-center justify-center rounded-xl border bg-white p-1">
+        <Image src={source.logo} alt={source.institution ?? source.name} width={28} height={28} className="object-contain" />
+      </div>
+    )
+  }
   const initials = (source.initials ?? source.name.replace(/[^a-z0-9]/gi, "").slice(0, 2).toUpperCase()) || "BK"
   const colorClass = source.color ?? "bg-muted"
   const textClass = source.color ? "text-white" : "text-muted-foreground"
@@ -107,11 +115,12 @@ export function KnowledgeBasePanel() {
       </div>
 
       {/* Body */}
-      <div className="flex w-[480px] flex-1 flex-col gap-5 overflow-y-auto p-4">
+      <ScrollArea className="flex-1 w-[480px]">
+      <div className="flex flex-col gap-5 p-4">
 
         {/* Add Sources card */}
         <Card>
-          <CardContent className="pt-4">
+          <CardContent>
             <div className="flex items-start gap-3">
               {/* Tilted doc illustration */}
               <div className="flex size-14 shrink-0 items-center justify-center">
@@ -176,15 +185,15 @@ export function KnowledgeBasePanel() {
           </div>
         )}
       </div>
+      </ScrollArea>
 
       <input ref={fileRef} type="file" multiple className="hidden" onChange={handleFileChange} />
 
-      {wizardOpen && (
-        <ConnectWizard
-          onClose={() => setWizardOpen(false)}
-          onLinked={() => { refresh(); setWizardOpen(false) }}
-        />
-      )}
+      <ConnectWizard
+        open={wizardOpen}
+        onClose={() => setWizardOpen(false)}
+        onLinked={() => { refresh(); setWizardOpen(false) }}
+      />
     </div>
   )
 }

@@ -1,18 +1,25 @@
 "use client"
 
+import Image from "next/image"
 import { useState } from "react"
-import { ArrowLeft, X, CheckCircle2 } from "lucide-react"
-import { Button, Checkbox } from "aperia-ds5"
+import { ArrowLeft, CheckCircle2 } from "lucide-react"
+import { Button, Checkbox, Dialog, DialogContent, Input, Label } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
-import { addBankSource } from "@/lib/ask-nanci/source-store"
+import { addBankSource } from "@/lib/ask-nanci/sourceStore"
+
+const INSTITUTION_GROUPS = [
+  { key: "accounting", label: "Accounting" },
+  { key: "bank",       label: "Banks" },
+]
 
 const INSTITUTIONS = [
-  { key: "chase", name: "Chase", website: "chase.com", color: "bg-blue-700", initials: "CH" },
-  { key: "bofa", name: "Bank of America", website: "bankofamerica.com", color: "bg-red-600", initials: "BA" },
-  { key: "wellsfargo", name: "Wells Fargo", website: "wellsfargo.com", color: "bg-yellow-600", initials: "WF" },
-  { key: "amex", name: "Amex", website: "americanexpress.com", color: "bg-sky-600", initials: "AX" },
-  { key: "citi", name: "Citi", website: "citi.com", color: "bg-blue-500", initials: "CI" },
-  { key: "usbank", name: "U.S. Bank", website: "usbank.com", color: "bg-red-800", initials: "US" },
+  { key: "quickbook",  group: "accounting", name: "QuickBooks",       website: "quickbooks.com",       color: "bg-green-600",  initials: "QB", skipAccountStep: true, logo: "/fi/quickbook.svg" },
+  { key: "chase",      group: "bank",       name: "Chase",            website: "chase.com",            color: "bg-blue-700",   initials: "CH", logo: "/fi/chase.png"                    },
+  { key: "bofa",       group: "bank",       name: "Bank of America",  website: "bankofamerica.com",    color: "bg-red-600",    initials: "BA", logo: "/fi/bofa.png"                     },
+  { key: "wellsfargo", group: "bank",       name: "Wells Fargo",      website: "wellsfargo.com",       color: "bg-yellow-600", initials: "WF", logo: "/fi/wellsfargo.png"               },
+  { key: "amex",       group: "bank",       name: "Amex",             website: "americanexpress.com",  color: "bg-sky-600",    initials: "AX", logo: "/fi/amex.svg"                     },
+  { key: "citi",       group: "bank",       name: "Citi",             website: "citi.com",             color: "bg-blue-500",   initials: "CI", logo: "/fi/citi.png"                     },
+  { key: "usbank",     group: "bank",       name: "U.S. Bank",        website: "usbank.com",           color: "bg-red-800",    initials: "US", logo: "/fi/usbank.png"                   },
 ]
 
 const ACCOUNT_TYPES = [
@@ -20,113 +27,164 @@ const ACCOUNT_TYPES = [
   { key: "business", label: "Business ••3302" },
 ]
 
+type Institution = typeof INSTITUTIONS[0]
+
 interface Props {
+  open: boolean
   onClose: () => void
   onLinked: () => void
 }
 
-function FILogo({ institution, size = "md" }: { institution: typeof INSTITUTIONS[0]; size?: "sm" | "md" | "lg" }) {
-  const sizeClass = size === "lg" ? "size-16 text-xl" : size === "sm" ? "size-8 text-xs" : "size-10 text-sm"
+function FILogo({ institution, size = "md" }: { institution: Institution; size?: "sm" | "md" | "lg" }) {
+  const sizeClass = size === "lg" ? "size-16" : size === "sm" ? "size-8" : "size-10"
+  const imgSize = size === "lg" ? 64 : size === "sm" ? 32 : 40
+
+  if (institution.logo) {
+    return (
+      <div className={cn("flex shrink-0 items-center justify-center rounded-xl border bg-white p-1.5", sizeClass)}>
+        <Image src={institution.logo} alt={institution.name} width={imgSize} height={imgSize} className="object-contain" />
+      </div>
+    )
+  }
+
+  const textSize = size === "lg" ? "text-xl" : size === "sm" ? "text-xs" : "text-sm"
   return (
-    <div className={cn("flex shrink-0 items-center justify-center rounded-xl font-bold text-white", institution.color, sizeClass)}>
+    <div className={cn("flex shrink-0 items-center justify-center rounded-xl font-bold text-white", institution.color, textSize, sizeClass)}>
       {institution.initials}
     </div>
   )
 }
 
-export function ConnectWizard({ onClose, onLinked }: Props) {
+export function ConnectWizard({ open, onClose, onLinked }: Props) {
   const [step, setStep] = useState(1)
-  const [selected, setSelected] = useState<typeof INSTITUTIONS[0] | null>(null)
+  const [selected, setSelected] = useState<Institution | null>(null)
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [accounts, setAccounts] = useState<string[]>([])
+
+  function reset() {
+    setStep(1)
+    setSelected(null)
+    setUsername("")
+    setPassword("")
+    setAccounts([])
+  }
+
+  function handleOpenChange(isOpen: boolean) {
+    if (!isOpen) { reset(); onClose() }
+  }
+
+  function handleSelectFI(fi: Institution) {
+    setSelected(fi)
+    setStep(2)
+  }
+
+  function handleBack() {
+    if (step === 2) setStep(1)
+    // For skipAccountStep FIs, step 4 goes back to step 2 (no step 3)
+    else if (step === 3) setStep(2)
+    else if (step === 4) setStep(selected?.skipAccountStep ? 2 : 3)
+  }
+
+  function handleCredentialsNext() {
+    selected?.skipAccountStep ? setStep(4) : setStep(3)
+  }
+
+  function handleDone() {
+    if (selected) {
+      const linkedAccounts = selected.skipAccountStep
+        ? [{ key: "preset", label: `${selected.name} — ${username}` }]
+        : accounts.map((k) => ACCOUNT_TYPES.find((a) => a.key === k)!)
+
+      linkedAccounts.forEach((account) => {
+        addBankSource(account.label, {
+          institution: selected.name,
+          color: selected.color,
+          initials: selected.initials,
+          logo: selected.logo,
+        })
+      })
+    }
+    onLinked()
+    reset()
+    onClose()
+  }
 
   function toggleAccount(key: string) {
     setAccounts((prev) => prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key])
   }
 
-  function handleSelectFI(fi: typeof INSTITUTIONS[0]) {
-    setSelected(fi)
-    setStep(2)
-  }
-
-  function handleDone() {
-    if (selected) {
-      accounts.forEach((k) => {
-        const account = ACCOUNT_TYPES.find((a) => a.key === k)
-        addBankSource(account?.label ?? k, {
-          institution: selected.name,
-          color: selected.color,
-          initials: selected.initials,
-        })
-      })
-    }
-    onLinked()
-    onClose()
-  }
-
   const canProceedStep2 = username.trim().length > 0 && password.trim().length > 0
   const canProceedStep3 = accounts.length > 0
+  const showBack = step > 1 && step < 4
+  const stepTitle =
+    step === 1 ? "Link Account" :
+    step === 2 ? `Log in to ${selected?.name}` :
+    step === 3 ? "Select Accounts" :
+    "Account Linked"
 
   return (
-    /* Overlay */
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="relative w-full max-w-sm overflow-hidden rounded-2xl border bg-background shadow-2xl">
+    <Dialog open={open} onOpenChange={handleOpenChange}>
+      <DialogContent showCloseButton={false}>
 
         {/* Header */}
-        <div className="flex items-center justify-between border-b px-5 py-4">
-          {/* Back button — hidden on step 1 */}
+        <div className="flex items-center justify-between">
           <button
-            onClick={() => setStep((s) => s - 1)}
+            onClick={handleBack}
             className={cn(
-              "flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted transition-colors",
-              step === 1 || step === 4 ? "invisible" : "",
+              "flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted",
+              !showBack && "invisible",
             )}
           >
             <ArrowLeft className="size-4" />
           </button>
 
-          {/* Plaid-style logo placeholder */}
           <div className="flex items-center gap-2">
             {selected && step > 1 && step < 4 && <FILogo institution={selected} size="sm" />}
-            <span className="text-sm font-semibold text-foreground">
-              {step === 1 && "Link Account"}
-              {step === 2 && `Log in to ${selected?.name}`}
-              {step === 3 && "Select Accounts"}
-              {step === 4 && "Account Linked"}
-            </span>
+            {step === 1
+              ? <Image src="/logo_plaid.svg" alt="Plaid" width={55} height={20} />
+              : <span className="text-sm font-semibold text-foreground">{stepTitle}</span>
+            }
           </div>
 
           <button
-            onClick={onClose}
-            className="flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted transition-colors"
+            onClick={() => { reset(); onClose() }}
+            className="flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted"
           >
-            <X className="size-4" />
+            <span className="text-base leading-none">✕</span>
           </button>
         </div>
 
         {/* Step content */}
-        <div className="flex flex-col gap-4 p-5">
+        <div className="flex flex-col gap-4">
 
-          {/* Step 1 — Select institution */}
+          {/* Step 1 — Pick institution */}
           {step === 1 && (
             <>
               <p className="text-sm text-muted-foreground">Select your financial institution to connect.</p>
-              <div className="grid grid-cols-2 gap-2">
-                {INSTITUTIONS.map((fi) => (
-                  <button
-                    key={fi.key}
-                    onClick={() => handleSelectFI(fi)}
-                    className="flex items-center gap-2.5 rounded-xl border bg-background px-3 py-2.5 text-left transition-colors hover:bg-muted hover:border-primary/30"
-                  >
-                    <FILogo institution={fi} size="sm" />
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-foreground">{fi.name}</p>
-                      <p className="truncate text-xs text-muted-foreground">{fi.website}</p>
+              {INSTITUTION_GROUPS.map((group) => {
+                const fis = INSTITUTIONS.filter((fi) => fi.group === group.key)
+                return (
+                  <div key={group.key} className="flex flex-col gap-2">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{group.label}</p>
+                    <div className="grid grid-cols-2 gap-2">
+                      {fis.map((fi) => (
+                        <button
+                          key={fi.key}
+                          onClick={() => handleSelectFI(fi)}
+                          className="flex items-center gap-2.5 rounded-xl border bg-background px-3 py-2.5 text-left transition-colors hover:bg-muted"
+                        >
+                          <FILogo institution={fi} size="sm" />
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-medium text-foreground">{fi.name}</p>
+                            <p className="truncate text-xs text-muted-foreground">{fi.website}</p>
+                          </div>
+                        </button>
+                      ))}
                     </div>
-                  </button>
-                ))}
-              </div>
+                  </div>
+                )
+              })}
             </>
           )}
 
@@ -141,33 +199,31 @@ export function ConnectWizard({ onClose, onLinked }: Props) {
               </div>
               <div className="flex flex-col gap-3">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Username</label>
-                  <input
+                  <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Username</Label>
+                  <Input
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="Enter username"
-                    className="rounded-lg border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Password</label>
-                  <input
+                  <Label className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Password</Label>
+                  <Input
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter password"
-                    className="rounded-lg border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-ring focus:ring-2 focus:ring-ring/30"
                   />
                 </div>
               </div>
-              <Button className="w-full" disabled={!canProceedStep2} onClick={() => setStep(3)}>
+              <Button className="w-full" disabled={!canProceedStep2} onClick={handleCredentialsNext}>
                 Next
               </Button>
             </>
           )}
 
-          {/* Step 3 — Select accounts */}
+          {/* Step 3 — Select accounts (bank only) */}
           {step === 3 && selected && (
             <>
               <div className="flex flex-col items-center gap-2 text-center">
@@ -213,13 +269,20 @@ export function ConnectWizard({ onClose, onLinked }: Props) {
                     Your <strong className="text-foreground">{selected.name}</strong> account has been successfully linked to Ask Nanci.
                   </p>
                 </div>
-                <div className="flex flex-col gap-1 text-xs text-muted-foreground">
-                  {accounts.map((k) => (
-                    <span key={k} className="rounded-full border px-3 py-1">
-                      {ACCOUNT_TYPES.find((a) => a.key === k)?.label}
-                    </span>
-                  ))}
-                </div>
+                {!selected.skipAccountStep && (
+                  <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+                    {accounts.map((k) => (
+                      <span key={k} className="rounded-full border px-3 py-1">
+                        {ACCOUNT_TYPES.find((a) => a.key === k)?.label}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                {selected.skipAccountStep && (
+                  <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
+                    {selected.name} — {username}
+                  </span>
+                )}
               </div>
               <Button className="w-full" onClick={handleDone}>
                 Close
@@ -229,22 +292,7 @@ export function ConnectWizard({ onClose, onLinked }: Props) {
 
         </div>
 
-        {/* Step dots */}
-        {step < 4 && (
-          <div className="flex justify-center gap-1.5 pb-4">
-            {[1, 2, 3].map((s) => (
-              <div
-                key={s}
-                className={cn(
-                  "h-1.5 rounded-full transition-all duration-200",
-                  s === step ? "w-4 bg-primary" : "w-1.5 bg-muted-foreground/30",
-                )}
-              />
-            ))}
-          </div>
-        )}
-
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }

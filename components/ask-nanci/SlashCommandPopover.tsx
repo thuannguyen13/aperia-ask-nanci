@@ -13,15 +13,24 @@ const COMMANDS = [
     label: "/question-list",
     description: "Browse all available sample questions",
   },
+  {
+    id: "usage",
+    label: "/usage",
+    description: "Simulate reaching your daily token limit",
+  },
 ]
+
+export type SlashAction =
+  | { type: "select"; text: string }
+  | { type: "command"; id: string }
+  | { type: "dismiss" }
 
 interface Props {
   query: string
-  onSelect: (text: string) => void
-  onClose: () => void
+  onAction: (action: SlashAction) => void
 }
 
-export function SlashCommandPopover({ query, onSelect, onClose }: Props) {
+export function SlashCommandPopover({ query, onAction }: Props) {
   const [questionSearch, setQuestionSearch] = useState("")
   const [mode, setMode] = useState<"commands" | "questions">("commands")
 
@@ -36,8 +45,7 @@ export function SlashCommandPopover({ query, onSelect, onClose }: Props) {
   if (mode === "commands" && !filteredCommands.length) return null
 
   return (
-    <DropdownMenu open onOpenChange={(open) => { if (!open) onClose() }}>
-      {/* Invisible anchor — positions the content above the input's bottom-left */}
+    <DropdownMenu open onOpenChange={(open) => { if (!open) onAction({ type: "dismiss" }) }}>
       <DropdownMenuTrigger asChild>
         <span className="absolute bottom-0 left-0 size-0" />
       </DropdownMenuTrigger>
@@ -52,7 +60,11 @@ export function SlashCommandPopover({ query, onSelect, onClose }: Props) {
                 key={cmd.id}
                 onSelect={(e) => {
                   e.preventDefault()
-                  if (cmd.id === "question-list") setMode("questions")
+                  if (cmd.id === "question-list") {
+                    setMode("questions")
+                  } else {
+                    onAction({ type: "command", id: cmd.id })
+                  }
                 }}
                 className="flex-col items-start gap-0"
               >
@@ -77,7 +89,7 @@ export function SlashCommandPopover({ query, onSelect, onClose }: Props) {
               {filteredQuestions.map((q) => (
                 <DropdownMenuItem
                   key={q}
-                  onSelect={() => { onSelect(q); onClose() }}
+                  onSelect={() => onAction({ type: "select", text: q })}
                 >
                   {q}
                 </DropdownMenuItem>

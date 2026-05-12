@@ -1,8 +1,10 @@
 import type { Metadata } from "next"
+import Image from "next/image"
 import { AskNanciProvider } from "@/contexts/AskNanciContext"
-import { AskNanciSidebar } from "@/components/ask-nanci/AskNanciSidebar"
+import { Sidebar } from "@/components/ask-nanci/Sidebar"
 import { KnowledgeBasePanel } from "@/components/ask-nanci/KnowledgeBasePanel"
-import { PinPanel } from "@/components/ask-nanci/PinPanel"
+import { SettingsModal } from "@/components/ask-nanci/SettingsModal"
+import { TokenLimitDialog } from "@/components/ask-nanci/TokenLimitDialog"
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -19,21 +21,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div className="absolute inset-x-0 top-0 h-[100px] bg-primary" />
 
             <div className="relative z-10 flex h-10 shrink-0 items-center justify-center">
-              <span className="text-[11px] font-bold tracking-[0.2em] text-primary-foreground uppercase">TITAN</span>
+              <Image src="/clover-logo.svg" alt="Clover" width={80} height={24} className="h-6 w-auto" />
             </div>
 
             <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden rounded-2xl bg-sidebar shadow-sm">
-              <AskNanciSidebar />
+              <Sidebar />
 
               <div className="flex min-w-0 flex-1 gap-1 p-1">
                 <KnowledgeBasePanel />
                 <div className="flex min-w-0 flex-1 overflow-hidden rounded-[16px] border bg-background">
                   {children}
-                  <PinPanel />
                 </div>
               </div>
             </div>
           </div>
+
+          <SettingsModal />
+          <TokenLimitDialog />
         </AskNanciProvider>
       </body>
     </html>

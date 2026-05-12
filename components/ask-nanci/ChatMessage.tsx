@@ -2,9 +2,9 @@
 
 import Image from "next/image"
 import type { Message } from "@/lib/ask-nanci/types"
-import { ChatAttribution } from "./ChatAttribution"
-import { ChatSuggestions } from "./ChatSuggestions"
-import { BotChart } from "./BotChart"
+import { ChatCitedSources } from "./ChatCitedSources"
+import { SuggestedQuestions } from "./SuggestedQuestions"
+import { MessageChart } from "./MessageChart"
 
 function parseMarkdown(text: string): React.ReactNode[] {
   const parts = text.split(/(\*\*[^*]+\*\*)/g)
@@ -59,12 +59,12 @@ export function BotMessage({
         </div>
         {showExtras && (
           <>
-            {message.chart && <BotChart chart={message.chart} />}
+            {message.chart && <MessageChart chart={message.chart} />}
             {message.attributedSources?.length ? (
-              <ChatAttribution sources={message.attributedSources} />
+              <ChatCitedSources sources={message.attributedSources} />
             ) : null}
             {message.suggestions?.length ? (
-              <ChatSuggestions suggestions={message.suggestions} />
+              <SuggestedQuestions suggestions={message.suggestions} />
             ) : null}
           </>
         )}

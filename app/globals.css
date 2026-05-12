@@ -7,3 +7,10 @@
 @theme inline {
   --color-primary: green;
 }
+
+@layer base {
+  button, [role="button"], label[for],
+  [role="menuitem"], [role="option"], [role="menuitemcheckbox"], [role="menuitemradio"] {
+    cursor: pointer;
+  }
+}

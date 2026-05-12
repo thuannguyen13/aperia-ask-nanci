@@ -6,7 +6,7 @@ import { useAskNanci } from "@/contexts/AskNanciContext"
 
 const STEPS = ["Thinking", "Analyzing data", "Checking sources", "Preparing answer"]
 
-export function ChatThinking() {
+export function ThinkingIndicator() {
   const { sources } = useAskNanci()
   const [step, setStep] = useState(0)
 

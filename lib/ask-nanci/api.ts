@@ -23,7 +23,7 @@ import {
   readSessions,
   saveSession,
   deleteSession,
-} from "./session-store"
+} from "./sessionStore"
 import {
   readSources,
   writeSources,
@@ -31,7 +31,7 @@ import {
   addBankSource,
   toggleSource,
   removeSource,
-} from "./source-store"
+} from "./sourceStore"
 import { findResponse, DEFAULT_RESPONSE, DEFAULT_SUGGESTIONS } from "./mock-data"
 import { generateId } from "./utils"
 

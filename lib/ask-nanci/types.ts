@@ -11,6 +11,7 @@ export interface Source {
   institution?: string
   color?: string
   initials?: string
+  logo?: string
 }
 
 export interface ChartWidget {
@@ -37,8 +38,9 @@ export interface Session {
   updatedAt: number
 }
 
-export interface PinnedWidget {
-  id: string
-  title: string
-  chart: ChartWidget
+export interface UsageData {
+  plan: "Bronze" | "Gold" | "Diamond"
+  tokens: { used: number; limit: number }
+  chats: { used: number; limit: number }
+  files: { used: number; limit: number }
 }
