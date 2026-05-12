@@ -67,7 +67,7 @@ function WelcomeView() {
                 <button
                   key={label}
                   onClick={() => sendMessage(label)}
-                  className="flex cursor-pointer items-start gap-2 rounded-[10px] border bg-background px-3 py-2.5 text-left transition-colors hover:bg-muted"
+                  className="flex cursor-pointer items-start gap-2 rounded-[10px] border bg-card px-3 py-2.5 text-left transition-colors hover:bg-muted"
                 >
                   <CornerDownRight className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
                   <span className="text-sm font-medium text-foreground">{label}</span>
@@ -96,7 +96,7 @@ function WelcomeView() {
                     key={id}
                     onClick={() => resumeSession(id)}
                     className={cn(
-                      "flex w-full cursor-pointer flex-col gap-1 bg-background px-3 py-2.5 text-left transition-colors hover:bg-muted",
+                      "flex w-full cursor-pointer flex-col gap-1 bg-card px-3 py-2.5 text-left transition-colors hover:bg-muted",
                       i < recentSessions.length - 1 && "border-b",
                     )}
                   >
