@@ -1,10 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { MessageCirclePlus, PieChart, LifeBuoy, Send, PanelLeft, Settings, ArrowUpRight, CircleHelp, LogOut } from "lucide-react"
+import { MessageCirclePlus, PieChart, LifeBuoy, Send, PanelLeft, Settings, ArrowUpRight, CircleHelp, LogOut, Moon } from "lucide-react"
 import Image from "next/image"
+import { useTheme } from "next-themes"
 import {
-  Avatar, AvatarFallback, Button, Tooltip, TooltipTrigger, TooltipContent,
+  Avatar, AvatarFallback, Button, Switch, Tooltip, TooltipTrigger, TooltipContent,
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
   DropdownMenuLabel, DropdownMenuItem, DropdownMenuSeparator,
 } from "aperia-ds5"
@@ -57,6 +58,8 @@ function SidebarItem({
 export function Sidebar() {
   const { sessions, activeSessionId, startNewChat, resumeSession, deleteSessionById, sources, kbOpen, setKbOpen, openSettings } = useAskNanci()
   const [collapsed, setCollapsed] = useState(false)
+  const { resolvedTheme, setTheme } = useTheme()
+  const isDark = resolvedTheme === "dark"
 
   const activeCount = sources.filter((s) => s.active).length
 
@@ -226,6 +229,11 @@ export function Sidebar() {
             <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
               teresawalker@titan.com
             </DropdownMenuLabel>
+            <DropdownMenuItem onSelect={(e) => { e.preventDefault(); setTheme(isDark ? "light" : "dark") }} className="flex items-center justify-between">
+              <span className="flex items-center gap-2"><Moon className="size-4" /> Dark Mode</span>
+              <Switch checked={isDark} className="pointer-events-none" />
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={() => openSettings("account")}>
               <Settings className="size-4" /> Settings
             </DropdownMenuItem>

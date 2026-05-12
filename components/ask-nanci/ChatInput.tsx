@@ -62,14 +62,14 @@ export function ChatInput() {
         <SlashCommandPopover query={slashQuery} onAction={handleSlashAction} />
       )}
 
-      <div className="flex flex-col rounded-xl border bg-background shadow-sm transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50">
+      <div className="flex flex-col rounded-xl border bg-background dark:bg-input/30 shadow-sm transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50">
         <Textarea
           ref={textareaRef}
           placeholder="Ask anything"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="min-h-[72px] resize-none border-0 shadow-none focus-visible:ring-0 focus-visible:border-0 text-sm"
+          className="min-h-[72px] resize-none border-0 shadow-none focus-visible:ring-0 focus-visible:border-0 text-sm bg-transparent dark:bg-transparent"
         />
 
         <div className="flex items-center justify-between px-2 pb-2">

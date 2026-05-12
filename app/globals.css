@@ -5,7 +5,8 @@
 @source "../node_modules/aperia-ds5/dist";
 
 @theme inline {
-  --color-primary: green;
+  --color-primary: #218800;
+  --color-primary-foreground: oklch(0.985 0 0);
 }
 
 @layer base {
