@@ -1,0 +1,136 @@
+"use client"
+
+import { CornerDownRight, Clock, Compass } from "lucide-react"
+import Image from "next/image"
+import { Button, Tabs, TabsList, TabsTrigger } from "aperia-ds5"
+import { cn } from "aperia-ds5/utils"
+import { ChatInput } from "@/components/ask-nanci/ChatInput"
+import { ChatView } from "@/components/ask-nanci/ChatView"
+import { useAskNanci } from "@/contexts/AskNanciContext"
+import { WELCOME_SUGGESTIONS } from "@/lib/ask-nanci/mock-data"
+
+const tabs = [
+  { label: "Overview", value: "overview" },
+  { label: "Top Items", value: "top-items" },
+  { label: "Inventory", value: "inventory" },
+  { label: "Operation", value: "operation" },
+  { label: "Refunds & Voids", value: "refunds-voids" },
+  { label: "Payment", value: "payment" },
+  { label: "Tips", value: "tips" },
+]
+
+function WelcomeView() {
+  const { sendMessage, sessions, resumeSession } = useAskNanci()
+
+  const recentSessions = sessions.slice(0, 3)
+
+  return (
+    <div className="flex flex-1 flex-col justify-center items-center overflow-y-auto px-8 py-12">
+      <div className="flex w-full max-w-[800px] flex-col gap-8">
+
+        {/* Welcome header */}
+        <div className="flex flex-col items-center gap-4">
+          <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={40} height={40} />
+          <div className="text-center">
+            <p className="text-2xl font-medium text-foreground">Welcome to Ask Nanci</p>
+            <p className="text-2xl font-medium text-foreground">Ready when you are, Teresa.</p>
+          </div>
+        </div>
+
+        {/* Chat input */}
+        <ChatInput />
+
+        {/* Prompt suggestions */}
+        <div className="flex flex-col gap-6">
+          <Tabs defaultValue="overview">
+            <TabsList className="h-auto flex-wrap gap-1">
+              {tabs.map(({ label, value }) => (
+                <TabsTrigger key={value} value={value}>{label}</TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-start gap-2">
+                <Compass className="mt-0.5 size-5 shrink-0 text-foreground" />
+                <div>
+                  <p className="text-base font-medium text-foreground">Explore prompts</p>
+                  <p className="text-xs text-muted-foreground">Jumpstart your analysis with curated questions.</p>
+                </div>
+              </div>
+              <Button variant="secondary" size="sm">View All</Button>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2">
+              {WELCOME_SUGGESTIONS.map((label) => (
+                <button
+                  key={label}
+                  onClick={() => sendMessage(label)}
+                  className="flex cursor-pointer items-start gap-2 rounded-[10px] border bg-background px-3 py-2.5 text-left transition-colors hover:bg-muted"
+                >
+                  <CornerDownRight className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+                  <span className="text-sm font-medium text-foreground">{label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Recent chats */}
+          {recentSessions.length > 0 && (
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-start gap-2">
+                  <Clock className="mt-0.5 size-5 shrink-0 text-foreground" />
+                  <div>
+                    <p className="text-base font-medium text-foreground">Pick up where you left off</p>
+                    <p className="text-xs text-muted-foreground">Continue a previous conversation.</p>
+                  </div>
+                </div>
+                <Button variant="secondary" size="sm">View All</Button>
+              </div>
+
+              <div className="overflow-hidden rounded-[14px] border">
+                {recentSessions.map(({ id, title, updatedAt }, i) => (
+                  <button
+                    key={id}
+                    onClick={() => resumeSession(id)}
+                    className={cn(
+                      "flex w-full cursor-pointer flex-col gap-1 bg-background px-3 py-2.5 text-left transition-colors hover:bg-muted",
+                      i < recentSessions.length - 1 && "border-b",
+                    )}
+                  >
+                    <span className="text-sm font-medium text-foreground">{title}</span>
+                    <span className="text-sm text-muted-foreground">
+                      {new Date(updatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+      </div>
+    </div>
+  )
+}
+
+export default function AskNanciPage() {
+  const { view } = useAskNanci()
+
+  if (view === "chat") {
+    return (
+      <div className="flex min-w-0 flex-1 flex-col">
+        <ChatView />
+        <div className="shrink-0 px-4 py-4">
+          <div className="mx-auto w-full max-w-[800px]">
+            <ChatInput />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return <WelcomeView />
+}
