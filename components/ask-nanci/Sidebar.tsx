@@ -60,7 +60,6 @@ export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
   const { resolvedTheme, setTheme } = useTheme()
   const isDark = resolvedTheme === "dark"
-
   const activeCount = sources.filter((s) => s.active).length
 
   const sidebarContent = (isMobile: boolean) => (

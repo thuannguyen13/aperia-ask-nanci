@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { Suspense } from "react"
 import Image from "next/image"
 import { AskNanciProvider } from "@/contexts/AskNanciContext"
 import { ThemeProvider } from "@/components/ask-nanci/ThemeProvider"
@@ -34,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </div>
 
               <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden md:rounded-2xl bg-sidebar shadow-sm">
-                <Sidebar />
+                <Suspense fallback={null}><Sidebar /></Suspense>
 
                 <div className="flex min-w-0 flex-1 gap-1 p-1">
                   <KnowledgeBasePanel />
