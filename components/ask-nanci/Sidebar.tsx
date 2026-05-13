@@ -56,25 +56,19 @@ function SidebarItem({
 }
 
 export function Sidebar() {
-  const { sessions, activeSessionId, startNewChat, resumeSession, deleteSessionById, sources, kbOpen, setKbOpen, openSettings } = useAskNanci()
+  const { sessions, activeSessionId, startNewChat, resumeSession, deleteSessionById, sources, kbOpen, setKbOpen, openSettings, mobileSidebarOpen, setMobileSidebarOpen } = useAskNanci()
   const [collapsed, setCollapsed] = useState(false)
   const { resolvedTheme, setTheme } = useTheme()
   const isDark = resolvedTheme === "dark"
 
   const activeCount = sources.filter((s) => s.active).length
 
-  return (
-    <aside
-      className={cn(
-        "relative flex h-full shrink-0 flex-col bg-sidebar overflow-hidden transition-[width] duration-200 ease-in-out",
-        collapsed ? "w-12" : "w-64",
-      )}
-    >
+  const sidebarContent = (isMobile: boolean) => (
+    <>
       {/* Header */}
       <div className="flex items-center justify-between p-2 min-w-[256px]">
-        {/* Logo / expand trigger */}
         <div className="flex h-9 shrink-0 items-center gap-2 px-2">
-          {collapsed ? (
+          {!isMobile && collapsed ? (
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
@@ -103,27 +97,36 @@ export function Sidebar() {
           )}
         </div>
 
-        {/* Collapse button — only shown when expanded */}
-        <button
-          onClick={() => setCollapsed(true)}
-          className={cn(
-            "flex size-6 items-center justify-center rounded text-muted-foreground hover:bg-muted transition-colors",
-            collapsed && "pointer-events-none opacity-0",
-          )}
-        >
-          <PanelLeft className="size-4" />
-        </button>
+        {/* Close button */}
+        {isMobile ? (
+          <button
+            onClick={() => setMobileSidebarOpen(false)}
+            className="flex size-6 items-center justify-center rounded text-muted-foreground hover:bg-muted transition-colors"
+          >
+            <PanelLeft className="size-4" />
+          </button>
+        ) : (
+          <button
+            onClick={() => setCollapsed(true)}
+            className={cn(
+              "flex size-6 items-center justify-center rounded text-muted-foreground hover:bg-muted transition-colors",
+              collapsed && "pointer-events-none opacity-0",
+            )}
+          >
+            <PanelLeft className="size-4" />
+          </button>
+        )}
       </div>
 
       {/* Scrollable body */}
       <div className="flex flex-1 flex-col overflow-y-auto pb-60 min-w-12">
-        <div className={cn("p-2", collapsed && "px-1")}>
-          <SidebarItem icon={MessageCirclePlus} label="New Chat" collapsed={collapsed} onClick={startNewChat} />
-          <SidebarItem icon={PieChart} label="Insights" collapsed={collapsed} />
+        <div className={cn("p-2", !isMobile && collapsed && "px-1")}>
+          <SidebarItem icon={MessageCirclePlus} label="New Chat" collapsed={!isMobile && collapsed} onClick={startNewChat} />
+          <SidebarItem icon={PieChart} label="Insights" collapsed={!isMobile && collapsed} />
         </div>
 
         {/* Recent chats — hidden when collapsed */}
-        {!collapsed && sessions.length > 0 && (
+        {(isMobile || !collapsed) && sessions.length > 0 && (
           <div className="p-2">
             <p className="mb-1 flex h-8 items-center px-2 text-xs font-medium text-foreground opacity-70">
               Recent Chat
@@ -138,7 +141,7 @@ export function Sidebar() {
               >
                 <button
                   className="min-w-0 flex-1 truncate text-sm text-foreground text-left"
-                  onClick={() => resumeSession(session.id)}
+                  onClick={() => { resumeSession(session.id); if (isMobile) setMobileSidebarOpen(false) }}
                 >
                   {session.title}
                 </button>
@@ -159,16 +162,13 @@ export function Sidebar() {
       <div
         className={cn(
           "absolute bottom-0 left-0 right-0 p-2 pb-3 transition-[width,opacity] duration-200",
-          collapsed ? "w-12" : "w-64",
+          !isMobile && collapsed ? "w-12" : "w-64",
         )}
       >
         {/* Cards — hidden when collapsed */}
-        {!collapsed && (
+        {(isMobile || !collapsed) && (
           <div className="flex flex-col gap-2 mb-1">
-            {/* Usage card */}
             <UsageCard />
-
-            {/* KB card */}
             <div className="relative overflow-hidden rounded-[10px] border p-4 shadow-sm">
               <div className="pointer-events-none absolute right-2 top-0 flex h-20 w-20 items-center justify-center">
                 <div style={{ transform: "rotate(-12.88deg)" }}>
@@ -193,15 +193,15 @@ export function Sidebar() {
           </div>
         )}
 
-        <div className={cn(collapsed && "px-1")}>
+        <div className={cn(!isMobile && collapsed && "px-1")}>
           {footerNav.map(({ icon, label }) => (
-            <SidebarItem key={label} icon={icon} label={label} collapsed={collapsed} />
+            <SidebarItem key={label} icon={icon} label={label} collapsed={!isMobile && collapsed} />
           ))}
         </div>
 
         {/* User row with dropdown */}
         <DropdownMenu>
-          {collapsed ? (
+          {!isMobile && collapsed ? (
             <Tooltip>
               <TooltipTrigger asChild>
                 <DropdownMenuTrigger asChild>
@@ -252,6 +252,38 @@ export function Sidebar() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </aside>
+    </>
+  )
+
+  return (
+    <>
+      {/* Desktop sidebar */}
+      <aside
+        className={cn(
+          "relative hidden md:flex h-full shrink-0 flex-col bg-sidebar overflow-hidden transition-[width] duration-200 ease-in-out",
+          collapsed ? "w-12" : "w-64",
+        )}
+      >
+        {sidebarContent(false)}
+      </aside>
+
+      {/* Mobile overlay backdrop */}
+      {mobileSidebarOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/40 md:hidden"
+          onClick={() => setMobileSidebarOpen(false)}
+        />
+      )}
+
+      {/* Mobile sidebar */}
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 flex h-full w-72 flex-col bg-sidebar shadow-xl transition-transform duration-200 ease-in-out md:hidden",
+          mobileSidebarOpen ? "translate-x-0" : "-translate-x-full",
+        )}
+      >
+        {sidebarContent(true)}
+      </aside>
+    </>
   )
 }

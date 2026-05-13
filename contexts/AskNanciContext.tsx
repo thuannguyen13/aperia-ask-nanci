@@ -42,6 +42,8 @@ interface AskNanciCtx {
   settingsTab: string
   openSettings: (tab?: string) => void
   setSettingsOpen: (open: boolean) => void
+  mobileSidebarOpen: boolean
+  setMobileSidebarOpen: (open: boolean) => void
 }
 
 const Ctx = createContext<AskNanciCtx | null>(null)
@@ -66,6 +68,7 @@ export function AskNanciProvider({ children }: { children: React.ReactNode }) {
   const [tokenLimitReached, setTokenLimitReached] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [settingsTab, setSettingsTab] = useState("usage")
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const stopRef = useRef<boolean>(false)
   const sessionIdRef = useRef<string>(newSessionId())
 
@@ -221,6 +224,7 @@ export function AskNanciProvider({ children }: { children: React.ReactNode }) {
       usage: MOCK_USAGE,
       tokenLimitReached, setTokenLimitReached,
       settingsOpen, settingsTab, openSettings, setSettingsOpen,
+      mobileSidebarOpen, setMobileSidebarOpen,
     }}>
       {children}
     </Ctx.Provider>
