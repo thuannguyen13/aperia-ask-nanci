@@ -4,6 +4,7 @@ import Image from "next/image"
 import { useRef, useState } from "react"
 import { X, Link2, Upload } from "lucide-react"
 import { Button, Switch, Separator, Card, CardContent, ScrollArea } from "aperia-ds5"
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { addFileSource, toggleSource, removeSource, readSources } from "@/lib/ask-nanci/sourceStore"
 import type { Source } from "@/lib/ask-nanci/types"
@@ -152,24 +153,24 @@ export function KnowledgeBasePanel() {
         </Card>
 
         {/* Sources section */}
-        {hasSources && (
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-col gap-1">
-              <p className="text-sm font-semibold text-foreground">Sources</p>
-              <p className="text-xs text-muted-foreground">
-                Added sources will be used as reference for Ask Nanci when generating responses.
-              </p>
-            </div>
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-1">
+            <p className="text-sm font-semibold text-foreground">Sources</p>
+            <p className="text-xs text-muted-foreground">
+              Added sources will be used as reference for Ask Nanci when generating responses.
+            </p>
+          </div>
 
-            {/* Static payment data integration banner */}
-            <div className="flex items-center gap-2 rounded-md border bg-muted px-3 py-2">
-              <svg viewBox="0 0 24 24" className="size-4 shrink-0 text-primary" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76" />
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8M12 18V6" />
-              </svg>
-              <span className="text-xs font-medium text-primary">Payment data connected</span>
-            </div>
+          {/* Static payment data integration banner */}
+          <div className="flex items-center justify-center gap-2 rounded-md border bg-muted px-3 py-2">
+            <svg viewBox="0 0 24 24" className="size-4 shrink-0 text-primary" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76" />
+              <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8M12 18V6" />
+            </svg>
+            <span className="text-xs font-medium text-primary">Payment data connected</span>
+          </div>
 
+          {hasSources ? (
             <div className="flex flex-col">
               {sources.map((s, i) => (
                 <div key={s.id}>
@@ -182,8 +183,18 @@ export function KnowledgeBasePanel() {
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          ) : (
+            <Empty className="border">
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <Upload />
+                </EmptyMedia>
+                <EmptyTitle>No sources added yet</EmptyTitle>
+                <EmptyDescription>Upload a file or link an account to get started.</EmptyDescription>
+              </EmptyHeader>
+            </Empty>
+          )}
+        </div>
       </div>
       </ScrollArea>
 

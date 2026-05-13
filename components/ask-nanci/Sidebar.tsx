@@ -201,19 +201,21 @@ export function Sidebar() {
 
         {/* User row with dropdown */}
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            {collapsed ? (
-              <Tooltip>
-                <TooltipTrigger asChild>
+          {collapsed ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
                   <div className="mt-1 flex cursor-pointer items-center justify-center rounded-md px-2 py-1.5 hover:bg-muted transition-colors">
                     <Avatar className="size-7 shrink-0">
                       <AvatarFallback className="text-xs">TR</AvatarFallback>
                     </Avatar>
                   </div>
-                </TooltipTrigger>
-                <TooltipContent side="right">Teresa R. · teresa@example.com</TooltipContent>
-              </Tooltip>
-            ) : (
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent side="right">Teresa R. · teresa@example.com</TooltipContent>
+            </Tooltip>
+          ) : (
+            <DropdownMenuTrigger asChild>
               <div className="mt-1 flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted transition-colors">
                 <Avatar className="size-7 shrink-0">
                   <AvatarFallback className="text-xs">TR</AvatarFallback>
@@ -223,8 +225,8 @@ export function Sidebar() {
                   <p className="truncate text-xs leading-none text-muted-foreground mt-1">teresa@example.com</p>
                 </div>
               </div>
-            )}
-          </DropdownMenuTrigger>
+            </DropdownMenuTrigger>
+          )}
           <DropdownMenuContent side="top" align="start" className="w-52">
             <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
               teresawalker@titan.com

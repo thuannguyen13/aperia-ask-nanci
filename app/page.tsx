@@ -42,8 +42,8 @@ function WelcomeView() {
 
         {/* Prompt suggestions */}
         <div className="flex flex-col gap-6">
-          <Tabs defaultValue="overview">
-            <TabsList className="h-auto flex-wrap gap-1">
+          <Tabs defaultValue="overview" className="mx-auto">
+            <TabsList className="h-auto flex-wrap items-center gap-1">
               {tabs.map(({ label, value }) => (
                 <TabsTrigger key={value} value={value}>{label}</TabsTrigger>
               ))}
