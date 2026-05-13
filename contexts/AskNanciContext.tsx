@@ -99,6 +99,7 @@ export function AskNanciProvider({ children }: { children: React.ReactNode }) {
   const sendMessage = useCallback((text: string) => {
     if (!text.trim() || chatState !== "idle") return
     const userMsg: Message = { id: newSessionId(), role: "user", content: text.trim() }
+    const sentSessionId = sessionIdRef.current
 
     setView("chat")
     setChatState("thinking")
@@ -121,7 +122,7 @@ export function AskNanciProvider({ children }: { children: React.ReactNode }) {
       let started = false
 
       try {
-        for await (const chunk of streamChat(allMsgs, activeSources, sessionIdRef.current)) {
+        for await (const chunk of streamChat(allMsgs, activeSources, sentSessionId)) {
           if (stopRef.current) break
 
           if (chunk.type === "token") {
@@ -155,6 +156,13 @@ export function AskNanciProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (botMsg.content) {
+        // If the session changed (user started a new chat), discard the partial
+        // bot response rather than saving it under the wrong session ID.
+        if (sessionIdRef.current !== sentSessionId) {
+          setChatState("idle")
+          setPendingBot(null)
+          return
+        }
         appendBotMessage({ ...botMsg, stopped: true })
       } else {
         setChatState("idle")
