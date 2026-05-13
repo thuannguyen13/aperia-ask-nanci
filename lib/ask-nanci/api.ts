@@ -55,10 +55,11 @@ export async function* streamChat(
   const suggestions = match?.suggestions ?? DEFAULT_SUGGESTIONS
   const chart = match?.chart
 
-  // Emit tokens character by character to simulate streaming
-  for (const char of text) {
-    yield { type: "token", content: char }
-    await new Promise((r) => setTimeout(r, 12))
+  // Emit tokens word by word to simulate streaming
+  const words = text.match(/\S+|\s+/g) ?? []
+  for (const word of words) {
+    yield { type: "token", content: word }
+    await new Promise((r) => setTimeout(r, 20))
   }
 
   if (suggestions.length) yield { type: "suggestions", items: suggestions }

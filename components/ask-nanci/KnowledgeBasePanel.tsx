@@ -5,6 +5,7 @@ import { useRef, useState } from "react"
 import { X, Link2, Upload } from "lucide-react"
 import { Button, Switch, Separator, Card, CardContent, ScrollArea } from "aperia-ds5"
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "aperia-ds5"
+import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { addFileSource, toggleSource, removeSource, readSources } from "@/lib/ask-nanci/sourceStore"
 import type { Source } from "@/lib/ask-nanci/types"
@@ -100,15 +101,10 @@ export function KnowledgeBasePanel() {
     e.target.value = ""
   }
 
-  return (
-    <div
-      className={`flex h-full shrink-0 flex-col overflow-hidden rounded-[18px] border bg-background transition-[width,opacity] duration-200 ease-in-out ${
-        kbOpen ? "w-[480px] opacity-100" : "w-0 opacity-0 border-0 pointer-events-none"
-      }`}
-    >
-
+  const panelContent = (
+    <>
       {/* Header */}
-      <div className="flex w-[480px] shrink-0 items-center justify-between px-4 py-3">
+      <div className="flex shrink-0 items-center justify-between px-4 py-3">
         <h2 className="text-base font-semibold text-foreground">Knowledge Base</h2>
         <Button variant="ghost" size="icon-sm" onClick={() => setKbOpen(false)}>
           <X className="size-4" />
@@ -116,86 +112,84 @@ export function KnowledgeBasePanel() {
       </div>
 
       {/* Body */}
-      <ScrollArea className="flex-1 w-[480px]">
-      <div className="flex flex-col gap-5 p-4">
+      <ScrollArea className="flex-1">
+        <div className="flex flex-col gap-5 p-4">
 
-        {/* Add Sources card */}
-        <Card>
-          <CardContent>
-            <div className="flex items-start gap-3">
-              {/* Tilted doc illustration */}
-              <div className="flex size-14 shrink-0 items-center justify-center">
-                <div style={{ transform: "rotate(-13deg)" }}>
-                  <svg viewBox="0 0 30 37.5" className="h-12 w-9" fill="none">
-                    <path d="M2 0h18l10 10v25.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2Z" className="fill-primary/10 stroke-primary/30" strokeWidth="1" />
-                    <path d="M20 0l10 10H22a2 2 0 0 1-2-2V0Z" className="fill-primary/30" />
-                    <rect x="5" y="14" width="16" height="2" rx="1" className="fill-primary/40" />
-                    <rect x="5" y="19" width="10" height="2" rx="1" className="fill-primary/40" />
-                  </svg>
+          {/* Add Sources card */}
+          <Card>
+            <CardContent>
+              <div className="flex items-start gap-3">
+                <div className="flex size-14 shrink-0 items-center justify-center">
+                  <div style={{ transform: "rotate(-13deg)" }}>
+                    <svg viewBox="0 0 30 37.5" className="h-12 w-9" fill="none">
+                      <path d="M2 0h18l10 10v25.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2Z" className="fill-primary/10 stroke-primary/30" strokeWidth="1" />
+                      <path d="M20 0l10 10H22a2 2 0 0 1-2-2V0Z" className="fill-primary/30" />
+                      <rect x="5" y="14" width="16" height="2" rx="1" className="fill-primary/40" />
+                      <rect x="5" y="19" width="10" height="2" rx="1" className="fill-primary/40" />
+                    </svg>
+                  </div>
+                </div>
+                <div className="flex flex-1 flex-col gap-2">
+                  <p className="text-sm font-semibold text-foreground">Add Sources to Get Started</p>
+                  <p className="text-xs leading-4 text-muted-foreground">
+                    Upload files or add link to import your data. Your imports will be used to enhance Nanci's knowledge base.
+                  </p>
+                  <div className="flex gap-2">
+                    <Button size="sm" className="flex-1" onClick={() => setWizardOpen(true)}>
+                      <Link2 className="size-3.5" /> Link Accounts
+                    </Button>
+                    <Button size="sm" variant="secondary" className="flex-1" onClick={() => fileRef.current?.click()}>
+                      <Upload className="size-3.5" /> Upload File
+                    </Button>
+                  </div>
                 </div>
               </div>
-              <div className="flex flex-1 flex-col gap-2">
-                <p className="text-sm font-semibold text-foreground">Add Sources to Get Started</p>
-                <p className="text-xs leading-4 text-muted-foreground">
-                  Upload files or add link to import your data. Your imports will be used to enhance Nanci's knowledge base.
-                </p>
-                <div className="flex gap-2">
-                  <Button size="sm" className="flex-1" onClick={() => setWizardOpen(true)}>
-                    <Link2 className="size-3.5" /> Link Accounts
-                  </Button>
-                  <Button size="sm" variant="secondary" className="flex-1" onClick={() => fileRef.current?.click()}>
-                    <Upload className="size-3.5" /> Upload File
-                  </Button>
-                </div>
+            </CardContent>
+          </Card>
+
+          {/* Sources section */}
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-1">
+              <p className="text-sm font-semibold text-foreground">Sources</p>
+              <p className="text-xs text-muted-foreground">
+                Added sources will be used as reference for Ask Nanci when generating responses.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-center gap-2 rounded-md border bg-muted px-3 py-2">
+              <svg viewBox="0 0 24 24" className="size-4 shrink-0 text-primary" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76" />
+                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8M12 18V6" />
+              </svg>
+              <span className="text-xs font-medium text-primary">Payment data connected</span>
+            </div>
+
+            {hasSources ? (
+              <div className="flex flex-col">
+                {sources.map((s, i) => (
+                  <div key={s.id}>
+                    <SourceRow
+                      source={s}
+                      onToggle={() => handleToggle(s.id)}
+                      onRemove={() => handleRemove(s.id)}
+                    />
+                    {i < sources.length - 1 && <Separator />}
+                  </div>
+                ))}
               </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Sources section */}
-        <div className="flex flex-col gap-3">
-          <div className="flex flex-col gap-1">
-            <p className="text-sm font-semibold text-foreground">Sources</p>
-            <p className="text-xs text-muted-foreground">
-              Added sources will be used as reference for Ask Nanci when generating responses.
-            </p>
+            ) : (
+              <Empty className="border">
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <Upload />
+                  </EmptyMedia>
+                  <EmptyTitle>No sources added yet</EmptyTitle>
+                  <EmptyDescription>Upload a file or link an account to get started.</EmptyDescription>
+                </EmptyHeader>
+              </Empty>
+            )}
           </div>
-
-          {/* Static payment data integration banner */}
-          <div className="flex items-center justify-center gap-2 rounded-md border bg-muted px-3 py-2">
-            <svg viewBox="0 0 24 24" className="size-4 shrink-0 text-primary" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76" />
-              <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8M12 18V6" />
-            </svg>
-            <span className="text-xs font-medium text-primary">Payment data connected</span>
-          </div>
-
-          {hasSources ? (
-            <div className="flex flex-col">
-              {sources.map((s, i) => (
-                <div key={s.id}>
-                  <SourceRow
-                    source={s}
-                    onToggle={() => handleToggle(s.id)}
-                    onRemove={() => handleRemove(s.id)}
-                  />
-                  {i < sources.length - 1 && <Separator />}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <Empty className="border">
-              <EmptyHeader>
-                <EmptyMedia variant="icon">
-                  <Upload />
-                </EmptyMedia>
-                <EmptyTitle>No sources added yet</EmptyTitle>
-                <EmptyDescription>Upload a file or link an account to get started.</EmptyDescription>
-              </EmptyHeader>
-            </Empty>
-          )}
         </div>
-      </div>
       </ScrollArea>
 
       <input ref={fileRef} type="file" multiple className="hidden" onChange={handleFileChange} />
@@ -205,6 +199,38 @@ export function KnowledgeBasePanel() {
         onClose={() => setWizardOpen(false)}
         onLinked={() => { refresh(); setWizardOpen(false) }}
       />
-    </div>
+    </>
+  )
+
+  return (
+    <>
+      {/* Mobile backdrop */}
+      {kbOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/40 md:hidden"
+          onClick={() => setKbOpen(false)}
+        />
+      )}
+
+      {/* Mobile: full-screen slide-in from right */}
+      <div
+        className={cn(
+          "fixed inset-0 z-50 flex flex-col bg-background transition-transform duration-200 ease-in-out md:hidden",
+          kbOpen ? "translate-x-0" : "translate-x-full",
+        )}
+      >
+        {panelContent}
+      </div>
+
+      {/* Desktop: inline side panel */}
+      <div
+        className={cn(
+          "relative hidden h-full shrink-0 flex-col overflow-hidden rounded-[18px] border bg-background transition-[width,opacity] duration-200 ease-in-out md:flex",
+          kbOpen ? "w-[480px] opacity-100" : "w-0 opacity-0 border-0 pointer-events-none",
+        )}
+      >
+        {panelContent}
+      </div>
+    </>
   )
 }

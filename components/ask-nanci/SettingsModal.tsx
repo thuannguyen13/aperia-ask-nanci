@@ -30,7 +30,7 @@ function UsagePage() {
     <div className="flex flex-col gap-6">
 
       {/* Stat cards */}
-      <div className="flex gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row">
         <div className="flex flex-1 flex-col gap-2 rounded-xl border bg-background p-4 shadow-xs">
           <p className="text-xs font-medium text-muted-foreground">Tokens Used</p>
           <div className="flex flex-col gap-0.5">
@@ -83,7 +83,7 @@ function UsagePage() {
       {/* Plan comparison */}
       <div className="flex flex-col gap-2">
         <p className="text-xs font-semibold">Plan Comparison</p>
-        <div className="flex gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row">
           {PLAN_TIERS.map((tier) => {
             const isCurrent = tier.name === usage.plan
             return (
@@ -169,34 +169,34 @@ export function SettingsModal() {
     <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
       <DialogContent
         showCloseButton={false}
-        className="p-0 gap-0 overflow-hidden"
+        className="p-0 gap-0 overflow-hidden max-sm:inset-0 max-sm:top-0 max-sm:left-0 max-sm:translate-x-0 max-sm:translate-y-0 max-sm:h-screen max-sm:w-screen max-sm:max-w-full max-sm:rounded-none"
         style={{ maxWidth: "min(800px, calc(100vw - 2rem))", width: "100%" }}
       >
         <DialogTitle className="sr-only">Settings</DialogTitle>
-        <div className="flex max-h-[80vh] w-full overflow-hidden">
+        <div className="flex flex-col sm:flex-row max-h-screen sm:max-h-[80vh] w-full overflow-hidden h-full sm:h-auto">
 
-          {/* Left nav */}
-          <div className="flex w-64 shrink-0 flex-col border-r bg-sidebar p-2">
+          {/* Nav — vertical on desktop, horizontal scroll strip on mobile */}
+          <div className="flex shrink-0 flex-row overflow-x-auto border-b bg-sidebar sm:w-64 sm:flex-col sm:border-b-0 sm:border-r sm:overflow-x-visible sm:p-2">
             {NAV_ITEMS.map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
                 onClick={() => openSettings(id)}
                 className={cn(
-                  "flex items-center gap-2 rounded-md px-2 py-2 text-sm text-foreground transition-colors hover:bg-muted",
-                  settingsTab === id && "bg-muted font-medium",
+                  "flex shrink-0 items-center gap-2 px-3 py-3 text-sm text-foreground transition-colors hover:bg-muted sm:w-full sm:rounded-md sm:px-2 sm:py-2",
+                  settingsTab === id && "border-b-2 border-foreground font-medium sm:border-b-0 sm:bg-muted",
                 )}
               >
                 <Icon className="size-4 shrink-0" />
-                {label}
+                <span className="whitespace-nowrap sm:whitespace-normal">{label}</span>
               </button>
             ))}
           </div>
 
           {/* Right content */}
-          <div className="flex w-0 flex-1 flex-col overflow-hidden">
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
 
             {/* Header */}
-            <div className="flex h-16 shrink-0 items-center justify-between border-b px-4">
+            <div className="flex h-14 shrink-0 items-center justify-between border-b px-4">
               <div className="flex items-center gap-2 text-sm">
                 <span className="text-muted-foreground">Settings</span>
                 <span className="text-muted-foreground">/</span>

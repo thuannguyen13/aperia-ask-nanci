@@ -25,7 +25,7 @@ function WelcomeView() {
   const recentSessions = sessions.slice(0, 3)
 
   return (
-    <div className="flex flex-1 flex-col justify-center items-center overflow-y-auto px-8 py-12">
+    <div className="flex flex-1 flex-col justify-center items-center overflow-y-auto px-4 py-8 md:px-8 md:py-12">
       <div className="flex w-full max-w-[800px] flex-col gap-8">
 
         {/* Welcome header */}
@@ -42,10 +42,10 @@ function WelcomeView() {
 
         {/* Prompt suggestions */}
         <div className="flex flex-col gap-6">
-          <Tabs defaultValue="overview" className="mx-auto">
-            <TabsList className="h-auto flex-wrap items-center gap-1">
+          <Tabs defaultValue="overview" className="w-full">
+            <TabsList className="h-auto w-full justify-start gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden flex-nowrap">
               {tabs.map(({ label, value }) => (
-                <TabsTrigger key={value} value={value}>{label}</TabsTrigger>
+                <TabsTrigger key={value} value={value} className="shrink-0">{label}</TabsTrigger>
               ))}
             </TabsList>
           </Tabs>
@@ -62,7 +62,7 @@ function WelcomeView() {
               <Button variant="secondary" size="sm">View All</Button>
             </div>
 
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
               {WELCOME_SUGGESTIONS.map((label) => (
                 <button
                   key={label}
@@ -123,7 +123,7 @@ export default function AskNanciPage() {
     return (
       <div className="flex min-w-0 flex-1 flex-col">
         <ChatView />
-        <div className="shrink-0 px-4 py-4">
+        <div className="shrink-0 px-3 py-3 md:px-4 md:py-4">
           <div className="mx-auto w-full max-w-[800px]">
             <ChatInput />
           </div>

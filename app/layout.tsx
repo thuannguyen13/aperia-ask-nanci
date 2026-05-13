@@ -21,7 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ThemeProvider>
           <AskNanciProvider>
-            <div className="relative flex h-screen flex-col bg-primary/10 px-2 pb-2">
+            <div className="relative flex h-screen flex-col bg-primary/10 md:px-2 md:pb-2">
               <div className="absolute inset-x-0 top-0 h-[100px] bg-primary" />
 
               {/* Top bar */}
@@ -33,12 +33,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <Image src="/clover-logo.svg" alt="Clover" width={80} height={24} className="h-6 w-auto" />
               </div>
 
-              <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden rounded-2xl bg-sidebar shadow-sm">
+              <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden md:rounded-2xl bg-sidebar shadow-sm">
                 <Sidebar />
 
                 <div className="flex min-w-0 flex-1 gap-1 p-1">
                   <KnowledgeBasePanel />
-                  <div className="flex min-w-0 flex-1 overflow-hidden rounded-[16px] border bg-background">
+                  <div className="flex min-w-0 flex-1 overflow-hidden rounded-[12px] md:rounded-[16px] border bg-background">
                     {children}
                   </div>
                 </div>

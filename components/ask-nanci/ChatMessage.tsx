@@ -1,5 +1,6 @@
 "use client"
 
+import { memo } from "react"
 import Image from "next/image"
 import type { Message } from "@/lib/ask-nanci/types"
 import { ChatCitedSources } from "./ChatCitedSources"
@@ -29,7 +30,7 @@ function renderContent(content: string) {
   })
 }
 
-export function UserMessage({ message }: { message: Message }) {
+function UserMessageBase({ message }: { message: Message }) {
   return (
     <div className="flex justify-end px-4 py-2">
       <div className="max-w-[75%] rounded-2xl rounded-tr-sm bg-primary px-4 py-2.5 text-sm text-white">
@@ -39,7 +40,7 @@ export function UserMessage({ message }: { message: Message }) {
   )
 }
 
-export function BotMessage({
+function BotMessageBase({
   message,
   displayedContent,
   showExtras,
@@ -72,3 +73,6 @@ export function BotMessage({
     </div>
   )
 }
+
+export const UserMessage = memo(UserMessageBase)
+export const BotMessage = memo(BotMessageBase)

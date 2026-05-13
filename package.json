@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "aperia-ds5": "^0.1.2",
+    "aperia-ds5": "^0.1.3",
     "class-variance-authority": "^0.7.1",
     "lucide-react": "^1.8.0",
     "next": "16.1.7",

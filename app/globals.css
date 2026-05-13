@@ -1,8 +1,6 @@
 @import "tailwindcss";
-@import "tw-animate-css";
 @import "aperia-ds5/base.css";
 
-@source "../node_modules/aperia-ds5/dist";
 
 @theme inline {
   --color-primary: #218800;
