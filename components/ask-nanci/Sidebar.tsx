@@ -100,7 +100,7 @@ export function Sidebar() {
         {isMobile ? (
           <button
             onClick={() => setMobileSidebarOpen(false)}
-            className="flex size-6 items-center justify-center rounded text-muted-foreground hover:bg-muted transition-colors"
+            className="flex size-6 items-center justify-center rounded text-foreground hover:bg-muted transition-colors"
           >
             <PanelLeft className="size-4" />
           </button>
@@ -108,7 +108,7 @@ export function Sidebar() {
           <button
             onClick={() => setCollapsed(true)}
             className={cn(
-              "flex size-6 items-center justify-center rounded text-muted-foreground hover:bg-muted transition-colors",
+              "flex size-6 items-center justify-center rounded text-foreground hover:bg-muted transition-colors",
               collapsed && "pointer-events-none opacity-0",
             )}
           >
