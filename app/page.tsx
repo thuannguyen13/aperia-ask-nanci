@@ -1,5 +1,6 @@
 "use client"
 
+import { Suspense } from "react"
 import { CornerDownRight, Clock, Compass, BookOpen } from "lucide-react"
 import Image from "next/image"
 import { useSearchParams } from "next/navigation"
@@ -158,5 +159,5 @@ export default function AskNanciPage() {
     )
   }
 
-  return <WelcomeView />
+  return <Suspense fallback={null}><WelcomeView /></Suspense>
 }
