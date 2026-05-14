@@ -83,7 +83,7 @@ export function ChatInput() {
               <DropdownMenuContent side="top" align="start">
                 <DropdownMenuItem onSelect={() => setWizardOpen(true)}>
                   <Link2 className="size-4" />
-                  Link Account
+                  Link Accounts
                 </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => fileRef.current?.click()}>
                   <Upload className="size-4" />

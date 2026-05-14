@@ -2,9 +2,17 @@
 @import "aperia-ds5/base.css";
 
 
-@theme inline {
+
+:root {
   --color-primary: #218800;
   --color-primary-foreground: oklch(0.985 0 0);
+  --ring: var(--color-primary);
+}
+
+
+@theme inline {
+  --color-primary: var(--color-primary);
+  --color-primary-foreground: var(--color-primary-foreground);
 }
 
 @layer base {

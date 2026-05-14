@@ -166,33 +166,25 @@ export function Sidebar() {
         {/* Cards — hidden when collapsed */}
         {(isMobile || !collapsed) && (
           <div className="flex flex-col gap-2 mb-4">
-            
-            <div className="relative bg-card overflow-hidden rounded-[10px] border p-4 shadow-sm">
-              <div className="pointer-events-none absolute right-2 top-0 flex h-20 w-20 items-center justify-center">
-                <div style={{ transform: "rotate(-12.88deg)" }}>
-                  <svg viewBox="0 0 30 37.5" className="h-16 w-12 opacity-60" fill="none">
-                    <path d="M2 0h18l10 10v25.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2Z" fill="#dbeafe" stroke="#93c5fd" strokeWidth="1" />
-                    <path d="M20 0l10 10H22a2 2 0 0 1-2-2V0Z" fill="#93c5fd" />
-                    <rect x="5" y="14" width="16" height="2" rx="1" fill="#3b82f6" opacity=".5" />
-                    <rect x="5" y="19" width="10" height="2" rx="1" fill="#3b82f6" opacity=".5" />
-                  </svg>
+            {!kbOpen && (
+              <div className="relative bg-card rounded-[10px] border p-4 shadow-sm overflow-hidden">
+                <div className="pointer-events-none absolute top-3 -right-3">
+                  <Image src="/ask-nanci/img_kb-illustration.png" alt="" width={72} height={72} className="size-20 object-contain" />
                 </div>
+                <div className="pr-12 flex flex-col items-start gap-1">
+                  <p className="text-sm font-semibold text-foreground">Teach Nanci</p>
+                  <p className="text-sm text-muted-foreground">
+                    Add your other financial accounts, including your bookkeeping software to improve Nanci.
+                  </p>
+                </div>
+                <Button className="w-full mt-3" size="sm" onClick={() => setKbOpen(true)}>
+                  Link Accounts
+                </Button>
               </div>
-              <div className="mb-3 pr-12">
-                <p className="text-sm font-semibold leading-5 text-foreground">Teach Nanci</p>
-                <p className="text-xs font-medium leading-4 text-muted-foreground">
-                  Add your other financial accounts, including your bookkeeping software to improve Nanci.
-                </p>
-              </div>
-              <Button className="w-full" size="sm" onClick={() => setKbOpen(!kbOpen)}>
-                {kbOpen ? "Close Knowledge Base" : "Link Account"}
-              </Button>
-            </div>
+            )}
             <UsageCard />
           </div>
         )}
-
-        
 
         {/* User row with dropdown */}
         <DropdownMenu>

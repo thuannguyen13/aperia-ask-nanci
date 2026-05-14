@@ -3,7 +3,7 @@
 import Image from "next/image"
 import { useState } from "react"
 import { ArrowLeft, CheckCircle2 } from "lucide-react"
-import { Button, Checkbox, Dialog, DialogContent, Input, Label } from "aperia-ds5"
+import { Button, Checkbox, Dialog, DialogContent, DialogTitle, Input, Label } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { addBankSource } from "@/lib/ask-nanci/sourceStore"
 
@@ -126,6 +126,7 @@ export function ConnectWizard({ open, onClose, onLinked }: Props) {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent showCloseButton={false} className="max-sm:inset-0 max-sm:top-0 max-sm:left-0 max-sm:translate-x-0 max-sm:translate-y-0 max-sm:h-screen max-sm:w-screen max-sm:max-w-full max-sm:rounded-none max-sm:flex max-sm:flex-col">
+        <DialogTitle className="sr-only">Link Accounts</DialogTitle>
 
         {/* Header */}
         <div className="flex items-center justify-between">

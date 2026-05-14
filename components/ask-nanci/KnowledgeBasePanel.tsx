@@ -113,33 +113,26 @@ export function KnowledgeBasePanel() {
 
       {/* Body */}
       <ScrollArea className="flex-1">
-        <div className="flex flex-col gap-5 p-4">
+        <div className="flex flex-col gap-5 p-4 pt-0 pt-[1px]">
 
           {/* Add Sources card */}
           <Card>
             <CardContent>
-              <div className="flex items-start gap-3">
-                <div className="flex size-14 shrink-0 items-center justify-center">
-                  <div style={{ transform: "rotate(-13deg)" }}>
-                    <svg viewBox="0 0 30 37.5" className="h-12 w-9" fill="none">
-                      <path d="M2 0h18l10 10v25.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2Z" className="fill-primary/10 stroke-primary/30" strokeWidth="1" />
-                      <path d="M20 0l10 10H22a2 2 0 0 1-2-2V0Z" className="fill-primary/30" />
-                      <rect x="5" y="14" width="16" height="2" rx="1" className="fill-primary/40" />
-                      <rect x="5" y="19" width="10" height="2" rx="1" className="fill-primary/40" />
-                    </svg>
+              <div className="flex items-start gap-4">
+                <Image src="/ask-nanci/img_kb-illustration.png" alt="" width={72} height={72} className="size-18 shrink-0 object-contain -ml-2 -mt-2" />
+                <div className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-1">
+                    <p className="text-sm font-semibold text-foreground">Add Sources to Get Started</p>
+                    <p className="text-sm text-muted-foreground">
+                      Add sources by linking your accounts or uploading files to give Nanci a more complete picture of your business.
+                    </p>
                   </div>
-                </div>
-                <div className="flex flex-1 flex-col gap-2">
-                  <p className="text-sm font-semibold text-foreground">Add Sources to Get Started</p>
-                  <p className="text-xs leading-4 text-muted-foreground">
-                    Upload files or add link to import your data. Your imports will be used to enhance Nanci's knowledge base.
-                  </p>
                   <div className="flex gap-2">
                     <Button size="sm" className="flex-1" onClick={() => setWizardOpen(true)}>
-                      <Link2 className="size-3.5" /> Link Accounts
+                      Link Accounts
                     </Button>
                     <Button size="sm" variant="secondary" className="flex-1" onClick={() => fileRef.current?.click()}>
-                      <Upload className="size-3.5" /> Upload File
+                      Upload File
                     </Button>
                   </div>
                 </div>
@@ -151,17 +144,17 @@ export function KnowledgeBasePanel() {
           <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-1">
               <p className="text-sm font-semibold text-foreground">Sources</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 Added sources will be used as reference for Ask Nanci when generating responses.
               </p>
             </div>
 
-            <div className="flex items-center justify-center gap-2 rounded-md border bg-muted px-3 py-2">
-              <svg viewBox="0 0 24 24" className="size-4 shrink-0 text-primary" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <div className="flex items-center justify-center gap-2 rounded-md border bg-blue-50 border-blue-100 px-3 py-2">
+              <svg viewBox="0 0 24 24" className="size-4 shrink-0 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76" />
                 <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8M12 18V6" />
               </svg>
-              <span className="text-xs font-medium text-primary">Payment data connected</span>
+              <span className="text-sm font-medium text-blue-500">Clover Data Added</span>
             </div>
 
             {hasSources ? (
@@ -226,7 +219,7 @@ export function KnowledgeBasePanel() {
       <div
         className={cn(
           "relative hidden h-full shrink-0 flex-col overflow-hidden rounded-[18px] border bg-background transition-[width,opacity] duration-200 ease-in-out md:flex",
-          kbOpen ? "w-[480px] opacity-100" : "w-0 opacity-0 border-0 pointer-events-none",
+          kbOpen ? "w-[480px] opacity-100 mr-1" : "w-0 opacity-0 border-0 pointer-events-none",
         )}
       >
         {panelContent}

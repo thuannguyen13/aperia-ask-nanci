@@ -36,7 +36,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden md:rounded-2xl bg-sidebar shadow-sm">
                 <Suspense fallback={null}><Sidebar /></Suspense>
 
-                <div className="flex min-w-0 flex-1 gap-1 p-1">
+                <div className="flex min-w-0 flex-1 py-1 pr-1">
                   <KnowledgeBasePanel />
                   <div className="flex min-w-0 flex-1 overflow-hidden rounded-[12px] md:rounded-[16px] border bg-background">
                     {children}
