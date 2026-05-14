@@ -21,9 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ThemeProvider>
           <AskNanciProvider>
-            <div className="relative flex h-screen flex-col bg-primary/10 md:px-2 md:pb-2">
-              <div className="absolute inset-x-0 top-0 h-[100px] bg-primary" />
-
+            <div className="relative flex h-screen flex-col bg-[linear-gradient(180deg,#0d5c00_0%,#BFCDC5_200px)] md:px-2 md:pb-2">
               {/* Top bar */}
               <div className="relative z-10 flex h-10 shrink-0 items-center justify-center">
                 {/* Mobile sidebar toggle — persistent, left-aligned */}
