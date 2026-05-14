@@ -158,7 +158,7 @@ export function KnowledgeBasePanel() {
 
             <div className="flex items-center justify-center gap-2 rounded-md border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/20 px-3 py-2">
               <Image src="/ask-nanci/clover-logo-color.svg" alt="Clover" width={16} height={16} className="size-4 shrink-0" />
-              <span className="text-sm font-medium text-green-600">Clover Data Added</span>
+              <span className="text-sm font-medium text-foreground">Clover Data Added</span>
             </div>
 
             {hasSources ? (

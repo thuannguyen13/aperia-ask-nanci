@@ -1,23 +1,13 @@
 "use client"
 
-import { CornerDownRight, Clock, Compass, BookOpen } from "lucide-react"
+import { CornerDownRight, Clock, Compass, BookOpen, Brain } from "lucide-react"
 import Image from "next/image"
-import { Button, Tabs, TabsList, TabsTrigger } from "aperia-ds5"
+import { Button, Tabs, TabsList, TabsTrigger, TabsContent } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { ChatInput } from "@/components/ask-nanci/ChatInput"
 import { ChatView } from "@/components/ask-nanci/ChatView"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { WELCOME_SUGGESTIONS } from "@/lib/ask-nanci/mock-data"
-
-const tabs = [
-  { label: "Overview", value: "overview" },
-  { label: "Top Items", value: "top-items" },
-  { label: "Inventory", value: "inventory" },
-  { label: "Operation", value: "operation" },
-  { label: "Refunds & Voids", value: "refunds-voids" },
-  { label: "Payment", value: "payment" },
-  { label: "Tips", value: "tips" },
-]
+import { PROMPT_CATEGORIES } from "@/lib/ask-nanci/mock-data"
 
 function WelcomeView() {
   const { sendMessage, sessions, resumeSession, kbOpen, setKbOpen, sources } = useAskNanci()
@@ -40,7 +30,7 @@ function WelcomeView() {
 
         {/* KB banner */}
         {sources.length < 3 && <div className="flex items-center gap-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 dark:border-green-800 dark:bg-green-950/20">
-          <BookOpen className="size-5 shrink-0 text-green-700 dark:text-green-400" />
+          <Brain className="size-5 shrink-0 text-green-700 dark:text-green-400" />
           <div className="min-w-0 flex-1">
             <div className="mb-0.5 flex items-center gap-2">
               <p className="text-sm font-semibold text-foreground">Teach Nanci</p>
@@ -50,7 +40,7 @@ function WelcomeView() {
                   ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
                   : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
               )}>
-                {sources.length} {sources.length === 1 ? "Account" : "Accounts"}
+                {sources.length} {sources.length === 1 ? "Account Added" : "Accounts Added"}
               </span>
             </div>
             <p className="text-xs text-muted-foreground">
@@ -66,42 +56,42 @@ function WelcomeView() {
         <ChatInput />
 
         {/* Prompt suggestions */}
-        <div className="flex flex-col gap-6">
-          <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="h-auto w-full justify-start gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden flex-nowrap">
-              {tabs.map(({ label, value }) => (
-                <TabsTrigger key={value} value={value} className="shrink-0">{label}</TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
-
-          <div className="flex flex-col gap-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-start gap-2">
-                <Compass className="mt-0.5 size-5 shrink-0 text-foreground" />
-                <div>
-                  <p className="text-base font-medium text-foreground">Explore prompts</p>
-                  <p className="text-xs text-muted-foreground">Jumpstart your analysis with curated questions.</p>
-                </div>
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-start gap-2">
+              <Compass className="mt-0.5 size-5 shrink-0 text-foreground" />
+              <div>
+                <p className="text-base font-medium text-foreground">Explore prompts</p>
+                <p className="text-xs text-muted-foreground">Jumpstart your analysis with curated questions.</p>
               </div>
-              <Button variant="secondary" size="sm">View All</Button>
-            </div>
-
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
-              {WELCOME_SUGGESTIONS.map((label) => (
-                <button
-                  key={label}
-                  onClick={() => sendMessage(label)}
-                  className="flex cursor-pointer items-start gap-2 rounded-[10px] border bg-card px-3 py-2.5 text-left transition-colors hover:bg-muted"
-                >
-                  <CornerDownRight className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
-                  <span className="text-sm font-medium text-foreground">{label}</span>
-                </button>
-              ))}
             </div>
           </div>
 
-          {/* Recent chats */}
+          <Tabs defaultValue={PROMPT_CATEGORIES[0].id} className="w-full">
+            <TabsList className="h-auto w-full justify-start gap-1 overflow-x-auto scrollbar-none flex-nowrap">
+              {PROMPT_CATEGORIES.map(({ id, label }) => (
+                <TabsTrigger key={id} value={id} className="shrink-0">{label}</TabsTrigger>
+              ))}
+            </TabsList>
+
+            {PROMPT_CATEGORIES.map(({ id, prompts }) => (
+              <TabsContent key={id} value={id} className="mt-3">
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
+                  {prompts.map((prompt) => (
+                    <button
+                      key={prompt}
+                      onClick={() => sendMessage(prompt)}
+                      className="flex cursor-pointer items-start gap-2 rounded-[10px] border bg-card px-3 py-2.5 text-left transition-colors hover:bg-muted"
+                    >
+                      <CornerDownRight className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+                      <span className="text-sm font-medium text-foreground">{prompt}</span>
+                    </button>
+                  ))}
+                </div>
+              </TabsContent>
+            ))}
+          </Tabs>
+        {/* Recent chats */}
           {recentSessions.length > 0 && (
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">

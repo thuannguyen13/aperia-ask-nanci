@@ -289,6 +289,94 @@ export const MOCK_RESPONSES: MockResponse[] = [
   },
 ]
 
+// ─── Explore Prompts ──────────────────────────────────────────────────────────
+//
+// Structure for the tabbed prompt explorer on the welcome screen.
+// BE dev: replace the `prompts` array in each category with a real API call,
+// e.g. GET /api/nanci/prompts?category=overview  →  string[]
+// The category `id` should match the API's category identifier.
+
+export interface PromptCategory {
+  id: string
+  label: string
+  prompts: string[]
+}
+
+export const PROMPT_CATEGORIES: PromptCategory[] = [
+  {
+    id: "overview",
+    label: "Overview",
+    prompts: [
+      "Give me the full picture on yesterday.",
+      "How much did I actually make last week?",
+      "How come I had a great month but I can't pay my bills?",
+      "Was Saturday worth it?",
+      "Where's all my money going?",
+      "Which location should I be worried about?",
+    ],
+  },
+  {
+    id: "top-items",
+    label: "Top Items",
+    prompts: [
+      "What should I charge more for?",
+      "What's my best-selling item this week?",
+      "Which menu items have the highest margin?",
+      "What items are dragging down my average ticket?",
+    ],
+  },
+  {
+    id: "inventory",
+    label: "Inventory",
+    prompts: [
+      "I feel like we're throwing away too much food. Are we?",
+      "How much is Sysco costing me?",
+      "Which ingredients am I over-ordering?",
+      "How does my food cost percentage compare to last month?",
+    ],
+  },
+  {
+    id: "operation",
+    label: "Operation",
+    prompts: [
+      "Is it worth staying open past 9?",
+      "Can I afford to give my staff a raise?",
+      "Am I going to be able to make payroll on Friday?",
+      "Who's my best employee?",
+    ],
+  },
+  {
+    id: "refunds-voids",
+    label: "Refunds & Voids",
+    prompts: [
+      "Why do I keep getting chargebacks?",
+      "Which server has the most voids this week?",
+      "How much did refunds cost me this month?",
+      "Are my chargebacks trending up or down?",
+    ],
+  },
+  {
+    id: "payment",
+    label: "Payment",
+    prompts: [
+      "Why doesn't my bank match my sales report?",
+      "I'm paying way too much in fees. How bad is it?",
+      "Which card type is costing me the most?",
+      "Are any transactions still pending from last week?",
+    ],
+  },
+  {
+    id: "tips",
+    label: "Tips",
+    prompts: [
+      "Which server gets the highest tips on average?",
+      "Did tips go up or down this weekend?",
+      "What's my tip percentage compared to last month?",
+      "Are customers tipping more on card or cash?",
+    ],
+  },
+]
+
 // Questions flagged data-welcome="true" in Webflow
 export const WELCOME_SUGGESTIONS = [
   "Give me the full picture on yesterday.",
