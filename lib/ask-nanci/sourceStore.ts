@@ -3,6 +3,16 @@ import { generateId } from "./utils"
 
 const SOURCES_KEY = "asknanci_sources"
 
+export const CLOVER_SOURCE: Source = {
+  id: "clover-built-in",
+  name: "Clover",
+  kind: "bank",
+  institution: "Clover Data",
+  logo: "/ask-nanci/clover-logo-color.svg",
+  active: true,
+  addedAt: 0,
+}
+
 export function readSources(): Source[] {
   if (typeof window === "undefined") return []
   try {

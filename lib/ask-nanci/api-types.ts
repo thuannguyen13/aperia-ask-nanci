@@ -9,6 +9,7 @@ export interface ChatRequest {
 }
 
 export type ChatStreamChunk =
+  | { type: "thinking"; source: Pick<Source, "id" | "name" | "kind" | "logo" | "color" | "initials" | "institution"> }
   | { type: "token"; content: string }
   | { type: "suggestions"; items: string[] }
   | { type: "sources"; items: Source[] }

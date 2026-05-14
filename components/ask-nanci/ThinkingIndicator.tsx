@@ -2,39 +2,68 @@
 
 import { useEffect, useState } from "react"
 import Image from "next/image"
+import { FileText } from "lucide-react"
+import { DotLottieReact } from "@lottiefiles/dotlottie-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
+import type { Source } from "@/lib/ask-nanci/types"
 
-const STEPS = ["Thinking", "Analyzing data", "Checking sources", "Preparing answer"]
+function SourceIcon({ source }: { source: Pick<Source, "kind" | "logo" | "color" | "initials" | "name" | "institution"> }) {
+  if (source.logo) {
+    return (
+      <div className="flex size-6 shrink-0 items-center justify-center rounded-lg border bg-white p-0.5">
+        <Image src={source.logo} alt={source.institution ?? source.name} width={18} height={18} className="object-contain" />
+      </div>
+    )
+  }
+  if (source.kind === "file") {
+    return (
+      <div className="flex size-6 shrink-0 items-center justify-center rounded-lg bg-muted">
+        <FileText className="size-3.5 text-muted-foreground" />
+      </div>
+    )
+  }
+  const initials = (source.initials ?? source.name.replace(/[^a-z0-9]/gi, "").slice(0, 2).toUpperCase()) || "??"
+  return (
+    <div className={`flex size-6 shrink-0 items-center justify-center rounded-lg text-[9px] font-bold text-white ${source.color ?? "bg-primary"}`}>
+      {initials}
+    </div>
+  )
+}
 
 export function ThinkingIndicator() {
-  const { sources } = useAskNanci()
-  const [step, setStep] = useState(0)
+  // thinkingSource is set by the stream — BE plugs in here by emitting { type: "thinking", source }
+  const { thinkingSource } = useAskNanci()
+  const [visible, setVisible] = useState(true)
+  const [displayed, setDisplayed] = useState(thinkingSource)
 
-  const activeSources = sources.filter((s) => s.active)
-  const allSteps = activeSources.length
-    ? [...STEPS.slice(0, 2), ...activeSources.slice(0, 2).map((s) => `Reading ${s.name}`), STEPS[3]]
-    : STEPS
-
+  // Slide down → swap source → slide up on each change
   useEffect(() => {
-    const id = setInterval(() => setStep((s) => (s + 1) % allSteps.length), 900)
-    return () => clearInterval(id)
-  }, [allSteps.length])
+    setVisible(false)
+    const swap = setTimeout(() => {
+      setDisplayed(thinkingSource)
+      setVisible(true)
+    }, 200)
+    return () => clearTimeout(swap)
+  }, [thinkingSource])
 
   return (
-    <div className="flex items-start gap-3 px-4 py-3">
-      <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary">
-        <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={14} height={14} className="brightness-0 invert" />
-      </div>
-      <div className="mt-1 flex items-center gap-2 rounded-2xl rounded-tl-sm bg-muted px-3.5 py-2.5">
-        <span className="animate-pulse text-sm text-muted-foreground">{allSteps[step]}</span>
-        <span className="flex gap-0.5">
-          {[0, 1, 2].map((i) => (
-            <span
-              key={i}
-              className="inline-block size-1 rounded-full bg-muted-foreground"
-              style={{ animationDelay: `${i * 0.2}s`, animation: "bounce 1s infinite" }}
-            />
-          ))}
+    <div className="flex items-center gap-2 px-4 py-3 overflow-hidden">
+      <DotLottieReact
+        src="/ask-nanci/nanci-thinking.lottie"
+        autoplay
+        loop
+        style={{ width: 32, height: 32 }}
+      />
+      <div
+        className="flex items-center gap-2 transition-all duration-200 ease-out"
+        style={{
+          opacity: visible ? 1 : 0,
+          transform: visible ? "translateY(0)" : "translateY(-10px)",
+        }}
+      >
+        {displayed && <SourceIcon source={displayed} />}
+        <span className="text-sm text-muted-foreground">
+          {displayed ? `Checking ${displayed.name}` : "Thinking…"}
         </span>
       </div>
     </div>

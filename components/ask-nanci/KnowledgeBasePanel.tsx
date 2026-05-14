@@ -7,7 +7,7 @@ import { Button, Switch, Separator, Card, CardContent, ScrollArea } from "aperia
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { addFileSource, toggleSource, removeSource, readSources } from "@/lib/ask-nanci/sourceStore"
+import { CLOVER_SOURCE, addFileSource, toggleSource, removeSource, readSources } from "@/lib/ask-nanci/sourceStore"
 import type { Source } from "@/lib/ask-nanci/types"
 import { ConnectWizard } from "./ConnectWizard"
 
@@ -61,9 +61,13 @@ function BankIcon({ source }: { source: Source }) {
 // ─── Source row ──────────────────────────────────────────────────────────────
 
 function SourceRow({ source, onToggle, onRemove }: { source: Source; onToggle: () => void; onRemove: () => void }) {
+  const isBuiltIn = source.id === CLOVER_SOURCE.id
   return (
     <div className={`flex items-center gap-3 py-2.5 ${!source.active ? "opacity-50" : ""}`}>
-      <Switch size="sm" checked={source.active} onCheckedChange={onToggle} />
+      {isBuiltIn
+        ? <div className="size-6 shrink-0" />
+        : <Switch size="sm" checked={source.active} onCheckedChange={onToggle} />
+      }
       <div className="flex flex-1 items-center gap-2 min-w-0">
         {source.kind === "file" ? <FileTypeIcon name={source.name} /> : <BankIcon source={source} />}
         <div className="min-w-0">
@@ -73,9 +77,11 @@ function SourceRow({ source, onToggle, onRemove }: { source: Source; onToggle: (
           )}
         </div>
       </div>
-      <Button variant="ghost" size="icon-sm" onClick={onRemove}>
-        <X className="size-4" />
-      </Button>
+      {!isBuiltIn && (
+        <Button variant="ghost" size="icon-sm" onClick={onRemove}>
+          <X className="size-4" />
+        </Button>
+      )}
     </div>
   )
 }
@@ -87,9 +93,10 @@ export function KnowledgeBasePanel() {
   const fileRef = useRef<HTMLInputElement>(null)
   const [wizardOpen, setWizardOpen] = useState(false)
 
-  const hasSources = sources.length > 0
+  const userSources = sources.filter((s) => s.id !== CLOVER_SOURCE.id)
+  const hasSources = userSources.length > 0
 
-  function refresh() { setSources(readSources()) }
+  function refresh() { setSources([CLOVER_SOURCE, ...readSources()]) }
   function handleToggle(id: string) { toggleSource(id); refresh() }
   function handleRemove(id: string) { removeSource(id); refresh() }
 
@@ -149,24 +156,21 @@ export function KnowledgeBasePanel() {
               </p>
             </div>
 
-            <div className="flex items-center justify-center gap-2 rounded-md border bg-blue-50 border-blue-100 px-3 py-2">
-              <svg viewBox="0 0 24 24" className="size-4 shrink-0 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76" />
-                <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8M12 18V6" />
-              </svg>
-              <span className="text-sm font-medium text-blue-500">Clover Data Added</span>
+            <div className="flex items-center justify-center gap-2 rounded-md border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/20 px-3 py-2">
+              <Image src="/ask-nanci/clover-logo-color.svg" alt="Clover" width={16} height={16} className="size-4 shrink-0" />
+              <span className="text-sm font-medium text-green-600">Clover Data Added</span>
             </div>
 
             {hasSources ? (
               <div className="flex flex-col">
-                {sources.map((s, i) => (
+                {userSources.map((s, i) => (
                   <div key={s.id}>
                     <SourceRow
                       source={s}
                       onToggle={() => handleToggle(s.id)}
                       onRemove={() => handleRemove(s.id)}
                     />
-                    {i < sources.length - 1 && <Separator />}
+                    {i < userSources.length - 1 && <Separator />}
                   </div>
                 ))}
               </div>

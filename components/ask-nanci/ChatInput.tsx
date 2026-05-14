@@ -10,7 +10,7 @@ import { ConnectWizard } from "./ConnectWizard"
 import { ChatActiveSources } from "./ChatActiveSources"
 
 export function ChatInput() {
-  const { sendMessage, chatState, stopAnimation, sources, setSources, draft, setDraft, setTokenLimitReached } = useAskNanci()
+  const { sendMessage, chatState, stopAnimation, sources, setSources, draft, setDraft, setTokenLimitReached, setOnboardingOpen } = useAskNanci()
   const activeSources = sources.filter((s) => s.active)
 
   const [value, setValue] = useState("")
@@ -43,6 +43,7 @@ export function ChatInput() {
       setValue(action.text)
     } else if (action.type === "command") {
       if (action.id === "usage") setTokenLimitReached(true)
+      if (action.id === "onboarding") setOnboardingOpen(true)
       setValue("")
     } else {
       setValue("")

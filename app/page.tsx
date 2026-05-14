@@ -1,9 +1,7 @@
 "use client"
 
-import { Suspense } from "react"
 import { CornerDownRight, Clock, Compass, BookOpen } from "lucide-react"
 import Image from "next/image"
-import { useSearchParams } from "next/navigation"
 import { Button, Tabs, TabsList, TabsTrigger } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { ChatInput } from "@/components/ask-nanci/ChatInput"
@@ -22,10 +20,7 @@ const tabs = [
 ]
 
 function WelcomeView() {
-  const { sendMessage, sessions, resumeSession, kbOpen, setKbOpen } = useAskNanci()
-  const searchParams = useSearchParams()
-  const isVariantB = searchParams.get("v") === "b"
-
+  const { sendMessage, sessions, resumeSession, kbOpen, setKbOpen, sources } = useAskNanci()
   const recentSessions = sessions.slice(0, 3)
 
   return (
@@ -43,26 +38,29 @@ function WelcomeView() {
 
         
 
-        {/* Version B: KB banner between chat input and prompts */}
-        {isVariantB && (
-          <div className="flex items-center gap-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 dark:border-green-800 dark:border-l-green-500 dark:bg-green-950/20">
-            <BookOpen className="size-5 shrink-0 text-green-700 dark:text-green-400" />
-            <div className="min-w-0 flex-1">
-              <div className="mb-0.5 flex items-center gap-2">
-                <p className="text-sm font-semibold text-foreground">Teach Nanci</p>
-                <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
-                  Not set up
-                </span>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Your Clover data is already connected. Add your other financial accounts, including your bookkeeping software to give Nanci a complete picture of your business.
-              </p>
+        {/* KB banner */}
+        {sources.length < 3 && <div className="flex items-center gap-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 dark:border-green-800 dark:bg-green-950/20">
+          <BookOpen className="size-5 shrink-0 text-green-700 dark:text-green-400" />
+          <div className="min-w-0 flex-1">
+            <div className="mb-0.5 flex items-center gap-2">
+              <p className="text-sm font-semibold text-foreground">Teach Nanci</p>
+              <span className={cn(
+                "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                sources.length > 1
+                  ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                  : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+              )}>
+                {sources.length} {sources.length === 1 ? "Account" : "Accounts"}
+              </span>
             </div>
-            <Button size="sm" className="shrink-0" onClick={() => setKbOpen(!kbOpen)}>
-              {kbOpen ? "Close" : "Link Accounts"}
-            </Button>
+            <p className="text-xs text-muted-foreground">
+              Your Clover data is already connected. Add your other financial accounts, including your bookkeeping software to give Nanci a complete picture of your business.
+            </p>
           </div>
-        )}
+          <Button size="sm" className="shrink-0" onClick={() => setKbOpen(true)}>
+            Link Accounts
+          </Button>
+        </div>}
 
         {/* Chat input */}
         <ChatInput />
@@ -159,5 +157,5 @@ export default function AskNanciPage() {
     )
   }
 
-  return <Suspense fallback={null}><WelcomeView /></Suspense>
+  return <WelcomeView />
 }

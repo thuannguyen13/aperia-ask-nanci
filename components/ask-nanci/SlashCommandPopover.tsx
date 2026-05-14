@@ -18,6 +18,11 @@ const COMMANDS = [
     label: "/usage",
     description: "Simulate reaching your daily token limit",
   },
+  {
+    id: "onboarding",
+    label: "/onboarding",
+    description: "Re-open the onboarding dialog",
+  },
 ]
 
 export type SlashAction =

@@ -25,6 +25,7 @@ import {
   deleteSession,
 } from "./sessionStore"
 import {
+  CLOVER_SOURCE,
   readSources,
   writeSources,
   addFileSource,
@@ -54,6 +55,13 @@ export async function* streamChat(
   const text = match?.content ?? DEFAULT_RESPONSE
   const suggestions = match?.suggestions ?? DEFAULT_SUGGESTIONS
   const chart = match?.chart
+
+  // Cycle through active sources during thinking phase (BE: replace with real thinking chunks)
+  const thinkingSources = activeSources.length ? activeSources : [CLOVER_SOURCE]
+  for (const source of thinkingSources) {
+    yield { type: "thinking", source }
+    await new Promise((r) => setTimeout(r, 1200))
+  }
 
   // Emit tokens word by word to simulate streaming
   const words = text.match(/\S+|\s+/g) ?? []
@@ -97,7 +105,7 @@ export function newSessionId(): string {
 // ─── Sources ──────────────────────────────────────────────────────────────────
 
 export async function fetchSources(): Promise<Source[]> {
-  return readSources()
+  return [CLOVER_SOURCE, ...readSources()]
 }
 
 export async function persistSources(sources: Source[]): Promise<void> {

@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/ask-nanci/ThemeProvider"
 import { Sidebar } from "@/components/ask-nanci/Sidebar"
 import { KnowledgeBasePanel } from "@/components/ask-nanci/KnowledgeBasePanel"
 import { TokenLimitDialog } from "@/components/ask-nanci/TokenLimitDialog"
+import { OnboardingDialog } from "@/components/ask-nanci/OnboardingDialog"
 import { DarkModeToggle } from "@/components/ask-nanci/DarkModeToggle"
 import { MobileSidebarToggle } from "@/components/ask-nanci/MobileSidebarToggle"
 import "./globals.css"
@@ -44,6 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
 
             <TokenLimitDialog />
+            <OnboardingDialog />
             <DarkModeToggle />
           </AskNanciProvider>
         </ThemeProvider>

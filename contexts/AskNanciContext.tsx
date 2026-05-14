@@ -30,6 +30,7 @@ interface AskNanciCtx {
   deleteSessionById: (id: string) => void
   sources: Source[]
   setSources: (sources: Source[]) => void
+  thinkingSource: Source | null
   kbOpen: boolean
   setKbOpen: (open: boolean) => void
   draft: string
@@ -44,6 +45,8 @@ interface AskNanciCtx {
   setSettingsOpen: (open: boolean) => void
   mobileSidebarOpen: boolean
   setMobileSidebarOpen: (open: boolean) => void
+  onboardingOpen: boolean
+  setOnboardingOpen: (open: boolean) => void
 }
 
 const Ctx = createContext<AskNanciCtx | null>(null)
@@ -62,6 +65,7 @@ export function AskNanciProvider({ children }: { children: React.ReactNode }) {
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null)
   const [pendingBot, setPendingBot] = useState<Message | null>(null)
   const [sources, setSources_] = useState<Source[]>([])
+  const [thinkingSource, setThinkingSource] = useState<Source | null>(null)
   const [kbOpen, setKbOpen] = useState(false)
   const [draft, setDraft] = useState("")
   const [error, setError] = useState<string | null>(null)
@@ -69,12 +73,14 @@ export function AskNanciProvider({ children }: { children: React.ReactNode }) {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [settingsTab, setSettingsTab] = useState("usage")
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+  const [onboardingOpen, setOnboardingOpen] = useState(false)
   const stopRef = useRef<boolean>(false)
   const sessionIdRef = useRef<string>(newSessionId())
 
   useEffect(() => {
     fetchSessions().then(setSessions)
     fetchSources().then(setSources_)
+    if (!localStorage.getItem("ask_nanci_onboarded")) setOnboardingOpen(true)
   }, [])
 
   const reloadSessions = useCallback(() => {
@@ -125,9 +131,12 @@ export function AskNanciProvider({ children }: { children: React.ReactNode }) {
         for await (const chunk of streamChat(allMsgs, activeSources, sentSessionId)) {
           if (stopRef.current) break
 
-          if (chunk.type === "token") {
+          if (chunk.type === "thinking") {
+            setThinkingSource(chunk.source as Source)
+          } else if (chunk.type === "token") {
             if (!started) {
               started = true
+              setThinkingSource(null)
               setPendingBot(botMsg)
               setChatState("streaming")
             }
@@ -150,6 +159,7 @@ export function AskNanciProvider({ children }: { children: React.ReactNode }) {
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Something went wrong")
+        setThinkingSource(null)
         setChatState("idle")
         setPendingBot(null)
         return
@@ -211,7 +221,7 @@ export function AskNanciProvider({ children }: { children: React.ReactNode }) {
 
   const handleSetSources = useCallback((next: Source[]) => {
     setSources_(next)
-    persistSources(next)
+    persistSources(next.filter((s) => s.id !== "clover-built-in"))
   }, [])
 
   const openSettings = useCallback((tab = "usage") => {
@@ -225,7 +235,7 @@ export function AskNanciProvider({ children }: { children: React.ReactNode }) {
       pendingBot,
       sendMessage, stopAnimation, startNewChat, resumeSession,
       deleteSessionById: deleteSessionByIdCb,
-      sources, setSources: handleSetSources,
+      sources, setSources: handleSetSources, thinkingSource,
       kbOpen, setKbOpen,
       draft, setDraft,
       error,
@@ -233,6 +243,7 @@ export function AskNanciProvider({ children }: { children: React.ReactNode }) {
       tokenLimitReached, setTokenLimitReached,
       settingsOpen, settingsTab, openSettings, setSettingsOpen,
       mobileSidebarOpen, setMobileSidebarOpen,
+      onboardingOpen, setOnboardingOpen,
     }}>
       {children}
     </Ctx.Provider>

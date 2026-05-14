@@ -166,7 +166,7 @@ export function Sidebar() {
         {/* Cards — hidden when collapsed */}
         {(isMobile || !collapsed) && (
           <div className="flex flex-col gap-2 mb-4">
-            {!kbOpen && (
+            
               <div className="relative bg-card rounded-[10px] border p-4 shadow-sm overflow-hidden">
                 <div className="pointer-events-none absolute top-3 -right-3">
                   <Image src="/ask-nanci/img_kb-illustration.png" alt="" width={72} height={72} className="size-20 object-contain" />
@@ -177,11 +177,13 @@ export function Sidebar() {
                     Add your other financial accounts, including your bookkeeping software to improve Nanci.
                   </p>
                 </div>
+                
                 <Button className="w-full mt-3" size="sm" onClick={() => setKbOpen(true)}>
                   Link Accounts
                 </Button>
+                
               </div>
-            )}
+            
             <UsageCard />
           </div>
         )}
@@ -216,13 +218,13 @@ export function Sidebar() {
           )}
           <DropdownMenuContent side="top" align="start" className="w-52">
             <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-              teresawalker@titan.com
+              teresa@example.com
             </DropdownMenuLabel>
             <DropdownMenuItem onSelect={(e) => { e.preventDefault(); setTheme(isDark ? "light" : "dark") }} className="flex items-center justify-between">
               <span className="flex items-center gap-2"><Moon className="size-4" /> Dark Mode</span>
               <Switch checked={isDark} className="pointer-events-none" />
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
+            {/* <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={() => openSettings("account")}>
               <Settings className="size-4" /> Settings
             </DropdownMenuItem>
@@ -235,7 +237,7 @@ export function Sidebar() {
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <LogOut className="size-4" /> Log Out
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
