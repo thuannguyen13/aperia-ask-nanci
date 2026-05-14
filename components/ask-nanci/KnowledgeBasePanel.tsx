@@ -112,7 +112,7 @@ export function KnowledgeBasePanel() {
     <>
       {/* Header */}
       <div className="flex shrink-0 items-center justify-between px-4 py-3">
-        <h2 className="text-base font-semibold text-foreground">Knowledge Base</h2>
+        <h2 className="text-base font-semibold text-foreground">Teach Nanci</h2>
         <Button variant="ghost" size="icon-sm" onClick={() => setKbOpen(false)}>
           <X className="size-4" />
         </Button>
@@ -129,18 +129,18 @@ export function KnowledgeBasePanel() {
                 <Image src="/ask-nanci/img_kb-illustration.png" alt="" width={72} height={72} className="size-18 shrink-0 object-contain -ml-2 -mt-2" />
                 <div className="flex flex-col gap-4">
                   <div className="flex flex-col gap-1">
-                    <p className="text-sm font-semibold text-foreground">Add Sources to Get Started</p>
+                    <p className="text-sm font-semibold text-foreground">Add Accounts to Get Started</p>
                     <p className="text-sm text-muted-foreground">
-                      Add sources by linking your accounts or uploading files to give Nanci a more complete picture of your business.
+                      Add your financial and bookkeeping accounts to improve Nanci.
                     </p>
                   </div>
                   <div className="flex gap-2">
                     <Button size="sm" className="flex-1" onClick={() => setWizardOpen(true)}>
                       Link Accounts
                     </Button>
-                    <Button size="sm" variant="secondary" className="flex-1" onClick={() => fileRef.current?.click()}>
+                    {/* <Button size="sm" variant="secondary" className="flex-1" onClick={() => fileRef.current?.click()}>
                       Upload File
-                    </Button>
+                    </Button> */}
                   </div>
                 </div>
               </div>
@@ -150,9 +150,9 @@ export function KnowledgeBasePanel() {
           {/* Sources section */}
           <div className="flex flex-col gap-3">
             <div className="flex flex-col gap-1">
-              <p className="text-sm font-semibold text-foreground">Sources</p>
+              <p className="text-sm font-semibold text-foreground">Accounts</p>
               <p className="text-sm text-muted-foreground">
-                Added sources will be used as reference for Ask Nanci when generating responses.
+                Added accounts will be used as reference for Ask Nanci when generating responses.
               </p>
             </div>
 
@@ -180,8 +180,8 @@ export function KnowledgeBasePanel() {
                   <EmptyMedia variant="icon">
                     <Upload />
                   </EmptyMedia>
-                  <EmptyTitle>No sources added yet</EmptyTitle>
-                  <EmptyDescription>Upload a file or link an account to get started.</EmptyDescription>
+                  <EmptyTitle>No accounts added yet</EmptyTitle>
+                  <EmptyDescription>Link an account to get started.</EmptyDescription>
                 </EmptyHeader>
               </Empty>
             )}

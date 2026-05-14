@@ -12,6 +12,7 @@ import {
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { UsageCard } from "./UsageCard"
+import { ConnectWizard } from "./ConnectWizard"
 
 const footerNav = [
   { icon: LifeBuoy, label: "Support" },
@@ -58,6 +59,7 @@ function SidebarItem({
 export function Sidebar() {
   const { sessions, activeSessionId, startNewChat, resumeSession, deleteSessionById, sources, kbOpen, setKbOpen, openSettings, mobileSidebarOpen, setMobileSidebarOpen } = useAskNanci()
   const [collapsed, setCollapsed] = useState(false)
+  const [wizardOpen, setWizardOpen] = useState(false)
   const { resolvedTheme, setTheme } = useTheme()
   const isDark = resolvedTheme === "dark"
   const activeCount = sources.filter((s) => s.active).length
@@ -174,13 +176,18 @@ export function Sidebar() {
                 <div className="pr-12 flex flex-col items-start gap-1">
                   <p className="text-sm font-semibold text-foreground">Teach Nanci</p>
                   <p className="text-sm text-muted-foreground">
-                    Add your other financial accounts, including your bookkeeping software to improve Nanci.
+                    Add your financial and bookkeeping accounts to improve Nanci.
                   </p>
                 </div>
-                
-                <Button className="w-full mt-3" size="sm" onClick={() => setKbOpen(true)}>
+                <div className="flex gap-1">
+                  <Button className="flex-1 mt-3" size="sm" onClick={() => setWizardOpen(true)}>
                   Link Accounts
                 </Button>
+                <Button className=" mt-3" variant="secondary" size="icon-sm" onClick={() => setKbOpen(true)}>
+                  <Settings />
+                </Button>
+                </div>
+                
                 
               </div>
             
@@ -246,6 +253,12 @@ export function Sidebar() {
 
   return (
     <>
+      <ConnectWizard
+        open={wizardOpen}
+        onClose={() => setWizardOpen(false)}
+        onLinked={() => setWizardOpen(false)}
+      />
+
       {/* Desktop sidebar */}
       <aside
         className={cn(

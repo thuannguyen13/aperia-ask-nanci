@@ -30,7 +30,7 @@ function WelcomeView() {
 
         {/* KB banner */}
         {sources.length < 3 && <div className="flex items-center gap-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 dark:border-green-800 dark:bg-green-950/20">
-          <Brain className="size-5 shrink-0 text-green-700 dark:text-green-400" />
+          <Image src="/ask-nanci/img_kb-illustration.png" alt="" width={72} height={72} className="size-18 shrink-0 object-contain" />
           <div className="min-w-0 flex-1">
             <div className="mb-0.5 flex items-center gap-2">
               <p className="text-sm font-semibold text-foreground">Teach Nanci</p>
@@ -44,7 +44,7 @@ function WelcomeView() {
               </span>
             </div>
             <p className="text-xs text-muted-foreground">
-              Your Clover data is already connected. Add your other financial accounts, including your bookkeeping software to give Nanci a complete picture of your business.
+              Your Clover data is already connected. Add your financial and bookkeeping accounts to give Nanci a complete picture of your business.
             </p>
           </div>
           <Button size="sm" className="shrink-0" onClick={() => setKbOpen(true)}>
@@ -62,7 +62,7 @@ function WelcomeView() {
               <Compass className="mt-0.5 size-5 shrink-0 text-foreground" />
               <div>
                 <p className="text-base font-medium text-foreground">Explore prompts</p>
-                <p className="text-xs text-muted-foreground">Jumpstart your analysis with curated questions.</p>
+                <p className="text-sm text-muted-foreground">Jumpstart your analysis with curated questions.</p>
               </div>
             </div>
           </div>
@@ -99,7 +99,7 @@ function WelcomeView() {
                   <Clock className="mt-0.5 size-5 shrink-0 text-foreground" />
                   <div>
                     <p className="text-base font-medium text-foreground">Pick up where you left off</p>
-                    <p className="text-xs text-muted-foreground">Continue a previous conversation.</p>
+                    <p className="text-sm text-muted-foreground">Continue a previous conversation.</p>
                   </div>
                 </div>
                 <Button variant="secondary" size="sm">View All</Button>
