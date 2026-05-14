@@ -121,7 +121,6 @@ export function Sidebar() {
       <div className="flex flex-1 flex-col overflow-y-auto pb-60 min-w-12">
         <div className={cn("p-2", !isMobile && collapsed && "px-1")}>
           <SidebarItem icon={MessageCirclePlus} label="New Chat" collapsed={!isMobile && collapsed} onClick={startNewChat} />
-          <SidebarItem icon={PieChart} label="Insights" collapsed={!isMobile && collapsed} />
         </div>
 
         {/* Recent chats — hidden when collapsed */}
@@ -166,9 +165,9 @@ export function Sidebar() {
       >
         {/* Cards — hidden when collapsed */}
         {(isMobile || !collapsed) && (
-          <div className="flex flex-col gap-2 mb-1">
-            <UsageCard />
-            <div className="relative overflow-hidden rounded-[10px] border p-4 shadow-sm">
+          <div className="flex flex-col gap-2 mb-4">
+            
+            <div className="relative bg-card overflow-hidden rounded-[10px] border p-4 shadow-sm">
               <div className="pointer-events-none absolute right-2 top-0 flex h-20 w-20 items-center justify-center">
                 <div style={{ transform: "rotate(-12.88deg)" }}>
                   <svg viewBox="0 0 30 37.5" className="h-16 w-12 opacity-60" fill="none">
@@ -180,23 +179,20 @@ export function Sidebar() {
                 </div>
               </div>
               <div className="mb-3 pr-12">
-                <p className="text-sm font-semibold leading-5 text-foreground">Knowledge Base</p>
+                <p className="text-sm font-semibold leading-5 text-foreground">Teach Nanci</p>
                 <p className="text-xs font-medium leading-4 text-muted-foreground">
-                  Add your own data and documents to improve your Nanci.
+                  Add your other financial accounts, including your bookkeeping software to improve Nanci.
                 </p>
               </div>
               <Button className="w-full" size="sm" onClick={() => setKbOpen(!kbOpen)}>
-                {kbOpen ? "Close Knowledge Base" : "Teach Nanci"}
+                {kbOpen ? "Close Knowledge Base" : "Link Account"}
               </Button>
             </div>
+            <UsageCard />
           </div>
         )}
 
-        <div className={cn(!isMobile && collapsed && "px-1")}>
-          {footerNav.map(({ icon, label }) => (
-            <SidebarItem key={label} icon={icon} label={label} collapsed={!isMobile && collapsed} />
-          ))}
-        </div>
+        
 
         {/* User row with dropdown */}
         <DropdownMenu>
