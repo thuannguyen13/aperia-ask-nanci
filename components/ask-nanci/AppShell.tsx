@@ -18,7 +18,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return (
       <AskNanciProvider isEmbed>
         <div className="flex h-screen flex-col overflow-hidden bg-background">
-          {children}
+          <div className="flex min-w-0 min-h-0 flex-1 overflow-hidden">
+            {children}
+          </div>
         </div>
         <TokenLimitDialog />
       </AskNanciProvider>
