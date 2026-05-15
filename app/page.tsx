@@ -10,7 +10,7 @@ import { useAskNanci } from "@/contexts/AskNanciContext"
 import { PROMPT_CATEGORIES } from "@/lib/ask-nanci/mock-data"
 
 function WelcomeView() {
-  const { sendMessage, sessions, resumeSession, kbOpen, setKbOpen, sources } = useAskNanci()
+  const { sendMessage, sessions, resumeSession, kbOpen, setKbOpen, sources, isEmbed } = useAskNanci()
   const recentSessions = sessions.slice(0, 3)
 
   return (
@@ -29,7 +29,7 @@ function WelcomeView() {
         
 
         {/* KB banner */}
-        {sources.length < 3 && <div className="flex items-center gap-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 dark:border-green-800 dark:bg-green-950/20">
+        {!isEmbed && sources.length < 3 && <div className="flex items-center gap-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 dark:border-green-800 dark:bg-green-950/20">
           <Image src="/ask-nanci/img_kb-illustration.png" alt="" width={72} height={72} className="size-18 shrink-0 object-contain" />
           <div className="min-w-0 flex-1">
             <div className="mb-0.5 flex items-center gap-2">
@@ -92,7 +92,7 @@ function WelcomeView() {
             ))}
           </Tabs>
         {/* Recent chats */}
-          {recentSessions.length > 0 && (
+          {!isEmbed && recentSessions.length > 0 && (
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-start gap-2">
