@@ -136,7 +136,7 @@ export default function AskNanciPage() {
 
   if (view === "chat") {
     return (
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <ChatView />
         <div className="shrink-0 px-3 py-3 md:px-4 md:py-4">
           <div className="mx-auto w-full max-w-[800px]">
