@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import Image from "next/image"
 import { AskNanciProvider } from "@/contexts/AskNanciContext"
@@ -13,6 +14,14 @@ import { MobileSidebarToggle } from "./MobileSidebarToggle"
 export function AppShell({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams()
   const isEmbed = searchParams.get("embed") === "true"
+
+  useEffect(() => {
+    if (!isEmbed) return
+    document.documentElement.style.overflow = "hidden"
+    document.documentElement.style.overscrollBehavior = "none"
+    document.body.style.overflow = "hidden"
+    document.body.style.overscrollBehavior = "none"
+  }, [isEmbed])
 
   if (isEmbed) {
     return (
