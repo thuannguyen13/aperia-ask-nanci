@@ -11,7 +11,7 @@ export function ChatView() {
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" })
   }, [messages, pendingBot?.content, chatState])
 
   return (

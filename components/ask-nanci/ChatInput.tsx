@@ -20,7 +20,7 @@ export function ChatInput() {
   const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    if (draft) { setValue(draft); setDraft(""); textareaRef.current?.focus() }
+    if (draft) { setValue(draft); setDraft(""); textareaRef.current?.focus({ preventScroll: true }) }
   }, [draft, setDraft])
 
   const isIdle = chatState === "idle"
