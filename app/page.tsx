@@ -14,8 +14,8 @@ function WelcomeView() {
   const recentSessions = sessions.slice(0, 3)
 
   return (
-    <div className="flex flex-1 flex-col justify-center items-center overflow-y-auto px-4 py-8 md:px-8 md:py-12">
-      <div className="flex w-full max-w-[800px] flex-col gap-8">
+    <div className="flex flex-1 flex-col items-center overflow-y-auto px-4 py-8 md:px-8 md:py-12">
+      <div className="flex w-full max-w-[800px] flex-col gap-8 m-auto">
 
         {/* Welcome header */}
         <div className="flex flex-col items-center gap-4">
