@@ -15,7 +15,7 @@ export function ChatView() {
   }, [messages, pendingBot?.content, chatState])
 
   return (
-    <ScrollArea className="flex-1">
+    <ScrollArea className="flex-1 min-h-0">
       <div className="mx-auto w-full max-w-[800px] flex flex-col gap-0 py-4">
         {messages.map((msg) =>
           msg.role === "user" ? (
