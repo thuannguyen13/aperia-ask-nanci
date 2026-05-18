@@ -138,7 +138,7 @@ export default function AskNanciPage() {
     return (
       <div className="flex min-w-0 min-h-0 flex-1 flex-col overflow-hidden">
         <ChatView />
-        <div className="shrink-0 px-3 md:px-4">
+        <div className="shrink-0 px-3 pb-3 md:px-4 md:pb-4">
           <div className="mx-auto w-full max-w-[800px]">
             <ChatInput />
           </div>
