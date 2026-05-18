@@ -132,11 +132,19 @@ function WelcomeView() {
 }
 
 export default function AskNanciPage() {
-  const { view } = useAskNanci()
+  const { view, startNewChat } = useAskNanci()
 
   if (view === "chat") {
     return (
-      <div className="flex min-w-0 min-h-0 flex-1 flex-col overflow-hidden">
+      <div className="relative flex min-w-0 min-h-0 flex-1 flex-col overflow-hidden">
+        <button
+          onClick={startNewChat}
+          className="absolute top-4 left-4 z-10 flex items-center gap-2"
+          aria-label="Back to home"
+        >
+          <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="Ask Nanci" width={24} height={24} />
+          <span className="text-[15px] font-semibold tracking-tight text-foreground whitespace-nowrap">Ask Nanci</span>
+        </button>
         <ChatView />
         <div className="shrink-0 px-3 pb-3 md:px-4 md:pb-4">
           <div className="mx-auto w-full max-w-[800px]">
