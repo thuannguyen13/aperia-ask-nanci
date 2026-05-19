@@ -14,6 +14,16 @@ import {
 import { CLOVER_SOURCE } from "@/lib/ask-nanci/sourceStore"
 import { MOCK_USAGE, SCRIPTED_CONVERSATIONS } from "@/lib/ask-nanci/mock-data"
 
+const ACCESS_ONE_SOURCE: Source = {
+  id: "clover-built-in",
+  name: "AccessOne",
+  kind: "bank",
+  institution: "AccessOne Data",
+  logo: "/accessOne-logo.svg",
+  active: true,
+  addedAt: 0,
+}
+
 const EMBED_DEMO_SOURCES: Source[] = [
   CLOVER_SOURCE,
   { id: "demo-qb", name: "Walker's Business Books", kind: "bank", institution: "QuickBooks", color: "bg-green-600", initials: "QB", logo: "/fi/quickbook.svg", active: true, addedAt: 0 },
@@ -22,6 +32,10 @@ const EMBED_DEMO_SOURCES: Source[] = [
   { id: "demo-wf", name: "Wells Fargo Business ••7823", kind: "bank", institution: "Wells Fargo", color: "bg-yellow-600", initials: "WF", logo: "/fi/wellsfargo.png", active: true, addedAt: 0 },
   { id: "demo-amex", name: "Amex Business Gold ••5561", kind: "bank", institution: "American Express", color: "bg-sky-600", initials: "AX", logo: "/fi/amex.svg", active: true, addedAt: 0 },
 ]
+
+const EMBED_BO_DEMO_SOURCES: Source[] = EMBED_DEMO_SOURCES.map((s) =>
+  s.id === "clover-built-in" ? ACCESS_ONE_SOURCE : s
+)
 
 type ChatView = "welcome" | "chat"
 type ChatState = "idle" | "thinking" | "streaming"
@@ -78,7 +92,9 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [sessions, setSessions] = useState<Session[]>([])
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null)
   const [pendingBot, setPendingBot] = useState<Message | null>(null)
-  const [sources, setSources_] = useState<Source[]>(isEmbed ? EMBED_DEMO_SOURCES : [])
+  const [sources, setSources_] = useState<Source[]>(
+    isEmbed ? (embedVariant === "bo" ? EMBED_BO_DEMO_SOURCES : EMBED_DEMO_SOURCES) : []
+  )
   const [thinkingSource, setThinkingSource] = useState<Source | null>(null)
   const [thinkingLabel, setThinkingLabel] = useState("Thinking…")
   const [kbOpen, setKbOpen] = useState(false)

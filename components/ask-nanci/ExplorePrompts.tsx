@@ -11,7 +11,11 @@ interface ExplorePromptsProps {
 }
 
 export function ExplorePrompts({title, description}: ExplorePromptsProps) {
-  const { sendMessage, playScripted, isEmbed } = useAskNanci()
+  const { sendMessage, playScripted, isEmbed, embedVariant } = useAskNanci()
+
+  const visibleCategories = embedVariant === "bo"
+    ? PROMPT_CATEGORIES.filter(({ id }) => id !== "inventory")
+    : PROMPT_CATEGORIES
 
   return (
     <div className="flex flex-col gap-4">
@@ -25,14 +29,14 @@ export function ExplorePrompts({title, description}: ExplorePromptsProps) {
         </div>
       </div>
 
-      <Tabs defaultValue={PROMPT_CATEGORIES[0].id} className="w-full">
+      <Tabs defaultValue={visibleCategories[0].id} className="w-full">
         <TabsList className="h-auto w-full justify-start gap-1 overflow-x-auto scrollbar-none flex-nowrap">
-          {PROMPT_CATEGORIES.map(({ id, label }) => (
+          {visibleCategories.map(({ id, label }) => (
             <TabsTrigger key={id} value={id} className="shrink-0">{label}</TabsTrigger>
           ))}
         </TabsList>
 
-        {PROMPT_CATEGORIES.map(({ id, prompts }) => (
+        {visibleCategories.map(({ id, prompts }) => (
           <TabsContent key={id} value={id} className="mt-3">
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
               {prompts.map((prompt) => (
