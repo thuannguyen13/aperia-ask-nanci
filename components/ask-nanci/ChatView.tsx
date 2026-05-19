@@ -47,7 +47,7 @@ export function ChatView() {
           />
         )}
 
-        <div ref={bottomRef} />
+        <div ref={bottomRef} className="h-8 shrink-0" />
       </div>
     </div>
   )
