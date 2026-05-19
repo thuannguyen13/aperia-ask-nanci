@@ -3,6 +3,7 @@
 import { useEffect } from "react"
 import { useSearchParams } from "next/navigation"
 import Image from "next/image"
+import { useTheme } from "next-themes"
 import { AskNanciProvider } from "@/contexts/AskNanciContext"
 import { Sidebar } from "./Sidebar"
 import { KnowledgeBasePanel } from "./KnowledgeBasePanel"
@@ -14,12 +15,14 @@ import { MobileSidebarToggle } from "./MobileSidebarToggle"
 export function AppShell({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams()
   const isEmbed = searchParams.get("embed") === "true"
+  const { setTheme } = useTheme()
 
   useEffect(() => {
     if (!isEmbed) return
+    setTheme("light")
     document.documentElement.style.overscrollBehavior = "none"
     document.body.style.overscrollBehavior = "none"
-  }, [isEmbed])
+  }, [isEmbed, setTheme])
 
   if (isEmbed) {
     return (
