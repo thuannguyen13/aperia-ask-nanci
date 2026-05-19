@@ -6,6 +6,7 @@ export interface MockResponse {
   content: string
   suggestions: string[]
   chart?: ChartWidget
+  sourceInstitutions?: string[]
 }
 
 export const MOCK_RESPONSES: MockResponse[] = [
@@ -24,6 +25,7 @@ export const MOCK_RESPONSES: MockResponse[] = [
       labels: ["In-transit Deposits", "Processing Fees"],
       datasets: [{ label: "Gap Breakdown ($)", data: [1303, 12], color: "#1EBBFF" }],
     },
+    sourceInstitutions: ["Clover Data", "Chase", "Bank of America"],
   },
   {
     id: "open-past-9",
@@ -43,6 +45,7 @@ export const MOCK_RESPONSES: MockResponse[] = [
         { label: "Cost", data: [420, 420], color: "#e74c3c" },
       ],
     },
+    sourceInstitutions: ["Clover Data", "QuickBooks"],
   },
   {
     id: "yesterday",
@@ -59,6 +62,7 @@ export const MOCK_RESPONSES: MockResponse[] = [
       labels: ["Brisket Plate", "Margaritas", "Fish Tacos", "Other"],
       datasets: [{ label: "Orders", data: [28, 34, 19, 13], color: "#2c5aa0" }],
     },
+    sourceInstitutions: ["Clover Data", "QuickBooks"],
   },
   {
     id: "best-employee",
@@ -79,6 +83,7 @@ export const MOCK_RESPONSES: MockResponse[] = [
         { label: "Net Contribution", data: [3795, 3520, 2530], color: "#00d4ff" },
       ],
     },
+    sourceInstitutions: ["Clover Data", "American Express"],
   },
   {
     id: "charge-more",
@@ -98,6 +103,7 @@ export const MOCK_RESPONSES: MockResponse[] = [
         { label: "Current Margin (%)", data: [44, 42, 38], color: "#e74c3c" },
       ],
     },
+    sourceInstitutions: ["Clover Data", "QuickBooks"],
   },
   {
     id: "staff-raise",
@@ -114,6 +120,7 @@ export const MOCK_RESPONSES: MockResponse[] = [
       labels: ["Q1", "Q2", "Q3", "Q4"],
       datasets: [{ label: "Quarterly Revenue ($)", data: [150000, 162000, 175000, 189000], color: "#2c5aa0" }],
     },
+    sourceInstitutions: ["QuickBooks", "Chase"],
   },
   {
     id: "food-waste",
@@ -133,6 +140,7 @@ export const MOCK_RESPONSES: MockResponse[] = [
         { label: "Sold", data: [300, 180, 220], color: "#00d4ff" },
       ],
     },
+    sourceInstitutions: ["Clover Data", "QuickBooks"],
   },
   {
     id: "location",
@@ -153,6 +161,7 @@ export const MOCK_RESPONSES: MockResponse[] = [
         { label: "Net Profit", data: [6240, 8100], color: "#00d4ff" },
       ],
     },
+    sourceInstitutions: ["Clover Data", "QuickBooks", "Chase"],
   },
   {
     id: "sysco",
@@ -169,6 +178,7 @@ export const MOCK_RESPONSES: MockResponse[] = [
       labels: ["Invoiced", "Actually Paid"],
       datasets: [{ label: "Amount ($)", data: [14200, 15800], color: "#2c5aa0" }],
     },
+    sourceInstitutions: ["QuickBooks", "Chase"],
   },
   {
     id: "chargebacks",
@@ -185,6 +195,7 @@ export const MOCK_RESPONSES: MockResponse[] = [
       labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
       datasets: [{ label: "Chargebacks", data: [1, 0, 1, 2, 4, 5, 1], color: "#e74c3c" }],
     },
+    sourceInstitutions: ["Clover Data", "American Express", "Chase"],
   },
   {
     id: "fees",
@@ -203,6 +214,7 @@ export const MOCK_RESPONSES: MockResponse[] = [
         { label: "Avg Ticket ($)", data: [47, 28, 26, 31], color: "#2c5aa0" },
       ],
     },
+    sourceInstitutions: ["Clover Data", "American Express"],
   },
   {
     id: "payroll",
@@ -219,6 +231,7 @@ export const MOCK_RESPONSES: MockResponse[] = [
       labels: ["Mon", "Tue", "Wed", "Thu", "Fri"],
       datasets: [{ label: "Balance ($)", data: [11400, 11400, 16200, 19400, 8100], color: "#2c5aa0" }],
     },
+    sourceInstitutions: ["QuickBooks", "Chase", "Bank of America"],
   },
   {
     id: "great-month",
@@ -234,6 +247,7 @@ export const MOCK_RESPONSES: MockResponse[] = [
       labels: ["Day 1", "Day 5", "Day 10", "Day 14", "Day 18", "Day 25", "Day 30"],
       datasets: [{ label: "Bank Balance ($)", data: [28000, 29400, 31200, 28000, 25100, 26800, 24900], color: "#2c5aa0" }],
     },
+    sourceInstitutions: ["Clover Data", "QuickBooks", "Chase"],
   },
   {
     id: "saturday",
@@ -254,6 +268,7 @@ export const MOCK_RESPONSES: MockResponse[] = [
         { label: "Profit", data: [2520, 2300], color: "#06b6d4" },
       ],
     },
+    sourceInstitutions: ["Clover Data", "QuickBooks"],
   },
   {
     id: "money-going",
@@ -270,6 +285,7 @@ export const MOCK_RESPONSES: MockResponse[] = [
       labels: ["Payroll", "Suppliers", "Rent", "Fees", "Utilities", "Chargebacks", "Other"],
       datasets: [{ label: "Monthly Expenses ($)", data: [12000, 9800, 4500, 2870, 2340, 1200, 5690], color: "#2c5aa0" }],
     },
+    sourceInstitutions: ["Clover Data", "QuickBooks", "Chase"],
   },
   {
     id: "last-week",
@@ -286,6 +302,7 @@ export const MOCK_RESPONSES: MockResponse[] = [
       labels: ["Gross Sales", "After Fees", "After CB", "Net Settled", "Cash/Other", "Actual Income"],
       datasets: [{ label: "Revenue ($)", data: [14820, 14389, 14209, 14124, 15264, 15264], color: "#2c5aa0" }],
     },
+    sourceInstitutions: ["Clover Data", "Chase", "American Express"],
   },
 ]
 

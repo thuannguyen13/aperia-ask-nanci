@@ -72,11 +72,17 @@ export async function* streamChat(
 
   if (suggestions.length) yield { type: "suggestions", items: suggestions }
 
-  // Attribute a random sample of active sources
+  // Attribute sources relevant to the answer, falling back to random sample
   if (activeSources.length) {
-    const count = Math.min(activeSources.length, Math.floor(Math.random() * 3) + 1)
-    const sampled = [...activeSources].sort(() => Math.random() - 0.5).slice(0, count)
-    yield { type: "sources", items: sampled }
+    let attributed: typeof activeSources
+    if (match?.sourceInstitutions?.length) {
+      attributed = activeSources.filter((s) => match.sourceInstitutions!.includes(s.institution ?? s.name))
+      if (!attributed.length) attributed = activeSources.slice(0, 1)
+    } else {
+      const count = Math.min(activeSources.length, Math.floor(Math.random() * 3) + 1)
+      attributed = [...activeSources].sort(() => Math.random() - 0.5).slice(0, count)
+    }
+    yield { type: "sources", items: attributed }
   }
 
   if (chart) yield { type: "chart", data: chart }

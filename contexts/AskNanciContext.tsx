@@ -133,7 +133,7 @@ export function AskNanciProvider({ children, isEmbed = false }: { children: Reac
     })
 
     const run = async () => {
-      const activeSources = (await fetchSources()).filter((s) => s.active)
+      const activeSources = sources.filter((s) => s.active)
       const allMsgs = await new Promise<Message[]>((resolve) => {
         setMessages((prev) => { resolve([...prev]); return prev })
       })
@@ -195,7 +195,7 @@ export function AskNanciProvider({ children, isEmbed = false }: { children: Reac
     }
 
     run()
-  }, [chatState, persistAndReload, appendBotMessage])
+  }, [chatState, sources, persistAndReload, appendBotMessage])
 
   const stopAnimation = useCallback(() => {
     stopRef.current = true
