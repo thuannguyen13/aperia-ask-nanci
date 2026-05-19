@@ -9,6 +9,11 @@
   --ring: var(--color-primary);
 }
 
+[data-embed="bo"] {
+  --color-primary: #FC6A25;
+  --ring: #FC6A25;
+}
+
 
 @theme inline {
   --color-primary: var(--color-primary);

@@ -14,7 +14,8 @@ import { MobileSidebarToggle } from "./MobileSidebarToggle"
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams()
-  const isEmbed = searchParams.get("embed") === "true"
+  const embedVariant = searchParams.get("embed") as "clover" | "bo" | null
+  const isEmbed = embedVariant === "clover" || embedVariant === "bo"
   const { setTheme } = useTheme()
 
   useEffect(() => {
@@ -26,8 +27,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   if (isEmbed) {
     return (
-      <AskNanciProvider isEmbed>
-        <div className="flex h-screen flex-col overflow-hidden bg-background overscroll-contain">
+      <AskNanciProvider isEmbed embedVariant={embedVariant}>
+        <div data-embed={embedVariant} className="flex h-screen flex-col overflow-hidden bg-background overscroll-contain">
           {children}
         </div>
         <TokenLimitDialog />

@@ -28,6 +28,7 @@ type ChatState = "idle" | "thinking" | "streaming"
 
 interface AskNanciCtx {
   isEmbed: boolean
+  embedVariant: "clover" | "bo" | null
   view: ChatView
   messages: Message[]
   chatState: ChatState
@@ -70,7 +71,7 @@ export function useAskNanci() {
   return ctx
 }
 
-export function AskNanciProvider({ children, isEmbed = false }: { children: React.ReactNode; isEmbed?: boolean }) {
+export function AskNanciProvider({ children, isEmbed = false, embedVariant = null }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: "clover" | "bo" | null }) {
   const [view, setView] = useState<ChatView>("welcome")
   const [messages, setMessages] = useState<Message[]>([])
   const [chatState, setChatState] = useState<ChatState>("idle")
@@ -291,7 +292,7 @@ export function AskNanciProvider({ children, isEmbed = false }: { children: Reac
 
   return (
     <Ctx.Provider value={{
-      isEmbed,
+      isEmbed, embedVariant,
       view, messages, chatState, sessions, activeSessionId,
       pendingBot,
       sendMessage, playScripted, stopAnimation, startNewChat, resumeSession,
