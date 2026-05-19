@@ -32,7 +32,7 @@ function SourceIcon({ source }: { source: Pick<Source, "kind" | "logo" | "color"
 
 export function ThinkingIndicator() {
   // thinkingSource is set by the stream — BE plugs in here by emitting { type: "thinking", source }
-  const { thinkingSource } = useAskNanci()
+  const { thinkingSource, thinkingLabel } = useAskNanci()
   const [visible, setVisible] = useState(true)
   const [displayed, setDisplayed] = useState(thinkingSource)
 
@@ -63,7 +63,7 @@ export function ThinkingIndicator() {
       >
         {displayed && <SourceIcon source={displayed} />}
         <span className="text-sm text-muted-foreground">
-          {displayed ? `Checking ${displayed.name}` : "Thinking…"}
+          {displayed ? `Checking ${displayed.name}` : thinkingLabel}
         </span>
       </div>
     </div>

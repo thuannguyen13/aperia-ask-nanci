@@ -366,16 +366,74 @@ export const PROMPT_CATEGORIES: PromptCategory[] = [
     ],
   },
   {
-    id: "tips",
-    label: "Tips",
+    id: "account-maintenance",
+    label: "Maintenance",
     prompts: [
-      "Which server gets the highest tips on average?",
-      "Did tips go up or down this weekend?",
-      "What's my tip percentage compared to last month?",
-      "Are customers tipping more on card or cash?",
+      "Change my business address",
+      "Update my primary email",
+      "Update my phone number",
+      "Change my statement descriptor",
+      "Update customer service phone",
+      "Update my business name",
     ],
   },
 ]
+
+export interface ScriptedTurn {
+  role: "user" | "assistant"
+  content: string
+}
+
+export const SCRIPTED_CONVERSATIONS: Record<string, ScriptedTurn[]> = {
+  "Change my business address": [
+    { role: "user", content: "Change my business address" },
+    { role: "assistant", content: "Sure, I can help with that. Could you provide your new street address, city, state, and ZIP code?" },
+    { role: "user", content: "456 Market St, San Francisco, CA 94105" },
+    { role: "assistant", content: "Got it — just to confirm, you'd like to update your business address to:\n\n456 Market St, San Francisco, CA 94105\n\nIs that correct?" },
+    { role: "user", content: "Yes, that's correct." },
+    { role: "assistant", content: "Done! Your business address has been updated to 456 Market St, San Francisco, CA 94105. The change will be reflected on your account within 1–2 business days. You'll receive a confirmation email at your primary address shortly." },
+  ],
+  "Update my primary email": [
+    { role: "user", content: "Update my primary email" },
+    { role: "assistant", content: "Of course. What's the new email address you'd like to use? This will be where we send account notifications, receipts, and any important updates." },
+    { role: "user", content: "teresa.walker@walkerbiz.com" },
+    { role: "assistant", content: "Just to confirm — you want to change your primary email to teresa.walker@walkerbiz.com. Is that right?" },
+    { role: "user", content: "Yes, go ahead." },
+    { role: "assistant", content: "Your primary email has been updated to teresa.walker@walkerbiz.com. A confirmation link has been sent to your old address to verify the change. Future notifications will go to the new address once confirmed." },
+  ],
+  "Update my phone number": [
+    { role: "user", content: "Update my phone number" },
+    { role: "assistant", content: "No problem. What's the new phone number you'd like on file? This is used for account verification and support callbacks." },
+    { role: "user", content: "(415) 867-5309" },
+    { role: "assistant", content: "To confirm — updating your contact number to (415) 867-5309. Correct?" },
+    { role: "user", content: "That's right." },
+    { role: "assistant", content: "Your phone number has been updated to (415) 867-5309. If you ever need to verify your account, that's the number we'll use going forward." },
+  ],
+  "Change my statement descriptor": [
+    { role: "user", content: "Change my statement descriptor" },
+    { role: "assistant", content: "Sure — your statement descriptor is what appears on your customers' credit card statements after a purchase. What would you like it to say? Keep it under 22 characters so it displays cleanly." },
+    { role: "user", content: "WALKER BISTRO SF" },
+    { role: "assistant", content: "\"WALKER BISTRO SF\" is 16 characters — perfect. Just to confirm, this will replace your current descriptor on all new transactions. Ready to update?" },
+    { role: "user", content: "Yes, update it." },
+    { role: "assistant", content: "Done! Your statement descriptor has been changed to \"WALKER BISTRO SF\". It will appear on all new transactions going forward. Existing pending transactions may still show the old descriptor." },
+  ],
+  "Update customer service phone": [
+    { role: "user", content: "Update customer service phone" },
+    { role: "assistant", content: "Got it. What's the new customer service number you'd like to display? This shows up on receipts and cardholder dispute communications." },
+    { role: "user", content: "(415) 555-0192" },
+    { role: "assistant", content: "Confirm update to (415) 555-0192 for customer service? This will appear on all future receipts." },
+    { role: "user", content: "Yes, confirm." },
+    { role: "assistant", content: "Updated! Your customer service phone is now (415) 555-0192. Customers will see this number on their receipts starting with your next batch." },
+  ],
+  "Update my business name": [
+    { role: "user", content: "Update my business name" },
+    { role: "assistant", content: "I can help with that. What should the new business name be? Please note that if this is a legal entity name change, you may need to provide supporting documentation such as an updated business license or articles of incorporation." },
+    { role: "user", content: "Walker Bistro & Events LLC" },
+    { role: "assistant", content: "Got it — \"Walker Bistro & Events LLC\". Is this a legal name change or just a DBA (doing business as) update?" },
+    { role: "user", content: "It's a legal name change." },
+    { role: "assistant", content: "Understood. Your business name has been updated to Walker Bistro & Events LLC. Since this is a legal name change, our compliance team may follow up within 2–3 business days to request a copy of your updated documentation. You'll receive a confirmation at your primary email shortly." },
+  ],
+}
 
 // Questions flagged data-welcome="true" in Webflow
 export const WELCOME_SUGGESTIONS = [

@@ -11,7 +11,17 @@ import {
   persistSources,
   streamChat,
 } from "@/lib/ask-nanci/api"
-import { MOCK_USAGE } from "@/lib/ask-nanci/mock-data"
+import { CLOVER_SOURCE } from "@/lib/ask-nanci/sourceStore"
+import { MOCK_USAGE, SCRIPTED_CONVERSATIONS } from "@/lib/ask-nanci/mock-data"
+
+const EMBED_DEMO_SOURCES: Source[] = [
+  CLOVER_SOURCE,
+  { id: "demo-qb", name: "Walker's Business Books", kind: "bank", institution: "QuickBooks", color: "bg-green-600", initials: "QB", logo: "/fi/quickbook.svg", active: true, addedAt: 0 },
+  { id: "demo-chase", name: "Chase Business Checking ••4892", kind: "bank", institution: "Chase", color: "bg-blue-700", initials: "CH", logo: "/fi/chase.png", active: true, addedAt: 0 },
+  { id: "demo-bofa", name: "BofA Savings ••2341", kind: "bank", institution: "Bank of America", color: "bg-red-600", initials: "BA", logo: "/fi/bofa.png", active: true, addedAt: 0 },
+  { id: "demo-wf", name: "Wells Fargo Business ••7823", kind: "bank", institution: "Wells Fargo", color: "bg-yellow-600", initials: "WF", logo: "/fi/wellsfargo.png", active: true, addedAt: 0 },
+  { id: "demo-amex", name: "Amex Business Gold ••5561", kind: "bank", institution: "American Express", color: "bg-sky-600", initials: "AX", logo: "/fi/amex.svg", active: true, addedAt: 0 },
+]
 
 type ChatView = "welcome" | "chat"
 type ChatState = "idle" | "thinking" | "streaming"
@@ -25,6 +35,7 @@ interface AskNanciCtx {
   activeSessionId: string | null
   pendingBot: Message | null
   sendMessage: (text: string) => void
+  playScripted: (prompt: string) => void
   stopAnimation: () => void
   startNewChat: () => void
   resumeSession: (id: string) => void
@@ -32,6 +43,7 @@ interface AskNanciCtx {
   sources: Source[]
   setSources: (sources: Source[]) => void
   thinkingSource: Source | null
+  thinkingLabel: string
   kbOpen: boolean
   setKbOpen: (open: boolean) => void
   draft: string
@@ -65,8 +77,9 @@ export function AskNanciProvider({ children, isEmbed = false }: { children: Reac
   const [sessions, setSessions] = useState<Session[]>([])
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null)
   const [pendingBot, setPendingBot] = useState<Message | null>(null)
-  const [sources, setSources_] = useState<Source[]>([])
+  const [sources, setSources_] = useState<Source[]>(isEmbed ? EMBED_DEMO_SOURCES : [])
   const [thinkingSource, setThinkingSource] = useState<Source | null>(null)
+  const [thinkingLabel, setThinkingLabel] = useState("Thinking…")
   const [kbOpen, setKbOpen] = useState(false)
   const [draft, setDraft] = useState("")
   const [error, setError] = useState<string | null>(null)
@@ -80,9 +93,9 @@ export function AskNanciProvider({ children, isEmbed = false }: { children: Reac
 
   useEffect(() => {
     fetchSessions().then(setSessions)
-    fetchSources().then(setSources_)
+    if (!isEmbed) fetchSources().then(setSources_)
     if (!localStorage.getItem("ask_nanci_onboarded")) setOnboardingOpen(true)
-  }, [])
+  }, [isEmbed])
 
   const reloadSessions = useCallback(() => {
     fetchSessions().then(setSessions)
@@ -188,6 +201,52 @@ export function AskNanciProvider({ children, isEmbed = false }: { children: Reac
     stopRef.current = true
   }, [])
 
+  const playScripted = useCallback((prompt: string) => {
+    const script = SCRIPTED_CONVERSATIONS[prompt]
+    if (!script) return
+    setThinkingLabel("Updating your account…")
+    setView("chat")
+    setMessages([])
+    setChatState("idle")
+    setPendingBot(null)
+
+    const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
+
+    const streamText = (text: string, id: string) =>
+      new Promise<void>((resolve) => {
+        const botMsg = { id, role: "assistant" as const, content: "" }
+        setChatState("streaming")
+        let charIdx = 0
+        const interval = setInterval(() => {
+          charIdx++
+          setPendingBot({ ...botMsg, content: text.slice(0, charIdx) })
+          if (charIdx >= text.length) {
+            clearInterval(interval)
+            setMessages((prev) => [...prev, { ...botMsg, content: text }])
+            setPendingBot(null)
+            resolve()
+          }
+        }, 16)
+      })
+
+    const run = async () => {
+      for (let i = 0; i < script.length; i++) {
+        const turn = script[i]
+        if (turn.role === "user") {
+          await sleep(i === 0 ? 600 : 900)
+          setMessages((prev) => [...prev, { id: newSessionId(), role: "user" as const, content: turn.content }])
+          setChatState("thinking")
+        } else {
+          await sleep(1000)
+          await streamText(turn.content, newSessionId())
+          if (i === script.length - 1) { setChatState("idle"); setThinkingLabel("Thinking…") }
+        }
+      }
+    }
+
+    run()
+  }, [])
+
   const startNewChat = useCallback(() => {
     stopRef.current = true
     setView("welcome")
@@ -235,9 +294,9 @@ export function AskNanciProvider({ children, isEmbed = false }: { children: Reac
       isEmbed,
       view, messages, chatState, sessions, activeSessionId,
       pendingBot,
-      sendMessage, stopAnimation, startNewChat, resumeSession,
+      sendMessage, playScripted, stopAnimation, startNewChat, resumeSession,
       deleteSessionById: deleteSessionByIdCb,
-      sources, setSources: handleSetSources, thinkingSource,
+      sources, setSources: handleSetSources, thinkingSource, thinkingLabel,
       kbOpen, setKbOpen,
       draft, setDraft,
       error,

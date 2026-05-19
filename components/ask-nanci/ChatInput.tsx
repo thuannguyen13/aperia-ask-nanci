@@ -10,7 +10,7 @@ import { ConnectWizard } from "./ConnectWizard"
 import { ChatActiveSources } from "./ChatActiveSources"
 
 export function ChatInput() {
-  const { sendMessage, chatState, stopAnimation, sources, setSources, draft, setDraft, setTokenLimitReached, setOnboardingOpen } = useAskNanci()
+  const { sendMessage, chatState, stopAnimation, sources, setSources, draft, setDraft, setTokenLimitReached, setOnboardingOpen, isEmbed } = useAskNanci()
   const activeSources = sources.filter((s) => s.active)
 
   const [value, setValue] = useState("")
@@ -75,23 +75,29 @@ export function ChatInput() {
 
         <div className="flex items-center justify-between px-2 pb-2">
           <div className="flex items-center gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button size="icon-sm" variant="ghost">
-                  <Plus />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="top" align="start">
-                <DropdownMenuItem onSelect={() => setWizardOpen(true)}>
-                  <Link2 className="size-4" />
-                  Link Accounts
-                </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => fileRef.current?.click()}>
-                  <Upload className="size-4" />
-                  Upload File
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {isEmbed ? (
+              <Button size="icon-sm" variant="ghost" disabled>
+                <Plus />
+              </Button>
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="icon-sm" variant="ghost">
+                    <Plus />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="top" align="start">
+                  <DropdownMenuItem onSelect={() => setWizardOpen(true)}>
+                    <Link2 className="size-4" />
+                    Link Accounts
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => fileRef.current?.click()}>
+                    <Upload className="size-4" />
+                    Upload File
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
 
             <ChatActiveSources sources={activeSources} />
           </div>
@@ -101,7 +107,7 @@ export function ChatInput() {
               <Square className="size-3.5 fill-current" />
             </Button>
           ) : (
-            <Button size="icon-sm" variant="default" onClick={submit} disabled={!value.trim()}>
+            <Button size="icon-sm" variant="default" onClick={submit} disabled={isEmbed || !value.trim()}>
               <ArrowUp />
             </Button>
           )}
