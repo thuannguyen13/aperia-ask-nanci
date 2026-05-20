@@ -9,7 +9,7 @@
   --ring: var(--color-primary);
 }
 
-[data-embed="bo"] {
+[data-embed="business-owner"] {
   --color-primary: #FC6A25;
   --ring: #FC6A25;
 }
