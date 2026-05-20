@@ -4,6 +4,7 @@ import Image from "next/image"
 import { FileText } from "lucide-react"
 import { Popover, PopoverTrigger, PopoverContent } from "aperia-ds5"
 import type { Source } from "@/lib/ask-nanci/types"
+import { getSourceInitials } from "./SourceIcon"
 
 
 export function ChatCitedSources({ sources }: { sources: Source[] }) {
@@ -15,7 +16,7 @@ export function ChatCitedSources({ sources }: { sources: Source[] }) {
         <button className="mt-2 flex items-center gap-1.5 rounded-full border bg-background px-2.5 py-1 text-xs text-muted-foreground shadow-sm transition-colors hover:bg-muted">
           <div className="flex items-center">
             {sources.slice(0, 3).map((s, i) => {
-              const initials = (s.initials ?? s.name.replace(/[^a-z0-9]/gi, "").slice(0, 2).toUpperCase()) || "??"
+              const initials = getSourceInitials(s)
               return (
                 <div
                   key={s.id}
@@ -39,7 +40,7 @@ export function ChatCitedSources({ sources }: { sources: Source[] }) {
         <p className="px-3 py-3 text-xs font-semibold text-foreground">Sources used</p>
         <div className="flex flex-col pb-1">
           {sources.map((s) => {
-            const initials = (s.initials ?? s.name.replace(/[^a-z0-9]/gi, "").slice(0, 2).toUpperCase()) || "??"
+            const initials = getSourceInitials(s)
             return (
               <div key={s.id} className="flex items-center gap-2.5 px-3 py-1.5">
                 {s.kind === "bank" ? (

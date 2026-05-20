@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { Plus, ArrowUp, Square, Link2, Upload } from "lucide-react"
 import { Button, Textarea, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { addFileSource, readSources } from "@/lib/ask-nanci/sourceStore"
+import { addFileSources, readSources } from "@/lib/ask-nanci/sourceStore"
 import { SlashCommandPopover, type SlashAction } from "./SlashCommandPopover"
 import { ConnectWizard } from "./ConnectWizard"
 import { ChatActiveSources } from "./ChatActiveSources"
@@ -52,7 +52,7 @@ export function ChatInput() {
   }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    Array.from(e.target.files ?? []).forEach((f) => addFileSource(f.name, f.type || "application/octet-stream"))
+    addFileSources(e.target.files)
     setSources(readSources())
     e.target.value = ""
   }

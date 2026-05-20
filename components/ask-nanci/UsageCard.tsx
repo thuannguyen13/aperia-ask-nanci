@@ -20,14 +20,14 @@ export function UsageCard() {
 
   return (
     <div className="rounded-[10px] bg-card border p-3 shadow-sm flex flex-col gap-4">
-      <div className="flex flex-col items-center items-start gap-1">
+      <div className="flex flex-col items-start gap-1">
         <p className="text-sm font-semibold text-foreground">Your Usage</p>
         <p className="text-sm text-muted-foreground">Resets in {getTimeUntilMidnight()}</p>
       </div>
       <div className="flex flex-col gap-1">
         <div className="flex items-center justify-between">
           <span className="text-xs leading-none text-muted-foreground">Tokens Used</span>
-          <span className="text-xs leading-nonetext-foreground">{tokenPct}% Used</span>
+          <span className="text-xs leading-none text-foreground">{tokenPct}% Used</span>
         </div>
         <Progress value={tokenPct} className="h-1" />
       </div>

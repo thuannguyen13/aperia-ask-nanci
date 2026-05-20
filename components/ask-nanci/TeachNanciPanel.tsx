@@ -7,7 +7,8 @@ import { Button, Switch, Separator, Card, CardContent, ScrollArea } from "aperia
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { CLOVER_SOURCE, addFileSource, toggleSource, removeSource, readSources } from "@/lib/ask-nanci/sourceStore"
+import { CLOVER_SOURCE, addFileSources, toggleSource, removeSource, readSources } from "@/lib/ask-nanci/sourceStore"
+import { SourceIcon } from "./SourceIcon"
 import type { Source } from "@/lib/ask-nanci/types"
 import { ConnectWizard } from "./ConnectWizard"
 
@@ -40,23 +41,6 @@ function FileTypeIcon({ name }: { name: string }) {
   )
 }
 
-function BankIcon({ source }: { source: Source }) {
-  if (source.logo) {
-    return (
-      <div className="flex size-9 shrink-0 items-center justify-center rounded-xl border bg-white p-1">
-        <Image src={source.logo} alt={source.institution ?? source.name} width={28} height={28} className="object-contain" />
-      </div>
-    )
-  }
-  const initials = (source.initials ?? source.name.replace(/[^a-z0-9]/gi, "").slice(0, 2).toUpperCase()) || "BK"
-  const colorClass = source.color ?? "bg-muted"
-  const textClass = source.color ? "text-white" : "text-muted-foreground"
-  return (
-    <div className={`flex size-9 shrink-0 items-center justify-center rounded-xl text-[11px] font-semibold ${colorClass} ${textClass}`}>
-      {initials}
-    </div>
-  )
-}
 
 // ─── Source row ──────────────────────────────────────────────────────────────
 
@@ -69,7 +53,7 @@ function SourceRow({ source, onToggle, onRemove }: { source: Source; onToggle: (
         : <Switch size="sm" checked={source.active} onCheckedChange={onToggle} />
       }
       <div className="flex flex-1 items-center gap-2 min-w-0">
-        {source.kind === "file" ? <FileTypeIcon name={source.name} /> : <BankIcon source={source} />}
+        {source.kind === "file" ? <FileTypeIcon name={source.name} /> : <SourceIcon source={source} size="lg" />}
         <div className="min-w-0">
           <span className="block truncate text-sm text-foreground">{source.name}</span>
           {source.institution && (
@@ -88,7 +72,7 @@ function SourceRow({ source, onToggle, onRemove }: { source: Source; onToggle: (
 
 // ─── Main panel ──────────────────────────────────────────────────────────────
 
-export function KnowledgeBasePanel() {
+export function TeachNanciPanel() {
   const { kbOpen, setKbOpen, sources, setSources } = useAskNanci()
   const fileRef = useRef<HTMLInputElement>(null)
   const [wizardOpen, setWizardOpen] = useState(false)
@@ -101,9 +85,7 @@ export function KnowledgeBasePanel() {
   function handleRemove(id: string) { removeSource(id); refresh() }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    Array.from(e.target.files ?? []).forEach((f) =>
-      addFileSource(f.name, f.type || "application/octet-stream"),
-    )
+    addFileSources(e.target.files)
     refresh()
     e.target.value = ""
   }

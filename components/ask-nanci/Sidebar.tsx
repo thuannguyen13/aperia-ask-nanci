@@ -57,7 +57,7 @@ function SidebarItem({
 }
 
 export function Sidebar() {
-  const { sessions, activeSessionId, startNewChat, resumeSession, deleteSessionById, sources, kbOpen, setKbOpen, openSettings, mobileSidebarOpen, setMobileSidebarOpen } = useAskNanci()
+  const { sessions, activeSessionId, startNewChat, resumeSession, deleteSessionById, sources, kbOpen, setKbOpen, openSettings, mobileSidebarOpen, setMobileSidebarOpen, currentUser } = useAskNanci()
   const [collapsed, setCollapsed] = useState(false)
   const [wizardOpen, setWizardOpen] = useState(false)
   const { resolvedTheme, setTheme } = useTheme()
@@ -203,29 +203,29 @@ export function Sidebar() {
                 <DropdownMenuTrigger asChild>
                   <div className="mt-1 flex cursor-pointer items-center justify-center rounded-md px-2 py-1.5 hover:bg-muted transition-colors">
                     <Avatar className="size-7 shrink-0">
-                      <AvatarFallback className="text-xs">TW</AvatarFallback>
+                      <AvatarFallback className="text-xs">{currentUser?.initials ?? ""}</AvatarFallback>
                     </Avatar>
                   </div>
                 </DropdownMenuTrigger>
               </TooltipTrigger>
-              <TooltipContent side="right">Teresa W. · teresa.w@example.com</TooltipContent>
+              <TooltipContent side="right">{currentUser ? `${currentUser.name} · ${currentUser.email}` : ""}</TooltipContent>
             </Tooltip>
           ) : (
             <DropdownMenuTrigger asChild>
               <div className="mt-1 flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted transition-colors">
                 <Avatar className="size-7 shrink-0">
-                  <AvatarFallback className="text-xs">TW</AvatarFallback>
+                  <AvatarFallback className="text-xs">{currentUser?.initials ?? ""}</AvatarFallback>
                 </Avatar>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold leading-none text-foreground">Teresa W.</p>
-                  <p className="truncate text-xs leading-none text-muted-foreground mt-1">teresa.w@example.com</p>
+                  <p className="truncate text-sm font-semibold leading-none text-foreground">{currentUser?.name ?? ""}</p>
+                  <p className="truncate text-xs leading-none text-muted-foreground mt-1">{currentUser?.email ?? ""}</p>
                 </div>
               </div>
             </DropdownMenuTrigger>
           )}
           <DropdownMenuContent side="top" align="start" className="w-52">
             <DropdownMenuLabel className="text-xs font-normal text-muted-foreground">
-              teresa.w@example.com
+              {currentUser?.email ?? ""}
             </DropdownMenuLabel>
             <DropdownMenuItem onSelect={(e) => { e.preventDefault(); setTheme(isDark ? "light" : "dark") }} className="flex items-center justify-between">
               <span className="flex items-center gap-2"><Moon className="size-4" /> Dark Mode</span>

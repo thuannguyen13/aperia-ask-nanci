@@ -10,39 +10,24 @@ import {
   fetchSources,
   persistSources,
   streamChat,
+  fetchUsage,
+  fetchCurrentUser,
+  fetchPromptCategories,
+  fetchAllQuestions,
+  fetchPlanTiers,
+  fetchActivity,
 } from "@/lib/ask-nanci/api"
-import { CLOVER_SOURCE } from "@/lib/ask-nanci/sourceStore"
-import { MOCK_USAGE, SCRIPTED_CONVERSATIONS } from "@/lib/ask-nanci/mock-data"
-
-const ACCESS_ONE_SOURCE: Source = {
-  id: "clover-built-in",
-  name: "AccessOne",
-  kind: "bank",
-  institution: "AccessOne Data",
-  logo: "/accessOne-logo.svg",
-  active: true,
-  addedAt: 0,
-}
-
-const EMBED_DEMO_SOURCES: Source[] = [
-  CLOVER_SOURCE,
-  { id: "demo-qb", name: "Walker's Business Books", kind: "bank", institution: "QuickBooks", color: "bg-green-600", initials: "QB", logo: "/fi/quickbook.svg", active: true, addedAt: 0 },
-  { id: "demo-chase", name: "Chase Business Checking ••4892", kind: "bank", institution: "Chase", color: "bg-blue-700", initials: "CH", logo: "/fi/chase.png", active: true, addedAt: 0 },
-  { id: "demo-bofa", name: "BofA Savings ••2341", kind: "bank", institution: "Bank of America", color: "bg-red-600", initials: "BA", logo: "/fi/bofa.png", active: true, addedAt: 0 },
-  { id: "demo-wf", name: "Wells Fargo Business ••7823", kind: "bank", institution: "Wells Fargo", color: "bg-yellow-600", initials: "WF", logo: "/fi/wellsfargo.png", active: true, addedAt: 0 },
-  { id: "demo-amex", name: "Amex Business Gold ••5561", kind: "bank", institution: "American Express", color: "bg-sky-600", initials: "AX", logo: "/fi/amex.svg", active: true, addedAt: 0 },
-]
-
-const EMBED_BO_DEMO_SOURCES: Source[] = EMBED_DEMO_SOURCES.map((s) =>
-  s.id === "clover-built-in" ? ACCESS_ONE_SOURCE : s
-)
+import type { CurrentUser, PromptCategory, PlanTier, ActivityItem } from "@/lib/ask-nanci/api"
+import { EMBED_DEMO_SOURCES, EMBED_BUSINESS_OWNER_DEMO_SOURCES, SCRIPTED_CONVERSATIONS } from "@/lib/ask-nanci/embed-demo-config"
+import type { EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
+import { CLOVER_SOURCE_ID, ONBOARDING_KEY } from "@/lib/ask-nanci/sourceStore"
 
 type ChatView = "welcome" | "chat"
 type ChatState = "idle" | "thinking" | "streaming"
 
 interface AskNanciCtx {
   isEmbed: boolean
-  embedVariant: "clover" | "bo" | null
+  embedVariant: EmbedVariant | null
   view: ChatView
   messages: Message[]
   chatState: ChatState
@@ -50,6 +35,7 @@ interface AskNanciCtx {
   activeSessionId: string | null
   pendingBot: Message | null
   sendMessage: (text: string) => void
+  handlePrompt: (prompt: string) => void
   playScripted: (prompt: string) => void
   stopAnimation: () => void
   startNewChat: () => void
@@ -57,14 +43,18 @@ interface AskNanciCtx {
   deleteSessionById: (id: string) => void
   sources: Source[]
   setSources: (sources: Source[]) => void
-  thinkingSource: Source | null
-  thinkingLabel: string
+  thinking: { source: Source | null; label: string }
   kbOpen: boolean
   setKbOpen: (open: boolean) => void
   draft: string
   setDraft: (text: string) => void
   error: string | null
   usage: UsageData
+  currentUser: CurrentUser | null
+  promptCategories: PromptCategory[]
+  allQuestions: string[]
+  planTiers: PlanTier[]
+  activity: ActivityItem[]
   tokenLimitReached: boolean
   setTokenLimitReached: (v: boolean) => void
   settingsOpen: boolean
@@ -85,21 +75,26 @@ export function useAskNanci() {
   return ctx
 }
 
-export function AskNanciProvider({ children, isEmbed = false, embedVariant = null }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: "clover" | "bo" | null }) {
+export function AskNanciProvider({ children, isEmbed = false, embedVariant = null }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null }) {
   const [view, setView] = useState<ChatView>("welcome")
   const [messages, setMessages] = useState<Message[]>([])
   const [chatState, setChatState] = useState<ChatState>("idle")
   const [sessions, setSessions] = useState<Session[]>([])
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null)
   const [pendingBot, setPendingBot] = useState<Message | null>(null)
-  const [sources, setSources_] = useState<Source[]>(
-    isEmbed ? (embedVariant === "bo" ? EMBED_BO_DEMO_SOURCES : EMBED_DEMO_SOURCES) : []
+  const [sources, setSourcesState] = useState<Source[]>(
+    isEmbed ? (embedVariant === "business-owner" ? EMBED_BUSINESS_OWNER_DEMO_SOURCES : EMBED_DEMO_SOURCES) : []
   )
-  const [thinkingSource, setThinkingSource] = useState<Source | null>(null)
-  const [thinkingLabel, setThinkingLabel] = useState("Thinking…")
+  const [thinking, setThinking] = useState<{ source: Source | null; label: string }>({ source: null, label: "Thinking…" })
   const [kbOpen, setKbOpen] = useState(false)
   const [draft, setDraft] = useState("")
   const [error, setError] = useState<string | null>(null)
+  const [usage, setUsage] = useState<UsageData>({ plan: "Gold", tokens: { used: 0, limit: 15000 }, chats: { used: 0, limit: 10 }, files: { used: 0, limit: 5 } })
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null)
+  const [promptCategories, setPromptCategories] = useState<PromptCategory[]>([])
+  const [allQuestions, setAllQuestions] = useState<string[]>([])
+  const [planTiers, setPlanTiers] = useState<PlanTier[]>([])
+  const [activity, setActivity] = useState<ActivityItem[]>([])
   const [tokenLimitReached, setTokenLimitReached] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [settingsTab, setSettingsTab] = useState("usage")
@@ -110,18 +105,20 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
 
   useEffect(() => {
     fetchSessions().then(setSessions)
-    if (!isEmbed) fetchSources().then(setSources_)
-    if (!localStorage.getItem("ask_nanci_onboarded")) setOnboardingOpen(true)
+    fetchUsage().then(setUsage)
+    fetchCurrentUser().then(setCurrentUser)
+    fetchPromptCategories().then(setPromptCategories)
+    fetchAllQuestions().then(setAllQuestions)
+    fetchPlanTiers().then(setPlanTiers)
+    fetchActivity().then(setActivity)
+    if (!isEmbed) fetchSources().then(setSourcesState)
+    if (!localStorage.getItem(ONBOARDING_KEY)) setOnboardingOpen(true)
   }, [isEmbed])
-
-  const reloadSessions = useCallback(() => {
-    fetchSessions().then(setSessions)
-  }, [])
 
   const persistAndReload = useCallback(async (msgs: Message[]) => {
     await persistSession(msgs, sessionIdRef.current)
-    reloadSessions()
-  }, [reloadSessions])
+    fetchSessions().then(setSessions)
+  }, [])
 
   const appendBotMessage = useCallback((msg: Message) => {
     setMessages((prev) => {
@@ -151,6 +148,9 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
 
     const run = async () => {
       const activeSources = sources.filter((s) => s.active)
+      // Read the latest messages from React state synchronously.
+      // setMessages callback is guaranteed to receive the current state value,
+      // so resolving the promise from inside it is the safest way to avoid stale closures.
       const allMsgs = await new Promise<Message[]>((resolve) => {
         setMessages((prev) => { resolve([...prev]); return prev })
       })
@@ -163,11 +163,11 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
           if (stopRef.current) break
 
           if (chunk.type === "thinking") {
-            setThinkingSource(chunk.source as Source)
+            setThinking((prev) => ({ ...prev, source: chunk.source as Source }))
           } else if (chunk.type === "token") {
             if (!started) {
               started = true
-              setThinkingSource(null)
+              setThinking((prev) => ({ ...prev, source: null }))
               setPendingBot(botMsg)
               setChatState("streaming")
             }
@@ -190,7 +190,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Something went wrong")
-        setThinkingSource(null)
+        setThinking((prev) => ({ ...prev, source: null }))
         setChatState("idle")
         setPendingBot(null)
         return
@@ -221,7 +221,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const playScripted = useCallback((prompt: string) => {
     const script = SCRIPTED_CONVERSATIONS[prompt]
     if (!script) return
-    setThinkingLabel("Updating your account…")
+    setThinking((prev) => ({ ...prev, label: "Updating your account…" }))
     setView("chat")
     setMessages([])
     setChatState("idle")
@@ -233,17 +233,25 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       new Promise<void>((resolve) => {
         const botMsg = { id, role: "assistant" as const, content: "" }
         setChatState("streaming")
-        let charIdx = 0
-        const interval = setInterval(() => {
-          charIdx++
-          setPendingBot({ ...botMsg, content: text.slice(0, charIdx) })
-          if (charIdx >= text.length) {
-            clearInterval(interval)
+        // Split into word-boundary chunks to mimic real token streaming
+        const chunks = text.match(/\S+\s*/g) ?? []
+        let chunkIdx = 0
+        const emitNext = () => {
+          if (chunkIdx >= chunks.length) {
             setMessages((prev) => [...prev, { ...botMsg, content: text }])
             setPendingBot(null)
             resolve()
+            return
           }
-        }, 16)
+          // Emit 1-3 chunks per tick with ~30-80ms variable delay
+          const batch = Math.floor(Math.random() * 3) + 1
+          for (let i = 0; i < batch && chunkIdx < chunks.length; i++, chunkIdx++) {
+            botMsg.content += chunks[chunkIdx]
+          }
+          setPendingBot({ ...botMsg })
+          setTimeout(emitNext, 30 + Math.random() * 50)
+        }
+        emitNext()
       })
 
     const run = async () => {
@@ -256,13 +264,18 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
         } else {
           await sleep(1000)
           await streamText(turn.content, newSessionId())
-          if (i === script.length - 1) { setChatState("idle"); setThinkingLabel("Thinking…") }
+          if (i === script.length - 1) { setChatState("idle"); setThinking({ source: null, label: "Thinking…" }) }
         }
       }
     }
 
     run()
   }, [])
+
+  const handlePrompt = useCallback((prompt: string) => {
+    if (isEmbed && SCRIPTED_CONVERSATIONS[prompt]) playScripted(prompt)
+    else sendMessage(prompt)
+  }, [isEmbed, sendMessage, playScripted])
 
   const startNewChat = useCallback(() => {
     stopRef.current = true
@@ -290,15 +303,15 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setError(null)
   }, [])
 
-  const deleteSessionByIdCb = useCallback(async (id: string) => {
+  const deleteSessionById = useCallback(async (id: string) => {
     await removeSessionById(id)
-    reloadSessions()
+    fetchSessions().then(setSessions)
     if (activeSessionId === id) startNewChat()
-  }, [activeSessionId, startNewChat, reloadSessions])
+  }, [activeSessionId, startNewChat])
 
   const handleSetSources = useCallback((next: Source[]) => {
-    setSources_(next)
-    persistSources(next.filter((s) => s.id !== "clover-built-in"))
+    setSourcesState(next)
+    persistSources(next.filter((s) => s.id !== CLOVER_SOURCE_ID))
   }, [])
 
   const openSettings = useCallback((tab = "usage") => {
@@ -311,13 +324,13 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       isEmbed, embedVariant,
       view, messages, chatState, sessions, activeSessionId,
       pendingBot,
-      sendMessage, playScripted, stopAnimation, startNewChat, resumeSession,
-      deleteSessionById: deleteSessionByIdCb,
-      sources, setSources: handleSetSources, thinkingSource, thinkingLabel,
+      sendMessage, handlePrompt, playScripted, stopAnimation, startNewChat, resumeSession,
+      deleteSessionById,
+      sources, setSources: handleSetSources, thinking,
       kbOpen, setKbOpen,
       draft, setDraft,
       error,
-      usage: MOCK_USAGE,
+      usage, currentUser, promptCategories, allQuestions, planTiers, activity,
       tokenLimitReached, setTokenLimitReached,
       settingsOpen, settingsTab, openSettings, setSettingsOpen,
       mobileSidebarOpen, setMobileSidebarOpen,

@@ -28,6 +28,7 @@ export interface Message {
   suggestions?: string[]
   attributedSources?: Source[]
   chart?: ChartWidget
+  /** True when the stream ended (user stopped or natural completion). Prevents re-appending a partial response on session resume. */
   stopped?: boolean
 }
 

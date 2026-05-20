@@ -10,7 +10,7 @@ import { ExplorePrompts } from "@/components/ask-nanci/ExplorePrompts"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 
 function WelcomeView() {
-  const { sessions, resumeSession, setKbOpen, sources, isEmbed } = useAskNanci()
+  const { sessions, resumeSession, setKbOpen, sources, isEmbed, currentUser } = useAskNanci()
   const recentSessions = sessions.slice(0, 3)
 
   return (
@@ -22,11 +22,9 @@ function WelcomeView() {
           <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={40} height={40} />
           <div className="text-center">
             <p className="text-2xl font-medium text-foreground">Welcome to Ask Nanci</p>
-            <p className="text-2xl font-medium text-foreground">Ready when you are, Teresa.</p>
+            <p className="text-2xl font-medium text-foreground">Ready when you are{currentUser ? `, ${currentUser.name.split(" ")[0]}` : ""}.</p>
           </div>
         </div>
-
-        
 
         {/* KB banner */}
         {!isEmbed && sources.length < 3 && <div className="flex items-center gap-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 dark:border-green-800 dark:bg-green-950/20">
@@ -100,19 +98,21 @@ function WelcomeView() {
 }
 
 export default function AskNanciPage() {
-  const { view, startNewChat } = useAskNanci()
+  const { view, startNewChat, isEmbed } = useAskNanci()
 
   if (view === "chat") {
     return (
       <div className="relative flex min-w-0 min-h-0 flex-1 flex-col overflow-hidden">
-        <button
-          onClick={startNewChat}
-          className="absolute top-4 left-4 z-10 flex items-center gap-2"
-          aria-label="Back to home"
-        >
-          <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="Ask Nanci" width={24} height={24} />
-          <span className="text-[15px] font-semibold tracking-tight text-foreground whitespace-nowrap">Ask Nanci</span>
-        </button>
+        {isEmbed && (
+          <button
+            onClick={startNewChat}
+            className="absolute top-4 left-4 z-10 flex items-center gap-2"
+            aria-label="Back to home"
+          >
+            <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="Ask Nanci" width={24} height={24} />
+            <span className="text-[15px] font-semibold tracking-tight text-foreground whitespace-nowrap">Ask Nanci</span>
+          </button>
+        )}
         <ChatView />
         <div className="shrink-0 px-3 pb-3 md:px-4 md:pb-4">
           <div className="mx-auto w-full max-w-[800px]">

@@ -5,17 +5,20 @@ import { useSearchParams } from "next/navigation"
 import Image from "next/image"
 import { useTheme } from "next-themes"
 import { AskNanciProvider } from "@/contexts/AskNanciContext"
+import { isEmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
 import { Sidebar } from "./Sidebar"
-import { KnowledgeBasePanel } from "./KnowledgeBasePanel"
+import { TeachNanciPanel } from "./TeachNanciPanel"
 import { TokenLimitDialog } from "./TokenLimitDialog"
 import { OnboardingDialog } from "./OnboardingDialog"
+import { SettingsDialog } from "./SettingsDialog"
 import { DarkModeToggle } from "./DarkModeToggle"
 import { MobileSidebarToggle } from "./MobileSidebarToggle"
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams()
-  const embedVariant = searchParams.get("embed") as "clover" | "bo" | null
-  const isEmbed = embedVariant === "clover" || embedVariant === "bo"
+  const raw = searchParams.get("embed")
+  const embedVariant = isEmbedVariant(raw) ? raw : null
+  const isEmbed = embedVariant !== null
   const { setTheme } = useTheme()
 
   useEffect(() => {
@@ -50,7 +53,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden md:rounded-2xl bg-sidebar shadow-sm">
           <Sidebar />
           <div className="flex min-w-0 flex-1 py-1 pr-1">
-            <KnowledgeBasePanel />
+            <TeachNanciPanel />
             <div className="flex min-w-0 flex-1 overflow-hidden rounded-[12px] md:rounded-[16px] border bg-background">
               {children}
             </div>
@@ -60,6 +63,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <TokenLimitDialog />
       <OnboardingDialog />
+      <SettingsDialog />
       <DarkModeToggle />
     </AskNanciProvider>
   )
