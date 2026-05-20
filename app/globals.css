@@ -14,6 +14,11 @@
   --ring: #FC6A25;
 }
 
+[data-embed="iso"] {
+  --color-primary: #002F67;
+  --ring: #002F67;
+}
+
 
 @theme inline {
   --color-primary: var(--color-primary);
