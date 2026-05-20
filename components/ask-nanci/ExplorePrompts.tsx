@@ -28,7 +28,7 @@ export function ExplorePrompts({title, description}: ExplorePromptsProps) {
         </div>
       </div>
 
-      <Tabs defaultValue={visibleCategories[0]?.id} className="w-full">
+      <Tabs key={visibleCategories[0]?.id} defaultValue={visibleCategories[0]?.id} className="w-full">
         <TabsList className="h-auto w-full justify-start gap-1 overflow-x-auto scrollbar-none flex-nowrap">
           {visibleCategories.map(({ id, label }) => (
             <TabsTrigger key={id} value={id} className="shrink-0">{label}</TabsTrigger>
