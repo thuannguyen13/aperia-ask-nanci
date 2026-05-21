@@ -1,10 +1,11 @@
 "use client"
 
-import { memo } from "react"
+import { memo, useState } from "react"
 import type { Message } from "@/lib/ask-nanci/types"
 import { ChatCitedSources } from "./ChatCitedSources"
 import { SuggestedQuestions } from "./SuggestedQuestions"
 import { MessageChart } from "./MessageChart"
+import { ChangeAuditSheet } from "./concept/ChangeAuditSheet"
 
 function parseMarkdown(text: string): React.ReactNode[] {
   const parts = text.split(/(\*\*[^*]+\*\*)/g)
@@ -48,12 +49,25 @@ function BotMessageBase({
   displayedContent: string
   showExtras: boolean
 }) {
+  const [sheetOpen, setSheetOpen] = useState(false)
+
   return (
     <div className="flex items-start gap-3 px-4 py-3">
       <div className="min-w-0 flex-1">
         <div className="text-sm leading-relaxed text-foreground">
           <ul>{renderContent(displayedContent)}</ul>
         </div>
+        {showExtras && message.sheetAction && (
+          <>
+            <button
+              onClick={() => setSheetOpen(true)}
+              className="mt-2 text-xs font-medium text-primary underline-offset-2 hover:underline"
+            >
+              [view change]
+            </button>
+            <ChangeAuditSheet open={sheetOpen} onOpenChange={setSheetOpen} data={message.sheetAction} />
+          </>
+        )}
         {showExtras && (
           <>
             {message.chart && <MessageChart chart={message.chart} />}

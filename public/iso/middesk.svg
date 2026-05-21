@@ -1,4 +1,12 @@
 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="32" height="32" rx="6" fill="#EEE8F5"/>
-  <text x="16" y="21" text-anchor="middle" font-family="sans-serif" font-size="11" font-weight="600" fill="#6A4FA5">MD</text>
+<rect width="32" height="32" rx="16" fill="white"/>
+<g clip-path="url(#clip0_7410_16282)">
+<path d="M11.8926 8.96667H20.1081V21.8333H26.0003V6H11.8926V8.96667Z" fill="black"/>
+<path d="M20.1077 23.0337H11.8923V10.167H6V26.0003H20.1077V23.0337Z" fill="black"/>
+</g>
+<defs>
+<clipPath id="clip0_7410_16282">
+<rect width="20" height="20" fill="white" transform="translate(6 6)"/>
+</clipPath>
+</defs>
 </svg>

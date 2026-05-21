@@ -8,6 +8,11 @@ import { AskNanciProvider } from "@/contexts/AskNanciContext"
 import { isEmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
 import { Sidebar } from "./Sidebar"
 import { TeachNanciPanel } from "./TeachNanciPanel"
+import { MerchantVolumePanel } from "./concept/MerchantVolumePanel"
+import { BankAccountFormPanel } from "./concept/BankAccountFormPanel"
+import { StepUpAuthPanel } from "./concept/StepUpAuthPanel"
+import { BatchDetailPanel } from "./concept/BatchDetailPanel"
+import { ConceptPanelArea } from "./concept/ConceptPanelArea"
 import { TokenLimitDialog } from "./TokenLimitDialog"
 import { OnboardingDialog } from "./OnboardingDialog"
 import { SettingsDialog } from "./SettingsDialog"
@@ -19,6 +24,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const raw = searchParams.get("embed")
   const embedVariant = isEmbedVariant(raw) ? raw : null
   const isEmbed = embedVariant !== null
+  const isConceptVersion = searchParams.get("version") === "concept"
   const { setTheme } = useTheme()
 
   useEffect(() => {
@@ -30,9 +36,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   if (isEmbed) {
     return (
-      <AskNanciProvider isEmbed embedVariant={embedVariant}>
-        <div data-embed={embedVariant} className="flex h-screen flex-col overflow-hidden bg-background overscroll-contain">
-          {children}
+      <AskNanciProvider isEmbed embedVariant={embedVariant} isConceptVersion={isConceptVersion}>
+        <div data-embed={embedVariant} className="flex h-screen overflow-hidden bg-background overscroll-contain">
+          <div className="flex min-w-0 flex-1 overflow-hidden">
+            <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+              {children}
+            </div>
+            {isConceptVersion && <MerchantVolumePanel />}
+            {isConceptVersion && <BankAccountFormPanel />}
+            {isConceptVersion && <StepUpAuthPanel />}
+            {isConceptVersion && <BatchDetailPanel />}
+            {isConceptVersion && <ConceptPanelArea />}
+          </div>
         </div>
         <TokenLimitDialog />
       </AskNanciProvider>
@@ -40,7 +55,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AskNanciProvider>
+    <AskNanciProvider isConceptVersion={isConceptVersion}>
       <div className="relative flex h-screen flex-col bg-[linear-gradient(180deg,#0d5c00_0%,#BFCDC5_200px)] md:px-2 md:pb-2">
         {/* Top bar */}
         <div className="relative z-10 flex h-10 shrink-0 items-center justify-center">
@@ -57,6 +72,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="flex min-w-0 flex-1 overflow-hidden rounded-[12px] md:rounded-[16px] border bg-background">
               {children}
             </div>
+            {isConceptVersion && <MerchantVolumePanel />}
+            {isConceptVersion && <BankAccountFormPanel />}
+            {isConceptVersion && <StepUpAuthPanel />}
+            {isConceptVersion && <BatchDetailPanel />}
+            {isConceptVersion && <ConceptPanelArea />}
           </div>
         </div>
       </div>

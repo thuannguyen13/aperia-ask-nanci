@@ -20,6 +20,7 @@ import {
 import type { CurrentUser, PromptCategory, PlanTier, ActivityItem } from "@/lib/ask-nanci/api"
 import { EMBED_DEMO_SOURCES, EMBED_BUSINESS_OWNER_DEMO_SOURCES, EMBED_ISO_DEMO_SOURCES, SCRIPTED_CONVERSATIONS } from "@/lib/ask-nanci/embed-demo-config"
 import type { EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
+import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW2_PROMPT, CONCEPT_FLOW2_FOLLOWUP, CONCEPT_FLOW6_KEY, CONCEPT_ALL_PROMPTS, CONCEPT_NO_RESET_PROMPTS } from "@/lib/ask-nanci/concept-config"
 import { CLOVER_SOURCE_ID, ONBOARDING_KEY } from "@/lib/ask-nanci/sourceStore"
 
 type ChatView = "welcome" | "chat"
@@ -65,6 +66,28 @@ interface AskNanciCtx {
   setMobileSidebarOpen: (open: boolean) => void
   onboardingOpen: boolean
   setOnboardingOpen: (open: boolean) => void
+  isConceptVersion: boolean
+  reportPanelOpen: boolean
+  setReportPanelOpen: (open: boolean) => void
+  reportTopN: number
+  formPanelOpen: boolean
+  setFormPanelOpen: (open: boolean) => void
+  submitFormPanel: () => void
+  stepUpPanelOpen: boolean
+  setStepUpPanelOpen: (open: boolean) => void
+  stepUpPanelStep: 1 | 2 | 3
+  advanceStepUpPanel: () => void
+  submitStepUpPanel: () => void
+  batchPanelOpen: boolean
+  setBatchPanelOpen: (open: boolean) => void
+  triggerProactiveFlow: () => void
+  openPanels: string[]
+  openPanel: (type: string) => void
+  closePanel: (type: string) => void
+  closeAllNewPanels: () => void
+  submitDisputeDraft: () => void
+  declineReportFiltered: boolean
+  workQueuePhase: "triage" | "quick-wins" | "outage"
 }
 
 const Ctx = createContext<AskNanciCtx | null>(null)
@@ -75,7 +98,7 @@ export function useAskNanci() {
   return ctx
 }
 
-export function AskNanciProvider({ children, isEmbed = false, embedVariant = null }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null }) {
+export function AskNanciProvider({ children, isEmbed = false, embedVariant = null, isConceptVersion = false }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null; isConceptVersion?: boolean }) {
   const [view, setView] = useState<ChatView>("welcome")
   const [messages, setMessages] = useState<Message[]>([])
   const [chatState, setChatState] = useState<ChatState>("idle")
@@ -103,6 +126,15 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [settingsTab, setSettingsTab] = useState("usage")
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [onboardingOpen, setOnboardingOpen] = useState(false)
+  const [reportPanelOpen, setReportPanelOpen] = useState(false)
+  const [reportTopN, setReportTopN] = useState(10)
+  const [formPanelOpen, setFormPanelOpen] = useState(false)
+  const [stepUpPanelOpen, setStepUpPanelOpen] = useState(false)
+  const [stepUpPanelStep, setStepUpPanelStep] = useState<1 | 2 | 3>(1)
+  const [batchPanelOpen, setBatchPanelOpen] = useState(false)
+  const [openPanels, setOpenPanels] = useState<string[]>([])
+  const [declineReportFiltered, setDeclineReportFiltered] = useState(false)
+  const [workQueuePhase, setWorkQueuePhase] = useState<"triage" | "quick-wins" | "outage">("triage")
   const stopRef = useRef<boolean>(false)
   const sessionIdRef = useRef<string>(newSessionId())
 
@@ -275,10 +307,136 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     run()
   }, [])
 
+  const playConceptScripted = useCallback((prompt: string) => {
+    const script = CONCEPT_SCRIPTED_CONVERSATIONS[prompt]
+    if (!script) return
+    setThinking((prev) => ({ ...prev, label: "Thinking…" }))
+    setView("chat")
+    if (!CONCEPT_NO_RESET_PROMPTS.has(prompt)) {
+      setMessages([])
+    }
+    setChatState("idle")
+    setPendingBot(null)
+
+    const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
+
+    const streamText = (text: string, id: string) =>
+      new Promise<void>((resolve) => {
+        const botMsg: Message = { id, role: "assistant", content: "" }
+        setChatState("streaming")
+        const chunks = text.match(/\S+\s*/g) ?? []
+        let chunkIdx = 0
+        const emitNext = () => {
+          if (chunkIdx >= chunks.length) {
+            setMessages((prev) => [...prev, { ...botMsg, content: text }])
+            setPendingBot(null)
+            resolve()
+            return
+          }
+          const batch = Math.floor(Math.random() * 2) + 1
+          for (let i = 0; i < batch && chunkIdx < chunks.length; i++, chunkIdx++) {
+            botMsg.content += chunks[chunkIdx]
+          }
+          setPendingBot({ ...botMsg })
+          setTimeout(emitNext, 50 + Math.random() * 70)
+        }
+        emitNext()
+      })
+
+    const run = async () => {
+      for (let i = 0; i < script.length; i++) {
+        const turn = script[i]
+        if (turn.role === "user") {
+          await sleep(i === 0 ? 1000 : 1800)
+          setMessages((prev) => [...prev, { id: newSessionId(), role: "user" as const, content: turn.content }])
+          setChatState("thinking")
+        } else {
+          await sleep(1800)
+          await streamText(turn.content, newSessionId())
+          if (turn.sheetAction || turn.suggestions) {
+            setMessages((prev) => {
+              const next = [...prev]
+              const last = next[next.length - 1]
+              if (last && last.role === "assistant") {
+                next[next.length - 1] = {
+                  ...last,
+                  ...(turn.sheetAction ? { sheetAction: turn.sheetAction } : {}),
+                  ...(turn.suggestions ? { suggestions: turn.suggestions } : {}),
+                }
+              }
+              return next
+            })
+          }
+          if (turn.openFormPanel) { setFormPanelOpen(true) }
+          if (turn.openStepUpPanel) { setStepUpPanelOpen(true); setStepUpPanelStep(1) }
+          if (turn.advanceStepUp) { setStepUpPanelStep((s) => Math.min(3, s + 1) as 1 | 2 | 3) }
+          if (turn.openBatchPanel) { setBatchPanelOpen(true) }
+          if (prompt === CONCEPT_FLOW2_PROMPT) { setReportPanelOpen(true); setReportTopN(10) }
+          if (prompt === CONCEPT_FLOW2_FOLLOWUP) { setReportTopN(5) }
+          if (turn.openPanel) { setOpenPanels((prev) => prev.includes(turn.openPanel!) ? prev : [...prev, turn.openPanel!]) }
+          if (turn.filterDeclineReport) { setDeclineReportFiltered(true) }
+          if (turn.advanceWorkQueue) { setWorkQueuePhase(turn.advanceWorkQueue) }
+          if (turn.closeAllPanels) { setOpenPanels([]); setDeclineReportFiltered(false); setWorkQueuePhase("triage") }
+          if (i === script.length - 1) { setChatState("idle") }
+        }
+      }
+    }
+
+    run()
+  }, [])
+
+  const submitFormPanel = useCallback(() => {
+    setFormPanelOpen(false)
+    setMessages((prev) => [
+      ...prev,
+      { id: newSessionId(), role: "assistant" as const, content: "Done — your deposit bank account has been updated. Changes take effect within 1–2 business days.", suggestions: CONCEPT_ALL_PROMPTS },
+    ])
+  }, [])
+
+  const advanceStepUpPanel = useCallback(() => {
+    setStepUpPanelStep((s) => Math.min(3, s + 1) as 1 | 2 | 3)
+  }, [])
+
+  const submitStepUpPanel = useCallback(() => {
+    setStepUpPanelOpen(false)
+    setStepUpPanelStep(1)
+    setMessages((prev) => [
+      ...prev,
+      { id: newSessionId(), role: "assistant" as const, content: "New account confirmed and submitted. Micro-deposits will arrive in 1–2 business days — I'll notify you when they're ready to verify. Deposits continue to your current account until then.", suggestions: CONCEPT_ALL_PROMPTS },
+    ])
+  }, [])
+
+  const openPanel = useCallback((type: string) => {
+    setOpenPanels((prev) => prev.includes(type) ? prev : [...prev, type])
+  }, [])
+
+  const closePanel = useCallback((type: string) => {
+    setOpenPanels((prev) => prev.filter((p) => p !== type))
+  }, [])
+
+  const closeAllNewPanels = useCallback(() => {
+    setOpenPanels([])
+    setDeclineReportFiltered(false)
+    setWorkQueuePhase("triage")
+  }, [])
+
+  const submitDisputeDraft = useCallback(() => {
+    setOpenPanels([])
+    setMessages((prev) => [
+      ...prev,
+      { id: newSessionId(), role: "assistant" as const, content: "Submitted to the processor. Case status updated to Dispute Filed. Next deadline: processor response due May 28.", suggestions: CONCEPT_ALL_PROMPTS },
+    ])
+  }, [])
+
+  const triggerProactiveFlow = useCallback(() => {
+    playConceptScripted(CONCEPT_FLOW6_KEY)
+  }, [playConceptScripted])
+
   const handlePrompt = useCallback((prompt: string) => {
-    if (isEmbed && SCRIPTED_CONVERSATIONS[prompt]) playScripted(prompt)
+    if (isConceptVersion && CONCEPT_SCRIPTED_CONVERSATIONS[prompt]) playConceptScripted(prompt)
+    else if (isEmbed && SCRIPTED_CONVERSATIONS[prompt]) playScripted(prompt)
     else sendMessage(prompt)
-  }, [isEmbed, sendMessage, playScripted])
+  }, [isConceptVersion, isEmbed, sendMessage, playScripted, playConceptScripted])
 
   const startNewChat = useCallback(() => {
     stopRef.current = true
@@ -289,6 +447,14 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     sessionIdRef.current = newSessionId()
     setPendingBot(null)
     setError(null)
+    setReportPanelOpen(false)
+    setFormPanelOpen(false)
+    setStepUpPanelOpen(false)
+    setStepUpPanelStep(1)
+    setBatchPanelOpen(false)
+    setOpenPanels([])
+    setDeclineReportFiltered(false)
+    setWorkQueuePhase("triage")
   }, [])
 
   const resumeSession = useCallback(async (id: string) => {
@@ -338,6 +504,13 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       settingsOpen, settingsTab, openSettings, setSettingsOpen,
       mobileSidebarOpen, setMobileSidebarOpen,
       onboardingOpen, setOnboardingOpen,
+      isConceptVersion, reportPanelOpen, setReportPanelOpen, reportTopN,
+      formPanelOpen, setFormPanelOpen, submitFormPanel,
+      stepUpPanelOpen, setStepUpPanelOpen, stepUpPanelStep, advanceStepUpPanel, submitStepUpPanel,
+      batchPanelOpen, setBatchPanelOpen,
+      triggerProactiveFlow,
+      openPanels, openPanel, closePanel, closeAllNewPanels, submitDisputeDraft,
+      declineReportFiltered, workQueuePhase,
     }}>
       {children}
     </Ctx.Provider>

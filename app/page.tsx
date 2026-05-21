@@ -8,6 +8,7 @@ import { ChatInput } from "@/components/ask-nanci/ChatInput"
 import { ChatView } from "@/components/ask-nanci/ChatView"
 import { ExplorePrompts } from "@/components/ask-nanci/ExplorePrompts"
 import { useAskNanci } from "@/contexts/AskNanciContext"
+import { ConceptWelcomeView } from "@/components/ask-nanci/concept/ConceptWelcomeView"
 
 function WelcomeView() {
   const { sessions, resumeSession, setKbOpen, sources, isEmbed, currentUser } = useAskNanci()
@@ -98,7 +99,7 @@ function WelcomeView() {
 }
 
 export default function AskNanciPage() {
-  const { view, startNewChat, isEmbed } = useAskNanci()
+  const { view, startNewChat, isEmbed, isConceptVersion } = useAskNanci()
 
   if (view === "chat") {
     return (
@@ -123,5 +124,6 @@ export default function AskNanciPage() {
     )
   }
 
+  if (isConceptVersion) return <ConceptWelcomeView />
   return <WelcomeView />
 }

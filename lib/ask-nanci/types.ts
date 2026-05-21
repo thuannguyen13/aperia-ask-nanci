@@ -21,6 +21,14 @@ export interface ChartWidget {
   datasets: { label: string; data: number[]; color?: string }[]
 }
 
+export interface SheetActionData {
+  field: string
+  fromValue: string
+  toValue: string
+  timestamp: string
+  status: "completed"
+}
+
 export interface Message {
   id: string
   role: MessageRole
@@ -28,6 +36,7 @@ export interface Message {
   suggestions?: string[]
   attributedSources?: Source[]
   chart?: ChartWidget
+  sheetAction?: SheetActionData
   /** True when the stream ended (user stopped or natural completion). Prevents re-appending a partial response on session resume. */
   stopped?: boolean
 }
