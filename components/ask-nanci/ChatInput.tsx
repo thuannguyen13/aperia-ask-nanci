@@ -1,10 +1,10 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Plus, ArrowUp, Square, Link2, Upload } from "lucide-react"
+import { Plus, ArrowUp, Square, Link2 } from "lucide-react"
 import { Button, Textarea, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { addFileSource, readSources } from "@/lib/ask-nanci/sourceStore"
+import { readSources } from "@/lib/ask-nanci/sourceStore"
 import { SlashCommandPopover, type SlashAction } from "./SlashCommandPopover"
 import { ConnectWizard } from "./ConnectWizard"
 import { ChatActiveSources } from "./ChatActiveSources"
@@ -17,7 +17,6 @@ export function ChatInput() {
   const [wizardOpen, setWizardOpen] = useState(false)
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (draft) { setValue(draft); setDraft(""); textareaRef.current?.focus() }
@@ -51,12 +50,6 @@ export function ChatInput() {
     textareaRef.current?.focus()
   }
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    Array.from(e.target.files ?? []).forEach((f) => addFileSource(f.name, f.type || "application/octet-stream"))
-    setSources(readSources())
-    e.target.value = ""
-  }
-
   return (
     <div className="relative">
       {showSlash && (
@@ -86,10 +79,6 @@ export function ChatInput() {
                   <Link2 className="size-4" />
                   Link Accounts
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => fileRef.current?.click()}>
-                  <Upload className="size-4" />
-                  Upload File
-                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
@@ -107,8 +96,6 @@ export function ChatInput() {
           )}
         </div>
       </div>
-
-      <input ref={fileRef} type="file" multiple className="hidden" onChange={handleFileChange} />
 
       <ConnectWizard
         open={wizardOpen}
