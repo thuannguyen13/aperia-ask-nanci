@@ -13,7 +13,7 @@ export function ExplorePrompts({title, description}: ExplorePromptsProps) {
   const { handlePrompt, embedVariant, promptCategories } = useAskNanci()
 
   const visibleCategories = embedVariant === "business-owner"
-    ? promptCategories.filter(({ id }) => id !== "inventory")
+    ? promptCategories.filter(({ id }) => id !== "inventory" && id !== "top-items")
     : promptCategories
 
   return (
