@@ -143,7 +143,7 @@ export function ConnectWizard({ open, onClose, onLinked }: Props) {
           <div className="flex items-center gap-2">
             {institution && step > 1 && step < 4 && <FILogo institution={institution} size="sm" />}
             {step === 1
-              ? <Image src="/logo_plaid.svg" alt="Plaid" width={55} height={20} />
+              ? <Image src="/logos/plaid.svg" alt="Plaid" width={55} height={20} />
               : <span className="text-sm font-semibold text-foreground">{stepTitle}</span>
             }
           </div>

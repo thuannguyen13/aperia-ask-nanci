@@ -3,6 +3,7 @@
 import { CornerDownRight, Compass } from "lucide-react"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
+import { ISO_PROMPT_CATEGORIES } from "@/lib/ask-nanci/embed-demo-config"
 
 interface ExplorePromptsProps {
   title?: string
@@ -12,9 +13,11 @@ interface ExplorePromptsProps {
 export function ExplorePrompts({title, description}: ExplorePromptsProps) {
   const { handlePrompt, embedVariant, promptCategories } = useAskNanci()
 
-  const visibleCategories = embedVariant === "business-owner"
-    ? promptCategories.filter(({ id }) => id !== "inventory" && id !== "top-items")
-    : promptCategories
+  const visibleCategories = embedVariant === "iso"
+    ? ISO_PROMPT_CATEGORIES
+    : embedVariant === "business-owner"
+      ? promptCategories.filter(({ id }) => id !== "inventory" && id !== "top-items")
+      : promptCategories
 
   return (
     <div className="flex flex-col gap-4">

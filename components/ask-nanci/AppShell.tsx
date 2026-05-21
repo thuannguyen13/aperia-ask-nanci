@@ -47,7 +47,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="absolute left-0 flex items-center md:hidden">
             <MobileSidebarToggle />
           </div>
-          <Image src="/clover-logo.svg" alt="Clover" width={80} height={24} className="h-6 w-auto" />
+          <Image src="/logos/clover.svg" alt="Clover" width={80} height={24} className="h-6 w-auto" />
         </div>
 
         <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden md:rounded-2xl bg-sidebar shadow-sm">
