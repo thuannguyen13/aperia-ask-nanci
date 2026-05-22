@@ -413,7 +413,7 @@ export interface ScriptedTurn {
 export const SCRIPTED_CONVERSATIONS: Record<string, ScriptedTurn[]> = {
   "Change my business address": [
     { role: "user", content: "Change my business address" },
-    { role: "assistant", content: "Sure. Your current business address on file is:\n\n142 Oak Street, Austin, TX 78701\n\nWhat would you like to change it to? Please include street, city, state, and ZIP." },
+    { role: "assistant", content: "Sure. Your current business address on file is:\n\n142 Oak Street, Austin, TX 78701\n\nWhat would you like to change it to? Please include street, city, state, and ZIP.", map: { address: "142 Oak Street, Austin, TX 78701", lat: 30.2645, lng: -97.7430 } },
     { role: "user", content: "456 Market St, San Francisco, CA 94105" },
     { role: "assistant", content: "Got it — just to confirm, you'd like to update your business address from 142 Oak Street, Austin, TX 78701 to:\n\n456 Market St, San Francisco, CA 94105\n\nIs that correct?" },
     { role: "user", content: "Yes, that's correct." },
