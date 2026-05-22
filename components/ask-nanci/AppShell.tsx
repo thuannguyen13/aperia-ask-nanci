@@ -21,7 +21,8 @@ import { MobileSidebarToggle } from "./MobileSidebarToggle"
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams()
-  const { isEmbed, embedVariant, isConceptVersion } = parseMode(searchParams.get("mode"))
+  const mode = searchParams.get("mode") ?? "default"
+  const { isEmbed, embedVariant, isConceptVersion } = parseMode(mode)
   const { setTheme } = useTheme()
 
   useEffect(() => {
@@ -34,7 +35,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   if (isEmbed) {
     return (
       <AskNanciProvider isEmbed embedVariant={embedVariant} isConceptVersion={isConceptVersion}>
-        <div data-embed={embedVariant} className="flex h-screen overflow-hidden bg-background overscroll-contain">
+        <div data-mode={mode} className="flex h-screen overflow-hidden bg-background overscroll-contain">
           <div className="flex min-w-0 flex-1 overflow-hidden">
             <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
               {children}
@@ -53,7 +54,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <AskNanciProvider isConceptVersion={isConceptVersion}>
-      <div className="relative flex h-screen flex-col bg-[linear-gradient(180deg,#0d5c00_0%,#BFCDC5_200px)] md:px-2 md:pb-2">
+      <div data-mode={mode} className="relative flex h-screen flex-col bg-[linear-gradient(180deg,#0d5c00_0%,#BFCDC5_200px)] md:px-2 md:pb-2">
         {/* Top bar */}
         <div className="relative z-10 flex h-10 shrink-0 items-center justify-center">
           <div className="absolute left-0 flex items-center md:hidden">

@@ -9,12 +9,12 @@
   --ring: var(--color-primary);
 }
 
-[data-embed="business-owner"] {
+[data-mode="embed-business-owner"] {
   --color-primary: #FC6A25;
   --ring: #FC6A25;
 }
 
-[data-embed="iso"] {
+[data-mode="embed-iso"] {
   --color-primary: #002F67;
   --ring: #002F67;
 }
