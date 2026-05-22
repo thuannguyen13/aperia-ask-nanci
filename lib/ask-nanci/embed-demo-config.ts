@@ -236,6 +236,18 @@ export const ISO_PROMPT_CATEGORIES: PromptCategory[] = [
     ],
   },
   {
+    id: "boarding",
+    label: "Boarding",
+    prompts: [
+      "How many merchants are pending approval right now?",
+      "Which merchants were boarded this month but haven't run their first batch yet?",
+      "Show me my boarding pipeline for the last 30 days.",
+      "How long does it take from application to first batch for new merchants?",
+      "Which new merchants have the highest volume in their first 30 days?",
+      "Show me the approval history and status for a specific merchant application.",
+    ],
+  },
+  {
     id: "processing",
     label: "Processing",
     prompts: [
@@ -281,18 +293,6 @@ export const ISO_PROMPT_CATEGORIES: PromptCategory[] = [
       "Which merchants had their risk classification change recently?",
       "Show me merchants with suspicious transaction patterns.",
       "What's my portfolio's overall risk score distribution?",
-    ],
-  },
-  {
-    id: "boarding",
-    label: "Boarding",
-    prompts: [
-      "How many merchants are pending approval right now?",
-      "Which merchants were boarded this month but haven't run their first batch yet?",
-      "Show me my boarding pipeline for the last 30 days.",
-      "How long does it take from application to first batch for new merchants?",
-      "Which new merchants have the highest volume in their first 30 days?",
-      "Show me the approval history and status for a specific merchant application.",
     ],
   },
   {
