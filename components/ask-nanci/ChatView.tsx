@@ -7,12 +7,12 @@ import { ThinkingIndicator } from "./ThinkingIndicator"
 import { ExplorePrompts } from "./ExplorePrompts"
 
 export function ChatView() {
-  const { messages, chatState, pendingBot } = useAskNanci()
+  const { messages, chatState, pendingBot, isConceptVersion } = useAskNanci()
   const { containerRef, spacerRef, lastUserMsgRef } = useChatScroll(chatState, pendingBot?.content)
 
   return (
     <div ref={containerRef} className="flex-1 min-h-0 overflow-y-auto">
-      <div className="mx-auto w-full max-w-[800px] flex flex-col gap-0 py-4">
+      <div className="mx-auto w-full max-w-[800px] flex flex-col gap-0 pt-4">
         {messages.map((msg, i) => {
           const isLastMsg = i === messages.length - 1
           const isLastUser = isLastMsg && msg.role === "user"
@@ -27,7 +27,7 @@ export function ChatView() {
                 displayedContent={msg.content}
                 showExtras={true}
               />
-              {isLastMsg && chatState === "idle" && (
+              {isLastMsg && chatState === "idle" && !isConceptVersion && (
                 <div className="mt-6">
                   <ExplorePrompts title="Ask More" description="Pick another question to keep the conversation going." />
                 </div>

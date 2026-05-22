@@ -81,6 +81,8 @@ interface AskNanciCtx {
   batchPanelOpen: boolean
   setBatchPanelOpen: (open: boolean) => void
   triggerProactiveFlow: () => void
+  proactiveNotificationActive: boolean
+  activateProactiveNotification: () => void
   openPanels: string[]
   openPanel: (type: string) => void
   closePanel: (type: string) => void
@@ -135,7 +137,9 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [openPanels, setOpenPanels] = useState<string[]>([])
   const [declineReportFiltered, setDeclineReportFiltered] = useState(false)
   const [workQueuePhase, setWorkQueuePhase] = useState<"triage" | "quick-wins" | "outage">("triage")
+  const [proactiveNotificationActive, setProactiveNotificationActive] = useState(false)
   const stopRef = useRef<boolean>(false)
+  const scriptStopRef = useRef<boolean>(false)
   const sessionIdRef = useRef<string>(newSessionId())
 
   useEffect(() => {
@@ -310,6 +314,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const playConceptScripted = useCallback((prompt: string) => {
     const script = CONCEPT_SCRIPTED_CONVERSATIONS[prompt]
     if (!script) return
+    scriptStopRef.current = false
     setThinking((prev) => ({ ...prev, label: "Thinking…" }))
     setView("chat")
     if (!CONCEPT_NO_RESET_PROMPTS.has(prompt)) {
@@ -327,6 +332,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
         const chunks = text.match(/\S+\s*/g) ?? []
         let chunkIdx = 0
         const emitNext = () => {
+          if (scriptStopRef.current) { setPendingBot(null); resolve(); return }
           if (chunkIdx >= chunks.length) {
             setMessages((prev) => [...prev, { ...botMsg, content: text }])
             setPendingBot(null)
@@ -345,13 +351,16 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
 
     const run = async () => {
       for (let i = 0; i < script.length; i++) {
+        if (scriptStopRef.current) break
         const turn = script[i]
         if (turn.role === "user") {
           await sleep(i === 0 ? 1000 : 1800)
+          if (scriptStopRef.current) break
           setMessages((prev) => [...prev, { id: newSessionId(), role: "user" as const, content: turn.content }])
           setChatState("thinking")
         } else {
           await sleep(1800)
+          if (scriptStopRef.current) break
           await streamText(turn.content, newSessionId())
           if (turn.sheetAction || turn.suggestions) {
             setMessages((prev) => {
@@ -428,6 +437,10 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     ])
   }, [])
 
+  const activateProactiveNotification = useCallback(() => {
+    setProactiveNotificationActive(true)
+  }, [])
+
   const triggerProactiveFlow = useCallback(() => {
     playConceptScripted(CONCEPT_FLOW6_KEY)
   }, [playConceptScripted])
@@ -440,6 +453,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
 
   const startNewChat = useCallback(() => {
     stopRef.current = true
+    scriptStopRef.current = true
     setView("welcome")
     setMessages([])
     setChatState("idle")
@@ -508,7 +522,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       formPanelOpen, setFormPanelOpen, submitFormPanel,
       stepUpPanelOpen, setStepUpPanelOpen, stepUpPanelStep, advanceStepUpPanel, submitStepUpPanel,
       batchPanelOpen, setBatchPanelOpen,
-      triggerProactiveFlow,
+      triggerProactiveFlow, proactiveNotificationActive, activateProactiveNotification,
       openPanels, openPanel, closePanel, closeAllNewPanels, submitDisputeDraft,
       declineReportFiltered, workQueuePhase,
     }}>

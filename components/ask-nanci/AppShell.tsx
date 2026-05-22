@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation"
 import Image from "next/image"
 import { useTheme } from "next-themes"
 import { AskNanciProvider } from "@/contexts/AskNanciContext"
-import { isEmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
+import { parseMode } from "@/lib/ask-nanci/embed-demo-config"
 import { Sidebar } from "./Sidebar"
 import { TeachNanciPanel } from "./TeachNanciPanel"
 import { MerchantVolumePanel } from "./concept/MerchantVolumePanel"
@@ -21,10 +21,7 @@ import { MobileSidebarToggle } from "./MobileSidebarToggle"
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams()
-  const raw = searchParams.get("embed")
-  const embedVariant = isEmbedVariant(raw) ? raw : null
-  const isEmbed = embedVariant !== null
-  const isConceptVersion = searchParams.get("version") === "concept"
+  const { isEmbed, embedVariant, isConceptVersion } = parseMode(searchParams.get("mode"))
   const { setTheme } = useTheme()
 
   useEffect(() => {
