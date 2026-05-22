@@ -165,6 +165,34 @@ const ISO_SCRIPTED_CONVERSATIONS: Record<string, ScriptedTurn[]> = {
     { role: "assistant", content: "Risk score distribution across your **214 active merchants** as of today:\n\n| Risk Tier | Score Range | Merchants | % of Portfolio | MTD Volume |\n|---|---|---|---|---|\n| Low Risk | 0–30 | 89 | 41.6% | $8,214,440 |\n| Standard | 31–50 | 74 | 34.6% | $7,108,320 |\n| Elevated | 51–70 | 36 | 16.8% | $4,812,110 |\n| High Risk | 71–80 | 7 | 3.3% | $1,240,880 |\n| Critical | 81–100 | 8 | 3.7% | $1,470,220 |\n\n**Portfolio Average Risk Score: 38.4** — in the Standard range.\n\nThe 15 merchants in the High Risk and Critical tiers (7.0% of your portfolio) are generating $2.7M in MTD volume, roughly 12.1% of total. That's a concentration worth monitoring — a disproportionate share of risk exposure relative to merchant count.\n\nCompared to last month, 4 merchants moved from Elevated to Standard (improving) and 4 moved from Standard to Elevated or higher (worsening)." },
   ],
 
+  // ── Boarding ───────────────────────────────────────────────────────────────
+  "How many merchants are pending approval right now?": [
+    { role: "user", content: "How many merchants are pending approval right now?" },
+    { role: "assistant", content: "You currently have **23 merchants in the approval pipeline** as of today:\n\n| Stage | Count | Avg Time in Stage |\n|---|---|---|\n| Application received | 6 | 1.2 days |\n| Underwriting review | 9 | 3.4 days |\n| Approval pending DDA verification | 5 | 2.1 days |\n| Conditionally approved | 3 | 4.8 days |\n\n**Oldest pending application:** Harborside Gym & Spa (submitted May 12 — 9 days). Currently stuck in underwriting review.\n\nFor context, your average approval-to-activation time this month is **5.6 days**, compared to your Q1 average of 6.8 days — you're processing applications faster than earlier this year." },
+  ],
+  "Which merchants were boarded this month but haven't run their first batch yet?": [
+    { role: "user", content: "Which merchants were boarded this month but haven't run their first batch yet?" },
+    { role: "assistant", content: "**5 merchants** were approved and activated in May but have not yet submitted a qualifying batch:\n\n| Merchant | MID | Approved | Days Since Activation | SIC/MCC |\n|---|---|---|---|---|\n| Eastside Barbershop | 1052 | May 19 | 2 days | 7230 (Beauty/Barber) |\n| Lakeside Brewing Taproom | 1058 | May 15 | 6 days | 5812 (Restaurant) |\n| Pacific Coast Pilates | 1061 | May 13 | 8 days | 7941 (Sports/Recreation) |\n| Northgate Auto Detail | 1067 | May 10 | 11 days | 7542 (Auto Services) |\n| Mesa Flower Studio | 1071 | May 8 | 13 days | 5992 (Florists) |\n\n**Eastside Barbershop** just activated 2 days ago — normal. **Mesa Flower Studio** at 13 days without a batch is worth a follow-up. Equipment delivery and terminal setup issues are the most common causes at this stage." },
+  ],
+  "Show me my boarding pipeline for the last 30 days.": [
+    { role: "user", content: "Show me my boarding pipeline for the last 30 days." },
+    { role: "assistant", content: "Boarding pipeline summary, Apr 22 – May 21:\n\n| Stage | Applications | Approved | Declined | Withdrawn |\n|---|---|---|---|---|\n| Restaurants / Food Service | 9 | 7 | 1 | 1 |\n| Retail | 7 | 5 | 2 | 0 |\n| Health & Beauty | 6 | 6 | 0 | 0 |\n| Auto Services | 4 | 3 | 1 | 0 |\n| Professional Services | 3 | 2 | 0 | 1 |\n| Other | 4 | 4 | 0 | 0 |\n| **Total** | **33** | **27** | **4** | **2** |\n\n**Approval rate: 81.8%** (27 of 33 applications). Of the 27 approved, **22 have submitted at least one qualifying batch**.\n\n**4 declines this period** — 2 for insufficient business history, 1 for TIN mismatch, 1 for high-risk MCC. All received written notification within 48 hours per your SLA." },
+  ],
+  "How long does it take from application to first batch for new merchants?": [
+    { role: "user", content: "How long does it take from application to first batch for new merchants?" },
+    { role: "assistant", content: "Time-to-first-batch analysis for merchants activated Apr 22 – May 21 (22 merchants with at least one qualifying batch):\n\n| Time to First Batch | Merchants | % |\n|---|---|---|\n| Same day as activation | 4 | 18.2% |\n| 1–3 days | 9 | 40.9% |\n| 4–7 days | 6 | 27.3% |\n| 8–14 days | 3 | 13.6% |\n\n**Median time to first batch: 3 days**\n**Average time to first batch: 4.1 days**\n\n**Breakdown by stage:**\n\n| Stage | Avg Days |\n|---|---|\n| Application → Approval | 5.6 days |\n| Approval → Equipment delivery | 2.8 days |\n| Equipment delivery → First batch | 1.3 days |\n| **Total: Application → First batch** | **9.7 days** |\n\nYour fastest activation this month was **Lakeview Ramen Bar** (MID 1047) — approved and first batch on the same day, May 20. The 3 merchants in the 8–14 day window all involved equipment shipping delays." },
+  ],
+  "Which new merchants have the highest volume in their first 30 days?": [
+    { role: "user", content: "Which new merchants have the highest volume in their first 30 days?" },
+    { role: "assistant", content: "Top 5 new merchants by volume in their first 30 days of processing (activated Apr–May 2026):\n\n| Merchant | MID | Activated | 30-Day Volume | Txn Count | Avg Ticket | SIC/MCC |\n|---|---|---|---|---|---|---|\n| Oceanfront Gifts | 3348 | May 12 | $84,320 | 1,204 | $70.03 | 5947 (Gift/Card/Novelty) |\n| Mesa Verde Catering | 4415 | May 8 | $71,440 | 312 | $228.97 | 5812 (Restaurant) |\n| Sunrise Pilates Studio | 2291 | May 17 | $58,880 | 984 | $59.84 | 7941 (Sports/Recreation) |\n| Northpark Nail Salon | 5562 | May 3 | $48,210 | 1,641 | $29.38 | 7230 (Beauty/Barber) |\n| Hillcrest Pet Supply | 6619 | Apr 25 | $41,770 | 887 | $47.09 | 5995 (Pet Shops) |\n\nOceanfront Gifts and Mesa Verde Catering are strong early performers. Mesa Verde's $228.97 average ticket is high for a new merchant — worth monitoring, but consistent with a catering operation handling event bookings." },
+  ],
+  "Show me the approval history and status for a specific merchant application.": [
+    { role: "user", content: "Show me the approval history and status for a specific merchant application." },
+    { role: "assistant", content: "Which merchant are you looking up? You can search by application number, business name, or the owner's name." },
+    { role: "user", content: "Harborside Gym & Spa" },
+    { role: "assistant", content: "**Application Status — Harborside Gym & Spa**\n\n| Field | Detail |\n|---|---|\n| Application # | APP-2026-0841 |\n| Submitted | May 12, 2026 |\n| Business Type | Health Club / Spa (MCC 7997) |\n| Legal Name | Harborside Wellness LLC |\n| Owner | Marcus T. Reyes |\n| TIN | Verified ✅ |\n| DDA | On file — pending micro-deposit verification ⏳ |\n| Current Status | **Underwriting Review** |\n| Days in Current Stage | 9 days |\n| Assigned Underwriter | Dana L. |\n\n**Timeline:**\n- May 12 — Application received\n- May 13 — TIN verified via Middesk\n- May 13 — DDA submitted; micro-deposits sent\n- May 14 — Underwriting review opened\n- May 21 — Still in review (9 days)\n\n**Notes:** DDA micro-deposit confirmation has not been received. Merchant was contacted May 17 with no response. Recommend follow-up today — DDA verification is the only remaining blocker before approval." },
+  ],
+
   // ── Merchants ──────────────────────────────────────────────────────────────
   "Pull up the profile for merchant ID 4892.": [
     { role: "user", content: "Pull up the profile for merchant ID 4892." },
@@ -253,6 +281,18 @@ export const ISO_PROMPT_CATEGORIES: PromptCategory[] = [
       "Which merchants had their risk classification change recently?",
       "Show me merchants with suspicious transaction patterns.",
       "What's my portfolio's overall risk score distribution?",
+    ],
+  },
+  {
+    id: "boarding",
+    label: "Boarding",
+    prompts: [
+      "How many merchants are pending approval right now?",
+      "Which merchants were boarded this month but haven't run their first batch yet?",
+      "Show me my boarding pipeline for the last 30 days.",
+      "How long does it take from application to first batch for new merchants?",
+      "Which new merchants have the highest volume in their first 30 days?",
+      "Show me the approval history and status for a specific merchant application.",
     ],
   },
   {
