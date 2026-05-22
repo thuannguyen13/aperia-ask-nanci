@@ -218,6 +218,8 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
             botMsg.attributedSources = chunk.items
           } else if (chunk.type === "chart") {
             botMsg.chart = chunk.data
+          } else if (chunk.type === "map") {
+            botMsg.map = chunk.data
           } else if (chunk.type === "error") {
             setError(chunk.message)
             setChatState("idle")

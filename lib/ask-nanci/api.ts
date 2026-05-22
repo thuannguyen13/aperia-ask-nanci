@@ -55,6 +55,7 @@ export async function* streamChat(
   const text = match?.content ?? DEFAULT_RESPONSE
   const suggestions = match?.suggestions ?? DEFAULT_SUGGESTIONS
   const chart = match?.chart
+  const map = match?.map
 
   // Cycle through active sources during thinking phase (BE: replace with real thinking chunks)
   const thinkingSources = activeSources.length ? activeSources : [CLOVER_SOURCE]
@@ -86,6 +87,7 @@ export async function* streamChat(
   }
 
   if (chart) yield { type: "chart", data: chart }
+  if (map) yield { type: "map", data: map }
 
   yield { type: "done" }
 }

@@ -6,6 +6,7 @@ export interface MockResponse {
   content: string
   suggestions: string[]
   chart?: ChartWidget
+  map?: MapWidget
   sourceInstitutions?: string[]
 }
 
@@ -303,6 +304,13 @@ export const MOCK_RESPONSES: MockResponse[] = [
       datasets: [{ label: "Revenue ($)", data: [14820, 14389, 14209, 14124, 15264, 15264], color: "#2c5aa0" }],
     },
     sourceInstitutions: ["Clover Data", "AccessOne Data", "Chase", "American Express"],
+  },
+  {
+    id: "business-address",
+    keywords: ["business address", "change my address", "update my address"],
+    content: "Done! Your business address has been updated to 456 Market St, San Francisco, CA 94105. The change will be reflected on your account within 1–2 business days. You'll receive a confirmation email at your primary address shortly.",
+    suggestions: ["Update my primary email", "Update my phone number", "Change my statement descriptor"],
+    map: { address: "456 Market St, San Francisco, CA 94105", lat: 37.7915, lng: -122.3972 },
   },
 ]
 
