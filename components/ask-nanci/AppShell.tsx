@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation"
 import Image from "next/image"
 import { useTheme } from "next-themes"
 import { AskNanciProvider } from "@/contexts/AskNanciContext"
-import { parseMode } from "@/lib/ask-nanci/embed-demo-config"
+import { isEmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
 import { Sidebar } from "./Sidebar"
 import { TeachNanciPanel } from "./TeachNanciPanel"
 import { MerchantVolumePanel } from "./concept/MerchantVolumePanel"
@@ -21,7 +21,10 @@ import { MobileSidebarToggle } from "./MobileSidebarToggle"
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams()
-  const { isEmbed, embedVariant, isConceptVersion, dataMode } = parseMode(searchParams.get("mode"))
+  const raw = searchParams.get("embed")
+  const embedVariant = isEmbedVariant(raw) ? raw : null
+  const isEmbed = embedVariant !== null
+  const isConceptVersion = searchParams.get("version") === "concept"
   const { setTheme } = useTheme()
 
   useEffect(() => {
@@ -34,7 +37,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   if (isEmbed) {
     return (
       <AskNanciProvider isEmbed embedVariant={embedVariant} isConceptVersion={isConceptVersion}>
-        <div data-mode={dataMode} className="flex h-screen overflow-hidden bg-background overscroll-contain">
+        <div data-embed={embedVariant} className="flex h-screen overflow-hidden bg-background overscroll-contain">
           <div className="flex min-w-0 flex-1 overflow-hidden">
             <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
               {children}
@@ -53,7 +56,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <AskNanciProvider isConceptVersion={isConceptVersion}>
-      <div data-mode={dataMode} className="relative flex h-screen flex-col bg-[linear-gradient(180deg,#0d5c00_0%,#BFCDC5_200px)] md:px-2 md:pb-2">
+      <div className="relative flex h-screen flex-col bg-[linear-gradient(180deg,#0d5c00_0%,#BFCDC5_200px)] md:px-2 md:pb-2">
         {/* Top bar */}
         <div className="relative z-10 flex h-10 shrink-0 items-center justify-center">
           <div className="absolute left-0 flex items-center md:hidden">
