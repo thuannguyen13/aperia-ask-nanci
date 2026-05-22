@@ -14,15 +14,16 @@ export interface ParsedMode {
   isEmbed: boolean
   embedVariant: EmbedVariant | null
   isConceptVersion: boolean
+  dataMode: string
 }
 
 export function parseMode(mode: string | null): ParsedMode {
   switch (mode) {
-    case "embed":                return { isEmbed: true,  embedVariant: "clover",          isConceptVersion: false }
-    case "embed-business-owner": return { isEmbed: true,  embedVariant: "business-owner",  isConceptVersion: false }
-    case "embed-iso":            return { isEmbed: true,  embedVariant: "iso",             isConceptVersion: false }
-    case "concept":              return { isEmbed: false, embedVariant: null,              isConceptVersion: true  }
-    default:                     return { isEmbed: false, embedVariant: null,              isConceptVersion: false }
+    case "embed":                return { isEmbed: true,  embedVariant: "clover",         isConceptVersion: false, dataMode: "clover"         }
+    case "embed-business-owner": return { isEmbed: true,  embedVariant: "business-owner", isConceptVersion: false, dataMode: "business-owner" }
+    case "embed-iso":            return { isEmbed: true,  embedVariant: "iso",            isConceptVersion: false, dataMode: "iso"            }
+    case "concept":              return { isEmbed: false, embedVariant: null,             isConceptVersion: true,  dataMode: "concept"        }
+    default:                     return { isEmbed: false, embedVariant: null,             isConceptVersion: false, dataMode: "default"        }
   }
 }
 
