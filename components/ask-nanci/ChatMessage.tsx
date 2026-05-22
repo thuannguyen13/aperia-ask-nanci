@@ -17,18 +17,80 @@ function parseMarkdown(text: string): React.ReactNode[] {
   )
 }
 
+function parseTableRow(line: string): string[] {
+  return line.split("|").slice(1, -1).map((cell) => cell.trim())
+}
+
+function isSeparatorRow(line: string): boolean {
+  return /^\|[\s|:-]+\|$/.test(line.trim())
+}
+
 function renderContent(content: string) {
-  return content.split("\n").map((line, i) => {
+  const lines = content.split("\n")
+  const nodes: React.ReactNode[] = []
+  let i = 0
+
+  while (i < lines.length) {
+    const line = lines[i]
+
+    if (line.trimStart().startsWith("|")) {
+      // Collect all consecutive table lines
+      const tableLines: string[] = []
+      while (i < lines.length && lines[i].trimStart().startsWith("|")) {
+        tableLines.push(lines[i])
+        i++
+      }
+
+      const nonSep = tableLines.filter((l) => !isSeparatorRow(l))
+      if (nonSep.length === 0) continue
+
+      const [headerRow, ...bodyRows] = nonSep
+      const headers = parseTableRow(headerRow)
+
+      nodes.push(
+        <div key={`table-${i}`} className="my-2 overflow-x-auto">
+          <table className="w-full border-collapse text-xs">
+            <thead>
+              <tr className="border-b border-border">
+                {headers.map((h, j) => (
+                  <th key={j} className="py-1.5 pr-4 text-left font-semibold text-foreground last:pr-0">
+                    {parseMarkdown(h)}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {bodyRows.map((row, ri) => (
+                <tr key={ri} className="border-b border-border/50 last:border-0">
+                  {parseTableRow(row).map((cell, ci) => (
+                    <td key={ci} className="py-1.5 pr-4 text-muted-foreground last:pr-0">
+                      {parseMarkdown(cell)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )
+      continue
+    }
+
     if (line.startsWith("- ")) {
-      return (
+      nodes.push(
         <li key={i} className="ml-4 list-disc">
           {parseMarkdown(line.slice(2))}
         </li>
       )
+    } else if (line === "") {
+      nodes.push(<br key={i} />)
+    } else {
+      nodes.push(<p key={i}>{parseMarkdown(line)}</p>)
     }
-    if (line === "") return <br key={i} />
-    return <p key={i}>{parseMarkdown(line)}</p>
-  })
+    i++
+  }
+
+  return nodes
 }
 
 function UserMessageBase({ message }: { message: Message }) {
@@ -60,13 +122,13 @@ function BotMessageBase({
             const [before, after] = displayedContent.split("{{MAP}}")
             return (
               <>
-                <ul>{renderContent(before)}</ul>
+                <div>{renderContent(before)}</div>
                 {message.map && <MessageMap map={message.map} />}
-                {after && <ul className="mt-3">{renderContent(after)}</ul>}
+                {after && <div className="mt-3">{renderContent(after)}</div>}
               </>
             )
           })() : (
-            <ul>{renderContent(displayedContent)}</ul>
+            <div>{renderContent(displayedContent)}</div>
           )}
         </div>
         {showExtras && message.sheetAction && (
