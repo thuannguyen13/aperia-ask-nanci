@@ -56,7 +56,18 @@ function BotMessageBase({
     <div className="flex items-start gap-3 px-4 py-3">
       <div className="min-w-0 flex-1">
         <div className="text-sm leading-relaxed text-foreground">
-          <ul>{renderContent(displayedContent)}</ul>
+          {displayedContent.includes("{{MAP}}") ? (() => {
+            const [before, after] = displayedContent.split("{{MAP}}")
+            return (
+              <>
+                <ul>{renderContent(before)}</ul>
+                {message.map && <MessageMap map={message.map} />}
+                {after && <ul className="mt-3">{renderContent(after)}</ul>}
+              </>
+            )
+          })() : (
+            <ul>{renderContent(displayedContent)}</ul>
+          )}
         </div>
         {showExtras && message.sheetAction && (
           <>
@@ -72,7 +83,7 @@ function BotMessageBase({
         {showExtras && (
           <>
             {message.chart && <MessageChart chart={message.chart} />}
-            {message.map && <MessageMap map={message.map} />}
+            {message.map && !message.content.includes("{{MAP}}") && <MessageMap map={message.map} />}
             {message.attributedSources?.length ? (
               <ChatCitedSources sources={message.attributedSources} />
             ) : null}
