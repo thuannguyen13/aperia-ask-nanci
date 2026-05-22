@@ -10,8 +10,20 @@
 export const EMBED_VARIANTS = ["clover", "business-owner", "iso"] as const
 export type EmbedVariant = (typeof EMBED_VARIANTS)[number]
 
-export function isEmbedVariant(v: string | null): v is EmbedVariant {
-  return EMBED_VARIANTS.includes(v as EmbedVariant)
+export interface ParsedMode {
+  isEmbed: boolean
+  embedVariant: EmbedVariant | null
+  isConceptVersion: boolean
+}
+
+export function parseMode(mode: string | null): ParsedMode {
+  switch (mode) {
+    case "clover":          return { isEmbed: true,  embedVariant: "clover",         isConceptVersion: false }
+    case "business-owner":  return { isEmbed: true,  embedVariant: "business-owner", isConceptVersion: false }
+    case "iso":             return { isEmbed: true,  embedVariant: "iso",            isConceptVersion: false }
+    case "concept":         return { isEmbed: false, embedVariant: null,             isConceptVersion: true  }
+    default:                return { isEmbed: false, embedVariant: null,             isConceptVersion: false }
+  }
 }
 
 import type { Source } from "./types"
