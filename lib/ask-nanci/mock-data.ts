@@ -1,4 +1,4 @@
-import type { ChartWidget, UsageData } from "./types"
+import type { ChartWidget, MapWidget, UsageData } from "./types"
 
 export interface MockResponse {
   id: string
@@ -399,6 +399,7 @@ export const PROMPT_CATEGORIES: PromptCategory[] = [
 export interface ScriptedTurn {
   role: "user" | "assistant"
   content: string
+  map?: MapWidget
 }
 
 export const SCRIPTED_CONVERSATIONS: Record<string, ScriptedTurn[]> = {
@@ -408,7 +409,7 @@ export const SCRIPTED_CONVERSATIONS: Record<string, ScriptedTurn[]> = {
     { role: "user", content: "456 Market St, San Francisco, CA 94105" },
     { role: "assistant", content: "Got it — just to confirm, you'd like to update your business address from 142 Oak Street, Austin, TX 78701 to:\n\n456 Market St, San Francisco, CA 94105\n\nIs that correct?" },
     { role: "user", content: "Yes, that's correct." },
-    { role: "assistant", content: "Done! Your business address has been updated to 456 Market St, San Francisco, CA 94105. The change will be reflected on your account within 1–2 business days. You'll receive a confirmation email at your primary address shortly." },
+    { role: "assistant", content: "Done! Your business address has been updated to 456 Market St, San Francisco, CA 94105. The change will be reflected on your account within 1–2 business days. You'll receive a confirmation email at your primary address shortly.", map: { address: "456 Market St, San Francisco, CA 94105", lat: 37.7915, lng: -122.3972 } },
   ],
   "Update my primary email": [
     { role: "user", content: "Update my primary email" },

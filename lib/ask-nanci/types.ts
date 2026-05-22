@@ -14,6 +14,12 @@ export interface Source {
   logo?: string
 }
 
+export interface MapWidget {
+  address: string
+  lat: number
+  lng: number
+}
+
 export interface ChartWidget {
   kind: "bar" | "line"
   title: string
@@ -36,6 +42,7 @@ export interface Message {
   suggestions?: string[]
   attributedSources?: Source[]
   chart?: ChartWidget
+  map?: MapWidget
   sheetAction?: SheetActionData
   /** True when the stream ended (user stopped or natural completion). Prevents re-appending a partial response on session resume. */
   stopped?: boolean

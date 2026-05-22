@@ -5,6 +5,7 @@ import type { Message } from "@/lib/ask-nanci/types"
 import { ChatCitedSources } from "./ChatCitedSources"
 import { SuggestedQuestions } from "./SuggestedQuestions"
 import { MessageChart } from "./MessageChart"
+import { MessageMap } from "./MessageMap"
 import { ChangeAuditSheet } from "./concept/ChangeAuditSheet"
 
 function parseMarkdown(text: string): React.ReactNode[] {
@@ -71,6 +72,7 @@ function BotMessageBase({
         {showExtras && (
           <>
             {message.chart && <MessageChart chart={message.chart} />}
+            {message.map && <MessageMap map={message.map} />}
             {message.attributedSources?.length ? (
               <ChatCitedSources sources={message.attributedSources} />
             ) : null}

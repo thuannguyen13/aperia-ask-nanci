@@ -268,16 +268,16 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
 
     const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
-    const streamText = (text: string, id: string) =>
+    const streamText = (turn: typeof script[number], id: string) =>
       new Promise<void>((resolve) => {
         const botMsg = { id, role: "assistant" as const, content: "" }
         setChatState("streaming")
         // Split into word-boundary chunks to mimic real token streaming
-        const chunks = text.match(/\S+\s*/g) ?? []
+        const chunks = turn.content.match(/\S+\s*/g) ?? []
         let chunkIdx = 0
         const emitNext = () => {
           if (chunkIdx >= chunks.length) {
-            setMessages((prev) => [...prev, { ...botMsg, content: text }])
+            setMessages((prev) => [...prev, { ...botMsg, content: turn.content, ...(turn.map ? { map: turn.map } : {}) }])
             setPendingBot(null)
             resolve()
             return
@@ -302,7 +302,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
           setChatState("thinking")
         } else {
           await sleep(1000)
-          await streamText(turn.content, newSessionId())
+          await streamText(turn, newSessionId())
           if (i === script.length - 1) { setChatState("idle"); setThinking({ source: null, label: "Thinking…" }) }
         }
       }
