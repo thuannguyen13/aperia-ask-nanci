@@ -25,7 +25,7 @@ export function ExplorePrompts({title, description}: ExplorePromptsProps) {
         <div className="flex items-start gap-2">
           <Compass className="mt-0.5 size-5 shrink-0 text-foreground" />
           <div>
-            <p className="text-base font-medium text-foreground">{title || "Explore prompts"}</p>
+            <p className="text-base font-medium text-foreground">{title || "Common Questions"}</p>
             <p className="text-sm text-muted-foreground">{description || "Jumpstart your analysis with curated questions."}</p>
           </div>
         </div>
