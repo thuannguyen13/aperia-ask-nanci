@@ -23,17 +23,17 @@ const EMBED_FRAME: Record<EmbedVariant, { logo: string; alt: string; gradient: s
   clover: {
     logo: "/logos/clover.svg",
     alt: "Clover",
-    gradient: "bg-[linear-gradient(180deg,#0d5c00_0%,#BFCDC5_200px)]",
+    gradient: "bg-[linear-gradient(180deg,#218800_0%,#BFCDC5_200px)]",
   },
   "business-owner": {
-    logo: "/logos/access-one.svg",
+    logo: "/logos/access-one-logo.svg",
     alt: "AccessOne",
-    gradient: "bg-[linear-gradient(180deg,#b84a0c_0%,#fde8d8_200px)]",
+    gradient: "bg-[linear-gradient(180deg,#FC6A25_0%,#fde8d8_200px)]",
   },
   iso: {
-    logo: "/logos/aperia.svg",
-    alt: "VisionWeb",
-    gradient: "bg-[linear-gradient(180deg,#001a40_0%,#c5d5ed_200px)]",
+    logo: "/logos/titan.svg",
+    alt: "Titan",
+    gradient: "bg-[linear-gradient(180deg,#002F67_0%,#c5d5ed_200px)]",
   },
 }
 
