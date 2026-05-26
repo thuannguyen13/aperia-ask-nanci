@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation"
 import Image from "next/image"
 import { useTheme } from "next-themes"
 import { AskNanciProvider } from "@/contexts/AskNanciContext"
-import { parseMode } from "@/lib/ask-nanci/embed-demo-config"
+import { parseMode, type EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
 import { Sidebar } from "./Sidebar"
 import { TeachNanciPanel } from "./TeachNanciPanel"
 import { MerchantVolumePanel } from "./concept/MerchantVolumePanel"
@@ -19,6 +19,24 @@ import { SettingsDialog } from "./SettingsDialog"
 import { DarkModeToggle } from "./DarkModeToggle"
 import { MobileSidebarToggle } from "./MobileSidebarToggle"
 
+const EMBED_FRAME: Record<EmbedVariant, { logo: string; alt: string; gradient: string }> = {
+  clover: {
+    logo: "/logos/clover.svg",
+    alt: "Clover",
+    gradient: "bg-[linear-gradient(180deg,#0d5c00_0%,#BFCDC5_200px)]",
+  },
+  "business-owner": {
+    logo: "/logos/access-one.svg",
+    alt: "AccessOne",
+    gradient: "bg-[linear-gradient(180deg,#b84a0c_0%,#fde8d8_200px)]",
+  },
+  iso: {
+    logo: "/logos/aperia.svg",
+    alt: "VisionWeb",
+    gradient: "bg-[linear-gradient(180deg,#001a40_0%,#c5d5ed_200px)]",
+  },
+}
+
 export function AppShell({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams()
   const { isEmbed, embedVariant, isConceptVersion } = parseMode(searchParams.get("mode"))
@@ -29,21 +47,29 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     setTheme("light")
     document.documentElement.style.overscrollBehavior = "none"
     document.body.style.overscrollBehavior = "none"
+    return () => {
+      document.documentElement.style.overscrollBehavior = ""
+      document.body.style.overscrollBehavior = ""
+    }
   }, [isEmbed, setTheme])
 
   if (isEmbed) {
+    const frame = EMBED_FRAME[embedVariant!]
     return (
       <AskNanciProvider isEmbed embedVariant={embedVariant} isConceptVersion={isConceptVersion}>
-        <div data-embed={embedVariant} className="flex h-screen overflow-hidden bg-background overscroll-contain">
-          <div className="flex min-w-0 flex-1 overflow-hidden">
-            <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-              {children}
+        <div
+          data-embed={embedVariant}
+          className={`relative flex h-screen flex-col overscroll-contain ${frame.gradient} md:px-2 md:pb-2`}
+        >
+          <div className="relative z-10 flex h-10 shrink-0 items-center justify-center">
+            <Image src={frame.logo} alt={frame.alt} width={80} height={24} className="h-6 w-auto" />
+          </div>
+          <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden md:rounded-2xl bg-sidebar shadow-sm">
+            <div className="flex min-w-0 flex-1 py-1 px-1">
+              <div className="flex min-w-0 flex-1 overflow-hidden rounded-xl md:rounded-2xl border bg-background">
+                {children}
+              </div>
             </div>
-            {isConceptVersion && <MerchantVolumePanel />}
-            {isConceptVersion && <BankAccountFormPanel />}
-            {isConceptVersion && <StepUpAuthPanel />}
-            {isConceptVersion && <BatchDetailPanel />}
-            {isConceptVersion && <ConceptPanelArea />}
           </div>
         </div>
         <TokenLimitDialog />
@@ -66,7 +92,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <Sidebar />
           <div className="flex min-w-0 flex-1 py-1 pr-1">
             <TeachNanciPanel />
-            <div className="flex min-w-0 flex-1 overflow-hidden rounded-[12px] md:rounded-[16px] border bg-background">
+            <div className="flex min-w-0 flex-1 overflow-hidden rounded-xl md:rounded-2xl border bg-background">
               {children}
             </div>
             {isConceptVersion && <MerchantVolumePanel />}

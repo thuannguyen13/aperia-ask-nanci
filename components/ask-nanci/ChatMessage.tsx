@@ -18,7 +18,9 @@ function parseMarkdown(text: string): React.ReactNode[] {
 }
 
 function parseTableRow(line: string): string[] {
-  return line.split("|").slice(1, -1).map((cell) => cell.trim())
+  const trimmed = line.trim()
+  const cells = trimmed.endsWith("|") ? trimmed.split("|").slice(1, -1) : trimmed.split("|").slice(1)
+  return cells.map((cell) => cell.trim())
 }
 
 function isSeparatorRow(line: string): boolean {
@@ -77,11 +79,20 @@ function renderContent(content: string) {
     }
 
     if (line.startsWith("- ")) {
+      const start = i
+      const items: string[] = []
+      while (i < lines.length && lines[i].startsWith("- ")) {
+        items.push(lines[i].slice(2))
+        i++
+      }
       nodes.push(
-        <li key={i} className="ml-4 list-disc">
-          {parseMarkdown(line.slice(2))}
-        </li>
+        <ul key={`ul-${start}`} className="ml-4 list-disc">
+          {items.map((item, j) => (
+            <li key={j}>{parseMarkdown(item)}</li>
+          ))}
+        </ul>
       )
+      continue
     } else if (line === "") {
       nodes.push(<br key={i} />)
     } else {
