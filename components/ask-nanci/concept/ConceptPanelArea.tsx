@@ -12,12 +12,16 @@ import { RiskFlagsPanel } from "./RiskFlagsPanel"
 import { VolumeSettlementPanel } from "./VolumeSettlementPanel"
 import { ChangeLogPanel } from "./ChangeLogPanel"
 import { WorkQueuePanel } from "./WorkQueuePanel"
+import { DetectionQueuePanel } from "./DetectionQueuePanel"
+import { BarometerReportPanel } from "./BarometerReportPanel"
+import { CoastalRiskPanel } from "./CoastalRiskPanel"
 
 type PanelId =
   | "case" | "transaction-receipt" | "dispute-draft"
   | "decline-report" | "email-draft"
   | "risk-flags" | "volume-settlement" | "change-log"
   | "work-queue"
+  | "detection-queue" | "barometer-report" | "coastal-risk"
 
 type Slots = { A: PanelId | null; B: PanelId | null; C: PanelId | null; D: PanelId | null }
 
@@ -59,6 +63,16 @@ function mapPanelsToSlots(openPanels: string[]): Slots {
     return { A: "work-queue", B: null, C: null, D: null }
   }
 
+  // Flow 12 — Detection Queue
+  if (has("detection-queue") || has("barometer-report") || has("coastal-risk")) {
+    return {
+      A: has("barometer-report") ? "barometer-report" : "detection-queue",
+      B: has("coastal-risk") ? "coastal-risk" : null,
+      C: null,
+      D: null,
+    }
+  }
+
   return { A: null, B: null, C: null, D: null }
 }
 
@@ -73,10 +87,13 @@ function PanelContent({ id }: { id: PanelId }) {
     case "volume-settlement":   return <VolumeSettlementPanel />
     case "change-log":          return <ChangeLogPanel />
     case "work-queue":          return <WorkQueuePanel />
+    case "detection-queue":     return <DetectionQueuePanel />
+    case "barometer-report":    return <BarometerReportPanel />
+    case "coastal-risk":        return <CoastalRiskPanel />
   }
 }
 
-export function ConceptPanelArea() {
+export function ConceptPanelArea({ fillWidth = false }: { fillWidth?: boolean }) {
   const { openPanels } = useAskNanci()
   const isOpen = openPanels.length > 0
 
@@ -91,9 +108,11 @@ export function ConceptPanelArea() {
       className={cn(
         "relative hidden h-full shrink-0 flex-col overflow-hidden rounded-[18px] border bg-background",
         "transition-[width,opacity,margin] duration-200 ease-in-out md:flex",
-        isOpen
-          ? "w-[58%] opacity-100 ml-1"
-          : "w-0 opacity-0 border-transparent pointer-events-none",
+        fillWidth
+          ? "flex-1 min-w-0 opacity-100"
+          : isOpen
+            ? "w-[58%] opacity-100 ml-1"
+            : "w-0 opacity-0 border-transparent pointer-events-none",
       )}
     >
       {isOpen && (

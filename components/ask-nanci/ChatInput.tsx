@@ -13,7 +13,7 @@ import { ChatActiveSources } from "./ChatActiveSources"
 const PROACTIVE_CONTENT = CONCEPT_SCRIPTED_CONVERSATIONS[CONCEPT_FLOW6_KEY][0].content
 
 export function ChatInput() {
-  const { sendMessage, chatState, stopAnimation, sources, setSources, draft, setDraft, setTokenLimitReached, setOnboardingOpen, isEmbed, isConceptVersion, triggerProactiveFlow, proactiveNotificationActive } = useAskNanci()
+  const { sendMessage, handlePrompt, chatState, stopAnimation, sources, setSources, draft, setDraft, setTokenLimitReached, setOnboardingOpen, isEmbed, isConceptVersion, triggerProactiveFlow, proactiveNotificationActive } = useAskNanci()
   const activeSources = sources.filter((s) => s.active)
 
   const [value, setValue] = useState("")
@@ -49,7 +49,7 @@ export function ChatInput() {
 
   function submit() {
     if (!value.trim() || !isIdle) return
-    sendMessage(value.trim())
+    handlePrompt(value.trim())
     setValue("")
   }
 

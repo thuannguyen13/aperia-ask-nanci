@@ -13,6 +13,7 @@ export interface ConceptScriptedTurn {
   filterDeclineReport?: true
   advanceWorkQueue?: "quick-wins" | "outage"
   closeAllPanels?: true
+  loopToPrompt?: string
 }
 
 export const CONCEPT_FLOW2_PROMPT = "Show me merchant volume for this week"
@@ -26,6 +27,8 @@ export const CONCEPT_FLOW10_FOLLOWUP2 = "Who else has approved account changes f
 export const CONCEPT_FLOW11_QUICKWINS = "Start with the quick wins"
 export const CONCEPT_FLOW11_APPROVE = "Approve all except the third one"
 
+export const CONCEPT_FLOW12_PROMPT = "Show me the detection queue"
+
 export const CONCEPT_ALL_PROMPTS = [
   "Update my phone number",
   CONCEPT_FLOW2_PROMPT,
@@ -36,6 +39,7 @@ export const CONCEPT_ALL_PROMPTS = [
   "Show me merchants with decline rates above 15% last week",
   "Show me everything unusual about Bayside Imports in the last 90 days",
   "Show me my work queue",
+  CONCEPT_FLOW12_PROMPT,
 ]
 
 export const CONCEPT_NO_RESET_PROMPTS = new Set([
@@ -237,6 +241,38 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   "Yes, send the template and mark them": [
     { role: "user", content: "Yes, send the template and mark them" },
     { role: "assistant", content: "Done — 8 merchants notified, cases marked Waiting on Vendor. Auto-close will trigger when Processor X confirms resolution.", suggestions: CONCEPT_ALL_PROMPTS },
+  ],
+
+  // ── Flow 12: Detection Queue ──────────────────────────────────────────────
+  [CONCEPT_FLOW12_PROMPT]: [
+    { role: "user", content: CONCEPT_FLOW12_PROMPT },
+    {
+      role: "assistant",
+      content: "Morning. Your Detection Queue has an active assignment: **High Velocity Watch**. 14 merchants triggered since yesterday — 3 with risk scores above 80.\n\nWant me to open the Barometer Report?",
+      openPanel: "detection-queue",
+      suggestions: ["Yes, open it"],
+    },
+    { role: "user", content: "Yes, open it" },
+    {
+      role: "assistant",
+      content: "Opening Barometer Report for High Velocity Watch. 3 merchants are flagged above risk score 80. Coastal Merchant Solutions is the highest — score 89, triggered on 4 rules.",
+      openPanel: "barometer-report",
+      suggestions: ["Pull up Coastal's risk report alongside"],
+    },
+    { role: "user", content: "Pull up Coastal's risk report alongside" },
+    {
+      role: "assistant",
+      content: "Score climbed from 44 to 89 in 52 days. Settlement account and address both changed within the last 10 days.",
+      openPanel: "coastal-risk",
+      suggestions: ["Escalate this one and open a risk case."],
+    },
+    { role: "user", content: "Escalate this one and open a risk case." },
+    {
+      role: "assistant",
+      content: "Done — case opened for Coastal Merchant Solutions (Case #RR-7291). Escalated to Risk Lead. Merchant and ISO notified. Funding hold placed pending senior review.",
+      closeAllPanels: true,
+      loopToPrompt: CONCEPT_FLOW12_PROMPT,
+    },
   ],
 
   // ── Flow 6: Proactive ─────────────────────────────────────────────────────

@@ -4,9 +4,16 @@
 
 
 :root {
+  --primary: #218800;
   --color-primary: #218800;
   --color-primary-foreground: oklch(0.985 0 0);
   --ring: var(--color-primary);
+
+  /* --chart-1: oklch(0.8100 0.1000 252);  
+  --chart-2: oklch(0.6200 0.1900 260);  
+  --chart-3: oklch(0.5500 0.2200 263);  
+  --chart-4: oklch(0.4900 0.2200 264);  
+  --chart-5: oklch(0.4200 0.1800 266); */
 }
 
 [data-embed="business-owner"] {
@@ -14,9 +21,11 @@
   --ring: #FC6A25;
 }
 
-[data-embed="iso"] {
+[data-embed="iso"], [data-embed="concept"], [data-embed="detect"] {
+  --primary: #002F67;
   --color-primary: #002F67;
   --ring: #002F67;
+  --sidebar-primary: #002F67;
 }
 
 

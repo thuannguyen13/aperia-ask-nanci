@@ -4,7 +4,7 @@ import { useState } from "react"
 import Image from "next/image"
 import { TriangleAlert } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { CONCEPT_FLOW2_PROMPT, CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY } from "@/lib/ask-nanci/concept-config"
+import { CONCEPT_FLOW2_PROMPT, CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_FLOW12_PROMPT } from "@/lib/ask-nanci/concept-config"
 import { ChatInput } from "@/components/ask-nanci/ChatInput"
 
 const PROACTIVE_CONTENT = CONCEPT_SCRIPTED_CONVERSATIONS[CONCEPT_FLOW6_KEY][0].content
@@ -90,6 +90,14 @@ const FLOWS = [
     prompt: "Show me my work queue",
     proactive: false,
   },
+  {
+    num: 12,
+    title: "Detection Queue",
+    badge: "Risk · Looping",
+    description: "Risk analyst works a Detection Queue assignment — Barometer Report, risk profile, and case escalation open side by side. Loops automatically.",
+    prompt: CONCEPT_FLOW12_PROMPT,
+    proactive: false,
+  },
 ]
 
 const BADGE_COLORS: Record<string, string> = {
@@ -102,6 +110,7 @@ const BADGE_COLORS: Record<string, string> = {
   "Bulk · Multi-panel": "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-500",
   "Risk · Multi-panel": "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",
   "ISO · Queue":     "bg-teal-100 text-teal-600 dark:bg-teal-900/30 dark:text-teal-400",
+  "Risk · Looping":  "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",
 }
 
 export function ConceptWelcomeView() {

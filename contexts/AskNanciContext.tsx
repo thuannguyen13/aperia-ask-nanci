@@ -20,7 +20,7 @@ import {
 import type { CurrentUser, PromptCategory, PlanTier, ActivityItem } from "@/lib/ask-nanci/api"
 import { EMBED_DEMO_SOURCES, EMBED_BUSINESS_OWNER_DEMO_SOURCES, EMBED_ISO_DEMO_SOURCES, SCRIPTED_CONVERSATIONS } from "@/lib/ask-nanci/embed-demo-config"
 import type { EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
-import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW2_PROMPT, CONCEPT_FLOW2_FOLLOWUP, CONCEPT_FLOW6_KEY, CONCEPT_ALL_PROMPTS, CONCEPT_NO_RESET_PROMPTS } from "@/lib/ask-nanci/concept-config"
+import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW2_PROMPT, CONCEPT_FLOW2_FOLLOWUP, CONCEPT_FLOW6_KEY, CONCEPT_FLOW12_PROMPT, CONCEPT_ALL_PROMPTS, CONCEPT_NO_RESET_PROMPTS } from "@/lib/ask-nanci/concept-config"
 import { CLOVER_SOURCE_ID, ONBOARDING_KEY } from "@/lib/ask-nanci/sourceStore"
 
 type ChatView = "welcome" | "chat"
@@ -154,6 +154,14 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     if (!localStorage.getItem(ONBOARDING_KEY)) setOnboardingOpen(true)
   }, [isEmbed])
 
+  useEffect(() => {
+    if (embedVariant === "detect") {
+      const t = setTimeout(() => playConceptScripted(CONCEPT_FLOW12_PROMPT), 800)
+      return () => clearTimeout(t)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const persistAndReload = useCallback(async (msgs: Message[]) => {
     await persistSession(msgs, sessionIdRef.current)
     fetchSessions().then(setSessions)
@@ -198,7 +206,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       let started = false
 
       try {
-        for await (const chunk of streamChat(allMsgs, activeSources, sentSessionId)) {
+        for await (const chunk of streamChat(allMsgs, activeSources, sentSessionId, embedVariant)) {
           if (stopRef.current) break
 
           if (chunk.type === "thinking") {
@@ -388,7 +396,13 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
           if (turn.filterDeclineReport) { setDeclineReportFiltered(true) }
           if (turn.advanceWorkQueue) { setWorkQueuePhase(turn.advanceWorkQueue) }
           if (turn.closeAllPanels) { setOpenPanels([]); setDeclineReportFiltered(false); setWorkQueuePhase("triage") }
-          if (i === script.length - 1) { setChatState("idle") }
+          if (i === script.length - 1) {
+            setChatState("idle")
+            if (turn.loopToPrompt && !scriptStopRef.current) {
+              await sleep(3000)
+              if (!scriptStopRef.current) playConceptScripted(turn.loopToPrompt)
+            }
+          }
         }
       }
     }
