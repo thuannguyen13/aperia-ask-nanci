@@ -20,7 +20,7 @@ import {
 import type { CurrentUser, PromptCategory, PlanTier, ActivityItem } from "@/lib/ask-nanci/api"
 import { EMBED_DEMO_SOURCES, EMBED_BUSINESS_OWNER_DEMO_SOURCES, EMBED_ISO_DEMO_SOURCES, EMBED_DETECT_DEMO_SOURCES, SCRIPTED_CONVERSATIONS } from "@/lib/ask-nanci/embed-demo-config"
 import type { EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
-import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW2_PROMPT, CONCEPT_FLOW2_FOLLOWUP, CONCEPT_FLOW6_KEY, CONCEPT_FLOW12_PROMPT, CONCEPT_ALL_PROMPTS, CONCEPT_NO_RESET_PROMPTS } from "@/lib/ask-nanci/concept-config"
+import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW2_PROMPT, CONCEPT_FLOW2_FOLLOWUP, CONCEPT_FLOW6_KEY, CONCEPT_FLOW12_PROMPT, CONCEPT_ALL_PROMPTS, CONCEPT_NO_RESET_PROMPTS, CONCEPT_WELCOME_KEY } from "@/lib/ask-nanci/concept-config"
 import { CLOVER_SOURCE_ID, ONBOARDING_KEY } from "@/lib/ask-nanci/sourceStore"
 
 type ChatView = "welcome" | "chat"
@@ -84,6 +84,7 @@ interface AskNanciCtx {
   proactiveNotificationActive: boolean
   activateProactiveNotification: () => void
   openPanels: string[]
+  closingPanels: string[]
   openPanel: (type: string) => void
   closePanel: (type: string) => void
   closeAllNewPanels: () => void
@@ -101,7 +102,7 @@ export function useAskNanci() {
 }
 
 export function AskNanciProvider({ children, isEmbed = false, embedVariant = null, isConceptVersion = false }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null; isConceptVersion?: boolean }) {
-  const [view, setView] = useState<ChatView>("welcome")
+  const [view, setView] = useState<ChatView>(embedVariant === "detect" ? "chat" : "welcome")
   const [messages, setMessages] = useState<Message[]>([])
   const [chatState, setChatState] = useState<ChatState>("idle")
   const [sessions, setSessions] = useState<Session[]>([])
@@ -136,6 +137,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [stepUpPanelStep, setStepUpPanelStep] = useState<1 | 2 | 3>(1)
   const [batchPanelOpen, setBatchPanelOpen] = useState(false)
   const [openPanels, setOpenPanels] = useState<string[]>([])
+  const [closingPanels, setClosingPanels] = useState<string[]>([])
   const [declineReportFiltered, setDeclineReportFiltered] = useState(false)
   const [workQueuePhase, setWorkQueuePhase] = useState<"triage" | "quick-wins" | "outage">("triage")
   const [proactiveNotificationActive, setProactiveNotificationActive] = useState(false)
@@ -157,7 +159,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
 
   useEffect(() => {
     if (embedVariant === "detect") {
-      const t = setTimeout(() => playConceptScripted(CONCEPT_FLOW12_PROMPT), 800)
+      const t = setTimeout(() => playConceptScripted(CONCEPT_WELCOME_KEY), 800)
       return () => clearTimeout(t)
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -360,6 +362,10 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
         emitNext()
       })
 
+    // If the script starts with an assistant turn (no leading user message),
+    // show the thinking indicator immediately so there's feedback on click.
+    if (script[0]?.role === "assistant") setChatState("thinking")
+
     const run = async () => {
       for (let i = 0; i < script.length; i++) {
         if (scriptStopRef.current) break
@@ -373,7 +379,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
           await sleep(1800)
           if (scriptStopRef.current) break
           await streamText(turn.content, newSessionId())
-          if (turn.sheetAction || turn.suggestions) {
+          if (turn.sheetAction || turn.suggestions || turn.widget) {
             setMessages((prev) => {
               const next = [...prev]
               const last = next[next.length - 1]
@@ -382,6 +388,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
                   ...last,
                   ...(turn.sheetAction ? { sheetAction: turn.sheetAction } : {}),
                   ...(turn.suggestions ? { suggestions: turn.suggestions } : {}),
+                  ...(turn.widget ? { widget: turn.widget } : {}),
                 }
               }
               return next
@@ -396,7 +403,20 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
           if (turn.openPanel) { setOpenPanels((prev) => prev.includes(turn.openPanel!) ? prev : [...prev, turn.openPanel!]) }
           if (turn.filterDeclineReport) { setDeclineReportFiltered(true) }
           if (turn.advanceWorkQueue) { setWorkQueuePhase(turn.advanceWorkQueue) }
-          if (turn.closeAllPanels) { setOpenPanels([]); setDeclineReportFiltered(false); setWorkQueuePhase("triage") }
+          if (turn.closeAllPanels) {
+            await sleep(600)
+            // Stagger panels closed — right column first, then left
+            const current = [...openPanels]
+            const rightFirst = ["coastal-risk", "transaction-receipt", "email-draft", "change-log"]
+            const first = current.find(p => rightFirst.includes(p))
+            const rest = current.filter(p => p !== first)
+            if (first) { setClosingPanels([first]); await sleep(350) }
+            if (rest.length) { setClosingPanels(current); await sleep(350) }
+            setClosingPanels([])
+            setOpenPanels([])
+            setDeclineReportFiltered(false)
+            setWorkQueuePhase("triage")
+          }
           if (i === script.length - 1) {
             setChatState("idle")
             if (turn.loopToPrompt && !scriptStopRef.current) {
@@ -540,7 +560,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       stepUpPanelOpen, setStepUpPanelOpen, stepUpPanelStep, advanceStepUpPanel, submitStepUpPanel,
       batchPanelOpen, setBatchPanelOpen,
       triggerProactiveFlow, proactiveNotificationActive, activateProactiveNotification,
-      openPanels, openPanel, closePanel, closeAllNewPanels, submitDisputeDraft,
+      openPanels, closingPanels, openPanel, closePanel, closeAllNewPanels, submitDisputeDraft,
       declineReportFiltered, workQueuePhase,
     }}>
       {children}

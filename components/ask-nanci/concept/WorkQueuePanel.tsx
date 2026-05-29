@@ -1,15 +1,8 @@
 "use client"
 
-import { X, Clock, Layers, Zap, BarChart3, CheckCircle2, AlertCircle } from "lucide-react"
+import { X, CheckCircle2, AlertCircle } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-
-const TRIAGE_GROUPS = [
-  { label: "Time-critical",   count: 4,  note: "SLA breach within 2 hours",                    color: "red",   icon: Clock   },
-  { label: "Grouped issue",   count: 8,  note: "All Processor X settlement delays",             color: "amber", icon: Layers  },
-  { label: "Quick wins",      count: 12, note: "Document approvals, docs already submitted",    color: "green", icon: Zap     },
-  { label: "Normal priority", count: 23, note: "Standard service requests",                     color: "slate", icon: BarChart3 },
-]
 
 const QUICK_WINS = [
   { id: "SR-4401", merchant: "Blue Oak Brewing",    doc: "Void Check",       valid: true  },
@@ -35,14 +28,12 @@ const OUTAGE_MERCHANTS = [
 export function WorkQueuePanel() {
   const { closePanel, closeAllNewPanels, workQueuePhase } = useAskNanci()
 
-  const totalCount = workQueuePhase === "triage" ? 47 : workQueuePhase === "quick-wins" ? 12 : 8
-  const phaseLabel = workQueuePhase === "triage" ? "AI TRIAGE" : workQueuePhase === "quick-wins" ? "QUICK WINS" : "OUTAGE"
-  const phaseDotColor = workQueuePhase === "triage" ? "bg-blue-400" : workQueuePhase === "quick-wins" ? "bg-green-400" : "bg-amber-400"
-  const badgeCls = workQueuePhase === "triage"
-    ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400"
-    : workQueuePhase === "quick-wins"
-      ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400"
-      : "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400"
+  const totalCount = workQueuePhase === "quick-wins" ? 12 : 8
+  const phaseLabel = workQueuePhase === "quick-wins" ? "QUICK WINS" : "OUTAGE"
+  const phaseDotColor = workQueuePhase === "quick-wins" ? "bg-green-400" : "bg-amber-400"
+  const badgeCls = workQueuePhase === "quick-wins"
+    ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400"
+    : "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400"
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
@@ -57,7 +48,6 @@ export function WorkQueuePanel() {
             </div>
             <p className="text-[10px] text-muted-foreground">
               <span className="font-mono font-semibold text-foreground">{totalCount}</span>
-              {workQueuePhase === "triage" && " open cases · AI-sorted"}
               {workQueuePhase === "quick-wins" && " document approvals"}
               {workQueuePhase === "outage" && " merchants affected"}
             </p>
@@ -71,60 +61,6 @@ export function WorkQueuePanel() {
           <X className="size-3.5" />
         </button>
       </div>
-
-      {/* Triage phase */}
-      {workQueuePhase === "triage" && (
-        <div className="flex-1 overflow-auto px-4 py-3">
-          <p className="text-[9px] font-bold tracking-[0.12em] uppercase text-muted-foreground mb-3">AI Triage Summary</p>
-          <div className="space-y-2">
-            {TRIAGE_GROUPS.map(({ label, count, note, color, icon: Icon }) => (
-              <div
-                key={label}
-                className={cn(
-                  "flex items-center gap-3 rounded-lg border px-3 py-2.5",
-                  color === "red"   ? "border-red-200 bg-red-50 dark:border-red-800/60 dark:bg-red-950/20"
-                  : color === "amber" ? "border-amber-200 bg-amber-50 dark:border-amber-800/60 dark:bg-amber-950/20"
-                  : color === "green" ? "border-green-200 bg-green-50 dark:border-green-800/60 dark:bg-green-950/20"
-                  : "border-border bg-muted/20",
-                )}
-              >
-                <div className={cn(
-                  "flex size-7 shrink-0 items-center justify-center rounded",
-                  color === "red"   ? "bg-red-100 dark:bg-red-900/40"
-                  : color === "amber" ? "bg-amber-100 dark:bg-amber-900/40"
-                  : color === "green" ? "bg-green-100 dark:bg-green-900/40"
-                  : "bg-muted",
-                )}>
-                  <Icon className={cn(
-                    "size-3.5",
-                    color === "red"   ? "text-red-600 dark:text-red-400"
-                    : color === "amber" ? "text-amber-600 dark:text-amber-400"
-                    : color === "green" ? "text-green-600 dark:text-green-400"
-                    : "text-muted-foreground",
-                  )} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className={cn(
-                    "text-xs font-semibold",
-                    color === "red"   ? "text-red-800 dark:text-red-300"
-                    : color === "amber" ? "text-amber-800 dark:text-amber-300"
-                    : color === "green" ? "text-green-800 dark:text-green-300"
-                    : "text-foreground",
-                  )}>{label}</p>
-                  <p className="text-[9px] text-muted-foreground mt-0.5">{note}</p>
-                </div>
-                <span className={cn(
-                  "font-mono text-xl font-bold shrink-0",
-                  color === "red"   ? "text-red-600 dark:text-red-400"
-                  : color === "amber" ? "text-amber-600 dark:text-amber-400"
-                  : color === "green" ? "text-green-600 dark:text-green-400"
-                  : "text-foreground",
-                )}>{count}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
       {/* Quick-wins phase */}
       {workQueuePhase === "quick-wins" && (

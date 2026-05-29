@@ -7,6 +7,7 @@ import { SuggestedQuestions } from "./SuggestedQuestions"
 import { MessageChart } from "./MessageChart"
 import { MessageMap } from "./MessageMap"
 import { ChangeAuditSheet } from "./concept/ChangeAuditSheet"
+import { AiTriageSummaryWidget } from "./AiTriageSummaryWidget"
 
 function parseMarkdown(text: string): React.ReactNode[] {
   const parts = text.split(/(\*\*[^*]+\*\*)/g)
@@ -142,6 +143,9 @@ function BotMessageBase({
             <div>{renderContent(displayedContent)}</div>
           )}
         </div>
+        {showExtras && message.widget === "ai-triage-summary" && (
+          <AiTriageSummaryWidget />
+        )}
         {showExtras && message.sheetAction && (
           <>
             <button
