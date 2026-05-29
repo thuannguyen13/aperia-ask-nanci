@@ -21,12 +21,12 @@ import { MobileSidebarToggle } from "./MobileSidebarToggle"
 
 const DQ_PANELS = new Set(["detection-queue", "barometer-report", "coastal-risk"])
 
-function ConceptContentArea({ children }: { children: React.ReactNode }) {
+function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode; noSidebar?: boolean }) {
   const { openPanels } = useAskNanci()
   const isDQ = openPanels.some((p) => DQ_PANELS.has(p))
 
   return (
-    <div className="flex min-w-0 flex-1 py-1 pr-1">
+    <div className={`flex min-w-0 flex-1 py-1 pr-1${noSidebar ? " pl-1" : ""}`}>
       <TeachNanciPanel />
       {isDQ ? (
         <>
@@ -104,7 +104,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
           <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden md:rounded-2xl bg-sidebar shadow-sm">
             {isDetect ? (
-              <ConceptContentArea>{children}</ConceptContentArea>
+              <ConceptContentArea noSidebar>{children}</ConceptContentArea>
             ) : (
               <div className="flex min-w-0 flex-1 py-1 px-1">
                 <div className="flex min-w-0 flex-1 overflow-hidden rounded-xl md:rounded-2xl border bg-background">
