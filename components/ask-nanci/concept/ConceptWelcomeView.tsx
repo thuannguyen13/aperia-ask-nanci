@@ -114,7 +114,7 @@ const BADGE_COLORS: Record<string, string> = {
 }
 
 export function ConceptWelcomeView() {
-  const { handlePrompt, triggerProactiveFlow, activateProactiveNotification } = useAskNanci()
+  const { handlePrompt, triggerProactiveFlow, activateProactiveNotification, embedVariant } = useAskNanci()
   const [proactiveAlertVisible, setProactiveAlertVisible] = useState(false)
   const [detailsExpanded, setDetailsExpanded] = useState(false)
 
@@ -134,13 +134,15 @@ export function ConceptWelcomeView() {
     <div className="flex flex-1 flex-col items-center overflow-y-auto px-4 py-8 md:px-8 md:py-12">
       <div className="flex w-full max-w-[800px] flex-col gap-8 mx-auto">
 
-        <div className="flex flex-col items-center gap-3 text-center">
-          <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={40} height={40} />
-          <div>
-            <p className="text-2xl font-medium text-foreground">Ask Nanci — Concept Demo</p>
-            <p className="mt-1 text-sm text-muted-foreground">Ten interaction patterns. Each flow demonstrates a distinct AI + panel UX.</p>
+        {embedVariant !== "detect" && (
+          <div className="flex flex-col items-center gap-3 text-center">
+            <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={40} height={40} />
+            <div>
+              <p className="text-2xl font-medium text-foreground">Ask Nanci — Concept Demo</p>
+              <p className="mt-1 text-sm text-muted-foreground">Ten interaction patterns. Each flow demonstrates a distinct AI + panel UX.</p>
+            </div>
           </div>
-        </div>
+        )}
 
         <ChatInput />
 

@@ -99,12 +99,12 @@ function WelcomeView() {
 }
 
 export default function AskNanciPage() {
-  const { view, startNewChat, isEmbed, isConceptVersion } = useAskNanci()
+  const { view, startNewChat, isEmbed, isConceptVersion, embedVariant } = useAskNanci()
 
   if (view === "chat") {
     return (
       <div className="relative flex min-w-0 min-h-0 flex-1 flex-col overflow-hidden">
-        {isEmbed && (
+        {isEmbed && embedVariant !== "detect" && (
           <button
             onClick={startNewChat}
             className="absolute top-4 left-4 z-10 flex items-center gap-2"

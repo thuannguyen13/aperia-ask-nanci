@@ -24,24 +24,28 @@ const DQ_PANELS = new Set(["detection-queue", "barometer-report", "coastal-risk"
 function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode; noSidebar?: boolean }) {
   const { openPanels } = useAskNanci()
   const isDQ = openPanels.some((p) => DQ_PANELS.has(p))
+  const [showDQ, setShowDQ] = useState(false)
   const [dqVisible, setDqVisible] = useState(false)
 
   useEffect(() => {
     if (isDQ) {
+      setShowDQ(true)
       const id = requestAnimationFrame(() => setDqVisible(true))
       return () => cancelAnimationFrame(id)
     } else {
       setDqVisible(false)
+      const t = setTimeout(() => setShowDQ(false), 300)
+      return () => clearTimeout(t)
     }
   }, [isDQ])
 
   return (
     <div className={`flex min-w-0 flex-1 py-1 pr-1${noSidebar ? " pl-1" : ""}`}>
       <TeachNanciPanel />
-      {isDQ ? (
+      {showDQ ? (
         <>
           <ConceptPanelArea fillWidth visible={dqVisible} />
-          <div className={`ml-1 flex w-[390px] shrink-0 overflow-hidden rounded-xl md:rounded-2xl border bg-background transition-[opacity,transform] duration-300 ease-out ${dqVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-3"}`}>
+          <div className={`ml-1 flex w-[320px] shrink-0 overflow-hidden rounded-xl border bg-background md:w-[390px] md:rounded-2xl transition-opacity duration-300 ease-out ${dqVisible ? "opacity-100" : "opacity-0"}`}>
             {children}
           </div>
         </>

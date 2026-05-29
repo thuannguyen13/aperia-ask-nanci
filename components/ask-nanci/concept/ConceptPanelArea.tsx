@@ -1,8 +1,21 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
+
+function useIsSmallScreen() {
+  const [isSmall, setIsSmall] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)")
+    setIsSmall(mq.matches)
+    const handler = (e: MediaQueryListEvent) => setIsSmall(e.matches)
+    mq.addEventListener("change", handler)
+    return () => mq.removeEventListener("change", handler)
+  }, [])
+  return isSmall
+}
 import { CaseDetailPanel } from "./CaseDetailPanel"
 import { TransactionReceiptPanel } from "./TransactionReceiptPanel"
 import { DisputeDraftPanel } from "./DisputeDraftPanel"
@@ -96,6 +109,7 @@ function PanelContent({ id }: { id: PanelId }) {
 export function ConceptPanelArea({ fillWidth = false, visible = true }: { fillWidth?: boolean; visible?: boolean }) {
   const { openPanels } = useAskNanci()
   const isOpen = openPanels.length > 0
+  const isSmall = useIsSmallScreen()
 
   const layoutKey = [...openPanels].sort().join(",")
   const { A, B, C, D } = mapPanelsToSlots(openPanels)
@@ -106,33 +120,36 @@ export function ConceptPanelArea({ fillWidth = false, visible = true }: { fillWi
   return (
     <div
       className={cn(
-        "relative hidden h-full shrink-0 flex-col overflow-hidden rounded-[18px] border bg-background",
-        "transition-[width,opacity,margin] duration-300 ease-out md:flex",
+        "relative h-full shrink-0 flex-col overflow-hidden rounded-[18px] border bg-background",
+        "transition-[width,opacity,margin] duration-300 ease-out",
         fillWidth
-          ? `flex-1 min-w-0 transition-opacity duration-300 ease-out ${visible ? "opacity-100" : "opacity-0"}`
-          : isOpen
-            ? "w-[58%] opacity-100 ml-1"
-            : "w-0 opacity-0 border-transparent pointer-events-none",
+          ? cn("flex flex-1 min-w-0 transition-opacity duration-300 ease-out", visible ? "opacity-100" : "opacity-0")
+          : cn(
+              "hidden md:flex",
+              isOpen
+                ? "w-[58%] opacity-100 ml-1"
+                : "w-0 opacity-0 border-transparent pointer-events-none",
+            ),
       )}
     >
       {isOpen && (
-        <ResizablePanelGroup key={layoutKey} orientation="horizontal" className="h-full">
+        <ResizablePanelGroup orientation={isSmall ? "vertical" : "horizontal"} className="h-full">
 
           {/* ── Left column (slots A + C) ── */}
           {hasLeft && (
             <ResizablePanel defaultSize={hasRight ? 50 : 100} minSize={20}>
               {A && C ? (
-                <ResizablePanelGroup orientation="vertical" className="h-full">
+                <ResizablePanelGroup key={`${A}-${C}`} orientation="vertical" className="h-full">
                   <ResizablePanel defaultSize={55} minSize={15}>
-                    <PanelContent id={A} />
+                    <div key={A} className="h-full animate-panel-in"><PanelContent id={A} /></div>
                   </ResizablePanel>
                   <ResizableHandle withHandle />
                   <ResizablePanel defaultSize={45} minSize={15}>
-                    <PanelContent id={C} />
+                    <div key={C} className="h-full animate-panel-in"><PanelContent id={C} /></div>
                   </ResizablePanel>
                 </ResizablePanelGroup>
               ) : (
-                <PanelContent id={(A ?? C)!} />
+                <div key={A ?? C} className="h-full animate-panel-in"><PanelContent id={(A ?? C)!} /></div>
               )}
             </ResizablePanel>
           )}
@@ -144,17 +161,17 @@ export function ConceptPanelArea({ fillWidth = false, visible = true }: { fillWi
           {hasRight && (
             <ResizablePanel defaultSize={hasLeft ? 50 : 100} minSize={20}>
               {B && D ? (
-                <ResizablePanelGroup orientation="vertical" className="h-full">
+                <ResizablePanelGroup key={`${B}-${D}`} orientation="vertical" className="h-full">
                   <ResizablePanel defaultSize={55} minSize={15}>
-                    <PanelContent id={B} />
+                    <div key={B} className="h-full animate-panel-in"><PanelContent id={B} /></div>
                   </ResizablePanel>
                   <ResizableHandle withHandle />
                   <ResizablePanel defaultSize={45} minSize={15}>
-                    <PanelContent id={D} />
+                    <div key={D} className="h-full animate-panel-in"><PanelContent id={D} /></div>
                   </ResizablePanel>
                 </ResizablePanelGroup>
               ) : (
-                <PanelContent id={(B ?? D)!} />
+                <div key={B ?? D} className="h-full animate-panel-in"><PanelContent id={(B ?? D)!} /></div>
               )}
             </ResizablePanel>
           )}

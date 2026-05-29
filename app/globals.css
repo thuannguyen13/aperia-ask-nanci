@@ -43,14 +43,24 @@
   to   { transform: translateX(0); }
 }
 
+@keyframes panel-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 @theme {
   --animate-marquee-left: marquee-left 12s linear infinite;
   --animate-marquee-right: marquee-right 12s linear infinite;
+  --animate-panel-in: panel-fade-in 0.28s ease-out;
 }
 
 @layer base {
   button, [role="button"], label[for],
   [role="menuitem"], [role="option"], [role="menuitemcheckbox"], [role="menuitemradio"] {
     cursor: pointer;
+  }
+
+  [data-panel] {
+    transition: flex 0.3s ease-out;
   }
 }
