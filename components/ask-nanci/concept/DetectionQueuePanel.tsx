@@ -79,17 +79,15 @@ export function DetectionQueuePanel() {
         </div>
 
         {/* Action buttons */}
-        <div className="flex items-center justify-between pt-1">
-          <div className="flex items-center gap-2">
-            <button className="flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90">
-              <FileBarChart2 className="size-3.5" />
-              Barometer Report
-            </button>
-            <button className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted">
-              <ShieldCheck className="size-3.5" />
-              Security Report
-            </button>
-          </div>
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          <button className="flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:bg-primary/90">
+            <FileBarChart2 className="size-3.5" />
+            Barometer Report
+          </button>
+          <button className="flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted">
+            <ShieldCheck className="size-3.5" />
+            Security Report
+          </button>
           <button className="flex items-center gap-1 rounded-md border px-3 py-1.5 text-xs font-medium text-foreground hover:bg-muted">
             Next Queue
             <ArrowRight className="size-3.5" />
