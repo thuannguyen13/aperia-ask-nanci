@@ -93,7 +93,7 @@ function PanelContent({ id }: { id: PanelId }) {
   }
 }
 
-export function ConceptPanelArea({ fillWidth = false }: { fillWidth?: boolean }) {
+export function ConceptPanelArea({ fillWidth = false, visible = true }: { fillWidth?: boolean; visible?: boolean }) {
   const { openPanels } = useAskNanci()
   const isOpen = openPanels.length > 0
 
@@ -107,9 +107,9 @@ export function ConceptPanelArea({ fillWidth = false }: { fillWidth?: boolean })
     <div
       className={cn(
         "relative hidden h-full shrink-0 flex-col overflow-hidden rounded-[18px] border bg-background",
-        "transition-[width,opacity,margin] duration-200 ease-in-out md:flex",
+        "transition-[width,opacity,margin] duration-300 ease-out md:flex",
         fillWidth
-          ? "flex-1 min-w-0 opacity-100"
+          ? `flex-1 min-w-0 transition-opacity duration-300 ease-out ${visible ? "opacity-100" : "opacity-0"}`
           : isOpen
             ? "w-[58%] opacity-100 ml-1"
             : "w-0 opacity-0 border-transparent pointer-events-none",
