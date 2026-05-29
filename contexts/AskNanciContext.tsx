@@ -18,7 +18,7 @@ import {
   fetchActivity,
 } from "@/lib/ask-nanci/api"
 import type { CurrentUser, PromptCategory, PlanTier, ActivityItem } from "@/lib/ask-nanci/api"
-import { EMBED_DEMO_SOURCES, EMBED_BUSINESS_OWNER_DEMO_SOURCES, EMBED_ISO_DEMO_SOURCES, SCRIPTED_CONVERSATIONS } from "@/lib/ask-nanci/embed-demo-config"
+import { EMBED_DEMO_SOURCES, EMBED_BUSINESS_OWNER_DEMO_SOURCES, EMBED_ISO_DEMO_SOURCES, EMBED_DETECT_DEMO_SOURCES, SCRIPTED_CONVERSATIONS } from "@/lib/ask-nanci/embed-demo-config"
 import type { EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
 import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW2_PROMPT, CONCEPT_FLOW2_FOLLOWUP, CONCEPT_FLOW6_KEY, CONCEPT_FLOW12_PROMPT, CONCEPT_ALL_PROMPTS, CONCEPT_NO_RESET_PROMPTS } from "@/lib/ask-nanci/concept-config"
 import { CLOVER_SOURCE_ID, ONBOARDING_KEY } from "@/lib/ask-nanci/sourceStore"
@@ -109,8 +109,9 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [pendingBot, setPendingBot] = useState<Message | null>(null)
   const [sources, setSourcesState] = useState<Source[]>(
     isEmbed ? (
-      embedVariant === "business-owner" ? EMBED_BUSINESS_OWNER_DEMO_SOURCES : 
+      embedVariant === "business-owner" ? EMBED_BUSINESS_OWNER_DEMO_SOURCES :
       embedVariant === "iso" ? EMBED_ISO_DEMO_SOURCES :
+      embedVariant === "detect" ? EMBED_DETECT_DEMO_SOURCES :
       EMBED_DEMO_SOURCES) : []
   )
   const [thinking, setThinking] = useState<{ source: Source | null; label: string }>({ source: null, label: "Thinking…" })
