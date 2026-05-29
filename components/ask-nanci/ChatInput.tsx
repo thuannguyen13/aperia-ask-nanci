@@ -1,23 +1,22 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Plus, ArrowUp, Square, Link2, Upload, Bell } from "lucide-react"
-import { Button, Textarea, DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, Popover, PopoverTrigger, PopoverContent } from "aperia-ds5"
+import { ArrowUp, Square, Bell, MessageCircleQuestion, Clock5 } from "lucide-react"
+import { Button, Textarea, Popover, PopoverTrigger, PopoverContent, Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, Dialog, DialogContent, DialogHeader, DialogTitle } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { addFileSources, readSources } from "@/lib/ask-nanci/sourceStore"
 import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY } from "@/lib/ask-nanci/concept-config"
 import { SlashCommandPopover, type SlashAction } from "./SlashCommandPopover"
-import { ConnectWizard } from "./ConnectWizard"
 import { ChatActiveSources } from "./ChatActiveSources"
+import { ExplorePrompts } from "./ExplorePrompts"
 
 const PROACTIVE_CONTENT = CONCEPT_SCRIPTED_CONVERSATIONS[CONCEPT_FLOW6_KEY][0].content
 
 export function ChatInput() {
-  const { sendMessage, handlePrompt, chatState, stopAnimation, sources, setSources, draft, setDraft, setTokenLimitReached, setOnboardingOpen, isEmbed, isConceptVersion, triggerProactiveFlow, proactiveNotificationActive } = useAskNanci()
+  const { sendMessage, handlePrompt, startNewChat, chatState, stopAnimation, sources, setSources, draft, setDraft, setTokenLimitReached, setOnboardingOpen, isEmbed, isConceptVersion, triggerProactiveFlow, proactiveNotificationActive } = useAskNanci()
   const activeSources = sources.filter((s) => s.active)
 
   const [value, setValue] = useState("")
-  const [wizardOpen, setWizardOpen] = useState(false)
+  const [commonQOpen, setCommonQOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
   const [notifRead, setNotifRead] = useState(false)
 
@@ -32,7 +31,6 @@ export function ChatInput() {
   }
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const fileRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (draft) { setValue(draft); setDraft(""); textareaRef.current?.focus({ preventScroll: true }) }
@@ -66,12 +64,6 @@ export function ChatInput() {
     textareaRef.current?.focus()
   }
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    addFileSources(e.target.files)
-    setSources(readSources())
-    e.target.value = ""
-  }
-
   return (
     <div className="relative">
       {showSlash && (
@@ -90,31 +82,28 @@ export function ChatInput() {
 
         <div className="flex items-center justify-between px-2 pb-2">
           <div className="flex items-center gap-2">
-            {isEmbed ? (
-              <Button size="icon-sm" variant="ghost" disabled>
-                <Plus />
-              </Button>
-            ) : (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button size="icon-sm" variant="ghost">
-                    <Plus />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent side="top" align="start">
-                  <DropdownMenuItem onSelect={() => setWizardOpen(true)}>
-                    <Link2 className="size-4" />
-                    Link Accounts
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => fileRef.current?.click()}>
-                    <Upload className="size-4" />
-                    Upload File
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-
             <ChatActiveSources sources={activeSources} />
+
+            <TooltipProvider delayDuration={400}>
+              <div className="flex overflow-hidden rounded-lg">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button onClick={() => setCommonQOpen(true)} className="flex h-7 w-7 items-center justify-center bg-secondary text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground">
+                      <MessageCircleQuestion className="size-3.5" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">Common Questions</TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button className="flex h-7 w-7 items-center justify-center bg-secondary text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground">
+                      <Clock5 className="size-3.5" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">Recent Chats</TooltipContent>
+                </Tooltip>
+              </div>
+            </TooltipProvider>
 
             {isConceptVersion && proactiveNotificationActive && (
               <Popover open={notifOpen} onOpenChange={handleNotifOpen}>
@@ -159,13 +148,18 @@ export function ChatInput() {
         </div>
       </div>
 
-      <input ref={fileRef} type="file" multiple className="hidden" onChange={handleFileChange} />
-
-      <ConnectWizard
-        open={wizardOpen}
-        onClose={() => setWizardOpen(false)}
-        onLinked={() => { setSources(readSources()); setWizardOpen(false) }}
-      />
+      <Dialog open={commonQOpen} onOpenChange={setCommonQOpen}>
+        <DialogContent className="sm:max-w-[750px]">
+          <DialogHeader>
+            <DialogTitle className="sr-only">Common Questions</DialogTitle>
+          </DialogHeader>
+          <ExplorePrompts onPromptClick={(prompt) => {
+            setCommonQOpen(false)
+            startNewChat()
+            handlePrompt(prompt)
+          }} />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

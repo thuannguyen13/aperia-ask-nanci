@@ -21,6 +21,8 @@ export const CONCEPT_FLOW2_PROMPT = "Show me merchant volume for this week"
 export const CONCEPT_FLOW2_FOLLOWUP = "Just the top 5"
 export const CONCEPT_FLOW6_KEY = "__proactive__"
 export const CONCEPT_WELCOME_KEY = "__welcome__"
+export const CONCEPT_DETECT_WELCOME_KEY = "__detect_welcome__"
+export const CONCEPT_DETECT_DQ_KEY = "__detect_dq__"
 
 export const CONCEPT_FLOW8_FOLLOWUP = "Filter to ones not contacted in the last 30 days"
 export const CONCEPT_FLOW8_FINAL = "Send them all"
@@ -60,6 +62,8 @@ export const CONCEPT_NO_RESET_PROMPTS = new Set([
   "Now show me the Processor X cases",
   "Yes, send the template and mark them",
   CONCEPT_FLOW12_CONTINUE_KEY,
+  CONCEPT_DETECT_WELCOME_KEY,
+  CONCEPT_DETECT_DQ_KEY,
 ])
 
 const FLOW1_SHEET: SheetActionData = {
@@ -315,6 +319,45 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       role: "assistant",
       content: "Good morning, Teresa. A few things came in while you were away — I've gone through everything and sorted it for you. Here's where your queue stands:",
       widget: "ai-triage-summary",
+    },
+  ],
+
+  // ── Detect embed: looping welcome → DQ → back ────────────────────────────
+  [CONCEPT_DETECT_WELCOME_KEY]: [
+    {
+      role: "assistant",
+      content: "Good morning, Teresa. A few things came in while you were away — I've gone through everything and sorted it for you. Here's where your queue stands:",
+      widget: "ai-triage-summary",
+      loopToPrompt: CONCEPT_DETECT_DQ_KEY,
+    },
+  ],
+  [CONCEPT_DETECT_DQ_KEY]: [
+    {
+      role: "assistant",
+      content: "Your Detection Queue has an active assignment: **High Velocity Watch**. 14 merchants triggered since yesterday — 3 with risk scores above 80.\n\nWant me to open the Barometer Report?",
+      openPanel: "detection-queue",
+      suggestions: ["Yes, open it"],
+    },
+    { role: "user", content: "Yes, open it" },
+    {
+      role: "assistant",
+      content: "Opening Barometer Report for High Velocity Watch. 3 merchants are flagged above risk score 80. Coastal Merchant Solutions is the highest — score 89, triggered on 4 rules.",
+      openPanel: "barometer-report",
+      suggestions: ["Pull up Coastal's risk report alongside"],
+    },
+    { role: "user", content: "Pull up Coastal's risk report alongside" },
+    {
+      role: "assistant",
+      content: "Score climbed from 44 to 89 in 52 days. Settlement account and address both changed within the last 10 days.",
+      openPanel: "coastal-risk",
+      suggestions: ["Escalate this one and open a risk case."],
+    },
+    { role: "user", content: "Escalate this one and open a risk case." },
+    {
+      role: "assistant",
+      content: "Done — case opened for Coastal Merchant Solutions (Case #RR-7291). Escalated to Risk Lead. Merchant and ISO notified. Funding hold placed pending senior review.",
+      closeAllPanels: true,
+      loopToPrompt: CONCEPT_DETECT_WELCOME_KEY,
     },
   ],
 
