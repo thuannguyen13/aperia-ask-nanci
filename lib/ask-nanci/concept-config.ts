@@ -62,7 +62,6 @@ export const CONCEPT_NO_RESET_PROMPTS = new Set([
   "Now show me the Processor X cases",
   "Yes, send the template and mark them",
   CONCEPT_FLOW12_CONTINUE_KEY,
-  CONCEPT_DETECT_WELCOME_KEY,
   CONCEPT_DETECT_DQ_KEY,
 ])
 
