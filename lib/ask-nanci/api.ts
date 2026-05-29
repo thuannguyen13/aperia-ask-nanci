@@ -34,6 +34,8 @@ import {
   removeSource,
 } from "./sourceStore"
 import { findResponse, DEFAULT_RESPONSE, DEFAULT_SUGGESTIONS, MOCK_USAGE, PROMPT_CATEGORIES, ALL_QUESTIONS, PLAN_TIERS, MOCK_ACTIVITY } from "./mock-data"
+import { BUSINESS_OWNER_CONTENT_OVERRIDES } from "./embed-demo-config"
+import type { EmbedVariant } from "./embed-demo-config"
 import { generateId } from "./utils"
 
 // ─── Chat ─────────────────────────────────────────────────────────────────────
@@ -48,11 +50,15 @@ export async function* streamChat(
   messages: Pick<Message, "role" | "content">[],
   activeSources: Source[],
   _sessionId: string,
+  embedVariant?: EmbedVariant | null,
 ): AsyncGenerator<ChatStreamChunk> {
   const lastUser = [...messages].reverse().find((m) => m.role === "user")
   const match = findResponse(lastUser?.content ?? "")
 
-  const text = match?.content ?? DEFAULT_RESPONSE
+  const overrideContent = match && embedVariant === "business-owner"
+    ? BUSINESS_OWNER_CONTENT_OVERRIDES[match.id]
+    : undefined
+  const text = overrideContent ?? match?.content ?? DEFAULT_RESPONSE
   const suggestions = match?.suggestions ?? DEFAULT_SUGGESTIONS
   const chart = match?.chart
   const map = match?.map
