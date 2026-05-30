@@ -1,5 +1,66 @@
 export type MessageRole = "user" | "assistant"
 
+// ─── Demo data types ───────────────────────────────────────────────────────────
+
+export interface MockResponse {
+  id: string
+  keywords: string[]
+  content: string
+  suggestions: string[]
+  chart?: ChartWidget
+  map?: MapWidget
+  sourceInstitutions?: string[]
+}
+
+export interface PromptCategory {
+  id: string
+  label: string
+  prompts: string[]
+}
+
+export interface ScriptedTurn {
+  role: MessageRole
+  content: string
+  map?: MapWidget
+}
+
+export interface ConceptScriptedTurn extends ScriptedTurn {
+  sheetAction?: SheetActionData
+  suggestions?: string[]
+  openFormPanel?: true
+  openStepUpPanel?: true
+  advanceStepUp?: true
+  openBatchPanel?: true
+  openPanel?: string
+  filterDeclineReport?: true
+  advanceWorkQueue?: "quick-wins" | "outage"
+  closeAllPanels?: true
+  loopToPrompt?: string
+  widget?: "ai-triage-summary"
+}
+
+// ─── API / user types ──────────────────────────────────────────────────────────
+
+export interface CurrentUser {
+  name: string
+  email: string
+  initials: string
+}
+
+export interface PlanTier {
+  name: UsageData["plan"]
+  tokensPerDay: number
+  chatsPerDay: number | null
+  filesMax: number | null
+  price: string
+}
+
+export interface ActivityItem {
+  date: string
+  title: string
+  tokens: number
+}
+
 export interface Source {
   id: string
   name: string

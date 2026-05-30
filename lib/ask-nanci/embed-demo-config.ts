@@ -31,9 +31,8 @@ import type { Source } from "./types"
 import { CLOVER_SOURCE, CLOVER_SOURCE_ID } from "./sourceStore"
 
 import { SCRIPTED_CONVERSATIONS as BASE_SCRIPTED_CONVERSATIONS } from "./mock-data"
-export type { ScriptedTurn } from "./mock-data"
-import type { PromptCategory, ScriptedTurn } from "./mock-data"
-export type { PromptCategory }
+export type { ScriptedTurn, PromptCategory } from "./types"
+import type { PromptCategory, ScriptedTurn } from "./types"
 
 const ISO_SCRIPTED_CONVERSATIONS: Record<string, ScriptedTurn[]> = {
   // ── Portfolio ──────────────────────────────────────────────────────────────

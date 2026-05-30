@@ -1,14 +1,4 @@
-import type { ChartWidget, MapWidget, UsageData } from "./types"
-
-export interface MockResponse {
-  id: string
-  keywords: string[]
-  content: string
-  suggestions: string[]
-  chart?: ChartWidget
-  map?: MapWidget
-  sourceInstitutions?: string[]
-}
+import type { MockResponse, PromptCategory, ScriptedTurn, PlanTier, ActivityItem, UsageData } from "./types"
 
 export const MOCK_RESPONSES: MockResponse[] = [
   {
@@ -428,12 +418,6 @@ export const MOCK_RESPONSES: MockResponse[] = [
 // e.g. GET /api/nanci/prompts?category=overview  →  string[]
 // The category `id` should match the API's category identifier.
 
-export interface PromptCategory {
-  id: string
-  label: string
-  prompts: string[]
-}
-
 export const PROMPT_CATEGORIES: PromptCategory[] = [
   {
     id: "overview",
@@ -510,12 +494,6 @@ export const PROMPT_CATEGORIES: PromptCategory[] = [
     ],
   },
 ]
-
-export interface ScriptedTurn {
-  role: "user" | "assistant"
-  content: string
-  map?: MapWidget
-}
 
 export const SCRIPTED_CONVERSATIONS: Record<string, ScriptedTurn[]> = {
   "Change my business address": [
@@ -621,7 +599,7 @@ export const MOCK_USAGE: UsageData = {
   files: { used: 2, limit: 5 },
 }
 
-export const PLAN_TIERS: { name: UsageData["plan"]; tokensPerDay: number; chatsPerDay: number | null; filesMax: number | null; price: string }[] = [
+export const PLAN_TIERS: PlanTier[] = [
   { name: "Bronze",  tokensPerDay: 5000,  chatsPerDay: 5,    filesMax: 2,    price: "$19/mo" },
   { name: "Gold",    tokensPerDay: 15000, chatsPerDay: 10,   filesMax: 5,    price: "$49/mo" },
   { name: "Diamond", tokensPerDay: 50000, chatsPerDay: null, filesMax: null, price: "$99/mo" },

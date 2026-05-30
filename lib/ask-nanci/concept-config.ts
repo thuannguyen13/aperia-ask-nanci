@@ -1,21 +1,4 @@
-import type { SheetActionData } from "./types"
-
-export interface ConceptScriptedTurn {
-  role: "user" | "assistant"
-  content: string
-  sheetAction?: SheetActionData
-  suggestions?: string[]
-  openFormPanel?: true
-  openStepUpPanel?: true
-  advanceStepUp?: true
-  openBatchPanel?: true
-  openPanel?: string
-  filterDeclineReport?: true
-  advanceWorkQueue?: "quick-wins" | "outage"
-  closeAllPanels?: true
-  loopToPrompt?: string
-  widget?: "ai-triage-summary"
-}
+import type { ConceptScriptedTurn, SheetActionData } from "./types"
 
 export const CONCEPT_FLOW2_PROMPT = "Show me merchant volume for this week"
 export const CONCEPT_FLOW2_FOLLOWUP = "Just the top 5"

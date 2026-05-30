@@ -17,7 +17,7 @@
  *   DELETE /api/nanci/sources/:id
  */
 
-import type { Message, Session, Source, UsageData } from "./types"
+import type { Message, Session, Source, UsageData, MockResponse, PromptCategory, PlanTier, ActivityItem, CurrentUser } from "./types"
 import type { ChatStreamChunk, SourceAddRequest, SourceUpdateRequest } from "./api-types"
 import {
   readSessions,
@@ -34,6 +34,7 @@ import {
   removeSource,
 } from "./sourceStore"
 import { findResponse, DEFAULT_RESPONSE, DEFAULT_SUGGESTIONS, MOCK_USAGE, PROMPT_CATEGORIES, ALL_QUESTIONS, PLAN_TIERS, MOCK_ACTIVITY } from "./mock-data"
+export type { MockResponse, PromptCategory, PlanTier, ActivityItem, CurrentUser } from "./types"
 import { BUSINESS_OWNER_CONTENT_OVERRIDES } from "./embed-demo-config"
 import type { EmbedVariant } from "./embed-demo-config"
 import { generateId } from "./utils"
@@ -152,12 +153,6 @@ export async function deleteSourceById(id: string): Promise<void> {
 
 // ─── Current User ─────────────────────────────────────────────────────────────
 
-export interface CurrentUser {
-  name: string
-  email: string
-  initials: string
-}
-
 // Real: GET /api/nanci/me → CurrentUser
 export async function fetchCurrentUser(): Promise<CurrentUser> {
   return { name: "Teresa W.", email: "teresa.w@example.com", initials: "TW" }
@@ -172,10 +167,8 @@ export async function fetchUsage(): Promise<UsageData> {
 
 // ─── Prompts ──────────────────────────────────────────────────────────────────
 
-export type { PromptCategory } from "./mock-data"
-
 // Real: GET /api/nanci/prompts/categories → PromptCategory[]
-export async function fetchPromptCategories(): Promise<import("./mock-data").PromptCategory[]> {
+export async function fetchPromptCategories(): Promise<PromptCategory[]> {
   return PROMPT_CATEGORIES
 }
 
@@ -186,17 +179,9 @@ export async function fetchAllQuestions(): Promise<string[]> {
 
 // ─── Plan & Activity ──────────────────────────────────────────────────────────
 
-export type PlanTier = (typeof PLAN_TIERS)[number]
-
 // Real: GET /api/nanci/plan/tiers → PlanTier[]
 export async function fetchPlanTiers(): Promise<PlanTier[]> {
   return PLAN_TIERS
-}
-
-export interface ActivityItem {
-  date: string
-  title: string
-  tokens: number
 }
 
 // Real: GET /api/nanci/activity → ActivityItem[]
