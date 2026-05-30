@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, type ReactNode } from "react"
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
@@ -106,13 +106,45 @@ function PanelContent({ id }: { id: PanelId }) {
   }
 }
 
+function SlotWrapper({ id, closing, children }: { id: PanelId | null | undefined; closing: string[]; children: ReactNode }) {
+  const isClosing = !!id && closing.includes(id)
+  return (
+    <div
+      key={id ?? undefined}
+      className={cn(
+        "h-full transition-opacity duration-300 ease-out",
+        isClosing ? "opacity-0" : "animate-panel-in",
+      )}
+    >
+      {children}
+    </div>
+  )
+}
+
 export function ConceptPanelArea({ fillWidth = false, visible = true }: { fillWidth?: boolean; visible?: boolean }) {
-  const { openPanels } = useAskNanci()
+  const { openPanels, closingPanels } = useAskNanci()
   const isOpen = openPanels.length > 0
+  const isClosing = closingPanels.length > 0
   const isSmall = useIsSmallScreen()
 
-  const layoutKey = [...openPanels].sort().join(",")
-  const { A, B, C, D } = mapPanelsToSlots(openPanels)
+  // Freeze the slot layout during close animation — don't update while a staggered close is in progress
+  const [renderContent, setRenderContent] = useState(isOpen)
+  const [frozenSlots, setFrozenSlots] = useState(() => mapPanelsToSlots(openPanels))
+  const [frozenKey, setFrozenKey] = useState(() => [...openPanels].sort().join(","))
+  useEffect(() => {
+    if (isClosing) return  // freeze layout during staggered close
+    if (isOpen) {
+      setRenderContent(true)
+      setFrozenSlots(mapPanelsToSlots(openPanels))
+      setFrozenKey([...openPanels].sort().join(","))
+    } else {
+      const t = setTimeout(() => setRenderContent(false), 350)
+      return () => clearTimeout(t)
+    }
+  }, [isOpen, isClosing, openPanels])
+
+  const { A, B, C, D } = frozenSlots
+  const layoutKey = frozenKey
 
   const hasLeft  = !!(A || C)
   const hasRight = !!(B || D)
@@ -132,7 +164,7 @@ export function ConceptPanelArea({ fillWidth = false, visible = true }: { fillWi
             ),
       )}
     >
-      {isOpen && (
+      {renderContent && (
         <ResizablePanelGroup orientation={isSmall ? "vertical" : "horizontal"} className="h-full">
 
           {/* ── Left column (slots A + C) ── */}
@@ -141,15 +173,15 @@ export function ConceptPanelArea({ fillWidth = false, visible = true }: { fillWi
               {A && C ? (
                 <ResizablePanelGroup key={`${A}-${C}`} orientation="vertical" className="h-full">
                   <ResizablePanel defaultSize={55} minSize={15}>
-                    <div key={A} className="h-full animate-panel-in"><PanelContent id={A} /></div>
+                    <SlotWrapper id={A} closing={closingPanels}><PanelContent id={A!} /></SlotWrapper>
                   </ResizablePanel>
                   <ResizableHandle withHandle />
                   <ResizablePanel defaultSize={45} minSize={15}>
-                    <div key={C} className="h-full animate-panel-in"><PanelContent id={C} /></div>
+                    <SlotWrapper id={C} closing={closingPanels}><PanelContent id={C!} /></SlotWrapper>
                   </ResizablePanel>
                 </ResizablePanelGroup>
               ) : (
-                <div key={A ?? C} className="h-full animate-panel-in"><PanelContent id={(A ?? C)!} /></div>
+                <SlotWrapper id={A ?? C} closing={closingPanels}><PanelContent id={(A ?? C)!} /></SlotWrapper>
               )}
             </ResizablePanel>
           )}
@@ -163,15 +195,15 @@ export function ConceptPanelArea({ fillWidth = false, visible = true }: { fillWi
               {B && D ? (
                 <ResizablePanelGroup key={`${B}-${D}`} orientation="vertical" className="h-full">
                   <ResizablePanel defaultSize={55} minSize={15}>
-                    <div key={B} className="h-full animate-panel-in"><PanelContent id={B} /></div>
+                    <SlotWrapper id={B} closing={closingPanels}><PanelContent id={B!} /></SlotWrapper>
                   </ResizablePanel>
                   <ResizableHandle withHandle />
                   <ResizablePanel defaultSize={45} minSize={15}>
-                    <div key={D} className="h-full animate-panel-in"><PanelContent id={D} /></div>
+                    <SlotWrapper id={D} closing={closingPanels}><PanelContent id={D!} /></SlotWrapper>
                   </ResizablePanel>
                 </ResizablePanelGroup>
               ) : (
-                <div key={B ?? D} className="h-full animate-panel-in"><PanelContent id={(B ?? D)!} /></div>
+                <SlotWrapper id={B ?? D} closing={closingPanels}><PanelContent id={(B ?? D)!} /></SlotWrapper>
               )}
             </ResizablePanel>
           )}

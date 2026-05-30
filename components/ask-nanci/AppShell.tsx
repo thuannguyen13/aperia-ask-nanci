@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import Image from "next/image"
 import { useTheme } from "next-themes"
@@ -26,15 +26,24 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
   const isDQ = openPanels.some((p) => DQ_PANELS.has(p))
   const [showDQ, setShowDQ] = useState(false)
   const [dqVisible, setDqVisible] = useState(false)
+  // Tracks whether the non-DQ chat just appeared so we can fade it in
+  const [chatFadingIn, setChatFadingIn] = useState(false)
+  const chatFadeRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     if (isDQ) {
       setShowDQ(true)
+      setChatFadingIn(false)
+      if (chatFadeRef.current) clearTimeout(chatFadeRef.current)
       const id = requestAnimationFrame(() => setDqVisible(true))
       return () => cancelAnimationFrame(id)
     } else {
       setDqVisible(false)
-      const t = setTimeout(() => setShowDQ(false), 300)
+      const t = setTimeout(() => {
+        setShowDQ(false)
+        setChatFadingIn(true)
+        chatFadeRef.current = setTimeout(() => setChatFadingIn(false), 200)
+      }, 300)
       return () => clearTimeout(t)
     }
   }, [isDQ])
@@ -45,13 +54,14 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
       {showDQ ? (
         <>
           <ConceptPanelArea fillWidth visible={dqVisible} />
-          <div className={`ml-1 flex w-[320px] shrink-0 overflow-hidden rounded-xl border bg-background md:w-[390px] md:rounded-2xl transition-opacity duration-300 ease-out ${dqVisible ? "opacity-100" : "opacity-0"}`}>
+          {/* Chat stays fully visible — only the panel area fades, avoiding a blank-screen flash */}
+          <div className="ml-1 flex w-[320px] shrink-0 overflow-hidden rounded-xl border bg-background md:w-[390px] md:rounded-2xl">
             {children}
           </div>
         </>
       ) : (
         <>
-          <div className="flex min-w-0 flex-1 overflow-hidden rounded-xl md:rounded-2xl border bg-background">
+          <div className={`flex min-w-0 flex-1 overflow-hidden rounded-xl md:rounded-2xl border bg-background transition-opacity duration-200 ease-out ${chatFadingIn ? "opacity-0" : "opacity-100"}`}>
             {children}
           </div>
           <MerchantVolumePanel />

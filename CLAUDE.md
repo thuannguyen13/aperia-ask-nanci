@@ -68,6 +68,17 @@ In `CONCEPT_SCRIPTED_CONVERSATIONS`, use turn fields to trigger panel opens:
 4. Add it to the relevant flow's slot mapping in `mapPanelsToSlots`
 5. Import and add a `case` for `turn.openPanel` in `playConceptScripted` if script-driven
 
+### Adding a new concept scripted flow
+
+1. Add the trigger prompt string to `CONCEPT_ALL_PROMPTS` in `concept-config.ts`
+2. Add any follow-up prompts (continuations that shouldn't reset the session) to `CONCEPT_NO_RESET_PROMPTS`
+3. Add the full turn sequence to `CONCEPT_SCRIPTED_CONVERSATIONS` keyed by the trigger prompt
+4. Wire panel opens in the turn objects:
+   - `openPanel: "panel-id"` for multi panels
+   - `openFormPanel: true` / `openStepUpPanel: true` / `openBatchPanel: true` for simple panels
+   - `closeAllPanels: true` to reset at end of flow
+5. If the flow needs a new multi panel, follow "Adding a new multi panel" above first
+
 ## Components
 
 ### Resizable panels (`ResizablePanelGroup`, `ResizablePanel`, `ResizableHandle`)

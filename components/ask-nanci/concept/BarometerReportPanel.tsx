@@ -121,12 +121,13 @@ export function BarometerReportPanel() {
             <span className="text-[10px] text-muted-foreground">Sorted by risk score</span>
           </div>
 
-          <table className="w-full text-xs border-collapse rounded-md border overflow-hidden">
+          <div className="rounded-md border overflow-hidden">
+          <table className="w-full text-xs border-collapse">
             <thead>
               <tr className="bg-muted/60 border-b border-border">
-                <th className="px-3 py-2 text-left text-[10px] font-semibold text-muted-foreground">Merchant</th>
-                <th className="px-2 py-2 text-center text-[10px] font-semibold text-muted-foreground">Score</th>
-                <th className="px-2 py-2 text-left text-[10px] font-semibold text-muted-foreground">Status</th>
+                <th className="px-3 py-2 text-left text-[10px] font-semibold text-muted-foreground border-r border-border">Merchant</th>
+                <th className="px-2 py-2 text-center text-[10px] font-semibold text-muted-foreground border-r border-border">Score</th>
+                <th className="px-2 py-2 text-left text-[10px] font-semibold text-muted-foreground border-r border-border">Status</th>
                 <th className="px-2 py-2 text-right text-[10px] font-semibold text-muted-foreground">Amount</th>
               </tr>
             </thead>
@@ -140,19 +141,20 @@ export function BarometerReportPanel() {
                     i === 0 ? "font-medium" : "",
                   )}
                 >
-                  <td className="px-3 py-2">
+                  <td className="px-3 py-2 border-r border-border/40">
                     <p className="text-foreground truncate max-w-[140px]">{row.name}</p>
                     <p className="font-mono text-[9px] text-muted-foreground">{row.id}</p>
                   </td>
-                  <td className="px-2 py-2 text-center">
+                  <td className="px-2 py-2 text-center border-r border-border/40">
                     <ScoreBadge score={row.score} />
                   </td>
-                  <td className="px-2 py-2 text-muted-foreground text-[10px] whitespace-nowrap">{row.status}</td>
+                  <td className="px-2 py-2 text-muted-foreground text-[10px] whitespace-nowrap border-r border-border/40">{row.status}</td>
                   <td className="px-2 py-2 text-right font-mono text-foreground">{row.amount}</td>
                 </tr>
               ))}
             </tbody>
           </table>
+          </div>
         </div>
       </div>
     </div>

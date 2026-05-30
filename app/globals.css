@@ -9,11 +9,12 @@
   --color-primary-foreground: oklch(0.985 0 0);
   --ring: var(--color-primary);
 
-  /* --chart-1: oklch(0.8100 0.1000 252);  
-  --chart-2: oklch(0.6200 0.1900 260);  
-  --chart-3: oklch(0.5500 0.2200 263);  
-  --chart-4: oklch(0.4900 0.2200 264);  
-  --chart-5: oklch(0.4200 0.1800 266); */
+  --chart-1: #3F65C2;
+  --chart-2: #F18442;
+  --chart-3: #951B19;  
+  --chart-4: #9FD689;  
+  --chart-5: #ECD1FB;
+  --chart-6: #2C2073;
 }
 
 [data-embed="business-owner"] {

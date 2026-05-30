@@ -223,7 +223,7 @@ export const MOCK_RESPONSES: MockResponse[] = [
     content:
       "Right now you have $11,400 in the bank. Payroll on Friday is $8,200, and you have two vendor invoices totaling $3,100 due before then. That leaves you with just $100 before the deposits land. But — you have $4,800 in settled card transactions depositing Wednesday and another $3,200 coming Thursday. After everything clears, you should land around $8,100 by Friday evening. You'll be fine, but it'll be tight.\n\n- Current Balance: $11,400\n- Payroll Friday: $8,200\n- Bills Due: $3,100\n- Projected Friday: $8,100",
     suggestions: [
-      "How come I had a great month but I can't pay my bills?",
+      "Why did my bank balance drop this month even though sales were up?",
       "Can I afford to give my staff a raise?",
     ],
     chart: {
@@ -236,7 +236,7 @@ export const MOCK_RESPONSES: MockResponse[] = [
   },
   {
     id: "great-month",
-    keywords: ["great month", "bills", "cash flow"],
+    keywords: ["bank balance drop", "sales were up", "balance drop"],
     content:
       "Your sales were actually up 15% this month — $62,400 vs $54,300 last month. But your bank balance dropped $3,100. Here's what happened: A chargeback batch of $3,200 hit on the 14th. Your quarterly tax estimate of $4,800 went out on the 15th. Annual insurance premium of $2,900 auto-debited on the 18th. So you had $10,900 in unusual outflows that ate your growth and then some.\n\n- Sales Growth: +15%\n- Balance Change: -$3,100\n- Unusual Outflows: $10,900\n- This Month: $62,400",
     suggestions: [
@@ -290,7 +290,7 @@ export const MOCK_RESPONSES: MockResponse[] = [
   },
   {
     id: "last-week",
-    keywords: ["last week", "week", "make last week"],
+    keywords: ["last week", "make last week"],
     content:
       "Last week you brought in $14,820 in total sales across the register. After processing fees ($431), chargebacks ($180), and one pending hold ($85), your net settled amount was $14,124. Your bank received $14,124 from card settlements, plus $940 in cash deposits and a $200 catering check — so your actual total income was $15,264.\n\n- Gross Sales: $14,820\n- Processing Fees: $431\n- Chargebacks: $180\n- **Actual Income: $15,264**",
     suggestions: [
@@ -304,6 +304,114 @@ export const MOCK_RESPONSES: MockResponse[] = [
       datasets: [{ label: "Revenue ($)", data: [14820, 14389, 14209, 14124, 15264, 15264] }],
     },
     sourceInstitutions: ["Clover Data", "AccessOne Data", "Chase", "American Express"],
+  },
+  {
+    id: "top-margin",
+    keywords: ["highest margin", "menu margin", "most profitable item", "best margin"],
+    content:
+      "Your top three margin items right now are margaritas (68%), appetizer sampler (61%), and the chef's salad (38%). Margaritas are your standout — low ingredient cost, high perceived value, and they sell 34 a day on average. Compare that to the brisket sandwich, which has slipped to 44% margin after the recent beef price increase. If you want to protect profitability, push the margaritas and appetizers — they're doing the heavy lifting.\n\n- Margaritas: 68% margin\n- Appetizer Sampler: 61% margin\n- Chef's Salad: 38% margin\n- Brisket Sandwich: 44% margin (↓ from 52%)",
+    suggestions: [
+      "What should I charge more for?",
+      "Where's all my money going?",
+    ],
+    chart: {
+      kind: "bar",
+      title: "Item Margin Comparison (%)",
+      labels: ["Margaritas", "App Sampler", "Chef Salad", "Fish Tacos", "Brisket"],
+      datasets: [{ label: "Margin (%)", data: [68, 61, 38, 42, 44] }],
+    },
+    sourceInstitutions: ["Clover Data", "AccessOne Data", "QuickBooks"],
+  },
+  {
+    id: "low-ticket",
+    keywords: ["dragging down", "average ticket", "low ticket", "average order"],
+    content:
+      "Your current average ticket is $28.40. Three item types are pulling it down: side-only orders (avg $6.50, 18% of transactions), single-drink orders at the bar (avg $7.20, 11% of transactions), and kids' meals (avg $8.90, 9% of transactions). Together they account for 38% of your transactions but only 14% of revenue. Adding a combo upsell prompt at the register for side orders could move the needle — even a $3 upsell on half those transactions adds about $900/month.\n\n- Current Avg Ticket: $28.40\n- Side-only Orders: $6.50 avg (18% of txns)\n- Single Drinks: $7.20 avg (11% of txns)\n- Upsell Opportunity: ~$900/mo",
+    suggestions: [
+      "What should I charge more for?",
+      "Which menu items have the highest margin?",
+    ],
+    chart: {
+      kind: "bar",
+      title: "Avg Ticket by Order Type ($)",
+      labels: ["Full Meal", "Kids Meal", "Single Drink", "Side Only"],
+      datasets: [{ label: "Avg Ticket ($)", data: [38.50, 8.90, 7.20, 6.50] }],
+    },
+    sourceInstitutions: ["Clover Data", "AccessOne Data"],
+  },
+  {
+    id: "over-ordering",
+    keywords: ["over-ordering", "over ordering", "ordering too much", "over order"],
+    content:
+      "Based on your last four weeks of POS sales vs. supplier invoices, chicken is your biggest over-order — you're purchasing about 25% more than you sell. Fish is next at 14% excess, and pasta at 8%. On the flip side, you've run low on margarita mix twice this month, suggesting you're under-ordering on bar supplies. Trimming your chicken order by 20% would save roughly $280/week without risking stockouts based on your current sell-through rate.\n\n- Chicken: 25% excess (~$280/week)\n- Fish: 14% excess (~$90/week)\n- Pasta: 8% excess (~$40/week)\n- Margarita mix: under-ordered (2 stockouts)",
+    suggestions: [
+      "I feel like we're throwing away too much food. Are we?",
+      "Where's all my money going?",
+    ],
+    chart: {
+      kind: "bar",
+      title: "Ordered vs. Sold (weekly avg, servings)",
+      labels: ["Chicken", "Fish", "Pasta"],
+      datasets: [
+        { label: "Ordered", data: [400, 210, 240] },
+        { label: "Sold", data: [300, 180, 220] },
+      ],
+    },
+    sourceInstitutions: ["Clover Data", "AccessOne Data", "QuickBooks"],
+  },
+  {
+    id: "food-cost-pct",
+    keywords: ["food cost percentage", "food cost compare", "food cost percent"],
+    content:
+      "Your food cost percentage this month is 31.2%, up from 28.4% last month. The jump is driven mostly by beef prices — your brisket and burger items are now costing about 18% more from your supplier. Your beverage cost held steady at 19.1%. The industry benchmark for a full-service restaurant is 28–32%, so you're at the high end but not out of range. If beef costs don't normalize, a $1 price increase on brisket items would bring your food cost back to ~28.8%.\n\n- This Month: 31.2%\n- Last Month: 28.4%\n- Change: +2.8 pts\n- Beverage Cost: 19.1% (stable)\n- Benchmark: 28–32%",
+    suggestions: [
+      "What should I charge more for?",
+      "I feel like we're throwing away too much food. Are we?",
+    ],
+    chart: {
+      kind: "line",
+      title: "Food Cost % — Last 4 Months",
+      labels: ["2 Months Ago", "Last Month", "This Month"],
+      datasets: [{ label: "Food Cost (%)", data: [27.8, 28.4, 31.2] }],
+    },
+    sourceInstitutions: ["Clover Data", "AccessOne Data", "QuickBooks"],
+  },
+  {
+    id: "refunds",
+    keywords: ["refunds", "refund cost", "how much refunds", "cost me in refunds"],
+    content:
+      "This month you've had $2,240 in total refunds and voids. That breaks down to: 18 voids totaling $780 (mostly mid-service order changes), 9 full refunds totaling $1,020, and 14 chargebacks totaling $1,840 — though chargebacks are handled separately through your processor. The $780 in voids is on the higher side; your monthly average over the past year is $490. Two servers account for 11 of the 18 voids, which is worth a conversation.\n\n- Voids: $780 (18 transactions)\n- Refunds: $1,020 (9 transactions)\n- Chargebacks: $1,840 (14 transactions)\n- Avg Monthly Voids: $490",
+    suggestions: [
+      "Why do I keep getting chargebacks?",
+      "Who's my best employee?",
+    ],
+    chart: {
+      kind: "bar",
+      title: "Refunds & Voids This Month ($)",
+      labels: ["Voids", "Refunds", "Chargebacks"],
+      datasets: [{ label: "Amount ($)", data: [780, 1020, 1840] }],
+    },
+    sourceInstitutions: ["Clover Data", "AccessOne Data", "American Express", "Chase"],
+  },
+  {
+    id: "card-spend",
+    keywords: ["card brand", "highest spend", "spend per customer", "card brand spend", "highest spend per"],
+    content:
+      "Amex cardholders spend the most per visit by far — $47 average ticket versus $31 for Discover, $28 for Visa, and $26 for Mastercard. Amex is only 22% of your transaction volume but generates 37% of your card revenue. The tradeoff is cost: Amex charges you 3.2% per transaction versus 2.3–2.5% for the others. Even after fees, your net revenue per Amex transaction ($45.49) beats Visa ($27.33) and Mastercard ($25.40) comfortably.\n\n- Amex: $47 avg ticket / $45.49 net after fees\n- Discover: $31 avg ticket / $30.22 net\n- Visa: $28 avg ticket / $27.33 net\n- Mastercard: $26 avg ticket / $25.40 net",
+    suggestions: [
+      "I'm paying way too much in fees. How bad is it?",
+      "How much did I actually make last week?",
+    ],
+    chart: {
+      kind: "bar",
+      title: "Avg Ticket by Card Brand ($)",
+      labels: ["Amex", "Discover", "Visa", "Mastercard"],
+      datasets: [
+        { label: "Avg Ticket ($)", data: [47, 31, 28, 26] },
+        { label: "Net After Fees ($)", data: [45.49, 30.22, 27.33, 25.40] },
+      ],
+    },
+    sourceInstitutions: ["Clover Data", "AccessOne Data", "American Express"],
   },
   {
     id: "business-address",
@@ -485,8 +593,14 @@ const QUESTION_TITLES: Record<string, string> = {
   "payroll": "Am I going to be able to make payroll on Friday?",
   "great-month": "Why did my bank balance drop this month even though sales were up?",
   "saturday": "Was Saturday worth it?",
-  "money-going": "Where's all my money going?",
-  "last-week": "How much did I actually make last week?",
+  "money-going":    "Where's all my money going?",
+  "last-week":      "How much did I actually make last week?",
+  "top-margin":     "Which menu items have the highest margin?",
+  "low-ticket":     "What items are dragging down my average ticket?",
+  "over-ordering":  "Which ingredients am I over-ordering?",
+  "food-cost-pct":  "How does my food cost percentage compare to last month?",
+  "refunds":        "How much did refunds cost me this month?",
+  "card-spend":     "Which card brand has the highest spend per customer?",
 }
 
 export const ALL_QUESTIONS = MOCK_RESPONSES.map((r) => QUESTION_TITLES[r.id] ?? r.id)

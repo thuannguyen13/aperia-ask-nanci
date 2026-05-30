@@ -13,7 +13,7 @@ export function ChatCitedSources({ sources }: { sources: Source[] }) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button className="mt-2 flex items-center gap-1.5 rounded-full border bg-background px-2.5 py-1 text-xs text-muted-foreground shadow-sm transition-colors hover:bg-muted">
+        <button className="mt-2 flex items-center gap-1.5 rounded-full border bg-background px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-muted">
           <div className="flex items-center">
             {sources.slice(0, 3).map((s, i) => {
               const initials = getSourceInitials(s)

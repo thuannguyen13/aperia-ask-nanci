@@ -12,7 +12,8 @@ import { ExplorePrompts } from "./ExplorePrompts"
 const PROACTIVE_CONTENT = CONCEPT_SCRIPTED_CONVERSATIONS[CONCEPT_FLOW6_KEY][0].content
 
 export function ChatInput() {
-  const { sendMessage, handlePrompt, startNewChat, chatState, stopAnimation, sources, setSources, draft, setDraft, setTokenLimitReached, setOnboardingOpen, isEmbed, isConceptVersion, triggerProactiveFlow, proactiveNotificationActive } = useAskNanci()
+  const { sendMessage, handlePrompt, startNewChat, chatState, stopAnimation, sources, setSources, draft, setDraft, setTokenLimitReached, setOnboardingOpen, isEmbed, embedVariant, isConceptVersion, triggerProactiveFlow, proactiveNotificationActive } = useAskNanci()
+  const isDetect = embedVariant === "detect"
   const activeSources = sources.filter((s) => s.active)
 
   const [value, setValue] = useState("")
@@ -141,7 +142,7 @@ export function ChatInput() {
               <Square className="size-3.5 fill-current" />
             </Button>
           ) : (
-            <Button size="icon-sm" variant="default" onClick={submit} disabled={isEmbed || !value.trim()}>
+            <Button size="icon-sm" variant="default" onClick={submit} disabled={(isEmbed && !isDetect) || !value.trim()}>
               <ArrowUp />
             </Button>
           )}
@@ -155,7 +156,7 @@ export function ChatInput() {
           </DialogHeader>
           <ExplorePrompts onPromptClick={(prompt) => {
             setCommonQOpen(false)
-            startNewChat()
+            if (!isDetect) startNewChat()
             handlePrompt(prompt)
           }} />
         </DialogContent>

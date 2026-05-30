@@ -8,10 +8,12 @@ import { ISO_PROMPT_CATEGORIES } from "@/lib/ask-nanci/embed-demo-config"
 interface ExplorePromptsProps {
   title?: string
   description?: string
+  onPromptClick?: (prompt: string) => void
 }
 
-export function ExplorePrompts({title, description}: ExplorePromptsProps) {
+export function ExplorePrompts({ title, description, onPromptClick }: ExplorePromptsProps) {
   const { handlePrompt, embedVariant, promptCategories } = useAskNanci()
+  const handleClick = onPromptClick ?? handlePrompt
 
   const visibleCategories = embedVariant === "iso"
     ? ISO_PROMPT_CATEGORIES
@@ -44,7 +46,7 @@ export function ExplorePrompts({title, description}: ExplorePromptsProps) {
               {prompts.map((prompt) => (
                 <button
                   key={prompt}
-                  onClick={() => handlePrompt(prompt)}
+                  onClick={() => handleClick(prompt)}
                   className="flex cursor-pointer items-start gap-2 rounded-[10px] border bg-card px-3 py-2.5 text-left transition-colors hover:bg-muted"
                 >
                   <CornerDownRight className="mt-0.5 size-4 shrink-0 text-muted-foreground" />

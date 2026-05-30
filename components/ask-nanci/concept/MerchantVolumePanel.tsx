@@ -67,7 +67,7 @@ export function MerchantVolumePanel() {
 
       {/* Table */}
       <ScrollArea className="flex-1">
-        <Table>
+        <Table className="border-collapse [&_th]:border [&_td]:border [&_th]:border-border [&_td]:border-border">
           <TableHeader>
             <TableRow>
               <TableHead className="w-8">#</TableHead>

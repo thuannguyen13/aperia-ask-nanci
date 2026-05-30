@@ -27,11 +27,6 @@ export function ChatView() {
                 displayedContent={msg.content}
                 showExtras={true}
               />
-              {isLastMsg && chatState === "idle" && !isConceptVersion && (
-                <div className="mt-6">
-                  <ExplorePrompts title="Ask More" description="Pick another question to keep the conversation going." />
-                </div>
-              )}
             </div>
           )
         })}
