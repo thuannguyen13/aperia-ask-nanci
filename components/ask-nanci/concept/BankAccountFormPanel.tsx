@@ -24,7 +24,7 @@ export function BankAccountFormPanel() {
       "transition-[width,opacity,margin] duration-200 ease-in-out md:flex",
       formPanelOpen
         ? "w-[420px] opacity-100 ml-1"
-        : "w-0 opacity-0 border-transparent pointer-events-none",
+        : "w-0 opacity-0 border-0 pointer-events-none",
     )}>
       {/* Header */}
       <div className="flex shrink-0 items-center justify-between gap-3 border-b px-4 py-3">

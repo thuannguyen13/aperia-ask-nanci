@@ -160,7 +160,7 @@ export function ConceptPanelArea({ fillWidth = false, visible = true }: { fillWi
               "hidden md:flex",
               isOpen
                 ? "w-[58%] opacity-100 ml-1"
-                : "w-0 opacity-0 border-transparent pointer-events-none",
+                : "w-0 opacity-0 border-0 pointer-events-none",
             ),
       )}
     >
