@@ -53,11 +53,3 @@ export const EMBED_ISO_DEMO_SOURCES: Source[] = [
   { id: "iso-g2risk",  name: "G2 Risk Solutions", kind: "bank", institution: "G2 Risk Solutions", logo: "/iso/g2risk.svg",        active: true, addedAt: 0 },
 ]
 
-export const EMBED_DETECT_DEMO_SOURCES: Source[] = [
-  APERIA_SOURCE,
-  { id: "detect-visa",   name: "Visa",              kind: "bank", institution: "Visa",              logo: "/iso/visa.svg",          active: true, addedAt: 0 },
-  { id: "detect-mc",     name: "Mastercard",        kind: "bank", institution: "Mastercard",        logo: "/iso/mastercard.svg",    active: true, addedAt: 0 },
-  { id: "detect-alloy",  name: "Alloy",             kind: "bank", institution: "Alloy",             logo: "/iso/alloy.svg",         active: true, addedAt: 0 },
-  { id: "detect-cb911",  name: "Chargeback911",     kind: "bank", institution: "Chargeback911",     logo: "/iso/chargeback911.svg", active: true, addedAt: 0 },
-  { id: "detect-g2risk", name: "G2 Risk Solutions", kind: "bank", institution: "G2 Risk Solutions", logo: "/iso/g2risk.svg",        active: true, addedAt: 0 },
-]

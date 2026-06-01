@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useCallback, useRef, useEffect } from "react"
-import type { Message, Session, Source, UsageData } from "@/lib/ask-nanci/types"
+import type { Message, Session, Source, UsageData, ConceptScriptedTurn } from "@/lib/ask-nanci/types"
 import {
   fetchSessions,
   persistSession,
@@ -18,10 +18,12 @@ import {
   fetchActivity,
 } from "@/lib/ask-nanci/api"
 import type { CurrentUser, PromptCategory, PlanTier, ActivityItem } from "@/lib/ask-nanci/api"
-import { EMBED_DEMO_SOURCES, EMBED_BUSINESS_OWNER_DEMO_SOURCES, EMBED_ISO_DEMO_SOURCES, EMBED_DETECT_DEMO_SOURCES, SCRIPTED_CONVERSATIONS } from "@/lib/ask-nanci/embed-demo-config"
+import { EMBED_DEMO_SOURCES, EMBED_BUSINESS_OWNER_DEMO_SOURCES, EMBED_ISO_DEMO_SOURCES, SCRIPTED_CONVERSATIONS } from "@/lib/ask-nanci/embed-demo-config"
 import type { EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
-import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW2_PROMPT, CONCEPT_FLOW2_FOLLOWUP, CONCEPT_FLOW6_KEY, CONCEPT_FLOW12_PROMPT, CONCEPT_ALL_PROMPTS, CONCEPT_NO_RESET_PROMPTS, CONCEPT_WELCOME_KEY, CONCEPT_DETECT_WELCOME_KEY } from "@/lib/ask-nanci/concept-config"
+import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW2_PROMPT, CONCEPT_FLOW2_FOLLOWUP, CONCEPT_FLOW6_KEY, CONCEPT_FLOW12_PROMPT, CONCEPT_ALL_PROMPTS, CONCEPT_NO_RESET_PROMPTS, CONCEPT_WELCOME_KEY } from "@/lib/ask-nanci/concept-config"
 import { CLOVER_SOURCE_ID, ONBOARDING_KEY } from "@/lib/ask-nanci/sourceStore"
+
+const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
 type ChatView = "welcome" | "chat"
 type ChatState = "idle" | "thinking" | "streaming"
@@ -37,7 +39,6 @@ interface AskNanciCtx {
   pendingBot: Message | null
   sendMessage: (text: string) => void
   handlePrompt: (prompt: string) => void
-  playScripted: (prompt: string) => void
   stopAnimation: () => void
   startNewChat: () => void
   resumeSession: (id: string) => void
@@ -85,7 +86,6 @@ interface AskNanciCtx {
   activateProactiveNotification: () => void
   openPanels: string[]
   closingPanels: string[]
-  openPanel: (type: string) => void
   closePanel: (type: string) => void
   closeAllNewPanels: () => void
   submitDisputeDraft: () => void
@@ -101,8 +101,8 @@ export function useAskNanci() {
   return ctx
 }
 
-export function AskNanciProvider({ children, isEmbed = false, embedVariant = null, isConceptVersion = false }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null; isConceptVersion?: boolean }) {
-  const [view, setView] = useState<ChatView>(embedVariant === "detect" ? "chat" : "welcome")
+export function AskNanciProvider({ children, isEmbed = false, embedVariant = null, isConceptVersion = false, autoPlayFlow = null }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null; isConceptVersion?: boolean; autoPlayFlow?: string | null }) {
+  const [view, setView] = useState<ChatView>(embedVariant === "concept-embed" ? "chat" : "welcome")
   const [messages, setMessages] = useState<Message[]>([])
   const [chatState, setChatState] = useState<ChatState>("idle")
   const [sessions, setSessions] = useState<Session[]>([])
@@ -112,7 +112,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     isEmbed ? (
       embedVariant === "business-owner" ? EMBED_BUSINESS_OWNER_DEMO_SOURCES :
       embedVariant === "iso" ? EMBED_ISO_DEMO_SOURCES :
-      embedVariant === "detect" ? EMBED_DETECT_DEMO_SOURCES :
       EMBED_DEMO_SOURCES) : []
   )
   const [thinking, setThinking] = useState<{ source: Source | null; label: string }>({ source: null, label: "Thinking…" })
@@ -158,10 +157,10 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   }, [isEmbed])
 
   useEffect(() => {
-    if (embedVariant === "detect") {
-      const t = setTimeout(() => playConceptScripted(CONCEPT_DETECT_WELCOME_KEY), 800)
-      return () => clearTimeout(t)
-    }
+    const flowKey = autoPlayFlow
+    if (!flowKey) return
+    const t = setTimeout(() => playConceptScripted(flowKey), 800)
+    return () => clearTimeout(t)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -279,8 +278,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setChatState("idle")
     setPendingBot(null)
 
-    const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
-
     const streamText = (turn: typeof script[number], id: string) =>
       new Promise<void>((resolve) => {
         const botMsg = { id, role: "assistant" as const, content: "" }
@@ -324,6 +321,18 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     run()
   }, [])
 
+  const applyTurnEffects = useCallback((turn: ConceptScriptedTurn, prompt: string) => {
+    if (turn.openFormPanel) { setFormPanelOpen(true) }
+    if (turn.openStepUpPanel) { setStepUpPanelOpen(true); setStepUpPanelStep(1) }
+    if (turn.advanceStepUp) { setStepUpPanelStep((s) => Math.min(3, s + 1) as 1 | 2 | 3) }
+    if (turn.openBatchPanel) { setBatchPanelOpen(true) }
+    if (prompt === CONCEPT_FLOW2_PROMPT) { setReportPanelOpen(true); setReportTopN(10) }
+    if (prompt === CONCEPT_FLOW2_FOLLOWUP) { setReportTopN(5) }
+    if (turn.openPanel) { setOpenPanels((prev) => prev.includes(turn.openPanel!) ? prev : [...prev, turn.openPanel!]) }
+    if (turn.filterDeclineReport) { setDeclineReportFiltered(true) }
+    if (turn.advanceWorkQueue) { setWorkQueuePhase(turn.advanceWorkQueue) }
+  }, [])
+
   const playConceptScripted = useCallback((prompt: string) => {
     const script = CONCEPT_SCRIPTED_CONVERSATIONS[prompt]
     if (!script) return
@@ -335,8 +344,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     }
     setChatState("idle")
     setPendingBot(null)
-
-    const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
     const streamText = (text: string, id: string) =>
       new Promise<void>((resolve) => {
@@ -395,15 +402,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
               return next
             })
           }
-          if (turn.openFormPanel) { setFormPanelOpen(true) }
-          if (turn.openStepUpPanel) { setStepUpPanelOpen(true); setStepUpPanelStep(1) }
-          if (turn.advanceStepUp) { setStepUpPanelStep((s) => Math.min(3, s + 1) as 1 | 2 | 3) }
-          if (turn.openBatchPanel) { setBatchPanelOpen(true) }
-          if (prompt === CONCEPT_FLOW2_PROMPT) { setReportPanelOpen(true); setReportTopN(10) }
-          if (prompt === CONCEPT_FLOW2_FOLLOWUP) { setReportTopN(5) }
-          if (turn.openPanel) { setOpenPanels((prev) => prev.includes(turn.openPanel!) ? prev : [...prev, turn.openPanel!]) }
-          if (turn.filterDeclineReport) { setDeclineReportFiltered(true) }
-          if (turn.advanceWorkQueue) { setWorkQueuePhase(turn.advanceWorkQueue) }
+          applyTurnEffects(turn, prompt)
           if (turn.closeAllPanels) {
             await sleep(600)
             // Stagger panels closed — right column first, then left
@@ -451,10 +450,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       ...prev,
       { id: newSessionId(), role: "assistant" as const, content: "New account confirmed and submitted. Micro-deposits will arrive in 1–2 business days — I'll notify you when they're ready to verify. Deposits continue to your current account until then.", suggestions: CONCEPT_ALL_PROMPTS },
     ])
-  }, [])
-
-  const openPanel = useCallback((type: string) => {
-    setOpenPanels((prev) => prev.includes(type) ? prev : [...prev, type])
   }, [])
 
   const closePanel = useCallback((type: string) => {
@@ -545,7 +540,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       isEmbed, embedVariant,
       view, messages, chatState, sessions, activeSessionId,
       pendingBot,
-      sendMessage, handlePrompt, playScripted, stopAnimation, startNewChat, resumeSession,
+      sendMessage, handlePrompt, stopAnimation, startNewChat, resumeSession,
       deleteSessionById,
       sources, setSources: handleSetSources, thinking,
       kbOpen, setKbOpen,
@@ -561,7 +556,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       stepUpPanelOpen, setStepUpPanelOpen, stepUpPanelStep, advanceStepUpPanel, submitStepUpPanel,
       batchPanelOpen, setBatchPanelOpen,
       triggerProactiveFlow, proactiveNotificationActive, activateProactiveNotification,
-      openPanels, closingPanels, openPanel, closePanel, closeAllNewPanels, submitDisputeDraft,
+      openPanels, closingPanels, closePanel, closeAllNewPanels, submitDisputeDraft,
       declineReportFiltered, workQueuePhase,
     }}>
       {children}

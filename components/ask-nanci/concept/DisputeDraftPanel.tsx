@@ -2,19 +2,14 @@
 
 import { X, Send } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-
-const EVIDENCE = [
-  { num: 1, label: "Signed receipt",      detail: "Cardholder J. Martinez signed at POS on May 14, 2026" },
-  { num: 2, label: "No-refund policy",    detail: "Printed on receipt and posted at register" },
-  { num: 3, label: "Cardholder history",  detail: "6 prior transactions, matching signature, no disputes" },
-  { num: 4, label: "Merchant call notes", detail: "Customer collected order and signed without complaint" },
-]
+import { EVIDENCE } from "@/lib/ask-nanci/data/panels/dispute-draft"
+import { PanelShell } from "@/components/ask-nanci/shared"
 
 export function DisputeDraftPanel() {
   const { closePanel, submitDisputeDraft } = useAskNanci()
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
+    <PanelShell>
       {/* Header */}
       <div className="flex shrink-0 items-center justify-between border-b bg-muted/30 px-4 py-2.5">
         <div className="flex items-center gap-2.5">
@@ -80,6 +75,6 @@ export function DisputeDraftPanel() {
           Submit to Processor
         </button>
       </div>
-    </div>
+    </PanelShell>
   )
 }

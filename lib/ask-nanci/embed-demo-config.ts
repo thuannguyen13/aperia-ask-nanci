@@ -5,7 +5,7 @@
  * All demo content is imported from data/ — this file only contains logic.
  */
 
-export const EMBED_VARIANTS = ["clover", "business-owner", "iso", "detect"] as const
+export const EMBED_VARIANTS = ["clover", "business-owner", "iso", "concept-embed"] as const
 export type EmbedVariant = (typeof EMBED_VARIANTS)[number]
 
 export interface ParsedMode {
@@ -19,7 +19,7 @@ export function parseMode(mode: string | null): ParsedMode {
     case "clover":          return { isEmbed: true,  embedVariant: "clover",         isConceptVersion: false }
     case "business-owner":  return { isEmbed: true,  embedVariant: "business-owner", isConceptVersion: false }
     case "iso":             return { isEmbed: true,  embedVariant: "iso",            isConceptVersion: false }
-    case "detect":          return { isEmbed: true,  embedVariant: "detect",         isConceptVersion: true  }
+    case "concept-embed":   return { isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true  }
     case "concept":         return { isEmbed: false, embedVariant: null,             isConceptVersion: true  }
     default:                return { isEmbed: false, embedVariant: null,             isConceptVersion: false }
   }
@@ -35,4 +35,5 @@ export const SCRIPTED_CONVERSATIONS = { ...BASE_SCRIPTED_CONVERSATIONS, ...ISO_S
 
 export { ISO_PROMPT_CATEGORIES } from "./data/prompts.iso"
 export { BUSINESS_OWNER_CONTENT_OVERRIDES } from "./data/overrides.business-owner"
-export { EMBED_DEMO_SOURCES, EMBED_ISO_DEMO_SOURCES, EMBED_BUSINESS_OWNER_DEMO_SOURCES, EMBED_DETECT_DEMO_SOURCES } from "./data/sources"
+export { EMBED_DEMO_SOURCES, EMBED_ISO_DEMO_SOURCES, EMBED_BUSINESS_OWNER_DEMO_SOURCES } from "./data/sources"
+export { CONCEPT_FLOW_SLUGS } from "./data/flows.concept"

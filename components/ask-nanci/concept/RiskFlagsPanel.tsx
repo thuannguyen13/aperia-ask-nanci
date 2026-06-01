@@ -1,26 +1,16 @@
 "use client"
 
-import { X, TrendingUp, CreditCard, Globe, AlertOctagon, Building2, MapPin } from "lucide-react"
+import { X } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-
-const FLAGS = [
-  { icon: TrendingUp,    label: "Volume spike",         detail: "+340% in 30 days vs prior period",      severity: "critical" as const },
-  { icon: CreditCard,    label: "Avg ticket doubled",   detail: "$42 → $84 average ticket size",          severity: "critical" as const },
-  { icon: Globe,         label: "23% CNP — new BINs",   detail: "Card-not-present from unrecognized BINs", severity: "critical" as const },
-  { icon: AlertOctagon,  label: "3 chargebacks / week", detail: "Prior 90 days: zero chargebacks",         severity: "critical" as const },
-  { icon: Building2,     label: "Settlement acct changed", detail: "18 days ago · new routing ••••3341",  severity: "medium" as const },
-  { icon: MapPin,        label: "Address updated",      detail: "12 days ago · 831 Harbor Blvd",          severity: "medium" as const },
-]
-
-const criticalCount = FLAGS.filter(f => f.severity === "critical").length
-const mediumCount = FLAGS.filter(f => f.severity === "medium").length
+import { FLAGS, criticalCount, mediumCount } from "@/lib/ask-nanci/data/panels/risk-flags"
+import { PanelShell } from "@/components/ask-nanci/shared"
 
 export function RiskFlagsPanel() {
   const { closePanel } = useAskNanci()
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
+    <PanelShell>
       {/* Header */}
       <div className="flex shrink-0 items-center justify-between border-b bg-muted/30 px-4 py-2.5">
         <div className="flex items-center gap-2.5 min-w-0">
@@ -87,6 +77,6 @@ export function RiskFlagsPanel() {
           </div>
         ))}
       </div>
-    </div>
+    </PanelShell>
   )
 }

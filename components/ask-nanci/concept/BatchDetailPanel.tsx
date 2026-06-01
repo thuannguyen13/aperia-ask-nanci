@@ -3,21 +3,8 @@
 import { X } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-
-const BATCH_TRANSACTIONS = [
-  { id: "TXN-001", time: "8:14 AM", card: "Visa ••4821", amount: 124.50, status: "Approved", flagged: false },
-  { id: "TXN-002", time: "8:31 AM", card: "MC ••7734",  amount:  89.00, status: "Approved", flagged: false },
-  { id: "TXN-003", time: "9:02 AM", card: "Visa ••2291", amount: 312.75, status: "Approved", flagged: false },
-  { id: "TXN-004", time: "9:18 AM", card: "Amex ••6614", amount: 2840.00, status: "Held",     flagged: true  },
-  { id: "TXN-005", time: "9:44 AM", card: "Visa ••8812", amount:  55.20, status: "Approved", flagged: false },
-  { id: "TXN-006", time: "10:03 AM", card: "MC ••3391",  amount: 198.40, status: "Approved", flagged: false },
-  { id: "TXN-007", time: "10:22 AM", card: "Disc ••5518", amount:  74.90, status: "Approved", flagged: false },
-  { id: "TXN-008", time: "11:05 AM", card: "Visa ••9923", amount: 441.00, status: "Approved", flagged: false },
-]
-
-function fmt(n: number) {
-  return n.toLocaleString("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 })
-}
+import { BATCH_TRANSACTIONS } from "@/lib/ask-nanci/data/panels/batch-detail"
+import { Callout, formatCurrency } from "@/components/ask-nanci/shared"
 
 export function BatchDetailPanel() {
   const { batchPanelOpen, setBatchPanelOpen } = useAskNanci()
@@ -34,7 +21,7 @@ export function BatchDetailPanel() {
       <div className="flex shrink-0 items-center justify-between px-4 py-3 border-b">
         <div>
           <h2 className="text-base font-semibold text-foreground">Batch #4471</h2>
-          <p className="text-xs text-muted-foreground">May 20 · {BATCH_TRANSACTIONS.length} transactions · {fmt(total)}</p>
+          <p className="text-xs text-muted-foreground">May 20 · {BATCH_TRANSACTIONS.length} transactions · {formatCurrency(total)}</p>
         </div>
         <button
           onClick={() => setBatchPanelOpen(false)}
@@ -45,9 +32,9 @@ export function BatchDetailPanel() {
         </button>
       </div>
 
-      <div className="mx-4 my-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950/20 dark:text-amber-300 shrink-0">
+      <Callout variant="amber" className="mx-4 my-3 shrink-0">
         1 transaction held for review — exceeds your single-ticket limit of $2,500.
-      </div>
+      </Callout>
 
       <div className="flex-1 overflow-auto">
         <table className="w-full text-sm">
@@ -74,7 +61,7 @@ export function BatchDetailPanel() {
                   "px-3 py-2.5 text-right font-medium",
                   txn.flagged ? "text-amber-700 dark:text-amber-400" : "text-foreground",
                 )}>
-                  {fmt(txn.amount)}
+                  {formatCurrency(txn.amount)}
                 </td>
                 <td className="px-3 py-2.5">
                   {txn.flagged ? (

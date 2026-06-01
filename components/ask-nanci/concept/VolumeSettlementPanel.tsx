@@ -3,27 +3,14 @@
 import { X } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-
-const BARS = [
-  { label: "Feb", w1: 8,  w2: 7,  w3: 9,  w4: 8  },
-  { label: "Mar", w1: 10, w2: 11, w3: 13, w4: 18 },
-  { label: "Apr", w1: 24, w2: 31, w3: 38, w4: 45 },
-]
-
-const FLAT_BARS = BARS.flatMap(m => [
-  { label: m.label, week: "W1", val: m.w1 },
-  { label: "",      week: "W2", val: m.w2 },
-  { label: "",      week: "W3", val: m.w3 },
-  { label: "",      week: "W4", val: m.w4 },
-])
-
-const MAX = 45
+import { FLAT_BARS, MAX } from "@/lib/ask-nanci/data/panels/volume-settlement"
+import { PanelShell } from "@/components/ask-nanci/shared"
 
 export function VolumeSettlementPanel() {
   const { closePanel } = useAskNanci()
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
+    <PanelShell>
       {/* Header */}
       <div className="flex shrink-0 items-center justify-between border-b bg-muted/30 px-4 py-2.5">
         <div className="flex items-center gap-2.5">
@@ -107,6 +94,6 @@ export function VolumeSettlementPanel() {
           </div>
         </div>
       </div>
-    </div>
+    </PanelShell>
   )
 }

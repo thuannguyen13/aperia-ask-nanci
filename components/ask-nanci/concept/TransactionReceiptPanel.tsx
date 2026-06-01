@@ -2,23 +2,14 @@
 
 import { X, ShieldCheck } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-
-const TXN_FIELDS = [
-  ["Date",        "May 14, 2026 · 2:18pm"],
-  ["Amount",      "$284.50"],
-  ["Card",        "Visa ····4821"],
-  ["Cardholder",  "J. Martinez"],
-  ["Auth Code",   "881234"],
-  ["Entry Mode",  "Chip & PIN"],
-  ["Card Type",   "Card Present"],
-  ["MID",         "4831••••7291"],
-]
+import { TXN_FIELDS } from "@/lib/ask-nanci/data/panels/transaction-receipt"
+import { PanelShell } from "@/components/ask-nanci/shared"
 
 export function TransactionReceiptPanel() {
   const { closePanel } = useAskNanci()
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
+    <PanelShell>
       {/* Header */}
       <div className="flex shrink-0 items-center justify-between border-b bg-muted/30 px-4 py-2.5">
         <div className="flex items-center gap-2.5">
@@ -83,6 +74,6 @@ export function TransactionReceiptPanel() {
           </div>
         </div>
       </div>
-    </div>
+    </PanelShell>
   )
 }

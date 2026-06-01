@@ -23,6 +23,15 @@ export const CONCEPT_FLOW11_APPROVE  = "Approve all except the third one"
 export const CONCEPT_FLOW12_PROMPT       = "Show me the detection queue"
 export const CONCEPT_FLOW12_CONTINUE_KEY = "__dq_continue__"
 
+// Registry: numeric flow number (as string) → CONCEPT_SCRIPTED_CONVERSATIONS key.
+// Add one line here to make any flow embeddable via ?mode=concept-embed&flow=<number>.
+export const CONCEPT_FLOW_SLUGS: Record<string, string> = {
+  "2":  CONCEPT_FLOW2_PROMPT,
+  "6":  CONCEPT_FLOW6_KEY,
+  "11": CONCEPT_DETECT_WELCOME_KEY,
+  "12": CONCEPT_FLOW12_PROMPT,
+}
+
 // Prompts that trigger scripted concept flows (used to guard handlePrompt routing).
 export const CONCEPT_ALL_PROMPTS = [
   "Update my phone number",

@@ -17,16 +17,22 @@
   --chart-6: #2C2073;
 }
 
-[data-embed="business-owner"] {
-  --color-primary: #FC6A25;
-  --ring: #FC6A25;
+[data-theme="clover"] {
+  background: linear-gradient(180deg, #218800 0%, #BFCDC5 200px);
 }
 
-[data-embed="iso"], [data-embed="concept"], [data-embed="detect"] {
+[data-theme="aperia"] {
   --primary: #002F67;
   --color-primary: #002F67;
   --ring: #002F67;
   --sidebar-primary: #002F67;
+  background: linear-gradient(180deg, #002F67 0%, #c5d5ed 200px);
+}
+
+[data-theme="access-one"] {
+  --color-primary: #FC6A25;
+  --ring: #FC6A25;
+  background: linear-gradient(180deg, #FC6A25 0%, #fde8d8 200px);
 }
 
 

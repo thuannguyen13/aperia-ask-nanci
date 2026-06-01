@@ -79,6 +79,33 @@ In `CONCEPT_SCRIPTED_CONVERSATIONS`, use turn fields to trigger panel opens:
    - `closeAllPanels: true` to reset at end of flow
 5. If the flow needs a new multi panel, follow "Adding a new multi panel" above first
 
+## Demo content
+
+All demo data lives in `lib/ask-nanci/data/`. Never put mock content in component files.
+
+- `data/responses.clover.ts` / `data/prompts.clover.ts` / `data/flows.clover.ts` — clover persona
+- `data/flows.iso.ts` / `data/prompts.iso.ts` — ISO persona
+- `data/flows.concept.ts` — concept demo flows and constants
+- `data/overrides.business-owner.ts` — business-owner content overrides
+- `data/sources.ts` — embed source arrays per variant
+- `data/account.ts` — mock usage, plan tiers, activity, current user
+- `data/merchants.ts` — merchant volume table data
+- `data/panels/` — per-panel data (timeline rows, risk flags, batch lines, etc.); one file per panel
+
+The lib shells (`mock-data.ts`, `embed-demo-config.ts`, `concept-config.ts`) are thin re-export barrels — edit the `data/` files, not the shells.
+
+## Shared panel primitives
+
+`components/ask-nanci/shared/` — import from `@/components/ask-nanci/shared`.
+
+- `PanelShell` — the outer `flex h-full flex-col overflow-hidden` wrapper; replaces the raw div
+- `PanelHeader` — shrink-0 header with title and close button built in
+- `ScoreBadge` — colored score chip (used in BarometerReportPanel)
+- `Callout` — severity callout box (`border-{color}-200 bg-{color}-50` pattern)
+- `formatCurrency` / `formatPercent` — shared number formatters from `format.ts`
+
+Use these instead of re-implementing the header/scroll structure or severity box in each panel.
+
 ## Components
 
 ### Resizable panels (`ResizablePanelGroup`, `ResizablePanel`, `ResizableHandle`)

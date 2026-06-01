@@ -3,27 +3,8 @@
 import { X, CheckCircle2, AlertCircle } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-
-const QUICK_WINS = [
-  { id: "SR-4401", merchant: "Blue Oak Brewing",    doc: "Void Check",       valid: true  },
-  { id: "SR-4402", merchant: "Harbor View Hotel",    doc: "Business License", valid: true  },
-  { id: "SR-4403", merchant: "Summit Auto Group",    doc: "Bank Statement",   valid: false },
-  { id: "SR-4404", merchant: "Coastal Fresh Market", doc: "Void Check",       valid: true  },
-  { id: "SR-4405", merchant: "Riviera Day Spa",      doc: "Tax ID Letter",    valid: true  },
-  { id: "SR-4406", merchant: "Greenfield Hardware",  doc: "Void Check",       valid: true  },
-  { id: "SR-4407", merchant: "Westside CrossFit",    doc: "Business License", valid: true  },
-  { id: "SR-4408", merchant: "Canyon Road Bakery",   doc: "Bank Statement",   valid: true  },
-  { id: "SR-4409", merchant: "Pacific Rim Rest.",    doc: "Void Check",       valid: true  },
-  { id: "SR-4410", merchant: "Pinnacle Dental",      doc: "Insurance Form",   valid: true  },
-  { id: "SR-4411", merchant: "Blue Oak Brewing 2",   doc: "Void Check",       valid: true  },
-  { id: "SR-4412", merchant: "Valley Trade Corp",    doc: "Bank Statement",   valid: false },
-]
-
-const OUTAGE_MERCHANTS = [
-  "Harbor View Hotel", "Summit Auto Group", "Coastal Fresh Market",
-  "Pinnacle Dental", "Pacific Rim Restaurant", "Riviera Day Spa",
-  "Blue Oak Brewing", "Greenfield Hardware",
-]
+import { QUICK_WINS, OUTAGE_MERCHANTS } from "@/lib/ask-nanci/data/panels/work-queue"
+import { PanelShell, Callout } from "@/components/ask-nanci/shared"
 
 export function WorkQueuePanel() {
   const { closePanel, closeAllNewPanels, workQueuePhase } = useAskNanci()
@@ -36,7 +17,7 @@ export function WorkQueuePanel() {
     : "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400"
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
+    <PanelShell>
       {/* Header */}
       <div className="flex shrink-0 items-center justify-between border-b bg-muted/30 px-4 py-2.5">
         <div className="flex items-center gap-2.5">
@@ -107,12 +88,12 @@ export function WorkQueuePanel() {
       {/* Outage phase */}
       {workQueuePhase === "outage" && (
         <div className="flex-1 overflow-auto px-4 py-3 space-y-3">
-          <div className="rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-800/60 dark:bg-amber-950/20 px-3 py-2.5">
-            <p className="text-xs font-semibold text-amber-800 dark:text-amber-300">Processor X Outage</p>
-            <p className="text-[9px] text-amber-600 dark:text-amber-400 mt-0.5">
+          <Callout variant="amber" className="rounded-lg px-3 py-2.5 text-xs">
+            <p className="font-semibold">Processor X Outage</p>
+            <p className="text-[9px] mt-0.5">
               <span className="font-mono">Posted 06:14</span> · ETA: noon · <span className="font-mono font-semibold">8</span> merchants affected
             </p>
-          </div>
+          </Callout>
 
           <p className="text-[9px] font-bold tracking-[0.12em] uppercase text-muted-foreground">Affected Merchants</p>
           <div className="space-y-1">
@@ -124,12 +105,12 @@ export function WorkQueuePanel() {
             ))}
           </div>
 
-          <div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-800/60 dark:bg-blue-950/20 px-3 py-2.5">
-            <p className="text-[10px] font-semibold text-blue-700 dark:text-blue-300">Suggested action ready</p>
-            <p className="text-[9px] text-blue-600 dark:text-blue-400 mt-0.5">Notify all 8 · Mark Waiting on Vendor · Auto-close on resolution</p>
-          </div>
+          <Callout variant="blue" className="rounded-lg px-3 py-2.5 text-[10px]">
+            <p className="font-semibold">Suggested action ready</p>
+            <p className="text-[9px] mt-0.5">Notify all 8 · Mark Waiting on Vendor · Auto-close on resolution</p>
+          </Callout>
         </div>
       )}
-    </div>
+    </PanelShell>
   )
 }

@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation"
 import Image from "next/image"
 import { useTheme } from "next-themes"
 import { AskNanciProvider, useAskNanci } from "@/contexts/AskNanciContext"
-import { parseMode, type EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
+import { parseMode, CONCEPT_FLOW_SLUGS, type EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
 import { Sidebar } from "./Sidebar"
 import { TeachNanciPanel } from "./TeachNanciPanel"
 import { MerchantVolumePanel } from "./concept/MerchantVolumePanel"
@@ -55,7 +55,7 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
         <>
           <ConceptPanelArea fillWidth visible={dqVisible} />
           {/* Chat stays fully visible — only the panel area fades, avoiding a blank-screen flash */}
-          <div className="ml-1 flex w-[320px] shrink-0 overflow-hidden rounded-xl border bg-background md:w-[390px] md:rounded-2xl">
+          <div className="ml-1 flex w-[320px] shrink-0 overflow-hidden rounded-xl border bg-background md:w-97.5 md:rounded-2xl">
             {children}
           </div>
         </>
@@ -75,32 +75,18 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
   )
 }
 
-const EMBED_FRAME: Record<EmbedVariant, { logo: string; alt: string; gradient: string }> = {
-  clover: {
-    logo: "/logos/clover.svg",
-    alt: "Clover",
-    gradient: "bg-[linear-gradient(180deg,#218800_0%,#BFCDC5_200px)]",
-  },
-  "business-owner": {
-    logo: "/logos/access-one-logo.svg",
-    alt: "AccessOne",
-    gradient: "bg-[linear-gradient(180deg,#FC6A25_0%,#fde8d8_200px)]",
-  },
-  iso: {
-    logo: "/logos/titan.svg",
-    alt: "Titan",
-    gradient: "bg-[linear-gradient(180deg,#002F67_0%,#c5d5ed_200px)]",
-  },
-  detect: {
-    logo: "/logos/aperia-full.svg",
-    alt: "Aperia",
-    gradient: "bg-[linear-gradient(180deg,#002F67_0%,#c5d5ed_200px)]",
-  },
+const EMBED_CONFIG: Record<EmbedVariant, { theme: string; logo: string; alt: string }> = {
+  clover:           { theme: "clover",     logo: "/logos/clover.svg",          alt: "Clover"    },
+  "business-owner": { theme: "access-one", logo: "/logos/access-one-logo.svg", alt: "AccessOne" },
+  iso:              { theme: "aperia",     logo: "/logos/titan.svg",           alt: "Titan"     },
+  "concept-embed":  { theme: "aperia",     logo: "/logos/aperia-full.svg",     alt: "Aperia"    },
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams()
   const { isEmbed, embedVariant, isConceptVersion } = parseMode(searchParams.get("mode"))
+  const rawFlow = searchParams.get("flow")
+  const autoPlayFlow = (rawFlow && CONCEPT_FLOW_SLUGS[rawFlow]) ?? null
   const { setTheme } = useTheme()
 
   useEffect(() => {
@@ -115,19 +101,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, [isEmbed, setTheme])
 
   if (isEmbed) {
-    const frame = EMBED_FRAME[embedVariant!]
-    const isDetect = embedVariant === "detect"
+    const config = EMBED_CONFIG[embedVariant!]
+    const isConceptEmbed = embedVariant === "concept-embed"
     return (
-      <AskNanciProvider isEmbed embedVariant={embedVariant} isConceptVersion={isConceptVersion}>
+      <AskNanciProvider isEmbed embedVariant={embedVariant} isConceptVersion={isConceptVersion} autoPlayFlow={autoPlayFlow}>
         <div
           data-embed={embedVariant}
-          className={`relative flex h-screen flex-col overscroll-contain ${frame.gradient} md:px-2 md:pb-2`}
+          data-theme={config.theme}
+          className="relative flex h-screen flex-col overscroll-contain md:px-2 md:pb-2"
         >
           <div className="relative z-10 flex h-10 shrink-0 items-center justify-center">
-            <Image src={frame.logo} alt={frame.alt} width={isDetect ? 120 : 80} height={24} className="h-6 w-auto" />
+            <Image src={config.logo} alt={config.alt} width={isConceptEmbed ? 120 : 80} height={24} className="h-6 w-auto" />
           </div>
           <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden md:rounded-2xl bg-sidebar shadow-sm">
-            {isDetect ? (
+            {isConceptEmbed ? (
               <ConceptContentArea noSidebar>{children}</ConceptContentArea>
             ) : (
               <div className="flex min-w-0 flex-1 py-1 px-1">
@@ -145,7 +132,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <AskNanciProvider isConceptVersion={isConceptVersion}>
-      <div data-embed="concept" className="relative flex h-screen flex-col bg-[linear-gradient(180deg,#002F67_0%,#c5d5ed_200px)] md:px-2 md:pb-2">
+      <div data-embed="concept" data-theme="aperia" className="relative flex h-screen flex-col md:px-2 md:pb-2">
         {/* Top bar */}
         <div className="relative z-10 flex h-10 shrink-0 items-center justify-center">
           <div className="absolute left-0 flex items-center md:hidden">

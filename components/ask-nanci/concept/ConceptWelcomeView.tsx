@@ -134,7 +134,7 @@ export function ConceptWelcomeView() {
     <div className="flex flex-1 flex-col items-center overflow-y-auto px-4 py-8 md:px-8 md:py-12">
       <div className="flex w-full max-w-[800px] flex-col gap-8 mx-auto">
 
-        {embedVariant !== "detect" && (
+        {embedVariant !== "concept-embed" && (
           <div className="flex flex-col items-center gap-3 text-center">
             <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={40} height={40} />
             <div>

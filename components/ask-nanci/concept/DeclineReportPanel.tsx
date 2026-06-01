@@ -3,49 +3,8 @@
 import { X, Download } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-
-const ALL_MERCHANTS = [
-  { name: "Bayshore Fuel & Mart",    iso: "Pacific",   rate: 31.2, contact: "Apr 3"  },
-  { name: "Delta Auto Body",          iso: "Pacific",   rate: 28.7, contact: "Mar 12" },
-  { name: "Peak Performance Gym",     iso: "Summit",    rate: 26.4, contact: "Apr 18" },
-  { name: "Coastal Pawn & Trade",     iso: "Coastal",   rate: 24.9, contact: "Feb 28" },
-  { name: "Sunset Vape & Smoke",      iso: "Summit",    rate: 23.1, contact: "Apr 5"  },
-  { name: "Fast Track Courier",       iso: "National",  rate: 22.8, contact: "Jan 15" },
-  { name: "Lucky Star Casino Gifts",  iso: "Pacific",   rate: 22.3, contact: "Apr 21" },
-  { name: "Metro Tech Repair",        iso: "Metro",     rate: 21.6, contact: "Mar 30" },
-  { name: "Harbor Towing Services",   iso: "Coastal",   rate: 20.4, contact: "Apr 14" },
-  { name: "Night Owl Convenience",    iso: "National",  rate: 19.8, contact: "Feb 10" },
-  { name: "Pioneer Pawn Shop",        iso: "Metro",     rate: 19.2, contact: "Mar 22" },
-  { name: "Ridgeline Car Wash",       iso: "Summit",    rate: 18.7, contact: "Apr 8"  },
-  { name: "Valley Smoke Shop",        iso: "National",  rate: 18.1, contact: "Jan 30" },
-  { name: "Apex Check Cashing",       iso: "Metro",     rate: 17.9, contact: "Apr 12" },
-  { name: "Blue Chip Tattoo",         iso: "Pacific",   rate: 17.4, contact: "Mar 5"  },
-  { name: "Frontier Bail Bonds",      iso: "National",  rate: 16.8, contact: "Feb 20" },
-  { name: "Canyon Tech Outlet",       iso: "Summit",    rate: 16.3, contact: "Apr 19" },
-  { name: "Iron Horse Pawn",          iso: "Coastal",   rate: 16.1, contact: "Apr 1"  },
-  { name: "Copper Kettle Diner",      iso: "Metro",     rate: 15.9, contact: "Mar 14" },
-  { name: "Sunrise Laundromat",       iso: "Summit",    rate: 15.7, contact: "Mar 28" },
-  { name: "Golden Gate Gifts",        iso: "Pacific",   rate: 15.5, contact: "Apr 22" },
-  { name: "West End Auto Parts",      iso: "National",  rate: 15.4, contact: "Apr 20" },
-  { name: "Pinnacle Pawn",            iso: "Summit",    rate: 15.3, contact: "Apr 16" },
-  { name: "Maplewood Deli",           iso: "Metro",     rate: 15.2, contact: "Apr 17" },
-  { name: "Crystal Clear Car Audio",  iso: "Coastal",   rate: 15.1, contact: "Apr 23" },
-  { name: "Thunder Road Bikes",       iso: "Pacific",   rate: 15.0, contact: "Apr 19" },
-  { name: "North Star Tobacco",       iso: "National",  rate: 15.0, contact: "Apr 24" },
-  { name: "Crossroads Diner",         iso: "Summit",    rate: 15.0, contact: "Apr 15" },
-  { name: "Boulevard Tires",          iso: "Metro",     rate: 15.0, contact: "Apr 21" },
-  { name: "Lakeside Bait & Tackle",   iso: "Coastal",   rate: 15.0, contact: "Apr 18" },
-  { name: "High Noon Saloon",         iso: "Pacific",   rate: 15.0, contact: "Apr 22" },
-  { name: "Main Street Pawn",         iso: "National",  rate: 15.0, contact: "Apr 20" },
-  { name: "River City Auto Wash",     iso: "Metro",     rate: 15.0, contact: "Apr 16" },
-  { name: "Northside Check Express",  iso: "Coastal",   rate: 15.0, contact: "Apr 19" },
-  { name: "Harbor Lights Diner",      iso: "Summit",    rate: 15.0, contact: "Apr 23" },
-  { name: "Freedom Financial",        iso: "Pacific",   rate: 15.0, contact: "Apr 17" },
-  { name: "Eastside Tech",            iso: "National",  rate: 15.0, contact: "Apr 21" },
-  { name: "Silver Creek Market",      iso: "Metro",     rate: 15.0, contact: "Apr 14" },
-]
-
-const FILTERED = ALL_MERCHANTS.slice(0, 22)
+import { ALL_MERCHANTS, FILTERED } from "@/lib/ask-nanci/data/panels/decline-report"
+import { PanelShell } from "@/components/ask-nanci/shared"
 
 function rateColor(r: number) {
   if (r >= 25) return "text-red-600 dark:text-red-400"
@@ -65,7 +24,7 @@ export function DeclineReportPanel() {
   const rows = declineReportFiltered ? FILTERED : ALL_MERCHANTS
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
+    <PanelShell>
       {/* Header */}
       <div className="flex shrink-0 items-center justify-between border-b bg-muted/30 px-4 py-2.5">
         <div className="flex items-center gap-2.5 min-w-0">
@@ -130,6 +89,6 @@ export function DeclineReportPanel() {
           <Download className="size-3.5" /> Export CSV
         </button>
       </div>
-    </div>
+    </PanelShell>
   )
 }

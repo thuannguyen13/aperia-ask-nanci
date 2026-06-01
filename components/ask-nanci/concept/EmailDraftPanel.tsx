@@ -3,12 +3,8 @@
 import { X, Send } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { CONCEPT_FLOW8_FINAL } from "@/lib/ask-nanci/concept-config"
-
-const PREVIEWS = [
-  { name: "Bayshore Fuel & Mart",  rate: "31.2%", iso: "Pacific ISO",   to: "ops@bayshore.com"  },
-  { name: "Delta Auto Body",        rate: "28.7%", iso: "Pacific ISO",   to: "mgr@deltaauto.com" },
-  { name: "Peak Performance Gym",   rate: "26.4%", iso: "Summit Group",  to: "gm@ppgym.com"      },
-]
+import { PREVIEWS } from "@/lib/ask-nanci/data/panels/email-draft"
+import { PanelShell } from "@/components/ask-nanci/shared"
 
 function Var({ children }: { children: string }) {
   return (
@@ -22,7 +18,7 @@ export function EmailDraftPanel() {
   const { closePanel, handlePrompt } = useAskNanci()
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
+    <PanelShell>
       {/* Header */}
       <div className="flex shrink-0 items-center justify-between border-b bg-muted/30 px-4 py-2.5">
         <div className="flex items-center gap-2.5">
@@ -98,6 +94,6 @@ export function EmailDraftPanel() {
           <Send className="size-3.5" /> Send All 22
         </button>
       </div>
-    </div>
+    </PanelShell>
   )
 }

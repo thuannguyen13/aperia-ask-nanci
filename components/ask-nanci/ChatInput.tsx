@@ -13,7 +13,7 @@ const PROACTIVE_CONTENT = CONCEPT_SCRIPTED_CONVERSATIONS[CONCEPT_FLOW6_KEY][0].c
 
 export function ChatInput() {
   const { sendMessage, handlePrompt, startNewChat, chatState, stopAnimation, sources, setSources, draft, setDraft, setTokenLimitReached, setOnboardingOpen, isEmbed, embedVariant, isConceptVersion, triggerProactiveFlow, proactiveNotificationActive } = useAskNanci()
-  const isDetect = embedVariant === "detect"
+  const isDetect = embedVariant === "concept-embed"
   const activeSources = sources.filter((s) => s.active)
 
   const [value, setValue] = useState("")

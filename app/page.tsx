@@ -104,7 +104,7 @@ export default function AskNanciPage() {
   if (view === "chat") {
     return (
       <div className="relative flex min-w-0 min-h-0 flex-1 flex-col overflow-hidden">
-        {isEmbed && embedVariant !== "detect" && (
+        {isEmbed && embedVariant !== "concept-embed" && (
           <button
             onClick={startNewChat}
             className="absolute top-4 left-4 z-10 flex items-center gap-2"

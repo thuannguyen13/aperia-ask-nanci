@@ -1,20 +1,15 @@
 "use client"
 
-import { X, FileText, Phone, CreditCard, AlertTriangle } from "lucide-react"
+import { X } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-
-const TIMELINE = [
-  { icon: Phone,        time: "Today 9:14am",     label: "Merchant call",      detail: "Confirmed no-refund policy at time of sale",           color: "text-blue-500" },
-  { icon: FileText,     time: "Yesterday 4:02pm", label: "Receipt uploaded",   detail: "Signed receipt attached to case file",                  color: "text-green-500" },
-  { icon: AlertTriangle,time: "May 19",           label: "Chargeback received", detail: "Issuing bank dispute — reason: item not received",     color: "text-amber-500" },
-  { icon: CreditCard,   time: "May 14",           label: "Original transaction", detail: "$284.50 · Oak Street Coffee · Chip & PIN",           color: "text-muted-foreground" },
-]
+import { TIMELINE } from "@/lib/ask-nanci/data/panels/case-detail"
+import { PanelShell } from "@/components/ask-nanci/shared"
 
 export function CaseDetailPanel() {
   const { closePanel } = useAskNanci()
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
+    <PanelShell>
       {/* Header */}
       <div className="flex shrink-0 items-center justify-between border-b bg-muted/30 px-4 py-2.5">
         <div className="flex items-center gap-2.5 min-w-0">
@@ -84,6 +79,6 @@ export function CaseDetailPanel() {
           </blockquote>
         </div>
       </div>
-    </div>
+    </PanelShell>
   )
 }

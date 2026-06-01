@@ -1,47 +1,16 @@
 "use client"
 
-import { X, Settings, MapPin, FileText, AlertTriangle } from "lucide-react"
+import { X, AlertTriangle } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-
-const CHANGES = [
-  {
-    date: "Apr 27",
-    code: "CHG-003",
-    action: "Settlement account updated",
-    user: "M. Torres",
-    role: "Pacific ISO",
-    highlight: false,
-    icon: Settings,
-    severity: "high" as const,
-  },
-  {
-    date: "Apr 15",
-    code: "CHG-002",
-    action: "Business address updated",
-    user: "R. Vega",
-    role: "Pacific ISO",
-    highlight: false,
-    icon: MapPin,
-    severity: "low" as const,
-  },
-  {
-    date: "Apr 4",
-    code: "CHG-001",
-    action: "DBA name updated",
-    user: "S. Park",
-    role: "Aperia Analyst",
-    highlight: true,
-    icon: FileText,
-    severity: "internal" as const,
-  },
-]
+import { CHANGES } from "@/lib/ask-nanci/data/panels/change-log"
+import { PanelShell } from "@/components/ask-nanci/shared"
 
 export function ChangeLogPanel() {
   const { closePanel } = useAskNanci()
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
+    <PanelShell>
       {/* Header */}
       <div className="flex shrink-0 items-center justify-between border-b bg-muted/30 px-4 py-2.5">
         <div className="flex items-center gap-2.5">
@@ -134,6 +103,6 @@ export function ChangeLogPanel() {
           </div>
         </div>
       </div>
-    </div>
+    </PanelShell>
   )
 }
