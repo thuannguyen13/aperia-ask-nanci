@@ -339,11 +339,10 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     {
       role: "assistant",
       content: "Your Detection Queue has an active assignment: **High Velocity Watch**. 14 merchants triggered since yesterday — 3 with risk scores above 80.\n\nWant me to open the Barometer Report?",
-      openPanel: "detection-queue",
       pauseAfter: 2000,
       suggestions: ["Yes, open it"],
     },
-    { role: "user", content: "Yes, open it" },
+    { role: "user", content: "Yes, open it", openPanel: "detection-queue" },
     {
       role: "assistant",
       content: "Opening Barometer Report for High Velocity Watch. 3 merchants are flagged above risk score 80. Coastal Merchant Solutions is the highest — score 89, triggered on 4 rules.",

@@ -88,11 +88,13 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
   )
 }
 
+const CONCEPT_CONFIG = { theme: "aperia", logo: "/logos/titan.svg", alt: "Aperia" }
+
 const EMBED_CONFIG: Record<EmbedVariant, { theme: string; logo: string; alt: string }> = {
   clover:           { theme: "clover",     logo: "/logos/clover.svg",          alt: "Clover"    },
   "business-owner": { theme: "access-one", logo: "/logos/access-one-logo.svg", alt: "AccessOne" },
   iso:              { theme: "aperia",     logo: "/logos/titan.svg",           alt: "Titan"     },
-  "concept-embed":  { theme: "aperia",     logo: "/logos/aperia-full.svg",     alt: "Aperia"    },
+  "concept-embed":  { theme: "aperia",     logo: "/logos/titan.svg",          alt: "Aperia"    },
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -146,13 +148,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <AskNanciProvider isConceptVersion={isConceptVersion}>
-      <div data-embed="concept" data-theme="aperia" className="relative flex h-screen flex-col md:px-2 md:pb-2">
+      <div data-embed="concept" data-theme={CONCEPT_CONFIG.theme} className="relative flex h-screen flex-col md:px-2 md:pb-2">
         {/* Top bar */}
         <div className="relative z-10 flex h-10 shrink-0 items-center justify-center">
           <div className="absolute left-0 flex items-center md:hidden">
             <MobileSidebarToggle />
           </div>
-          <Image src="/logos/aperia-full.svg" alt="Aperia" width={120} height={24} className="h-6 w-auto" />
+          <Image src={CONCEPT_CONFIG.logo} alt={CONCEPT_CONFIG.alt} width={120} height={24} className="h-6 w-auto" />
         </div>
 
         <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden md:rounded-2xl bg-sidebar shadow-sm">

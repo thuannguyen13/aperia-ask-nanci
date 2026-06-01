@@ -382,12 +382,14 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
           await sleep(i === 0 ? 1000 : 1800)
           if (scriptStopRef.current) break
           setMessages((prev) => [...prev, { id: newSessionId(), role: "user" as const, content: turn.content }])
+          applyTurnEffects(turn, prompt)
           setChatState("thinking")
         } else {
           await sleep(1800)
           if (scriptStopRef.current) break
           await streamText(turn.content, newSessionId())
           if (turn.pauseAfter) await sleep(turn.pauseAfter)
+          applyTurnEffects(turn, prompt)
           if (turn.sheetAction || turn.suggestions || turn.widget) {
             setMessages((prev) => {
               const next = [...prev]
@@ -403,7 +405,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
               return next
             })
           }
-          applyTurnEffects(turn, prompt)
           if (turn.closeAllPanels) {
             await sleep(600)
             // Stagger panels closed — right column first, then left
