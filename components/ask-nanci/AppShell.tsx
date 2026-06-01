@@ -1,9 +1,11 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { RotateCcw } from "lucide-react"
 import { useSearchParams } from "next/navigation"
 import Image from "next/image"
 import { useTheme } from "next-themes"
+import { Button } from "aperia-ds5"
 import { AskNanciProvider, useAskNanci } from "@/contexts/AskNanciContext"
 import { parseMode, CONCEPT_FLOW_SLUGS, type EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
 import { Sidebar } from "./Sidebar"
@@ -20,6 +22,17 @@ import { DarkModeToggle } from "./DarkModeToggle"
 import { MobileSidebarToggle } from "./MobileSidebarToggle"
 
 const DQ_PANELS = new Set(["detection-queue", "barometer-report", "coastal-risk"])
+
+function ReplayButton() {
+  const { replayFlow, chatState, messages } = useAskNanci()
+  if (!replayFlow || chatState !== "idle" || messages.length === 0) return null
+  return (
+    <Button variant="secondary" size="xs" onClick={replayFlow} className="absolute right-3 gap-1.5">
+      <RotateCcw className="size-3" />
+      Replay
+    </Button>
+  )
+}
 
 function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode; noSidebar?: boolean }) {
   const { openPanels } = useAskNanci()
@@ -112,6 +125,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         >
           <div className="relative z-10 flex h-10 shrink-0 items-center justify-center">
             <Image src={config.logo} alt={config.alt} width={isConceptEmbed ? 120 : 80} height={24} className="h-6 w-auto" />
+            {isConceptEmbed && <ReplayButton />}
           </div>
           <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden md:rounded-2xl bg-sidebar shadow-sm">
             {isConceptEmbed ? (

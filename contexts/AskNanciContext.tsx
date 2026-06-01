@@ -41,6 +41,7 @@ interface AskNanciCtx {
   handlePrompt: (prompt: string) => void
   stopAnimation: () => void
   startNewChat: () => void
+  replayFlow: (() => void) | null
   resumeSession: (id: string) => void
   deleteSessionById: (id: string) => void
   sources: Source[]
@@ -418,10 +419,11 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
             setWorkQueuePhase("triage")
           }
           if (i === script.length - 1) {
-            setChatState("idle")
             if (turn.loopToPrompt && !scriptStopRef.current) {
               await sleep(3000)
               if (!scriptStopRef.current) playConceptScripted(turn.loopToPrompt)
+            } else {
+              setChatState("idle")
             }
           }
         }
@@ -504,6 +506,26 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setWorkQueuePhase("triage")
   }, [])
 
+  const replayFlow: (() => void) | null = autoPlayFlow ? useCallback(() => {
+    scriptStopRef.current = true
+    stopRef.current = true
+    setMessages([])
+    setChatState("idle")
+    setPendingBot(null)
+    setError(null)
+    setOpenPanels([])
+    setClosingPanels([])
+    setReportPanelOpen(false)
+    setFormPanelOpen(false)
+    setStepUpPanelOpen(false)
+    setStepUpPanelStep(1)
+    setBatchPanelOpen(false)
+    setDeclineReportFiltered(false)
+    setWorkQueuePhase("triage")
+    setProactiveNotificationActive(false)
+    setTimeout(() => playConceptScripted(autoPlayFlow), 300)
+  }, []) : null
+
   const resumeSession = useCallback(async (id: string) => {
     const all = await fetchSessions()
     const session = all.find((s) => s.id === id)
@@ -540,7 +562,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       isEmbed, embedVariant,
       view, messages, chatState, sessions, activeSessionId,
       pendingBot,
-      sendMessage, handlePrompt, stopAnimation, startNewChat, resumeSession,
+      sendMessage, handlePrompt, stopAnimation, startNewChat, replayFlow, resumeSession,
       deleteSessionById,
       sources, setSources: handleSetSources, thinking,
       kbOpen, setKbOpen,

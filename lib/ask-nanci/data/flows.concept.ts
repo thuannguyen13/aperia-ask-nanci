@@ -363,9 +363,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     {
       role: "assistant",
       content: "Done — case opened for Coastal Merchant Solutions (Case #RR-7291). Escalated to Risk Lead. Merchant and ISO notified. Funding hold placed pending senior review.",
-      pauseAfter: 3000,
       closeAllPanels: true,
-      loopToPrompt: CONCEPT_DETECT_WELCOME_KEY,
     },
   ],
 
