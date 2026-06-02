@@ -64,19 +64,20 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
   return (
     <div className={`flex min-w-0 flex-1 py-1 pr-1${noSidebar ? " pl-1" : ""}`}>
       <TeachNanciPanel />
+      {/* Chat is always mounted at this position so React never remounts it.
+          In DQ mode it moves to the right via order-last; the panel area renders after it in DOM
+          but appears first visually because it uses the default flex order. */}
+      <div className={
+        showDQ
+          ? "order-last ml-1 flex w-[320px] shrink-0 overflow-hidden rounded-xl border bg-background md:w-97.5 md:rounded-2xl"
+          : `flex min-w-0 flex-1 overflow-hidden rounded-xl md:rounded-2xl border bg-background transition-opacity duration-200 ease-out ${chatFadingIn ? "opacity-0" : "opacity-100"}`
+      }>
+        {children}
+      </div>
       {showDQ ? (
-        <>
-          <ConceptPanelArea fillWidth visible={dqVisible} />
-          {/* Chat stays fully visible — only the panel area fades, avoiding a blank-screen flash */}
-          <div className="ml-1 flex w-[320px] shrink-0 overflow-hidden rounded-xl border bg-background md:w-97.5 md:rounded-2xl">
-            {children}
-          </div>
-        </>
+        <ConceptPanelArea fillWidth visible={dqVisible} />
       ) : (
         <>
-          <div className={`flex min-w-0 flex-1 overflow-hidden rounded-xl md:rounded-2xl border bg-background transition-opacity duration-200 ease-out ${chatFadingIn ? "opacity-0" : "opacity-100"}`}>
-            {children}
-          </div>
           <MerchantVolumePanel />
           <BankAccountFormPanel />
           <StepUpAuthPanel />

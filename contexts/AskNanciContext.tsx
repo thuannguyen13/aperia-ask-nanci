@@ -327,7 +327,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     if (turn.openStepUpPanel) { setStepUpPanelOpen(true); setStepUpPanelStep(1) }
     if (turn.advanceStepUp) { setStepUpPanelStep((s) => Math.min(3, s + 1) as 1 | 2 | 3) }
     if (turn.openBatchPanel) { setBatchPanelOpen(true) }
-    if (prompt === CONCEPT_FLOW2_PROMPT) { setReportPanelOpen(true); setReportTopN(10) }
+    if (turn.openReportPanel) { setReportPanelOpen(true); setReportTopN(10) }
     if (prompt === CONCEPT_FLOW2_FOLLOWUP) { setReportTopN(5) }
     if (turn.openPanel) { setOpenPanels((prev) => prev.includes(turn.openPanel!) ? prev : [...prev, turn.openPanel!]) }
     if (turn.filterDeclineReport) { setDeclineReportFiltered(true) }
@@ -382,6 +382,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
           await sleep(i === 0 ? 1000 : 1800)
           if (scriptStopRef.current) break
           setMessages((prev) => [...prev, { id: newSessionId(), role: "user" as const, content: turn.content }])
+          if (turn.pauseAfter) await sleep(turn.pauseAfter)
           applyTurnEffects(turn, prompt)
           setChatState("thinking")
         } else {

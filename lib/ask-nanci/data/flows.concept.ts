@@ -105,7 +105,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   // ── Flow 2: Data Lookup ───────────────────────────────────────────────────
   [CONCEPT_FLOW2_PROMPT]: [
     { role: "user", content: CONCEPT_FLOW2_PROMPT },
-    { role: "assistant", content: "Here's your merchant volume for the week of May 15–21. I've opened the full breakdown in the panel — you can sort by any column." },
+    { role: "assistant", content: "Here's your merchant volume for the week of May 15–21. I've opened the full breakdown in the panel — you can sort by any column.", openReportPanel: true },
   ],
   [CONCEPT_FLOW2_FOLLOWUP]: [
     { role: "user", content: CONCEPT_FLOW2_FOLLOWUP },
@@ -263,11 +263,10 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       openPanel: "detection-queue",
       suggestions: ["Yes, open it"],
     },
-    { role: "user", content: "Yes, open it" },
+    { role: "user", content: "Yes, open it", openPanel: "barometer-report", pauseAfter: 500 },
     {
       role: "assistant",
       content: "Opening Barometer Report for High Velocity Watch. 3 merchants are flagged above risk score 80. Coastal Merchant Solutions is the highest — score 89, triggered on 4 rules.",
-      openPanel: "barometer-report",
       suggestions: ["Pull up Coastal's risk report alongside"],
     },
     { role: "user", content: "Pull up Coastal's risk report alongside" },
@@ -294,11 +293,10 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       openPanel: "detection-queue",
       suggestions: ["Yes, open it"],
     },
-    { role: "user", content: "Yes, open it" },
+    { role: "user", content: "Yes, open it", openPanel: "barometer-report", pauseAfter: 500 },
     {
       role: "assistant",
       content: "Opening Barometer Report for High Velocity Watch. 3 merchants are flagged above risk score 80. Coastal Merchant Solutions is the highest — score 89, triggered on 4 rules.",
-      openPanel: "barometer-report",
       suggestions: ["Pull up Coastal's risk report alongside"],
     },
     { role: "user", content: "Pull up Coastal's risk report alongside" },
@@ -339,14 +337,14 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     {
       role: "assistant",
       content: "Your Detection Queue has an active assignment: **High Velocity Watch**. 14 merchants triggered since yesterday — 3 with risk scores above 80.\n\nWant me to open the Barometer Report?",
+      openPanel: "detection-queue",
       pauseAfter: 2000,
       suggestions: ["Yes, open it"],
     },
-    { role: "user", content: "Yes, open it", openPanel: "detection-queue" },
+    { role: "user", content: "Yes, open it", openPanel: "barometer-report", pauseAfter: 500 },
     {
       role: "assistant",
       content: "Opening Barometer Report for High Velocity Watch. 3 merchants are flagged above risk score 80. Coastal Merchant Solutions is the highest — score 89, triggered on 4 rules.",
-      openPanel: "barometer-report",
       pauseAfter: 2500,
       suggestions: ["Pull up Coastal's risk report alongside"],
     },

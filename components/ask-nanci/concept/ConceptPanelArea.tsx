@@ -8,7 +8,7 @@ import { useAskNanci } from "@/contexts/AskNanciContext"
 function useIsSmallScreen() {
   const [isSmall, setIsSmall] = useState(false)
   useEffect(() => {
-    const mq = window.matchMedia("(max-width: 999px)")
+    const mq = window.matchMedia("(max-width: 1439px)")
     setIsSmall(mq.matches)
     const handler = (e: MediaQueryListEvent) => setIsSmall(e.matches)
     mq.addEventListener("change", handler)

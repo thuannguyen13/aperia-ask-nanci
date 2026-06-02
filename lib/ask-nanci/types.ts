@@ -31,6 +31,7 @@ export interface ConceptScriptedTurn extends ScriptedTurn {
   openStepUpPanel?: true
   advanceStepUp?: true
   openBatchPanel?: true
+  openReportPanel?: true
   openPanel?: string
   filterDeclineReport?: true
   advanceWorkQueue?: "quick-wins" | "outage"
