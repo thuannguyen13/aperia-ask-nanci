@@ -4,7 +4,7 @@
 
 
 :root {
-  --primary: #218800;
+  --primary: #218400;
   --color-primary: #218800;
   --color-primary-foreground: oklch(0.985 0 0);
   --ring: var(--color-primary);

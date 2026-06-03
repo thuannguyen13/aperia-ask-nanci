@@ -1,7 +1,5 @@
 import type { Metadata } from "next"
-import { Suspense } from "react"
 import { ThemeProvider } from "@/components/ask-nanci/ThemeProvider"
-import { AppShell } from "@/components/ask-nanci/AppShell"
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -14,9 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <body>
         <ThemeProvider>
-          <Suspense fallback={null}>
-            <AppShell>{children}</AppShell>
-          </Suspense>
+          {children}
         </ThemeProvider>
       </body>
     </html>
