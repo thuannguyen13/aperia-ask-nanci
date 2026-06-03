@@ -3,8 +3,11 @@ import { generateId } from "./utils"
 
 const SOURCES_KEY = "asknanci_sources"
 
+export const CLOVER_SOURCE_ID = "clover-built-in"
+export const ONBOARDING_KEY   = "ask_nanci_onboarded"
+
 export const CLOVER_SOURCE: Source = {
-  id: "clover-built-in",
+  id: CLOVER_SOURCE_ID,
   name: "Clover",
   kind: "bank",
   institution: "Clover Data",
@@ -34,6 +37,10 @@ export function addFileSource(name: string, mimeType: string): Source {
   const source: Source = { id: generateId(), name, kind: "file", mimeType, active: true, addedAt: Date.now() }
   writeSources([source, ...sources])
   return source
+}
+
+export function addFileSources(files: FileList | null): void {
+  Array.from(files ?? []).forEach((f) => addFileSource(f.name, f.type || "application/octet-stream"))
 }
 
 export function addBankSource(name: string, opts?: { institution?: string; color?: string; initials?: string; logo?: string }): Source {

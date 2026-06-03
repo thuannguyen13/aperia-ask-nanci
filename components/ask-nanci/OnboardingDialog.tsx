@@ -6,7 +6,7 @@ import { useEffect, useState } from "react"
 import { Button, Dialog, DialogContent, DialogTitle } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { ConnectWizard } from "./ConnectWizard"
-import { CLOVER_SOURCE, readSources } from "@/lib/ask-nanci/sourceStore"
+import { CLOVER_SOURCE, ONBOARDING_KEY, readSources } from "@/lib/ask-nanci/sourceStore"
 
 
 const ROW1 = [
@@ -48,9 +48,11 @@ function MarqueeRow({ logos, direction }: { logos: typeof ROW1; direction: "left
   )
 }
 
+type OnboardingStep = 1 | 2  // 1 = welcome, 2 = link accounts
+
 export function OnboardingDialog() {
   const { onboardingOpen, setOnboardingOpen, setSources } = useAskNanci()
-  const [step, setStep] = useState<1 | 2>(1)
+  const [step, setStep] = useState<OnboardingStep>(1)
   const [wizardOpen, setWizardOpen] = useState(false)
 
   useEffect(() => {
@@ -61,7 +63,7 @@ export function OnboardingDialog() {
     setSources([CLOVER_SOURCE, ...readSources()])
     setWizardOpen(false)
     setOnboardingOpen(false)
-    localStorage.setItem("ask_nanci_onboarded", "1")
+    localStorage.setItem(ONBOARDING_KEY, "1")
   }
 
   return (

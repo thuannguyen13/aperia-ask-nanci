@@ -4,7 +4,7 @@ import { CornerDownRight } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 
 export function SuggestedQuestions({ suggestions }: { suggestions: string[] }) {
-  const { sendMessage } = useAskNanci()
+  const { handlePrompt } = useAskNanci()
   if (!suggestions.length) return null
 
   return (
@@ -12,7 +12,7 @@ export function SuggestedQuestions({ suggestions }: { suggestions: string[] }) {
       {suggestions.map((s) => (
         <button
           key={s}
-          onClick={() => sendMessage(s)}
+          onClick={() => handlePrompt(s)}
           className="flex items-center gap-1.5 rounded-full border bg-background px-3 py-1.5 text-left text-sm text-foreground transition-colors hover:bg-muted hover:border-ring"
         >
           <CornerDownRight className="size-3 shrink-0 text-muted-foreground" />

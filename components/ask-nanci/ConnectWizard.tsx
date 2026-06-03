@@ -57,14 +57,14 @@ function FILogo({ institution, size = "md" }: { institution: Institution; size?:
 
 export function ConnectWizard({ open, onClose, onLinked }: Props) {
   const [step, setStep] = useState(1)
-  const [selected, setSelected] = useState<Institution | null>(null)
+  const [institution, setInstitution] = useState<Institution | null>(null)
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [accounts, setAccounts] = useState<string[]>([])
 
   function reset() {
     setStep(1)
-    setSelected(null)
+    setInstitution(null)
     setUsername("")
     setPassword("")
     setAccounts([])
@@ -75,33 +75,33 @@ export function ConnectWizard({ open, onClose, onLinked }: Props) {
   }
 
   function handleSelectFI(fi: Institution) {
-    setSelected(fi)
+    setInstitution(fi)
     setStep(2)
   }
 
-  function handleBack() {
-    if (step === 2) setStep(1)
-    // For skipAccountStep FIs, step 4 goes back to step 2 (no step 3)
-    else if (step === 3) setStep(2)
-    else if (step === 4) setStep(selected?.skipAccountStep ? 2 : 3)
-  }
+  // Step transition map — next/back destinations depend on whether the FI skips the account step
+  const STEPS = {
+    1: { next: () => 2,                                        back: () => null },
+    2: { next: () => institution?.skipAccountStep ? 4 : 3,       back: () => 1    },
+    3: { next: () => 4,                                        back: () => 2    },
+    4: { next: () => null, back: () => institution?.skipAccountStep ? 2 : 3       },
+  } as const
 
-  function handleCredentialsNext() {
-    selected?.skipAccountStep ? setStep(4) : setStep(3)
-  }
+  function goNext() { const n = STEPS[step as keyof typeof STEPS].next(); if (n !== null) setStep(n) }
+  function goBack() { const b = STEPS[step as keyof typeof STEPS].back(); if (b !== null) setStep(b) }
 
   function handleDone() {
-    if (selected) {
-      const linkedAccounts = selected.skipAccountStep
-        ? [{ key: "preset", label: `${selected.name} — ${username}` }]
+    if (institution) {
+      const linkedAccounts = institution.skipAccountStep
+        ? [{ key: "preset", label: `${institution.name} — ${username}` }]
         : accounts.map((k) => ACCOUNT_TYPES.find((a) => a.key === k)!)
 
       linkedAccounts.forEach((account) => {
         addBankSource(account.label, {
-          institution: selected.name,
-          color: selected.color,
-          initials: selected.initials,
-          logo: selected.logo,
+          institution: institution.name,
+          color: institution.color,
+          initials: institution.initials,
+          logo: institution.logo,
         })
       })
     }
@@ -119,7 +119,7 @@ export function ConnectWizard({ open, onClose, onLinked }: Props) {
   const showBack = step > 1 && step < 4
   const stepTitle =
     step === 1 ? "Link Account" :
-    step === 2 ? `Log in to ${selected?.name}` :
+    step === 2 ? `Log in to ${institution?.name}` :
     step === 3 ? "Select Accounts" :
     "Account Linked"
 
@@ -131,7 +131,7 @@ export function ConnectWizard({ open, onClose, onLinked }: Props) {
         {/* Header */}
         <div className="flex items-center justify-between">
           <button
-            onClick={handleBack}
+            onClick={goBack}
             className={cn(
               "flex size-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted",
               !showBack && "invisible",
@@ -141,9 +141,9 @@ export function ConnectWizard({ open, onClose, onLinked }: Props) {
           </button>
 
           <div className="flex items-center gap-2">
-            {selected && step > 1 && step < 4 && <FILogo institution={selected} size="sm" />}
+            {institution && step > 1 && step < 4 && <FILogo institution={institution} size="sm" />}
             {step === 1
-              ? <Image src="/logo_plaid.svg" alt="Plaid" width={55} height={20} />
+              ? <Image src="/logos/plaid.svg" alt="Plaid" width={55} height={20} />
               : <span className="text-sm font-semibold text-foreground">{stepTitle}</span>
             }
           </div>
@@ -190,12 +190,12 @@ export function ConnectWizard({ open, onClose, onLinked }: Props) {
           )}
 
           {/* Step 2 — Credentials */}
-          {step === 2 && selected && (
+          {step === 2 && institution && (
             <>
               <div className="flex flex-col items-center gap-3 text-center">
-                <FILogo institution={selected} size="lg" />
+                <FILogo institution={institution} size="lg" />
                 <p className="text-sm text-muted-foreground">
-                  Enter your <strong className="text-foreground">{selected.name}</strong> credentials to connect your account to Ask Nanci.
+                  Enter your <strong className="text-foreground">{institution.name}</strong> credentials to connect your account to Ask Nanci.
                 </p>
               </div>
               <div className="flex flex-col gap-3">
@@ -218,19 +218,19 @@ export function ConnectWizard({ open, onClose, onLinked }: Props) {
                   />
                 </div>
               </div>
-              <Button className="w-full" disabled={!canProceedStep2} onClick={handleCredentialsNext}>
+              <Button className="w-full" disabled={!canProceedStep2} onClick={goNext}>
                 Next
               </Button>
             </>
           )}
 
           {/* Step 3 — Select accounts (bank only) */}
-          {step === 3 && selected && (
+          {step === 3 && institution && (
             <>
               <div className="flex flex-col items-center gap-2 text-center">
-                <FILogo institution={selected} size="lg" />
+                <FILogo institution={institution} size="lg" />
                 <p className="text-sm text-muted-foreground">
-                  Select the <strong className="text-foreground">{selected.name}</strong> accounts you want to share with Ask Nanci.
+                  Select the <strong className="text-foreground">{institution.name}</strong> accounts you want to share with Ask Nanci.
                 </p>
               </div>
               <div className="flex flex-col gap-2">
@@ -250,27 +250,27 @@ export function ConnectWizard({ open, onClose, onLinked }: Props) {
                   </label>
                 ))}
               </div>
-              <Button className="w-full" disabled={!canProceedStep3} onClick={() => setStep(4)}>
+              <Button className="w-full" disabled={!canProceedStep3} onClick={goNext}>
                 Next
               </Button>
             </>
           )}
 
           {/* Step 4 — Success */}
-          {step === 4 && selected && (
+          {step === 4 && institution && (
             <>
               <div className="flex flex-col items-center gap-4 py-4 text-center">
                 <div className="relative">
-                  <FILogo institution={selected} size="lg" />
+                  <FILogo institution={institution} size="lg" />
                   <CheckCircle2 className="absolute -bottom-1 -right-1 size-5 fill-green-500 text-background" />
                 </div>
                 <div>
                   <p className="text-base font-semibold text-foreground">Account Linked</p>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    Your <strong className="text-foreground">{selected.name}</strong> account has been successfully linked to Ask Nanci.
+                    Your <strong className="text-foreground">{institution.name}</strong> account has been successfully linked to Ask Nanci.
                   </p>
                 </div>
-                {!selected.skipAccountStep && (
+                {!institution.skipAccountStep && (
                   <div className="flex flex-col gap-1 text-xs text-muted-foreground">
                     {accounts.map((k) => (
                       <span key={k} className="rounded-full border px-3 py-1">
@@ -279,9 +279,9 @@ export function ConnectWizard({ open, onClose, onLinked }: Props) {
                     ))}
                   </div>
                 )}
-                {selected.skipAccountStep && (
+                {institution.skipAccountStep && (
                   <span className="rounded-full border px-3 py-1 text-xs text-muted-foreground">
-                    {selected.name} — {username}
+                    {institution.name} — {username}
                   </span>
                 )}
               </div>

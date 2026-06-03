@@ -4,7 +4,6 @@ import { User, Bell, Lock, Globe, Box, ArrowDown, ArrowUpRight, X } from "lucide
 import { Badge, Button, Dialog, DialogContent, DialogTitle, Progress, Separator } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { PLAN_TIERS, MOCK_ACTIVITY } from "@/lib/ask-nanci/mock-data"
 
 function fmt(n: number) {
   return n >= 1000 ? `${(n / 1000).toFixed(n % 1000 === 0 ? 0 : 1)}K` : String(n)
@@ -19,12 +18,12 @@ const NAV_ITEMS = [
 ]
 
 function UsagePage() {
-  const { usage } = useAskNanci()
+  const { usage, planTiers, activity } = useAskNanci()
 
   const tokenPct = Math.round((usage.tokens.used / usage.tokens.limit) * 100)
   const chatPct  = Math.round((usage.chats.used  / usage.chats.limit)  * 100)
   const filePct  = Math.round((usage.files.used  / usage.files.limit)  * 100)
-  const maxActivity = Math.max(...MOCK_ACTIVITY.map((a) => a.tokens))
+  const maxActivity = activity.length ? Math.max(...activity.map((a) => a.tokens)) : 1
 
   return (
     <div className="flex flex-col gap-6">
@@ -84,7 +83,7 @@ function UsagePage() {
       <div className="flex flex-col gap-2">
         <p className="text-xs font-semibold">Plan Comparison</p>
         <div className="flex flex-col gap-3 sm:flex-row">
-          {PLAN_TIERS.map((tier) => {
+          {planTiers.map((tier) => {
             const isCurrent = tier.name === usage.plan
             return (
               <div
@@ -127,7 +126,7 @@ function UsagePage() {
       <div className="flex flex-col gap-3">
         <p className="text-xs font-semibold">Activity — Last 7 Days</p>
         <div className="flex flex-col">
-          {MOCK_ACTIVITY.map((item, i) => (
+          {activity.map((item, i) => (
             <div key={i}>
               <div className="flex items-center justify-between py-2">
                 <div className="flex items-center gap-5 min-w-0 flex-1">
@@ -144,7 +143,7 @@ function UsagePage() {
                   </div>
                 </div>
               </div>
-              {i < MOCK_ACTIVITY.length - 1 && <Separator />}
+              {i < activity.length - 1 && <Separator />}
             </div>
           ))}
         </div>
@@ -162,7 +161,7 @@ function PlaceholderPage({ label }: { label: string }) {
   )
 }
 
-export function SettingsModal() {
+export function SettingsDialog() {
   const { settingsOpen, setSettingsOpen, settingsTab, openSettings } = useAskNanci()
 
   return (

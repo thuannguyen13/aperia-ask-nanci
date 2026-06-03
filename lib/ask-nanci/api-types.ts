@@ -1,4 +1,4 @@
-import type { Message, Session, Source, ChartWidget } from "./types"
+import type { Message, Session, Source, ChartWidget, MapWidget } from "./types"
 
 // ─── Chat ─────────────────────────────────────────────────────────────────────
 
@@ -14,6 +14,7 @@ export type ChatStreamChunk =
   | { type: "suggestions"; items: string[] }
   | { type: "sources"; items: Source[] }
   | { type: "chart"; data: ChartWidget }
+  | { type: "map"; data: MapWidget }
   | { type: "done" }
   | { type: "error"; message: string }
 

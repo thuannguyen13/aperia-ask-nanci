@@ -1,11 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { ALL_QUESTIONS } from "@/lib/ask-nanci/mock-data"
+import { useAskNanci } from "@/contexts/AskNanciContext"
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
   DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, Input,
 } from "aperia-ds5"
+
+const MAX_VISIBLE_QUESTIONS = 20
 
 const COMMANDS = [
   {
@@ -38,14 +40,15 @@ interface Props {
 export function SlashCommandPopover({ query, onAction }: Props) {
   const [questionSearch, setQuestionSearch] = useState("")
   const [mode, setMode] = useState<"commands" | "questions">("commands")
+  const { allQuestions } = useAskNanci()
 
   const filteredCommands = COMMANDS.filter((c) =>
     c.id.includes(query.toLowerCase().replace("/", "")),
   )
 
-  const filteredQuestions = ALL_QUESTIONS.filter((q) =>
+  const filteredQuestions = allQuestions.filter((q) =>
     !questionSearch || q.toLowerCase().includes(questionSearch.toLowerCase()),
-  ).slice(0, 20)
+  ).slice(0, MAX_VISIBLE_QUESTIONS)
 
   if (mode === "commands" && !filteredCommands.length) return null
 

@@ -1,35 +1,34 @@
 "use client"
 
-import { CornerDownRight, Clock, Compass, BookOpen, Brain } from "lucide-react"
+import { Clock } from "lucide-react"
 import Image from "next/image"
-import { Button, Tabs, TabsList, TabsTrigger, TabsContent } from "aperia-ds5"
+import { Button } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { ChatInput } from "@/components/ask-nanci/ChatInput"
 import { ChatView } from "@/components/ask-nanci/ChatView"
+import { ExplorePrompts } from "@/components/ask-nanci/ExplorePrompts"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { PROMPT_CATEGORIES } from "@/lib/ask-nanci/mock-data"
+import { ConceptWelcomeView } from "@/components/ask-nanci/concept/ConceptWelcomeView"
 
 function WelcomeView() {
-  const { sendMessage, sessions, resumeSession, kbOpen, setKbOpen, sources } = useAskNanci()
+  const { sessions, resumeSession, setKbOpen, sources, isEmbed, currentUser } = useAskNanci()
   const recentSessions = sessions.slice(0, 3)
 
   return (
-    <div className="flex flex-1 flex-col justify-center items-center overflow-y-auto px-4 py-8 md:px-8 md:py-12">
-      <div className="flex w-full max-w-[800px] flex-col gap-8">
+    <div className="flex flex-1 flex-col items-center overflow-y-auto px-4 py-8 md:px-8 md:py-12">
+      <div className="flex w-full max-w-[800px] flex-col gap-8 mx-auto">
 
         {/* Welcome header */}
         <div className="flex flex-col items-center gap-4">
           <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={40} height={40} />
           <div className="text-center">
             <p className="text-2xl font-medium text-foreground">Welcome to Ask Nanci</p>
-            <p className="text-2xl font-medium text-foreground">Ready when you are, Teresa.</p>
+            <p className="text-2xl font-medium text-foreground">Ready when you are{currentUser ? `, ${currentUser.name.split(" ")[0]}` : ""}.</p>
           </div>
         </div>
 
-        
-
         {/* KB banner */}
-        {sources.length < 3 && <div className="flex items-center gap-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 dark:border-green-800 dark:bg-green-950/20">
+        {!isEmbed && sources.length < 3 && <div className="flex items-center gap-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 dark:border-green-800 dark:bg-green-950/20">
           <Image src="/ask-nanci/img_kb-illustration.png" alt="" width={72} height={72} className="size-18 shrink-0 object-contain" />
           <div className="min-w-0 flex-1">
             <div className="mb-0.5 flex items-center gap-2">
@@ -56,43 +55,11 @@ function WelcomeView() {
         <ChatInput />
 
         {/* Prompt suggestions */}
+        <ExplorePrompts />
+
         <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-start gap-2">
-              <Compass className="mt-0.5 size-5 shrink-0 text-foreground" />
-              <div>
-                <p className="text-base font-medium text-foreground">Explore prompts</p>
-                <p className="text-sm text-muted-foreground">Jumpstart your analysis with curated questions.</p>
-              </div>
-            </div>
-          </div>
-
-          <Tabs defaultValue={PROMPT_CATEGORIES[0].id} className="w-full">
-            <TabsList className="h-auto w-full justify-start gap-1 overflow-x-auto scrollbar-none flex-nowrap">
-              {PROMPT_CATEGORIES.map(({ id, label }) => (
-                <TabsTrigger key={id} value={id} className="shrink-0">{label}</TabsTrigger>
-              ))}
-            </TabsList>
-
-            {PROMPT_CATEGORIES.map(({ id, prompts }) => (
-              <TabsContent key={id} value={id} className="mt-3">
-                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 md:grid-cols-3">
-                  {prompts.map((prompt) => (
-                    <button
-                      key={prompt}
-                      onClick={() => sendMessage(prompt)}
-                      className="flex cursor-pointer items-start gap-2 rounded-[10px] border bg-card px-3 py-2.5 text-left transition-colors hover:bg-muted"
-                    >
-                      <CornerDownRight className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
-                      <span className="text-sm font-medium text-foreground">{prompt}</span>
-                    </button>
-                  ))}
-                </div>
-              </TabsContent>
-            ))}
-          </Tabs>
         {/* Recent chats */}
-          {recentSessions.length > 0 && (
+          {!isEmbed && recentSessions.length > 0 && (
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-start gap-2">
@@ -132,13 +99,23 @@ function WelcomeView() {
 }
 
 export default function AskNanciPage() {
-  const { view } = useAskNanci()
+  const { view, startNewChat, isEmbed, isConceptVersion, embedVariant } = useAskNanci()
 
   if (view === "chat") {
     return (
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="relative flex min-w-0 min-h-0 flex-1 flex-col overflow-hidden">
+        {isEmbed && embedVariant !== "concept-embed" && (
+          <button
+            onClick={startNewChat}
+            className="absolute top-4 left-4 z-10 flex items-center gap-2"
+            aria-label="Back to home"
+          >
+            <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="Ask Nanci" width={24} height={24} />
+            <span className="text-[15px] font-semibold tracking-tight text-foreground whitespace-nowrap">Ask Nanci</span>
+          </button>
+        )}
         <ChatView />
-        <div className="shrink-0 px-3 py-3 md:px-4 md:py-4">
+        <div className="shrink-0 px-3 pb-3 md:px-4 md:pb-4">
           <div className="mx-auto w-full max-w-[800px]">
             <ChatInput />
           </div>
@@ -147,5 +124,6 @@ export default function AskNanciPage() {
     )
   }
 
+  if (isConceptVersion) return <ConceptWelcomeView />
   return <WelcomeView />
 }

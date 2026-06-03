@@ -17,7 +17,7 @@
  *   DELETE /api/nanci/sources/:id
  */
 
-import type { Message, Session, Source } from "./types"
+import type { Message, Session, Source, UsageData, MockResponse, PromptCategory, PlanTier, ActivityItem, CurrentUser } from "./types"
 import type { ChatStreamChunk, SourceAddRequest, SourceUpdateRequest } from "./api-types"
 import {
   readSessions,
@@ -33,7 +33,10 @@ import {
   toggleSource,
   removeSource,
 } from "./sourceStore"
-import { findResponse, DEFAULT_RESPONSE, DEFAULT_SUGGESTIONS } from "./mock-data"
+import { findResponse, DEFAULT_RESPONSE, DEFAULT_SUGGESTIONS, MOCK_USAGE, PROMPT_CATEGORIES, ALL_QUESTIONS, PLAN_TIERS, MOCK_ACTIVITY } from "./mock-data"
+export type { MockResponse, PromptCategory, PlanTier, ActivityItem, CurrentUser } from "./types"
+import { BUSINESS_OWNER_CONTENT_OVERRIDES } from "./embed-demo-config"
+import type { EmbedVariant } from "./embed-demo-config"
 import { generateId } from "./utils"
 
 // ─── Chat ─────────────────────────────────────────────────────────────────────
@@ -48,13 +51,18 @@ export async function* streamChat(
   messages: Pick<Message, "role" | "content">[],
   activeSources: Source[],
   _sessionId: string,
+  embedVariant?: EmbedVariant | null,
 ): AsyncGenerator<ChatStreamChunk> {
   const lastUser = [...messages].reverse().find((m) => m.role === "user")
   const match = findResponse(lastUser?.content ?? "")
 
-  const text = match?.content ?? DEFAULT_RESPONSE
+  const overrideContent = match && embedVariant === "business-owner"
+    ? BUSINESS_OWNER_CONTENT_OVERRIDES[match.id]
+    : undefined
+  const text = overrideContent ?? match?.content ?? DEFAULT_RESPONSE
   const suggestions = match?.suggestions ?? DEFAULT_SUGGESTIONS
   const chart = match?.chart
+  const map = match?.map
 
   // Cycle through active sources during thinking phase (BE: replace with real thinking chunks)
   const thinkingSources = activeSources.length ? activeSources : [CLOVER_SOURCE]
@@ -72,28 +80,38 @@ export async function* streamChat(
 
   if (suggestions.length) yield { type: "suggestions", items: suggestions }
 
-  // Attribute a random sample of active sources
+  // Attribute sources relevant to the answer, falling back to random sample
   if (activeSources.length) {
-    const count = Math.min(activeSources.length, Math.floor(Math.random() * 3) + 1)
-    const sampled = [...activeSources].sort(() => Math.random() - 0.5).slice(0, count)
-    yield { type: "sources", items: sampled }
+    let attributed: typeof activeSources
+    if (match?.sourceInstitutions?.length) {
+      attributed = activeSources.filter((s) => match.sourceInstitutions!.includes(s.institution ?? s.name))
+      if (!attributed.length) attributed = activeSources.slice(0, 1)
+    } else {
+      const count = Math.min(activeSources.length, Math.floor(Math.random() * 3) + 1)
+      attributed = [...activeSources].sort(() => Math.random() - 0.5).slice(0, count)
+    }
+    yield { type: "sources", items: attributed }
   }
 
   if (chart) yield { type: "chart", data: chart }
+  if (map) yield { type: "map", data: map }
 
   yield { type: "done" }
 }
 
 // ─── Sessions ─────────────────────────────────────────────────────────────────
 
+// Real: GET /api/nanci/sessions → Session[]
 export async function fetchSessions(): Promise<Session[]> {
   return readSessions()
 }
 
+// Real: PUT /api/nanci/sessions/:id
 export async function persistSession(messages: Message[], id: string): Promise<Session> {
   return saveSession(messages, id)
 }
 
+// Real: DELETE /api/nanci/sessions/:id
 export async function removeSessionById(id: string): Promise<void> {
   deleteSession(id)
 }
@@ -123,10 +141,50 @@ export async function addSource(req: SourceAddRequest): Promise<Source> {
   })
 }
 
-export async function updateSource(id: string, _updates: SourceUpdateRequest): Promise<void> {
+// Stub only toggles active state; real endpoint should apply the full updates payload.
+export async function updateSource(id: string, updates: SourceUpdateRequest): Promise<void> {
+  void updates
   toggleSource(id)
 }
 
 export async function deleteSourceById(id: string): Promise<void> {
   removeSource(id)
+}
+
+// ─── Current User ─────────────────────────────────────────────────────────────
+
+// Real: GET /api/nanci/me → CurrentUser
+export async function fetchCurrentUser(): Promise<CurrentUser> {
+  return { name: "Teresa W.", email: "teresa.w@example.com", initials: "TW" }
+}
+
+// ─── Usage ────────────────────────────────────────────────────────────────────
+
+// Real: GET /api/nanci/usage → UsageData
+export async function fetchUsage(): Promise<UsageData> {
+  return MOCK_USAGE
+}
+
+// ─── Prompts ──────────────────────────────────────────────────────────────────
+
+// Real: GET /api/nanci/prompts/categories → PromptCategory[]
+export async function fetchPromptCategories(): Promise<PromptCategory[]> {
+  return PROMPT_CATEGORIES
+}
+
+// Real: GET /api/nanci/prompts → string[]
+export async function fetchAllQuestions(): Promise<string[]> {
+  return ALL_QUESTIONS
+}
+
+// ─── Plan & Activity ──────────────────────────────────────────────────────────
+
+// Real: GET /api/nanci/plan/tiers → PlanTier[]
+export async function fetchPlanTiers(): Promise<PlanTier[]> {
+  return PLAN_TIERS
+}
+
+// Real: GET /api/nanci/activity → ActivityItem[]
+export async function fetchActivity(): Promise<ActivityItem[]> {
+  return MOCK_ACTIVITY
 }

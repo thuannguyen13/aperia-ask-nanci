@@ -1,34 +1,35 @@
 "use client"
 
-import { useEffect, useRef } from "react"
-import { ScrollArea } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
+import { useChatScroll } from "@/hooks/useChatScroll"
 import { UserMessage, BotMessage } from "./ChatMessage"
 import { ThinkingIndicator } from "./ThinkingIndicator"
+import { ExplorePrompts } from "./ExplorePrompts"
 
 export function ChatView() {
-  const { messages, chatState, pendingBot } = useAskNanci()
-  const bottomRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages, pendingBot?.content, chatState])
+  const { messages, chatState, pendingBot, isConceptVersion } = useAskNanci()
+  const { containerRef, spacerRef, lastUserMsgRef } = useChatScroll(chatState, pendingBot?.content)
 
   return (
-    <ScrollArea className="flex-1">
-      <div className="mx-auto w-full max-w-[800px] flex flex-col gap-0 py-4">
-        {messages.map((msg) =>
-          msg.role === "user" ? (
-            <UserMessage key={msg.id} message={msg} />
+    <div ref={containerRef} className="flex-1 min-h-0 overflow-y-auto">
+      <div className="mx-auto w-full max-w-[800px] flex flex-col gap-0 pt-4">
+        {messages.map((msg, i) => {
+          const isLastMsg = i === messages.length - 1
+          const isLastUser = isLastMsg && msg.role === "user"
+          return msg.role === "user" ? (
+            <div key={msg.id} ref={isLastUser ? lastUserMsgRef : undefined}>
+              <UserMessage message={msg} />
+            </div>
           ) : (
-            <BotMessage
-              key={msg.id}
-              message={msg}
-              displayedContent={msg.content}
-              showExtras={true}
-            />
-          ),
-        )}
+            <div key={msg.id}>
+              <BotMessage
+                message={msg}
+                displayedContent={msg.content}
+                showExtras={true}
+              />
+            </div>
+          )
+        })}
 
         {chatState === "thinking" && <ThinkingIndicator />}
 
@@ -40,8 +41,8 @@ export function ChatView() {
           />
         )}
 
-        <div ref={bottomRef} />
+        <div ref={spacerRef} className="shrink-0" />
       </div>
-    </ScrollArea>
+    </div>
   )
 }

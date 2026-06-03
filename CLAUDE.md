@@ -1,0 +1,150 @@
+# Project Rules
+
+## Side Panels
+
+### Two panel types
+
+**Simple panels** — single-purpose, own their own open/close state via a dedicated context boolean (e.g. `reportPanelOpen`, `formPanelOpen`). Used when only one instance of that panel can ever be open. Rendered as direct siblings to the main content area inside `AppShell`.
+
+**Multi panels** — registered in the `openPanels: string[]` array in context. Opened with `openPanel(id)`, closed with `closePanel(id)` or `closeAllNewPanels()`. Rendered and laid out by `ConceptPanelArea`, which maps panel IDs to grid slots (A/B/C/D) and wraps them in `ResizablePanelGroup`.
+
+Use a simple panel for standalone flows (one panel at a time). Use a multi panel when the flow may open 2–3 panels side by side.
+
+### Panel component structure
+
+Every panel — simple or multi — follows the same internal layout:
+
+```tsx
+<div className="flex h-full flex-col overflow-hidden">
+  {/* Header: title + close button, always visible */}
+  <div className="flex shrink-0 items-center justify-between border-b px-4 py-3">
+    ...
+    <button onClick={() => closePanel("id")} ...><X /></button>
+  </div>
+
+  {/* Body: scrollable content */}
+  <ScrollArea className="flex-1">
+    ...
+  </ScrollArea>
+</div>
+```
+
+- Header is `shrink-0`, body is `flex-1` — never let the header scroll away
+- Always include a close (`X`) button in the header
+- Simple panels close via their own context setter; multi panels call `closePanel(id)`
+
+### Animating open/close
+
+Panels slide in by transitioning `width` and `opacity`. The panel is always mounted — CSS controls visibility:
+
+```tsx
+<div className={cn(
+  "relative hidden h-full shrink-0 flex-col overflow-hidden rounded-[18px] border bg-background",
+  "transition-[width,opacity,margin] duration-200 ease-in-out md:flex",
+  isOpen
+    ? "w-[55%] opacity-100 ml-1"
+    : "w-0 opacity-0 border-transparent pointer-events-none",
+)}>
+```
+
+- Use `pointer-events-none` when closed to prevent invisible click targets
+- Use `border-transparent` when closed to hide the border without layout shift
+- Width percentage is typically 55–58% for a single panel, 50/50 split for two columns
+
+### Opening panels from scripted flows
+
+In `CONCEPT_SCRIPTED_CONVERSATIONS`, use turn fields to trigger panel opens:
+
+- `openPanel: "panel-id"` — opens a multi panel via `openPanels`
+- `openFormPanel: true` — opens the bank account form panel
+- `openStepUpPanel: true` — opens step-up auth panel
+- `closeAllPanels: true` — resets all open panels
+
+### Adding a new multi panel
+
+1. Create the panel component in `components/ask-nanci/concept/`
+2. Add its ID to the `PanelId` union in `ConceptPanelArea.tsx`
+3. Add a `case` for it in the `PanelContent` switch
+4. Add it to the relevant flow's slot mapping in `mapPanelsToSlots`
+5. Import and add a `case` for `turn.openPanel` in `playConceptScripted` if script-driven
+
+### Adding a new concept scripted flow
+
+1. Add the trigger prompt string to `CONCEPT_ALL_PROMPTS` in `concept-config.ts`
+2. Add any follow-up prompts (continuations that shouldn't reset the session) to `CONCEPT_NO_RESET_PROMPTS`
+3. Add the full turn sequence to `CONCEPT_SCRIPTED_CONVERSATIONS` keyed by the trigger prompt
+4. Wire panel opens in the turn objects:
+   - `openPanel: "panel-id"` for multi panels
+   - `openFormPanel: true` / `openStepUpPanel: true` / `openBatchPanel: true` for simple panels
+   - `closeAllPanels: true` to reset at end of flow
+5. If the flow needs a new multi panel, follow "Adding a new multi panel" above first
+
+## Demo content
+
+All demo data lives in `lib/ask-nanci/data/`. Never put mock content in component files.
+
+- `data/responses.clover.ts` / `data/prompts.clover.ts` / `data/flows.clover.ts` — clover persona
+- `data/flows.iso.ts` / `data/prompts.iso.ts` — ISO persona
+- `data/flows.concept.ts` — concept demo flows and constants
+- `data/overrides.business-owner.ts` — business-owner content overrides
+- `data/sources.ts` — embed source arrays per variant
+- `data/account.ts` — mock usage, plan tiers, activity, current user
+- `data/merchants.ts` — merchant volume table data
+- `data/panels/` — per-panel data (timeline rows, risk flags, batch lines, etc.); one file per panel
+
+The lib shells (`mock-data.ts`, `embed-demo-config.ts`, `concept-config.ts`) are thin re-export barrels — edit the `data/` files, not the shells.
+
+## Shared panel primitives
+
+`components/ask-nanci/shared/` — import from `@/components/ask-nanci/shared`.
+
+- `PanelShell` — the outer `flex h-full flex-col overflow-hidden` wrapper; replaces the raw div
+- `PanelHeader` — shrink-0 header with title and close button built in
+- `ScoreBadge` — colored score chip (used in BarometerReportPanel)
+- `Callout` — severity callout box (`border-{color}-200 bg-{color}-50` pattern)
+- `formatCurrency` / `formatPercent` — shared number formatters from `format.ts`
+
+Use these instead of re-implementing the header/scroll structure or severity box in each panel.
+
+## Components
+
+### Resizable panels (`ResizablePanelGroup`, `ResizablePanel`, `ResizableHandle`)
+
+Imported from `aperia-ds5`.
+
+- `ResizablePanelGroup` requires an `orientation` prop (`"horizontal"` or `"vertical"`)
+- `ResizablePanel` takes `defaultSize` and `minSize` as percentages — sibling sizes must sum to 100
+- `ResizableHandle` goes between panels; use `withHandle` to show the drag grip
+- Add `key={layoutKey}` on the group whenever the panel set can change at runtime — forces a remount to avoid stale size state
+- Groups can nest: a `ResizablePanel` can contain another `ResizablePanelGroup` with a different orientation
+
+**Example — 2-column layout with vertical split in the left column:**
+```tsx
+<ResizablePanelGroup key={layoutKey} orientation="horizontal" className="h-full">
+  <ResizablePanel defaultSize={50} minSize={20}>
+    <ResizablePanelGroup orientation="vertical" className="h-full">
+      <ResizablePanel defaultSize={55} minSize={15}>
+        <TopContent />
+      </ResizablePanel>
+      <ResizableHandle withHandle />
+      <ResizablePanel defaultSize={45} minSize={15}>
+        <BottomContent />
+      </ResizablePanel>
+    </ResizablePanelGroup>
+  </ResizablePanel>
+  <ResizableHandle withHandle />
+  <ResizablePanel defaultSize={50} minSize={20}>
+    <RightContent />
+  </ResizablePanel>
+</ResizablePanelGroup>
+```
+
+## Knowledge Base
+
+A compiled wiki lives at `./wiki/` (relative to this file). Before answering questions about Ask Nanci's domain, personas, or workflows:
+
+1. Read `./wiki/index.md` to find relevant pages
+2. Read those pages directly — they are the compiled source of truth
+3. Raw sources are in `../demo-context/` and are never modified
+
+Start with `./wiki/overview.md` for a full orientation.

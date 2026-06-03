@@ -4,9 +4,35 @@
 
 
 :root {
+  --primary: #218400;
   --color-primary: #218800;
   --color-primary-foreground: oklch(0.985 0 0);
   --ring: var(--color-primary);
+
+  --chart-1: #3F65C2;
+  --chart-2: #F18442;
+  --chart-3: #951B19;  
+  --chart-4: #9FD689;  
+  --chart-5: #ECD1FB;
+  --chart-6: #2C2073;
+}
+
+[data-theme="clover"] {
+  background: linear-gradient(180deg, #218800 0%, #BFCDC5 200px);
+}
+
+[data-theme="aperia"] {
+  --primary: #002F67;
+  --color-primary: #002F67;
+  --ring: #002F67;
+  --sidebar-primary: #002F67;
+  background: linear-gradient(180deg, #002F67 0%, #c5d5ed 200px);
+}
+
+[data-theme="access-one"] {
+  --color-primary: #FC6A25;
+  --ring: #FC6A25;
+  background: linear-gradient(180deg, #FC6A25 0%, #fde8d8 200px);
 }
 
 
@@ -24,14 +50,24 @@
   to   { transform: translateX(0); }
 }
 
+@keyframes panel-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 @theme {
   --animate-marquee-left: marquee-left 12s linear infinite;
   --animate-marquee-right: marquee-right 12s linear infinite;
+  --animate-panel-in: panel-fade-in 0.28s ease-out;
 }
 
 @layer base {
   button, [role="button"], label[for],
   [role="menuitem"], [role="option"], [role="menuitemcheckbox"], [role="menuitemradio"] {
     cursor: pointer;
+  }
+
+  [data-panel] {
+    transition: flex 0.3s ease-out;
   }
 }
