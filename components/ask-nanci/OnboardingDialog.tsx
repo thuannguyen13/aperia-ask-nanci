@@ -108,7 +108,7 @@ export function OnboardingDialog() {
 
               {/* Right panel — illustration */}
               <div className="flex-1 overflow-hidden relative rounded-xl border-l border-y">
-                <Image src="/ask-nanci/img_onboarding.png" alt="" fill className="object-cover object-left-top" />
+                <Image src="/ask-nanci/img_onboarding-titan.png" alt="" fill className="object-cover object-left-top" />
               </div>
             </div>
           ) : (

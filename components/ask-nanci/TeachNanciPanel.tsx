@@ -94,7 +94,7 @@ export function TeachNanciPanel() {
     <>
       {/* Header */}
       <div className="flex shrink-0 items-center justify-between px-4 py-3">
-        <h2 className="text-base font-semibold text-foreground">Teach Nanci</h2>
+        <h2 className="text-base font-semibold text-foreground">Personalize Nanci</h2>
         <Button variant="ghost" size="icon-sm" onClick={() => setKbOpen(false)}>
           <X className="size-4" />
         </Button>
@@ -139,8 +139,8 @@ export function TeachNanciPanel() {
             </div>
 
             <div className="flex items-center justify-center gap-2 rounded-md border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/20 px-3 py-2">
-              <Image src="/ask-nanci/clover-logo-color.svg" alt="Clover" width={16} height={16} className="size-4 shrink-0" />
-              <span className="text-sm font-medium text-foreground">Clover Data Added</span>
+              <Image src="/logos/titan.svg" alt="Titan" width={16} height={16} className="size-4 shrink-0 invert dark:invert-0" />
+              <span className="text-sm font-medium text-foreground">Titan Data Added</span>
             </div>
 
             {hasSources ? (

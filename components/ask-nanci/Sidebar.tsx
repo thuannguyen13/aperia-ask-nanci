@@ -174,7 +174,7 @@ export function Sidebar() {
                   <Image src="/ask-nanci/img_kb-illustration.png" alt="" width={72} height={72} className="size-20 object-contain" />
                 </div>
                 <div className="pr-12 flex flex-col items-start gap-1">
-                  <p className="text-sm font-semibold text-foreground">Teach Nanci</p>
+                  <p className="text-sm font-semibold text-foreground">Personalize Nanci</p>
                   <p className="text-sm text-muted-foreground">
                     Add your financial and bookkeeping accounts to improve Nanci.
                   </p>
