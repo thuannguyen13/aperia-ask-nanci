@@ -95,7 +95,13 @@ const EMBED_CONFIG: Record<EmbedVariant, { theme: string; logo: string; alt: str
   clover:           { theme: "clover",     logo: "/logos/clover.svg",          alt: "Clover"    },
   "business-owner": { theme: "access-one", logo: "/logos/access-one-logo.svg", alt: "AccessOne" },
   iso:              { theme: "aperia",     logo: "/logos/titan.svg",           alt: "Titan"     },
-  "concept-embed":  { theme: "aperia",     logo: "/logos/titan.svg",          alt: "Aperia"    },
+  "concept-embed":  { theme: "aperia",     logo: "/logos/titan.svg",           alt: "Aperia"    },
+}
+
+const EMBED_FRAME: Partial<Record<EmbedVariant, string>> = {
+  clover:           "bg-[linear-gradient(180deg,#218800_0%,#BFCDC5_200px)]",
+  "business-owner": "bg-[linear-gradient(180deg,#FC6A25_0%,#fde8d8_200px)]",
+  iso:              "bg-[linear-gradient(180deg,#002F67_0%,#c5d5ed_200px)]",
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -119,12 +125,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   if (isEmbed) {
     const config = EMBED_CONFIG[embedVariant!]
     const isConceptEmbed = embedVariant === "concept-embed"
+    const frameGradient = EMBED_FRAME[embedVariant!] ?? ""
     return (
       <AskNanciProvider isEmbed embedVariant={embedVariant} isConceptVersion={isConceptVersion} autoPlayFlow={autoPlayFlow}>
         <div
           data-embed={embedVariant}
           data-theme={config.theme}
-          className="relative flex h-screen flex-col overscroll-contain md:px-2 md:pb-2"
+          className={`relative flex h-screen flex-col overscroll-contain ${frameGradient} md:px-2 md:pb-2`}
         >
           <div className="relative z-10 flex h-10 shrink-0 items-center justify-center">
             <Image src={config.logo} alt={config.alt} width={isConceptEmbed ? 120 : 80} height={24} className="h-6 w-auto" />
@@ -149,7 +156,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <AskNanciProvider isConceptVersion={isConceptVersion}>
-      <div data-embed="concept" data-theme={CONCEPT_CONFIG.theme} className="relative flex h-screen flex-col md:px-2 md:pb-2">
+      <div data-embed="concept" data-theme={CONCEPT_CONFIG.theme} className="relative flex h-screen flex-col bg-[linear-gradient(180deg,#002F67_0%,#c5d5ed_200px)] md:px-2 md:pb-2">
         {/* Top bar */}
         <div className="relative z-10 flex h-10 shrink-0 items-center justify-center">
           <div className="absolute left-0 flex items-center md:hidden">
