@@ -157,13 +157,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     if (!localStorage.getItem(ONBOARDING_KEY)) setOnboardingOpen(true)
   }, [isEmbed])
 
-  useEffect(() => {
-    const flowKey = autoPlayFlow
-    if (!flowKey) return
-    const t = setTimeout(() => playConceptScripted(flowKey), 800)
-    return () => clearTimeout(t)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   const persistAndReload = useCallback(async (msgs: Message[]) => {
     await persistSession(msgs, sessionIdRef.current)
