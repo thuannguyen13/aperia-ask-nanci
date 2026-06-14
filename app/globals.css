@@ -35,6 +35,12 @@
   background: linear-gradient(180deg, #FC6A25 0%, #fde8d8 200px);
 }
 
+[data-theme="vision-web"] {
+  --color-primary: #1565C0;
+  --ring: #1565C0;
+  background: linear-gradient(180deg, #1565C0 0%, #d0e4f7 200px);
+}
+
 
 @theme inline {
   --color-primary: var(--color-primary);

@@ -35,7 +35,7 @@ import {
 } from "./sourceStore"
 import { findResponse, DEFAULT_RESPONSE, DEFAULT_SUGGESTIONS, MOCK_USAGE, PROMPT_CATEGORIES, ALL_QUESTIONS, PLAN_TIERS, MOCK_ACTIVITY } from "./mock-data"
 export type { MockResponse, PromptCategory, PlanTier, ActivityItem, CurrentUser } from "./types"
-import { BUSINESS_OWNER_CONTENT_OVERRIDES } from "./embed-demo-config"
+import { BUSINESS_OWNER_CONTENT_OVERRIDES, VW_CONTENT_OVERRIDES } from "./embed-demo-config"
 import type { EmbedVariant } from "./embed-demo-config"
 import { generateId } from "./utils"
 
@@ -56,9 +56,11 @@ export async function* streamChat(
   const lastUser = [...messages].reverse().find((m) => m.role === "user")
   const match = findResponse(lastUser?.content ?? "")
 
-  const overrideContent = match && embedVariant === "business-owner"
-    ? BUSINESS_OWNER_CONTENT_OVERRIDES[match.id]
-    : undefined
+  const overrideContent = match && (
+    embedVariant === "business-owner" ? BUSINESS_OWNER_CONTENT_OVERRIDES[match.id] :
+    embedVariant === "vw" ? VW_CONTENT_OVERRIDES[match.id] :
+    undefined
+  )
   const text = overrideContent ?? match?.content ?? DEFAULT_RESPONSE
   const suggestions = match?.suggestions ?? DEFAULT_SUGGESTIONS
   const chart = match?.chart

@@ -92,10 +92,11 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
 const CONCEPT_CONFIG = { theme: "aperia", logo: "/logos/titan.svg", alt: "Aperia" }
 
 const EMBED_CONFIG: Record<EmbedVariant, { theme: string; logo: string; alt: string }> = {
-  clover:           { theme: "clover",     logo: "/logos/clover.svg",          alt: "Clover"    },
-  "business-owner": { theme: "access-one", logo: "/logos/access-one-logo.svg", alt: "AccessOne" },
-  iso:              { theme: "aperia",     logo: "/logos/titan.svg",           alt: "Titan"     },
-  "concept-embed":  { theme: "aperia",     logo: "/logos/titan.svg",          alt: "Aperia"    },
+  clover:           { theme: "clover",      logo: "/logos/clover.svg",          alt: "Clover"     },
+  "business-owner": { theme: "access-one",  logo: "/logos/access-one-logo.svg", alt: "AccessOne"  },
+  iso:              { theme: "aperia",      logo: "/logos/titan.svg",           alt: "Titan"      },
+  "concept-embed":  { theme: "aperia",      logo: "/logos/titan.svg",           alt: "Aperia"     },
+  vw:               { theme: "vision-web",  logo: "/logos/vision-web-logo.svg", alt: "VisionWeb"  },
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {

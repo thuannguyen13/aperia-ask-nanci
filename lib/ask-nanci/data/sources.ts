@@ -26,6 +26,16 @@ const APERIA_SOURCE: Source = {
   addedAt: 0,
 }
 
+const VISION_WEB_SOURCE: Source = {
+  id: CLOVER_SOURCE_ID,
+  name: "VisionWeb",
+  kind: "bank",
+  institution: "VisionWeb Data",
+  logo: "/logos/aperia.svg",
+  active: true,
+  addedAt: 0,
+}
+
 // ─── Per-variant source lists ─────────────────────────────────────────────────
 
 export const EMBED_DEMO_SOURCES: Source[] = [
@@ -39,6 +49,10 @@ export const EMBED_DEMO_SOURCES: Source[] = [
 
 export const EMBED_BUSINESS_OWNER_DEMO_SOURCES: Source[] = EMBED_DEMO_SOURCES.map((s) =>
   s.id === CLOVER_SOURCE_ID ? ACCESS_ONE_SOURCE : s
+)
+
+export const EMBED_VW_DEMO_SOURCES: Source[] = EMBED_DEMO_SOURCES.map((s) =>
+  s.id === CLOVER_SOURCE_ID ? VISION_WEB_SOURCE : s
 )
 
 export const EMBED_ISO_DEMO_SOURCES: Source[] = [
