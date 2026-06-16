@@ -301,11 +301,11 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       for (let i = 0; i < script.length; i++) {
         const turn = script[i]
         if (turn.role === "user") {
-          await sleep(i === 0 ? 600 : 900)
+          await sleep(i === 0 ? 1000 : 1800)
           setMessages((prev) => [...prev, { id: newSessionId(), role: "user" as const, content: turn.content }])
           setChatState("thinking")
         } else {
-          await sleep(1000)
+          await sleep(1800)
           await streamText(turn, newSessionId())
           if (i === script.length - 1) { setChatState("idle"); setThinking({ source: null, label: "Thinking…" }) }
         }
