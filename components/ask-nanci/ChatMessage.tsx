@@ -134,7 +134,7 @@ function BotMessageBase({
             const [before, after] = displayedContent.split("{{MAP}}")
             return (
               <>
-                <div>{renderContent(before)}</div>
+                <div>{renderContent(before.trimEnd())}</div>
                 {message.map && <MessageMap map={message.map} />}
                 {after && <div className="mt-3">{renderContent(after)}</div>}
               </>
