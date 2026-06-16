@@ -329,7 +329,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       role: "assistant",
       content: "Good morning, Teresa. A few things came in while you were away — I've gone through everything and sorted it for you. Here's where your queue stands:",
       widget: "ai-triage-summary",
-      widgetDelay: 600,
+      widgetDelay: 1500,
       openPanel: "detection-queue",
       pauseAfter: 2500,
       loopToPrompt: CONCEPT_DETECT_DQ_KEY,
