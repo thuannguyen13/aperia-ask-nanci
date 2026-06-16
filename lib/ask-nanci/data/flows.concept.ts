@@ -105,7 +105,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   // ── Flow 2: Data Lookup ───────────────────────────────────────────────────
   [CONCEPT_FLOW2_PROMPT]: [
     { role: "user", content: CONCEPT_FLOW2_PROMPT },
-    { role: "assistant", content: "Here's your merchant volume for the week of May 15–21. I've opened the full breakdown in the panel — you can sort by any column.", openReportPanel: true },
+    { role: "assistant", content: "Here's your merchant volume for the week of May 15–21. I've opened the full breakdown in the panel — you can sort by any column.", openReportPanel: true, pauseAfter: 800 },
   ],
   [CONCEPT_FLOW2_FOLLOWUP]: [
     { role: "user", content: CONCEPT_FLOW2_FOLLOWUP },
