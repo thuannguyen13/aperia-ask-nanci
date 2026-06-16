@@ -329,6 +329,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       role: "assistant",
       content: "Good morning, Teresa. A few things came in while you were away — I've gone through everything and sorted it for you. Here's where your queue stands:",
       widget: "ai-triage-summary",
+      openPanel: "detection-queue",
       pauseAfter: 2500,
       loopToPrompt: CONCEPT_DETECT_DQ_KEY,
     },
@@ -337,7 +338,6 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     {
       role: "assistant",
       content: "Your Detection Queue has an active assignment: **High Velocity Watch**. 14 merchants triggered since yesterday — 3 with risk scores above 80.\n\nWant me to open the Barometer Report?",
-      openPanel: "detection-queue",
       pauseAfter: 2000,
       suggestions: ["Yes, open it"],
     },
