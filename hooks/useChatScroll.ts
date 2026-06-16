@@ -77,6 +77,16 @@ export function useChatScroll(
         const target = lastUserMsgRef.current
         if (!container || !spacer || !target) return
 
+        // Zero out the spacer before measuring so we see the natural content height.
+        spacer.style.height = "0px"
+        const contentOverflows = container.scrollHeight > container.clientHeight
+
+        // If everything fits on screen, no need to scroll or reserve space.
+        if (!contentOverflows) {
+          availableHeightRef.current = 0
+          return
+        }
+
         const targetRect = target.getBoundingClientRect()
         const containerRect = container.getBoundingClientRect()
         const scrollTarget =
