@@ -287,13 +287,12 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
             resolve()
             return
           }
-          // Emit 1-3 chunks per tick with ~30-80ms variable delay
-          const batch = Math.floor(Math.random() * 3) + 1
+          const batch = Math.floor(Math.random() * 2) + 1
           for (let i = 0; i < batch && chunkIdx < chunks.length; i++, chunkIdx++) {
             botMsg.content += chunks[chunkIdx]
           }
           setPendingBot({ ...botMsg })
-          setTimeout(emitNext, 30 + Math.random() * 50)
+          setTimeout(emitNext, 50 + Math.random() * 70)
         }
         emitNext()
       })
