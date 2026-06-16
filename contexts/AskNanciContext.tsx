@@ -376,8 +376,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
           await sleep(1800)
           if (scriptStopRef.current) break
           await streamText(turn.content, newSessionId())
-          if (turn.pauseAfter) await sleep(turn.pauseAfter)
-          applyTurnEffects(turn, prompt)
           if (turn.sheetAction || turn.suggestions || turn.widget) {
             setMessages((prev) => {
               const next = [...prev]
@@ -393,6 +391,8 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
               return next
             })
           }
+          if (turn.pauseAfter) await sleep(turn.pauseAfter)
+          applyTurnEffects(turn, prompt)
           if (turn.closeAllPanels) {
             await sleep(600)
             // Stagger panels closed — right column first, then left
