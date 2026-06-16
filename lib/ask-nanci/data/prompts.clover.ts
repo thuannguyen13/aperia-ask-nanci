@@ -17,6 +17,18 @@ export const PROMPT_CATEGORIES: PromptCategory[] = [
     ],
   },
   {
+    id: "account-maintenance",
+    label: "Maintenance",
+    prompts: [
+      "Change my business address",
+      "Update my primary email",
+      "Update my phone number",
+      "Change my statement descriptor",
+      "Update customer service phone",
+      "Update my business name",
+    ],
+  },
+  {
     id: "top-items",
     label: "Top Items",
     prompts: [
@@ -64,18 +76,6 @@ export const PROMPT_CATEGORIES: PromptCategory[] = [
       "I'm paying way too much in fees. How bad is it?",
       "Which card brand has the highest spend per customer?",
       "Are any transactions still pending from last week?",
-    ],
-  },
-  {
-    id: "account-maintenance",
-    label: "Maintenance",
-    prompts: [
-      "Change my business address",
-      "Update my primary email",
-      "Update my phone number",
-      "Change my statement descriptor",
-      "Update customer service phone",
-      "Update my business name",
     ],
   },
 ]
