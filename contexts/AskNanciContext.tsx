@@ -287,10 +287,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
             resolve()
             return
           }
-          const batch = Math.floor(Math.random() * 2) + 1
-          for (let i = 0; i < batch && chunkIdx < chunks.length; i++, chunkIdx++) {
-            botMsg.content += chunks[chunkIdx]
-          }
+          botMsg.content += chunks[chunkIdx++]
           setPendingBot({ ...botMsg })
           setTimeout(emitNext, 50 + Math.random() * 70)
         }
@@ -353,10 +350,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
             resolve()
             return
           }
-          const batch = Math.floor(Math.random() * 2) + 1
-          for (let i = 0; i < batch && chunkIdx < chunks.length; i++, chunkIdx++) {
-            botMsg.content += chunks[chunkIdx]
-          }
+          botMsg.content += chunks[chunkIdx++]
           setPendingBot({ ...botMsg })
           setTimeout(emitNext, 50 + Math.random() * 70)
         }
