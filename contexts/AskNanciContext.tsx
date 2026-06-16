@@ -376,6 +376,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
           await sleep(1800)
           if (scriptStopRef.current) break
           await streamText(turn.content, newSessionId())
+          if (turn.widgetDelay) await sleep(turn.widgetDelay)
           if (turn.sheetAction || turn.suggestions || turn.widget) {
             setMessages((prev) => {
               const next = [...prev]

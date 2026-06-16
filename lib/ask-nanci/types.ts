@@ -38,6 +38,7 @@ export interface ConceptScriptedTurn extends ScriptedTurn {
   closeAllPanels?: true
   loopToPrompt?: string
   widget?: "ai-triage-summary"
+  widgetDelay?: number
   pauseAfter?: number
 }
 
