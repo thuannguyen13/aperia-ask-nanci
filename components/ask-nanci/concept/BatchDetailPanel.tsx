@@ -14,7 +14,7 @@ export function BatchDetailPanel() {
   return (
     <div
       className={cn(
-        "relative hidden h-full shrink-0 flex-col overflow-hidden rounded-[18px] border bg-background transition-[width,opacity] duration-200 ease-in-out md:flex",
+        "relative hidden h-full shrink-0 flex-col overflow-hidden rounded-[18px] border bg-background transition-[width,opacity] duration-500 ease-in-out md:flex",
         batchPanelOpen ? "w-[480px] opacity-100 mr-1" : "w-0 opacity-0 border-0 pointer-events-none",
       )}
     >

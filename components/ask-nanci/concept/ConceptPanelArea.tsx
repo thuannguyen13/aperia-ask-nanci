@@ -112,7 +112,7 @@ function SlotWrapper({ id, closing, children }: { id: PanelId | null | undefined
     <div
       key={id ?? undefined}
       className={cn(
-        "h-full transition-opacity duration-300 ease-out",
+        "h-full transition-opacity duration-500 ease-out",
         isClosing ? "opacity-0" : "animate-panel-in",
       )}
     >
@@ -153,9 +153,9 @@ export function ConceptPanelArea({ fillWidth = false, visible = true }: { fillWi
     <div
       className={cn(
         "relative h-full shrink-0 flex-col overflow-hidden rounded-[18px] border bg-background",
-        "transition-[width,opacity,margin] duration-300 ease-out",
+        "transition-[width,opacity,margin] duration-500 ease-out",
         fillWidth
-          ? cn("flex flex-1 min-w-0 transition-opacity duration-300 ease-out", visible ? "opacity-100" : "opacity-0")
+          ? cn("flex flex-1 min-w-0 transition-opacity duration-500 ease-out", visible ? "opacity-100" : "opacity-0")
           : cn(
               "hidden md:flex",
               isOpen

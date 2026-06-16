@@ -21,7 +21,7 @@ export function BankAccountFormPanel() {
   return (
     <div className={cn(
       "relative hidden h-full shrink-0 flex-col overflow-hidden rounded-[18px] border bg-background",
-      "transition-[width,opacity,margin] duration-200 ease-in-out md:flex",
+      "transition-[width,opacity,margin] duration-500 ease-in-out md:flex",
       formPanelOpen
         ? "w-[420px] opacity-100 ml-1"
         : "w-0 opacity-0 border-0 pointer-events-none",
