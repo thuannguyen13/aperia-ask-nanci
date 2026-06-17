@@ -31,7 +31,7 @@ const VISION_WEB_SOURCE: Source = {
   name: "VisionWeb",
   kind: "bank",
   institution: "VisionWeb Data",
-  logo: "/logos/aperia.svg",
+  logo: "/logos/vision-web-source-logo.svg",
   active: true,
   addedAt: 0,
 }
