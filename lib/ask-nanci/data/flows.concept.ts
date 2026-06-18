@@ -85,29 +85,38 @@ const DETECT_FLOW: Array<{ trigger: string; turns: ConceptScriptedTurn[] }> = [
   },
   {
     trigger: "Yes, open it",
-    turns: [{
-      role: "assistant",
-      content: "Opening Barometer Report for High Velocity Watch. 3 merchants are flagged above risk score 80. Coastal Merchant Solutions is the highest — score 89, triggered on 4 rules.",
-      openPanel: "barometer-report",
-      suggestions: ["Pull up Coastal's risk report alongside"],
-    }],
+    turns: [
+      { role: "user", content: "Yes, open it" },
+      {
+        role: "assistant",
+        content: "Opening Barometer Report for High Velocity Watch. 3 merchants are flagged above risk score 80. Coastal Merchant Solutions is the highest — score 89, triggered on 4 rules.",
+        openPanel: "barometer-report",
+        suggestions: ["Pull up Coastal's risk report alongside"],
+      },
+    ],
   },
   {
     trigger: "Pull up Coastal's risk report alongside",
-    turns: [{
-      role: "assistant",
-      content: "Score climbed from 44 to 89 in 52 days. Settlement account and address both changed within the last 10 days.",
-      openPanel: "coastal-risk",
-      suggestions: ["Escalate this one and open a risk case."],
-    }],
+    turns: [
+      { role: "user", content: "Pull up Coastal's risk report alongside" },
+      {
+        role: "assistant",
+        content: "Score climbed from 44 to 89 in 52 days. Settlement account and address both changed within the last 10 days.",
+        openPanel: "coastal-risk",
+        suggestions: ["Escalate this one and open a risk case."],
+      },
+    ],
   },
   {
     trigger: "Escalate this one and open a risk case.",
-    turns: [{
-      role: "assistant",
-      content: "Done — case opened for Coastal Merchant Solutions (Case #RR-7291). Escalated to Risk Lead. Merchant and ISO notified. Funding hold placed pending senior review.",
-      closeAllPanels: true,
-    }],
+    turns: [
+      { role: "user", content: "Escalate this one and open a risk case." },
+      {
+        role: "assistant",
+        content: "Done — case opened for Coastal Merchant Solutions (Case #RR-7291). Escalated to Risk Lead. Merchant and ISO notified. Funding hold placed pending senior review.",
+        closeAllPanels: true,
+      },
+    ],
   },
 ]
 
