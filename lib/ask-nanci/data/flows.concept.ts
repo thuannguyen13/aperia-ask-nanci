@@ -11,7 +11,6 @@ export const CONCEPT_FLOW2_FOLLOWUP  = "Just the top 5"
 export const CONCEPT_FLOW6_KEY       = "__proactive__"
 export const CONCEPT_WELCOME_KEY     = "__welcome__"
 export const CONCEPT_DETECT_WELCOME_KEY = "__detect_welcome__"
-export const CONCEPT_DETECT_DQ_KEY  = "__detect_dq__"
 
 export const CONCEPT_FLOW8_FOLLOWUP  = "Filter to ones not contacted in the last 30 days"
 export const CONCEPT_FLOW8_FINAL     = "Send them all"
@@ -47,6 +46,71 @@ export const CONCEPT_ALL_PROMPTS = [
 ]
 
 // Prompts that continue an existing session instead of resetting it.
+// ── Flow 11 + 12: Detection Queue (step-driven, user controls each step) ──────
+// All detect/DQ flows live here so the full narrative is readable top-to-bottom.
+const DETECT_FLOW: Array<{ trigger: string; turns: ConceptScriptedTurn[] }> = [
+  {
+    // Ask button (mode=concept-embed&flow=11) → greeting + triage widget
+    trigger: CONCEPT_DETECT_WELCOME_KEY,
+    turns: [{
+      role: "assistant",
+      content: "Good morning, Teresa. A few things came in while you were away — I've gone through everything and sorted it for you. Here's where your queue stands:",
+      widget: "ai-triage-summary",
+      widgetDelay: 1500,
+      pauseAfter: 2500,
+    }],
+  },
+  {
+    // Widget "Detection Queue" button → DQ assignment (no preceding user message)
+    trigger: CONCEPT_FLOW12_CONTINUE_KEY,
+    turns: [{
+      role: "assistant",
+      content: "Your Detection Queue has an active assignment: **High Velocity Watch**. 14 merchants triggered since yesterday — 3 with risk scores above 80.\n\nWant me to open the Barometer Report?",
+      openPanel: "detection-queue",
+      suggestions: ["Yes, open it"],
+    }],
+  },
+  {
+    // ConceptWelcomeView Flow 12 button → same DQ conversation, shows user message first
+    trigger: CONCEPT_FLOW12_PROMPT,
+    turns: [
+      { role: "user", content: CONCEPT_FLOW12_PROMPT },
+      {
+        role: "assistant",
+        content: "Morning. Your Detection Queue has an active assignment: **High Velocity Watch**. 14 merchants triggered since yesterday — 3 with risk scores above 80.\n\nWant me to open the Barometer Report?",
+        openPanel: "detection-queue",
+        suggestions: ["Yes, open it"],
+      },
+    ],
+  },
+  {
+    trigger: "Yes, open it",
+    turns: [{
+      role: "assistant",
+      content: "Opening Barometer Report for High Velocity Watch. 3 merchants are flagged above risk score 80. Coastal Merchant Solutions is the highest — score 89, triggered on 4 rules.",
+      openPanel: "barometer-report",
+      suggestions: ["Pull up Coastal's risk report alongside"],
+    }],
+  },
+  {
+    trigger: "Pull up Coastal's risk report alongside",
+    turns: [{
+      role: "assistant",
+      content: "Score climbed from 44 to 89 in 52 days. Settlement account and address both changed within the last 10 days.",
+      openPanel: "coastal-risk",
+      suggestions: ["Escalate this one and open a risk case."],
+    }],
+  },
+  {
+    trigger: "Escalate this one and open a risk case.",
+    turns: [{
+      role: "assistant",
+      content: "Done — case opened for Coastal Merchant Solutions (Case #RR-7291). Escalated to Risk Lead. Merchant and ISO notified. Funding hold placed pending senior review.",
+      closeAllPanels: true,
+    }],
+  },
+]
+
 export const CONCEPT_NO_RESET_PROMPTS = new Set([
   CONCEPT_FLOW2_FOLLOWUP,
   CONCEPT_FLOW6_KEY,
@@ -61,8 +125,10 @@ export const CONCEPT_NO_RESET_PROMPTS = new Set([
   CONCEPT_FLOW11_APPROVE,
   "Now show me the Processor X cases",
   "Yes, send the template and mark them",
-  CONCEPT_FLOW12_CONTINUE_KEY,
-  CONCEPT_DETECT_DQ_KEY,
+  // Detect flow: all steps except the welcome and flow12 prompt reset the session
+  ...DETECT_FLOW
+    .filter(({ trigger }) => trigger !== CONCEPT_DETECT_WELCOME_KEY && trigger !== CONCEPT_FLOW12_PROMPT)
+    .map(({ trigger }) => trigger),
 ])
 
 // ─── Sheet action data (populated at module load) ─────────────────────────────
@@ -254,66 +320,6 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     { role: "assistant", content: "Done — 8 merchants notified, cases marked Waiting on Vendor. Auto-close will trigger when Processor X confirms resolution.", suggestions: CONCEPT_ALL_PROMPTS },
   ],
 
-  // ── Flow 12: Detection Queue (standalone / detect embed) ──────────────────
-  [CONCEPT_FLOW12_PROMPT]: [
-    { role: "user", content: CONCEPT_FLOW12_PROMPT },
-    {
-      role: "assistant",
-      content: "Morning. Your Detection Queue has an active assignment: **High Velocity Watch**. 14 merchants triggered since yesterday — 3 with risk scores above 80.\n\nWant me to open the Barometer Report?",
-      openPanel: "detection-queue",
-      suggestions: ["Yes, open it"],
-    },
-    { role: "user", content: "Yes, open it", openPanel: "barometer-report", pauseAfter: 500 },
-    {
-      role: "assistant",
-      content: "Opening Barometer Report for High Velocity Watch. 3 merchants are flagged above risk score 80. Coastal Merchant Solutions is the highest — score 89, triggered on 4 rules.",
-      suggestions: ["Pull up Coastal's risk report alongside"],
-    },
-    { role: "user", content: "Pull up Coastal's risk report alongside" },
-    {
-      role: "assistant",
-      content: "Score climbed from 44 to 89 in 52 days. Settlement account and address both changed within the last 10 days.",
-      openPanel: "coastal-risk",
-      suggestions: ["Escalate this one and open a risk case."],
-    },
-    { role: "user", content: "Escalate this one and open a risk case." },
-    {
-      role: "assistant",
-      content: "Done — case opened for Coastal Merchant Solutions (Case #RR-7291). Escalated to Risk Lead. Merchant and ISO notified. Funding hold placed pending senior review.",
-      closeAllPanels: true,
-      loopToPrompt: CONCEPT_WELCOME_KEY,
-    },
-  ],
-
-  // ── Flow 12: Detection Queue (continued from Work Queue) ──────────────────
-  [CONCEPT_FLOW12_CONTINUE_KEY]: [
-    {
-      role: "assistant",
-      content: "Your Detection Queue has an active assignment: **High Velocity Watch**. 14 merchants triggered since yesterday — 3 with risk scores above 80.\n\nWant me to open the Barometer Report?",
-      openPanel: "detection-queue",
-      suggestions: ["Yes, open it"],
-    },
-    { role: "user", content: "Yes, open it", openPanel: "barometer-report", pauseAfter: 500 },
-    {
-      role: "assistant",
-      content: "Opening Barometer Report for High Velocity Watch. 3 merchants are flagged above risk score 80. Coastal Merchant Solutions is the highest — score 89, triggered on 4 rules.",
-      suggestions: ["Pull up Coastal's risk report alongside"],
-    },
-    { role: "user", content: "Pull up Coastal's risk report alongside" },
-    {
-      role: "assistant",
-      content: "Score climbed from 44 to 89 in 52 days. Settlement account and address both changed within the last 10 days.",
-      openPanel: "coastal-risk",
-      suggestions: ["Escalate this one and open a risk case."],
-    },
-    { role: "user", content: "Escalate this one and open a risk case." },
-    {
-      role: "assistant",
-      content: "Done — case opened for Coastal Merchant Solutions (Case #RR-7291). Escalated to Risk Lead. Merchant and ISO notified. Funding hold placed pending senior review.",
-      closeAllPanels: true,
-    },
-  ],
-
   // ── Welcome: Greeting with AI Triage Summary ──────────────────────────────
   [CONCEPT_WELCOME_KEY]: [
     {
@@ -323,48 +329,8 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     },
   ],
 
-  // ── Detect embed: looping welcome → DQ → back ─────────────────────────────
-  [CONCEPT_DETECT_WELCOME_KEY]: [
-    {
-      role: "assistant",
-      content: "Good morning, Teresa. A few things came in while you were away — I've gone through everything and sorted it for you. Here's where your queue stands:",
-      widget: "ai-triage-summary",
-      widgetDelay: 1500,
-      openPanel: "detection-queue",
-      pauseAfter: 2500,
-      loopToPrompt: CONCEPT_DETECT_DQ_KEY,
-    },
-  ],
-  [CONCEPT_DETECT_DQ_KEY]: [
-    {
-      role: "assistant",
-      content: "Your Detection Queue has an active assignment: **High Velocity Watch**. 14 merchants triggered since yesterday — 3 with risk scores above 80.\n\nWant me to open the Barometer Report?",
-      pauseAfter: 2000,
-      suggestions: ["Yes, open it"],
-    },
-    { role: "user", content: "Yes, open it", openPanel: "barometer-report", pauseAfter: 500 },
-    {
-      role: "assistant",
-      content: "Opening Barometer Report for High Velocity Watch. 3 merchants are flagged above risk score 80. Coastal Merchant Solutions is the highest — score 89, triggered on 4 rules.",
-      pauseAfter: 2500,
-      suggestions: ["Pull up Coastal's risk report alongside"],
-    },
-    { role: "user", content: "Pull up Coastal's risk report alongside" },
-    {
-      role: "assistant",
-      content: "Score climbed from 44 to 89 in 52 days. Settlement account and address both changed within the last 10 days.",
-      openPanel: "coastal-risk",
-      pauseAfter: 2500,
-      suggestions: ["Escalate this one and open a risk case."],
-    },
-    { role: "user", content: "Escalate this one and open a risk case." },
-    {
-      role: "assistant",
-      content: "Done — case opened for Coastal Merchant Solutions (Case #RR-7291). Escalated to Risk Lead. Merchant and ISO notified. Funding hold placed pending senior review.",
-      pauseAfter: 2000,
-      closeAllPanels: true,
-    },
-  ],
+  // ── Flow 11 + 12: Detection Queue (step-driven) ───────────────────────────
+  ...Object.fromEntries(DETECT_FLOW.map(({ trigger, turns }) => [trigger, turns])),
 
   // ── Flow 6: Proactive ─────────────────────────────────────────────────────
   [CONCEPT_FLOW6_KEY]: [
