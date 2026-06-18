@@ -21,6 +21,9 @@ export const CONCEPT_FLOW11_APPROVE  = "Approve all except the third one"
 
 export const CONCEPT_FLOW12_PROMPT       = "Show me the detection queue"
 export const CONCEPT_FLOW12_CONTINUE_KEY = "__dq_continue__"
+export const CONCEPT_DQ_OPEN_KEY         = "Yes, open it"
+export const CONCEPT_DQ_COASTAL_KEY      = "Pull up Coastal's risk report alongside"
+export const CONCEPT_DQ_ESCALATE_KEY     = "Escalate this one and open a risk case."
 
 // Registry: numeric flow number (as string) → CONCEPT_SCRIPTED_CONVERSATIONS key.
 // Add one line here to make any flow embeddable via ?mode=concept-embed&flow=<number>.
@@ -45,81 +48,6 @@ export const CONCEPT_ALL_PROMPTS = [
   CONCEPT_FLOW12_PROMPT,
 ]
 
-// Prompts that continue an existing session instead of resetting it.
-// ── Flow 11 + 12: Detection Queue (step-driven, user controls each step) ──────
-// All detect/DQ flows live here so the full narrative is readable top-to-bottom.
-const DETECT_FLOW: Array<{ trigger: string; turns: ConceptScriptedTurn[] }> = [
-  {
-    // Ask button (mode=concept-embed&flow=11) → greeting + triage widget
-    trigger: CONCEPT_DETECT_WELCOME_KEY,
-    turns: [{
-      role: "assistant",
-      content: "Good morning, Teresa. A few things came in while you were away — I've gone through everything and sorted it for you. Here's where your queue stands:",
-      widget: "ai-triage-summary",
-      widgetDelay: 1500,
-      pauseAfter: 2500,
-    }],
-  },
-  {
-    // Widget "Detection Queue" button → DQ assignment (no preceding user message)
-    trigger: CONCEPT_FLOW12_CONTINUE_KEY,
-    turns: [{
-      role: "assistant",
-      content: "Your Detection Queue has an active assignment: **High Velocity Watch**. 14 merchants triggered since yesterday — 3 with risk scores above 80.\n\nWant me to open the Barometer Report?",
-      openPanel: "detection-queue",
-      suggestions: ["Yes, open it"],
-    }],
-  },
-  {
-    // ConceptWelcomeView Flow 12 button → same DQ conversation, shows user message first
-    trigger: CONCEPT_FLOW12_PROMPT,
-    turns: [
-      { role: "user", content: CONCEPT_FLOW12_PROMPT },
-      {
-        role: "assistant",
-        content: "Morning. Your Detection Queue has an active assignment: **High Velocity Watch**. 14 merchants triggered since yesterday — 3 with risk scores above 80.\n\nWant me to open the Barometer Report?",
-        openPanel: "detection-queue",
-        suggestions: ["Yes, open it"],
-      },
-    ],
-  },
-  {
-    trigger: "Yes, open it",
-    turns: [
-      { role: "user", content: "Yes, open it" },
-      {
-        role: "assistant",
-        content: "Opening Barometer Report for High Velocity Watch. 3 merchants are flagged above risk score 80. Coastal Merchant Solutions is the highest — score 89, triggered on 4 rules.",
-        openPanel: "barometer-report",
-        suggestions: ["Pull up Coastal's risk report alongside"],
-      },
-    ],
-  },
-  {
-    trigger: "Pull up Coastal's risk report alongside",
-    turns: [
-      { role: "user", content: "Pull up Coastal's risk report alongside" },
-      {
-        role: "assistant",
-        content: "Score climbed from 44 to 89 in 52 days. Settlement account and address both changed within the last 10 days.",
-        openPanel: "coastal-risk",
-        suggestions: ["Escalate this one and open a risk case."],
-      },
-    ],
-  },
-  {
-    trigger: "Escalate this one and open a risk case.",
-    turns: [
-      { role: "user", content: "Escalate this one and open a risk case." },
-      {
-        role: "assistant",
-        content: "Done — case opened for Coastal Merchant Solutions (Case #RR-7291). Escalated to Risk Lead. Merchant and ISO notified. Funding hold placed pending senior review.",
-        closeAllPanels: true,
-      },
-    ],
-  },
-]
-
 export const CONCEPT_NO_RESET_PROMPTS = new Set([
   CONCEPT_FLOW2_FOLLOWUP,
   CONCEPT_FLOW6_KEY,
@@ -134,10 +62,11 @@ export const CONCEPT_NO_RESET_PROMPTS = new Set([
   CONCEPT_FLOW11_APPROVE,
   "Now show me the Processor X cases",
   "Yes, send the template and mark them",
-  // Detect flow: all steps except the welcome and flow12 prompt reset the session
-  ...DETECT_FLOW
-    .filter(({ trigger }) => trigger !== CONCEPT_DETECT_WELCOME_KEY && trigger !== CONCEPT_FLOW12_PROMPT)
-    .map(({ trigger }) => trigger),
+  // Detection Queue steps: continue the session rather than resetting it
+  CONCEPT_FLOW12_CONTINUE_KEY,
+  CONCEPT_DQ_OPEN_KEY,
+  CONCEPT_DQ_COASTAL_KEY,
+  CONCEPT_DQ_ESCALATE_KEY,
 ])
 
 // ─── Sheet action data (populated at module load) ─────────────────────────────
@@ -173,7 +102,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       role: "assistant",
       content: "Done — phone number updated to (415) 867-5309. If you ever need to verify your account, that's the number we'll use going forward.",
       sheetAction: FLOW1_SHEET,
-      suggestions: CONCEPT_ALL_PROMPTS,
+      suggestions: ["Change my deposit bank account", "Pull up the case for Oak Street Coffee"],
     },
   ],
 
@@ -184,7 +113,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   ],
   [CONCEPT_FLOW2_FOLLOWUP]: [
     { role: "user", content: CONCEPT_FLOW2_FOLLOWUP },
-    { role: "assistant", content: "Got it — filtered to your top 5 by volume.", suggestions: CONCEPT_ALL_PROMPTS },
+    { role: "assistant", content: "Got it — filtered to your top 5 by volume.", suggestions: ["Show me merchants with decline rates above 15% last week", CONCEPT_FLOW2_PROMPT] },
   ],
 
   // ── Flow 3: Panel-as-form ─────────────────────────────────────────────────
@@ -242,7 +171,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       role: "assistant",
       content: "Done — DBA name updated to \"Walker Bistro\". Receipts and statements will reflect the new name starting with your next batch.",
       sheetAction: FLOW5_SHEET,
-      suggestions: CONCEPT_ALL_PROMPTS,
+      suggestions: ["Pull up the case for Oak Street Coffee", "Show me merchants with decline rates above 15% last week"],
     },
   ],
 
@@ -256,7 +185,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       role: "assistant",
       content: "Done — DBA name updated to \"Walker Bistro\". Receipts will reflect this starting with your next batch.",
       sheetAction: FLOW5_SHEET,
-      suggestions: CONCEPT_ALL_PROMPTS,
+      suggestions: ["Pull up the case for Oak Street Coffee", "Show me merchants with decline rates above 15% last week"],
     },
   ],
 
@@ -269,7 +198,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     { role: "user", content: "Draft a response to the chargeback citing the signed receipt and the customer's prior history" },
     { role: "assistant", content: "Draft ready. References the receipt, the six prior signed transactions, and the no-refund policy printed on the receipt itself. Review and submit?", openPanel: "dispute-draft" },
     { role: "user", content: "Submit" },
-    { role: "assistant", content: "Submitted to the processor. Case status updated to Dispute Filed. Next deadline: processor response due May 28.", suggestions: CONCEPT_ALL_PROMPTS },
+    { role: "assistant", content: "Submitted to the processor. Case status updated to Dispute Filed. Next deadline: processor response due May 28.", suggestions: ["Show me everything unusual about Bayside Imports in the last 90 days", "Show me my work queue"] },
   ],
 
   // ── Flow 8: Bulk Action ───────────────────────────────────────────────────
@@ -287,7 +216,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   ],
   [CONCEPT_FLOW8_FINAL]: [
     { role: "user", content: CONCEPT_FLOW8_FINAL },
-    { role: "assistant", content: "Sent to 22 merchants. Routed to their respective ISOs based on account assignments.", suggestions: CONCEPT_ALL_PROMPTS },
+    { role: "assistant", content: "Sent to 22 merchants. Routed to their respective ISOs based on account assignments.", suggestions: ["Show me everything unusual about Bayside Imports in the last 90 days", "Show me my work queue"] },
   ],
 
   // ── Flow 10: Risk Investigation ───────────────────────────────────────────
@@ -305,7 +234,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   ],
   "Yes, and put a temporary funding hold on the account": [
     { role: "user", content: "Yes, and put a temporary funding hold on the account" },
-    { role: "assistant", content: "Hold placed, case escalated to Risk Lead, merchant and ISO notified. Funding hold active as of 2:47pm. Audit entry logged.", suggestions: CONCEPT_ALL_PROMPTS },
+    { role: "assistant", content: "Hold placed, case escalated to Risk Lead, merchant and ISO notified. Funding hold active as of 2:47pm. Audit entry logged.", suggestions: ["Show me my work queue", CONCEPT_FLOW12_PROMPT] },
   ],
 
   // ── Flow 11: Work Queue ───────────────────────────────────────────────────
@@ -326,7 +255,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   ],
   "Yes, send the template and mark them": [
     { role: "user", content: "Yes, send the template and mark them" },
-    { role: "assistant", content: "Done — 8 merchants notified, cases marked Waiting on Vendor. Auto-close will trigger when Processor X confirms resolution.", suggestions: CONCEPT_ALL_PROMPTS },
+    { role: "assistant", content: "Done — 8 merchants notified, cases marked Waiting on Vendor. Auto-close will trigger when Processor X confirms resolution.", suggestions: [CONCEPT_FLOW12_PROMPT, "Show me merchants with decline rates above 15% last week"] },
   ],
 
   // ── Welcome: Greeting with AI Triage Summary ──────────────────────────────
@@ -339,7 +268,63 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   ],
 
   // ── Flow 11 + 12: Detection Queue (step-driven) ───────────────────────────
-  ...Object.fromEntries(DETECT_FLOW.map(({ trigger, turns }) => [trigger, turns])),
+
+  // Ask button (mode=concept-embed&flow=11) → greeting + triage widget
+  [CONCEPT_DETECT_WELCOME_KEY]: [{
+    role: "assistant",
+    content: "Good morning, Teresa. A few things came in while you were away — I've gone through everything and sorted it for you. Here's where your queue stands:",
+    widget: "ai-triage-summary",
+    widgetDelay: 1500,
+    pauseAfter: 2500,
+  }],
+
+  // Widget "Detection Queue" button → DQ assignment (no preceding user message)
+  [CONCEPT_FLOW12_CONTINUE_KEY]: [{
+    role: "assistant",
+    content: "Your Detection Queue has an active assignment: **High Velocity Watch**. 14 merchants triggered since yesterday — 3 with risk scores above 80.\n\nWant me to open the Barometer Report?",
+    openPanel: "detection-queue",
+    suggestions: [CONCEPT_DQ_OPEN_KEY],
+  }],
+
+  // ConceptWelcomeView Flow 12 button → same DQ conversation, shows user message first
+  [CONCEPT_FLOW12_PROMPT]: [
+    { role: "user", content: CONCEPT_FLOW12_PROMPT },
+    {
+      role: "assistant",
+      content: "Morning. Your Detection Queue has an active assignment: **High Velocity Watch**. 14 merchants triggered since yesterday — 3 with risk scores above 80.\n\nWant me to open the Barometer Report?",
+      openPanel: "detection-queue",
+      suggestions: [CONCEPT_DQ_OPEN_KEY],
+    },
+  ],
+
+  [CONCEPT_DQ_OPEN_KEY]: [
+    { role: "user", content: CONCEPT_DQ_OPEN_KEY },
+    {
+      role: "assistant",
+      content: "Opening Barometer Report for High Velocity Watch. 3 merchants are flagged above risk score 80. Coastal Merchant Solutions is the highest — score 89, triggered on 4 rules.",
+      openPanel: "barometer-report",
+      suggestions: [CONCEPT_DQ_COASTAL_KEY],
+    },
+  ],
+
+  [CONCEPT_DQ_COASTAL_KEY]: [
+    { role: "user", content: CONCEPT_DQ_COASTAL_KEY },
+    {
+      role: "assistant",
+      content: "Score climbed from 44 to 89 in 52 days. Settlement account and address both changed within the last 10 days.",
+      openPanel: "coastal-risk",
+      suggestions: [CONCEPT_DQ_ESCALATE_KEY],
+    },
+  ],
+
+  [CONCEPT_DQ_ESCALATE_KEY]: [
+    { role: "user", content: CONCEPT_DQ_ESCALATE_KEY },
+    {
+      role: "assistant",
+      content: "Done — case opened for Coastal Merchant Solutions (Case #RR-7291). Escalated to Risk Lead. Merchant and ISO notified. Funding hold placed pending senior review.",
+      closeAllPanels: true,
+    },
+  ],
 
   // ── Flow 6: Proactive ─────────────────────────────────────────────────────
   [CONCEPT_FLOW6_KEY]: [
@@ -359,7 +344,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     {
       role: "assistant",
       content: "Review request submitted for Batch #4471. You'll hear back within 1 business day. The rest of the batch will settle on its normal schedule.",
-      suggestions: CONCEPT_ALL_PROMPTS,
+      suggestions: ["Show me my work queue", CONCEPT_FLOW12_PROMPT],
     },
   ],
 }

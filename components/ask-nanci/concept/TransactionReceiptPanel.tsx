@@ -1,31 +1,22 @@
 "use client"
 
-import { X, ShieldCheck } from "lucide-react"
+import { ShieldCheck } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { TXN_FIELDS } from "@/lib/ask-nanci/data/panels/transaction-receipt"
-import { PanelShell } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
 
 export function TransactionReceiptPanel() {
   const { closePanel } = useAskNanci()
 
   return (
     <PanelShell>
-      {/* Header */}
-      <div className="flex shrink-0 items-center justify-between border-b bg-muted/30 px-4 py-2.5">
-        <div className="flex items-center gap-2.5">
-          <div className="size-2 rounded-full bg-blue-400 shrink-0" />
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-foreground">Transaction &amp; Receipt</span>
-              <span className="rounded bg-blue-100 px-1.5 py-px text-[9px] font-bold tracking-wide text-blue-700 dark:bg-blue-900/40 dark:text-blue-400">EVIDENCE</span>
-            </div>
-            <p className="text-[10px] text-muted-foreground">Case #CS-8821 · May 14, 2026</p>
-          </div>
-        </div>
-        <button onClick={() => closePanel("transaction-receipt")} className="ml-2 shrink-0 rounded p-1 text-muted-foreground hover:bg-muted" aria-label="Close">
-          <X className="size-3.5" />
-        </button>
-      </div>
+      <PanelHeader
+        title="Transaction & Receipt"
+        dot="bg-blue-400"
+        badge={{ label: "EVIDENCE", className: "rounded bg-blue-100 px-1.5 py-px text-[9px] font-bold tracking-wide text-blue-700 dark:bg-blue-900/40 dark:text-blue-400" }}
+        subtitle="Case #CS-8821 · May 14, 2026"
+        onClose={() => closePanel("transaction-receipt")}
+      />
 
       <div className="flex flex-1 overflow-hidden divide-x">
         {/* Transaction detail */}

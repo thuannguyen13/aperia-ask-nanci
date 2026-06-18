@@ -4,7 +4,7 @@ import { X } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { BATCH_TRANSACTIONS } from "@/lib/ask-nanci/data/panels/batch-detail"
-import { Callout, formatCurrency } from "@/components/ask-nanci/shared"
+import { SidebarPanelShell, Callout, formatCurrency } from "@/components/ask-nanci/shared"
 
 export function BatchDetailPanel() {
   const { batchPanelOpen, setBatchPanelOpen } = useAskNanci()
@@ -12,12 +12,7 @@ export function BatchDetailPanel() {
   const total = BATCH_TRANSACTIONS.reduce((sum, t) => sum + t.amount, 0)
 
   return (
-    <div
-      className={cn(
-        "relative hidden h-full shrink-0 flex-col overflow-hidden rounded-[18px] border bg-background transition-[width,opacity] duration-500 ease-in-out md:flex",
-        batchPanelOpen ? "w-[480px] opacity-100 mr-1" : "w-0 opacity-0 border-0 pointer-events-none",
-      )}
-    >
+    <SidebarPanelShell isOpen={batchPanelOpen} width="480px" side="right">
       <div className="flex shrink-0 items-center justify-between px-4 py-3 border-b">
         <div>
           <h2 className="text-base font-semibold text-foreground">Batch #4471</h2>
@@ -77,6 +72,6 @@ export function BatchDetailPanel() {
           </tbody>
         </table>
       </div>
-    </div>
+    </SidebarPanelShell>
   )
 }

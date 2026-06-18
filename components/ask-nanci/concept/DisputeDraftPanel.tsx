@@ -1,31 +1,22 @@
 "use client"
 
-import { X, Send } from "lucide-react"
+import { Send } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { EVIDENCE } from "@/lib/ask-nanci/data/panels/dispute-draft"
-import { PanelShell } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
 
 export function DisputeDraftPanel() {
   const { closePanel, submitDisputeDraft } = useAskNanci()
 
   return (
     <PanelShell>
-      {/* Header */}
-      <div className="flex shrink-0 items-center justify-between border-b bg-muted/30 px-4 py-2.5">
-        <div className="flex items-center gap-2.5">
-          <div className="size-2 rounded-full bg-green-400 shrink-0" />
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-foreground">Dispute Response</span>
-              <span className="rounded bg-green-100 px-1.5 py-px text-[9px] font-bold tracking-wide text-green-700 dark:bg-green-900/40 dark:text-green-400">DRAFT</span>
-            </div>
-            <p className="text-[10px] text-muted-foreground">Case #CS-8821 · 4 evidence items</p>
-          </div>
-        </div>
-        <button onClick={() => closePanel("dispute-draft")} className="ml-2 shrink-0 rounded p-1 text-muted-foreground hover:bg-muted" aria-label="Close">
-          <X className="size-3.5" />
-        </button>
-      </div>
+      <PanelHeader
+        title="Dispute Response"
+        dot="bg-green-400"
+        badge={{ label: "DRAFT", className: "rounded bg-green-100 px-1.5 py-px text-[9px] font-bold tracking-wide text-green-700 dark:bg-green-900/40 dark:text-green-400" }}
+        subtitle="Case #CS-8821 · 4 evidence items"
+        onClose={() => closePanel("dispute-draft")}
+      />
 
       <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
         {/* Letter header */}

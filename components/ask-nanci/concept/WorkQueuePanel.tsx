@@ -1,47 +1,29 @@
 "use client"
 
-import { X, CheckCircle2, AlertCircle } from "lucide-react"
+import { CheckCircle2, AlertCircle } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { QUICK_WINS, OUTAGE_MERCHANTS } from "@/lib/ask-nanci/data/panels/work-queue"
-import { PanelShell, Callout } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, Callout } from "@/components/ask-nanci/shared"
+
+const PHASE_CLS = {
+  "quick-wins": { dot: "bg-green-400", badge: "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400", label: "QUICK WINS", count: 12, subtitle: " document approvals" },
+  outage:       { dot: "bg-amber-400", badge: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400", label: "OUTAGE",      count: 8,  subtitle: " merchants affected"  },
+} as const
 
 export function WorkQueuePanel() {
   const { closePanel, closeAllNewPanels, workQueuePhase } = useAskNanci()
-
-  const totalCount = workQueuePhase === "quick-wins" ? 12 : 8
-  const phaseLabel = workQueuePhase === "quick-wins" ? "QUICK WINS" : "OUTAGE"
-  const phaseDotColor = workQueuePhase === "quick-wins" ? "bg-green-400" : "bg-amber-400"
-  const badgeCls = workQueuePhase === "quick-wins"
-    ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400"
-    : "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400"
+  const phase = PHASE_CLS[workQueuePhase as keyof typeof PHASE_CLS] ?? PHASE_CLS["outage"]
 
   return (
     <PanelShell>
-      {/* Header */}
-      <div className="flex shrink-0 items-center justify-between border-b bg-muted/30 px-4 py-2.5">
-        <div className="flex items-center gap-2.5">
-          <div className={cn("size-2 rounded-full shrink-0", phaseDotColor)} />
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-foreground">Work Queue</span>
-              <span className={cn("rounded px-1.5 py-px text-[9px] font-bold tracking-wide", badgeCls)}>{phaseLabel}</span>
-            </div>
-            <p className="text-[10px] text-muted-foreground">
-              <span className="font-mono font-semibold text-foreground">{totalCount}</span>
-              {workQueuePhase === "quick-wins" && " document approvals"}
-              {workQueuePhase === "outage" && " merchants affected"}
-            </p>
-          </div>
-        </div>
-        <button
-          onClick={() => { closePanel("work-queue"); closeAllNewPanels() }}
-          className="ml-2 shrink-0 rounded p-1 text-muted-foreground hover:bg-muted"
-          aria-label="Close"
-        >
-          <X className="size-3.5" />
-        </button>
-      </div>
+      <PanelHeader
+        title="Work Queue"
+        dot={phase.dot}
+        badge={{ label: phase.label, className: cn("rounded px-1.5 py-px text-[9px] font-bold tracking-wide", phase.badge) }}
+        subtitle={<><span className="font-mono font-semibold text-foreground">{phase.count}</span>{phase.subtitle}</>}
+        onClose={() => { closePanel("work-queue"); closeAllNewPanels() }}
+      />
 
       {/* Quick-wins phase */}
       {workQueuePhase === "quick-wins" && (

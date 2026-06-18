@@ -4,6 +4,7 @@ import { useEffect, useState, type ReactNode } from "react"
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
+import type { PanelId } from "@/lib/ask-nanci/types"
 
 function useIsSmallScreen() {
   const [isSmall, setIsSmall] = useState(false)
@@ -28,13 +29,6 @@ import { WorkQueuePanel } from "./WorkQueuePanel"
 import { DetectionQueuePanel } from "./DetectionQueuePanel"
 import { BarometerReportPanel } from "./BarometerReportPanel"
 import { CoastalRiskPanel } from "./CoastalRiskPanel"
-
-type PanelId =
-  | "case" | "transaction-receipt" | "dispute-draft"
-  | "decline-report" | "email-draft"
-  | "risk-flags" | "volume-settlement" | "change-log"
-  | "work-queue"
-  | "detection-queue" | "barometer-report" | "coastal-risk"
 
 type Slots = { A: PanelId | null; B: PanelId | null; C: PanelId | null; D: PanelId | null }
 

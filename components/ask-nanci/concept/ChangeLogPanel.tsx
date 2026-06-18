@@ -1,32 +1,23 @@
 "use client"
 
-import { X, AlertTriangle } from "lucide-react"
+import { AlertTriangle } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { CHANGES } from "@/lib/ask-nanci/data/panels/change-log"
-import { PanelShell } from "@/components/ask-nanci/shared"
+import { CHANGES, CHANGE_SEVERITY_CLS } from "@/lib/ask-nanci/data/panels/change-log"
+import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
 
 export function ChangeLogPanel() {
   const { closePanel } = useAskNanci()
 
   return (
     <PanelShell>
-      {/* Header */}
-      <div className="flex shrink-0 items-center justify-between border-b bg-muted/30 px-4 py-2.5">
-        <div className="flex items-center gap-2.5">
-          <div className="size-2 rounded-full bg-violet-400 shrink-0" />
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-foreground">Account Change Log</span>
-              <span className="rounded bg-violet-100 px-1.5 py-px text-[9px] font-bold tracking-wide text-violet-700 dark:bg-violet-900/40 dark:text-violet-400">90 DAYS</span>
-            </div>
-            <p className="text-[10px] text-muted-foreground">Bayside Imports</p>
-          </div>
-        </div>
-        <button onClick={() => closePanel("change-log")} className="ml-2 shrink-0 rounded p-1 text-muted-foreground hover:bg-muted" aria-label="Close">
-          <X className="size-3.5" />
-        </button>
-      </div>
+      <PanelHeader
+        title="Account Change Log"
+        dot="bg-violet-400"
+        badge={{ label: "90 DAYS", className: "rounded bg-violet-100 px-1.5 py-px text-[9px] font-bold tracking-wide text-violet-700 dark:bg-violet-900/40 dark:text-violet-400" }}
+        subtitle="Bayside Imports"
+        onClose={() => closePanel("change-log")}
+      />
 
       {/* Alert strip */}
       <div className="flex shrink-0 items-center gap-2 border-b bg-amber-50/60 dark:bg-amber-950/10 px-4 py-2">
@@ -49,16 +40,9 @@ export function ChangeLogPanel() {
                 {/* Icon dot */}
                 <div className={cn(
                   "relative z-10 flex size-[18px] shrink-0 items-center justify-center rounded-full border-2",
-                  severity === "high"
-                    ? "border-red-300 bg-red-50 dark:border-red-700 dark:bg-red-950/40"
-                    : severity === "internal"
-                      ? "border-amber-300 bg-amber-50 dark:border-amber-700 dark:bg-amber-950/40"
-                      : "border-border bg-background",
+                  CHANGE_SEVERITY_CLS[severity].dotContainer,
                 )}>
-                  <Icon className={cn(
-                    "size-2.5",
-                    severity === "high" ? "text-red-500" : severity === "internal" ? "text-amber-600" : "text-muted-foreground",
-                  )} />
+                  <Icon className={cn("size-2.5", CHANGE_SEVERITY_CLS[severity].dotIcon)} />
                 </div>
 
                 {/* Content */}

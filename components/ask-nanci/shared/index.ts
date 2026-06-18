@@ -1,5 +1,6 @@
 export { PanelShell } from "./PanelShell"
 export { PanelHeader } from "./PanelHeader"
+export { SidebarPanelShell } from "./SidebarPanelShell"
 export { ScoreBadge } from "./ScoreBadge"
 export { Callout } from "./Callout"
 export { formatCurrency, formatPercent } from "./format"

@@ -24,6 +24,13 @@ export interface ScriptedTurn {
   map?: MapWidget
 }
 
+export type PanelId =
+  | "case" | "transaction-receipt" | "dispute-draft"
+  | "decline-report" | "email-draft"
+  | "risk-flags" | "volume-settlement" | "change-log"
+  | "work-queue"
+  | "detection-queue" | "barometer-report" | "coastal-risk"
+
 export interface ConceptScriptedTurn extends ScriptedTurn {
   sheetAction?: SheetActionData
   suggestions?: string[]
@@ -32,7 +39,7 @@ export interface ConceptScriptedTurn extends ScriptedTurn {
   advanceStepUp?: true
   openBatchPanel?: true
   openReportPanel?: true
-  openPanel?: string
+  openPanel?: PanelId
   filterDeclineReport?: true
   advanceWorkQueue?: "quick-wins" | "outage"
   closeAllPanels?: true

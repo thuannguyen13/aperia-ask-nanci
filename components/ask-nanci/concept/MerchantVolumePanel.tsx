@@ -6,9 +6,9 @@ import {
   Button, Badge, ScrollArea,
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "aperia-ds5"
-import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { MERCHANT_VOLUME_DATA } from "@/lib/ask-nanci/concept-config"
+import { SidebarPanelShell } from "@/components/ask-nanci/shared"
 
 type SortKey = "volume" | "txnCount" | "avgTicket"
 
@@ -27,13 +27,7 @@ export function MerchantVolumePanel() {
     .slice(0, reportTopN)
 
   return (
-    <div className={cn(
-      "relative hidden h-full shrink-0 flex-col overflow-hidden rounded-[18px] border bg-background",
-      "transition-[width,opacity,margin] duration-500 ease-in-out md:flex",
-      reportPanelOpen
-        ? "w-[55%] opacity-100 ml-1"
-        : "w-0 opacity-0 border-0 pointer-events-none",
-    )}>
+    <SidebarPanelShell isOpen={reportPanelOpen} width="55%" side="left">
       {/* Header */}
       <div className="flex shrink-0 items-center justify-between gap-3 border-b px-4 py-3">
         <div className="min-w-0">
@@ -102,6 +96,6 @@ export function MerchantVolumePanel() {
           </TableBody>
         </Table>
       </ScrollArea>
-    </div>
+    </SidebarPanelShell>
   )
 }

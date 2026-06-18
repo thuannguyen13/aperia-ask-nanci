@@ -1,32 +1,22 @@
 "use client"
 
-import { X } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { FLAT_BARS, MAX } from "@/lib/ask-nanci/data/panels/volume-settlement"
-import { PanelShell } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
 
 export function VolumeSettlementPanel() {
   const { closePanel } = useAskNanci()
 
   return (
     <PanelShell>
-      {/* Header */}
-      <div className="flex shrink-0 items-center justify-between border-b bg-muted/30 px-4 py-2.5">
-        <div className="flex items-center gap-2.5">
-          <div className="size-2 rounded-full bg-orange-400 shrink-0" />
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-foreground">Volume &amp; Settlement</span>
-              <span className="rounded bg-orange-100 px-1.5 py-px text-[9px] font-bold tracking-wide text-orange-700 dark:bg-orange-900/40 dark:text-orange-400">90 DAYS</span>
-            </div>
-            <p className="text-[10px] text-muted-foreground">Bayside Imports</p>
-          </div>
-        </div>
-        <button onClick={() => closePanel("volume-settlement")} className="ml-2 shrink-0 rounded p-1 text-muted-foreground hover:bg-muted" aria-label="Close">
-          <X className="size-3.5" />
-        </button>
-      </div>
+      <PanelHeader
+        title="Volume & Settlement"
+        dot="bg-orange-400"
+        badge={{ label: "90 DAYS", className: "rounded bg-orange-100 px-1.5 py-px text-[9px] font-bold tracking-wide text-orange-700 dark:bg-orange-900/40 dark:text-orange-400" }}
+        subtitle="Bayside Imports"
+        onClose={() => closePanel("volume-settlement")}
+      />
 
       <div className="flex flex-1 overflow-hidden divide-x">
         {/* Volume chart */}

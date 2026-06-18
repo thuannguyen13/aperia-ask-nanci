@@ -1,10 +1,10 @@
 "use client"
 
-import { X, Send } from "lucide-react"
+import { Send } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { CONCEPT_FLOW8_FINAL } from "@/lib/ask-nanci/concept-config"
 import { PREVIEWS } from "@/lib/ask-nanci/data/panels/email-draft"
-import { PanelShell } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
 
 function Var({ children }: { children: string }) {
   return (
@@ -19,22 +19,13 @@ export function EmailDraftPanel() {
 
   return (
     <PanelShell>
-      {/* Header */}
-      <div className="flex shrink-0 items-center justify-between border-b bg-muted/30 px-4 py-2.5">
-        <div className="flex items-center gap-2.5">
-          <div className="size-2 rounded-full bg-amber-400 shrink-0" />
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-foreground">Outreach Draft</span>
-              <span className="rounded bg-amber-100 px-1.5 py-px font-mono text-[9px] font-bold text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">22 RECIPIENTS</span>
-            </div>
-            <p className="text-[10px] text-muted-foreground">High-decline merchants · Routed to ISO</p>
-          </div>
-        </div>
-        <button onClick={() => closePanel("email-draft")} className="ml-2 shrink-0 rounded p-1 text-muted-foreground hover:bg-muted" aria-label="Close">
-          <X className="size-3.5" />
-        </button>
-      </div>
+      <PanelHeader
+        title="Outreach Draft"
+        dot="bg-amber-400"
+        badge={{ label: "22 RECIPIENTS", className: "rounded bg-amber-100 px-1.5 py-px font-mono text-[9px] font-bold text-amber-700 dark:bg-amber-900/40 dark:text-amber-400" }}
+        subtitle="High-decline merchants · Routed to ISO"
+        onClose={() => closePanel("email-draft")}
+      />
 
       <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
         {/* Template */}

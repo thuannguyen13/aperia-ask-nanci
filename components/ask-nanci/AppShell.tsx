@@ -24,8 +24,8 @@ import { MobileSidebarToggle } from "./MobileSidebarToggle"
 const DQ_PANELS = new Set(["detection-queue", "barometer-report", "coastal-risk"])
 
 function ReplayButton() {
-  const { replayFlow, chatState } = useAskNanci()
-  if (!replayFlow || chatState !== "idle") return null
+  const { replayFlow, chatState, messages } = useAskNanci()
+  if (!replayFlow || chatState !== "idle" || messages.length > 0) return null
   return (
     <Button variant="secondary" size="xs" onClick={replayFlow} className="absolute right-3 gap-1.5">
       <RotateCcw className="size-3" />

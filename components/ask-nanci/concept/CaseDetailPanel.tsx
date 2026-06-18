@@ -1,31 +1,21 @@
 "use client"
 
-import { X } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { TIMELINE } from "@/lib/ask-nanci/data/panels/case-detail"
-import { PanelShell } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
 
 export function CaseDetailPanel() {
   const { closePanel } = useAskNanci()
 
   return (
     <PanelShell>
-      {/* Header */}
-      <div className="flex shrink-0 items-center justify-between border-b bg-muted/30 px-4 py-2.5">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <div className="size-2 rounded-full bg-amber-400 shrink-0" />
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-xs font-bold text-foreground">CS-8821</span>
-              <span className="rounded bg-amber-100 px-1.5 py-px text-[9px] font-bold tracking-wide text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">IN REVIEW</span>
-            </div>
-            <p className="text-[10px] text-muted-foreground truncate">Oak Street Coffee · Chargeback</p>
-          </div>
-        </div>
-        <button onClick={() => closePanel("case")} className="ml-2 shrink-0 rounded p-1 text-muted-foreground hover:bg-muted" aria-label="Close">
-          <X className="size-3.5" />
-        </button>
-      </div>
+      <PanelHeader
+        title="CS-8821"
+        dot="bg-amber-400"
+        badge={{ label: "IN REVIEW", className: "rounded bg-amber-100 px-1.5 py-px text-[9px] font-bold tracking-wide text-amber-700 dark:bg-amber-900/40 dark:text-amber-400" }}
+        subtitle="Oak Street Coffee · Chargeback"
+        onClose={() => closePanel("case")}
+      />
 
       <div className="flex-1 overflow-auto">
         {/* Summary grid */}

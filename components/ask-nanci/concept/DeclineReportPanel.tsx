@@ -1,10 +1,10 @@
 "use client"
 
-import { X, Download } from "lucide-react"
+import { Download } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { ALL_MERCHANTS, FILTERED } from "@/lib/ask-nanci/data/panels/decline-report"
-import { PanelShell } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
 
 function rateColor(r: number) {
   if (r >= 25) return "text-red-600 dark:text-red-400"
@@ -25,27 +25,20 @@ export function DeclineReportPanel() {
 
   return (
     <PanelShell>
-      {/* Header */}
-      <div className="flex shrink-0 items-center justify-between border-b bg-muted/30 px-4 py-2.5">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <div className="size-2 rounded-full bg-red-400 shrink-0" />
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold text-foreground">High-Decline Merchants</span>
-              <span className="rounded bg-red-100 px-1.5 py-px font-mono text-[9px] font-bold text-red-700 dark:bg-red-900/40 dark:text-red-400">{rows.length}</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <p className="text-[10px] text-muted-foreground">Last week · Above 15%</p>
-              {declineReportFiltered && (
-                <span className="rounded bg-amber-100 px-1.5 py-px text-[9px] font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">Not contacted 30+ days</span>
-              )}
-            </div>
-          </div>
-        </div>
-        <button onClick={() => closePanel("decline-report")} className="ml-2 shrink-0 rounded p-1 text-muted-foreground hover:bg-muted" aria-label="Close">
-          <X className="size-3.5" />
-        </button>
-      </div>
+      <PanelHeader
+        title="High-Decline Merchants"
+        dot="bg-red-400"
+        badge={{ label: rows.length, className: "rounded bg-red-100 px-1.5 py-px font-mono text-[9px] font-bold text-red-700 dark:bg-red-900/40 dark:text-red-400" }}
+        subtitle={
+          <span className="flex items-center gap-1.5">
+            Last week · Above 15%
+            {declineReportFiltered && (
+              <span className="rounded bg-amber-100 px-1.5 py-px text-[9px] font-semibold text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">Not contacted 30+ days</span>
+            )}
+          </span>
+        }
+        onClose={() => closePanel("decline-report")}
+      />
 
       {/* Table */}
       <div className="flex-1 overflow-auto">

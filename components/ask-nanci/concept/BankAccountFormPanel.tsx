@@ -3,8 +3,8 @@
 import { useState } from "react"
 import { X, CheckCircle2 } from "lucide-react"
 import { Button, Input, Label, Separator } from "aperia-ds5"
-import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
+import { SidebarPanelShell } from "@/components/ask-nanci/shared"
 
 export function BankAccountFormPanel() {
   const { formPanelOpen, setFormPanelOpen, submitFormPanel } = useAskNanci()
@@ -19,13 +19,7 @@ export function BankAccountFormPanel() {
   }
 
   return (
-    <div className={cn(
-      "relative hidden h-full shrink-0 flex-col overflow-hidden rounded-[18px] border bg-background",
-      "transition-[width,opacity,margin] duration-500 ease-in-out md:flex",
-      formPanelOpen
-        ? "w-[420px] opacity-100 ml-1"
-        : "w-0 opacity-0 border-0 pointer-events-none",
-    )}>
+    <SidebarPanelShell isOpen={formPanelOpen} width="420px" side="left">
       {/* Header */}
       <div className="flex shrink-0 items-center justify-between gap-3 border-b px-4 py-3">
         <div className="min-w-0">
@@ -108,6 +102,6 @@ export function BankAccountFormPanel() {
           <Button className="w-full" onClick={handleSubmit}>Confirm &amp; Submit</Button>
         </div>
       )}
-    </div>
+    </SidebarPanelShell>
   )
 }
