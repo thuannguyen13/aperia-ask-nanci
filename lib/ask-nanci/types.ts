@@ -31,14 +31,14 @@ export type PanelId =
   | "work-queue"
   | "detection-queue" | "barometer-report" | "coastal-risk"
   | "pending-deposits" | "flagged-transaction" | "fee-summary" | "chargeback-status"
-  | "sales-snapshot" | "account-change"
+  | "sales-snapshot" | "sales-drilldown" | "account-change"
 
 // Panel ids that flow through the dynamic panel stack (usePanelStack) instead
 // of the legacy hardcoded mapPanelsToSlots switch in ConceptPanelArea.
 export type DynamicPanelId =
   | "pending-deposits" | "flagged-transaction"
   | "fee-summary" | "chargeback-status"
-  | "sales-snapshot" | "account-change"
+  | "sales-snapshot" | "sales-drilldown" | "account-change"
 
 export interface ConceptScriptedTurn extends ScriptedTurn {
   sheetAction?: SheetActionData
@@ -58,7 +58,6 @@ export interface ConceptScriptedTurn extends ScriptedTurn {
   widgetDelay?: number
   pauseAfter?: number
   highlightFeeVolumeRow?: true
-  expandSalesDrilldown?: true
   advanceAccountChange?: true
   depositNotifyRequested?: true
 }
