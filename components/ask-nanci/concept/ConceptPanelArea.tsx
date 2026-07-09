@@ -33,6 +33,7 @@ import { PendingDepositsPanel } from "./PendingDepositsPanel"
 import { FeeSummaryPanel } from "./FeeSummaryPanel"
 import { ChargebackStatusPanel } from "./ChargebackStatusPanel"
 import { SalesSnapshotPanel } from "./SalesSnapshotPanel"
+import { SalesDrilldownPanel } from "./SalesDrilldownPanel"
 import { AccountChangePanel } from "./AccountChangePanel"
 import { FlaggedTransactionPanel } from "./FlaggedTransactionPanel"
 
@@ -117,6 +118,7 @@ function PanelContent({ id }: { id: PanelId }) {
     case "fee-summary":         return <FeeSummaryPanel />
     case "chargeback-status":   return <ChargebackStatusPanel />
     case "sales-snapshot":      return <SalesSnapshotPanel />
+    case "sales-drilldown":     return <SalesDrilldownPanel />
     case "account-change":      return <AccountChangePanel />
   }
 }
