@@ -96,7 +96,6 @@ interface AskNanciCtx {
   declineReportFiltered: boolean
   workQueuePhase: "triage" | "quick-wins" | "outage"
   feeVolumeRowHighlighted: boolean
-  salesDrilldownOpen: boolean
   accountChangeStep: 1 | 2 | 3
   depositNotifyRequested: boolean
   requestDepositNotify: () => void
@@ -151,7 +150,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [declineReportFiltered, setDeclineReportFiltered] = useState(false)
   const [workQueuePhase, setWorkQueuePhase] = useState<"triage" | "quick-wins" | "outage">("triage")
   const [feeVolumeRowHighlighted, setFeeVolumeRowHighlighted] = useState(false)
-  const [salesDrilldownOpen, setSalesDrilldownOpen] = useState(false)
   const [accountChangeStep, setAccountChangeStep] = useState<1 | 2 | 3>(1)
   const [depositNotifyRequested, setDepositNotifyRequested] = useState(false)
   const [proactiveNotificationActive, setProactiveNotificationActive] = useState(false)
@@ -338,7 +336,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     if (turn.filterDeclineReport) { setDeclineReportFiltered(true) }
     if (turn.advanceWorkQueue) { setWorkQueuePhase(turn.advanceWorkQueue) }
     if (turn.highlightFeeVolumeRow) { setFeeVolumeRowHighlighted(true) }
-    if (turn.expandSalesDrilldown) { setSalesDrilldownOpen(true) }
     if (turn.advanceAccountChange) { setAccountChangeStep((s) => Math.min(3, s + 1) as 1 | 2 | 3) }
     if (turn.depositNotifyRequested) { setDepositNotifyRequested(true) }
   }, [])
@@ -473,7 +470,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setDeclineReportFiltered(false)
     setWorkQueuePhase("triage")
     setFeeVolumeRowHighlighted(false)
-    setSalesDrilldownOpen(false)
     setAccountChangeStep(1)
     setDepositNotifyRequested(false)
   }, [])
@@ -528,7 +524,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setDeclineReportFiltered(false)
     setWorkQueuePhase("triage")
     setFeeVolumeRowHighlighted(false)
-    setSalesDrilldownOpen(false)
     setAccountChangeStep(1)
     setDepositNotifyRequested(false)
   }, [])
@@ -551,7 +546,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setDeclineReportFiltered(false)
     setWorkQueuePhase("triage")
     setFeeVolumeRowHighlighted(false)
-    setSalesDrilldownOpen(false)
     setAccountChangeStep(1)
     setDepositNotifyRequested(false)
     setProactiveNotificationActive(false)
@@ -613,7 +607,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       openPanels, closingPanels, closePanel, closeAllNewPanels, submitDisputeDraft,
       dynamicPanels, closeDynamicPanel,
       declineReportFiltered, workQueuePhase,
-      feeVolumeRowHighlighted, salesDrilldownOpen, accountChangeStep, depositNotifyRequested, requestDepositNotify,
+      feeVolumeRowHighlighted, accountChangeStep, depositNotifyRequested, requestDepositNotify,
     }}>
       {children}
     </Ctx.Provider>
