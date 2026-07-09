@@ -26,7 +26,7 @@ export const CONCEPT_DQ_COASTAL_KEY      = "Pull up Coastal's risk report alongs
 export const CONCEPT_DQ_ESCALATE_KEY     = "Escalate this one and open a risk case."
 
 export const CONCEPT_FLOW13_PROMPT = "When's my money from the weekend hitting?"
-export const CONCEPT_FLOW14_PROMPT = "My fees went up this month, what happened?"
+export const CONCEPT_FLOW14_PROMPT = "my fees went up this month, what happened?"
 export const CONCEPT_FLOW15_PROMPT = "How'd this week go vs last week?"
 export const CONCEPT_FLOW16_PROMPT  = "I changed banks, send my deposits to the new account"
 export const CONCEPT_FLOW16_CONFIRM = "7715"
@@ -379,9 +379,9 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   [CONCEPT_FLOW14_PROMPT]: [
     { role: "user", content: CONCEPT_FLOW14_PROMPT },
     { role: "assistant", content: "They rose $117 versus April. Almost all of it is one driver: your volume was up 18%, so per-transaction fees scaled with it. Your rate barely moved.", openDynamicPanel: "fee-summary" },
-    { role: "user", content: "So it's just because I sold more?" },
+    { role: "user", content: "so it's just because I sold more?" },
     { role: "assistant", content: "Correct. Your effective rate held roughly steady — 2.67% to 2.71%. You paid more in total mostly because you processed more. The one exception is a $15 chargeback fee from a single dispute on May 3, which is what nudged the rate up slightly.", highlightFeeVolumeRow: true },
-    { role: "user", content: "Ok that makes sense. Show me that chargeback" },
+    { role: "user", content: "ok that makes sense. show me that chargeback" },
     {
       role: "assistant",
       content: "Here it is. It is already resolved in your favor, so the $15 will be credited back on next month's statement.",
