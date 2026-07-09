@@ -29,6 +29,11 @@ import { WorkQueuePanel } from "./WorkQueuePanel"
 import { DetectionQueuePanel } from "./DetectionQueuePanel"
 import { BarometerReportPanel } from "./BarometerReportPanel"
 import { CoastalRiskPanel } from "./CoastalRiskPanel"
+import { PendingDepositsPanel } from "./PendingDepositsPanel"
+import { FeeSummaryPanel } from "./FeeSummaryPanel"
+import { ChargebackStatusPanel } from "./ChargebackStatusPanel"
+import { SalesSnapshotPanel } from "./SalesSnapshotPanel"
+import { AccountChangePanel } from "./AccountChangePanel"
 
 type Slots = { A: PanelId | null; B: PanelId | null; C: PanelId | null; D: PanelId | null }
 
@@ -80,6 +85,31 @@ function mapPanelsToSlots(openPanels: string[]): Slots {
     }
   }
 
+  // Deposit Tracker
+  if (has("pending-deposits")) {
+    return { A: "pending-deposits", B: null, C: null, D: null }
+  }
+
+  // Fee Change Explainer
+  if (has("fee-summary") || has("chargeback-status")) {
+    return {
+      A: has("fee-summary") ? "fee-summary" : null,
+      B: has("chargeback-status") ? "chargeback-status" : null,
+      C: null,
+      D: null,
+    }
+  }
+
+  // Sales Snapshot
+  if (has("sales-snapshot")) {
+    return { A: "sales-snapshot", B: null, C: null, D: null }
+  }
+
+  // Account Change
+  if (has("account-change")) {
+    return { A: "account-change", B: null, C: null, D: null }
+  }
+
   return { A: null, B: null, C: null, D: null }
 }
 
@@ -97,6 +127,11 @@ function PanelContent({ id }: { id: PanelId }) {
     case "detection-queue":     return <DetectionQueuePanel />
     case "barometer-report":    return <BarometerReportPanel />
     case "coastal-risk":        return <CoastalRiskPanel />
+    case "pending-deposits":    return <PendingDepositsPanel />
+    case "fee-summary":         return <FeeSummaryPanel />
+    case "chargeback-status":   return <ChargebackStatusPanel />
+    case "sales-snapshot":      return <SalesSnapshotPanel />
+    case "account-change":      return <AccountChangePanel />
   }
 }
 
