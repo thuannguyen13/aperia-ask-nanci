@@ -67,7 +67,7 @@ export function SalesSnapshotPanel() {
                 <tr className="border-b bg-muted/40">
                   <th className="px-3 py-2 text-left font-medium text-foreground">Day</th>
                   <th className="px-3 py-2 text-right font-medium text-foreground">Sales</th>
-                  <th className="px-3 py-2 text-left font-medium text-foreground">Transactions</th>
+                  <th className="px-3 py-2 text-right font-medium text-foreground">Transactions</th>
                   <th className="px-3 py-2 text-right font-medium text-foreground">Avg Ticket</th>
                 </tr>
               </thead>
@@ -78,7 +78,7 @@ export function SalesSnapshotPanel() {
                     <td className={cn("px-3 py-2 text-right", d.isBest ? "font-semibold text-green-700 dark:text-green-400" : "text-foreground")}>
                       {formatCurrency(d.sales)}
                     </td>
-                    <td className="px-3 py-2 text-left text-foreground">{d.transactions}</td>
+                    <td className="px-3 py-2 text-right text-foreground">{d.transactions}</td>
                     <td className="px-3 py-2 text-right text-foreground">{formatCurrency(d.avgTicket)}</td>
                   </tr>
                 ))}
