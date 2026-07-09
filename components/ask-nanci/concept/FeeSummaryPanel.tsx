@@ -30,14 +30,14 @@ export function FeeSummaryPanel() {
                 <tr className="border-b bg-muted/40">
                   <th className="px-3 py-2 text-center font-medium text-foreground">April</th>
                   <th className="px-3 py-2 text-center font-medium text-foreground">May</th>
-                  <th className="px-3 py-2 text-center font-medium text-foreground">Change</th>
+                  <th className="px-3 py-2 text-right font-medium text-foreground">Change</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td className="px-3 py-2 text-center text-foreground">{EFFECTIVE_RATE.april}</td>
                   <td className="px-3 py-2 text-center text-foreground">{EFFECTIVE_RATE.may}</td>
-                  <td className="px-3 py-2 text-center text-amber-600 dark:text-amber-400">{EFFECTIVE_RATE.change}</td>
+                  <td className="px-3 py-2 text-right text-amber-600 dark:text-amber-400">{EFFECTIVE_RATE.change}</td>
                 </tr>
               </tbody>
             </table>
@@ -52,14 +52,14 @@ export function FeeSummaryPanel() {
                 <tr className="border-b bg-muted/40">
                   <th className="px-3 py-2 text-center font-medium text-foreground">April</th>
                   <th className="px-3 py-2 text-center font-medium text-foreground">May</th>
-                  <th className="px-3 py-2 text-center font-medium text-foreground">Change</th>
+                  <th className="px-3 py-2 text-right font-medium text-foreground">Change</th>
                 </tr>
               </thead>
               <tbody>
                 <tr className={cn(feeVolumeRowHighlighted ? "bg-blue-50 dark:bg-blue-950/20" : "")}>
                   <td className="px-3 py-2 text-center text-foreground">{formatCurrency(VOLUME.april)}</td>
                   <td className="px-3 py-2 text-center text-foreground">{formatCurrency(VOLUME.may)}</td>
-                  <td className="px-3 py-2 text-center text-amber-600 dark:text-amber-400">+{formatCurrency(VOLUME.changeAmount)} (+{VOLUME.changePct}%)</td>
+                  <td className="px-3 py-2 text-right text-amber-600 dark:text-amber-400">+{formatCurrency(VOLUME.changeAmount)} (+{VOLUME.changePct}%)</td>
                 </tr>
               </tbody>
             </table>
