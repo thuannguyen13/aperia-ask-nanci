@@ -34,6 +34,7 @@ import { FeeSummaryPanel } from "./FeeSummaryPanel"
 import { ChargebackStatusPanel } from "./ChargebackStatusPanel"
 import { SalesSnapshotPanel } from "./SalesSnapshotPanel"
 import { AccountChangePanel } from "./AccountChangePanel"
+import { FlaggedTransactionPanel } from "./FlaggedTransactionPanel"
 
 type Slots = { A: PanelId | null; B: PanelId | null; C: PanelId | null; D: PanelId | null }
 
@@ -85,11 +86,6 @@ function mapPanelsToSlots(openPanels: string[]): Slots {
     }
   }
 
-  // Deposit Tracker
-  if (has("pending-deposits")) {
-    return { A: "pending-deposits", B: null, C: null, D: null }
-  }
-
   // Fee Change Explainer
   if (has("fee-summary") || has("chargeback-status")) {
     return {
@@ -113,6 +109,15 @@ function mapPanelsToSlots(openPanels: string[]): Slots {
   return { A: null, B: null, C: null, D: null }
 }
 
+// Slot geometry for the dynamic panel stack (new flows only). Position in the
+// stack array is the only input: 1st panel gets a full-height column, a 2nd
+// shares it 50/50, a 3rd stacks under the 2nd (55/45) — same nesting the
+// legacy switch above already uses for its A/B/C/D slots.
+function slotsFromDynamicPanels(stack: PanelId[]): Slots {
+  const [first, second, third] = stack
+  return { A: first ?? null, B: second ?? null, C: null, D: third ?? null }
+}
+
 function PanelContent({ id }: { id: PanelId }) {
   switch (id) {
     case "case":                return <CaseDetailPanel />
@@ -128,6 +133,7 @@ function PanelContent({ id }: { id: PanelId }) {
     case "barometer-report":    return <BarometerReportPanel />
     case "coastal-risk":        return <CoastalRiskPanel />
     case "pending-deposits":    return <PendingDepositsPanel />
+    case "flagged-transaction": return <FlaggedTransactionPanel />
     case "fee-summary":         return <FeeSummaryPanel />
     case "chargeback-status":   return <ChargebackStatusPanel />
     case "sales-snapshot":      return <SalesSnapshotPanel />
@@ -151,26 +157,31 @@ function SlotWrapper({ id, closing, children }: { id: PanelId | null | undefined
 }
 
 export function ConceptPanelArea({ fillWidth = false, visible = true }: { fillWidth?: boolean; visible?: boolean }) {
-  const { openPanels, closingPanels } = useAskNanci()
-  const isOpen = openPanels.length > 0
+  const { openPanels, closingPanels, dynamicPanels } = useAskNanci()
+  const isOpen = openPanels.length > 0 || dynamicPanels.length > 0
   const isClosing = closingPanels.length > 0
   const isSmall = useIsSmallScreen()
 
+  // Legacy hardcoded flows take priority; the dynamic stack is only consulted
+  // when no legacy flow has panels open.
+  const resolveSlots = () =>
+    openPanels.length > 0 ? mapPanelsToSlots(openPanels) : slotsFromDynamicPanels(dynamicPanels)
+
   // Freeze the slot layout during close animation — don't update while a staggered close is in progress
   const [renderContent, setRenderContent] = useState(isOpen)
-  const [frozenSlots, setFrozenSlots] = useState(() => mapPanelsToSlots(openPanels))
-  const [frozenKey, setFrozenKey] = useState(() => [...openPanels].sort().join(","))
+  const [frozenSlots, setFrozenSlots] = useState(() => resolveSlots())
+  const [frozenKey, setFrozenKey] = useState(() => [...openPanels, ...dynamicPanels].sort().join(","))
   useEffect(() => {
     if (isClosing) return  // freeze layout during staggered close
     if (isOpen) {
       setRenderContent(true)
-      setFrozenSlots(mapPanelsToSlots(openPanels))
-      setFrozenKey([...openPanels].sort().join(","))
+      setFrozenSlots(resolveSlots())
+      setFrozenKey([...openPanels, ...dynamicPanels].sort().join(","))
     } else {
       const t = setTimeout(() => setRenderContent(false), 350)
       return () => clearTimeout(t)
     }
-  }, [isOpen, isClosing, openPanels])
+  }, [isOpen, isClosing, openPanels, dynamicPanels])
 
   const { A, B, C, D } = frozenSlots
   const layoutKey = frozenKey
