@@ -212,7 +212,7 @@ export function ConceptPanelArea({ fillWidth = false, visible = true }: { fillWi
     >
       {renderContent && (
         isDynamicLayout ? (
-          <div className={cn("flex h-full gap-2", isSmall ? "flex-col" : "flex-row")}>
+          <div className="flex h-full flex-col gap-2">
             {[A, B, D].filter((id): id is PanelId => !!id).map((id) => (
               <div key={id} className="h-full min-w-0 flex-1 overflow-hidden rounded-[18px] border bg-background">
                 <SlotWrapper id={id} closing={closingPanels}><PanelContent id={id} /></SlotWrapper>
