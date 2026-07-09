@@ -30,6 +30,11 @@ export type PanelId =
   | "risk-flags" | "volume-settlement" | "change-log"
   | "work-queue"
   | "detection-queue" | "barometer-report" | "coastal-risk"
+  | "flagged-transaction"
+
+// Panel ids that flow through the dynamic panel stack (usePanelStack) instead
+// of the legacy hardcoded mapPanelsToSlots switch in ConceptPanelArea.
+export type DynamicPanelId = "pending-deposits" | "flagged-transaction"
 
 export interface ConceptScriptedTurn extends ScriptedTurn {
   sheetAction?: SheetActionData
@@ -40,6 +45,7 @@ export interface ConceptScriptedTurn extends ScriptedTurn {
   openBatchPanel?: true
   openReportPanel?: true
   openPanel?: PanelId
+  openDynamicPanel?: DynamicPanelId
   filterDeclineReport?: true
   advanceWorkQueue?: "quick-wins" | "outage"
   closeAllPanels?: true
