@@ -2,11 +2,11 @@
 
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { WEEK_COMPARE, DAILY_SALES, WEEKDAY_AVG_TRANSACTIONS, SATURDAY_DRILLDOWN } from "@/lib/ask-nanci/data/panels/sales-snapshot"
-import { PanelShell, PanelHeader, PanelExportButton, Callout, StatCard, formatCurrency } from "@/components/ask-nanci/shared"
+import { WEEK_COMPARE, DAILY_SALES, WEEKDAY_AVG_TRANSACTIONS, SATURDAY_DRILLDOWN, SLOWEST_DAY } from "@/lib/ask-nanci/data/panels/sales-snapshot"
+import { PanelShell, PanelHeader, PanelExportButton, Callout, formatCurrency } from "@/components/ask-nanci/shared"
 
 export function SalesSnapshotPanel() {
-  const { closeDynamicPanel, salesDrilldownOpen } = useAskNanci()
+  const { closeDynamicPanel } = useAskNanci()
 
   return (
     <PanelShell>
@@ -19,11 +19,12 @@ export function SalesSnapshotPanel() {
 
       <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
         <Callout variant="blue">
-          +{WEEK_COMPARE.changePct}% vs last week — you brought in {formatCurrency(WEEK_COMPARE.thisWeek)} against {formatCurrency(WEEK_COMPARE.lastWeek)}, driven almost entirely by Saturday. You ran {SATURDAY_DRILLDOWN.transactions} transactions that day versus a weekday average of {WEEKDAY_AVG_TRANSACTIONS}, while your average ticket held steady.
+          <span className="font-bold">+{WEEK_COMPARE.changePct}% vs last week</span> — you brought in {formatCurrency(WEEK_COMPARE.thisWeek)} against {formatCurrency(WEEK_COMPARE.lastWeek)}, driven almost entirely by Saturday. You ran {SATURDAY_DRILLDOWN.transactions} transactions that day versus a weekday average of {WEEKDAY_AVG_TRANSACTIONS}, while your average ticket held steady around $29–43. This was a busier week, not bigger baskets. {SLOWEST_DAY.day} was your softest day at {formatCurrency(SLOWEST_DAY.sales)}.
         </Callout>
 
         <div>
-          <p className="mb-2 text-base font-bold text-foreground">This Week vs Last Week</p>
+          <p className="text-base font-bold text-foreground">This Week vs Last Week Sales</p>
+          <p className="mb-2 text-sm text-muted-foreground">Week of May 11–17 vs. Week of May 4–10</p>
           <div className="overflow-hidden rounded-lg border">
             <table className="w-full table-fixed text-sm">
               <colgroup>
@@ -66,46 +67,24 @@ export function SalesSnapshotPanel() {
                 <tr className="border-b bg-muted/40">
                   <th className="px-3 py-2 text-left font-medium text-foreground">Day</th>
                   <th className="px-3 py-2 text-right font-medium text-foreground">Sales</th>
-                  <th className="px-3 py-2 text-right font-medium text-foreground">Transactions</th>
+                  <th className="px-3 py-2 text-left font-medium text-foreground">Transactions</th>
                   <th className="px-3 py-2 text-right font-medium text-foreground">Avg Ticket</th>
                 </tr>
               </thead>
               <tbody>
                 {DAILY_SALES.map((d) => (
                   <tr key={d.day} className={cn("border-b last:border-0", d.isBest ? "bg-green-50 dark:bg-green-950/20" : "")}>
-                    <td className="px-3 py-2">
-                      <p className="text-foreground">{d.day}</p>
-                      <p className="text-xs text-muted-foreground">{d.date}</p>
-                    </td>
+                    <td className="px-3 py-2 text-foreground">{d.date}</td>
                     <td className={cn("px-3 py-2 text-right", d.isBest ? "font-semibold text-green-700 dark:text-green-400" : "text-foreground")}>
                       {formatCurrency(d.sales)}
                     </td>
-                    <td className="px-3 py-2 text-right text-foreground">{d.transactions}</td>
+                    <td className="px-3 py-2 text-left text-foreground">{d.transactions}</td>
                     <td className="px-3 py-2 text-right text-foreground">{formatCurrency(d.avgTicket)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-
-          {salesDrilldownOpen && (
-            <div className="mt-3">
-              <p className="mb-2 text-base font-bold text-foreground">{SATURDAY_DRILLDOWN.date} — Sales</p>
-              <div className="grid grid-cols-2 gap-2">
-                <StatCard
-                  label="Vs Weekday Average"
-                  value={`${SATURDAY_DRILLDOWN.transactions} txns`}
-                  sublabel={`Weekday avg: ${WEEKDAY_AVG_TRANSACTIONS}`}
-                  emphasis
-                />
-                <StatCard
-                  label="Total Sales"
-                  value={formatCurrency(SATURDAY_DRILLDOWN.sales)}
-                  sublabel={`Avg ticket ${formatCurrency(SATURDAY_DRILLDOWN.avgTicket)}`}
-                />
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </PanelShell>
