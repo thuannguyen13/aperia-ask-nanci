@@ -60,8 +60,8 @@ export function PendingDepositsPanel() {
                   {BATCHES.map((b) => (
                     <TableRow key={b.day} className={cn(b.isHeld && "bg-amber-50 dark:bg-amber-950/20")}>
                       <TableCell>
-                        <p className="font-medium text-foreground">{b.day}</p>
-                        <p className="font-mono text-[10px] text-muted-foreground">{b.date}</p>
+                        <p className="font-medium text-foreground">{b.date}</p>
+                        <p className="font-mono text-[10px] text-muted-foreground">{b.batchId}</p>
                       </TableCell>
                       <TableCell>
                         {b.isHeld ? (
