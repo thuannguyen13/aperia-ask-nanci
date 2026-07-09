@@ -44,7 +44,7 @@ export function PanelHeader({ title, subtitle, actions, onClose, dot, badge, siz
   return (
     <div className="flex shrink-0 items-center justify-between border-b px-4 py-3">
       <div className="min-w-0">
-        <p className={cn("truncate text-foreground", size === "lg" ? "text-base font-bold" : "text-sm font-semibold")}>{title}</p>
+        <p className={cn("truncate text-foreground", size === "lg" ? "text-base font-semibold" : "text-sm font-semibold")}>{title}</p>
         {subtitle && <p className="text-xs text-muted-foreground truncate">{subtitle}</p>}
       </div>
       <div className="ml-2 flex shrink-0 items-center gap-2">
