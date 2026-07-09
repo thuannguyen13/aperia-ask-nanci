@@ -189,11 +189,17 @@ export function ConceptPanelArea({ fillWidth = false, visible = true }: { fillWi
   const hasLeft  = !!(A || C)
   const hasRight = !!(B || D)
 
+  // Dynamic-stack panels (new flows) render as genuinely separate boxes —
+  // own border/rounded corners, a real gap, no shared resize handle. Legacy
+  // flows keep the existing resizable shared-divider layout untouched.
+  const isDynamicLayout = openPanels.length === 0 && dynamicPanels.length > 0
+
   return (
     <div
       className={cn(
-        "relative h-full shrink-0 flex-col overflow-hidden rounded-[18px] border bg-background",
+        "relative h-full shrink-0 flex-col overflow-hidden",
         "transition-[width,opacity,margin] duration-500 ease-out",
+        !isDynamicLayout && "rounded-[18px] border bg-background",
         fillWidth
           ? cn("flex flex-1 min-w-0 transition-opacity duration-500 ease-out", visible ? "opacity-100" : "opacity-0")
           : cn(
@@ -205,6 +211,15 @@ export function ConceptPanelArea({ fillWidth = false, visible = true }: { fillWi
       )}
     >
       {renderContent && (
+        isDynamicLayout ? (
+          <div className={cn("flex h-full gap-2", isSmall ? "flex-col" : "flex-row")}>
+            {[A, B, D].filter((id): id is PanelId => !!id).map((id) => (
+              <div key={id} className="h-full min-w-0 flex-1 overflow-hidden rounded-[18px] border bg-background">
+                <SlotWrapper id={id} closing={closingPanels}><PanelContent id={id} /></SlotWrapper>
+              </div>
+            ))}
+          </div>
+        ) : (
         <ResizablePanelGroup orientation={isSmall ? "vertical" : "horizontal"} className="h-full">
 
           {/* ── Left column (slots A + C) ── */}
@@ -249,6 +264,7 @@ export function ConceptPanelArea({ fillWidth = false, visible = true }: { fillWi
           )}
 
         </ResizablePanelGroup>
+        )
       )}
     </div>
   )
