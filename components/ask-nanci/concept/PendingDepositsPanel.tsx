@@ -1,14 +1,12 @@
 "use client"
 
-import { X } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import {
-  Button, Card, CardHeader, CardTitle, CardDescription, CardAction, CardContent,
   Table, TableHeader, TableBody, TableRow, TableHead, TableCell,
 } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { BATCHES } from "@/lib/ask-nanci/data/panels/pending-deposits"
-import { PanelShell, StatCard, formatCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelExportButton, StatCard, formatCurrency } from "@/components/ask-nanci/shared"
 
 export function PendingDepositsPanel() {
   const { closeDynamicPanel } = useAskNanci()
@@ -20,19 +18,15 @@ export function PendingDepositsPanel() {
   const onHold = onHoldBatches.reduce((sum, b) => sum + b.net, 0)
 
   return (
-    <PanelShell className="overflow-y-auto p-0">
-      <Card className="h-full gap-4 py-4">
-        <CardHeader className="border-b">
-          <CardTitle>Pending Deposits</CardTitle>
-          <CardDescription>Account ending ••4432</CardDescription>
-          <CardAction>
-            <Button variant="ghost" size="icon" onClick={() => closeDynamicPanel("pending-deposits")} aria-label="Close">
-              <X className="size-4" />
-            </Button>
-          </CardAction>
-        </CardHeader>
+    <PanelShell>
+      <PanelHeader
+        title="Pending Deposits"
+        size="lg"
+        actions={<PanelExportButton />}
+        onClose={() => closeDynamicPanel("pending-deposits")}
+      />
 
-        <CardContent className="flex flex-col gap-4">
+      <div className="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-4">
           <div className="grid grid-cols-3 gap-3">
             <StatCard label="Total Deposit" value={formatCurrency(totalDeposit)} sublabel={`${BATCHES.length} batches`} />
             <StatCard label="In Transit" value={formatCurrency(inTransit)} sublabel={`${inTransitBatches.length} batches`} />
@@ -83,8 +77,7 @@ export function PendingDepositsPanel() {
               </Table>
             </div>
           </div>
-        </CardContent>
-      </Card>
+      </div>
     </PanelShell>
   )
 }

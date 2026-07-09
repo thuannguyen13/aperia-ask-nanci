@@ -5,7 +5,7 @@ import { Bell, Check } from "lucide-react"
 import { Button } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { HELD_TXN } from "@/lib/ask-nanci/data/panels/pending-deposits"
-import { PanelShell, PanelHeader, Callout, formatCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelExportButton, Callout, formatCurrency } from "@/components/ask-nanci/shared"
 
 export function FlaggedTransactionPanel() {
   const { closeDynamicPanel, depositNotifyRequested, requestDepositNotify } = useAskNanci()
@@ -14,7 +14,8 @@ export function FlaggedTransactionPanel() {
     <PanelShell>
       <PanelHeader
         title="Flagged Transaction"
-        subtitle="Pending Deposits · Sunday's batch"
+        size="lg"
+        actions={<PanelExportButton />}
         onClose={() => closeDynamicPanel("flagged-transaction")}
       />
       <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4">
