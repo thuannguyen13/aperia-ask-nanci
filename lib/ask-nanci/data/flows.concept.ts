@@ -28,6 +28,7 @@ export const CONCEPT_DQ_ESCALATE_KEY     = "Escalate this one and open a risk ca
 export const CONCEPT_FLOW13_PROMPT = "When's my money from the weekend hitting?"
 export const CONCEPT_FLOW14_PROMPT = "my fees went up this month, what happened?"
 export const CONCEPT_FLOW15_PROMPT = "How'd this week go vs last week?"
+export const CONCEPT_FLOW15_FOLLOWUP = "Was there a slow day too?"
 export const CONCEPT_FLOW16_PROMPT  = "I changed banks, send my deposits to the new account"
 export const CONCEPT_FLOW16_CONFIRM = "7715"
 
@@ -79,6 +80,8 @@ export const CONCEPT_NO_RESET_PROMPTS = new Set([
   CONCEPT_DQ_ESCALATE_KEY,
   // Account Change: confirm step continues the session rather than resetting it
   CONCEPT_FLOW16_CONFIRM,
+  // Sales Snapshot: drill-down follow-up continues the session rather than resetting it
+  CONCEPT_FLOW15_FOLLOWUP,
 ])
 
 // ─── Sheet action data (populated at module load) ─────────────────────────────
@@ -393,10 +396,17 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   // ── Flow 15: Sales Snapshot ────────────────────────────────────────────────
   [CONCEPT_FLOW15_PROMPT]: [
     { role: "user", content: CONCEPT_FLOW15_PROMPT },
-    { role: "assistant", content: "Up. $18,240 this week against $15,900 last week — a 14.7% lift. Saturday was your best day at $4,110.", openDynamicPanel: "sales-snapshot" },
+    { role: "assistant", content: "Up 15% vs last week — you brought in $18,240 against $15,900, driven almost entirely by Saturday. You ran 96 transactions that day versus a weekday average of 60, while your average ticket held steady around $29–43. This was a busier week, not bigger baskets. Tuesday was your softest day at $1,980.", openDynamicPanel: "sales-snapshot" },
     { role: "user", content: "What drove Saturday?" },
-    { role: "assistant", content: "Higher ticket count, not bigger tickets. You ran 96 transactions versus a weekday average of 60. Average ticket held steady around $43.", expandSalesDrilldown: true },
-    { role: "user", content: "Nice. Was there a slow day?" },
+    {
+      role: "assistant",
+      content: "Saturday was your best day this week at $4,110. Both traffic and basket size were up — you ran 96 transactions versus a weekday average of 78, and your average ticket rose to $42.81 versus a weekday average of $29.43.",
+      openDynamicPanel: "sales-drilldown",
+      suggestions: [CONCEPT_FLOW15_FOLLOWUP],
+    },
+  ],
+  [CONCEPT_FLOW15_FOLLOWUP]: [
+    { role: "user", content: CONCEPT_FLOW15_FOLLOWUP },
     {
       role: "assistant",
       content: "Tuesday, at $1,980. Weather was rough that day if that tracks with what you saw in-store.",
