@@ -25,6 +25,12 @@ export const CONCEPT_DQ_OPEN_KEY         = "Yes, open it"
 export const CONCEPT_DQ_COASTAL_KEY      = "Pull up Coastal's risk report alongside"
 export const CONCEPT_DQ_ESCALATE_KEY     = "Escalate this one and open a risk case."
 
+export const CONCEPT_FLOW13_PROMPT = "When's my money from the weekend hitting?"
+export const CONCEPT_FLOW14_PROMPT = "My fees went up this month, what happened?"
+export const CONCEPT_FLOW15_PROMPT = "How'd this week go vs last week?"
+export const CONCEPT_FLOW16_PROMPT  = "I changed banks, send my deposits to the new account"
+export const CONCEPT_FLOW16_CONFIRM = "7715"
+
 // Registry: numeric flow number (as string) → CONCEPT_SCRIPTED_CONVERSATIONS key.
 // Add one line here to make any flow embeddable via ?mode=concept-embed&flow=<number>.
 export const CONCEPT_FLOW_SLUGS: Record<string, string> = {
@@ -46,6 +52,10 @@ export const CONCEPT_ALL_PROMPTS = [
   "Show me everything unusual about Bayside Imports in the last 90 days",
   "Show me my work queue",
   CONCEPT_FLOW12_PROMPT,
+  CONCEPT_FLOW13_PROMPT,
+  CONCEPT_FLOW14_PROMPT,
+  CONCEPT_FLOW15_PROMPT,
+  CONCEPT_FLOW16_PROMPT,
 ]
 
 export const CONCEPT_NO_RESET_PROMPTS = new Set([
@@ -67,6 +77,8 @@ export const CONCEPT_NO_RESET_PROMPTS = new Set([
   CONCEPT_DQ_OPEN_KEY,
   CONCEPT_DQ_COASTAL_KEY,
   CONCEPT_DQ_ESCALATE_KEY,
+  // Account Change: confirm step continues the session rather than resetting it
+  CONCEPT_FLOW16_CONFIRM,
 ])
 
 // ─── Sheet action data (populated at module load) ─────────────────────────────
@@ -345,6 +357,72 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       role: "assistant",
       content: "Review request submitted for Batch #4471. You'll hear back within 1 business day. The rest of the batch will settle on its normal schedule.",
       suggestions: ["Show me my work queue", CONCEPT_FLOW12_PROMPT],
+    },
+  ],
+
+  // ── Flow 13: Deposit Tracker ──────────────────────────────────────────────
+  [CONCEPT_FLOW13_PROMPT]: [
+    { role: "user", content: CONCEPT_FLOW13_PROMPT },
+    { role: "assistant", content: "You have three batches pending. Friday and Saturday are in transit, expected in your account ending ••4432 tomorrow morning. Sunday's batch is on a temporary hold.", openDynamicPanel: "pending-deposits" },
+    { role: "user", content: "Why's Sunday held?" },
+    { role: "assistant", content: "A single $2,190 transaction triggered a routine review — larger than your typical ticket. No action needed on your end. It usually clears within one business day, so expected Wednesday. I can notify you the moment it funds.", openDynamicPanel: "flagged-transaction" },
+    { role: "user", content: "Yes, do that" },
+    {
+      role: "assistant",
+      content: "Done. You'll get a notification when Sunday's batch funds. Friday and Saturday total $4,860, landing tomorrow.",
+      depositNotifyRequested: true,
+      suggestions: CONCEPT_ALL_PROMPTS,
+    },
+  ],
+
+  // ── Flow 14: Fee Change Explainer ─────────────────────────────────────────
+  [CONCEPT_FLOW14_PROMPT]: [
+    { role: "user", content: CONCEPT_FLOW14_PROMPT },
+    { role: "assistant", content: "They rose $84 versus April. Almost all of it is one driver: your volume was up 17.9%, so per-transaction fees scaled with it. Your rate did not change.", openPanel: "fee-summary" },
+    { role: "user", content: "So it's just because I sold more?" },
+    { role: "assistant", content: "Correct. Effective rate held steady at 2.71%. You paid more in total because you processed more. The one exception is a $15 chargeback fee from a single dispute on May 3.", highlightFeeVolumeRow: true },
+    { role: "user", content: "Ok that makes sense. Show me that chargeback" },
+    {
+      role: "assistant",
+      content: "Here it is. It's already resolved in your favor, so the $15 will be credited back on next month's statement.",
+      openPanel: "chargeback-status",
+      suggestions: CONCEPT_ALL_PROMPTS,
+    },
+  ],
+
+  // ── Flow 15: Sales Snapshot ────────────────────────────────────────────────
+  [CONCEPT_FLOW15_PROMPT]: [
+    { role: "user", content: CONCEPT_FLOW15_PROMPT },
+    { role: "assistant", content: "Up. $18,240 this week against $15,900 last week — a 14.7% lift. Saturday was your best day at $4,110.", openPanel: "sales-snapshot" },
+    { role: "user", content: "What drove Saturday?" },
+    { role: "assistant", content: "Higher ticket count, not bigger tickets. You ran 96 transactions versus a weekday average of 60. Average ticket held steady around $43.", expandSalesDrilldown: true },
+    { role: "user", content: "Nice. Was there a slow day?" },
+    {
+      role: "assistant",
+      content: "Tuesday, at $1,980. Weather was rough that day if that tracks with what you saw in-store.",
+      suggestions: CONCEPT_ALL_PROMPTS,
+    },
+  ],
+
+  // ── Flow 16: Account Change (Guardrail Write, chunked) ────────────────────
+  [CONCEPT_FLOW16_PROMPT]: [
+    { role: "user", content: CONCEPT_FLOW16_PROMPT },
+    { role: "assistant", content: "I can update that. Current account ends ••4432. Enter the new routing and account number in the panel and I'll validate them before anything changes.", openPanel: "account-change" },
+    { role: "user", content: "Entered my new account details" },
+    {
+      role: "assistant",
+      content: "Routing number checks out to First National. To confirm, new deposits will route to the account ending 7715 starting with your next batch. Verify the last four digits and I'll apply it.",
+      advanceAccountChange: true,
+      suggestions: [CONCEPT_FLOW16_CONFIRM],
+    },
+  ],
+  [CONCEPT_FLOW16_CONFIRM]: [
+    { role: "user", content: CONCEPT_FLOW16_CONFIRM },
+    {
+      role: "assistant",
+      content: "Confirmed and updated. A confirmation was sent to your email on file. Your next deposit, tomorrow's batch, will go to the new account.",
+      advanceAccountChange: true,
+      suggestions: CONCEPT_ALL_PROMPTS,
     },
   ],
 }
