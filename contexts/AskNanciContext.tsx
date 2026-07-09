@@ -1,7 +1,8 @@
 "use client"
 
 import { createContext, useContext, useState, useCallback, useRef, useEffect } from "react"
-import type { Message, Session, Source, UsageData, ConceptScriptedTurn } from "@/lib/ask-nanci/types"
+import type { Message, Session, Source, UsageData, ConceptScriptedTurn, DynamicPanelId } from "@/lib/ask-nanci/types"
+import { usePanelStack } from "@/lib/ask-nanci/use-panel-stack"
 import {
   fetchSessions,
   persistSession,
@@ -88,6 +89,8 @@ interface AskNanciCtx {
   openPanels: string[]
   closingPanels: string[]
   closePanel: (type: string) => void
+  dynamicPanels: DynamicPanelId[]
+  closeDynamicPanel: (id: DynamicPanelId) => void
   closeAllNewPanels: () => void
   submitDisputeDraft: () => void
   declineReportFiltered: boolean
@@ -139,6 +142,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [batchPanelOpen, setBatchPanelOpen] = useState(false)
   const [openPanels, setOpenPanels] = useState<string[]>([])
   const [closingPanels, setClosingPanels] = useState<string[]>([])
+  const { stack: dynamicPanels, openDynamic, closeDynamic: closeDynamicPanel, resetDynamic } = usePanelStack()
   const [declineReportFiltered, setDeclineReportFiltered] = useState(false)
   const [workQueuePhase, setWorkQueuePhase] = useState<"triage" | "quick-wins" | "outage">("triage")
   const [proactiveNotificationActive, setProactiveNotificationActive] = useState(false)
@@ -320,6 +324,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     if (turn.openReportPanel) { setReportPanelOpen(true); setReportTopN(10) }
     if (prompt === CONCEPT_FLOW2_FOLLOWUP) { setReportTopN(5) }
     if (turn.openPanel) { setOpenPanels((prev) => prev.includes(turn.openPanel!) ? prev : [...prev, turn.openPanel!]) }
+    if (turn.openDynamicPanel) { openDynamic(turn.openDynamicPanel) }
     if (turn.filterDeclineReport) { setDeclineReportFiltered(true) }
     if (turn.advanceWorkQueue) { setWorkQueuePhase(turn.advanceWorkQueue) }
   }, [])
@@ -450,6 +455,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
 
   const closeAllNewPanels = useCallback(() => {
     setOpenPanels([])
+    resetDynamic()
     setDeclineReportFiltered(false)
     setWorkQueuePhase("triage")
   }, [])
@@ -492,6 +498,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setStepUpPanelStep(1)
     setBatchPanelOpen(false)
     setOpenPanels([])
+    resetDynamic()
     setDeclineReportFiltered(false)
     setWorkQueuePhase("triage")
   }, [])
@@ -504,6 +511,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setPendingBot(null)
     setError(null)
     setOpenPanels([])
+    resetDynamic()
     setClosingPanels([])
     setReportPanelOpen(false)
     setFormPanelOpen(false)
@@ -569,6 +577,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       batchPanelOpen, setBatchPanelOpen,
       triggerProactiveFlow, proactiveNotificationActive, activateProactiveNotification,
       openPanels, closingPanels, closePanel, closeAllNewPanels, submitDisputeDraft,
+      dynamicPanels, closeDynamicPanel,
       declineReportFiltered, workQueuePhase,
     }}>
       {children}
