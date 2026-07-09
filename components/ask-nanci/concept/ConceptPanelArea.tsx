@@ -86,26 +86,6 @@ function mapPanelsToSlots(openPanels: string[]): Slots {
     }
   }
 
-  // Fee Change Explainer
-  if (has("fee-summary") || has("chargeback-status")) {
-    return {
-      A: has("fee-summary") ? "fee-summary" : null,
-      B: has("chargeback-status") ? "chargeback-status" : null,
-      C: null,
-      D: null,
-    }
-  }
-
-  // Sales Snapshot
-  if (has("sales-snapshot")) {
-    return { A: "sales-snapshot", B: null, C: null, D: null }
-  }
-
-  // Account Change
-  if (has("account-change")) {
-    return { A: "account-change", B: null, C: null, D: null }
-  }
-
   return { A: null, B: null, C: null, D: null }
 }
 

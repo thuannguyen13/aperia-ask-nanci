@@ -378,14 +378,14 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   // ── Flow 14: Fee Change Explainer ─────────────────────────────────────────
   [CONCEPT_FLOW14_PROMPT]: [
     { role: "user", content: CONCEPT_FLOW14_PROMPT },
-    { role: "assistant", content: "They rose $84 versus April. Almost all of it is one driver: your volume was up 17.9%, so per-transaction fees scaled with it. Your rate did not change.", openPanel: "fee-summary" },
+    { role: "assistant", content: "They rose $84 versus April. Almost all of it is one driver: your volume was up 17.9%, so per-transaction fees scaled with it. Your rate did not change.", openDynamicPanel: "fee-summary" },
     { role: "user", content: "So it's just because I sold more?" },
     { role: "assistant", content: "Correct. Effective rate held steady at 2.71%. You paid more in total because you processed more. The one exception is a $15 chargeback fee from a single dispute on May 3.", highlightFeeVolumeRow: true },
     { role: "user", content: "Ok that makes sense. Show me that chargeback" },
     {
       role: "assistant",
       content: "Here it is. It's already resolved in your favor, so the $15 will be credited back on next month's statement.",
-      openPanel: "chargeback-status",
+      openDynamicPanel: "chargeback-status",
       suggestions: CONCEPT_ALL_PROMPTS,
     },
   ],
@@ -393,7 +393,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   // ── Flow 15: Sales Snapshot ────────────────────────────────────────────────
   [CONCEPT_FLOW15_PROMPT]: [
     { role: "user", content: CONCEPT_FLOW15_PROMPT },
-    { role: "assistant", content: "Up. $18,240 this week against $15,900 last week — a 14.7% lift. Saturday was your best day at $4,110.", openPanel: "sales-snapshot" },
+    { role: "assistant", content: "Up. $18,240 this week against $15,900 last week — a 14.7% lift. Saturday was your best day at $4,110.", openDynamicPanel: "sales-snapshot" },
     { role: "user", content: "What drove Saturday?" },
     { role: "assistant", content: "Higher ticket count, not bigger tickets. You ran 96 transactions versus a weekday average of 60. Average ticket held steady around $43.", expandSalesDrilldown: true },
     { role: "user", content: "Nice. Was there a slow day?" },
@@ -407,7 +407,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   // ── Flow 16: Account Change (Guardrail Write, chunked) ────────────────────
   [CONCEPT_FLOW16_PROMPT]: [
     { role: "user", content: CONCEPT_FLOW16_PROMPT },
-    { role: "assistant", content: "I can update that. Current account ends ••4432. Enter the new routing and account number in the panel and I'll validate them before anything changes.", openPanel: "account-change" },
+    { role: "assistant", content: "I can update that. Current account ends ••4432. Enter the new routing and account number in the panel and I'll validate them before anything changes.", openDynamicPanel: "account-change" },
     { role: "user", content: "Entered my new account details" },
     {
       role: "assistant",

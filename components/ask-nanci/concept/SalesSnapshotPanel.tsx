@@ -6,7 +6,7 @@ import { WEEK_COMPARE, DAILY_SALES, WEEKDAY_AVG_TRANSACTIONS, SATURDAY_DRILLDOWN
 import { PanelShell, PanelHeader, PanelExportButton, Callout, StatCard, formatCurrency } from "@/components/ask-nanci/shared"
 
 export function SalesSnapshotPanel() {
-  const { closePanel, salesDrilldownOpen } = useAskNanci()
+  const { closeDynamicPanel, salesDrilldownOpen } = useAskNanci()
 
   return (
     <PanelShell>
@@ -14,7 +14,7 @@ export function SalesSnapshotPanel() {
         title="Weekly Sales Trend"
         size="lg"
         actions={<PanelExportButton />}
-        onClose={() => closePanel("sales-snapshot")}
+        onClose={() => closeDynamicPanel("sales-snapshot")}
       />
 
       <div className="flex-1 overflow-auto px-4 py-3 space-y-4">

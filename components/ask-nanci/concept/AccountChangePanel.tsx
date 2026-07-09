@@ -84,7 +84,7 @@ function Step3() {
 }
 
 export function AccountChangePanel() {
-  const { closePanel, accountChangeStep, handlePrompt } = useAskNanci()
+  const { closeDynamicPanel, accountChangeStep, handlePrompt } = useAskNanci()
 
   return (
     <PanelShell>
@@ -92,7 +92,7 @@ export function AccountChangePanel() {
         title="Deposit Account"
         size="lg"
         actions={<PanelExportButton />}
-        onClose={() => closePanel("account-change")}
+        onClose={() => closeDynamicPanel("account-change")}
       />
 
       {accountChangeStep === 1 && <Step1 />}

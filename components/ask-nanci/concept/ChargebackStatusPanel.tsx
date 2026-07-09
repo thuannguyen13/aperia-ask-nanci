@@ -6,7 +6,7 @@ import { CHARGEBACK } from "@/lib/ask-nanci/data/panels/chargeback-status"
 import { PanelShell, PanelHeader, PanelExportButton, Callout, formatCurrency } from "@/components/ask-nanci/shared"
 
 export function ChargebackStatusPanel() {
-  const { closePanel } = useAskNanci()
+  const { closeDynamicPanel } = useAskNanci()
 
   return (
     <PanelShell>
@@ -14,7 +14,7 @@ export function ChargebackStatusPanel() {
         title={`${formatCurrency(CHARGEBACK.amount)} Chargeback Fee`}
         size="lg"
         actions={<PanelExportButton />}
-        onClose={() => closePanel("chargeback-status")}
+        onClose={() => closeDynamicPanel("chargeback-status")}
       />
 
       <div className="flex-1 overflow-auto px-4 py-3 space-y-4">

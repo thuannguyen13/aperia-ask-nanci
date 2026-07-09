@@ -95,6 +95,11 @@ interface AskNanciCtx {
   submitDisputeDraft: () => void
   declineReportFiltered: boolean
   workQueuePhase: "triage" | "quick-wins" | "outage"
+  feeVolumeRowHighlighted: boolean
+  salesDrilldownOpen: boolean
+  accountChangeStep: 1 | 2 | 3
+  depositNotifyRequested: boolean
+  requestDepositNotify: () => void
 }
 
 const Ctx = createContext<AskNanciCtx | null>(null)
@@ -145,6 +150,10 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const { stack: dynamicPanels, openDynamic, closeDynamic: closeDynamicPanel, resetDynamic } = usePanelStack()
   const [declineReportFiltered, setDeclineReportFiltered] = useState(false)
   const [workQueuePhase, setWorkQueuePhase] = useState<"triage" | "quick-wins" | "outage">("triage")
+  const [feeVolumeRowHighlighted, setFeeVolumeRowHighlighted] = useState(false)
+  const [salesDrilldownOpen, setSalesDrilldownOpen] = useState(false)
+  const [accountChangeStep, setAccountChangeStep] = useState<1 | 2 | 3>(1)
+  const [depositNotifyRequested, setDepositNotifyRequested] = useState(false)
   const [proactiveNotificationActive, setProactiveNotificationActive] = useState(false)
   const stopRef = useRef<boolean>(false)
   const scriptStopRef = useRef<boolean>(false)
@@ -324,9 +333,14 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     if (turn.openReportPanel) { setReportPanelOpen(true); setReportTopN(10) }
     if (prompt === CONCEPT_FLOW2_FOLLOWUP) { setReportTopN(5) }
     if (turn.openPanel) { setOpenPanels((prev) => prev.includes(turn.openPanel!) ? prev : [...prev, turn.openPanel!]) }
+    if (turn.openPanel === "account-change" || turn.openDynamicPanel === "account-change") { setAccountChangeStep(1) }
     if (turn.openDynamicPanel) { openDynamic(turn.openDynamicPanel) }
     if (turn.filterDeclineReport) { setDeclineReportFiltered(true) }
     if (turn.advanceWorkQueue) { setWorkQueuePhase(turn.advanceWorkQueue) }
+    if (turn.highlightFeeVolumeRow) { setFeeVolumeRowHighlighted(true) }
+    if (turn.expandSalesDrilldown) { setSalesDrilldownOpen(true) }
+    if (turn.advanceAccountChange) { setAccountChangeStep((s) => Math.min(3, s + 1) as 1 | 2 | 3) }
+    if (turn.depositNotifyRequested) { setDepositNotifyRequested(true) }
   }, [])
 
   const playConceptScripted = useCallback((prompt: string) => {
@@ -458,6 +472,18 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     resetDynamic()
     setDeclineReportFiltered(false)
     setWorkQueuePhase("triage")
+    setFeeVolumeRowHighlighted(false)
+    setSalesDrilldownOpen(false)
+    setAccountChangeStep(1)
+    setDepositNotifyRequested(false)
+  }, [])
+
+  const requestDepositNotify = useCallback(() => {
+    setDepositNotifyRequested(true)
+    setMessages((prev) => [
+      ...prev,
+      { id: newSessionId(), role: "assistant" as const, content: "Done. You'll get a notification when Sunday's batch funds.", suggestions: CONCEPT_ALL_PROMPTS },
+    ])
   }, [])
 
   const submitDisputeDraft = useCallback(() => {
@@ -501,6 +527,10 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     resetDynamic()
     setDeclineReportFiltered(false)
     setWorkQueuePhase("triage")
+    setFeeVolumeRowHighlighted(false)
+    setSalesDrilldownOpen(false)
+    setAccountChangeStep(1)
+    setDepositNotifyRequested(false)
   }, [])
 
   const replayFlow: (() => void) | null = autoPlayFlow ? useCallback(() => {
@@ -520,6 +550,10 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setBatchPanelOpen(false)
     setDeclineReportFiltered(false)
     setWorkQueuePhase("triage")
+    setFeeVolumeRowHighlighted(false)
+    setSalesDrilldownOpen(false)
+    setAccountChangeStep(1)
+    setDepositNotifyRequested(false)
     setProactiveNotificationActive(false)
     setTimeout(() => playConceptScripted(autoPlayFlow), 300)
   }, []) : null
@@ -579,6 +613,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       openPanels, closingPanels, closePanel, closeAllNewPanels, submitDisputeDraft,
       dynamicPanels, closeDynamicPanel,
       declineReportFiltered, workQueuePhase,
+      feeVolumeRowHighlighted, salesDrilldownOpen, accountChangeStep, depositNotifyRequested, requestDepositNotify,
     }}>
       {children}
     </Ctx.Provider>

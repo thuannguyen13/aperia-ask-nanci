@@ -6,7 +6,7 @@ import { DRIVER_SUMMARY, EFFECTIVE_RATE, VOLUME, FEES, FEES_TOTAL } from "@/lib/
 import { PanelShell, PanelHeader, PanelExportButton, Callout, formatCurrency } from "@/components/ask-nanci/shared"
 
 export function FeeSummaryPanel() {
-  const { closePanel, feeVolumeRowHighlighted } = useAskNanci()
+  const { closeDynamicPanel, feeVolumeRowHighlighted } = useAskNanci()
 
   return (
     <PanelShell>
@@ -14,7 +14,7 @@ export function FeeSummaryPanel() {
         title="Fee Summary"
         size="lg"
         actions={<PanelExportButton />}
-        onClose={() => closePanel("fee-summary")}
+        onClose={() => closeDynamicPanel("fee-summary")}
       />
 
       <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
