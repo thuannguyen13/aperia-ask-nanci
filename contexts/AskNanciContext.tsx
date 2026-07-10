@@ -97,6 +97,9 @@ interface AskNanciCtx {
   workQueuePhase: "triage" | "quick-wins" | "outage"
   feeVolumeRowHighlighted: boolean
   accountChangeStep: 1 | 2 | 3
+  submitAccountChangeDetails: () => void
+  goBackAccountChangeStep: () => void
+  confirmAccountChange: () => void
   depositNotifyRequested: boolean
   requestDepositNotify: () => void
 }
@@ -336,7 +339,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     if (turn.filterDeclineReport) { setDeclineReportFiltered(true) }
     if (turn.advanceWorkQueue) { setWorkQueuePhase(turn.advanceWorkQueue) }
     if (turn.highlightFeeVolumeRow) { setFeeVolumeRowHighlighted(true) }
-    if (turn.advanceAccountChange) { setAccountChangeStep((s) => Math.min(3, s + 1) as 1 | 2 | 3) }
     if (turn.depositNotifyRequested) { setDepositNotifyRequested(true) }
   }, [])
 
@@ -482,6 +484,26 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     ])
   }, [])
 
+  const submitAccountChangeDetails = useCallback(() => {
+    setAccountChangeStep(2)
+    setMessages((prev) => [
+      ...prev,
+      { id: newSessionId(), role: "assistant" as const, content: "Routing number checks out to First National. To confirm, new deposits will route to the account ending 7715 starting with your next batch. Verify the last four digits and I'll apply it." },
+    ])
+  }, [])
+
+  const goBackAccountChangeStep = useCallback(() => {
+    setAccountChangeStep(1)
+  }, [])
+
+  const confirmAccountChange = useCallback(() => {
+    setAccountChangeStep(3)
+    setMessages((prev) => [
+      ...prev,
+      { id: newSessionId(), role: "assistant" as const, content: "Confirmed and updated at 3:40 PM. A confirmation was sent to the email ending in ...@oakst.com. Your next deposit, tomorrow's batch, will go to the new account.", suggestions: CONCEPT_ALL_PROMPTS },
+    ])
+  }, [])
+
   const submitDisputeDraft = useCallback(() => {
     setOpenPanels([])
     setMessages((prev) => [
@@ -607,7 +629,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       openPanels, closingPanels, closePanel, closeAllNewPanels, submitDisputeDraft,
       dynamicPanels, closeDynamicPanel,
       declineReportFiltered, workQueuePhase,
-      feeVolumeRowHighlighted, accountChangeStep, depositNotifyRequested, requestDepositNotify,
+      feeVolumeRowHighlighted, accountChangeStep, submitAccountChangeDetails, goBackAccountChangeStep, confirmAccountChange, depositNotifyRequested, requestDepositNotify,
     }}>
       {children}
     </Ctx.Provider>
