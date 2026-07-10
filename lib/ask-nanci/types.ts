@@ -58,7 +58,6 @@ export interface ConceptScriptedTurn extends ScriptedTurn {
   widgetDelay?: number
   pauseAfter?: number
   highlightFeeVolumeRow?: true
-  advanceAccountChange?: true
   depositNotifyRequested?: true
 }
 
