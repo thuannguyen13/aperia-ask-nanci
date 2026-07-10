@@ -488,7 +488,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setAccountChangeStep(2)
     setMessages((prev) => [
       ...prev,
-      { id: newSessionId(), role: "assistant" as const, content: "Routing number checks out to First National. To confirm, new deposits will route to the account ending 7715 starting with your next batch. Verify the last four digits and I'll apply it." },
+      { id: newSessionId(), role: "assistant" as const, content: "Routing number checks out to First National. To confirm, new deposits will route to the account ending 7715 starting with your next batch. Verify the last four digits and I will apply it." },
     ])
   }, [])
 

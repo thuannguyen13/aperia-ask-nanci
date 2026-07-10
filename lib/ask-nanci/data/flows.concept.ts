@@ -416,6 +416,6 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   // confirmAccountChange in AskNanciContext), not scripted turns — see AccountChangePanel.tsx.
   [CONCEPT_FLOW16_PROMPT]: [
     { role: "user", content: CONCEPT_FLOW16_PROMPT },
-    { role: "assistant", content: "I can update that. Current account ends ••4432. Enter the new routing and account number in the panel and I'll validate them before anything changes.", openDynamicPanel: "account-change" },
+    { role: "assistant", content: "I can update that. Current account ends 4432. Enter the new routing and account number and I will validate them before anything changes.", openDynamicPanel: "account-change" },
   ],
 }

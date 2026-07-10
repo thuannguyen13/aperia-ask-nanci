@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { Landmark, ArrowRight, CheckCircle2 } from "lucide-react"
 import { Button, Input, Label } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
@@ -93,7 +94,12 @@ function Step3() {
   return (
     <div className="flex flex-1 flex-col overflow-y-auto px-4 py-3 gap-4">
       <Callout variant="blue">
-        <span className="font-bold">Account Updated</span> — deposits now route to ••••••••••{NEW_ACCOUNT.last4}. Your next deposit, tomorrow's batch, will go to the new account. A confirmation was sent to {CONFIRMATION_EMAIL} for your records.
+        <div className="flex items-start gap-2">
+          <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={18} height={18} className="mt-0.5 shrink-0" />
+          <p>
+            <span className="font-bold">Account Updated</span> — deposits now route to ••••••••••{NEW_ACCOUNT.last4}. Your next deposit, tomorrow's batch, will go to the new account. A confirmation was sent to {CONFIRMATION_EMAIL} for your records.
+          </p>
+        </div>
       </Callout>
 
       <div className="flex flex-1 flex-col items-center justify-center gap-3">
