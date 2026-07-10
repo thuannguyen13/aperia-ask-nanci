@@ -4,7 +4,7 @@ import { Landmark, ArrowRight, CheckCircle2 } from "lucide-react"
 import { Button, Input, Label } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { CURRENT_ACCOUNT, NEW_ACCOUNT, CONFIRMATION_EMAIL, CONFIRMED_AT } from "@/lib/ask-nanci/data/panels/account-change"
-import { PanelShell, PanelHeader, PanelExportButton, Callout } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, Callout } from "@/components/ask-nanci/shared"
 
 function AccountRow({ last4, className }: { last4: string; className?: string }) {
   return (
@@ -97,7 +97,9 @@ function Step3() {
       </Callout>
 
       <div className="flex flex-1 flex-col items-center justify-center gap-3">
-        <CheckCircle2 className="size-10 text-green-500" />
+        <div className="flex size-14 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/40">
+          <CheckCircle2 className="size-7 text-green-600 dark:text-green-400" />
+        </div>
         <div className="text-center">
           <p className="text-base font-semibold text-foreground">Account Updated</p>
           <p className="text-xs text-muted-foreground">Confirmed today at {CONFIRMED_AT}</p>
@@ -116,9 +118,8 @@ export function AccountChangePanel() {
   return (
     <PanelShell>
       <PanelHeader
-        title="Deposit Account"
+        title={accountChangeStep === 2 ? "Confirm Account Change" : "Deposit Account"}
         size="lg"
-        actions={<PanelExportButton />}
         onClose={() => closeDynamicPanel("account-change")}
       />
 
