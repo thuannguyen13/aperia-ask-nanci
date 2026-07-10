@@ -30,7 +30,6 @@ export const CONCEPT_FLOW14_PROMPT = "my fees went up this month, what happened?
 export const CONCEPT_FLOW15_PROMPT = "How'd this week go vs last week?"
 export const CONCEPT_FLOW15_FOLLOWUP = "Was there a slow day too?"
 export const CONCEPT_FLOW16_PROMPT  = "I changed banks, send my deposits to the new account"
-export const CONCEPT_FLOW16_CONFIRM = "7715"
 
 // Registry: numeric flow number (as string) → CONCEPT_SCRIPTED_CONVERSATIONS key.
 // Add one line here to make any flow embeddable via ?mode=concept-embed&flow=<number>.
@@ -78,8 +77,6 @@ export const CONCEPT_NO_RESET_PROMPTS = new Set([
   CONCEPT_DQ_OPEN_KEY,
   CONCEPT_DQ_COASTAL_KEY,
   CONCEPT_DQ_ESCALATE_KEY,
-  // Account Change: confirm step continues the session rather than resetting it
-  CONCEPT_FLOW16_CONFIRM,
   // Sales Snapshot: drill-down follow-up continues the session rather than resetting it
   CONCEPT_FLOW15_FOLLOWUP,
 ])
@@ -415,24 +412,10 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   ],
 
   // ── Flow 16: Account Change (Guardrail Write, chunked) ────────────────────
+  // Steps 1→2→3 are advanced by direct panel button pushes (submitAccountChangeDetails /
+  // confirmAccountChange in AskNanciContext), not scripted turns — see AccountChangePanel.tsx.
   [CONCEPT_FLOW16_PROMPT]: [
     { role: "user", content: CONCEPT_FLOW16_PROMPT },
     { role: "assistant", content: "I can update that. Current account ends ••4432. Enter the new routing and account number in the panel and I'll validate them before anything changes.", openDynamicPanel: "account-change" },
-    { role: "user", content: "Entered my new account details" },
-    {
-      role: "assistant",
-      content: "Routing number checks out to First National. To confirm, new deposits will route to the account ending 7715 starting with your next batch. Verify the last four digits and I'll apply it.",
-      advanceAccountChange: true,
-      suggestions: [CONCEPT_FLOW16_CONFIRM],
-    },
-  ],
-  [CONCEPT_FLOW16_CONFIRM]: [
-    { role: "user", content: CONCEPT_FLOW16_CONFIRM },
-    {
-      role: "assistant",
-      content: "Confirmed and updated. A confirmation was sent to your email on file. Your next deposit, tomorrow's batch, will go to the new account.",
-      advanceAccountChange: true,
-      suggestions: CONCEPT_ALL_PROMPTS,
-    },
   ],
 }
