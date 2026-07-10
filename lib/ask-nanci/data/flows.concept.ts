@@ -30,6 +30,7 @@ export const CONCEPT_FLOW14_PROMPT = "my fees went up this month, what happened?
 export const CONCEPT_FLOW15_PROMPT = "How'd this week go vs last week?"
 export const CONCEPT_FLOW15_FOLLOWUP = "Was there a slow day too?"
 export const CONCEPT_FLOW16_PROMPT  = "I changed banks, send my deposits to the new account"
+export const CONCEPT_FLOW9_PROMPT   = "none of this is right, my payout is short by like 600 bucks and I don't get why"
 
 // Registry: numeric flow number (as string) → CONCEPT_SCRIPTED_CONVERSATIONS key.
 // Add one line here to make any flow embeddable via ?mode=concept-embed&flow=<number>.
@@ -56,6 +57,7 @@ export const CONCEPT_ALL_PROMPTS = [
   CONCEPT_FLOW14_PROMPT,
   CONCEPT_FLOW15_PROMPT,
   CONCEPT_FLOW16_PROMPT,
+  CONCEPT_FLOW9_PROMPT,
 ]
 
 export const CONCEPT_NO_RESET_PROMPTS = new Set([
@@ -417,5 +419,15 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   [CONCEPT_FLOW16_PROMPT]: [
     { role: "user", content: CONCEPT_FLOW16_PROMPT },
     { role: "assistant", content: "I can update that. Current account ends 4432. Enter the new routing and account number and I will validate them before anything changes.", openDynamicPanel: "account-change" },
+  ],
+
+  // ── Flow 9: Escalation ─────────────────────────────────────────────────────
+  [CONCEPT_FLOW9_PROMPT]: [
+    { role: "user", content: CONCEPT_FLOW9_PROMPT },
+    { role: "assistant", content: "That is worth a person's eyes, and I do not want to guess on missing money. Here is what I have gathered so you do not have to repeat it: expected payout $3,400, received $2,800, for the batch dated May 12.", openDynamicPanel: "escalation" },
+    { role: "user", content: "yeah exactly" },
+    { role: "assistant", content: "I can get you to the settlement team two ways. Book a call, next slot is today at 4:30, or file a ticket now and they reach you within 4 business hours. Both carry the batch details I just pulled.", advanceEscalation: "paths" },
+    { role: "user", content: "book the 4:30" },
+    { role: "assistant", content: "Booked for 4:30 today. Reference SR-2205. The team will have the batch discrepancy in front of them, so you can pick up where we left off.", advanceEscalation: "booked", suggestions: CONCEPT_ALL_PROMPTS },
   ],
 }

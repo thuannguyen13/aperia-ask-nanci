@@ -4,7 +4,7 @@ import { useState } from "react"
 import Image from "next/image"
 import { TriangleAlert } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { CONCEPT_FLOW2_PROMPT, CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_FLOW12_PROMPT } from "@/lib/ask-nanci/concept-config"
+import { CONCEPT_FLOW2_PROMPT, CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_FLOW12_PROMPT, CONCEPT_FLOW13_PROMPT, CONCEPT_FLOW14_PROMPT, CONCEPT_FLOW15_PROMPT, CONCEPT_FLOW16_PROMPT, CONCEPT_FLOW9_PROMPT } from "@/lib/ask-nanci/concept-config"
 import { ChatInput } from "@/components/ask-nanci/ChatInput"
 
 const PROACTIVE_CONTENT = CONCEPT_SCRIPTED_CONVERSATIONS[CONCEPT_FLOW6_KEY][0].content
@@ -100,6 +100,49 @@ const FLOWS = [
   },
 ]
 
+const MONEY_FLOWS = [
+  {
+    num: 13,
+    title: "Deposit Tracker",
+    badge: "Chat + panel",
+    description: "Pending batches with a held-transaction explainer — the AI reasons about why, not just a status label.",
+    prompt: CONCEPT_FLOW13_PROMPT,
+    proactive: false,
+  },
+  {
+    num: 14,
+    title: "Fee Change Explainer",
+    badge: "Chat + panel",
+    description: "Statement went up — AI attributes the delta to volume, then chains into the one real exception.",
+    prompt: CONCEPT_FLOW14_PROMPT,
+    proactive: false,
+  },
+  {
+    num: 15,
+    title: "Sales Snapshot",
+    badge: "Chat + panel",
+    description: "Week-over-week sales with an AI-authored driver line and a same-panel drill-in.",
+    prompt: CONCEPT_FLOW15_PROMPT,
+    proactive: false,
+  },
+  {
+    num: 16,
+    title: "Account Change",
+    badge: "Multi-step",
+    description: "Bank account change submitted as a verified request, not applied directly — the guardrail-write reference pattern.",
+    prompt: CONCEPT_FLOW16_PROMPT,
+    proactive: false,
+  },
+  {
+    num: 17,
+    title: "Escalation",
+    badge: "Chat + panel",
+    description: "AI can't resolve a payout shortfall — hands off to a human with the batch context already attached, never a dead end.",
+    prompt: CONCEPT_FLOW9_PROMPT,
+    proactive: false,
+  },
+]
+
 const BADGE_COLORS: Record<string, string> = {
   "Chat only":       "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",
   "Chat + panel":    "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300",
@@ -189,41 +232,52 @@ export function ConceptWelcomeView() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {FLOWS.map((flow) => (
-            <div key={flow.num} className="flex flex-col gap-3 rounded-2xl border bg-card p-4">
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="flex size-6 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
-                    {flow.num}
-                  </span>
-                  <h3 className="text-sm font-semibold text-foreground">{flow.title}</h3>
-                </div>
-                <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${BADGE_COLORS[flow.badge] ?? ""}`}>
-                  {flow.badge}
-                </span>
-              </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">{flow.description}</p>
-              {flow.proactive ? (
-                <button
-                  onClick={handleSimulateLogin}
-                  className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors"
-                >
-                  Simulate login
-                </button>
-              ) : (
-                <button
-                  onClick={() => handlePrompt(flow.prompt!)}
-                  className="rounded-lg border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
-                >
-                  Try it
-                </button>
-              )}
-            </div>
-          ))}
+        <FlowGrid flows={FLOWS} onTryIt={handlePrompt} onSimulateLogin={handleSimulateLogin} />
+
+        <div className="flex flex-col gap-3">
+          <p className="text-[11px] font-bold tracking-[0.1em] uppercase text-muted-foreground">Merchant Money Questions</p>
+          <FlowGrid flows={MONEY_FLOWS} onTryIt={handlePrompt} onSimulateLogin={handleSimulateLogin} />
         </div>
 
       </div>
+    </div>
+  )
+}
+
+function FlowGrid({ flows, onTryIt, onSimulateLogin }: { flows: typeof FLOWS; onTryIt: (prompt: string) => void; onSimulateLogin: () => void }) {
+  return (
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      {flows.map((flow) => (
+        <div key={flow.num} className="flex flex-col gap-3 rounded-2xl border bg-card p-4">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <span className="flex size-6 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
+                {flow.num}
+              </span>
+              <h3 className="text-sm font-semibold text-foreground">{flow.title}</h3>
+            </div>
+            <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${BADGE_COLORS[flow.badge] ?? ""}`}>
+              {flow.badge}
+            </span>
+          </div>
+          <p className="text-sm text-muted-foreground leading-relaxed">{flow.description}</p>
+          {flow.proactive ? (
+            <button
+              onClick={onSimulateLogin}
+              className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors"
+            >
+              Simulate login
+            </button>
+          ) : (
+            <button
+              onClick={() => onTryIt(flow.prompt!)}
+              className="rounded-lg border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+            >
+              Try it
+            </button>
+          )}
+        </div>
+      ))}
     </div>
   )
 }

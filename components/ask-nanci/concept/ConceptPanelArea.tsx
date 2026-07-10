@@ -36,6 +36,7 @@ import { SalesSnapshotPanel } from "./SalesSnapshotPanel"
 import { SalesDrilldownPanel } from "./SalesDrilldownPanel"
 import { AccountChangePanel } from "./AccountChangePanel"
 import { FlaggedTransactionPanel } from "./FlaggedTransactionPanel"
+import { EscalationPanel } from "./EscalationPanel"
 
 type Slots = { A: PanelId | null; B: PanelId | null; C: PanelId | null; D: PanelId | null }
 
@@ -120,6 +121,7 @@ function PanelContent({ id }: { id: PanelId }) {
     case "sales-snapshot":      return <SalesSnapshotPanel />
     case "sales-drilldown":     return <SalesDrilldownPanel />
     case "account-change":      return <AccountChangePanel />
+    case "escalation":          return <EscalationPanel />
   }
 }
 

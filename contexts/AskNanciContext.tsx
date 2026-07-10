@@ -102,6 +102,7 @@ interface AskNanciCtx {
   confirmAccountChange: () => void
   depositNotifyRequested: boolean
   requestDepositNotify: () => void
+  escalationPhase: "detail" | "paths" | "booked"
 }
 
 const Ctx = createContext<AskNanciCtx | null>(null)
@@ -155,6 +156,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [feeVolumeRowHighlighted, setFeeVolumeRowHighlighted] = useState(false)
   const [accountChangeStep, setAccountChangeStep] = useState<1 | 2 | 3>(1)
   const [depositNotifyRequested, setDepositNotifyRequested] = useState(false)
+  const [escalationPhase, setEscalationPhase] = useState<"detail" | "paths" | "booked">("detail")
   const [proactiveNotificationActive, setProactiveNotificationActive] = useState(false)
   const stopRef = useRef<boolean>(false)
   const scriptStopRef = useRef<boolean>(false)
@@ -335,11 +337,13 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     if (prompt === CONCEPT_FLOW2_FOLLOWUP) { setReportTopN(5) }
     if (turn.openPanel) { setOpenPanels((prev) => prev.includes(turn.openPanel!) ? prev : [...prev, turn.openPanel!]) }
     if (turn.openPanel === "account-change" || turn.openDynamicPanel === "account-change") { setAccountChangeStep(1) }
+    if (turn.openDynamicPanel === "escalation") { setEscalationPhase("detail") }
     if (turn.openDynamicPanel) { openDynamic(turn.openDynamicPanel) }
     if (turn.filterDeclineReport) { setDeclineReportFiltered(true) }
     if (turn.advanceWorkQueue) { setWorkQueuePhase(turn.advanceWorkQueue) }
     if (turn.highlightFeeVolumeRow) { setFeeVolumeRowHighlighted(true) }
     if (turn.depositNotifyRequested) { setDepositNotifyRequested(true) }
+    if (turn.advanceEscalation) { setEscalationPhase(turn.advanceEscalation) }
   }, [])
 
   const playConceptScripted = useCallback((prompt: string) => {
@@ -474,6 +478,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setFeeVolumeRowHighlighted(false)
     setAccountChangeStep(1)
     setDepositNotifyRequested(false)
+    setEscalationPhase("detail")
   }, [])
 
   const requestDepositNotify = useCallback(() => {
@@ -484,13 +489,36 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     ])
   }, [])
 
+  const streamAssistantReply = useCallback((content: string, extra?: Partial<Message>) => {
+    return new Promise<void>((resolve) => {
+      const botMsg: Message = { id: newSessionId(), role: "assistant", content: "" }
+      setChatState("streaming")
+      const chunks = content.match(/\S+\s*/g) ?? []
+      let chunkIdx = 0
+      const emitNext = () => {
+        if (chunkIdx >= chunks.length) {
+          setMessages((prev) => [...prev, { ...botMsg, content, ...extra }])
+          setPendingBot(null)
+          setChatState("idle")
+          resolve()
+          return
+        }
+        botMsg.content += chunks[chunkIdx++]
+        setPendingBot({ ...botMsg })
+        setTimeout(emitNext, 50 + Math.random() * 70)
+      }
+      emitNext()
+    })
+  }, [])
+
   const submitAccountChangeDetails = useCallback(() => {
     setAccountChangeStep(2)
-    setMessages((prev) => [
-      ...prev,
-      { id: newSessionId(), role: "assistant" as const, content: "Routing number checks out to First National. To confirm, new deposits will route to the account ending 7715 starting with your next batch. Verify the last four digits and I will apply it." },
-    ])
-  }, [])
+    setMessages((prev) => [...prev, { id: newSessionId(), role: "user" as const, content: "Request Changes" }])
+    setChatState("thinking")
+    sleep(600).then(() => streamAssistantReply(
+      "Routing number checks out to First National. This is a financial change, so I'll verify it's you first — I've sent a 6-digit code to your email teresawalker@example.com. Enter it to confirm."
+    ))
+  }, [streamAssistantReply])
 
   const goBackAccountChangeStep = useCallback(() => {
     setAccountChangeStep(1)
@@ -498,11 +526,13 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
 
   const confirmAccountChange = useCallback(() => {
     setAccountChangeStep(3)
-    setMessages((prev) => [
-      ...prev,
-      { id: newSessionId(), role: "assistant" as const, content: "Confirmed and updated at 3:40 PM. A confirmation was sent to the email ending in ...@oakst.com. Your next deposit, tomorrow's batch, will go to the new account.", suggestions: CONCEPT_ALL_PROMPTS },
-    ])
-  }, [])
+    setMessages((prev) => [...prev, { id: newSessionId(), role: "user" as const, content: "Confirm" }])
+    setChatState("thinking")
+    sleep(600).then(() => streamAssistantReply(
+      "Request submitted at 3:40 PM. A confirmation was sent to the email teresawalker@example.com. Deposits continue going to your current account until the new one is verified — typically within 1–2 business days. I'll notify you once it's active.",
+      { suggestions: CONCEPT_ALL_PROMPTS }
+    ))
+  }, [streamAssistantReply])
 
   const submitDisputeDraft = useCallback(() => {
     setOpenPanels([])
@@ -630,6 +660,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       dynamicPanels, closeDynamicPanel,
       declineReportFiltered, workQueuePhase,
       feeVolumeRowHighlighted, accountChangeStep, submitAccountChangeDetails, goBackAccountChangeStep, confirmAccountChange, depositNotifyRequested, requestDepositNotify,
+      escalationPhase,
     }}>
       {children}
     </Ctx.Provider>
