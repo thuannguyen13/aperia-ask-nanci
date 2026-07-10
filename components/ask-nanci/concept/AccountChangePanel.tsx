@@ -1,90 +1,117 @@
 "use client"
 
-import { CheckCircle2, Check } from "lucide-react"
+import { Landmark, ArrowRight, CheckCircle2 } from "lucide-react"
 import { Button, Input, Label } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { CONCEPT_FLOW16_CONFIRM } from "@/lib/ask-nanci/concept-config"
-import { CURRENT_ACCOUNT, NEW_ACCOUNT, VALIDATION_COPY } from "@/lib/ask-nanci/data/panels/account-change"
-import { PanelShell, PanelHeader, PanelExportButton } from "@/components/ask-nanci/shared"
+import { CURRENT_ACCOUNT, NEW_ACCOUNT, CONFIRMATION_EMAIL, CONFIRMED_AT } from "@/lib/ask-nanci/data/panels/account-change"
+import { PanelShell, PanelHeader, PanelExportButton, Callout } from "@/components/ask-nanci/shared"
 
-function Step1() {
+function AccountRow({ last4, className }: { last4: string; className?: string }) {
   return (
-    <div className="flex flex-1 flex-col overflow-y-auto px-5 py-4 gap-5">
-      <div className="rounded-lg border bg-muted/40 px-3 py-2.5">
-        <p className="text-xs text-muted-foreground">Current Account</p>
-        <p className="mt-0.5 font-mono text-sm font-medium text-foreground">Routing {CURRENT_ACCOUNT.routing} · Account {CURRENT_ACCOUNT.account}</p>
+    <div className={`flex flex-1 items-center gap-3 rounded-lg border px-3 py-3 ${className ?? ""}`}>
+      <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted">
+        <Landmark className="size-4 text-muted-foreground" />
       </div>
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="new-routing" className="text-xs">New Routing Number</Label>
-        <Input id="new-routing" placeholder="9-digit routing number" />
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="new-account" className="text-xs">New Account Number</Label>
-        <Input id="new-account" placeholder="Account number" />
-      </div>
-      <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 dark:border-blue-800 dark:bg-blue-950/20 dark:text-blue-300">
-        Tell Nanci once you&apos;ve entered your new account details.
+      <div>
+        <p className="font-mono text-sm text-foreground">••••••••••{last4}</p>
+        <p className="text-xs text-muted-foreground">Receiving Deposits</p>
       </div>
     </div>
   )
 }
 
-function Step2({ onConfirm }: { onConfirm: () => void }) {
+function Step1({ onSubmit }: { onSubmit: () => void }) {
   return (
-    <div className="flex flex-1 flex-col overflow-y-auto px-5 py-4 gap-5">
-      <div className="flex items-center gap-2 text-sm text-green-700 dark:text-green-400">
-        <Check className="size-4" /> {VALIDATION_COPY}
+    <div className="flex flex-1 flex-col overflow-y-auto px-4 py-3 gap-4">
+      <div>
+        <p className="mb-2 text-base font-bold text-foreground">Current Account</p>
+        <AccountRow last4={CURRENT_ACCOUNT.last4} />
       </div>
 
-      <div className="space-y-3 text-[11px]">
-        <p className="text-[9px] font-bold tracking-[0.12em] uppercase text-muted-foreground">What Will Change</p>
-        <div>
-          <p className="text-[9px] text-muted-foreground mb-1.5">Current account</p>
-          <div className="rounded-md border bg-muted/20 px-3 py-2 space-y-1 font-mono">
-            <p className="text-foreground">Routing {CURRENT_ACCOUNT.routing}</p>
-            <p className="text-foreground">Account {CURRENT_ACCOUNT.account}</p>
-            <p className="text-muted-foreground">{CURRENT_ACCOUNT.type}</p>
+      <div>
+        <p className="mb-2 text-base font-bold text-foreground">New Account</p>
+        <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="new-routing" className="text-xs">Routing Number</Label>
+            <Input id="new-routing" placeholder="9 Digits" />
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="new-account" className="text-xs">Account Number</Label>
+            <Input id="new-account" placeholder="Enter Account Number" />
           </div>
         </div>
+      </div>
+
+      <Button className="w-full" onClick={onSubmit}>Submit</Button>
+    </div>
+  )
+}
+
+function Step2({ onBack, onConfirm }: { onBack: () => void; onConfirm: () => void }) {
+  return (
+    <div className="flex flex-1 flex-col overflow-y-auto px-4 py-3 gap-4">
+      <Callout variant="green">
+        <div className="flex items-center gap-1.5">
+          <CheckCircle2 className="size-4 shrink-0" />
+          Routing number checks out — {NEW_ACCOUNT.bank}
+        </div>
+      </Callout>
+
+      <div>
+        <p className="mb-2 text-base font-bold text-foreground">What Will Change</p>
         <div className="flex items-center gap-2">
-          <div className="flex-1 h-px bg-border" />
-          <span className="text-[9px] text-muted-foreground">changing to</span>
-          <div className="flex-1 h-px bg-border" />
+          <AccountRow last4={CURRENT_ACCOUNT.last4} />
+          <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
+          <AccountRow last4={NEW_ACCOUNT.last4} />
         </div>
-        <div>
-          <p className="text-[9px] text-muted-foreground mb-1.5">New account · {NEW_ACCOUNT.bank}</p>
-          <div className="rounded-md border border-primary/30 bg-primary/5 px-3 py-2 space-y-1 font-mono">
-            <p className="text-foreground">Routing {NEW_ACCOUNT.routing}</p>
-            <p className="text-foreground">Account {NEW_ACCOUNT.account}</p>
-            <p className="text-muted-foreground">{NEW_ACCOUNT.type}</p>
+      </div>
+
+      <div>
+        <p className="mb-2 text-base font-bold text-foreground">Verification</p>
+        <div className="flex flex-col items-center gap-2">
+          <Label className="text-xs">Verification code</Label>
+          <div className="flex gap-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Input key={i} maxLength={1} className="size-11 text-center font-mono" />
+            ))}
           </div>
+          <p className="text-center text-xs text-muted-foreground">
+            Enter the last 4 digits of the new account number to confirm.
+          </p>
         </div>
       </div>
 
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="verify-last4" className="text-xs">Verify last 4 of new account number</Label>
-        <Input id="verify-last4" maxLength={4} placeholder="7715" className="font-mono" />
+      <div className="flex gap-2">
+        <Button variant="secondary" className="flex-1" onClick={onBack}>Back</Button>
+        <Button className="flex-1" onClick={onConfirm}>Confirm</Button>
       </div>
-
-      <Button className="w-full" onClick={onConfirm}>Confirm &amp; Apply</Button>
     </div>
   )
 }
 
 function Step3() {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6">
-      <CheckCircle2 className="size-10 text-green-500" />
-      <p className="text-sm font-semibold text-foreground">Account Updated</p>
-      <p className="text-xs text-center text-muted-foreground">
-        Deposits will route to the account ending {NEW_ACCOUNT.account.replace("••••", "")} starting with your next batch.
-      </p>
+    <div className="flex flex-1 flex-col overflow-y-auto px-4 py-3 gap-4">
+      <Callout variant="blue">
+        <span className="font-bold">Account Updated</span> — deposits now route to ••••••••••{NEW_ACCOUNT.last4}. Your next deposit, tomorrow's batch, will go to the new account. A confirmation was sent to {CONFIRMATION_EMAIL} for your records.
+      </Callout>
+
+      <div className="flex flex-1 flex-col items-center justify-center gap-3">
+        <CheckCircle2 className="size-10 text-green-500" />
+        <div className="text-center">
+          <p className="text-base font-semibold text-foreground">Account Updated</p>
+          <p className="text-xs text-muted-foreground">Confirmed today at {CONFIRMED_AT}</p>
+        </div>
+        <div className="w-full max-w-xs">
+          <AccountRow last4={NEW_ACCOUNT.last4} />
+        </div>
+      </div>
     </div>
   )
 }
 
 export function AccountChangePanel() {
-  const { closeDynamicPanel, accountChangeStep, handlePrompt } = useAskNanci()
+  const { closeDynamicPanel, accountChangeStep, submitAccountChangeDetails, goBackAccountChangeStep, confirmAccountChange } = useAskNanci()
 
   return (
     <PanelShell>
@@ -95,8 +122,8 @@ export function AccountChangePanel() {
         onClose={() => closeDynamicPanel("account-change")}
       />
 
-      {accountChangeStep === 1 && <Step1 />}
-      {accountChangeStep === 2 && <Step2 onConfirm={() => handlePrompt(CONCEPT_FLOW16_CONFIRM)} />}
+      {accountChangeStep === 1 && <Step1 onSubmit={submitAccountChangeDetails} />}
+      {accountChangeStep === 2 && <Step2 onBack={goBackAccountChangeStep} onConfirm={confirmAccountChange} />}
       {accountChangeStep === 3 && <Step3 />}
     </PanelShell>
   )
