@@ -32,6 +32,7 @@ export type PanelId =
   | "detection-queue" | "barometer-report" | "coastal-risk"
   | "pending-deposits" | "flagged-transaction" | "fee-summary" | "chargeback-status"
   | "sales-snapshot" | "sales-drilldown" | "account-change" | "escalation"
+  | "menu-performance" | "menu-cost-detail"
 
 // Panel ids that flow through the dynamic panel stack (usePanelStack) instead
 // of the legacy hardcoded mapPanelsToSlots switch in ConceptPanelArea.
@@ -39,6 +40,7 @@ export type DynamicPanelId =
   | "pending-deposits" | "flagged-transaction"
   | "fee-summary" | "chargeback-status"
   | "sales-snapshot" | "sales-drilldown" | "account-change" | "escalation"
+  | "menu-performance" | "menu-cost-detail"
 
 export interface ConceptScriptedTurn extends ScriptedTurn {
   sheetAction?: SheetActionData
@@ -60,6 +62,7 @@ export interface ConceptScriptedTurn extends ScriptedTurn {
   highlightFeeVolumeRow?: true
   depositNotifyRequested?: true
   advanceEscalation?: "paths" | "booked"
+  advanceMenuMargin?: "margin" | "compare"
 }
 
 // ─── API / user types ──────────────────────────────────────────────────────────

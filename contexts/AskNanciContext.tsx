@@ -103,6 +103,7 @@ interface AskNanciCtx {
   depositNotifyRequested: boolean
   requestDepositNotify: () => void
   escalationPhase: "detail" | "paths" | "booked"
+  menuMarginPhase: "volume" | "margin" | "compare"
 }
 
 const Ctx = createContext<AskNanciCtx | null>(null)
@@ -157,6 +158,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [accountChangeStep, setAccountChangeStep] = useState<1 | 2 | 3>(1)
   const [depositNotifyRequested, setDepositNotifyRequested] = useState(false)
   const [escalationPhase, setEscalationPhase] = useState<"detail" | "paths" | "booked">("detail")
+  const [menuMarginPhase, setMenuMarginPhase] = useState<"volume" | "margin" | "compare">("volume")
   const [proactiveNotificationActive, setProactiveNotificationActive] = useState(false)
   const stopRef = useRef<boolean>(false)
   const scriptStopRef = useRef<boolean>(false)
@@ -338,12 +340,14 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     if (turn.openPanel) { setOpenPanels((prev) => prev.includes(turn.openPanel!) ? prev : [...prev, turn.openPanel!]) }
     if (turn.openPanel === "account-change" || turn.openDynamicPanel === "account-change") { setAccountChangeStep(1) }
     if (turn.openDynamicPanel === "escalation") { setEscalationPhase("detail") }
+    if (turn.openDynamicPanel === "menu-performance") { setMenuMarginPhase("volume") }
     if (turn.openDynamicPanel) { openDynamic(turn.openDynamicPanel) }
     if (turn.filterDeclineReport) { setDeclineReportFiltered(true) }
     if (turn.advanceWorkQueue) { setWorkQueuePhase(turn.advanceWorkQueue) }
     if (turn.highlightFeeVolumeRow) { setFeeVolumeRowHighlighted(true) }
     if (turn.depositNotifyRequested) { setDepositNotifyRequested(true) }
     if (turn.advanceEscalation) { setEscalationPhase(turn.advanceEscalation) }
+    if (turn.advanceMenuMargin) { setMenuMarginPhase(turn.advanceMenuMargin) }
   }, [])
 
   const playConceptScripted = useCallback((prompt: string) => {
@@ -479,6 +483,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setAccountChangeStep(1)
     setDepositNotifyRequested(false)
     setEscalationPhase("detail")
+    setMenuMarginPhase("volume")
   }, [])
 
   const requestDepositNotify = useCallback(() => {
@@ -661,6 +666,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       declineReportFiltered, workQueuePhase,
       feeVolumeRowHighlighted, accountChangeStep, submitAccountChangeDetails, goBackAccountChangeStep, confirmAccountChange, depositNotifyRequested, requestDepositNotify,
       escalationPhase,
+      menuMarginPhase,
     }}>
       {children}
     </Ctx.Provider>

@@ -4,7 +4,7 @@ import { useState } from "react"
 import Image from "next/image"
 import { TriangleAlert } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { CONCEPT_FLOW2_PROMPT, CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_FLOW12_PROMPT, CONCEPT_FLOW13_PROMPT, CONCEPT_FLOW14_PROMPT, CONCEPT_FLOW15_PROMPT, CONCEPT_FLOW16_PROMPT, CONCEPT_FLOW9_PROMPT } from "@/lib/ask-nanci/concept-config"
+import { CONCEPT_FLOW2_PROMPT, CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_FLOW12_PROMPT, CONCEPT_FLOW13_PROMPT, CONCEPT_FLOW14_PROMPT, CONCEPT_FLOW15_PROMPT, CONCEPT_FLOW16_PROMPT, CONCEPT_FLOW9_PROMPT, CONCEPT_MENU_MARGIN_PROMPT } from "@/lib/ask-nanci/concept-config"
 import { ChatInput } from "@/components/ask-nanci/ChatInput"
 
 const PROACTIVE_CONTENT = CONCEPT_SCRIPTED_CONVERSATIONS[CONCEPT_FLOW6_KEY][0].content
@@ -139,6 +139,14 @@ const MONEY_FLOWS = [
     badge: "Chat + panel",
     description: "AI can't resolve a payout shortfall — hands off to a human with the batch context already attached, never a dead end.",
     prompt: CONCEPT_FLOW9_PROMPT,
+    proactive: false,
+  },
+  {
+    num: 18,
+    title: "Menu Margin Truth",
+    badge: "Chat + panel",
+    description: "Best-seller by volume isn't the best earner — Nanci joins sales and ingredient cost to rank the menu by profit, insight only she can surface.",
+    prompt: CONCEPT_MENU_MARGIN_PROMPT,
     proactive: false,
   },
 ]

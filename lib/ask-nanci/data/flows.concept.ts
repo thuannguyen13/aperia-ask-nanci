@@ -31,6 +31,7 @@ export const CONCEPT_FLOW15_PROMPT = "How'd this week go vs last week?"
 export const CONCEPT_FLOW15_FOLLOWUP = "Was there a slow day too?"
 export const CONCEPT_FLOW16_PROMPT  = "I changed banks, send my deposits to the new account"
 export const CONCEPT_FLOW9_PROMPT   = "none of this is right, my payout is short by like 600 bucks and I don't get why"
+export const CONCEPT_MENU_MARGIN_PROMPT = "how's the Italian combo doing this month?"
 
 // Registry: numeric flow number (as string) → CONCEPT_SCRIPTED_CONVERSATIONS key.
 // Add one line here to make any flow embeddable via ?mode=concept-embed&flow=<number>.
@@ -58,6 +59,7 @@ export const CONCEPT_ALL_PROMPTS = [
   CONCEPT_FLOW15_PROMPT,
   CONCEPT_FLOW16_PROMPT,
   CONCEPT_FLOW9_PROMPT,
+  CONCEPT_MENU_MARGIN_PROMPT,
 ]
 
 export const CONCEPT_NO_RESET_PROMPTS = new Set([
@@ -429,5 +431,17 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     { role: "assistant", content: "I can get you to the settlement team two ways. Book a call, next slot is today at 4:30, or file a ticket now and they reach you within 4 business hours. Both carry the batch details I just pulled.", advanceEscalation: "paths" },
     { role: "user", content: "book the 4:30" },
     { role: "assistant", content: "Booked for 4:30 today. Reference SR-2205. The team will have the batch discrepancy in front of them, so you can pick up where we left off.", advanceEscalation: "booked", suggestions: CONCEPT_ALL_PROMPTS },
+  ],
+
+  // ── Menu Margin Truth (Merchant, Read-Only) ───────────────────────────────
+  [CONCEPT_MENU_MARGIN_PROMPT]: [
+    { role: "user", content: CONCEPT_MENU_MARGIN_PROMPT },
+    { role: "assistant", content: "It is your volume leader. 840 sold, $7,140 in sales. It is the sandwich the shop runs on.", openDynamicPanel: "menu-performance" },
+    { role: "user", content: "figured. that's our star" },
+    { role: "assistant", content: "By volume, yes. By margin per sandwich, it ranks fourth. Its ingredient cost runs high, mostly the imported meats, so each one nets about $2.90. The chicken pesto nets $4.60 on far fewer sales.", advanceMenuMargin: "margin" },
+    { role: "user", content: "wait, the pesto makes more per sandwich than the combo?" },
+    { role: "assistant", content: "Yes. Here is every sandwich ranked two ways, volume on the left, profit-per-sandwich on the right. The two lists do not match. Your highest-margin items sit in the middle of your sales, and your top seller sits near the bottom on margin.", advanceMenuMargin: "compare" },
+    { role: "user", content: "why's the combo's cost so high" },
+    { role: "assistant", content: "Three imported meats carry it. Prosciutto and mortadella together are 60% of the ingredient cost. The provolone and bread are minor. Nothing here is wrong, it is just an expensive sandwich to build.", openDynamicPanel: "menu-cost-detail", suggestions: CONCEPT_ALL_PROMPTS },
   ],
 }
