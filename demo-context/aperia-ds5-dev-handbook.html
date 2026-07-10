@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aperia DS5 — Developer Handbook</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --ink: #0f0f0e;
+      --ink-2: #44443f;
+      --ink-3: #888780;
+      --rule: #e2e0d8;
+      --surface: #f8f7f4;
+      --white: #ffffff;
+      --accent: #002F67;
+      --accent-light: #e8eef6;
+      --green: #0f6e56;
+      --green-light: #e1f5ee;
+      --amber: #854f0b;
+      --amber-light: #faeeda;
+      --red: #8b1a1a;
+      --red-light: #fdecea;
+      --purple: #3c3489;
+      --purple-light: #eeedfe;
+      --orange: #7c4a00;
+      --orange-light: #fff3e0;
+      --mono: 'IBM Plex Mono', monospace;
+      --sans: 'IBM Plex Sans', sans-serif;
+    }
+
+    body {
+      font-family: var(--sans);
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--ink);
+      background: var(--white);
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 64px 48px 120px;
+    }
+
+    .doc-header {
+      border-bottom: 2px solid var(--ink);
+      padding-bottom: 28px;
+      margin-bottom: 56px;
+    }
+
+    .doc-eyebrow {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 10px;
+    }
+
+    .doc-title {
+      font-size: 32px;
+      font-weight: 600;
+      letter-spacing: -.02em;
+      line-height: 1.2;
+      color: var(--ink);
+      margin-bottom: 12px;
+    }
+
+    .doc-subtitle {
+      font-size: 15px;
+      color: var(--ink-2);
+      font-weight: 300;
+      max-width: 580px;
+    }
+
+    .doc-meta {
+      margin-top: 20px;
+      display: flex;
+      gap: 24px;
+      font-size: 11px;
+      color: var(--ink-3);
+      flex-wrap: wrap;
+    }
+
+    .version-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: var(--accent-light);
+      color: var(--accent);
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    /* TOC */
+    .toc {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 56px;
+    }
+
+    .toc-title {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 12px;
+    }
+
+    .toc-list {
+      list-style: none;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 32px;
+    }
+
+    .toc-list a {
+      font-size: 13px;
+      color: var(--accent);
+      text-decoration: none;
+      display: flex;
+      gap: 8px;
+      align-items: baseline;
+    }
+
+    .toc-list a:hover {
+      text-decoration: underline;
+    }
+
+    .toc-list .toc-num {
+      font-size: 10px;
+      font-family: var(--mono);
+      color: var(--ink-3);
+      flex-shrink: 0;
+    }
+
+    section {
+      margin-bottom: 56px;
+    }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 6px;
+    }
+
+    h2 {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -.015em;
+      color: var(--ink);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      margin: 24px 0 8px;
+    }
+
+    p {
+      color: var(--ink-2);
+      margin-bottom: 12px;
+    }
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+
+    ul, ol {
+      margin: 8px 0 12px 20px;
+      color: var(--ink-2);
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    pre {
+      background: var(--ink);
+      color: #d4d0c8;
+      padding: 16px 20px;
+      border-radius: 8px;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.75;
+      overflow-x: auto;
+      margin: 12px 0;
+    }
+
+    pre .comment { color: #666; }
+    pre .key { color: #8dbdff; }
+    pre .val { color: #9de89a; }
+    pre .cmd { color: #ffd27a; }
+    pre .str { color: #f9a87f; }
+    pre .kw { color: #c792ea; }
+
+    code {
+      font-family: var(--mono);
+      font-size: 12px;
+      background: var(--surface);
+      padding: 1px 5px;
+      border-radius: 3px;
+      color: var(--accent);
+      border: 1px solid var(--rule);
+    }
+
+    a {
+      color: var(--accent);
+    }
+
+    .callout {
+      padding: 14px 18px;
+      border-radius: 8px;
+      border-left: 3px solid;
+      margin: 20px 0;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .callout.warn {
+      background: var(--amber-light);
+      border-color: #ef9f27;
+      color: var(--amber);
+    }
+
+    .callout.info {
+      background: var(--accent-light);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .callout.ok {
+      background: var(--green-light);
+      border-color: #1d9e75;
+      color: var(--green);
+    }
+
+    .callout strong {
+      font-weight: 600;
+    }
+
+    /* Steps */
+    .steps { margin: 16px 0; }
+
+    .step {
+      display: flex;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .step:last-child { border-bottom: none; }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+    }
+
+    .step-num.green { background: var(--green); }
+    .step-num.purple { background: var(--purple); }
+
+    .step-content h4 {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .step-content p {
+      font-size: 12px;
+      margin: 0;
+    }
+
+    .step-content p + p {
+      margin-top: 6px;
+    }
+
+    /* Stack table */
+    .stack-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin: 16px 0;
+    }
+
+    .stack-table th {
+      text-align: left;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      padding: 6px 12px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .stack-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--rule);
+      color: var(--ink-2);
+      vertical-align: top;
+    }
+
+    .stack-table td:first-child {
+      font-weight: 500;
+      color: var(--ink);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .stack-table tr:last-child td { border-bottom: none; }
+    .stack-table tr:hover td { background: var(--surface); }
+
+    /* Component chip */
+    .chip {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 500;
+      padding: 2px 7px;
+      border-radius: 10px;
+      white-space: nowrap;
+    }
+
+    .chip.done { background: var(--green-light); color: var(--green); }
+    .chip.none { background: var(--surface); color: var(--ink-3); border: 1px solid var(--rule); }
+    .chip.wip { background: var(--amber-light); color: var(--amber); }
+
+    /* Two-column layout for role cards */
+    .role-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .role-card {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .role-card .role-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .role-card ul {
+      font-size: 12px;
+      margin: 0;
+      padding-left: 16px;
+    }
+
+    .role-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    /* Inline badge for tool names */
+    .tool-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 500;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-family: var(--mono);
+      background: var(--purple-light);
+      color: var(--purple);
+      border: 1px solid #c9c4f5;
+      margin-left: 4px;
+    }
+
+    /* Flow diagram - inline SVG wrapper */
+    .flow-wrap {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 10px;
+      padding: 24px;
+      margin: 20px 0;
+      overflow-x: auto;
+    }
+
+    /* Theme override block */
+    .theme-block {
+      background: var(--ink);
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin: 16px 0;
+    }
+
+    .theme-block-title {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: #666;
+      margin-bottom: 12px;
+      font-family: var(--mono);
+    }
+
+    .theme-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 4px 0;
+      border-bottom: 1px solid #2a2a2a;
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .theme-row:last-child { border-bottom: none; }
+
+    .theme-row .var-name { color: #8dbdff; flex: 1; }
+    .theme-row .var-val { color: #9de89a; }
+    .theme-row .var-swatch {
+      width: 14px;
+      height: 14px;
+      border-radius: 3px;
+      flex-shrink: 0;
+      border: 1px solid rgba(255,255,255,.1);
+    }
+
+    /* Prompt anatomy */
+    .prompt-anatomy {
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      overflow: hidden;
+      margin: 16px 0;
+    }
+
+    .prompt-part {
+      display: flex;
+      gap: 16px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--rule);
+      font-size: 12px;
+    }
+
+    .prompt-part:last-child { border-bottom: none; }
+
+    .prompt-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 4px;
+      flex-shrink: 0;
+      min-width: 68px;
+      text-align: center;
+      align-self: flex-start;
+      margin-top: 1px;
+    }
+
+    .prompt-label.role { background: var(--purple); }
+    .prompt-label.context { background: var(--accent); }
+    .prompt-label.task { background: var(--green); }
+    .prompt-label.constraint { background: var(--amber); }
+
+    .prompt-text { color: var(--ink-2); line-height: 1.6; }
+
+    @media print {
+      body { padding: 32px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="doc-header">
+    <div class="doc-eyebrow">Internal · Design System · Developer Handbook</div>
+    <h1 class="doc-title">Getting Started with Aperia DS5 <span class="version-badge">v0.1.2</span></h1>
+    <p class="doc-subtitle">Everything a new developer needs to go from zero to shipping screens — where to find designs, how to set up a project, how to use AI to generate UI, and the rules of the road.</p>
+    <div class="doc-meta">
+      <span>Last updated: May 2026</span>
+      <span>Stack: Next.js 16 · Tailwind CSS v4 · shadcn/ui · aperia-ds5</span>
+      <span>AI tooling: Claude Code + Figma MCP</span>
+    </div>
+  </header>
+
+  <!-- TOC -->
+  <nav class="toc">
+    <div class="toc-title">Contents</div>
+    <ul class="toc-list">
+      <li><a href="#s00"><span class="toc-num">00</span> Who does what</a></li>
+      <li><a href="#s01"><span class="toc-num">01</span> Prerequisites &amp; tools</a></li>
+      <li><a href="#s02"><span class="toc-num">02</span> Where designs live</a></li>
+      <li><a href="#s03"><span class="toc-num">03</span> Set up a new project</a></li>
+      <li><a href="#s04"><span class="toc-num">04</span> Theming the project</a></li>
+      <li><a href="#s05"><span class="toc-num">05</span> Generate a screen with AI + worked example</a></li>
+      <li><a href="#s06"><span class="toc-num">06</span> Component reference</a></li>
+      <li><a href="#s07"><span class="toc-num">07</span> Prompt templates</a></li>
+      <li><a href="#s08"><span class="toc-num">08</span> Dos &amp; don'ts</a></li>
+      <li><a href="#s09"><span class="toc-num">09</span> compose-layout skill (AI Team repo)</a></li>
+    </ul>
+  </nav>
+
+  <!-- 00 Who does what -->
+  <section id="s00">
+    <div class="section-label">00</div>
+    <h2>Who Does What</h2>
+    <p>The pipeline has two roles. Understand which one you're in before you start — they interact at specific handoff points.</p>
+
+    <div class="role-grid">
+      <div class="role-card">
+        <div class="role-title">
+          <span class="role-dot" style="background: var(--purple);"></span>
+          Designer
+        </div>
+        <ul>
+          <li>Owns the Figma file and the ShadcnDesign Kit</li>
+          <li>Publishes Code Connect snippets to Dev Mode</li>
+          <li>Decides brand tokens (colors, radius, typography)</li>
+          <li>Hands off frames to developers via Figma link</li>
+        </ul>
+      </div>
+      <div class="role-card">
+        <div class="role-title">
+          <span class="role-dot" style="background: var(--green);"></span>
+          Developer
+        </div>
+        <ul>
+          <li>Sets up consuming projects using <code>aperia-ds5</code></li>
+          <li>Applies theming from the design token spec</li>
+          <li>Uses Claude + Figma MCP to generate UI from frames</li>
+          <li>Wires up state, data, and business logic</li>
+          <li>Reviews, fixes, and ships to staging → production</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <strong>If you're a developer:</strong> you don't need to touch the <code>aperia-ds5</code> library repo unless you're adding components. Your day-to-day is entirely in your consuming project — install the package, import components, build pages.
+    </div>
+  </section>
+
+  <!-- 01 Prerequisites -->
+  <section id="s01">
+    <div class="section-label">01</div>
+    <h2>Prerequisites &amp; Tools</h2>
+    <p>Get these set up on day one. Everything else in this handbook depends on them.</p>
+
+    <table class="stack-table">
+      <thead>
+        <tr>
+          <th>Tool</th>
+          <th>Why you need it</th>
+          <th>Get it</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Node.js ≥ 18</td>
+          <td>Run Next.js, build scripts, npm</td>
+          <td><a href="https://nodejs.org" target="_blank">nodejs.org</a></td>
+        </tr>
+        <tr>
+          <td>Claude Code CLI</td>
+          <td>AI generation + Figma MCP integration</td>
+          <td><code>npm install -g @anthropic-ai/claude-code</code></td>
+        </tr>
+        <tr>
+          <td>Figma account</td>
+          <td>Access the ShadcnDesign Kit and project Figma files</td>
+          <td>Ask your designer to share the file with your email</td>
+        </tr>
+        <tr>
+          <td>Figma MCP server</td>
+          <td>Lets Claude read Figma frames directly during generation</td>
+          <td>Configured in Claude Code settings (see below)</td>
+        </tr>
+        <tr>
+          <td>Figma personal token</td>
+          <td>Authenticates Figma MCP and Code Connect CLI</td>
+          <td>Figma → Settings → Security → Personal access tokens</td>
+        </tr>
+        <tr>
+          <td>Aperia AI Team repo</td>
+          <td>Contains the <code>compose-layout</code> skill and other Claude slash commands for DS5 workflows. Requires <strong>pnpm</strong>. See <a href="#s09">Section 09</a> for the full workflow.</td>
+          <td><a href="https://github.com/Joeperia/ai-team" target="_blank">github.com/Joeperia/ai-team</a> — clone adjacent to your project repos</td>
+        </tr>
+        <tr>
+          <td>pnpm</td>
+          <td>Package manager required by the AI Team repo</td>
+          <td><code>npm install -g pnpm</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Configure the Figma MCP server</h3>
+    <p>Add this to your Claude Code MCP settings (<code>~/.claude/settings.json</code> or via <code>/mcp</code> in Claude Code):</p>
+    <pre>{
+  <span class="key">"mcpServers"</span>: {
+    <span class="key">"figma"</span>: {
+      <span class="key">"command"</span>: <span class="val">"npx"</span>,
+      <span class="key">"args"</span>: [<span class="val">"-y"</span>, <span class="val">"figma-developer-mcp"</span>, <span class="val">"--stdio"</span>],
+      <span class="key">"env"</span>: {
+        <span class="key">"FIGMA_ACCESS_TOKEN"</span>: <span class="val">"&lt;your-figma-personal-token&gt;"</span>
+      }
+    }
+  }
+}</pre>
+
+    <div class="callout warn">
+      <strong>Keep your personal token private.</strong> Never commit it to git. If you paste it into a <code>.env</code> file, make sure that file is in <code>.gitignore</code>.
+    </div>
+  </section>
+
+  <!-- 02 Where designs live -->
+  <section id="s02">
+    <div class="section-label">02</div>
+    <h2>Where Designs Live</h2>
+    <p>All designs start in Figma. There are two files you'll interact with.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num purple">F</div>
+        <div class="step-content">
+          <h4>ShadcnDesign Kit — the component library source</h4>
+          <p>This is the Figma file that mirrors <code>aperia-ds5</code>. It contains every component, all their variants, and the token/style definitions. The designer maintains this file and publishes it to the team library so it can be used in project files.</p>
+          <p><strong>You don't edit this file.</strong> You use it as a reference when you need to understand what props a Figma component maps to. Code Connect snippets live here — you'll see the real <code>aperia-ds5</code> import snippets when you select a component in Dev Mode.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num purple">P</div>
+        <div class="step-content">
+          <h4>Project Figma file — the screens you're building</h4>
+          <p>This is the file your designer creates for the specific project. It contains page-level frames using components from the ShadcnDesign Kit. This is the file you get links from when building screens.</p>
+          <p><strong>How to get the link:</strong> the designer right-clicks a frame → Copy link. You'll receive something like <code>https://www.figma.com/design/&lt;fileKey&gt;/&lt;name&gt;?node-id=&lt;nodeId&gt;</code>.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>Reading a design in Dev Mode</h3>
+    <p>When the designer shares a frame, open it in Figma and switch to Dev Mode (the <code>&lt;/&gt;</code> toggle in the top-right). Select any component — if it has Code Connect set up, you'll see the exact <code>aperia-ds5</code> import and prop values instead of raw CSS. Use this to verify props before or after AI generation.</p>
+
+    <div class="callout ok">
+      <strong>Code Connect is live for:</strong> Alert, Avatar / AvatarBadge / AvatarGroup, Badge, Button, Checkbox, Empty / EmptyMedia, Icon (all Lucide icons), Input, InputGroup, RadioGroup, Select, Switch, Tabs / TabsTrigger, Textarea. These components show real code in Dev Mode.
+    </div>
+  </section>
+
+  <!-- 03 Set up a new project -->
+  <section id="s03">
+    <div class="section-label">03</div>
+    <h2>Set Up a New Project</h2>
+    <p>Follow these steps in order. Each step has exactly one command or action.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Scaffold a Next.js project</h4>
+          <p>Use the standard create-next-app command. Choose TypeScript, Tailwind CSS, and the App Router when prompted.</p>
+          <pre><span class="cmd">npx create-next-app@latest my-project --typescript --tailwind --app --src-dir=false</span>
+<span class="cmd">cd my-project</span></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Install aperia-ds5</h4>
+          <p>Install from the npm registry (<a href="https://www.npmjs.com/package/aperia-ds5" target="_blank">npmjs.com/package/aperia-ds5</a>):</p>
+          <pre><span class="cmd">npm install aperia-ds5</span></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Wire up globals.css</h4>
+          <p>Open <code>app/globals.css</code> and replace its contents with:</p>
+          <pre><span class="kw">@import</span> <span class="str">"tailwindcss"</span>;
+<span class="kw">@import</span> <span class="str">"aperia-ds5/base.css"</span>;
+
+<span class="comment">/* That's it. base.css brings tw-animate-css, tokens, Radix variants, */</span>
+<span class="comment">/* and @source for the dist — nothing else needed.                    */</span>
+
+<span class="comment">/* Brand overrides go here — see Section 04 */</span></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>Wrap the app in ThemeProvider</h4>
+          <p>Open <code>app/layout.tsx</code> and add the provider so dark mode works:</p>
+          <pre><span class="kw">import</span> { ThemeProvider } <span class="kw">from</span> <span class="str">"aperia-ds5/theme-provider"</span>
+
+<span class="comment">// Inside your root layout &lt;body&gt;:</span>
+&lt;<span class="key">ThemeProvider</span> <span class="val">defaultTheme</span>=<span class="str">"light"</span> <span class="val">attribute</span>=<span class="str">"class"</span>&gt;
+  {children}
+&lt;/<span class="key">ThemeProvider</span>&gt;</pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h4>Smoke test — render a button</h4>
+          <p>In <code>app/page.tsx</code>, import and render one component to confirm the wiring works:</p>
+          <pre><span class="kw">import</span> { Button } <span class="kw">from</span> <span class="str">"aperia-ds5"</span>
+
+<span class="kw">export default function</span> <span class="val">Page</span>() {
+  <span class="kw">return</span> &lt;<span class="key">Button</span>&gt;Hello DS5&lt;/<span class="key">Button</span>&gt;
+}</pre>
+          <pre><span class="cmd">npm run dev</span>  <span class="comment"># open localhost:3000 — button should render styled</span></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout ok">
+      <strong>It's working if:</strong> the button renders with the default Aperia styling (navy background, white text, rounded corners). If it's unstyled, the most common cause is a missing <code>@source</code> directive in <code>globals.css</code>.
+    </div>
+  </section>
+
+  <!-- 04 Theming -->
+  <section id="s04">
+    <div class="section-label">04</div>
+    <h2>Theming the Project</h2>
+    <p><code>aperia-ds5</code> ships default tokens in <code>base.css</code>. To apply a brand identity, add a <code>:root</code> override block in <code>globals.css</code> — no other config needed. The designer provides the token values; you copy them in.</p>
+
+    <h3>The override block</h3>
+    <p>Add this <em>after</em> your imports in <code>globals.css</code>. Override only what the brand changes — leave everything else to the defaults from <code>base.css</code>.</p>
+
+    <pre><span class="comment">/* globals.css — brand overrides */</span>
+<span class="key">:root</span> {
+  <span class="comment">/* Primary brand color (oklch recommended, hex also works) */</span>
+  <span class="val">--primary</span>: oklch(0.42 0.18 252);        <span class="comment">/* navy */</span>
+  <span class="val">--primary-foreground</span>: oklch(0.98 0 0);  <span class="comment">/* white */</span>
+
+  <span class="comment">/* Accent / brand highlight */</span>
+  <span class="val">--accent</span>: oklch(0.60 0.22 28);          <span class="comment">/* brand orange */</span>
+  <span class="val">--accent-foreground</span>: oklch(0.98 0 0);
+
+  <span class="comment">/* Surface + background */</span>
+  <span class="val">--background</span>: oklch(1 0 0);
+  <span class="val">--card</span>: oklch(0.97 0.002 286);
+
+  <span class="comment">/* Radius (consistent rounding) */</span>
+  <span class="val">--radius</span>: 0.5rem;
+
+  <span class="comment">/* Typography */</span>
+  <span class="val">--font-sans</span>: <span class="str">'Inter'</span>, system-ui, sans-serif;
+}
+
+<span class="comment">/* Dark mode — same variables, different values */</span>
+<span class="key">.dark</span> {
+  <span class="val">--background</span>: oklch(0.14 0.005 286);
+  <span class="val">--card</span>: oklch(0.20 0.005 286);
+}</pre>
+
+    <h3>What tokens are available</h3>
+    <p>The full set is in <a href="https://aperia-ds5.vercel.app/" target="_blank">aperia-ds5.vercel.app</a> → Storybook → Docs. The most commonly overridden tokens:</p>
+
+    <table class="stack-table">
+      <thead>
+        <tr><th>Token</th><th>Controls</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>--primary / --primary-foreground</td><td>Primary buttons, active states, focus rings</td></tr>
+        <tr><td>--secondary / --secondary-foreground</td><td>Secondary buttons, muted surfaces</td></tr>
+        <tr><td>--accent / --accent-foreground</td><td>Hover states, accent highlights</td></tr>
+        <tr><td>--background / --foreground</td><td>Page background and body text</td></tr>
+        <tr><td>--card / --card-foreground</td><td>Card surfaces</td></tr>
+        <tr><td>--destructive / --destructive-foreground</td><td>Error states, destructive actions</td></tr>
+        <tr><td>--border / --input / --ring</td><td>Borders, input outlines, focus rings</td></tr>
+        <tr><td>--radius</td><td>Border radius across all components</td></tr>
+        <tr><td>--font-sans / --font-mono</td><td>Body font, monospace font</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout info">
+      <strong>Tweakcn shortcut:</strong> Go to <a href="https://tweakcn.com" target="_blank">tweakcn.com</a>, design your theme visually, then copy the generated <code>:root</code> block directly into <code>globals.css</code>. The variable naming is 100% compatible with <code>aperia-ds5</code>.
+    </div>
+  </section>
+
+  <!-- 05 Generate a screen with AI -->
+  <section id="s05">
+    <div class="section-label">05</div>
+    <h2>Generate a Screen with AI</h2>
+    <p>This is the core workflow. With the Figma MCP server running, Claude can read the design directly and generate production-ready component code. Follow this exact sequence — skipping steps, especially the spec review, leads to rewrites.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Get the Figma link from your designer</h4>
+          <p>Ask for a direct frame link (not a page link). It should look like:<br>
+          <code>https://www.figma.com/design/&lt;fileKey&gt;/Name?node-id=&lt;nodeId&gt;</code></p>
+          <p>If you're handed a page link, open Figma, click the specific frame, then use Copy link from the right-click menu.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Open Claude Code in your project directory</h4>
+          <pre><span class="cmd">cd my-project</span>
+<span class="cmd">claude</span></pre>
+          <p>Confirm the Figma MCP server is active — you'll see it listed under active tools when Claude starts.</p>
+          <p>If you've installed the team skills from <a href="https://github.com/Joeperia/ai-team" target="_blank">github.com/Joeperia/ai-team</a>, load the relevant skill now with its slash command before sending Message 1. The skill pre-loads DS5-specific rules so Claude doesn't have to rediscover them mid-generation.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Message 1 — fetch and spec (do not code yet)</h4>
+          <p>Send this as your first message:</p>
+          <pre><span class="val">Fetch this Figma frame and give me the implementation spec for approval.
+Go through each section top-to-bottom. For each section note:
+- Layout (flex, grid, rows, columns)
+- Every component name and its props
+- Every icon name
+- Every piece of static copy
+
+Do not write any code yet. Wait for my approval.
+
+[paste your Figma URL here]</span></pre>
+          <p>Claude will call <code>get_design_context</code>, read the screenshot section-by-section, and return a structured spec.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>Review the spec</h4>
+          <p>Read Claude's spec against the Figma frame. Correct anything wrong — wrong component names, missing sections, invented copy. This is the cheapest moment to fix mistakes. Once you approve, corrections happen in code, which is more expensive.</p>
+          <p>Reply <code>Looks good, implement it.</code> to proceed, or list your corrections first.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h4>Message 2 — implement</h4>
+          <pre><span class="val">Implement the spec as approved.
+Use aperia-ds5 components throughout.
+Target file: app/[your-page-path]/page.tsx
+Do not use inline styles — use Tailwind utility classes only.</span></pre>
+          <p>Claude will generate the component tree, import all DS components, and write the file.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-content">
+          <h4>Review the output</h4>
+          <p>Open your browser at <code>localhost:3000</code>. Compare the rendered screen with the Figma frame side by side. Common things to check:</p>
+          <ul style="margin-top: 8px; font-size: 12px;">
+            <li>Spacing and padding match the design</li>
+            <li>Correct component variant is used (e.g. button variant="outline" not default)</li>
+            <li>Icons are the right names from Lucide</li>
+            <li>No hardcoded hex colors — everything should use tokens</li>
+          </ul>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">7</div>
+        <div class="step-content">
+          <h4>Wire up logic</h4>
+          <p>The generated output is UI scaffolding. You own connecting it to real data, state management, event handlers, API calls, and routing. Use targeted Claude messages for specific wiring tasks rather than rewriting the whole file.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout ok">
+      <strong>Key rule:</strong> always run two messages — spec first, code second. Developers who skip the spec review consistently end up with a correction pass that takes longer than the extra message would have.
+    </div>
+
+    <h3>Cleaning up context between screens</h3>
+    <p>After finishing one screen and starting the next, run <code>/compact</code> in Claude Code. This collapses the previous screen's tool output from the conversation window, keeping generation for the next screen faster and more accurate.</p>
+
+    <h3>Worked example — Ask Nanci welcome screen</h3>
+    <p>Ask Nanci is Aperia's internal AI analytics assistant and serves as the reference implementation for DS5 projects. Its Figma file is the canonical example to use when learning the two-message workflow.</p>
+
+    <div class="callout info">
+      <strong>Figma file:</strong> <a href="https://www.figma.com/design/pRnyi3pZOjICYkhl8xm348/Ask-Nanci?node-id=7098-220562" target="_blank">Ask Nanci — Welcome screen frame</a><br>
+      The file contains multiple sections (Onboarding, Chat Interactions, Knowledge Base, Upload Files, Usage) — each is a self-contained frame and a good standalone practice target.
+    </div>
+
+    <p>Below is what a correct Message 1 spec looks like for the welcome screen, and the resulting Message 2 output. Use this to calibrate what a good spec and a good implementation prompt look like before running the workflow on your own screens.</p>
+
+    <div class="prompt-anatomy">
+      <div class="prompt-part">
+        <span class="prompt-label task">Message 1</span>
+        <div class="prompt-text">
+          Fetch this Figma frame and give me the implementation spec for approval.<br>
+          Go section by section from top to bottom. For each section note: layout type, every component and its props, every icon name, and every piece of static copy.<br>
+          Do not write any code yet. Wait for my approval.<br><br>
+          <code>https://www.figma.com/design/pRnyi3pZOjICYkhl8xm348/Ask-Nanci?node-id=7098-220562</code>
+        </div>
+      </div>
+      <div class="prompt-part">
+        <span class="prompt-label context">Expected spec (excerpt)</span>
+        <div class="prompt-text" style="font-size:11px; font-family: var(--mono); line-height:1.8; white-space: pre-wrap;">Sidebar — flex column, 256 px wide, bg-sidebar
+  • Image: ask-nanci-logomark.svg, 24 px
+  • Text: "Ask Nanci" (15 px semibold)
+  • Button (ghost, sm): icon=MessageCirclePlus, label="New Chat"
+  • Button (ghost, sm): icon=PieChart, label="Insights"
+  — footer (pinned bottom) —
+  • Card: "Knowledge Base" + "Add your own data…" + Button (default, sm) "Teach Nanci"
+  • UsageCard: plan badge, daily token progress bar
+  • Avatar + name "Teresa Walker" + email (dropdown trigger)
+
+Main — flex column centered, max-width 800 px
+  • Image: ask-nanci-logomark.svg, 40 px
+  • Heading: "Welcome to Ask Nanci" / "Ready when you are, Teresa." (2xl medium)
+  • ChatInput component
+  • Tabs (line variant): Overview · Top Items · Inventory · Operation · Refunds &amp; Voids · Payment · Tips
+  • Section header: icon=Compass, "Explore prompts", sub "Jumpstart your analysis…", Button (secondary, sm) "View All"
+  • 6 × prompt card (border, rounded-[10px]): icon=CornerDownRight + prompt text</div>
+      </div>
+      <div class="prompt-part">
+        <span class="prompt-label task">Message 2</span>
+        <div class="prompt-text">
+          Implement the spec as approved.<br>
+          Use <code>aperia-ds5</code> components throughout. Target file: <code>app/page.tsx</code><br>
+          Use Tailwind utility classes only — no inline styles.
+        </div>
+      </div>
+    </div>
+
+    <div class="callout ok">
+      <strong>Why Ask Nanci?</strong> The codebase is available internally and already implements the full DS5 stack — ThemeProvider, sidebar layout, Suspense boundaries, dark mode. Reading the source alongside generating from the Figma frames is the fastest way to see the patterns in practice.
+    </div>
+  </section>
+
+  <!-- 06 Component reference -->
+  <section id="s06">
+    <div class="section-label">06</div>
+    <h2>Component Reference</h2>
+    <p>All components are imported from <code>aperia-ds5</code> as named exports. Full interactive documentation and prop tables at <a href="https://aperia-ds5.vercel.app/" target="_blank">aperia-ds5.vercel.app</a>. Package on npm: <a href="https://www.npmjs.com/package/aperia-ds5" target="_blank">npmjs.com/package/aperia-ds5</a>.</p>
+
+    <pre><span class="kw">import</span> {
+  Alert, AlertDescription, AlertTitle,
+  Avatar, AvatarBadge, AvatarGroup,
+  Badge,
+  Button,
+  Card, CardContent, CardHeader, CardTitle,
+  Checkbox,
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
+  Field,
+  Input, InputGroup,
+  Label,
+  Progress,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Separator,
+  Switch,
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+  Tabs, TabsContent, TabsList, TabsTrigger,
+  Textarea,
+} <span class="kw">from</span> <span class="str">"aperia-ds5"</span></pre>
+
+    <table class="stack-table">
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>Code Connect</th>
+          <th>Common props / notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Alert</td>
+          <td><span class="chip done">✓ Live</span></td>
+          <td><code>variant</code>: default | destructive | warning | success</td>
+        </tr>
+        <tr>
+          <td>Avatar / AvatarBadge / AvatarGroup</td>
+          <td><span class="chip done">✓ Live</span></td>
+          <td><code>size</code>: sm | md | lg. AvatarGroup takes array of items.</td>
+        </tr>
+        <tr>
+          <td>Badge</td>
+          <td><span class="chip done">✓ Live</span></td>
+          <td><code>variant</code>: default | secondary | destructive | outline</td>
+        </tr>
+        <tr>
+          <td>Button</td>
+          <td><span class="chip done">✓ Live</span></td>
+          <td><code>variant</code>: default | destructive | outline | secondary | ghost | link. <code>size</code>: default | sm | lg | icon</td>
+        </tr>
+        <tr>
+          <td>Card</td>
+          <td><span class="chip none">Not mapped</span></td>
+          <td>Compose with CardHeader, CardContent, CardFooter, CardTitle, CardDescription</td>
+        </tr>
+        <tr>
+          <td>Checkbox</td>
+          <td><span class="chip done">✓ Live</span></td>
+          <td>Controlled via <code>checked</code> + <code>onCheckedChange</code></td>
+        </tr>
+        <tr>
+          <td>DropdownMenu</td>
+          <td><span class="chip none">Not mapped</span></td>
+          <td>Trigger → Content → Item pattern. Uses Radix primitives.</td>
+        </tr>
+        <tr>
+          <td>Empty / EmptyMedia</td>
+          <td><span class="chip done">✓ Live</span></td>
+          <td>Empty state placeholder with icon, title, and description slots</td>
+        </tr>
+        <tr>
+          <td>Field</td>
+          <td><span class="chip none">Not mapped</span></td>
+          <td>Label + Input + helper/error text wrapper</td>
+        </tr>
+        <tr>
+          <td>Icon</td>
+          <td><span class="chip done">✓ Live</span></td>
+          <td>All Lucide icons — import individually from <code>lucide-react</code>: <code>import { Search } from "lucide-react"</code></td>
+        </tr>
+        <tr>
+          <td>Input</td>
+          <td><span class="chip done">✓ Live</span></td>
+          <td><code>variant</code>: default | password | file. Supports disabled, placeholder, invalid state</td>
+        </tr>
+        <tr>
+          <td>InputGroup</td>
+          <td><span class="chip done">✓ Live</span></td>
+          <td>Input + Textarea with addons: Text / Button / Icon / Kbd / Spinner / Dropdown inline or block</td>
+        </tr>
+        <tr>
+          <td>Progress</td>
+          <td><span class="chip none">Not mapped</span></td>
+          <td><code>value</code> 0–100</td>
+        </tr>
+        <tr>
+          <td>RadioGroup</td>
+          <td><span class="chip done">✓ Live</span></td>
+          <td>Controlled via <code>value</code> + <code>onValueChange</code></td>
+        </tr>
+        <tr>
+          <td>Select</td>
+          <td><span class="chip done">✓ Live</span></td>
+          <td>Trigger → Content → Item pattern. Controlled via <code>value</code> + <code>onValueChange</code></td>
+        </tr>
+        <tr>
+          <td>Switch</td>
+          <td><span class="chip done">✓ Live</span></td>
+          <td>Controlled via <code>checked</code> + <code>onCheckedChange</code></td>
+        </tr>
+        <tr>
+          <td>Table</td>
+          <td><span class="chip none">Not mapped</span></td>
+          <td>Table → TableHeader → TableRow → TableHead / TableBody → TableRow → TableCell</td>
+        </tr>
+        <tr>
+          <td>Tabs / TabsTrigger</td>
+          <td><span class="chip done">✓ Live</span></td>
+          <td><code>variant</code>: default | line. <code>orientation</code>: horizontal | vertical. TabsList → TabsTrigger → TabsContent</td>
+        </tr>
+        <tr>
+          <td>Textarea</td>
+          <td><span class="chip done">✓ Live</span></td>
+          <td>Standard HTML textarea props + DS styling</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 07 Prompt templates -->
+  <section id="s07">
+    <div class="section-label">07</div>
+    <h2>Prompt Templates</h2>
+    <p>Copy these and fill in the bracketed parts. They're structured to minimize correction passes.</p>
+
+    <h3>Full screen generation (two-message pattern)</h3>
+
+    <div class="prompt-anatomy">
+      <div class="prompt-part">
+        <span class="prompt-label task">Message 1</span>
+        <div class="prompt-text">
+          Fetch this Figma frame and give me the implementation spec for approval.<br>
+          Go section by section from top to bottom. For each section note: layout type, every component and its props, every icon name, and every piece of static copy.<br>
+          Do not write any code yet. Wait for my approval.<br><br>
+          <code>[Figma URL]</code>
+        </div>
+      </div>
+      <div class="prompt-part">
+        <span class="prompt-label task">Message 2</span>
+        <div class="prompt-text">
+          Implement the spec as approved.<br>
+          Use <code>aperia-ds5</code> components throughout. Target file: <code>app/[path]/page.tsx</code><br>
+          Use Tailwind utility classes only — no inline styles.
+        </div>
+      </div>
+    </div>
+
+    <h3>Targeted fix — specific line or element</h3>
+    <div class="prompt-anatomy">
+      <div class="prompt-part">
+        <span class="prompt-label constraint">Fix</span>
+        <div class="prompt-text">
+          In <code>[file-path]:[line-number]</code>, [describe what is wrong and what the correct behaviour is].<br>
+          Example: In <code>app/inbox/page.tsx:42</code>, the Tabs component is rendering below the heading — it should be inline with it on the same row.
+        </div>
+      </div>
+    </div>
+
+    <h3>Add a new component to an existing screen</h3>
+    <div class="prompt-anatomy">
+      <div class="prompt-part">
+        <span class="prompt-label context">Context</span>
+        <div class="prompt-text">
+          I need to add [component description] to <code>[file-path]</code>.<br>
+          It should appear [location — e.g. "in the toolbar, after the search input"].<br>
+          Use the <code>[ComponentName]</code> component from <code>aperia-ds5</code> with [props/variant].
+        </div>
+      </div>
+    </div>
+
+    <h3>Theming help</h3>
+    <div class="prompt-anatomy">
+      <div class="prompt-part">
+        <span class="prompt-label role">Theme</span>
+        <div class="prompt-text">
+          Generate a <code>:root</code> token override block for <code>globals.css</code> based on this brand:<br>
+          - Primary: <code>[hex or description]</code><br>
+          - Background: <code>[hex]</code><br>
+          - Radius: <code>[px value]</code><br>
+          - Font: <code>[font name]</code><br>
+          Use oklch values. Include a <code>.dark</code> override for dark mode.
+        </div>
+      </div>
+    </div>
+
+    <h3>Logic wiring — after UI is done</h3>
+    <div class="prompt-anatomy">
+      <div class="prompt-part">
+        <span class="prompt-label context">Wire</span>
+        <div class="prompt-text">
+          The UI for [page name] is done. Now wire up:<br>
+          1. [specific state or handler — e.g. "the search input should filter the table rows by name"]<br>
+          2. [API call — e.g. "fetch data from /api/users on mount and populate the table"]<br>
+          Keep changes minimal — only modify what's needed.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 Dos and don'ts -->
+  <section id="s08">
+    <div class="section-label">08</div>
+    <h2>Dos &amp; Don'ts</h2>
+    <p>Rules distilled from actual builds. Each don't maps to a real mistake that caused a rewrite.</p>
+
+    <table class="stack-table">
+      <thead>
+        <tr><th>Do</th><th>Don't</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Fetch the Figma frame before writing any code</td>
+          <td>Start coding from a text description of the design</td>
+        </tr>
+        <tr>
+          <td>Read the spec section by section and approve it before asking Claude to implement</td>
+          <td>Ask Claude to "build this page" in a single message</td>
+        </tr>
+        <tr>
+          <td>Extract exact copy, counts, and icon names from the Figma output</td>
+          <td>Let Claude invent labels, nav item names, or badge numbers</td>
+        </tr>
+        <tr>
+          <td>Use <code>aperia-ds5</code> components for every UI element in the spec</td>
+          <td>Mix DS components with raw HTML elements for the same type of UI</td>
+        </tr>
+        <tr>
+          <td>Use Tailwind utility classes for spacing, sizing, and layout</td>
+          <td>Write inline <code>style={{}}</code> objects — they ignore your token system</td>
+        </tr>
+        <tr>
+          <td>Use CSS token variables (<code>--primary</code>, <code>--background</code>) for colors</td>
+          <td>Hardcode hex values — they break dark mode and make theming impossible</td>
+        </tr>
+        <tr>
+          <td>Run <code>/compact</code> after completing a screen, before starting the next</td>
+          <td>Let context accumulate across many screens — it degrades generation quality</td>
+        </tr>
+        <tr>
+          <td>Give precise fix instructions: file, line, what's wrong, what to do</td>
+          <td>Say "fix the layout" without specifying what and where</td>
+        </tr>
+        <tr>
+          <td>Check <a href="https://aperia-ds5.vercel.app/" target="_blank">aperia-ds5.vercel.app</a> for the correct prop names before writing or reviewing code</td>
+          <td>Guess prop names from memory — they change between versions</td>
+        </tr>
+        <tr>
+          <td>Verify Code Connect snippets in Figma Dev Mode for mapped components</td>
+          <td>Assume Claude will always choose the right variant without checking</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>When something looks wrong after generation</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num green">1</div>
+        <div class="step-content">
+          <h4>Is it a component variant issue?</h4>
+          <p>Open the component in Figma Dev Mode (select it → switch to <code>&lt;/&gt;</code> tab). If it has Code Connect, the correct variant and props are shown. Compare to what was generated.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num green">2</div>
+        <div class="step-content">
+          <h4>Is it a layout issue?</h4>
+          <p>Open <a href="https://aperia-ds5.vercel.app/" target="_blank">aperia-ds5.vercel.app</a> Storybook, find the component, and look at the story that matches the design. Copy the correct JSX pattern and use it as a reference for a targeted fix message.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num green">3</div>
+        <div class="step-content">
+          <h4>Is it a styling / token issue?</h4>
+          <p>Check that <code>globals.css</code> has the <code>@source "../node_modules/aperia-ds5/dist"</code> line. Without it, Tailwind won't include the DS classes. Also confirm <code>@import "aperia-ds5/base.css"</code> is present.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <strong>Getting stuck?</strong> The quickest path is usually to show Claude the specific element that's wrong along with a screenshot or the Figma frame section — attach the image to your Claude Code message and say "this element should look like the Figma, fix it."
+    </div>
+  </section>
+
+  <!-- 09 compose-layout skill -->
+  <section id="s09">
+    <div class="section-label">09</div>
+    <h2>compose-layout Skill (AI Team Repo)</h2>
+    <p>The AI Team repo provides a <code>compose-layout</code> Claude skill that automates the entire Figma-to-code pipeline. Instead of running the two-message workflow manually inside your project, you open Claude Code <em>inside the AI repo</em> and let the skill do the heavy lifting — it breaks the design into individual components, generates each one, then assembles a full page component that matches the frame.</p>
+
+    <div class="callout info">
+      <strong>When to use this vs. the manual workflow:</strong> Use <code>compose-layout</code> for full page or multi-section layouts where you want components generated separately and then composed. Use the manual two-message workflow (Section 05) for targeted additions or when you're iterating on an existing screen.
+    </div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Clone the AI Team repo adjacent to your project</h4>
+          <p>The skill needs to reference your target repo by name, so clone it as a sibling directory — not inside your project.</p>
+          <pre><span class="comment"># Expected directory layout:</span>
+<span class="cmd">~/projects/
+  ai-team/          ← clone here
+  my-project/       ← your consuming project</span></pre>
+          <pre><span class="cmd">git clone https://github.com/Joeperia/ai-team</span>
+<span class="cmd">cd ai-team && pnpm install</span></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Add the globals.css file to your target repo</h4>
+          <p>Design provides a <code>globals.css</code> file for the project. Place it in your target repo and import it inside your entry CSS file:</p>
+          <pre><span class="comment">/* app/globals.css */</span>
+<span class="kw">@import</span> <span class="str">"tailwindcss"</span>;
+<span class="kw">@import</span> <span class="str">"aperia-ds5/base.css"</span>;
+<span class="kw">@import</span> <span class="str">"./[project-globals].css"</span>; <span class="comment">/* file provided by Design */</span></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Open Claude Code inside the AI repo</h4>
+          <p>Launch Claude from the <strong>AI repo directory</strong>, not your project. The skill files live there and Claude needs to be in that working directory to load them.</p>
+          <pre><span class="cmd">cd ai-team</span>
+<span class="cmd">claude</span></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>Run the compose-layout skill</h4>
+          <p>Pass two arguments: the Figma frame link and the name of your target repo directory.</p>
+          <pre><span class="val">/compose-layout figma_link="&lt;figma-url&gt;" target_repo_name="&lt;repo-folder-name&gt;"</span></pre>
+          <p>Example using the Ask Nanci welcome screen:</p>
+          <pre><span class="val">/compose-layout figma_link="https://www.figma.com/design/pRnyi3pZOjICYkhl8xm348/Ask-Nanci?node-id=7098-220562" target_repo_name="aperia-ask-nanci"</span></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h4>Respond to prompts as they come up</h4>
+          <p>The skill is interactive. You'll be asked to approve commands and verify results at key checkpoints — typically before it writes files into your target repo or runs a build. Read each prompt before accepting.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-content">
+          <h4>Review the output</h4>
+          <p>The skill breaks the design into separate components, generates each individually using <code>aperia-ds5</code>, then assembles a full page component that matches the Figma frame. Check the result against the design — spacing, variants, icons, and copy — the same way you would after the manual workflow.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num purple">+</div>
+        <div class="step-content">
+          <h4>Optional — generate Storybook stories</h4>
+          <p>At the end of the run you'll be prompted to generate Storybook stories for all the components that were created. Accept this to get component documentation alongside the implementation.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <strong>Claude Code must be open inside <code>ai-team/</code></strong>, not your project directory. The skill files won't be found if you launch Claude from the wrong location.
+    </div>
+  </section>
+
+</body>
+
+</html>

@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aperia DS — Progress Report · May 2026</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    .pipeline-wrap {
+      max-width: 70vw;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+
+    .pipeline-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .pipeline-wrap .mermaid {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 10px;
+      padding: 32px 24px;
+      overflow-x: auto;
+    }
+
+    .pipeline-wrap h2 {
+      max-width: 860px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .pipeline-wrap p {
+      max-width: 860px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .pipeline-who {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 16px 0;
+      max-width: 860px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .pipeline-who-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+    }
+
+    .pipeline-who-item .step-label {
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .pipeline-who-item .owner-tag {
+      font-size: 10px;
+      font-weight: 500;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    .pipeline-who-item .owner-tag.team {
+      background: var(--surface);
+      color: var(--ink-2);
+      border: 1px solid var(--rule);
+    }
+
+    .pipeline-who-item .owner-tag.done {
+      background: var(--green-light);
+      color: var(--green);
+    }
+
+    :root {
+      --ink: #0f0f0e;
+      --ink-2: #44443f;
+      --ink-3: #888780;
+      --rule: #e2e0d8;
+      --surface: #f8f7f4;
+      --white: #ffffff;
+      --accent: #002F67;
+      --accent-light: #e8eef6;
+      --green: #0f6e56;
+      --green-light: #e1f5ee;
+      --amber: #854f0b;
+      --amber-light: #faeeda;
+      --red: #8b1a1a;
+      --red-light: #fdecea;
+      --purple: #3c3489;
+      --purple-light: #eeedfe;
+      --orange: #7c4a00;
+      --orange-light: #fff3e0;
+      --mono: 'IBM Plex Mono', monospace;
+      --sans: 'IBM Plex Sans', sans-serif;
+    }
+
+    body {
+      font-family: var(--sans);
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--ink);
+      background: var(--white);
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 64px 48px 120px;
+    }
+
+    .doc-header {
+      border-bottom: 2px solid var(--ink);
+      padding-bottom: 28px;
+      margin-bottom: 56px;
+    }
+
+    .doc-eyebrow {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 10px;
+    }
+
+    .doc-title {
+      font-size: 32px;
+      font-weight: 600;
+      letter-spacing: -.02em;
+      line-height: 1.2;
+      color: var(--ink);
+      margin-bottom: 12px;
+    }
+
+    .doc-subtitle {
+      font-size: 15px;
+      color: var(--ink-2);
+      font-weight: 300;
+      max-width: 540px;
+    }
+
+    .doc-meta {
+      margin-top: 20px;
+      display: flex;
+      gap: 24px;
+      font-size: 11px;
+      color: var(--ink-3);
+      flex-wrap: wrap;
+    }
+
+    .version-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: var(--green-light);
+      color: var(--green);
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    section {
+      margin-bottom: 56px;
+    }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 6px;
+    }
+
+    h2 {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -.015em;
+      color: var(--ink);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      margin: 24px 0 8px;
+    }
+
+    p {
+      color: var(--ink-2);
+      margin-bottom: 12px;
+    }
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+
+    pre {
+      background: var(--ink);
+      color: #d4d0c8;
+      padding: 16px 20px;
+      border-radius: 8px;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.75;
+      overflow-x: auto;
+      margin: 12px 0;
+    }
+
+    pre .comment {
+      color: #666;
+    }
+
+    pre .key {
+      color: #8dbdff;
+    }
+
+    pre .val {
+      color: #9de89a;
+    }
+
+    pre .cmd {
+      color: #ffd27a;
+    }
+
+    code {
+      font-family: var(--mono);
+      font-size: 12px;
+      background: var(--surface);
+      padding: 1px 5px;
+      border-radius: 3px;
+      color: var(--accent);
+      border: 1px solid var(--rule);
+    }
+
+    .callout {
+      padding: 14px 18px;
+      border-radius: 8px;
+      border-left: 3px solid;
+      margin: 20px 0;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .callout.warn {
+      background: var(--amber-light);
+      border-color: #ef9f27;
+      color: var(--amber);
+    }
+
+    .callout.info {
+      background: var(--accent-light);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .callout.ok {
+      background: var(--green-light);
+      border-color: #1d9e75;
+      color: var(--green);
+    }
+
+    .callout.error {
+      background: var(--red-light);
+      border-color: #c0392b;
+      color: var(--red);
+    }
+
+    .callout strong {
+      font-weight: 600;
+    }
+
+    /* Status table */
+    .stack-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin: 16px 0;
+    }
+
+    .stack-table th {
+      text-align: left;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      padding: 6px 12px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .stack-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--rule);
+      color: var(--ink-2);
+      vertical-align: top;
+    }
+
+    .stack-table td:first-child {
+      font-weight: 500;
+      color: var(--ink);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .stack-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .stack-table tr:hover td {
+      background: var(--surface);
+    }
+
+    /* Steps */
+    .steps {
+      margin: 16px 0;
+    }
+
+    .step {
+      display: flex;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .step:last-child {
+      border-bottom: none;
+    }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+    }
+
+    .step-num.next {
+      background: var(--amber);
+    }
+
+    .step-num.open {
+      background: var(--purple);
+    }
+
+    .step-content h4 {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .step-content p {
+      font-size: 12px;
+      margin: 0;
+    }
+
+    /* Component status chips */
+    .chip {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 500;
+      padding: 2px 7px;
+      border-radius: 10px;
+      white-space: nowrap;
+    }
+
+    .chip.done {
+      background: var(--green-light);
+      color: var(--green);
+    }
+
+    .chip.none {
+      background: var(--surface);
+      color: var(--ink-3);
+      border: 1px solid var(--rule);
+    }
+
+    .chip.wip {
+      background: var(--amber-light);
+      color: var(--amber);
+    }
+
+    /* Practice cards */
+    .practice-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .practice-card {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .practice-card .num {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 6px;
+    }
+
+    .practice-card h4 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .practice-card p {
+      font-size: 12px;
+      color: var(--ink-2);
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    /* Showcase block */
+    .showcase-block {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 16px 0;
+    }
+
+    .showcase-header {
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .showcase-header-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .showcase-header-sub {
+      font-size: 11px;
+      color: var(--ink-3);
+    }
+
+    .showcase-body {
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .showcase-col {
+      background: var(--white);
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      padding: 12px;
+    }
+
+    .showcase-col-title {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 8px;
+    }
+
+    .showcase-item {
+      font-size: 11px;
+      font-family: var(--mono);
+      color: var(--ink-2);
+      padding: 3px 0;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .showcase-item:last-child {
+      border-bottom: none;
+    }
+
+    .showcase-item .tag {
+      color: var(--purple);
+    }
+
+    .showcase-item .comp {
+      color: var(--accent);
+    }
+
+    /* Next steps owner badge */
+    .owner {
+      font-size: 10px;
+      font-weight: 500;
+      padding: 1px 6px;
+      border-radius: 4px;
+      margin-left: 6px;
+    }
+
+    .owner.thuan {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    .owner.marcin {
+      background: var(--purple-light);
+      color: var(--purple);
+    }
+
+    .owner.team {
+      background: var(--surface);
+      color: var(--ink-2);
+      border: 1px solid var(--rule);
+    }
+
+    .pipeline-diagram {
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 10px;
+      padding: 24px 16px;
+      overflow-x: auto;
+      margin: 20px -10rem;
+    }
+
+    @media print {
+      body {
+        padding: 32px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="doc-header">
+    <div class="doc-eyebrow">Internal · Design System Team · May 2026</div>
+    <h1 class="doc-title">Design System Progress Report <span class="version-badge">On Track</span></h1>
+    <p class="doc-subtitle">Status update on the Figma → component library → AI code generation pipeline. Covers
+      completed work, component status, prompting best practices, and next steps.</p>
+
+  </header>
+
+  <!-- 00 Pipeline Overview -->
+  <div class="pipeline-wrap">
+    <section>
+      <div class="section-label">00</div>
+      <h2>Pipeline Overview</h2>
+      <p>The end-to-end workflow from design to production code. Style Dictionary has been removed — token management is
+        handled directly via Tailwind CSS v4 and shadcn's CSS variable convention.</p>
+
+      <div class="pipeline-diagram">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1040" width="100%"
+          font-family="IBM Plex Sans, sans-serif">
+          <defs>
+            <marker id="arr" markerWidth="7" markerHeight="5" refX="6" refY="2.5" orient="auto">
+              <polygon points="0 0, 7 2.5, 0 5" fill="#888780" />
+            </marker>
+            <!-- Replace path content below to swap icons -->
+            <symbol id="icon-developer" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="m16 18 6-6-6-6" stroke="currentColor" />
+              <path d="m8 6-6 6 6 6" stroke="currentColor" />
+            </symbol>
+            <symbol id="icon-designer" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M10 2v2" stroke="currentColor" />
+              <path d="M14 2v4" stroke="currentColor" />
+              <path d="M17 2a1 1 0 0 1 1 1v9H6V3a1 1 0 0 1 1-1z" stroke="currentColor" />
+              <path
+                d="M6 12a1 1 0 0 0-1 1v1a2 2 0 0 0 2 2h2a1 1 0 0 1 1 1v2.9a2 2 0 1 0 4 0V17a1 1 0 0 1 1-1h2a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1"
+                stroke="currentColor" />
+            </symbol>
+          </defs>
+
+          <!-- Background -->
+          <rect width="900" height="1040" fill="#f5f4f0" rx="12" />
+
+          <!-- Divider line between columns -->
+          <line x1="450" y1="55" x2="450" y2="730" stroke="#d8d6ce" stroke-width="1" stroke-dasharray="4,4" />
+
+          <!-- AI section separator -->
+          <line x1="40" y1="740" x2="860" y2="740" stroke="#d8d6ce" stroke-width="1" />
+
+          <!-- Track labels -->
+          <text x="230" y="38" text-anchor="middle" fill="#888780" font-size="10" font-weight="500"
+            letter-spacing="0.1em" font-family="IBM Plex Sans, sans-serif" text-transform="uppercase"
+            style="text-transform:uppercase">LIBRARY TRACK</text>
+          <text x="665" y="38" text-anchor="middle" fill="#888780" font-size="10" font-weight="500"
+            letter-spacing="0.1em" font-family="IBM Plex Sans, sans-serif" text-transform="uppercase"
+            style="text-transform:uppercase">PROJECT TRACK</text>
+          <line x1="95" y1="46" x2="365" y2="46" stroke="#d8d6ce" stroke-width="1" />
+          <line x1="530" y1="46" x2="800" y2="46" stroke="#d8d6ce" stroke-width="1" />
+
+          <!-- ═══ LEFT COLUMN ═══ -->
+
+          <!-- Figma box -->
+          <rect x="95" y="100" width="270" height="90" rx="10" fill="#eeecfb" stroke="#9b8fd4" stroke-width="1.5" />
+          <text x="230" y="135" text-anchor="middle" fill="#4a3a9e" font-size="14" font-weight="700"
+            font-family="IBM Plex Sans, sans-serif">Figma</text>
+          <text x="230" y="158" text-anchor="middle" fill="#7a6dbe" font-size="12"
+            font-family="IBM Plex Sans, sans-serif">ShadcnDesign Kit</text>
+          <rect x="25" y="136" width="70" height="18" rx="4" fill="#eeedfe" />
+          <use href="#icon-designer" x="29" y="140" width="10" height="10" color="#3c3489" />
+          <text x="66" y="145" text-anchor="middle" fill="#3c3489" font-size="10" font-weight="500"
+            font-family="IBM Plex Sans, sans-serif" dy="4">Designer</text>
+
+          <!-- arrow: Figma → aperia-ds5 -->
+          <line x1="230" y1="190" x2="230" y2="232" stroke="#888780" stroke-width="1" marker-end="url(#arr)" />
+          <text x="222" y="215" text-anchor="end" fill="#888780" font-size="11" font-family="IBM Plex Sans, sans-serif"
+            dy="4">components</text>
+
+          <!-- aperia-ds5 box -->
+          <rect x="95" y="240" width="270" height="170" rx="10" fill="#e3eef9" stroke="#4a7fb5" stroke-width="1.5" />
+          <text x="230" y="272" text-anchor="middle" fill="#1a4a7a" font-size="14" font-weight="700"
+            font-family="IBM Plex Sans, sans-serif">aperia-ds5</text>
+          <text x="230" y="294" text-anchor="middle" fill="#3a6a9a" font-size="12"
+            font-family="IBM Plex Sans, sans-serif">components · lib/utils</text>
+          <text x="230" y="312" text-anchor="middle" fill="#3a6a9a" font-size="12"
+            font-family="IBM Plex Sans, sans-serif">base.css · token.css</text>
+          <!-- inner dashed box: Code Connect -->
+          <rect x="117" y="330" width="226" height="38" rx="6" fill="transparent" stroke="#9b8fd4" stroke-width="1"
+            stroke-dasharray="5,3" />
+          <text x="230" y="354" text-anchor="middle" fill="#7a6dbe" font-size="12"
+            font-family="IBM Plex Sans, sans-serif">Code Connect (.figma.ts)</text>
+          <rect x="25" y="316" width="70" height="18" rx="4" fill="#eeedfe" />
+          <use href="#icon-designer" x="29" y="320" width="10" height="10" color="#3c3489" />
+          <text x="66" y="325" text-anchor="middle" fill="#3c3489" font-size="10" font-weight="500"
+            font-family="IBM Plex Sans, sans-serif" dy="4">Designer</text>
+
+          <!-- arrow: ds5 → dist -->
+          <line x1="230" y1="410" x2="230" y2="442" stroke="#888780" stroke-width="1" marker-end="url(#arr)" />
+          <text x="222" y="430" text-anchor="end" fill="#888780" font-size="11" font-family="IBM Plex Sans, sans-serif"
+            dy="4">tsup build</text>
+
+          <!-- dist/ box -->
+          <rect x="95" y="450" width="270" height="80" rx="10" fill="#efefed" stroke="#b8b6ae" stroke-width="1.5" />
+          <text x="230" y="480" text-anchor="middle" fill="#44443f" font-size="14" font-weight="700"
+            font-family="IBM Plex Sans, sans-serif">dist/</text>
+          <text x="230" y="502" text-anchor="middle" fill="#888780" font-size="12"
+            font-family="IBM Plex Sans, sans-serif">index.js · index.d.ts</text>
+          <rect x="19" y="481" width="76" height="18" rx="4" fill="#e1f5ee" />
+          <use href="#icon-developer" x="23" y="485" width="10" height="10" color="#0f6e56" />
+          <text x="63" y="490" text-anchor="middle" fill="#0f6e56" font-size="10" font-weight="500"
+            font-family="IBM Plex Sans, sans-serif" dy="4">Developer</text>
+
+          <!-- arrow: dist → npm registry -->
+          <line x1="230" y1="530" x2="230" y2="562" stroke="#888780" stroke-width="1" marker-end="url(#arr)" />
+          <text x="222" y="550" text-anchor="end" fill="#888780" font-size="11" font-family="IBM Plex Sans, sans-serif"
+            dy="4">npm publish</text>
+
+          <!-- npm registry box -->
+          <rect x="95" y="570" width="270" height="80" rx="10" fill="#fdecd8" stroke="#d4863a" stroke-width="1.5" />
+          <text x="230" y="600" text-anchor="middle" fill="#7c4a00" font-size="14" font-weight="700"
+            font-family="IBM Plex Sans, sans-serif">npm registry</text>
+          <text x="230" y="622" text-anchor="middle" fill="#a06020" font-size="12"
+            font-family="IBM Plex Sans, sans-serif">aperia-ds5 · versioned</text>
+          <rect x="19" y="601" width="76" height="18" rx="4" fill="#e1f5ee" />
+          <use href="#icon-developer" x="23" y="605" width="10" height="10" color="#0f6e56" />
+          <text x="63" y="610" text-anchor="middle" fill="#0f6e56" font-size="10" font-weight="500"
+            font-family="IBM Plex Sans, sans-serif" dy="4">Developer</text>
+
+          <!-- ═══ RIGHT COLUMN ═══ -->
+
+          <!-- Project box -->
+          <rect x="530" y="350" width="270" height="80" rx="10" fill="#f8f7f4" stroke="#b8b6ae" stroke-width="1.5" />
+          <text x="665" y="380" text-anchor="middle" fill="#0f0f0e" font-size="14" font-weight="700"
+            font-family="IBM Plex Sans, sans-serif">Project</text>
+          <text x="665" y="402" text-anchor="middle" fill="#888780" font-size="12"
+            font-family="IBM Plex Sans, sans-serif">any framework</text>
+          <rect x="800" y="381" width="76" height="18" rx="4" fill="#e1f5ee" />
+          <use href="#icon-developer" x="804" y="385" width="10" height="10" color="#0f6e56" />
+          <text x="844" y="390" text-anchor="middle" fill="#0f6e56" font-size="10" font-weight="500"
+            font-family="IBM Plex Sans, sans-serif" dy="4">Developer</text>
+
+          <!-- npm install horizontal arrow -->
+          <line x1="373" y1="630" x2="522" y2="630" stroke="#888780" stroke-width="1" marker-end="url(#arr)" />
+          <text x="447.5" y="622" text-anchor="middle" fill="#888780" font-size="11"
+            font-family="IBM Plex Sans, sans-serif">npm install</text>
+
+          <!-- manual theming arrow -->
+          <line x1="665" y1="430" x2="665" y2="482" stroke="#888780" stroke-width="1" marker-end="url(#arr)" />
+          <text x="657" y="460" text-anchor="end" fill="#888780" font-size="11" font-family="IBM Plex Sans, sans-serif"
+            dy="4">manual theming</text>
+
+          <!-- globals.css box -->
+          <rect x="530" y="490" width="270" height="90" rx="10" fill="#d9f4ee" stroke="#3aad8d" stroke-width="1.5" />
+          <text x="665" y="518" text-anchor="middle" fill="#0f6e56" font-size="14" font-weight="700"
+            font-family="IBM Plex Sans, sans-serif">globals.css</text>
+          <text x="665" y="540" text-anchor="middle" fill="#1a9e75" font-size="12"
+            font-family="IBM Plex Sans, sans-serif">@import aperia-ds5/base.css</text>
+          <text x="665" y="558" text-anchor="middle" fill="#1a9e75" font-size="12"
+            font-family="IBM Plex Sans, sans-serif">--brand: #E85D26</text>
+          <rect x="800" y="515" width="58" height="18" rx="4" fill="#eeedfe" />
+          <use href="#icon-designer" x="804" y="519" width="10" height="10" color="#3c3489" />
+          <text x="835" y="524" text-anchor="middle" fill="#3c3489" font-size="10" font-weight="500"
+            font-family="IBM Plex Sans, sans-serif" dy="4">Design</text>
+          <rect x="800" y="537" width="76" height="18" rx="4" fill="#e1f5ee" />
+          <use href="#icon-developer" x="804" y="541" width="10" height="10" color="#0f6e56" />
+          <text x="844" y="546" text-anchor="middle" fill="#0f6e56" font-size="10" font-weight="500"
+            font-family="IBM Plex Sans, sans-serif" dy="4">Developer</text>
+
+          <!-- arrow globals → import -->
+          <line x1="665" y1="580" x2="665" y2="612" stroke="#888780" stroke-width="1" marker-end="url(#arr)" />
+
+
+          <!-- import box -->
+          <rect x="530" y="620" width="270" height="80" rx="10" fill="#dceeff" stroke="#4a7fb5" stroke-width="1.5" />
+          <text x="665" y="648" text-anchor="middle" fill="#1a4a7a" font-size="14" font-weight="700"
+            font-family="IBM Plex Sans, sans-serif">import { Button, Card }</text>
+          <text x="665" y="670" text-anchor="middle" fill="#3a6a9a" font-size="12"
+            font-family="IBM Plex Sans, sans-serif">from 'aperia-ds5'</text>
+          <rect x="800" y="651" width="76" height="18" rx="4" fill="#e1f5ee" />
+          <use href="#icon-developer" x="804" y="655" width="10" height="10" color="#0f6e56" />
+          <text x="844" y="660" text-anchor="middle" fill="#0f6e56" font-size="10" font-weight="500"
+            font-family="IBM Plex Sans, sans-serif" dy="4">Developer</text>
+
+          <!-- ═══ AI CODE GENERATION SECTION ═══ -->
+          <text x="450" y="754" text-anchor="middle" fill="#888780" font-size="10" font-weight="500"
+            letter-spacing="0.1em" font-family="IBM Plex Sans, sans-serif" style="text-transform:uppercase">AI CODE
+            GENERATION</text>
+
+          <!-- Row 1 owner chips — above boxes -->
+          <rect x="156" y="760" width="69" height="16" rx="4" fill="#eeedfe" />
+          <use href="#icon-designer" x="160" y="763" width="10" height="10" color="#3c3489" />
+          <text x="197" y="768" text-anchor="middle" fill="#3c3489" font-size="10" font-weight="500"
+            font-family="IBM Plex Sans, sans-serif" dy="4">Designer</text>
+          <rect x="413" y="760" width="75" height="16" rx="4" fill="#e1f5ee" />
+          <use href="#icon-developer" x="417" y="763" width="10" height="10" color="#0f6e56" />
+          <text x="457" y="768" text-anchor="middle" fill="#0f6e56" font-size="10" font-weight="500"
+            font-family="IBM Plex Sans, sans-serif" dy="4">Developer</text>
+          <rect x="673" y="760" width="75" height="16" rx="4" fill="#e1f5ee" />
+          <use href="#icon-developer" x="677" y="763" width="10" height="10" color="#0f6e56" />
+          <text x="717" y="768" text-anchor="middle" fill="#0f6e56" font-size="10" font-weight="500"
+            font-family="IBM Plex Sans, sans-serif" dy="4">Developer</text>
+
+          <!-- AI Left: Figma frame -->
+          <rect x="90" y="782" width="200" height="80" rx="10" fill="#eeecfb" stroke="#9b8fd4" stroke-width="1.5"
+            stroke-dasharray="6,4" />
+          <text x="190" y="812" text-anchor="middle" fill="#4a3a9e" font-size="14" font-weight="700"
+            font-family="IBM Plex Sans, sans-serif">Design Handoff</text>
+          <text x="190" y="834" text-anchor="middle" fill="#7a6dbe" font-size="12"
+            font-family="IBM Plex Sans, sans-serif">Send Figma link to Developer</text>
+
+          <!-- arrow → -->
+          <line x1="298" y1="822" x2="342" y2="822" stroke="#888780" stroke-width="1" marker-end="url(#arr)" />
+
+          <!-- AI Mid: Claude + Figma MCP -->
+          <rect x="350" y="782" width="200" height="80" rx="10" fill="#fdecd8" stroke="#d4863a" stroke-width="1.5" />
+          <text x="450" y="812" text-anchor="middle" fill="#7c4a00" font-size="14" font-weight="700"
+            font-family="IBM Plex Sans, sans-serif">Use Claude + Figma MCP</text>
+          <text x="450" y="834" text-anchor="middle" fill="#a06020" font-size="12"
+            font-family="IBM Plex Sans, sans-serif">Generate UI</text>
+
+          <!-- arrow → -->
+          <line x1="558" y1="822" x2="602" y2="822" stroke="#888780" stroke-width="1" marker-end="url(#arr)" />
+
+          <!-- AI Right: Production code -->
+          <rect x="610" y="782" width="200" height="80" rx="10" fill="#1a1a1a" stroke="#1a1a1a" stroke-width="1.5" />
+          <text x="710" y="812" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="700"
+            font-family="IBM Plex Sans, sans-serif">Implement FE Logics</text>
+          <text x="710" y="834" text-anchor="middle" fill="#aaaaaa" font-size="12"
+            font-family="IBM Plex Sans, sans-serif">Connect UI with FE logics</text>
+
+          <!-- L-shaped arrow: Production code → Push to Staging -->
+          <polyline points="710,862 710,884 190,884 190,906" fill="none" stroke="#888780" stroke-width="1"
+            marker-end="url(#arr)" />
+
+          <!-- Row 2: Push to Staging -->
+          <rect x="90" y="906" width="200" height="80" rx="10" fill="#efefed" stroke="#b8b6ae" stroke-width="1.5" />
+          <text x="190" y="936" text-anchor="middle" fill="#44443f" font-size="14" font-weight="700"
+            font-family="IBM Plex Sans, sans-serif">Push to Staging</text>
+          <text x="190" y="958" text-anchor="middle" fill="#888780" font-size="12"
+            font-family="IBM Plex Sans, sans-serif">staging / QA env</text>
+          <rect x="152" y="992" width="76" height="16" rx="4" fill="#e1f5ee" />
+          <use href="#icon-developer" x="156" y="995" width="10" height="10" color="#0f6e56" />
+          <text x="196" y="1000" text-anchor="middle" fill="#0f6e56" font-size="10" font-weight="500"
+            font-family="IBM Plex Sans, sans-serif" dy="4">Developer</text>
+
+          <!-- arrow → -->
+          <line x1="298" y1="946" x2="342" y2="946" stroke="#888780" stroke-width="1" marker-end="url(#arr)" />
+
+          <!-- Row 2: UI & Logic Review -->
+          <rect x="350" y="906" width="200" height="80" rx="10" fill="#f0f4ff" stroke="#7a8fcc" stroke-width="1.5" />
+          <text x="450" y="934" text-anchor="middle" fill="#2a3a7a" font-size="13" font-weight="700"
+            font-family="IBM Plex Sans, sans-serif">UI &amp; Logic Review</text>
+          <text x="450" y="956" text-anchor="middle" fill="#4a5a9a" font-size="12"
+            font-family="IBM Plex Sans, sans-serif">layout · state · edge cases</text>
+          <rect x="412" y="992" width="76" height="16" rx="4" fill="#e1f5ee" />
+          <use href="#icon-developer" x="416" y="995" width="10" height="10" color="#0f6e56" />
+          <text x="456" y="1000" text-anchor="middle" fill="#0f6e56" font-size="10" font-weight="500"
+            font-family="IBM Plex Sans, sans-serif" dy="4">Developer</text>
+
+          <!-- arrow → -->
+          <line x1="558" y1="946" x2="602" y2="946" stroke="#888780" stroke-width="1" marker-end="url(#arr)" />
+
+          <!-- Row 2: Push to Production -->
+          <rect x="610" y="906" width="200" height="80" rx="10" fill="#1a1a1a" stroke="#1a1a1a" stroke-width="1.5" />
+          <text x="710" y="936" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="700"
+            font-family="IBM Plex Sans, sans-serif">Push to Production</text>
+          <text x="710" y="958" text-anchor="middle" fill="#aaaaaa" font-size="12"
+            font-family="IBM Plex Sans, sans-serif">verified &amp; shipped</text>
+          <rect x="672" y="992" width="76" height="16" rx="4" fill="#e1f5ee" />
+          <use href="#icon-developer" x="676" y="995" width="10" height="10" color="#0f6e56" />
+          <text x="716" y="1000" text-anchor="middle" fill="#0f6e56" font-size="10" font-weight="500"
+            font-family="IBM Plex Sans, sans-serif" dy="4">Developer</text>
+
+        </svg>
+      </div>
+
+    </section>
+  </div>
+
+  <!-- 01 Summary -->
+  <section>
+    <div class="section-label">01</div>
+    <h2>What's Been Completed</h2>
+    <p>Since the last sync, the component library, Figma integration, and AI workflow are all functional end-to-end. The
+      following has been validated in a real consuming project (<code>aperia-app</code>).</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">✓</div>
+        <div class="step-content">
+          <h4>Component library — <code>aperia-ds5</code></h4>
+          <p>19 components built on shadcn/ui with Tailwind v4. Bundled via <code>tsup</code> with ESM output and full
+            TypeScript types. Storybook stories for every component. Published to Vercel as a living documentation site.
+          </p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">✓</div>
+        <div class="step-content">
+          <h4>Figma Code Connect — live in Dev Mode</h4>
+          <p>6 components now show real code snippets in Figma Dev Mode instead of the default inspect panel:
+            <strong>Button, Alert, Avatar suite (Avatar / AvatarBadge / AvatarGroup), Tabs, TabsTrigger</strong>. Figma
+            MCP integration confirmed working — Claude reads Figma frames directly during generation.
+          </p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">✓</div>
+        <div class="step-content">
+          <h4>Theming — confirmed working</h4>
+          <p>Library ships default tokens in <code>base.css</code>. Consuming projects can apply their full visual
+            identity — colours, typography, radius, shadows — with a single copy-paste <code>:root</code> block, no
+            other config needed. Also open for custom theming beyond what shadcn covers out of the box. Verified with
+            Tweakcn-generated themes — fully compatible with shadcn variable naming. Dark mode supported via
+            <code>ThemeProvider</code>.
+          </p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">✓</div>
+        <div class="step-content">
+          <h4>AI page building — scaffold projects</h4>
+          <p>3 projects built in <code>aperia-app</code> via AI + Figma MCP, each under a different brand theme.</p>
+          <ul style="margin: 8px 0 0 16px; font-size: 13px; color: var(--ink-2); line-height: 2;">
+            <li><strong>Mail inbox</strong> — 3-column layout, tabs, search, reply composer <span class="chip done"
+                style="margin-left:6px;">Done</span></li>
+            <li><strong>Compliance dashboard</strong> — data table, status badges, filters <span class="chip done"
+                style="margin-left:6px;">Done</span></li>
+            <li><strong>AI Chat demo</strong> — chat interface, message thread, composer <span class="chip wip"
+                style="margin-left:6px;">In Progress</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 Component Status -->
+  <section>
+    <div class="section-label">02</div>
+    <h2>Component Status</h2>
+    <p>All components have Storybook stories. Code Connect is live for components where a Figma counterpart exists and
+      has been published to the team library. Full interactive documentation available at <a
+        href="https://aperia-ds5.vercel.app/" target="_blank">aperia-ds5.vercel.app</a>.</p>
+
+    <table class="stack-table">
+      <thead>
+        <tr>
+          <th>Component</th>
+          <th>Storybook</th>
+          <th>Code Connect</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Alert</td>
+          <td><span class="chip done">✓ Done</span></td>
+          <td><span class="chip done">✓ Live</span></td>
+          <td>Variant controls working</td>
+        </tr>
+        <tr>
+          <td>Avatar / AvatarBadge / AvatarGroup</td>
+          <td><span class="chip done">✓ Done</span></td>
+          <td><span class="chip done">✓ Live</span></td>
+          <td>Type (Image/Fallback/Icon), Show Badge, Size remapping xl/xs→lg/sm</td>
+        </tr>
+        <tr>
+          <td>Badge</td>
+          <td><span class="chip done">✓ Done</span></td>
+          <td><span class="chip none">Not mapped</span></td>
+          <td>No Figma component node found</td>
+        </tr>
+        <tr>
+          <td>Button</td>
+          <td><span class="chip done">✓ Done</span></td>
+          <td><span class="chip done">✓ Live</span></td>
+          <td>All variants and sizes</td>
+        </tr>
+        <tr>
+          <td>Card</td>
+          <td><span class="chip done">✓ Done</span></td>
+          <td><span class="chip none">Not mapped</span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>Checkbox</td>
+          <td><span class="chip done">✓ Done</span></td>
+          <td><span class="chip none">Not mapped</span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>DropdownMenu</td>
+          <td><span class="chip done">✓ Done</span></td>
+          <td><span class="chip none">Not mapped</span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>Field</td>
+          <td><span class="chip done">✓ Done</span></td>
+          <td><span class="chip none">Not mapped</span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>Icon</td>
+          <td><span class="chip none">—</span></td>
+          <td><span class="chip done">✓ Live</span></td>
+          <td>All Lucide icons connected via batch publish</td>
+        </tr>
+        <tr>
+          <td>Input</td>
+          <td><span class="chip done">✓ Done</span></td>
+          <td><span class="chip done">✓ Live</span></td>
+          <td>Variant (Default/Password/File), placeholder, disabled, invalid state</td>
+        </tr>
+        <tr>
+          <td>InputGroup</td>
+          <td><span class="chip done">✓ Done</span></td>
+          <td><span class="chip done">✓ Live</span></td>
+          <td>Input + Textarea types; Addon inline (Text/Button/Icon/Kbd/Spinner/Dropdown) + block (Start/End)</td>
+        </tr>
+        <tr>
+          <td>Label</td>
+          <td><span class="chip done">✓ Done</span></td>
+          <td><span class="chip none">Not mapped</span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>Progress</td>
+          <td><span class="chip done">✓ Done</span></td>
+          <td><span class="chip none">Not mapped</span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>Select</td>
+          <td><span class="chip done">✓ Done</span></td>
+          <td><span class="chip none">Not mapped</span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>Separator</td>
+          <td><span class="chip done">✓ Done</span></td>
+          <td><span class="chip none">Not mapped</span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>Switch</td>
+          <td><span class="chip done">✓ Done</span></td>
+          <td><span class="chip none">Not mapped</span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>Table</td>
+          <td><span class="chip done">✓ Done</span></td>
+          <td><span class="chip none">Not mapped</span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>Tabs / TabsTrigger</td>
+          <td><span class="chip done">✓ Done</span></td>
+          <td><span class="chip done">✓ Live</span></td>
+          <td>Variant (Default/Line), Orientation, Icon, Disabled. TabsList has no standalone Figma component.</td>
+        </tr>
+        <tr>
+          <td>Textarea</td>
+          <td><span class="chip done">✓ Done</span></td>
+          <td><span class="chip none">Not mapped</span></td>
+          <td>—</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout info">
+      <strong>Priority for next Code Connect batch:</strong> Select, Checkbox, and Switch — the remaining high-frequency
+      form components. Input and InputGroup are now live. More Code Connect coverage = fewer correction passes in
+      AI-generated pages.
+    </div>
+  </section>
+
+  <!-- 03 AI Showcase -->
+  <section>
+    <div class="section-label">03</div>
+    <h2>Demo Scenarios</h2>
+    <p>3 pages built via AI (Claude + Figma MCP), each running under a different brand theme to validate the full
+      pipeline end-to-end.</p>
+
+    <table class="stack-table">
+      <thead>
+        <tr>
+          <th>Demo</th>
+          <th>Description</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Mail Inbox</td>
+          <td>3-column layout with sidebar nav, message list, and detail panel</td>
+          <td><span class="chip done">Done</span></td>
+        </tr>
+        <tr>
+          <td>Compliance App</td>
+          <td>20+ page multi-section app: dashboard with charts, issues, governance, monitoring &amp; testing,
+            workflows, RRM, admin. Uses Avatar, Badge, Button, Card, DropdownMenu, Field, Input, InputGroup, Progress,
+            Select, Switch, Tabs.</td>
+          <td><span class="chip done">Done</span></td>
+        </tr>
+        <tr>
+          <td>AI Chat</td>
+          <td>Chat interface with message thread and composer</td>
+          <td><span class="chip wip">In Progress</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+  </section>
+
+  <!-- 04 Prompting Best Practices -->
+  <section>
+    <div class="section-label">04</div>
+    <h2>AI Prompting Best Practices</h2>
+    <p>These were derived directly from the Mail showcase build. The correction pass that was needed revealed where the
+      process broke down, and each practice below addresses a specific failure mode.</p>
+
+    <div class="practice-grid">
+      <div class="practice-card">
+        <div class="num">Practice 01</div>
+        <h4>Fetch the design before writing any code</h4>
+        <p>Always call <code>get_design_context</code> first and read the screenshot. Never infer layout from a text
+          description — the screenshot reveals structural decisions (inline vs. stacked, card vs. row) that words don't
+          convey.</p>
+      </div>
+      <div class="practice-card">
+        <div class="num">Practice 02</div>
+        <h4>Read section by section, not all at once</h4>
+        <p>Go through each panel in order — toolbar → header → list item → detail. For each section, note every icon
+          name, prop value, and layout decision explicitly before moving to the next.</p>
+      </div>
+      <div class="practice-card">
+        <div class="num">Practice 03</div>
+        <h4>Extract all static content from Figma</h4>
+        <p>Never invent counts, labels, or nav items. Pull exact values from the design output (e.g. nav group count,
+          badge numbers, exact copy). Invented values look plausible but create drift from the design spec.</p>
+      </div>
+      <div class="practice-card">
+        <div class="num">Practice 04</div>
+        <h4>Split fetch + implement into two messages</h4>
+        <p>First message: fetch the design, describe the spec back. Confirm with the developer. Second message:
+          implement. The extra round-trip costs less than a full rewrite pass.</p>
+      </div>
+      <div class="practice-card">
+        <div class="num">Practice 05</div>
+        <h4>Give AI precise coordinates, not vague requests</h4>
+        <p>Include file path + line + what's wrong + what you want. "In <code>mail-list.tsx:28</code>, the filter runs
+          on every render — memoize it" costs a fraction of "fix the mail component."</p>
+      </div>
+      <div class="practice-card">
+        <div class="num">Practice 06</div>
+        <h4>Use /compact proactively</h4>
+        <p>Once a major task is complete, run <code>/compact</code> before starting the next one. This clears
+          accumulated tool output from context, keeping subsequent generations faster and more accurate.</p>
+      </div>
+      <div class="practice-card">
+        <div class="num">Practice 07</div>
+        <h4>Prefer targeted edits over file rewrites</h4>
+        <p>Describe what specifically to change rather than asking to rewrite the file. A precise Edit call is faster
+          and less likely to introduce unintended side-effects than a full Write.</p>
+      </div>
+      <div class="practice-card">
+        <div class="num">Practice 08</div>
+        <h4>Batch related questions into one message</h4>
+        <p>Instead of asking about component availability one at a time, list all of them in a single message. Each
+          round-trip has overhead — batch independent questions to minimize it.</p>
+      </div>
+    </div>
+
+    <div class="callout ok">
+      <strong>Key insight:</strong> The most expensive AI mistake is starting to code before fully reading the design.
+      Two extra minutes extracting a layout spec from the Figma output prevents a full rewrite round, which costs far
+      more in both time and tokens.
+    </div>
+
+    <h3>The prompt template that works</h3>
+    <pre><span class="comment"># Step 1 — fetch and spec (first message)</span>
+<span class="val">"Fetch this Figma frame and give me the implementation spec for approval:
+[figma URL]
+Do not write any code yet."</span>
+
+<span class="comment"># Step 2 — implement (after approval)</span>
+<span class="val">"Implement the spec as approved. Use aperia-ds5 components.
+Target file: app/[page]/page.tsx"</span>
+
+<span class="comment"># For targeted fixes</span>
+<span class="val">"In components/mail/mail-list.tsx line 28,
+the tabs position should be inline with the Inbox heading — move it."</span></pre>
+  </section>
+
+  <!-- 05 Next Steps -->
+  <section>
+    <div class="section-label">05</div>
+    <h2>Next Steps</h2>
+
+    <h3>Ready to start</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num" style="background: var(--green);">✓</div>
+        <div class="step-content">
+          <h4>Scaffold starter projects with different themes <span class="chip done">Partially Done</span></h4>
+          <p><strong>Mail inbox</strong> and <strong>Compliance dashboard</strong> are complete. The <strong>AI Chat
+              demo</strong> is still in progress. Each project runs <code>aperia-ds5</code> under a different brand
+            theme to validate the theming model.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num next">2</div>
+        <div class="step-content">
+          <h4>Expand Code Connect coverage <span class="owner thuan">Thuan</span></h4>
+          <p><strong>Input</strong> and <strong>InputGroup</strong> are now live. Remaining priority: Select, Checkbox,
+            Switch — the form components most likely to appear in AI-generated pages. More coverage means fewer
+            correction passes.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num next">3</div>
+        <div class="step-content">
+          <h4>Build more AI pages and document findings <span class="owner thuan">Thuan</span></h4>
+          <p>Continue using AI to build pages from Figma, applying the prompting practices from Section 04. Document
+            each generation: what worked, what needed correction, what the prompt looked like. This builds the reference
+            guide for the team.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num next">4</div>
+        <div class="step-content">
+          <h4>Verify component updates propagate cleanly <span class="owner thuan">Thuan</span></h4>
+          <p>Make a change to a component in <code>aperia-ds5</code>, rebuild, and verify the update reaches all
+            consuming test projects without breaking anything. This validates the update workflow before going to a
+            wider rollout.</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>Needs input</h3>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num open">?</div>
+        <div class="step-content">
+          <h4>Azure DevOps Artifact — npm distribution setup <span class="owner marcin">Marcin</span></h4>
+          <p>The package structure is ready (<code>tsup</code> build, correct <code>exports</code> map in
+            <code>package.json</code>, <code>peerDependencies</code> configured). What's needed is the Azure Artifacts
+            feed setup and a publish pipeline. The library can be set to <code>"private": false</code> once the feed
+            target is confirmed. Marcin to advise on the pipeline config.
+          </p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num open">?</div>
+        <div class="step-content">
+          <h4>Distribution model decision — monorepo vs. published package <span class="owner team">Chris · Team</span>
+          </h4>
+          <p>Both models work. Monorepo (<code>workspace:*</code>) is simpler when all projects are in the same repo.
+            Published npm (or Azure Artifact) is required when projects are in separate repos or maintained by different
+            teams. Confirm which model fits the expected project structure so setup can be finalized.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 Open Questions -->
+  <section>
+    <div class="section-label">06</div>
+    <h2>Open Questions</h2>
+    <table class="stack-table">
+      <thead>
+        <tr>
+          <th>Question</th>
+          <th>Who</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Azure Artifacts feed name and org URL for the publish target?</td>
+          <td>Marcin</td>
+          <td><span class="chip wip">Pending</span></td>
+        </tr>
+        <tr>
+          <td>Monorepo or separate repos for the 2–3 starter projects?</td>
+          <td>Chris / Thuan</td>
+          <td><span class="chip wip">Pending</span></td>
+        </tr>
+        <tr>
+          <td>Which 2–3 brand themes should the starter projects use?</td>
+          <td>Designer / Chris</td>
+          <td><span class="chip wip">Pending</span></td>
+        </tr>
+        <tr>
+          <td>Versioning strategy — semantic versioning, changelogs, who approves releases?</td>
+          <td>DS Team</td>
+          <td><span class="chip none">Not started</span></td>
+        </tr>
+        <tr>
+          <td>Process for net-new components beyond shadcn (custom Aperia-specific)?</td>
+          <td>DS Team</td>
+          <td><span class="chip none">Not started</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 07 Demo -->
+  <section>
+    <div class="section-label">07</div>
+    <h2>Upcoming Demo</h2>
+    <div class="callout ok">
+      <strong>Demo scheduled for Monday or Tuesday next week.</strong> We'll walk through the live pipeline, the 3
+      scaffold projects, and theming in action. Calendar invite to follow.
+    </div>
+  </section>
+
+</body>
+
+</html>

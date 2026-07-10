@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aperia Design-to-Code Pipeline</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --ink: #0f0f0e;
+      --ink-2: #44443f;
+      --ink-3: #888780;
+      --rule: #e2e0d8;
+      --surface: #f8f7f4;
+      --white: #ffffff;
+      --accent: #002F67;
+      --accent-light: #e8eef6;
+      --green: #0f6e56;
+      --green-light: #e1f5ee;
+      --amber: #854f0b;
+      --amber-light: #faeeda;
+      --red: #8b1a1a;
+      --red-light: #fdecea;
+      --purple: #3c3489;
+      --purple-light: #eeedfe;
+      --orange: #7c4a00;
+      --orange-light: #fff3e0;
+      --mono: 'IBM Plex Mono', monospace;
+      --sans: 'IBM Plex Sans', sans-serif;
+    }
+
+    body {
+      font-family: var(--sans);
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--ink);
+      background: var(--white);
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 64px 48px 120px;
+    }
+
+    .doc-header {
+      border-bottom: 2px solid var(--ink);
+      padding-bottom: 28px;
+      margin-bottom: 56px;
+    }
+
+    .doc-eyebrow {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 10px;
+    }
+
+    .doc-title {
+      font-size: 32px;
+      font-weight: 600;
+      letter-spacing: -.02em;
+      line-height: 1.2;
+      color: var(--ink);
+      margin-bottom: 12px;
+    }
+
+    .doc-subtitle {
+      font-size: 15px;
+      color: var(--ink-2);
+      font-weight: 300;
+      max-width: 540px;
+    }
+
+    .doc-meta {
+      margin-top: 20px;
+      display: flex;
+      gap: 24px;
+      font-size: 11px;
+      color: var(--ink-3);
+      flex-wrap: wrap;
+    }
+
+    .version-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 10px;
+      background: var(--accent-light);
+      color: var(--accent);
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    section {
+      margin-bottom: 56px;
+    }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      margin-bottom: 6px;
+    }
+
+    h2 {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -.015em;
+      color: var(--ink);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      margin: 24px 0 8px;
+    }
+
+    p {
+      color: var(--ink-2);
+      margin-bottom: 12px;
+    }
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* ── Pipeline diagram ── */
+    .diagram-wrap {
+      margin: 28px 0;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: 12px;
+      padding: 36px 24px;
+      overflow-x: auto;
+    }
+
+    .diagram {
+      display: grid;
+      grid-template-columns: 1fr 40px 1fr;
+      gap: 0;
+      min-width: 560px;
+    }
+
+    .diag-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+
+    .diag-center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .diag-node {
+      padding: 10px 16px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 500;
+      line-height: 1.5;
+      width: 220px;
+    }
+
+    .diag-node.figma {
+      background: var(--purple-light);
+      color: var(--purple);
+      border: 1px solid #afa9ec;
+    }
+
+    .diag-node.library {
+      background: var(--accent-light);
+      color: var(--accent);
+      border: 1px solid #7aaad8;
+    }
+
+    .diag-node.build {
+      background: var(--surface);
+      color: var(--ink-2);
+      border: 1px solid var(--rule);
+    }
+
+    .diag-node.npm {
+      background: var(--amber-light);
+      color: var(--amber);
+      border: 1px solid #ef9f27;
+    }
+
+    .diag-node.project {
+      background: var(--white);
+      color: var(--ink);
+      border: 1.5px solid var(--rule);
+    }
+
+    .diag-node.theme {
+      background: var(--green-light);
+      color: var(--green);
+      border: 1px solid #5dcaa5;
+    }
+
+    .diag-node.ai {
+      background: var(--orange-light);
+      color: var(--orange);
+      border: 1px solid #efb55a;
+    }
+
+    .diag-node.code {
+      background: var(--ink);
+      color: #d4d0c8;
+      border: 1px solid var(--ink);
+    }
+
+    .diag-node .sub {
+      font-size: 10px;
+      opacity: .75;
+      font-weight: 400;
+      display: block;
+      margin-top: 2px;
+    }
+
+    .diag-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 36px;
+      color: var(--ink-3);
+      font-size: 18px;
+    }
+
+    .diag-label {
+      font-size: 10px;
+      color: var(--ink-3);
+      text-align: center;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .diag-spacer {
+      height: 36px;
+    }
+
+    .diag-empty {
+      height: 44px;
+    }
+
+    .diag-hconn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .hconn-line {
+      width: 100%;
+      height: 2px;
+      background: var(--rule);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hconn-line::after {
+      content: '→';
+      position: absolute;
+      right: -6px;
+      color: var(--ink-3);
+      font-size: 14px;
+      background: var(--surface);
+      padding: 0 2px;
+    }
+
+    .hconn-label {
+      font-size: 10px;
+      color: var(--ink-3);
+      position: absolute;
+      top: -16px;
+      white-space: nowrap;
+    }
+
+    .diag-cc-note {
+      font-size: 10px;
+      color: var(--purple);
+      background: var(--purple-light);
+      border: 1px dashed #afa9ec;
+      border-radius: 4px;
+      padding: 3px 8px;
+      margin-top: 4px;
+      text-align: center;
+      width: 220px;
+    }
+
+    /* row-connector: the horizontal bridge between columns */
+    .bridge-row {
+      display: flex;
+      align-items: center;
+      height: 60px;
+    }
+
+    .bridge-left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .bridge-mid {
+      width: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bridge-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Stack table */
+    .stack-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin: 16px 0;
+    }
+
+    .stack-table th {
+      text-align: left;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      padding: 6px 12px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .stack-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--rule);
+      color: var(--ink-2);
+      vertical-align: top;
+    }
+
+    .stack-table td:first-child {
+      font-weight: 500;
+      color: var(--ink);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .stack-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .stack-table tr:hover td {
+      background: var(--surface);
+    }
+
+    /* Code blocks */
+    pre {
+      background: var(--ink);
+      color: #d4d0c8;
+      padding: 16px 20px;
+      border-radius: 8px;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.75;
+      overflow-x: auto;
+      margin: 12px 0;
+    }
+
+    pre .comment {
+      color: #666;
+    }
+
+    pre .key {
+      color: #8dbdff;
+    }
+
+    pre .val {
+      color: #9de89a;
+    }
+
+    pre .cmd {
+      color: #ffd27a;
+    }
+
+    code {
+      font-family: var(--mono);
+      font-size: 12px;
+      background: var(--surface);
+      padding: 1px 5px;
+      border-radius: 3px;
+      color: var(--accent);
+      border: 1px solid var(--rule);
+    }
+
+    /* Callouts */
+    .callout {
+      padding: 14px 18px;
+      border-radius: 8px;
+      border-left: 3px solid;
+      margin: 20px 0;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .callout.warn {
+      background: var(--amber-light);
+      border-color: #ef9f27;
+      color: var(--amber);
+    }
+
+    .callout.info {
+      background: var(--accent-light);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .callout.ok {
+      background: var(--green-light);
+      border-color: #1d9e75;
+      color: var(--green);
+    }
+
+    .callout.error {
+      background: var(--red-light);
+      border-color: #c0392b;
+      color: var(--red);
+    }
+
+    .callout strong {
+      font-weight: 600;
+    }
+
+    /* Kit confirmed */
+    .kit-confirmed {
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #1d9e75;
+      background: var(--green-light);
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      margin: 16px 0;
+    }
+
+    .kit-confirmed-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .kit-confirmed-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .kit-confirmed-desc {
+      font-size: 12px;
+      color: var(--ink-2);
+      line-height: 1.6;
+    }
+
+    /* Roles table */
+    .roles-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin: 16px 0;
+    }
+
+    .roles-table th {
+      text-align: left;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      padding: 6px 12px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .roles-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--rule);
+      color: var(--ink-2);
+    }
+
+    .roles-table td:first-child {
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    .roles-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .badge-ds {
+      font-size: 10px;
+      background: var(--accent-light);
+      color: var(--accent);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .badge-des {
+      font-size: 10px;
+      background: var(--purple-light);
+      color: var(--purple);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .badge-dev {
+      font-size: 10px;
+      background: var(--green-light);
+      color: var(--green);
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    @media print {
+      body {
+        padding: 32px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header class="doc-header">
+    <div class="doc-eyebrow">Internal Reference · Design System</div>
+    <h1 class="doc-title">Aperia Design-to-Code Pipeline <span class="version-badge">v4</span></h1>
+    <p class="doc-subtitle">Why the AI-assisted Figma → shadcn/ui → React pipeline is a change worth making, and the
+      key architecture decisions behind it. Full implementation detail lives in the companion reference doc.</p>
+    <div class="doc-meta">
+      <span>Package: aperia-ds5</span>
+      <span>Stack: Tailwind v4 · shadcn/ui · React</span>
+      <span>Kit: ShadcnDesign ✓</span>
+    </div>
+  </header>
+
+  <!-- 00 Why This Matters -->
+  <section>
+    <div class="section-label">00</div>
+    <h2>Why This Matters</h2>
+    <p>Today, turning a Figma design into shipped code is a manual translation step: a developer reads the frame,
+      guesses spacing and color values, hand-writes markup, and hopes the imports and prop names match what the design
+      system actually ships. Mismatches surface in review, or later in production.</p>
+
+    <div class="callout info">
+      <strong>Where this sits:</strong> This pipeline is <strong>agentic engineering</strong>, not vibe coding — Code
+      Connect gives the AI a formal spec (which Figma component maps to which <code>aperia-ds5</code> import), Storybook
+      is a living reference for correctness, and every release is versioned rather than copy-pasted. The AI generates
+      within guardrails the team controls, instead of generating freely and fixing mistakes after the fact.
+    </div>
+
+    <h3>Same handoff, different bottleneck</h3>
+    <p style="font-size:12px">Box width below is relative effort, not a measured duration — it shows where time
+      concentrates today and how that shifts, without claiming precision we don't have.</p>
+    <div class="diagram-wrap">
+
+      <!-- Manual row -->
+      <div style="font-size:11px;font-weight:600;color:var(--ink);margin-bottom:14px">Manual Handoff — Today</div>
+      <div style="display:flex;align-items:stretch;gap:6px;min-width:680px">
+        <div style="flex:1 1 0;padding:10px 8px;background:var(--surface);border:1px solid var(--rule);border-radius:8px;text-align:center">
+          <div style="font-size:11px;font-weight:600;color:var(--ink)">Figma frame shared</div>
+        </div>
+        <div style="color:var(--ink-3);font-size:14px;align-self:center">→</div>
+        <div style="flex:2 1 0;padding:10px 8px;background:var(--surface);border:1px solid var(--rule);border-radius:8px;text-align:center">
+          <div style="font-size:9px;font-weight:700;letter-spacing:.06em;color:var(--ink-3);text-transform:uppercase;margin-bottom:3px">Manual</div>
+          <div style="font-size:11px;font-weight:600;color:var(--ink)">Developer interprets by eye</div>
+          <div style="font-size:9.5px;color:var(--ink-3);margin-top:3px">Guesses which component, spacing, color</div>
+        </div>
+        <div style="color:var(--ink-3);font-size:14px;align-self:center">→</div>
+        <div style="flex:2.5 1 0;padding:10px 8px;background:var(--amber-light);border:1px solid #ef9f27;border-radius:8px;text-align:center">
+          <div style="font-size:9px;font-weight:700;letter-spacing:.06em;color:var(--amber);text-transform:uppercase;margin-bottom:3px">Slowest step</div>
+          <div style="font-size:11px;font-weight:600;color:var(--amber)">Hand-write markup, guess tokens</div>
+          <div style="font-size:9.5px;color:var(--amber);margin-top:3px">Most time-consuming, most error-prone</div>
+        </div>
+        <div style="color:var(--ink-3);font-size:14px;align-self:center">→</div>
+        <div style="flex:2 1 0;padding:10px 8px;background:var(--red-light);border:1px solid #e2a5a0;border-radius:8px;text-align:center">
+          <div style="font-size:9px;font-weight:700;letter-spacing:.06em;color:var(--red);text-transform:uppercase;margin-bottom:3px">Rework</div>
+          <div style="font-size:11px;font-weight:600;color:var(--red)">Review catches wrong imports, spacing</div>
+          <div style="font-size:9.5px;color:var(--red);margin-top:3px">Errors surface late, cost compounds</div>
+        </div>
+        <div style="color:var(--ink-3);font-size:14px;align-self:center">→</div>
+        <div style="flex:1 1 0;padding:10px 8px;background:var(--surface);border:1px solid var(--rule);border-radius:8px;text-align:center">
+          <div style="font-size:11px;font-weight:600;color:var(--ink)">Ship</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:center;margin:26px 0 22px">
+        <div style="flex:1;height:1px;background:var(--rule)"></div>
+        <div style="font-size:10px;color:var(--ink-3);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap">Same phases, different bottleneck</div>
+        <div style="flex:1;height:1px;background:var(--rule)"></div>
+      </div>
+
+      <!-- AI-assisted row -->
+      <div style="font-size:11px;font-weight:600;color:var(--accent);margin-bottom:14px">AI-Assisted — With This Pipeline</div>
+      <div style="display:flex;align-items:stretch;gap:6px;min-width:680px">
+        <div style="flex:1 1 0;padding:10px 8px;background:var(--accent-light);border:1px solid #7aaad8;border-radius:8px;text-align:center">
+          <div style="font-size:11px;font-weight:600;color:var(--accent)">Figma frame shared</div>
+        </div>
+        <div style="color:var(--ink-3);font-size:14px;align-self:center">→</div>
+        <div style="flex:1 1 0;padding:10px 8px;background:var(--accent-light);border:1px solid #7aaad8;border-radius:8px;text-align:center">
+          <div style="font-size:9px;font-weight:700;letter-spacing:.06em;color:var(--accent);text-transform:uppercase;margin-bottom:3px">Automated</div>
+          <div style="font-size:11px;font-weight:600;color:var(--accent)">Claude reads frame via Figma MCP</div>
+          <div style="font-size:9.5px;color:#5584b8;margin-top:3px">No guessing — reads the live frame</div>
+        </div>
+        <div style="color:var(--ink-3);font-size:14px;align-self:center">→</div>
+        <div style="flex:1 1 0;padding:10px 8px;background:var(--accent-light);border:1px solid #7aaad8;border-radius:8px;text-align:center">
+          <div style="font-size:9px;font-weight:700;letter-spacing:.06em;color:var(--accent);text-transform:uppercase;margin-bottom:3px">Deterministic</div>
+          <div style="font-size:11px;font-weight:600;color:var(--accent)">Code Connect resolves import + props</div>
+          <div style="font-size:9.5px;color:#5584b8;margin-top:3px">Mapping is looked up, not guessed</div>
+        </div>
+        <div style="color:var(--ink-3);font-size:14px;align-self:center">→</div>
+        <div style="flex:1 1 0;padding:10px 8px;background:var(--green-light);border:1px solid #5dcaa5;border-radius:8px;text-align:center">
+          <div style="font-size:9px;font-weight:700;letter-spacing:.06em;color:var(--green);text-transform:uppercase;margin-bottom:3px">Shifted, not removed</div>
+          <div style="font-size:11px;font-weight:600;color:var(--green)">Review checks logic + intent only</div>
+          <div style="font-size:9.5px;color:var(--green);margin-top:3px">Correctness is no longer the reviewer's job</div>
+        </div>
+        <div style="color:var(--ink-3);font-size:14px;align-self:center">→</div>
+        <div style="flex:1 1 0;padding:10px 8px;background:var(--accent-light);border:1px solid #7aaad8;border-radius:8px;text-align:center">
+          <div style="font-size:11px;font-weight:600;color:var(--accent)">Ship</div>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:28px">Before vs. after, dimension by dimension</h3>
+    <table class="stack-table">
+      <thead>
+        <tr>
+          <th>Dimension</th>
+          <th>Today (manual)</th>
+          <th>With this pipeline</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Design handoff</td>
+          <td>Screenshot or Figma link; developer interprets by eye</td>
+          <td>Claude reads the live Figma frame via MCP</td>
+        </tr>
+        <tr>
+          <td>Component mapping</td>
+          <td>Developer guesses which internal component to use</td>
+          <td>Code Connect resolves the exact <code>aperia-ds5</code> import and props</td>
+        </tr>
+        <tr>
+          <td>Branding</td>
+          <td>Colors and spacing eyeballed or copied by hand</td>
+          <td>Project theme already applied via token overrides</td>
+        </tr>
+        <tr>
+          <td>Consistency across projects</td>
+          <td>Diverges per developer, per project</td>
+          <td>Same library, same tokens, same components everywhere</td>
+        </tr>
+        <tr>
+          <td>Review cost</td>
+          <td>Reviewer re-checks imports, spacing, prop names</td>
+          <td>Reviewer checks logic and intent; imports and styling are correct by construction</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>The trade</h3>
+    <p>The cost is upfront: building and maintaining <code>aperia-ds5</code>, the Code Connect mappings, and the Figma
+      kit setup. The payoff is ongoing — every future screen and every future project draws from the same verified
+      source instead of re-deriving it by hand, and design drift stops compounding project to project.</p>
+  </section>
+
+  <!-- 01 Pipeline Diagram -->
+  <section>
+    <div class="section-label">01</div>
+    <h2>Pipeline Overview</h2>
+    <p>Two parallel tracks — the <strong>library track</strong> (built and maintained by the DS team, published once)
+      and the <strong>project track</strong> (repeated per consuming project). They meet at npm install.</p>
+
+    <div class="diagram-wrap">
+      <div style="display:grid;grid-template-columns:1fr 72px 1fr;align-items:start;min-width:520px;gap:0">
+
+        <!-- Headers -->
+        <div
+          style="text-align:center;font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);padding-bottom:14px;border-bottom:1px solid var(--rule);margin-bottom:20px">
+          Library Track — DS Team</div>
+        <div style="border-bottom:1px solid var(--rule);margin-bottom:20px"></div>
+        <div
+          style="text-align:center;font-size:10px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);padding-bottom:14px;border-bottom:1px solid var(--rule);margin-bottom:20px">
+          Project Track — Developer</div>
+
+        <!-- Left column -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:0">
+          <div
+            style="width:210px;padding:12px 14px;background:#eeedfe;border:1.5px solid #afa9ec;border-radius:8px;text-align:center">
+            <div style="font-size:12px;font-weight:600;color:#3c3489">Figma</div>
+            <div style="font-size:10px;color:#5548c8;margin-top:2px">ShadcnDesign Kit</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;padding:4px 0;gap:1px">
+            <div style="font-size:10px;color:var(--ink-3)">components</div>
+            <div style="color:var(--ink-3)">↓</div>
+          </div>
+          <div
+            style="width:210px;padding:12px 14px;background:#e8eef6;border:1.5px solid #7aaad8;border-radius:8px;text-align:center">
+            <div style="font-size:12px;font-weight:600;color:#002F67">aperia-ds5</div>
+            <div style="font-size:10px;color:#002F67;margin-top:2px">components · lib/utils</div>
+            <div style="font-size:10px;color:#5584b8">base.css</div>
+            <div
+              style="margin-top:7px;padding:3px 8px;background:#eeedfe;border:1px dashed #afa9ec;border-radius:4px;font-size:10px;color:#3c3489">
+              Code Connect (.figma.ts)</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;padding:4px 0;gap:1px">
+            <div style="font-size:10px;color:var(--ink-3)">tsup build</div>
+            <div style="color:var(--ink-3)">↓</div>
+          </div>
+          <div
+            style="width:210px;padding:10px 14px;background:#f0f0f0;border:1.5px solid #ccc;border-radius:8px;text-align:center">
+            <div style="font-size:12px;font-weight:500;color:#44443f">dist/</div>
+            <div style="font-size:10px;color:var(--ink-3);margin-top:1px">index.js · index.d.ts</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;padding:4px 0;gap:1px">
+            <div style="font-size:10px;color:var(--ink-3)">npm publish</div>
+            <div style="color:var(--ink-3)">↓</div>
+          </div>
+          <div
+            style="width:210px;padding:12px 14px;background:#faeeda;border:1.5px solid #ef9f27;border-radius:8px;text-align:center">
+            <div style="font-size:12px;font-weight:600;color:#854f0b">npm registry</div>
+            <div style="font-size:10px;color:#854f0b;margin-top:1px">aperia-ds5 · versioned</div>
+          </div>
+        </div>
+
+        <!-- Center connector -->
+        <div style="display:flex;align-items:center;justify-content:center;padding-top:318px">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:3px">
+            <div style="font-size:10px;color:var(--ink-3);white-space:nowrap">npm install</div>
+            <div style="display:flex;align-items:center;gap:0">
+              <div style="width:32px;height:1.5px;background:var(--rule)"></div>
+              <div style="color:var(--ink-3);font-size:14px;line-height:1">›</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right column -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:0;padding-top:262px">
+          <div
+            style="width:210px;padding:12px 14px;background:var(--surface);border:1.5px solid var(--rule);border-radius:8px;text-align:center">
+            <div style="font-size:12px;font-weight:600;color:var(--ink)">Project</div>
+            <div style="font-size:10px;color:var(--ink-3);margin-top:1px">any framework</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;padding:4px 0;gap:1px">
+            <div style="font-size:10px;color:var(--ink-3)">manual theming</div>
+            <div style="color:var(--ink-3)">↓</div>
+          </div>
+          <div
+            style="width:210px;padding:12px 14px;background:#e1f5ee;border:1.5px solid #5dcaa5;border-radius:8px;text-align:center">
+            <div style="font-size:12px;font-weight:600;color:#0f6e56">globals.css</div>
+            <div style="font-size:10px;color:#0f6e56;margin-top:3px">@import aperia-ds5/base.css</div>
+            <div style="font-size:10px;color:#0f6e56">--brand: #E85D26</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;padding:4px 0">
+            <div style="color:var(--ink-3)">↓</div>
+          </div>
+          <div
+            style="width:210px;padding:12px 14px;background:#e8eef6;border:1.5px solid #7aaad8;border-radius:8px;text-align:center">
+            <div style="font-size:11px;font-weight:500;color:#002F67">import &#123; Button, Card &#125;</div>
+            <div style="font-size:10px;color:#5584b8;margin-top:1px">from 'aperia-ds5'</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- AI row -->
+      <div style="display:flex;gap:10px;align-items:center;margin-top:24px">
+        <div style="flex:1;height:1px;background:var(--rule)"></div>
+        <div style="font-size:10px;color:var(--ink-3);letter-spacing:.07em;text-transform:uppercase;white-space:nowrap">
+          AI Code Generation</div>
+        <div style="flex:1;height:1px;background:var(--rule)"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 40px 1fr 40px 1fr;align-items:center;margin-top:14px;gap:0">
+        <div
+          style="padding:12px 14px;background:#eeedfe;border:1px dashed #afa9ec;border-radius:8px;font-size:12px;color:#3c3489;text-align:center">
+          <strong>Figma frame</strong><br><span style="font-size:10px">shared by designer</span>
+        </div>
+        <div style="text-align:center;color:var(--ink-3);font-size:16px">→</div>
+        <div
+          style="padding:12px 14px;background:#fff3e0;border:1.5px solid #efb55a;border-radius:8px;font-size:12px;color:#7c4a00;text-align:center">
+          <strong>Claude + Figma MCP</strong><br><span style="font-size:10px">Code Connect → aperia-ds5</span>
+        </div>
+        <div style="text-align:center;color:var(--ink-3);font-size:16px">→</div>
+        <div
+          style="padding:12px 14px;background:var(--ink);border-radius:8px;font-size:12px;color:#d4d0c8;text-align:center">
+          <strong>Production code</strong><br><span style="font-size:10px;color:#888">correct imports · branded</span>
+        </div>
+      </div>
+    </div>
+
+    <p style="margin-top:16px">The Code Connect <code>.figma.ts</code> files are the bridge — they tell Claude which
+      <code>aperia-ds5</code> component maps to each Figma component, so generated code uses the right imports and prop
+      names automatically.</p>
+  </section>
+
+  <!-- 02 Implementation At a Glance -->
+  <section>
+    <div class="section-label">02</div>
+    <h2>Implementation at a Glance</h2>
+    <p>The library (<code>aperia-ds5</code>) wraps shadcn/ui + Radix, is bundled with tsup, and ships a single
+      <code>base.css</code> theme file. Projects install it via npm or a monorepo workspace, override a handful of
+      brand tokens by hand, and import components directly.</p>
+
+    <div class="callout info">
+      <strong>Full stack, token architecture, directory layout, dependency rules, and step-by-step workflows</strong>
+      are documented in the companion <a href="aperia-pipeline-reference.html">Implementation Reference</a> — this
+      overview stays at the decision level.
+    </div>
+  </section>
+
+  <!-- 03 Key Roles -->
+  <section>
+    <div class="section-label">03</div>
+    <h2>Key Roles</h2>
+
+    <table class="roles-table">
+      <thead>
+        <tr>
+          <th>Layer</th>
+          <th>Tool</th>
+          <th>Owner</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Design</td>
+          <td>Figma + ShadcnDesign kit</td>
+          <td><span class="badge-des">Designer</span></td>
+        </tr>
+        <tr>
+          <td>Component mapping</td>
+          <td>Code Connect (.figma.ts)</td>
+          <td><span class="badge-ds">DS team</span></td>
+        </tr>
+        <tr>
+          <td>Library build</td>
+          <td>tsup</td>
+          <td><span class="badge-ds">DS team</span></td>
+        </tr>
+        <tr>
+          <td>Component preview</td>
+          <td>Storybook</td>
+          <td><span class="badge-ds">DS team</span></td>
+        </tr>
+        <tr>
+          <td>Version distribution</td>
+          <td>npm / GitHub Packages</td>
+          <td><span class="badge-ds">DS team</span></td>
+        </tr>
+        <tr>
+          <td>Project theming</td>
+          <td>Manual globals.css</td>
+          <td><span class="badge-dev">Developer</span></td>
+        </tr>
+        <tr>
+          <td>AI code generation</td>
+          <td>Claude + Figma MCP</td>
+          <td><span class="badge-dev">Developer</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout ok">
+      <strong>Role shift:</strong> Developers spend less time hand-translating pixels into markup and more time
+      directing and reviewing AI output — checking that generated code matches intent, not re-deriving spacing values by
+      hand. Designers gain more direct influence on shipped code, since values encoded in the Figma kit flow through
+      Code Connect rather than being reinterpreted by a developer.
+    </div>
+  </section>
+
+  <!-- 04 Figma Kit -->
+  <section>
+    <div class="section-label">04</div>
+    <h2>Figma Kit</h2>
+
+    <div class="kit-confirmed">
+      <div class="kit-confirmed-icon">✓</div>
+      <div>
+        <div class="kit-confirmed-name">ShadcnDesign</div>
+        <div class="kit-confirmed-desc">shadcn-endorsed kit with 2,000+ components, component-level Figma Variable
+          linkage, and a Figma plugin that generates shadcn/ui component code from frame selections. Includes Agent
+          Skills for Claude, Cursor, and Codex. Actively maintained.</div>
+      </div>
+    </div>
+
+    <div class="callout info">
+      <strong>Agent Skills vs Code Connect:</strong> ShadcnDesign's Agent Skills output code against stock shadcn/ui
+      imports. Code Connect (<code>.figma.ts</code> files) additionally maps those components to <code>aperia-ds5</code>
+      specifically. Both are needed — Agent Skills for broad context, Code Connect for the correct package.
+    </div>
+  </section>
+
+  <!-- 05 Decisions -->
+  <section>
+    <div class="section-label">05</div>
+    <h2>Design Decisions</h2>
+    <p>Key choices made in this pipeline and the reasoning behind them.</p>
+
+    <h3>Figma kit — ShadcnDesign</h3>
+    <p>The shadcn-endorsed Figma kit. Chosen because it mirrors the shadcn/ui component model 1:1, ships with Agent
+      Skills for Claude and Cursor, and has component-level Figma Variable linkage. This means Code Connect mappings
+      stay accurate without custom maintenance.</p>
+
+    <h3>Token approach — designer hands off, developer writes</h3>
+    <p>No automated token export pipeline. The designer provides the values directly (brand color, radius, etc.) and the
+      developer writes them as CSS custom property overrides in the project's theme file. Brand tokens change
+      infrequently — typically once at project setup — so a 5-line <code>:root</code> block is faster and simpler to
+      maintain than a sync pipeline.</p>
+
+    <h3>Token ownership — library ships defaults, project overrides</h3>
+    <p>The library (<code>aperia-ds5</code>) ships a complete default theme in <code>base.css</code>. Each consuming
+      project imports it and only overrides what differs. This keeps project setup minimal while giving full control
+      over brand identity.</p>
+
+    <h3>Distribution — monorepo or published npm</h3>
+    <p>Both models are supported. Use <code>workspace:*</code> when all consuming projects live in the same repo.
+      Publish to npm (or GitHub Packages) when projects are in separate repos or maintained by different teams. The
+      library's public API is identical in both cases.</p>
+
+    <h3>Framework agnosticism</h3>
+    <p>The library has no framework dependency — React is declared as a peer dependency only. Consuming projects bring
+      their own React and framework (Next.js, Vite, Remix, etc.) without version conflicts.</p>
+
+    <h3>What's already governed</h3>
+    <div class="callout ok">
+      <strong>Guardrails in place today:</strong> Code Connect prevents the AI from guessing wrong imports or prop
+      names. Versioned npm releases mean a library change never silently changes a shipped project. Storybook documents
+      every component and variant as the source of truth reviewers can check against.
+    </div>
+
+    <h3>Open questions</h3>
+    <div class="callout warn">
+      <strong>Not yet solved:</strong> Version sync strategy between the Figma kit and the npm package is not yet
+      defined. Workflow for net-new components beyond shadcn (custom Aperia-specific components) is also not yet
+      established.
+    </div>
+  </section>
+
+</body>
+
+</html>

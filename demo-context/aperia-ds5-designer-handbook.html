@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aperia — Designer's Guide to AI Updates</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #0f0f0e;
+      --ink-2: #44443f;
+      --ink-3: #888780;
+      --rule: #e2e0d8;
+      --surface: #f8f7f4;
+      --white: #ffffff;
+      --accent: #002F67;
+      --accent-light: #e8eef6;
+      --green: #0f6e56;
+      --green-light: #e1f5ee;
+      --amber: #854f0b;
+      --amber-light: #faeeda;
+      --purple: #3c3489;
+      --purple-light: #eeedfe;
+      --mono: 'IBM Plex Mono', monospace;
+      --sans: 'IBM Plex Sans', sans-serif;
+    }
+
+    body {
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--ink);
+      background: var(--white);
+      max-width: 780px;
+      margin: 0 auto;
+      padding: 64px 48px 120px;
+    }
+
+    .doc-header { border-bottom: 2px solid var(--ink); padding-bottom: 28px; margin-bottom: 56px; }
+    .doc-eyebrow { font-size: 10px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 10px; }
+    .doc-title { font-size: 30px; font-weight: 600; letter-spacing: -.02em; line-height: 1.2; color: var(--ink); margin-bottom: 12px; }
+    .doc-subtitle { font-size: 16px; color: var(--ink-2); font-weight: 300; max-width: 560px; line-height: 1.6; }
+    .doc-meta { margin-top: 20px; font-size: 11px; color: var(--ink-3); }
+
+    .toc { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 20px 24px; margin-bottom: 56px; }
+    .toc-title { font-size: 10px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 12px; }
+    .toc-list { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+    .toc-list a { font-size: 14px; color: var(--accent); text-decoration: none; display: flex; gap: 10px; align-items: baseline; }
+    .toc-list a:hover { text-decoration: underline; }
+    .toc-list .toc-num { font-size: 10px; font-family: var(--mono); color: var(--ink-3); flex-shrink: 0; min-width: 20px; }
+
+    section { margin-bottom: 64px; }
+    .section-label { font-size: 10px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 6px; }
+    h2 { font-size: 22px; font-weight: 600; letter-spacing: -.015em; color: var(--ink); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--rule); }
+    h3 { font-size: 14px; font-weight: 600; color: var(--ink); margin: 28px 0 8px; }
+    p { color: var(--ink-2); margin-bottom: 14px; }
+    p:last-child { margin-bottom: 0; }
+    ul { margin: 8px 0 14px 20px; color: var(--ink-2); }
+    li { margin-bottom: 6px; }
+    a { color: var(--accent); }
+
+    .callout {
+      padding: 16px 20px; border-radius: 8px; border-left: 3px solid;
+      margin: 24px 0; font-size: 14px; line-height: 1.7;
+    }
+    .callout.warn { background: var(--amber-light); border-color: #ef9f27; color: var(--amber); }
+    .callout.info { background: var(--accent-light); border-color: var(--accent); color: var(--accent); }
+    .callout.ok { background: var(--green-light); border-color: #1d9e75; color: var(--green); }
+    .callout strong { font-weight: 600; }
+
+    /* Big numbered steps */
+    .steps { margin: 20px 0; display: flex; flex-direction: column; gap: 0; }
+    .step { display: flex; gap: 20px; padding: 20px 0; border-bottom: 1px solid var(--rule); }
+    .step:last-child { border-bottom: none; }
+    .step-num {
+      flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%;
+      background: var(--accent); color: white;
+      font-size: 13px; font-weight: 600;
+      display: flex; align-items: center; justify-content: center; margin-top: 2px;
+    }
+    .step-num.green { background: var(--green); }
+    .step-content h4 { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 6px; }
+    .step-content p { font-size: 14px; color: var(--ink-2); margin: 0; }
+    .step-content p + p { margin-top: 8px; }
+
+    /* Terminal command — styled to look friendly, not scary */
+    .cmd-block {
+      background: #1a1a1a; border-radius: 8px; padding: 14px 18px;
+      margin: 10px 0; font-family: var(--mono); font-size: 13px;
+      color: #ffd27a; line-height: 1.8;
+    }
+    .cmd-block .note { color: #666; font-family: var(--sans); font-size: 12px; display: block; margin-top: 4px; }
+
+    /* Example prompt box */
+    .prompt-box {
+      background: var(--surface); border: 1px solid var(--rule); border-radius: 8px;
+      padding: 16px 20px; margin: 16px 0; font-size: 14px;
+      color: var(--ink-2); line-height: 1.7; position: relative;
+    }
+    .prompt-box::before {
+      content: "Example prompt";
+      display: block; font-size: 10px; font-weight: 600;
+      letter-spacing: .08em; text-transform: uppercase;
+      color: var(--green); margin-bottom: 10px;
+    }
+
+    /* Flow diagram */
+    .flow {
+      display: flex; align-items: center; justify-content: center;
+      flex-wrap: wrap; gap: 0; margin: 28px 0;
+    }
+    .flow-node {
+      padding: 12px 20px; border-radius: 8px;
+      font-size: 13px; font-weight: 500; text-align: center;
+      line-height: 1.4;
+    }
+    .flow-node.you { background: var(--purple-light); color: var(--purple); border: 1px solid #c9c4f5; }
+    .flow-node.ai { background: var(--green-light); color: var(--green); border: 1px solid #a3d9c8; }
+    .flow-arrow { font-size: 20px; color: var(--ink-3); padding: 0 12px; }
+
+    /* Screenshot tip */
+    .tip-row {
+      display: flex; gap: 16px; align-items: flex-start;
+      padding: 14px 0; border-bottom: 1px solid var(--rule); font-size: 14px;
+    }
+    .tip-row:last-child { border-bottom: none; }
+    .tip-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .tip-text { color: var(--ink-2); line-height: 1.6; }
+    .tip-text strong { color: var(--ink); }
+
+    @media print { body { padding: 32px; } }
+  </style>
+</head>
+
+<body>
+
+  <header class="doc-header">
+    <div class="doc-eyebrow">Internal · Designer Guide</div>
+    <h1 class="doc-title">Making Design Changes with AI</h1>
+    <p class="doc-subtitle">A simple guide for designers. Make a change in Figma, hand it to AI, and see it appear in the app — no coding required.</p>
+    <div class="doc-meta">Last updated: May 2026</div>
+  </header>
+
+  <nav class="toc">
+    <div class="toc-title">What's in here</div>
+    <ul class="toc-list">
+      <li><a href="#s00"><span class="toc-num">01</span> How it works (the big picture)</a></li>
+      <li><a href="#s01"><span class="toc-num">02</span> Environment setup</a></li>
+      <li><a href="#sgit"><span class="toc-num">03</span> Saving and sharing your work (git basics)</a></li>
+      <li><a href="#s02"><span class="toc-num">04</span> Your everyday workflow</a></li>
+      <li><a href="#s03"><span class="toc-num">05</span> Getting the right Figma link</a></li>
+      <li><a href="#s04"><span class="toc-num">06</span> What to say to the AI</a></li>
+      <li><a href="#s05"><span class="toc-num">07</span> Checking the result</a></li>
+    </ul>
+  </nav>
+
+
+  <!-- 01 Big picture -->
+  <section id="s00">
+    <div class="section-label">01</div>
+    <h2>How It Works</h2>
+
+    <p>Think of the AI as a developer who can read your Figma files. You make a change in Figma, share the link, describe what you did, and the AI updates the code so the app matches. You review it in the browser and say what looks right or wrong.</p>
+
+    <div class="flow">
+      <div class="flow-node you">You update<br>Figma</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node you">You share the link<br>+ describe the change</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node ai">AI reads the design<br>and updates the code</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node you">You check it<br>in the browser</div>
+    </div>
+
+    <p>That's the whole loop. You stay in Figma — the AI handles the code.</p>
+
+    <div class="callout info">
+      <strong>You never write code.</strong> Your job is to make good designs in Figma and describe clearly what changed. The more specific you are, the better the result.
+    </div>
+  </section>
+
+
+  <!-- 02 Environment setup -->
+  <section id="s01">
+    <div class="section-label">02</div>
+    <h2>Environment Setup</h2>
+
+    <p>You only do this once. It takes about 20–30 minutes the first time, and a developer should sit with you while you do it. After this, your daily routine needs none of it.</p>
+
+    <div class="callout info">
+      <strong>Do this with a developer present.</strong> Not because it's hard — but because if anything goes sideways, they can fix it in 30 seconds. Once it's done, you won't need their help again for day-to-day work.
+    </div>
+
+    <h3>First — what is Terminal?</h3>
+    <p>Terminal is a built-in Mac app that lets you type commands directly to your computer. Think of it like texting your Mac — instead of clicking buttons, you type an instruction and your computer does it.</p>
+    <p>You don't need to understand how it works. You just need to open it and copy-paste the commands in this guide.</p>
+
+    <p><strong>How to open Terminal on a Mac:</strong></p>
+    <ul>
+      <li>Press <strong>Cmd + Space</strong> to open Spotlight search</li>
+      <li>Type <strong>Terminal</strong></li>
+      <li>Press <strong>Enter</strong></li>
+    </ul>
+    <p>A window will open with a blinking cursor. That's Terminal. Everything you type there runs as a command. When a step in this guide shows a dark box like the ones below, that's what you type into Terminal.</p>
+
+    <div class="callout warn">
+      <strong>Paste with Cmd + V</strong>, not Cmd + Shift + V. And always press <strong>Enter</strong> after pasting a command to run it. Nothing happens until you press Enter.
+    </div>
+
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Install Node.js</h4>
+          <p>Node.js is a behind-the-scenes tool that runs the app on your computer. Go to <a href="https://nodejs.org" target="_blank">nodejs.org</a> and look for the <strong>LTS</strong> version. Under it, click the <strong>macOS Installer (.pkg)</strong> button — it's the green button on the left. Open the downloaded file and follow the installer steps, just like any other Mac app.</p>
+          <p>When it's done, open Terminal and check it worked by typing:</p>
+          <div class="cmd-block">node --version
+            <span class="note">You should see something like v20.x.x printed back. If you do, Node is installed.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Get the project files onto your Mac</h4>
+          <p>Ask a developer for the repository URL. Then type the following into Terminal, replacing the URL with the one they gave you, and press Enter:</p>
+          <div class="cmd-block">git clone https://github.com/your-org/your-project
+            <span class="note">Make sure to include the full URL path after "git clone" — that's what tells git which project to download. Then press Enter.</span>
+          </div>
+          <p>This downloads the project files into a new folder on your Mac. You only do this once.</p>
+          <p>Next, move Terminal into that folder. The easiest way is to drag the folder straight into Terminal:</p>
+
+          <div class="callout ok">
+            <strong>💡 Drag the folder instead of typing.</strong>
+            <ol style="margin: 8px 0 0 0; padding-left: 20px; line-height: 1.8;">
+              <li>Type <strong>cd </strong> (with a space after it) in Terminal — but don't press Enter yet</li>
+              <li>Open Finder and find your project folder</li>
+              <li>Drag the project folder from Finder and drop it onto the Terminal window (after <code>cd</code> and the space)</li>
+              <li>The full folder path fills in automatically — now press Enter</li>
+            </ol>
+          </div>
+
+          <p>Or if you prefer to type it:</p>
+          <div class="cmd-block">cd your-project
+            <span class="note">Replace "your-project" with the actual folder name. The developer can tell you what it is.</span>
+          </div>
+          <p>Then install the project's dependencies:</p>
+          <div class="cmd-block">npm install
+            <span class="note">This might take a minute. Wait until the cursor comes back before moving on.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Install Claude Code</h4>
+          <p>Claude Code is the AI tool you'll use to send design changes. Install it by pasting this into Terminal and pressing Enter:</p>
+          <div class="cmd-block">npm install -g @anthropic-ai/claude-code
+            <span class="note">The -g means "install globally" — so it works in any folder, not just this project.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>Connect Claude to your Figma account</h4>
+          <p>Claude needs permission to read your Figma files. Here's how to get that set up:</p>
+          <ul>
+            <li>Open Figma and go to <strong>Settings → Security → Personal access tokens</strong></li>
+            <li>Click <strong>Create new token</strong>, give it a name like "Claude", and copy the token it gives you</li>
+            <li>Keep that token somewhere safe — you won't be able to see it again after you close the dialog</li>
+            <li>Hand the token to the developer sitting with you — they'll paste it into Claude's settings for you</li>
+          </ul>
+          <div class="callout warn">
+            <strong>Keep your token private.</strong> Don't paste it into Slack, email, or a shared doc. It's like a password.
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h4>Get a GitHub token so you can push your work</h4>
+          <p>When you upload your changes to the shared codebase (called "pushing"), GitHub will ask for a password. It doesn't accept your regular GitHub password — you need a special token instead. Here's how to get one:</p>
+          <ul>
+            <li>Go to <a href="https://github.com" target="_blank">github.com</a> and sign in</li>
+            <li>Click your profile photo in the top-right corner → <strong>Settings</strong></li>
+            <li>Scroll all the way down the left sidebar to the very bottom and click <strong>Developer settings</strong> (it's the last item)</li>
+            <li>Click <strong>Personal access tokens</strong> → <strong>Tokens (classic)</strong></li>
+            <li>Click <strong>Generate new token</strong> → <strong>Generate new token (classic)</strong></li>
+            <li>Give it a name like <em>My Mac</em> and set an expiration (90 days is fine)</li>
+            <li>Under <strong>Select scopes</strong>, tick the <strong>repo</strong> checkbox — that's all you need</li>
+            <li>Scroll down and click <strong>Generate token</strong></li>
+            <li>Copy the token immediately — GitHub will only show it once</li>
+          </ul>
+          <div class="callout warn">
+            <strong>Save the token somewhere safe right now</strong> — in your password manager or a private note. Once you leave that page, GitHub won't show it again. If you lose it, you'll need to generate a new one.
+          </div>
+          <p>The first time you run <code style="font-family: monospace; background: rgba(0,0,0,.08); padding: 1px 5px; border-radius: 3px;">git push</code>, Terminal will ask for your GitHub username and password. Enter your username, then paste this token as the password. Your Mac will remember it from then on.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num green">✓</div>
+        <div class="step-content">
+          <h4>All done</h4>
+          <p>Your Mac now has everything it needs. From here on, your daily routine is: open Terminal, navigate to the project folder, type two commands, send your prompt. That's it — no more installs.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- 03 Git basics -->
+  <section id="sgit">
+    <div class="section-label">03</div>
+    <h2>Saving and Sharing Your Work</h2>
+
+    <p>When the AI updates the code, those changes only live on your computer. To share them with the rest of the team — or get them into the real app — you need to save them to the shared codebase. That system is called <strong>git</strong>.</p>
+
+    <p>Think of git like Google Docs version history, but for code. Every save is recorded, nothing gets lost, and everyone on the team can see what changed and who changed it.</p>
+
+    <div class="callout info">
+      <strong>The golden rule:</strong> always do your work on your own branch. A branch is like your own copy of the project — you can make changes freely without affecting what everyone else sees. When you're happy with the result, you hand it to a developer who merges it in.
+    </div>
+
+    <h3>The four commands you need</h3>
+    <p>You'll use these in Terminal, inside your project folder. That's it — just four.</p>
+
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Create your own branch — do this before you start any work</h4>
+          <p>Give the branch a short name that describes what you're working on. Use dashes, no spaces.</p>
+          <div class="cmd-block">git checkout -b your-branch-name
+            <span class="note">Example: git checkout -b kb-banner-redesign</span>
+          </div>
+          <p>You only do this once per piece of work. From here, all changes stay on your branch.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Save your changes — do this when the result looks good</h4>
+          <p>First, stage everything that changed:</p>
+          <div class="cmd-block">git add .</div>
+          <p>Then write a short note describing what you did:</p>
+          <div class="cmd-block">git commit -m "your note here"
+            <span class="note">Example: git commit -m "move KB banner to welcome screen"</span>
+          </div>
+          <p>Keep the note short and specific. A few things to watch out for:</p>
+          <ul>
+            <li>The message <strong>must be wrapped in quotes</strong> — don't leave them out</li>
+            <li>Keep it to one line — no line breaks inside the quotes</li>
+            <li>Avoid special characters like <code>&amp;</code>, <code>'</code>, or <code>"</code> inside the message</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Push to the shared repo — do this when you're ready for others to see it</h4>
+          <div class="cmd-block">git push origin your-branch-name
+            <span class="note">Example: git push origin kb-banner-redesign</span>
+          </div>
+          <p>This uploads your branch so the team can see it. Nothing goes live yet — it's still just your branch.</p>
+          <div class="callout warn">
+            <strong>If you get an error when pushing, try these:</strong>
+            <ul style="margin: 6px 0 0 0; padding-left: 20px; line-height: 1.8;">
+              <li><strong>Wrong branch name</strong> — run <code>git branch</code> to see your current branch name, then use that exact name in the push command</li>
+              <li><strong>Asked for a username and password</strong> — enter your GitHub username, then paste your GitHub token (from Step 5) as the password</li>
+              <li><strong>"Updates were rejected"</strong> — run <code>git pull origin your-branch-name</code> first, then try pushing again</li>
+              <li>Still stuck? Ping a developer — push errors are usually quick to fix with a second pair of eyes</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>Tell a developer it's ready</h4>
+          <p>Ping a developer and let them know your branch is pushed and ready to review. They'll open a pull request — a formal request to merge your changes into the main codebase — and take it from there.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <h3>Starting fresh work the next day</h3>
+    <p>Before you start a new piece of work, always switch back to the main branch first so you're starting from the latest version:</p>
+    <div class="cmd-block">git checkout main
+<br>git pull
+      <span class="note">This switches to main and downloads any updates the team has made since you last worked.</span>
+    </div>
+    <p>Then create a new branch for the new work (step 1 above).</p>
+
+    <div class="callout warn">
+      <strong>Never work directly on main.</strong> Always create a branch first. If you're unsure what branch you're on, run <span style="font-family: monospace; font-size: 13px; background: rgba(0,0,0,.08); padding: 1px 5px; border-radius: 3px;">git branch</span> — the one with a star next to it is your current branch.
+    </div>
+
+    <h3>Quick reference card</h3>
+    <div style="background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; overflow: hidden; margin: 16px 0;">
+      <div class="tip-row" style="padding: 12px 16px;">
+        <div class="tip-icon">🌿</div>
+        <div class="tip-text"><strong>Start new work</strong> — <span style="font-family: monospace; font-size: 12px;">git checkout -b my-branch-name</span></div>
+      </div>
+      <div class="tip-row" style="padding: 12px 16px;">
+        <div class="tip-icon">💾</div>
+        <div class="tip-text"><strong>Save progress</strong> — <span style="font-family: monospace; font-size: 12px;">git add .</span> then <span style="font-family: monospace; font-size: 12px;">git commit -m "what I did"</span></div>
+      </div>
+      <div class="tip-row" style="padding: 12px 16px;">
+        <div class="tip-icon">☁️</div>
+        <div class="tip-text"><strong>Share with team</strong> — <span style="font-family: monospace; font-size: 12px;">git push origin my-branch-name</span></div>
+      </div>
+      <div class="tip-row" style="padding: 12px 16px; border-bottom: none;">
+        <div class="tip-icon">🔄</div>
+        <div class="tip-text"><strong>Get latest before starting</strong> — <span style="font-family: monospace; font-size: 12px;">git checkout main</span> then <span style="font-family: monospace; font-size: 12px;">git pull</span></div>
+      </div>
+    </div>
+
+  </section>
+
+
+  <!-- 04 Everyday workflow -->
+  <section id="s02">
+    <div class="section-label">04</div>
+    <h2>Your Everyday Workflow</h2>
+
+    <p>Every time you want a Figma change to show up in the app, follow these steps.</p>
+
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Make your change in Figma</h4>
+          <p>Design as normal. When you're happy with the change and want it in the app, move to step 2.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Copy the link to the frame you changed</h4>
+          <p>In Figma, click the frame (the screen or section you updated). Right-click it and choose <strong>Copy link to selection</strong>. See Section 04 for how to make sure you've got the right kind of link.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Open Terminal and start the app</h4>
+          <p>Press <strong>Cmd + Space</strong>, type <strong>Terminal</strong>, press <strong>Enter</strong>. Then navigate to the project folder — type <strong>cd </strong> (with a space), drag your project folder from Finder into the Terminal window, and press <strong>Enter</strong>. Then start the app:</p>
+          <div class="cmd-block">npm run dev
+            <span class="note">Keep this Terminal window open — don't close it. The app stops if you do.</span>
+          </div>
+          <p>Open <a href="http://localhost:3000" target="_blank"><strong>localhost:3000</strong></a> in Safari or Chrome. You should see the running app.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>Open a second Terminal tab and start Claude</h4>
+          <p>Press <strong>Cmd + T</strong> to open a new tab in the same Terminal window. Navigate to the project folder again the same way — type <strong>cd </strong>, drag the folder in, press <strong>Enter</strong> — then start Claude:</p>
+          <div class="cmd-block">claude</div>
+          <p>Claude Code opens in that tab. This is where you'll type your prompts. Keep both tabs open.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h4>Describe your change and paste the Figma link</h4>
+          <p>Type a message to Claude explaining what you changed and paste the Figma link. See Section 05 for examples of what to say.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num">6</div>
+        <div class="step-content">
+          <h4>Check the result in the browser</h4>
+          <p>Switch back to your browser at <strong>localhost:3000</strong>. The page refreshes automatically when Claude finishes. Compare it to your Figma design. If something looks off, tell Claude what's wrong — see Section 07.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-num green">7</div>
+        <div class="step-content">
+          <h4>Save and push when you're happy</h4>
+          <p>Once the result matches the design, save your work and push it so the team can see it:</p>
+          <div class="cmd-block">git add .
+git commit -m "brief description of what you changed"
+git push origin your-branch-name</div>
+          <p>Then ping a developer to let them know it's ready. See Section 03 for a full refresher on the git steps.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- 05 Getting the right Figma link -->
+  <section id="s03">
+    <div class="section-label">05</div>
+    <h2>Getting the Right Figma Link</h2>
+
+    <p>This is the step that trips people up the most. The AI needs a link to the specific frame you changed — not the whole file.</p>
+
+    <h3>The right way</h3>
+    <p>In Figma, <strong>click the frame</strong> you want (the screen or section that contains your change). Then <strong>right-click → Copy link to selection</strong>.</p>
+
+    <p>A good link looks like this — notice the <strong>node-id</strong> part at the end:</p>
+
+    <div class="cmd-block" style="color: #9de89a;">
+      https://www.figma.com/design/pRnyi3pZOjICYkhl8xm348/Ask-Nanci?node-id=7098-220562
+    </div>
+
+    <h3>How to know if something is wrong</h3>
+
+    <div style="margin: 16px 0;">
+      <div class="tip-row">
+        <div class="tip-icon">✅</div>
+        <div class="tip-text"><strong>Good</strong> — the link ends with <strong>?node-id=</strong> followed by numbers. This points to the exact frame.</div>
+      </div>
+      <div class="tip-row">
+        <div class="tip-icon">❌</div>
+        <div class="tip-text"><strong>Bad</strong> — the link ends with just the file name and nothing after it. This points to the whole Figma file, not a frame. Claude won't know which screen to look at.</div>
+      </div>
+      <div class="tip-row">
+        <div class="tip-icon">❌</div>
+        <div class="tip-text"><strong>Bad</strong> — you copied the link from your browser's address bar while viewing Figma. That gives the page link, not the frame link.</div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <strong>Always right-click the frame and use Copy link to selection.</strong> Don't copy from the browser address bar or the Share button.
+    </div>
+  </section>
+
+
+  <!-- 06 What to say to the AI -->
+  <section id="s04">
+    <div class="section-label">06</div>
+    <h2>What to Say to the AI</h2>
+
+    <p>You don't need to be technical. Just describe the change the way you'd explain it to a colleague. Tell Claude three things:</p>
+
+    <ul>
+      <li><strong>What changed</strong> — describe the difference between before and after</li>
+      <li><strong>Where it is</strong> — which part of the screen (sidebar, header, card, button, etc.)</li>
+      <li><strong>The Figma link</strong> — so Claude can see the updated design itself</li>
+    </ul>
+
+    <h3>Moving something</h3>
+    <div class="prompt-box">
+      I moved the Knowledge Base card from the bottom of the sidebar to just below the New Chat button. Please look at this Figma frame and update the code to match.<br><br>
+      https://www.figma.com/design/pRnyi3pZOjICYkhl8xm348/Ask-Nanci?node-id=7098-220562
+    </div>
+
+    <h3>Changing how something looks</h3>
+    <div class="prompt-box">
+      I updated the Knowledge Base card in the sidebar. It now has a green background tint and a thick green border on the left side instead of the plain white card. There's also a small amber badge that says "Not set up" next to the title.<br><br>
+      Please look at this Figma frame and apply those visual changes to the card.<br><br>
+      https://www.figma.com/design/pRnyi3pZOjICYkhl8xm348/Ask-Nanci?node-id=7098-220562
+    </div>
+
+    <h3>Changing text or labels</h3>
+    <div class="prompt-box">
+      I updated two labels in the sidebar — the button that said "Teach Nanci" now says "Add Knowledge" and the card title changed from "Knowledge Base" to "Your Knowledge". Please update the text in the code.
+    </div>
+
+    <h3>Adding something new</h3>
+    <div class="prompt-box">
+      I added a new banner to the main welcome screen — it sits between the chat input and the prompt suggestions. It's a horizontal bar with a green tint, a book icon on the left, a short description, and a "Teach Nanci" button on the right.<br><br>
+      Please look at this Figma frame and add the banner in the right position.<br><br>
+      https://www.figma.com/design/pRnyi3pZOjICYkhl8xm348/Ask-Nanci?node-id=7098-220562
+    </div>
+
+    <h3>Swapping an icon</h3>
+    <div class="prompt-box">
+      The icon on the Knowledge Base card changed from a document illustration to a book icon. Please update it in the code.
+    </div>
+
+    <div class="callout warn">
+      <strong>Avoid vague messages.</strong> "Can you update the design?" or "Make it look like Figma" won't give Claude enough to go on. Say specifically what changed and where.
+    </div>
+  </section>
+
+
+  <!-- 07 Checking the result -->
+  <section id="s05">
+    <div class="section-label">07</div>
+    <h2>Checking the Result</h2>
+
+    <p>After Claude finishes, your browser at <strong>localhost:3000</strong> will refresh automatically. Put it side by side with your Figma frame and look for any differences.</p>
+
+    <h3>What to look for</h3>
+    <div style="margin: 16px 0;">
+      <div class="tip-row">
+        <div class="tip-icon">📍</div>
+        <div class="tip-text"><strong>Position</strong> — is the element where you put it in Figma, or is it in the wrong place?</div>
+      </div>
+      <div class="tip-row">
+        <div class="tip-icon">🎨</div>
+        <div class="tip-text"><strong>Color</strong> — does the background, text, or border color look right?</div>
+      </div>
+      <div class="tip-row">
+        <div class="tip-icon">📐</div>
+        <div class="tip-text"><strong>Size and spacing</strong> — are things too close together, too far apart, too big, or too small?</div>
+      </div>
+      <div class="tip-row">
+        <div class="tip-icon">🔤</div>
+        <div class="tip-text"><strong>Text</strong> — are all the labels and copy exactly right?</div>
+      </div>
+      <div class="tip-row">
+        <div class="tip-icon">🔍</div>
+        <div class="tip-text"><strong>Missing pieces</strong> — is there anything from the Figma design that didn't show up?</div>
+      </div>
+    </div>
+
+    <h3>If something looks wrong, just describe it</h3>
+    <p>Stay in Claude Code and send a follow-up message. You don't need to paste the Figma link again unless Claude needs to re-read the design.</p>
+
+    <div class="prompt-box">
+      Two things look off:<br>
+      1. The card background is still white — it should be that light green tint from the design.<br>
+      2. The "Not set up" badge isn't showing up next to the title.
+    </div>
+
+    <div class="prompt-box">
+      The banner is there but it's below the prompt suggestions — it should be above them, right after the chat input box.
+    </div>
+
+    <div class="callout ok">
+      <strong>Keep going until it matches.</strong> Every follow-up message gets Claude closer to the design. You don't need to get it perfect in one shot — just keep describing what's off and it'll get there.
+    </div>
+
+    <h3>Checking dark mode</h3>
+    <p>If the app has a dark mode toggle (Ask Nanci has one in the bottom-right corner), click it to switch. Check that your change looks right in both light and dark modes, and let Claude know if anything needs adjusting.</p>
+  </section>
+
+</body>
+</html>
