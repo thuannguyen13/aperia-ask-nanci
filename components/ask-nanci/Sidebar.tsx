@@ -1,13 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { MessageCirclePlus, PieChart, LifeBuoy, Send, PanelLeft, Settings, ArrowUpRight, CircleHelp, LogOut, Moon } from "lucide-react"
+import { MessageCirclePlus, PieChart, LifeBuoy, Send, PanelLeft, Settings, Moon } from "lucide-react"
 import Image from "next/image"
 import { useTheme } from "next-themes"
 import {
   Avatar, AvatarFallback, Button, Switch, Tooltip, TooltipTrigger, TooltipContent,
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
-  DropdownMenuLabel, DropdownMenuItem, DropdownMenuSeparator,
+  DropdownMenuLabel, DropdownMenuItem,
 } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
@@ -57,7 +57,7 @@ function SidebarItem({
 }
 
 export function Sidebar() {
-  const { sessions, activeSessionId, startNewChat, resumeSession, deleteSessionById, sources, kbOpen, setKbOpen, openSettings, mobileSidebarOpen, setMobileSidebarOpen, currentUser } = useAskNanci()
+  const { sessions, activeSessionId, startNewChat, resumeSession, deleteSessionById, sources, kbOpen, setKbOpen, mobileSidebarOpen, setMobileSidebarOpen, currentUser } = useAskNanci()
   const [collapsed, setCollapsed] = useState(false)
   const [wizardOpen, setWizardOpen] = useState(false)
   const { resolvedTheme, setTheme } = useTheme()
@@ -231,20 +231,6 @@ export function Sidebar() {
               <span className="flex items-center gap-2"><Moon className="size-4" /> Dark Mode</span>
               <Switch checked={isDark} className="pointer-events-none" />
             </DropdownMenuItem>
-            {/* <DropdownMenuSeparator />
-            <DropdownMenuItem onSelect={() => openSettings("account")}>
-              <Settings className="size-4" /> Settings
-            </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => openSettings("usage")}>
-              <ArrowUpRight className="size-4" /> Upgrade Plan
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <CircleHelp className="size-4" /> Get Help
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <LogOut className="size-4" /> Log Out
-            </DropdownMenuItem> */}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

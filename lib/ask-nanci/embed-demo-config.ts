@@ -35,8 +35,7 @@ import { ISO_SCRIPTED_CONVERSATIONS } from "./data/flows.iso"
 export const SCRIPTED_CONVERSATIONS = { ...BASE_SCRIPTED_CONVERSATIONS, ...ISO_SCRIPTED_CONVERSATIONS }
 
 export { ISO_PROMPT_CATEGORIES } from "./data/prompts.iso"
-export { BUSINESS_OWNER_PROMPT_CATEGORIES } from "./data/prompts.business-owner"
-export { BUSINESS_OWNER_CONTENT_OVERRIDES } from "./data/overrides.business-owner"
-export { VW_CONTENT_OVERRIDES } from "./data/overrides.visionweb"
+export { BUSINESS_OWNER_PROMPT_CATEGORIES } from "./data/prompts.clover"
+export { VARIANT_CONTENT_OVERRIDES } from "./data/overrides"
 export { EMBED_DEMO_SOURCES, EMBED_ISO_DEMO_SOURCES, EMBED_BUSINESS_OWNER_DEMO_SOURCES, EMBED_VW_DEMO_SOURCES } from "./data/sources"
 export { CONCEPT_FLOW_SLUGS } from "./data/flows.concept"

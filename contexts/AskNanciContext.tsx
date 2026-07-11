@@ -11,14 +11,11 @@ import {
   fetchSources,
   persistSources,
   streamChat,
-  fetchUsage,
-  fetchCurrentUser,
   fetchPromptCategories,
   fetchAllQuestions,
-  fetchPlanTiers,
-  fetchActivity,
 } from "@/lib/ask-nanci/api"
-import type { CurrentUser, PromptCategory, PlanTier, ActivityItem } from "@/lib/ask-nanci/api"
+import type { CurrentUser, PromptCategory } from "@/lib/ask-nanci/api"
+import { MOCK_USAGE, DEFAULT_CURRENT_USER } from "@/lib/ask-nanci/mock-data"
 import { EMBED_DEMO_SOURCES, EMBED_BUSINESS_OWNER_DEMO_SOURCES, EMBED_ISO_DEMO_SOURCES, EMBED_VW_DEMO_SOURCES, SCRIPTED_CONVERSATIONS } from "@/lib/ask-nanci/embed-demo-config"
 import type { EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
 import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW2_PROMPT, CONCEPT_FLOW2_FOLLOWUP, CONCEPT_FLOW6_KEY, CONCEPT_FLOW12_PROMPT, CONCEPT_ALL_PROMPTS, CONCEPT_NO_RESET_PROMPTS, CONCEPT_WELCOME_KEY } from "@/lib/ask-nanci/concept-config"
@@ -57,22 +54,16 @@ interface AskNanciCtx {
   currentUser: CurrentUser | null
   promptCategories: PromptCategory[]
   allQuestions: string[]
-  planTiers: PlanTier[]
-  activity: ActivityItem[]
   tokenLimitReached: boolean
   setTokenLimitReached: (v: boolean) => void
   settingsOpen: boolean
-  settingsTab: string
-  openSettings: (tab?: string) => void
+  openSettings: () => void
   setSettingsOpen: (open: boolean) => void
   mobileSidebarOpen: boolean
   setMobileSidebarOpen: (open: boolean) => void
   onboardingOpen: boolean
   setOnboardingOpen: (open: boolean) => void
   isConceptVersion: boolean
-  reportPanelOpen: boolean
-  setReportPanelOpen: (open: boolean) => void
-  reportTopN: number
   formPanelOpen: boolean
   setFormPanelOpen: (open: boolean) => void
   submitFormPanel: () => void
@@ -104,6 +95,7 @@ interface AskNanciCtx {
   requestDepositNotify: () => void
   escalationPhase: "detail" | "paths" | "booked"
   menuMarginPhase: "volume" | "margin" | "compare"
+  merchantVolumePhase: "full" | "top5"
 }
 
 const Ctx = createContext<AskNanciCtx | null>(null)
@@ -132,19 +124,14 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [kbOpen, setKbOpen] = useState(false)
   const [draft, setDraft] = useState("")
   const [error, setError] = useState<string | null>(null)
-  const [usage, setUsage] = useState<UsageData>({ plan: "Gold", tokens: { used: 0, limit: 15000 }, chats: { used: 0, limit: 10 }, files: { used: 0, limit: 5 } })
-  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null)
+  const [usage] = useState<UsageData>(MOCK_USAGE)
+  const [currentUser] = useState<CurrentUser | null>(DEFAULT_CURRENT_USER)
   const [promptCategories, setPromptCategories] = useState<PromptCategory[]>([])
   const [allQuestions, setAllQuestions] = useState<string[]>([])
-  const [planTiers, setPlanTiers] = useState<PlanTier[]>([])
-  const [activity, setActivity] = useState<ActivityItem[]>([])
   const [tokenLimitReached, setTokenLimitReached] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
-  const [settingsTab, setSettingsTab] = useState("usage")
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [onboardingOpen, setOnboardingOpen] = useState(false)
-  const [reportPanelOpen, setReportPanelOpen] = useState(false)
-  const [reportTopN, setReportTopN] = useState(10)
   const [formPanelOpen, setFormPanelOpen] = useState(false)
   const [stepUpPanelOpen, setStepUpPanelOpen] = useState(false)
   const [stepUpPanelStep, setStepUpPanelStep] = useState<1 | 2 | 3>(1)
@@ -159,6 +146,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [depositNotifyRequested, setDepositNotifyRequested] = useState(false)
   const [escalationPhase, setEscalationPhase] = useState<"detail" | "paths" | "booked">("detail")
   const [menuMarginPhase, setMenuMarginPhase] = useState<"volume" | "margin" | "compare">("volume")
+  const [merchantVolumePhase, setMerchantVolumePhase] = useState<"full" | "top5">("full")
   const [proactiveNotificationActive, setProactiveNotificationActive] = useState(false)
   const stopRef = useRef<boolean>(false)
   const scriptStopRef = useRef<boolean>(false)
@@ -166,12 +154,8 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
 
   useEffect(() => {
     fetchSessions().then(setSessions)
-    fetchUsage().then(setUsage)
-    fetchCurrentUser().then(setCurrentUser)
     fetchPromptCategories().then(setPromptCategories)
     fetchAllQuestions().then(setAllQuestions)
-    fetchPlanTiers().then(setPlanTiers)
-    fetchActivity().then(setActivity)
     if (!isEmbed) fetchSources().then(setSourcesState)
     if (!localStorage.getItem(ONBOARDING_KEY)) setOnboardingOpen(true)
   }, [isEmbed])
@@ -335,12 +319,12 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     if (turn.openStepUpPanel) { setStepUpPanelOpen(true); setStepUpPanelStep(1) }
     if (turn.advanceStepUp) { setStepUpPanelStep((s) => Math.min(3, s + 1) as 1 | 2 | 3) }
     if (turn.openBatchPanel) { setBatchPanelOpen(true) }
-    if (turn.openReportPanel) { setReportPanelOpen(true); setReportTopN(10) }
-    if (prompt === CONCEPT_FLOW2_FOLLOWUP) { setReportTopN(5) }
     if (turn.openPanel) { setOpenPanels((prev) => prev.includes(turn.openPanel!) ? prev : [...prev, turn.openPanel!]) }
     if (turn.openPanel === "account-change" || turn.openDynamicPanel === "account-change") { setAccountChangeStep(1) }
     if (turn.openDynamicPanel === "escalation") { setEscalationPhase("detail") }
     if (turn.openDynamicPanel === "menu-performance") { setMenuMarginPhase("volume") }
+    if (turn.openDynamicPanel === "merchant-volume") { setMerchantVolumePhase("full") }
+    if (turn.openDynamicPanel === "work-queue") { setWorkQueuePhase("quick-wins") }
     if (turn.openDynamicPanel) { openDynamic(turn.openDynamicPanel) }
     if (turn.filterDeclineReport) { setDeclineReportFiltered(true) }
     if (turn.advanceWorkQueue) { setWorkQueuePhase(turn.advanceWorkQueue) }
@@ -348,6 +332,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     if (turn.depositNotifyRequested) { setDepositNotifyRequested(true) }
     if (turn.advanceEscalation) { setEscalationPhase(turn.advanceEscalation) }
     if (turn.advanceMenuMargin) { setMenuMarginPhase(turn.advanceMenuMargin) }
+    if (turn.advanceMerchantVolume) { setMerchantVolumePhase(turn.advanceMerchantVolume) }
   }, [])
 
   const playConceptScripted = useCallback((prompt: string) => {
@@ -484,6 +469,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setDepositNotifyRequested(false)
     setEscalationPhase("detail")
     setMenuMarginPhase("volume")
+    setMerchantVolumePhase("full")
   }, [])
 
   const requestDepositNotify = useCallback(() => {
@@ -571,7 +557,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     sessionIdRef.current = newSessionId()
     setPendingBot(null)
     setError(null)
-    setReportPanelOpen(false)
     setFormPanelOpen(false)
     setStepUpPanelOpen(false)
     setStepUpPanelStep(1)
@@ -583,6 +568,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setFeeVolumeRowHighlighted(false)
     setAccountChangeStep(1)
     setDepositNotifyRequested(false)
+    setMerchantVolumePhase("full")
   }, [])
 
   const replayFlow: (() => void) | null = autoPlayFlow ? useCallback(() => {
@@ -595,7 +581,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setOpenPanels([])
     resetDynamic()
     setClosingPanels([])
-    setReportPanelOpen(false)
     setFormPanelOpen(false)
     setStepUpPanelOpen(false)
     setStepUpPanelStep(1)
@@ -605,6 +590,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setFeeVolumeRowHighlighted(false)
     setAccountChangeStep(1)
     setDepositNotifyRequested(false)
+    setMerchantVolumePhase("full")
     setProactiveNotificationActive(false)
     setTimeout(() => playConceptScripted(autoPlayFlow), 300)
   }, []) : null
@@ -635,8 +621,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     persistSources(next.filter((s) => s.id !== CLOVER_SOURCE_ID))
   }, [])
 
-  const openSettings = useCallback((tab = "usage") => {
-    setSettingsTab(tab)
+  const openSettings = useCallback(() => {
     setSettingsOpen(true)
   }, [])
 
@@ -651,12 +636,12 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       kbOpen, setKbOpen,
       draft, setDraft,
       error,
-      usage, currentUser, promptCategories, allQuestions, planTiers, activity,
+      usage, currentUser, promptCategories, allQuestions,
       tokenLimitReached, setTokenLimitReached,
-      settingsOpen, settingsTab, openSettings, setSettingsOpen,
+      settingsOpen, openSettings, setSettingsOpen,
       mobileSidebarOpen, setMobileSidebarOpen,
       onboardingOpen, setOnboardingOpen,
-      isConceptVersion, reportPanelOpen, setReportPanelOpen, reportTopN,
+      isConceptVersion,
       formPanelOpen, setFormPanelOpen, submitFormPanel,
       stepUpPanelOpen, setStepUpPanelOpen, stepUpPanelStep, advanceStepUpPanel, submitStepUpPanel,
       batchPanelOpen, setBatchPanelOpen,
@@ -667,6 +652,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       feeVolumeRowHighlighted, accountChangeStep, submitAccountChangeDetails, goBackAccountChangeStep, confirmAccountChange, depositNotifyRequested, requestDepositNotify,
       escalationPhase,
       menuMarginPhase,
+      merchantVolumePhase,
     }}>
       {children}
     </Ctx.Provider>

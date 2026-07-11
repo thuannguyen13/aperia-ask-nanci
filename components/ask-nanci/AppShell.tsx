@@ -10,7 +10,6 @@ import { AskNanciProvider, useAskNanci } from "@/contexts/AskNanciContext"
 import { parseMode, CONCEPT_FLOW_SLUGS, type EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
 import { Sidebar } from "./Sidebar"
 import { TeachNanciPanel } from "./TeachNanciPanel"
-import { MerchantVolumePanel } from "./concept/MerchantVolumePanel"
 import { BankAccountFormPanel } from "./concept/BankAccountFormPanel"
 import { StepUpAuthPanel } from "./concept/StepUpAuthPanel"
 import { BatchDetailPanel } from "./concept/BatchDetailPanel"
@@ -65,11 +64,11 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
     <div className={`flex min-w-0 flex-1 py-1 pr-1${noSidebar ? " pl-1" : ""}`}>
       <TeachNanciPanel />
       {/* Chat is always mounted at this position so React never remounts it.
-          In DQ mode it moves to the right via order-last; the panel area renders after it in DOM
-          but appears first visually because it uses the default flex order. */}
+          It stays on the left in every mode (matching the latest flows); in DQ mode it
+          just shrinks to a fixed width while the panel area fills the space to its right. */}
       <div className={
         showDQ
-          ? "order-last ml-1 flex w-[320px] shrink-0 overflow-hidden rounded-xl border bg-background md:w-97.5 md:rounded-2xl"
+          ? "mr-1 flex w-[320px] shrink-0 overflow-hidden rounded-xl border bg-background md:w-97.5 md:rounded-2xl"
           : `flex min-w-0 flex-1 overflow-hidden rounded-xl md:rounded-2xl border bg-background transition-opacity duration-200 ease-out ${chatFadingIn ? "opacity-0" : "opacity-100"}`
       }>
         {children}
@@ -78,7 +77,6 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
         <ConceptPanelArea fillWidth visible={dqVisible} />
       ) : (
         <>
-          <MerchantVolumePanel />
           <BankAccountFormPanel />
           <StepUpAuthPanel />
           <BatchDetailPanel />

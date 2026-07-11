@@ -125,11 +125,11 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   // ── Flow 2: Data Lookup ───────────────────────────────────────────────────
   [CONCEPT_FLOW2_PROMPT]: [
     { role: "user", content: CONCEPT_FLOW2_PROMPT },
-    { role: "assistant", content: "Here's your merchant volume for the week of May 15–21. I've opened the full breakdown in the panel — you can sort by any column.", openReportPanel: true, pauseAfter: 800 },
+    { role: "assistant", content: "Here's your merchant volume for the week of May 15–21. I've opened the full breakdown in the panel — you can sort by any column.", openDynamicPanel: "merchant-volume", pauseAfter: 800 },
   ],
   [CONCEPT_FLOW2_FOLLOWUP]: [
     { role: "user", content: CONCEPT_FLOW2_FOLLOWUP },
-    { role: "assistant", content: "Got it — filtered to your top 5 by volume.", suggestions: ["Show me merchants with decline rates above 15% last week", CONCEPT_FLOW2_PROMPT] },
+    { role: "assistant", content: "Got it — filtered to your top 5 by volume.", advanceMerchantVolume: "top5", suggestions: ["Show me merchants with decline rates above 15% last week", CONCEPT_FLOW2_PROMPT] },
   ],
 
   // ── Flow 3: Panel-as-form ─────────────────────────────────────────────────
@@ -259,7 +259,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   ],
   [CONCEPT_FLOW11_QUICKWINS]: [
     { role: "user", content: CONCEPT_FLOW11_QUICKWINS },
-    { role: "assistant", content: "Filtered to 12 document-approval cases. All need your sign-off — the merchant submitted the doc, I've flagged anything that looks off. Review them one at a time or batch-approve after a quick scan?", advanceWorkQueue: "quick-wins", suggestions: [CONCEPT_FLOW11_APPROVE] },
+    { role: "assistant", content: "Filtered to 12 document-approval cases. All need your sign-off — the merchant submitted the doc, I've flagged anything that looks off. Review them one at a time or batch-approve after a quick scan?", openDynamicPanel: "work-queue", advanceWorkQueue: "quick-wins", suggestions: [CONCEPT_FLOW11_APPROVE] },
   ],
   [CONCEPT_FLOW11_APPROVE]: [
     { role: "user", content: CONCEPT_FLOW11_APPROVE },

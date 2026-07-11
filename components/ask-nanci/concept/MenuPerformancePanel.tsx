@@ -27,7 +27,7 @@ function ordinal(n: number) {
 function VolumeTable({ compact }: { compact?: boolean }) {
   const rows = [...MENU_ITEMS].sort((a, b) => b.unitsSold - a.unitsSold)
   return (
-    <table className="w-full text-xs border-collapse overflow-hidden rounded-lg border">
+    <table className="w-full text-xs border-separate border-spacing-0 overflow-hidden rounded-lg border [&_th]:border-b [&_tr:not(:last-child)_td]:border-b">
       <thead>
         <tr className="border-b bg-muted/40">
           <th className="px-3 py-2 text-left text-[9px] font-bold tracking-[0.1em] uppercase text-muted-foreground">Product</th>
@@ -51,7 +51,7 @@ function VolumeTable({ compact }: { compact?: boolean }) {
 function ProfitTable({ compact }: { compact?: boolean }) {
   const rows = [...MENU_ITEMS].sort((a, b) => b.margin - a.margin)
   return (
-    <table className="w-full text-xs border-collapse overflow-hidden rounded-lg border">
+    <table className="w-full text-xs border-separate border-spacing-0 overflow-hidden rounded-lg border [&_th]:border-b [&_tr:not(:last-child)_td]:border-b">
       <thead>
         <tr className="border-b bg-muted/40">
           <th className="px-3 py-2 text-left text-[9px] font-bold tracking-[0.1em] uppercase text-muted-foreground">Product</th>

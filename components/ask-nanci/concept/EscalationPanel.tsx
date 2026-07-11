@@ -33,7 +33,7 @@ export function EscalationPanel() {
       <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
         <p className="text-sm font-semibold text-foreground">Batch {PAYOUT_DISCREPANCY.batchId}</p>
 
-        <table className="w-full text-xs border-collapse overflow-hidden rounded-lg border">
+        <table className="w-full text-xs border-separate border-spacing-0 overflow-hidden rounded-lg border [&_th]:border-b [&_tr:not(:last-child)_td]:border-b">
           <thead>
             <tr className="border-b bg-muted/40">
               <th className="px-3 py-2 text-left text-[9px] font-bold tracking-[0.1em] uppercase text-muted-foreground">Fee Type</th>

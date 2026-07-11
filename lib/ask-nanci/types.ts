@@ -32,7 +32,7 @@ export type PanelId =
   | "detection-queue" | "barometer-report" | "coastal-risk"
   | "pending-deposits" | "flagged-transaction" | "fee-summary" | "chargeback-status"
   | "sales-snapshot" | "sales-drilldown" | "account-change" | "escalation"
-  | "menu-performance" | "menu-cost-detail"
+  | "menu-performance" | "menu-cost-detail" | "merchant-volume"
 
 // Panel ids that flow through the dynamic panel stack (usePanelStack) instead
 // of the legacy hardcoded mapPanelsToSlots switch in ConceptPanelArea.
@@ -41,6 +41,7 @@ export type DynamicPanelId =
   | "fee-summary" | "chargeback-status"
   | "sales-snapshot" | "sales-drilldown" | "account-change" | "escalation"
   | "menu-performance" | "menu-cost-detail"
+  | "merchant-volume" | "work-queue"
 
 export interface ConceptScriptedTurn extends ScriptedTurn {
   sheetAction?: SheetActionData
@@ -49,7 +50,6 @@ export interface ConceptScriptedTurn extends ScriptedTurn {
   openStepUpPanel?: true
   advanceStepUp?: true
   openBatchPanel?: true
-  openReportPanel?: true
   openPanel?: PanelId
   openDynamicPanel?: DynamicPanelId
   filterDeclineReport?: true
@@ -63,6 +63,7 @@ export interface ConceptScriptedTurn extends ScriptedTurn {
   depositNotifyRequested?: true
   advanceEscalation?: "paths" | "booked"
   advanceMenuMargin?: "margin" | "compare"
+  advanceMerchantVolume?: "top5"
 }
 
 // ─── API / user types ──────────────────────────────────────────────────────────
@@ -71,20 +72,6 @@ export interface CurrentUser {
   name: string
   email: string
   initials: string
-}
-
-export interface PlanTier {
-  name: UsageData["plan"]
-  tokensPerDay: number
-  chatsPerDay: number | null
-  filesMax: number | null
-  price: string
-}
-
-export interface ActivityItem {
-  date: string
-  title: string
-  tokens: number
 }
 
 export interface Source {

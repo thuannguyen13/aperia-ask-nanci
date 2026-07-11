@@ -17,7 +17,7 @@ export function TokenLimitDialog() {
 
   function handleUpgrade() {
     setTokenLimitReached(false)
-    openSettings("usage")
+    openSettings()
   }
 
   return (

@@ -39,6 +39,7 @@ import { FlaggedTransactionPanel } from "./FlaggedTransactionPanel"
 import { EscalationPanel } from "./EscalationPanel"
 import { MenuPerformancePanel } from "./MenuPerformancePanel"
 import { CostDetailPanel } from "./CostDetailPanel"
+import { MerchantVolumePanel } from "./MerchantVolumePanel"
 
 type Slots = { A: PanelId | null; B: PanelId | null; C: PanelId | null; D: PanelId | null }
 
@@ -73,11 +74,6 @@ function mapPanelsToSlots(openPanels: string[]): Slots {
       C: has("change-log") ? "change-log" : null,
       D: null,
     }
-  }
-
-  // Flow 11 — Work Queue
-  if (has("work-queue")) {
-    return { A: "work-queue", B: null, C: null, D: null }
   }
 
   // Flow 12 — Detection Queue
@@ -126,6 +122,7 @@ function PanelContent({ id }: { id: PanelId }) {
     case "escalation":          return <EscalationPanel />
     case "menu-performance":    return <MenuPerformancePanel />
     case "menu-cost-detail":    return <CostDetailPanel />
+    case "merchant-volume":     return <MerchantVolumePanel />
   }
 }
 

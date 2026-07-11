@@ -27,7 +27,7 @@ export function CostDetailPanel() {
 
         <div>
           <p className="mb-2 text-base font-bold text-foreground">Ingredient Cost per Sandwich</p>
-          <table className="w-full text-xs border-collapse overflow-hidden rounded-lg border">
+          <table className="w-full text-xs border-separate border-spacing-0 overflow-hidden rounded-lg border [&_th]:border-b [&_tr:not(:last-child)_td]:border-b">
             <thead>
               <tr className="border-b bg-muted/40">
                 <th className="px-3 py-2 text-left text-[9px] font-bold tracking-[0.1em] uppercase text-muted-foreground">Ingredient</th>

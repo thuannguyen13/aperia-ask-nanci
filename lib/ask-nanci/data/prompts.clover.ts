@@ -79,3 +79,11 @@ export const PROMPT_CATEGORIES: PromptCategory[] = [
     ],
   },
 ]
+
+// business-owner (AccessOne) embed reuses Clover's categories, only the order
+// differs (Maintenance promoted to 2nd).
+const BUSINESS_OWNER_ORDER = ["overview", "account-maintenance", "top-items", "inventory", "operation", "refunds-voids", "payment"]
+
+export const BUSINESS_OWNER_PROMPT_CATEGORIES: PromptCategory[] = BUSINESS_OWNER_ORDER
+  .map((id) => PROMPT_CATEGORIES.find((c) => c.id === id))
+  .filter((c): c is PromptCategory => c !== undefined)
