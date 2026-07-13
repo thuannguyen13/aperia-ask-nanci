@@ -9,7 +9,6 @@ import type { ConceptScriptedTurn, SheetActionData } from "../types"
 export const CONCEPT_FLOW2_PROMPT    = "Show me merchant volume for this week"
 export const CONCEPT_FLOW2_FOLLOWUP  = "Just the top 5"
 export const CONCEPT_FLOW6_KEY       = "__proactive__"
-export const CONCEPT_WELCOME_KEY     = "__welcome__"
 export const CONCEPT_DETECT_WELCOME_KEY = "__detect_welcome__"
 
 export const CONCEPT_FLOW8_FOLLOWUP  = "Filter to ones not contacted in the last 30 days"
@@ -279,15 +278,6 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   "Yes, send the template and mark them": [
     { role: "user", content: "Yes, send the template and mark them" },
     { role: "assistant", content: "Done — 8 merchants notified, cases marked Waiting on Vendor. Auto-close will trigger when Processor X confirms resolution.", suggestions: [CONCEPT_FLOW12_PROMPT, "Show me merchants with decline rates above 15% last week"] },
-  ],
-
-  // ── Welcome: Greeting with AI Triage Summary ──────────────────────────────
-  [CONCEPT_WELCOME_KEY]: [
-    {
-      role: "assistant",
-      content: "Good morning, Teresa. A few things came in while you were away — I've gone through everything and sorted it for you. Here's where your queue stands:",
-      widget: "ai-triage-summary",
-    },
   ],
 
   // ── Flow 11 + 12: Detection Queue (step-driven) ───────────────────────────

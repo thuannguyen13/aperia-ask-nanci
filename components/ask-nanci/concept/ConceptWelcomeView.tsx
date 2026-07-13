@@ -86,7 +86,7 @@ const FLOWS = [
     num: 12,
     title: "Detection Queue",
     badge: "Risk · Looping",
-    description: "Risk analyst works a Detection Queue assignment — Barometer Report, risk profile, and case escalation open side by side. Loops automatically.",
+    description: "Risk analyst works a Detection Queue assignment — Barometer Report, risk profile, and case escalation open side by side.",
     prompt: CONCEPT_FLOW12_PROMPT,
     proactive: false,
   },
@@ -190,7 +190,7 @@ export function ConceptWelcomeView() {
             <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={40} height={40} />
             <div>
               <p className="text-2xl font-medium text-foreground">Ask Nanci — Concept Demo</p>
-              <p className="mt-1 text-sm text-muted-foreground">Ten interaction patterns. Each flow demonstrates a distinct AI + panel UX.</p>
+              <p className="mt-1 text-sm text-muted-foreground">{FLOWS.length + MONEY_FLOWS.length} interaction patterns. Each flow demonstrates a distinct AI + panel UX.</p>
             </div>
           </div>
         )}
