@@ -38,8 +38,14 @@ export const CONCEPT_MENU_MARGIN_PROMPT = "how's the Italian combo doing this mo
 export const CONCEPT_FLOW_SLUGS: Record<string, string> = {
   "2":  CONCEPT_FLOW2_PROMPT,
   "6":  CONCEPT_FLOW6_KEY,
+  "9":  CONCEPT_FLOW9_PROMPT,
   "11": CONCEPT_DETECT_WELCOME_KEY,
   "12": CONCEPT_FLOW12_PROMPT,
+  "13": CONCEPT_FLOW13_PROMPT,
+  "14": CONCEPT_FLOW14_PROMPT,
+  "15": CONCEPT_FLOW15_PROMPT,
+  "16": CONCEPT_FLOW16_PROMPT,
+  "18": CONCEPT_MENU_MARGIN_PROMPT,
 }
 
 // Prompts that trigger scripted concept flows (used to guard handlePrompt routing).
