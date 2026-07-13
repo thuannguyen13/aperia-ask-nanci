@@ -1,11 +1,10 @@
 "use client"
 
-import Image from "next/image"
 import { ArrowUpRight } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { CONCEPT_FLOW15_FOLLOWUP } from "@/lib/ask-nanci/concept-config"
 import { SATURDAY_DRILLDOWN, WEEKDAY_AVG_TRANSACTIONS, WEEKDAY_AVG_TICKET } from "@/lib/ask-nanci/data/panels/sales-snapshot"
-import { PanelShell, PanelHeader, PanelExportButton, Callout, StatCard, formatCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, StatCard, formatCurrency } from "@/components/ask-nanci/shared"
 
 export function SalesDrilldownPanel() {
   const { closeDynamicPanel, handlePrompt } = useAskNanci()
@@ -23,14 +22,9 @@ export function SalesDrilldownPanel() {
       />
 
       <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
-        <Callout variant="blue">
-          <div className="flex items-start gap-2">
-            <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={18} height={18} className="mt-0.5 shrink-0" />
-            <p>
+        <NanciInsight>
               Saturday was your best day this week at {formatCurrency(SATURDAY_DRILLDOWN.sales)}. Both traffic and basket size were up — you ran {SATURDAY_DRILLDOWN.transactions} transactions versus a weekday average of {WEEKDAY_AVG_TRANSACTIONS}, and your average ticket rose to {formatCurrency(SATURDAY_DRILLDOWN.avgTicket)} versus a weekday average of {formatCurrency(WEEKDAY_AVG_TICKET)}.
-            </p>
-          </div>
-        </Callout>
+        </NanciInsight>
 
         <div>
           <p className="mb-2 text-base font-bold text-foreground">Vs Weekday Average</p>

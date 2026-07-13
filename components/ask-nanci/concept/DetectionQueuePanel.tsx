@@ -3,7 +3,7 @@
 import { ArrowRight, FileBarChart2, ShieldCheck } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { STATUS_ROWS } from "@/lib/ask-nanci/data/panels/barometer"
-import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelTable, Th, Td } from "@/components/ask-nanci/shared"
 
 export function DetectionQueuePanel() {
   const { closePanel, closeAllNewPanels } = useAskNanci()
@@ -44,30 +44,24 @@ export function DetectionQueuePanel() {
         </div>
 
         {/* Status table */}
-        <div className="rounded-md border overflow-hidden">
-          <table className="w-full table-fixed text-xs border-collapse">
-            <thead>
-              <tr className="bg-muted/60">
-                <th className="px-3 py-2.5 text-left text-[10px] font-semibold text-muted-foreground">
-                  <span className="block truncate">Distinct Merchants — Current Status</span>
-                </th>
-                <th className="w-12 px-3 py-2.5 text-right text-[10px] font-semibold text-muted-foreground">Count</th>
-                <th className="w-20 px-3 py-2.5 text-right text-[10px] font-semibold text-muted-foreground">Amount</th>
+        <PanelTable>
+          <thead>
+            <tr className="border-b bg-muted/40">
+              <Th>Distinct Merchants — Current Status</Th>
+              <Th align="right">Count</Th>
+              <Th align="right">Amount</Th>
+            </tr>
+          </thead>
+          <tbody>
+            {STATUS_ROWS.map(({ label, count, amount }) => (
+              <tr key={label}>
+                <Td className="whitespace-nowrap">{label}</Td>
+                <Td align="right" mono>{count}</Td>
+                <Td align="right" mono className="whitespace-nowrap">{amount}</Td>
               </tr>
-            </thead>
-            <tbody>
-              {STATUS_ROWS.map(({ label, count, amount }) => (
-                <tr key={label} className="border-t border-border/50">
-                  <td className="px-3 py-3 text-foreground">
-                    <span className="block truncate">{label}</span>
-                  </td>
-                  <td className="px-3 py-3 text-right text-foreground font-mono">{count}</td>
-                  <td className="px-3 py-3 text-right text-foreground font-mono">{amount}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </PanelTable>
 
         {/* Action buttons */}
         <div className="flex flex-wrap items-center gap-2 pt-1">

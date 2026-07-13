@@ -1,9 +1,8 @@
 "use client"
 
-import Image from "next/image"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { HERO_ITEM, COMBO_COST_BREAKDOWN, COMBO_MENU_PRICE, COMBO_TOTAL_INGREDIENT_COST, COMBO_MARGIN } from "@/lib/ask-nanci/data/panels/menu-margin"
-import { PanelShell, PanelHeader, PanelExportButton, Callout, formatCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelTable, Th, formatCurrency } from "@/components/ask-nanci/shared"
 
 export function CostDetailPanel() {
   const { closeDynamicPanel } = useAskNanci()
@@ -18,20 +17,15 @@ export function CostDetailPanel() {
       />
 
       <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
-        <Callout variant="blue">
-          <div className="flex items-start gap-2">
-            <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={18} height={18} className="mt-0.5 shrink-0" />
-            <p>Three imported meats carry it. Prosciutto and mortadella together are 60% of the ingredient cost. The provolone and bread are minor. Nothing here is wrong — it&apos;s just an expensive sandwich to build.</p>
-          </div>
-        </Callout>
+        <NanciInsight>Three imported meats carry it. Prosciutto and mortadella together are 60% of the ingredient cost. The provolone and bread are minor. Nothing here is wrong — it&apos;s just an expensive sandwich to build.</NanciInsight>
 
         <div>
           <p className="mb-2 text-base font-bold text-foreground">Ingredient Cost per Sandwich</p>
-          <table className="w-full text-xs border-separate border-spacing-0 overflow-hidden rounded-lg border [&_th]:border-b [&_tr:not(:last-child)_td]:border-b">
+          <PanelTable>
             <thead>
               <tr className="border-b bg-muted/40">
-                <th className="px-3 py-2 text-left text-[9px] font-bold tracking-[0.1em] uppercase text-muted-foreground">Ingredient</th>
-                <th className="px-3 py-2 text-right text-[9px] font-bold tracking-[0.1em] uppercase text-muted-foreground">Cost</th>
+                <Th>Ingredient</Th>
+                <Th align="right">Cost</Th>
               </tr>
             </thead>
             <tbody>
@@ -54,7 +48,7 @@ export function CostDetailPanel() {
                 <td className="px-3 py-2 text-right font-mono font-semibold text-foreground">{formatCurrency(COMBO_MARGIN)}</td>
               </tr>
             </tbody>
-          </table>
+          </PanelTable>
         </div>
       </div>
     </PanelShell>

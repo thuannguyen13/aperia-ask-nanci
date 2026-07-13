@@ -1,16 +1,13 @@
 "use client"
 
-import Image from "next/image"
 import { CheckCircle2, AlertCircle } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { QUICK_WINS, OUTAGE_MERCHANTS } from "@/lib/ask-nanci/data/panels/work-queue"
-import { PanelShell, PanelHeader, PanelExportButton, Callout } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelTable, Th } from "@/components/ask-nanci/shared"
 
 const reviewCount = QUICK_WINS.filter((r) => !r.valid).length
 const cleanCount = QUICK_WINS.length - reviewCount
-
-const TH = "px-3 py-2 text-[9px] font-bold tracking-[0.1em] uppercase text-muted-foreground"
 
 export function WorkQueuePanel() {
   const { closeDynamicPanel, workQueuePhase } = useAskNanci()
@@ -27,25 +24,20 @@ export function WorkQueuePanel() {
       />
 
       <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
-        <Callout variant="blue">
-          <div className="flex items-start gap-2">
-            <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={18} height={18} className="mt-0.5 shrink-0" />
-            <p>
+        <NanciInsight>
               {isOutage
                 ? <><span className="font-bold">Processor X posted an outage at 06:14</span> (ETA noon) — 8 merchants are waiting on settlement. I can notify all 8, mark them Waiting on Vendor, and auto-close when the processor confirms.</>
                 : <><span className="font-bold">{QUICK_WINS.length} approvals ready.</span> I&apos;ve pre-checked each — {cleanCount} look clean, {reviewCount} flagged something worth your eyes before you batch-approve.</>}
-            </p>
-          </div>
-        </Callout>
+        </NanciInsight>
 
         {/* Quick-wins phase */}
         {!isOutage && (
-          <table className="w-full text-xs border-separate border-spacing-0 overflow-hidden rounded-lg border [&_th]:border-b [&_tr:not(:last-child)_td]:border-b">
+          <PanelTable>
             <thead>
               <tr className="border-b bg-muted/40">
-                <th className={cn(TH, "text-left")}>Merchant</th>
-                <th className={cn(TH, "text-left")}>Doc</th>
-                <th className={cn(TH, "text-right")}>AI Read</th>
+                <Th>Merchant</Th>
+                <Th>Doc</Th>
+                <Th align="right">AI Read</Th>
               </tr>
             </thead>
             <tbody>
@@ -58,7 +50,7 @@ export function WorkQueuePanel() {
                   )}
                 >
                   <td className="px-3 py-2">
-                    <p className="text-foreground truncate max-w-[140px]">{row.merchant}</p>
+                    <p className="text-foreground">{row.merchant}</p>
                     <p className="font-mono text-[9px] text-muted-foreground">{row.id}</p>
                   </td>
                   <td className="px-3 py-2 text-[10px] text-muted-foreground">{row.doc}</td>
@@ -76,7 +68,7 @@ export function WorkQueuePanel() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </PanelTable>
         )}
 
         {/* Outage phase */}

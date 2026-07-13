@@ -1,11 +1,10 @@
 "use client"
 
-import Image from "next/image"
 import { Bell, Check } from "lucide-react"
 import { Button } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { HELD_TXN } from "@/lib/ask-nanci/data/panels/pending-deposits"
-import { PanelShell, PanelHeader, PanelExportButton, Callout, formatCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, formatCurrency } from "@/components/ask-nanci/shared"
 
 export function FlaggedTransactionPanel() {
   const { closeDynamicPanel, depositNotifyRequested, requestDepositNotify } = useAskNanci()
@@ -19,14 +18,9 @@ export function FlaggedTransactionPanel() {
         onClose={() => closeDynamicPanel("flagged-transaction")}
       />
       <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4">
-        <Callout variant="blue">
-          <div className="flex items-start gap-2">
-            <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={18} height={18} className="mt-0.5 shrink-0" />
-            <p>
+        <NanciInsight>
               A {formatCurrency(HELD_TXN.amount)} transaction in this batch exceeded your typical ticket size, triggering a routine review. No action needed on your end.
-            </p>
-          </div>
-        </Callout>
+        </NanciInsight>
 
         <div>
           <p className="mb-2 text-base font-semibold text-foreground">Flagged transaction (1)</p>

@@ -1,12 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
 import { Badge } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { MERCHANT_VOLUME_DATA } from "@/lib/ask-nanci/concept-config"
-import { PanelShell, PanelHeader, PanelExportButton, Callout, formatCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelTable, Th, formatCurrency } from "@/components/ask-nanci/shared"
 
 type SortKey = "volume" | "txnCount" | "avgTicket"
 
@@ -20,7 +19,6 @@ const SORT_LABELS: Record<SortKey, string> = {
 // regardless of which column the user sorts by, so it anchors the insight line.
 const leader = [...MERCHANT_VOLUME_DATA].sort((a, b) => b.volume - a.volume)[0]
 
-const TH = "px-3 py-2 text-[9px] font-bold tracking-[0.1em] uppercase text-muted-foreground"
 const TD = "px-3 py-2 font-mono text-foreground"
 
 export function MerchantVolumePanel() {
@@ -41,16 +39,11 @@ export function MerchantVolumePanel() {
       />
 
       <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
-        <Callout variant="blue">
-          <div className="flex items-start gap-2">
-            <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={18} height={18} className="mt-0.5 shrink-0" />
-            <p>
+        <NanciInsight>
               {merchantVolumePhase === "top5"
                 ? <>Your top 5 by volume. <span className="font-bold">{leader.merchant}</span> still leads at ${leader.volume.toLocaleString()} across {leader.txnCount.toLocaleString()} transactions. Sort by any column to reorder.</>
                 : <><span className="font-bold">{leader.merchant}</span> leads the week at ${leader.volume.toLocaleString()} across {leader.txnCount.toLocaleString()} transactions — the highest average ticket earners rank lower on count. Sort by any column to reorder.</>}
-            </p>
-          </div>
-        </Callout>
+        </NanciInsight>
 
         {/* Sort chips — the one Ranked-Report affordance; named dimensions, not raw arrows */}
         <div className="flex items-center gap-2">
@@ -67,14 +60,14 @@ export function MerchantVolumePanel() {
           ))}
         </div>
 
-        <table className="w-full text-xs border-separate border-spacing-0 overflow-hidden rounded-lg border [&_th]:border-b [&_tr:not(:last-child)_td]:border-b">
+        <PanelTable>
           <thead>
             <tr className="border-b bg-muted/40">
-              <th className={cn(TH, "text-left w-8")}>#</th>
-              <th className={cn(TH, "text-left")}>Merchant</th>
-              <th className={cn(TH, "text-right")}>Volume</th>
-              <th className={cn(TH, "text-right")}>Txns</th>
-              <th className={cn(TH, "text-right")}>Avg Ticket</th>
+              <Th className="w-8">#</Th>
+              <Th>Merchant</Th>
+              <Th align="right">Volume</Th>
+              <Th align="right">Txns</Th>
+              <Th align="right">Avg Ticket</Th>
             </tr>
           </thead>
           <tbody>
@@ -94,7 +87,7 @@ export function MerchantVolumePanel() {
               </tr>
             ))}
           </tbody>
-        </table>
+        </PanelTable>
       </div>
     </PanelShell>
   )

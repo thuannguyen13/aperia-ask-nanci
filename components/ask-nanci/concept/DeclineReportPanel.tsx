@@ -4,7 +4,7 @@ import { Download } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { ALL_MERCHANTS, FILTERED } from "@/lib/ask-nanci/data/panels/decline-report"
-import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelTable, Th, Td } from "@/components/ask-nanci/shared"
 
 function rateColor(r: number) {
   if (r >= 25) return "text-red-600 dark:text-red-400"
@@ -41,39 +41,39 @@ export function DeclineReportPanel() {
       />
 
       {/* Table */}
-      <div className="flex-1 overflow-auto">
-        <table className="w-full text-xs border-collapse">
-          <thead className="sticky top-0 bg-muted/60 backdrop-blur z-10">
-            <tr>
-              <th className="px-4 py-2 text-left text-[9px] font-bold tracking-[0.1em] uppercase text-muted-foreground">Merchant</th>
-              <th className="px-2 py-2 text-left text-[9px] font-bold tracking-[0.1em] uppercase text-muted-foreground">ISO</th>
-              <th className="px-3 py-2 text-right text-[9px] font-bold tracking-[0.1em] uppercase text-muted-foreground">Rate</th>
-              <th className="px-3 py-2 text-right text-[9px] font-bold tracking-[0.1em] uppercase text-muted-foreground">Contact</th>
+      <div className="flex-1 overflow-auto px-4 py-3">
+        <PanelTable>
+          <thead>
+            <tr className="border-b bg-muted/40">
+              <Th>Merchant</Th>
+              <Th>ISO</Th>
+              <Th align="right">Rate</Th>
+              <Th align="right">Contact</Th>
             </tr>
           </thead>
           <tbody>
             {rows.map((row, i) => {
               const { pct, color } = rateBar(row.rate)
               return (
-                <tr key={i} className="border-b border-border/50 hover:bg-muted/30 group">
-                  <td className="px-4 py-2">
+                <tr key={i} className="hover:bg-muted/30 group">
+                  <Td>
                     <div className="flex items-center gap-2">
                       <div className="w-[32px] h-1.5 rounded-full bg-muted overflow-hidden shrink-0">
                         <div className={cn("h-full rounded-full", color)} style={{ width: `${pct}%` }} />
                       </div>
                       <span className="text-foreground truncate max-w-[110px]">{row.name}</span>
                     </div>
-                  </td>
-                  <td className="px-2 py-2 text-muted-foreground">{row.iso}</td>
-                  <td className={cn("px-3 py-2 text-right font-mono font-semibold", rateColor(row.rate))}>
+                  </Td>
+                  <Td className="text-muted-foreground">{row.iso}</Td>
+                  <Td align="right" mono className={cn("font-semibold", rateColor(row.rate))}>
                     {row.rate.toFixed(1)}%
-                  </td>
-                  <td className="px-3 py-2 text-right font-mono text-muted-foreground">{row.contact}</td>
+                  </Td>
+                  <Td align="right" mono className="text-muted-foreground">{row.contact}</Td>
                 </tr>
               )
             })}
           </tbody>
-        </table>
+        </PanelTable>
       </div>
 
       {/* Footer */}

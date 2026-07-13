@@ -1,9 +1,8 @@
 "use client"
 
-import Image from "next/image"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { MENU_ITEMS, HERO_ITEM } from "@/lib/ask-nanci/data/panels/menu-margin"
-import { PanelShell, PanelHeader, PanelExportButton, Callout, formatCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelTable, Th, formatCurrency } from "@/components/ask-nanci/shared"
 
 const hero = MENU_ITEMS.find((item) => item.name === HERO_ITEM)!
 const topProfitItem = [...MENU_ITEMS].sort((a, b) => b.margin - a.margin)[0]
@@ -27,12 +26,12 @@ function ordinal(n: number) {
 function VolumeTable({ compact }: { compact?: boolean }) {
   const rows = [...MENU_ITEMS].sort((a, b) => b.unitsSold - a.unitsSold)
   return (
-    <table className="w-full text-xs border-separate border-spacing-0 overflow-hidden rounded-lg border [&_th]:border-b [&_tr:not(:last-child)_td]:border-b">
+    <PanelTable>
       <thead>
         <tr className="border-b bg-muted/40">
-          <th className="px-3 py-2 text-left text-[9px] font-bold tracking-[0.1em] uppercase text-muted-foreground">Product</th>
-          <th className="px-3 py-2 text-right text-[9px] font-bold tracking-[0.1em] uppercase text-muted-foreground">Unit Sold</th>
-          {!compact && <th className="px-3 py-2 text-right text-[9px] font-bold tracking-[0.1em] uppercase text-muted-foreground">Amount</th>}
+          <Th>Product</Th>
+          <Th align="right">Unit Sold</Th>
+          {!compact && <Th align="right">Amount</Th>}
         </tr>
       </thead>
       <tbody>
@@ -44,20 +43,20 @@ function VolumeTable({ compact }: { compact?: boolean }) {
           </tr>
         ))}
       </tbody>
-    </table>
+    </PanelTable>
   )
 }
 
 function ProfitTable({ compact }: { compact?: boolean }) {
   const rows = [...MENU_ITEMS].sort((a, b) => b.margin - a.margin)
   return (
-    <table className="w-full text-xs border-separate border-spacing-0 overflow-hidden rounded-lg border [&_th]:border-b [&_tr:not(:last-child)_td]:border-b">
+    <PanelTable>
       <thead>
         <tr className="border-b bg-muted/40">
-          <th className="px-3 py-2 text-left text-[9px] font-bold tracking-[0.1em] uppercase text-muted-foreground">Product</th>
-          {!compact && <th className="px-3 py-2 text-right text-[9px] font-bold tracking-[0.1em] uppercase text-muted-foreground">Unit Sold</th>}
-          <th className="px-3 py-2 text-right text-[9px] font-bold tracking-[0.1em] uppercase text-muted-foreground">Margin</th>
-          {!compact && <th className="px-3 py-2 text-right text-[9px] font-bold tracking-[0.1em] uppercase text-muted-foreground">Amount</th>}
+          <Th>Product</Th>
+          {!compact && <Th align="right">Unit Sold</Th>}
+          <Th align="right">Margin</Th>
+          {!compact && <Th align="right">Amount</Th>}
         </tr>
       </thead>
       <tbody>
@@ -70,7 +69,7 @@ function ProfitTable({ compact }: { compact?: boolean }) {
           </tr>
         ))}
       </tbody>
-    </table>
+    </PanelTable>
   )
 }
 
@@ -87,12 +86,7 @@ export function MenuPerformancePanel() {
       />
 
       <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
-        <Callout variant="blue">
-          <div className="flex items-start gap-2">
-            <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={18} height={18} className="mt-0.5 shrink-0" />
-            <p>{menuMarginPhase === "margin" ? MARGIN_REVEAL_CALLOUT : VOLUME_LEADER_CALLOUT}</p>
-          </div>
-        </Callout>
+        <NanciInsight>{menuMarginPhase === "margin" ? MARGIN_REVEAL_CALLOUT : VOLUME_LEADER_CALLOUT}</NanciInsight>
 
         {menuMarginPhase === "volume" && (
           <div>

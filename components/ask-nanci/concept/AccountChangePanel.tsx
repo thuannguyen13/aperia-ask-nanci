@@ -1,11 +1,10 @@
 "use client"
 
-import Image from "next/image"
 import { Landmark, ArrowRight, CheckCircle2, Clock } from "lucide-react"
 import { Button, Input, InputOTP, InputOTPGroup, InputOTPSlot, Label } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { CURRENT_ACCOUNT, NEW_ACCOUNT, CONFIRMATION_EMAIL, CONFIRMED_AT, REQUEST_REFERENCE } from "@/lib/ask-nanci/data/panels/account-change"
-import { PanelShell, PanelHeader, Callout } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, Callout, NanciInsight } from "@/components/ask-nanci/shared"
 
 function AccountRow({ last4, className }: { last4: string; className?: string }) {
   return (
@@ -95,14 +94,9 @@ function Step2({ onBack, onConfirm }: { onBack: () => void; onConfirm: () => voi
 function Step3() {
   return (
     <div className="flex flex-1 flex-col overflow-y-auto px-4 py-3 gap-4">
-      <Callout variant="blue">
-        <div className="flex items-start gap-2">
-          <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={18} height={18} className="mt-0.5 shrink-0" />
-          <p>
-            <span className="font-bold">Request Submitted</span> — a request to route deposits to ••••••••••{NEW_ACCOUNT.last4} was sent for verification. Deposits continue going to your current account until it clears, typically within 1–2 business days. A confirmation was sent to {CONFIRMATION_EMAIL} for your records.
-          </p>
-        </div>
-      </Callout>
+      <NanciInsight>
+        <span className="font-bold">Request Submitted</span> — a request to route deposits to ••••••••••{NEW_ACCOUNT.last4} was sent for verification. Deposits continue going to your current account until it clears, typically within 1–2 business days. A confirmation was sent to {CONFIRMATION_EMAIL} for your records.
+      </NanciInsight>
 
       <div className="flex flex-1 flex-col items-center justify-center gap-3">
         <div className="flex size-14 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/40">

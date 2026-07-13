@@ -1,10 +1,9 @@
 "use client"
 
-import Image from "next/image"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { DRIVER_SUMMARY, EFFECTIVE_RATE, VOLUME, FEES, FEES_TOTAL } from "@/lib/ask-nanci/data/panels/fee-summary"
-import { PanelShell, PanelHeader, PanelExportButton, Callout, formatCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelTable, Th, Td, formatCurrency } from "@/components/ask-nanci/shared"
 
 export function FeeSummaryPanel() {
   const { closeDynamicPanel, feeVolumeRowHighlighted } = useAskNanci()
@@ -19,116 +18,105 @@ export function FeeSummaryPanel() {
       />
 
       <div className="flex-1 overflow-auto px-4 py-3 space-y-5">
-        <Callout variant="blue">
-          <div className="flex items-start gap-2">
-            <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={18} height={18} className="mt-0.5 shrink-0" />
-            <p>
+        <NanciInsight>
               <span className="font-bold">+{formatCurrency(DRIVER_SUMMARY.deltaAmount)} vs April</span> — almost all of it is volume. You processed {DRIVER_SUMMARY.volumeChangePct}% more transactions this month. Your effective rate held roughly steady at {EFFECTIVE_RATE.april}–{EFFECTIVE_RATE.may}; the small uptick is entirely the one-time {formatCurrency(DRIVER_SUMMARY.chargebackFee)} chargeback fee from a dispute on May 3, not a pricing change.
-            </p>
-          </div>
-        </Callout>
+        </NanciInsight>
 
         <div>
           <p className="mb-2 text-base font-bold text-foreground">Effective Rate</p>
-          <div className="overflow-hidden rounded-lg border">
-            <table className="w-full table-fixed text-sm">
-              <colgroup>
-                <col className="w-[40%]" />
-                <col className="w-[20%]" />
-                <col className="w-[20%]" />
-                <col className="w-[20%]" />
-              </colgroup>
-              <thead>
-                <tr className="border-b bg-muted/40">
-                  <th></th>
-                  <th className="px-3 py-2 text-right font-medium text-foreground">April</th>
-                  <th className="px-3 py-2 text-right font-medium text-foreground">May</th>
-                  <th className="px-3 py-2 text-right font-medium text-foreground">Change</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td></td>
-                  <td className="px-3 py-2 text-right text-foreground">{EFFECTIVE_RATE.april}</td>
-                  <td className="px-3 py-2 text-right text-foreground">{EFFECTIVE_RATE.may}</td>
-                  <td className="px-3 py-2 text-right text-amber-600 dark:text-amber-400">{EFFECTIVE_RATE.change}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <PanelTable className="table-fixed">
+            <colgroup>
+              <col className="w-[40%]" />
+              <col className="w-[20%]" />
+              <col className="w-[20%]" />
+              <col className="w-[20%]" />
+            </colgroup>
+            <thead>
+              <tr className="border-b bg-muted/40">
+                <Th></Th>
+                <Th align="right">April</Th>
+                <Th align="right">May</Th>
+                <Th align="right">Change</Th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <Td></Td>
+                <Td align="right" mono>{EFFECTIVE_RATE.april}</Td>
+                <Td align="right" mono>{EFFECTIVE_RATE.may}</Td>
+                <Td align="right" mono className="text-amber-600 dark:text-amber-400">{EFFECTIVE_RATE.change}</Td>
+              </tr>
+            </tbody>
+          </PanelTable>
         </div>
 
         <div>
           <p className="mb-2 text-base font-bold text-foreground">Volume Processed</p>
-          <div className="overflow-hidden rounded-lg border">
-            <table className="w-full table-fixed text-sm">
-              <colgroup>
-                <col className="w-[40%]" />
-                <col className="w-[20%]" />
-                <col className="w-[20%]" />
-                <col className="w-[20%]" />
-              </colgroup>
-              <thead>
-                <tr className="border-b bg-muted/40">
-                  <th></th>
-                  <th className="px-3 py-2 text-right font-medium text-foreground">April</th>
-                  <th className="px-3 py-2 text-right font-medium text-foreground">May</th>
-                  <th className="px-3 py-2 text-right font-medium text-foreground">Change</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className={cn(feeVolumeRowHighlighted ? "bg-blue-50 dark:bg-blue-950/20" : "")}>
-                  <td></td>
-                  <td className="px-3 py-2 text-right text-foreground">{formatCurrency(VOLUME.april)}</td>
-                  <td className="px-3 py-2 text-right text-foreground">{formatCurrency(VOLUME.may)}</td>
-                  <td className="px-3 py-2 text-right text-amber-600 dark:text-amber-400">+{formatCurrency(VOLUME.changeAmount)} (+{VOLUME.changePct}%)</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <PanelTable className="table-fixed">
+            <colgroup>
+              <col className="w-[40%]" />
+              <col className="w-[20%]" />
+              <col className="w-[20%]" />
+              <col className="w-[20%]" />
+            </colgroup>
+            <thead>
+              <tr className="border-b bg-muted/40">
+                <Th></Th>
+                <Th align="right">April</Th>
+                <Th align="right">May</Th>
+                <Th align="right">Change</Th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr className={cn(feeVolumeRowHighlighted ? "bg-blue-50 dark:bg-blue-950/20" : "")}>
+                <Td></Td>
+                <Td align="right" mono>{formatCurrency(VOLUME.april)}</Td>
+                <Td align="right" mono>{formatCurrency(VOLUME.may)}</Td>
+                <Td align="right" mono className="text-amber-600 dark:text-amber-400">+{formatCurrency(VOLUME.changeAmount)} (+{VOLUME.changePct}%)</Td>
+              </tr>
+            </tbody>
+          </PanelTable>
         </div>
 
         <div>
           <p className="mb-2 text-base font-bold text-foreground">Fees</p>
-          <div className="overflow-hidden rounded-lg border">
-            <table className="w-full table-fixed text-sm">
-              <colgroup>
-                <col className="w-[40%]" />
-                <col className="w-[20%]" />
-                <col className="w-[20%]" />
-                <col className="w-[20%]" />
-              </colgroup>
-              <thead>
-                <tr className="border-b bg-muted/40">
-                  <th className="px-3 py-2 text-left font-medium text-foreground">Fee Type</th>
-                  <th className="px-3 py-2 text-right font-medium text-foreground">April</th>
-                  <th className="px-3 py-2 text-right font-medium text-foreground">May</th>
-                  <th className="px-3 py-2 text-right font-medium text-foreground">Change</th>
+          <PanelTable className="table-fixed">
+            <colgroup>
+              <col className="w-[40%]" />
+              <col className="w-[20%]" />
+              <col className="w-[20%]" />
+              <col className="w-[20%]" />
+            </colgroup>
+            <thead>
+              <tr className="border-b bg-muted/40">
+                <Th>Fee Type</Th>
+                <Th align="right">April</Th>
+                <Th align="right">May</Th>
+                <Th align="right">Change</Th>
+              </tr>
+            </thead>
+            <tbody>
+              {FEES.map((fee) => (
+                <tr key={fee.type}>
+                  <Td>
+                    <p className="text-foreground">{fee.type}</p>
+                    <p className="text-xs text-muted-foreground">{fee.sublabel}</p>
+                  </Td>
+                  <Td align="right" mono className="align-top">{formatCurrency(fee.april)}</Td>
+                  <Td align="right" mono className="align-top">{formatCurrency(fee.may)}</Td>
+                  <Td align="right" mono className="align-top text-amber-600 dark:text-amber-400">
+                    {fee.change == null ? "—" : `+${formatCurrency(fee.change)}`}
+                  </Td>
                 </tr>
-              </thead>
-              <tbody>
-                {FEES.map((fee) => (
-                  <tr key={fee.type} className="border-b last:border-0">
-                    <td className="px-3 py-2">
-                      <p className="text-foreground">{fee.type}</p>
-                      <p className="text-xs text-muted-foreground">{fee.sublabel}</p>
-                    </td>
-                    <td className="px-3 py-2 text-right align-top text-foreground">{formatCurrency(fee.april)}</td>
-                    <td className="px-3 py-2 text-right align-top text-foreground">{formatCurrency(fee.may)}</td>
-                    <td className="px-3 py-2 text-right align-top text-amber-600 dark:text-amber-400">
-                      {fee.change == null ? "—" : `+${formatCurrency(fee.change)}`}
-                    </td>
-                  </tr>
-                ))}
-                <tr className="bg-muted/40">
-                  <td className="px-3 py-2 font-semibold text-foreground">Total</td>
-                  <td className="px-3 py-2 text-right font-semibold text-foreground">{formatCurrency(FEES_TOTAL.april)}</td>
-                  <td className="px-3 py-2 text-right font-semibold text-foreground">{formatCurrency(FEES_TOTAL.may)}</td>
-                  <td className="px-3 py-2 text-right font-semibold text-amber-600 dark:text-amber-400">+{formatCurrency(FEES_TOTAL.change)}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+              ))}
+              <tr className="bg-muted/40">
+                <Td className="font-semibold">Total</Td>
+                <Td align="right" mono className="font-semibold">{formatCurrency(FEES_TOTAL.april)}</Td>
+                <Td align="right" mono className="font-semibold">{formatCurrency(FEES_TOTAL.may)}</Td>
+                <Td align="right" mono className="font-semibold text-amber-600 dark:text-amber-400">+{formatCurrency(FEES_TOTAL.change)}</Td>
+              </tr>
+            </tbody>
+          </PanelTable>
         </div>
       </div>
     </PanelShell>

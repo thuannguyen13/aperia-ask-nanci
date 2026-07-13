@@ -3,7 +3,7 @@
 import { X, Check } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { SidebarPanelShell } from "@/components/ask-nanci/shared"
+import { SidebarPanelShell, PanelTable, Th, Td } from "@/components/ask-nanci/shared"
 
 const STEPS = ["Verify Identity", "New Account", "Review & Confirm"] as const
 
@@ -107,34 +107,32 @@ function Step3({ onSubmit }: { onSubmit: () => void }) {
       <p className="text-sm text-muted-foreground">
         Review your account change before confirming.
       </p>
-      <div className="rounded-xl border overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b bg-muted/40">
-              <th className="px-4 py-2.5 text-left font-medium text-muted-foreground">Field</th>
-              <th className="px-4 py-2.5 text-left font-medium text-muted-foreground">Current</th>
-              <th className="px-4 py-2.5 text-left font-medium text-muted-foreground">New</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="border-b">
-              <td className="px-4 py-3 font-medium text-foreground">Routing</td>
-              <td className="px-4 py-3 text-muted-foreground">•••• 4892</td>
-              <td className="px-4 py-3 font-medium text-foreground">•••• 1234</td>
-            </tr>
-            <tr className="border-b">
-              <td className="px-4 py-3 font-medium text-foreground">Account</td>
-              <td className="px-4 py-3 text-muted-foreground">•••• 7823</td>
-              <td className="px-4 py-3 font-medium text-foreground">•••• 5678</td>
-            </tr>
-            <tr>
-              <td className="px-4 py-3 font-medium text-foreground">Type</td>
-              <td className="px-4 py-3 text-muted-foreground">Checking</td>
-              <td className="px-4 py-3 font-medium text-foreground">Checking</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <PanelTable>
+        <thead>
+          <tr className="border-b bg-muted/40">
+            <Th>Field</Th>
+            <Th>Current</Th>
+            <Th>New</Th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <Td className="font-medium">Routing</Td>
+            <Td className="text-muted-foreground">•••• 4892</Td>
+            <Td className="font-medium">•••• 1234</Td>
+          </tr>
+          <tr>
+            <Td className="font-medium">Account</Td>
+            <Td className="text-muted-foreground">•••• 7823</Td>
+            <Td className="font-medium">•••• 5678</Td>
+          </tr>
+          <tr>
+            <Td className="font-medium">Type</Td>
+            <Td className="text-muted-foreground">Checking</Td>
+            <Td className="font-medium">Checking</Td>
+          </tr>
+        </tbody>
+      </PanelTable>
       <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950/20 dark:text-amber-300">
         Two micro-deposits will be sent to verify the new account. Deposits continue to your current account until verification is complete.
       </div>

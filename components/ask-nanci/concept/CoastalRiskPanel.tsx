@@ -4,7 +4,7 @@ import { TrendingUp } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { RISK_INFO, ACCOUNT_INFO, ACTIVITY_TABS, VOLUME_ROWS } from "@/lib/ask-nanci/data/panels/coastal-risk"
-import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelTable, Th, Td } from "@/components/ask-nanci/shared"
 
 function InfoRow({ label, value, badge, highlight, large }: { label: string; value: string; badge?: boolean; highlight?: string; large?: boolean }) {
   return (
@@ -110,27 +110,27 @@ export function CoastalRiskPanel() {
             ))}
           </div>
 
-          <div className="overflow-x-auto rounded-md border">
-            <table className="w-full min-w-[280px] text-xs border-collapse">
+          <div className="overflow-x-auto">
+            <PanelTable className="min-w-[280px]">
               <thead>
-                <tr className="bg-muted/60 border-b border-border">
-                  <th className="px-3 py-2 text-left text-[10px] font-semibold text-muted-foreground whitespace-nowrap">Date</th>
-                  <th className="px-2 py-2 text-right text-[10px] font-semibold text-muted-foreground whitespace-nowrap">Txns</th>
-                  <th className="px-2 py-2 text-right text-[10px] font-semibold text-muted-foreground whitespace-nowrap">Amount</th>
-                  <th className="px-2 py-2 text-right text-[10px] font-semibold text-muted-foreground whitespace-nowrap">Avg</th>
+                <tr className="border-b bg-muted/40">
+                  <Th className="whitespace-nowrap">Date</Th>
+                  <Th align="right" className="whitespace-nowrap">Txns</Th>
+                  <Th align="right" className="whitespace-nowrap">Amount</Th>
+                  <Th align="right" className="whitespace-nowrap">Avg</Th>
                 </tr>
               </thead>
               <tbody>
                 {VOLUME_ROWS.map((row) => (
-                  <tr key={row.date} className="border-t border-border/40">
-                    <td className="px-3 py-2 font-mono text-[10px] text-foreground whitespace-nowrap">{row.date}</td>
-                    <td className="px-2 py-2 text-right font-mono text-foreground whitespace-nowrap">{row.count}</td>
-                    <td className="px-2 py-2 text-right font-mono text-foreground whitespace-nowrap">{row.amount}</td>
-                    <td className="px-2 py-2 text-right font-mono text-muted-foreground whitespace-nowrap">{row.avg}</td>
+                  <tr key={row.date}>
+                    <Td mono className="whitespace-nowrap">{row.date}</Td>
+                    <Td align="right" mono className="whitespace-nowrap">{row.count}</Td>
+                    <Td align="right" mono className="whitespace-nowrap">{row.amount}</Td>
+                    <Td align="right" mono className="text-muted-foreground whitespace-nowrap">{row.avg}</Td>
                   </tr>
                 ))}
               </tbody>
-            </table>
+            </PanelTable>
           </div>
         </div>
       </div>

@@ -186,9 +186,11 @@ The lib shells (`mock-data.ts`, `embed-demo-config.ts`, `concept-config.ts`) are
 - `ScoreBadge` — colored score chip (used in BarometerReportPanel)
 - `StatCard` — label/value/sublabel stat block, optional `emphasis` variant (used in SalesSnapshotPanel)
 - `Callout` — severity callout box (`border-{color}-200 bg-{color}-50` pattern)
+- `NanciInsight` — the blue "Nanci says" insight line (logomark + one paragraph) that leads a generative panel; borderless blue tint
+- `PanelTable` / `Th` / `Td` — the one table recipe every panel table uses. `PanelTable` is the rounded-bordered `border-separate` `<table>` (text-xs, auto row dividers); wrap the header row in `<tr className="border-b bg-muted/40">` and use `<Th align>` (sentence-case, foreground, medium) for headers, `<Td align mono>` for cells. Never hand-roll a `<table>` or header `<th>` styling in a panel — the chat markdown table in `ChatMessage.tsx` is the only intentional exception (inline, borderless).
 - `formatCurrency` / `formatPercent` — shared number formatters from `format.ts`
 
-Use these instead of re-implementing the header/scroll structure or severity box in each panel.
+Use these instead of re-implementing the header/scroll structure, severity box, or table chrome in each panel.
 
 ## Components
 

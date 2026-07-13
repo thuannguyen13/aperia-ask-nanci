@@ -4,7 +4,7 @@ import { Phone, Ticket, CheckCircle2 } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { PAYOUT_DISCREPANCY, ESCALATION_PATHS, ESCALATION_BOOKING } from "@/lib/ask-nanci/data/panels/escalation"
-import { PanelShell, PanelHeader, PanelExportButton, formatCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelExportButton, PanelTable, Th, formatCurrency } from "@/components/ask-nanci/shared"
 
 const PATH_ICONS = { call: Phone, ticket: Ticket } as const
 
@@ -33,11 +33,11 @@ export function EscalationPanel() {
       <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
         <p className="text-sm font-semibold text-foreground">Batch {PAYOUT_DISCREPANCY.batchId}</p>
 
-        <table className="w-full text-xs border-separate border-spacing-0 overflow-hidden rounded-lg border [&_th]:border-b [&_tr:not(:last-child)_td]:border-b">
+        <PanelTable>
           <thead>
             <tr className="border-b bg-muted/40">
-              <th className="px-3 py-2 text-left text-[9px] font-bold tracking-[0.1em] uppercase text-muted-foreground">Fee Type</th>
-              <th className="px-3 py-2 text-left text-[9px] font-bold tracking-[0.1em] uppercase text-muted-foreground">Amount</th>
+              <Th>Fee Type</Th>
+              <Th>Amount</Th>
             </tr>
           </thead>
           <tbody>
@@ -52,7 +52,7 @@ export function EscalationPanel() {
               <td className="px-3 py-2 font-mono font-semibold text-red-600 dark:text-red-400">{formatCurrency(PAYOUT_DISCREPANCY.short)}</td>
             </tr>
           </tbody>
-        </table>
+        </PanelTable>
 
         {(escalationPhase === "paths" || escalationPhase === "booked") && (
           <div>
