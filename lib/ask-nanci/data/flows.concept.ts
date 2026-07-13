@@ -37,6 +37,7 @@ export const CONCEPT_MENU_MARGIN_PROMPT = "how's the Italian combo doing this mo
 // Add one line here to make any flow embeddable via ?mode=concept-embed&flow=<number>.
 export const CONCEPT_FLOW_SLUGS: Record<string, string> = {
   "2":  CONCEPT_FLOW2_PROMPT,
+  "5":  "Change my MID to a new one",
   "6":  CONCEPT_FLOW6_KEY,
   "9":  CONCEPT_FLOW9_PROMPT,
   "11": CONCEPT_DETECT_WELCOME_KEY,

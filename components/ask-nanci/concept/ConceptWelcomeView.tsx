@@ -43,14 +43,6 @@ const FLOWS = [
     proactive: false,
   },
   {
-    num: 5,
-    title: "Error Recovery",
-    badge: "Chat only",
-    description: "AI can't change a MID — diagnoses intent, offers alternatives via chips.",
-    prompt: "Change my MID to a new one",
-    proactive: false,
-  },
-  {
     num: 6,
     title: "Proactive Surfacing",
     badge: "AI-initiated",
@@ -147,6 +139,14 @@ const MONEY_FLOWS = [
     badge: "Chat + panel",
     description: "Best-seller by volume isn't the best earner — Nanci joins sales and ingredient cost to rank the menu by profit, insight only she can surface.",
     prompt: CONCEPT_MENU_MARGIN_PROMPT,
+    proactive: false,
+  },
+  {
+    num: 5,
+    title: "Error Recovery",
+    badge: "Chat only",
+    description: "AI can't change a MID — diagnoses intent, offers alternatives via chips.",
+    prompt: "Change my MID to a new one",
     proactive: false,
   },
 ]
