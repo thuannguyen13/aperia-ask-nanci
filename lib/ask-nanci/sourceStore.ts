@@ -29,7 +29,7 @@ export function readSources(): Source[] {
 export function writeSources(sources: Source[]): void {
   try {
     localStorage.setItem(SOURCES_KEY, JSON.stringify(sources))
-  } catch {}
+  } catch { /* ignore */ }
 }
 
 export function addFileSource(name: string, mimeType: string): Source {

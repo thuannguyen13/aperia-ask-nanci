@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import { useRef, useState } from "react"
-import { X, Link2, Folder } from "lucide-react"
+import { X, Folder } from "lucide-react"
 import { Button, Switch, Separator, Card, CardContent, ScrollArea } from "aperia-ds5"
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"

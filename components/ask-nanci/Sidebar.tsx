@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { MessageCirclePlus, PieChart, LifeBuoy, Send, PanelLeft, Settings, Moon } from "lucide-react"
+import { MessageCirclePlus, PanelLeft, Settings, Moon } from "lucide-react"
 import Image from "next/image"
 import { useTheme } from "next-themes"
 import {
@@ -13,11 +13,6 @@ import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { UsageCard } from "./UsageCard"
 import { ConnectWizard } from "./ConnectWizard"
-
-const footerNav = [
-  { icon: LifeBuoy, label: "Support" },
-  { icon: Send, label: "Feedback" },
-]
 
 function SidebarItem({
   icon: Icon,
@@ -57,12 +52,11 @@ function SidebarItem({
 }
 
 export function Sidebar() {
-  const { sessions, activeSessionId, startNewChat, resumeSession, deleteSessionById, sources, kbOpen, setKbOpen, mobileSidebarOpen, setMobileSidebarOpen, currentUser } = useAskNanci()
+  const { sessions, activeSessionId, startNewChat, resumeSession, deleteSessionById, setKbOpen, mobileSidebarOpen, setMobileSidebarOpen, currentUser } = useAskNanci()
   const [collapsed, setCollapsed] = useState(false)
   const [wizardOpen, setWizardOpen] = useState(false)
   const { resolvedTheme, setTheme } = useTheme()
   const isDark = resolvedTheme === "dark"
-  const activeCount = sources.filter((s) => s.active).length
 
   const sidebarContent = (isMobile: boolean) => (
     <>

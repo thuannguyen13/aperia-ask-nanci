@@ -8,7 +8,7 @@ interface PreConnectDialogProps {
   onContinue: () => void
 }
 
-export function PreConnectDialog({ open, onClose, onContinue }: PreConnectDialogProps) {
+export function PreConnectDialog({ open, onClose, onContinue: _onContinue }: PreConnectDialogProps) {
   return (
     <Dialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose() }}>
       <DialogContent className="sm:max-w-[480px]">

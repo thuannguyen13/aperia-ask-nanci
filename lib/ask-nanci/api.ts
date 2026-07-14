@@ -17,7 +17,7 @@
  *   DELETE /api/nanci/sources/:id
  */
 
-import type { Message, Session, Source, MockResponse, PromptCategory } from "./types"
+import type { Message, Session, Source, PromptCategory } from "./types"
 import type { ChatStreamChunk, SourceAddRequest, SourceUpdateRequest } from "./api-types"
 import {
   readSessions,

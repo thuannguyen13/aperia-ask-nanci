@@ -4,10 +4,9 @@ import { useAskNanci } from "@/contexts/AskNanciContext"
 import { useChatScroll } from "@/hooks/useChatScroll"
 import { UserMessage, BotMessage } from "./ChatMessage"
 import { ThinkingIndicator } from "./ThinkingIndicator"
-import { ExplorePrompts } from "./ExplorePrompts"
 
 export function ChatView() {
-  const { messages, chatState, pendingBot, isConceptVersion } = useAskNanci()
+  const { messages, chatState, pendingBot } = useAskNanci()
   const { containerRef, spacerRef, lastUserMsgRef } = useChatScroll(chatState, pendingBot?.content)
 
   return (

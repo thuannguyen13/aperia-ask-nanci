@@ -12,7 +12,7 @@ import { ExplorePrompts } from "./ExplorePrompts"
 const PROACTIVE_CONTENT = CONCEPT_SCRIPTED_CONVERSATIONS[CONCEPT_FLOW6_KEY][0].content
 
 export function ChatInput() {
-  const { sendMessage, handlePrompt, startNewChat, chatState, stopAnimation, sources, setSources, draft, setDraft, setTokenLimitReached, setOnboardingOpen, isEmbed, embedVariant, isConceptVersion, triggerProactiveFlow, proactiveNotificationActive } = useAskNanci()
+  const { handlePrompt, startNewChat, chatState, stopAnimation, sources, draft, setDraft, setTokenLimitReached, setOnboardingOpen, isEmbed, embedVariant, isConceptVersion, triggerProactiveFlow, proactiveNotificationActive } = useAskNanci()
   const isDetect = embedVariant === "concept-embed"
   const activeSources = sources.filter((s) => s.active)
 

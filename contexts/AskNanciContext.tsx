@@ -18,7 +18,7 @@ import type { CurrentUser, PromptCategory } from "@/lib/ask-nanci/api"
 import { MOCK_USAGE, DEFAULT_CURRENT_USER } from "@/lib/ask-nanci/mock-data"
 import { EMBED_DEMO_SOURCES, EMBED_BUSINESS_OWNER_DEMO_SOURCES, EMBED_ISO_DEMO_SOURCES, EMBED_VW_DEMO_SOURCES, SCRIPTED_CONVERSATIONS } from "@/lib/ask-nanci/embed-demo-config"
 import type { EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
-import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW2_PROMPT, CONCEPT_FLOW2_FOLLOWUP, CONCEPT_FLOW6_KEY, CONCEPT_FLOW12_PROMPT, CONCEPT_ALL_PROMPTS, CONCEPT_NO_RESET_PROMPTS } from "@/lib/ask-nanci/concept-config"
+import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_ALL_PROMPTS, CONCEPT_NO_RESET_PROMPTS } from "@/lib/ask-nanci/concept-config"
 import { CLOVER_SOURCE_ID, ONBOARDING_KEY } from "@/lib/ask-nanci/sourceStore"
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
@@ -310,7 +310,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   }, [])
   const resetPanelViews = useCallback(() => setPanelViews({}), [])
 
-  const applyTurnEffects = useCallback((turn: ConceptScriptedTurn, prompt: string) => {
+  const applyTurnEffects = useCallback((turn: ConceptScriptedTurn) => {
     // Unified vocabulary: `panel` opens (idempotent); `view` sets its view, else the
     // panel resets to its own default view on open; `closePanel` closes one panel.
     if (turn.panel) {
@@ -368,7 +368,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
           if (scriptStopRef.current) break
           setMessages((prev) => [...prev, { id: newSessionId(), role: "user" as const, content: turn.content }])
           if (turn.pauseAfter) await sleep(turn.pauseAfter)
-          applyTurnEffects(turn, prompt)
+          applyTurnEffects(turn)
           setChatState("thinking")
         } else {
           await sleep(1800)
@@ -391,7 +391,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
             })
           }
           if (turn.pauseAfter) await sleep(turn.pauseAfter)
-          applyTurnEffects(turn, prompt)
+          applyTurnEffects(turn)
           if (turn.closeAllPanels) {
             await sleep(600)
             // Stagger panels closed — right column first, then left
@@ -533,7 +533,9 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     resetPanelViews()
   }, [])
 
-  const replayFlow: (() => void) | null = autoPlayFlow ? useCallback(() => {
+  // Always call the hook (rules-of-hooks); expose it only when there's a flow to replay.
+  const doReplayFlow = useCallback(() => {
+    if (!autoPlayFlow) return
     scriptStopRef.current = true
     stopRef.current = true
     setMessages([])
@@ -546,7 +548,8 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setProactiveNotificationActive(false)
     resetPanelViews()
     setTimeout(() => playConceptScripted(autoPlayFlow), 300)
-  }, []) : null
+  }, [autoPlayFlow])
+  const replayFlow: (() => void) | null = autoPlayFlow ? doReplayFlow : null
 
   const resumeSession = useCallback(async (id: string) => {
     const all = await fetchSessions()
