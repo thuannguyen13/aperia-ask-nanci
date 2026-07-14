@@ -211,6 +211,15 @@ export const CONCEPT_ALL_PROMPTS = [...FLOW_DEFS]
   .sort((a, b) => a.num - b.num)
   .map((f) => f.key);
 
+// Merchant-money group prompts, ascending. End-of-flow chips suggest sibling flows
+// in the same group — otherMerchantPrompts(self) drops the flow that just finished.
+export const CONCEPT_MERCHANT_PROMPTS = [...FLOW_DEFS]
+  .filter((f) => f.section === "merchant" && !f.proactive)
+  .sort((a, b) => a.num - b.num)
+  .map((f) => f.key);
+
+const otherMerchantPrompts = (self: string) => CONCEPT_MERCHANT_PROMPTS.filter((k) => k !== self);
+
 // Derived — a prompt that continues an in-progress flow must not reset the session.
 // Owned by each flow via `keepSession` (its own key) + `followups` (continuation keys).
 export const CONCEPT_NO_RESET_PROMPTS = new Set<string>([
@@ -596,7 +605,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       content: "Done. You'll get a notification when Sunday's batch funds. Friday and Saturday total $4,860, landing tomorrow.",
       panel: "flagged-transaction",
       view: "notified",
-      suggestions: CONCEPT_ALL_PROMPTS,
+      suggestions: otherMerchantPrompts(CONCEPT_FLOW13_PROMPT),
     },
   ],
 
@@ -621,7 +630,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       role: "assistant",
       content: "Here it is. It is already resolved in your favor, so the $15 will be credited back on next month's statement.",
       panel: "chargeback-status",
-      suggestions: CONCEPT_ALL_PROMPTS,
+      suggestions: otherMerchantPrompts(CONCEPT_FLOW14_PROMPT),
     },
   ],
 
@@ -648,7 +657,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     {
       role: "assistant",
       content: "Tuesday, at $1,980. Weather was rough that day if that tracks with what you saw in-store.",
-      suggestions: CONCEPT_ALL_PROMPTS,
+      suggestions: otherMerchantPrompts(CONCEPT_FLOW15_PROMPT),
     },
   ],
 
@@ -687,7 +696,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       content: "Booked for 4:30 today. Reference SR-2205. The team will have the batch discrepancy in front of them, so you can pick up where we left off.",
       panel: "escalation",
       view: "booked",
-      suggestions: CONCEPT_ALL_PROMPTS,
+      suggestions: otherMerchantPrompts(CONCEPT_FLOW9_PROMPT),
     },
   ],
 
@@ -717,7 +726,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       content:
         "Three imported meats carry it. Prosciutto and mortadella together are 60% of the ingredient cost. The provolone and bread are minor. Nothing here is wrong, it is just an expensive sandwich to build.",
       panel: "menu-cost-detail",
-      suggestions: CONCEPT_ALL_PROMPTS,
+      suggestions: otherMerchantPrompts(CONCEPT_MENU_MARGIN_PROMPT),
     },
   ],
 };
