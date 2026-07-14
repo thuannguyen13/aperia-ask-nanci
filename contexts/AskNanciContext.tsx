@@ -81,6 +81,7 @@ interface AskNanciCtx {
   confirmAccountChange: () => void
   requestDepositNotify: () => void
   panelViews: Record<string, string>
+  clearPanelView: (id: PanelId) => void
 }
 
 const Ctx = createContext<AskNanciCtx | null>(null)
@@ -366,7 +367,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
           if (scriptStopRef.current) break
           await streamText(turn.content, newSessionId())
           if (turn.widgetDelay) await sleep(turn.widgetDelay)
-          if (turn.sheetAction || turn.suggestions || turn.widget) {
+          if (turn.sheetAction || turn.suggestions || turn.widget || turn.map) {
             setMessages((prev) => {
               const next = [...prev]
               const last = next[next.length - 1]
@@ -376,6 +377,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
                   ...(turn.sheetAction ? { sheetAction: turn.sheetAction } : {}),
                   ...(turn.suggestions ? { suggestions: turn.suggestions } : {}),
                   ...(turn.widget ? { widget: turn.widget } : {}),
+                  ...(turn.map ? { map: turn.map } : {}),
                 }
               }
               return next
@@ -579,7 +581,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       dynamicPanels, closeDynamicPanel,
       declineReportFiltered,
       submitAccountChangeDetails, goBackAccountChangeStep, confirmAccountChange, requestDepositNotify,
-      panelViews,
+      panelViews, clearPanelView,
     }}>
       {children}
     </Ctx.Provider>

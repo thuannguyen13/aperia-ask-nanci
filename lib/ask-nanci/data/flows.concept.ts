@@ -31,6 +31,7 @@ export const CONCEPT_FLOW15_FOLLOWUP = "Was there a slow day too?";
 export const CONCEPT_FLOW16_PROMPT = "I changed banks, send my deposits to the new account";
 export const CONCEPT_FLOW9_PROMPT = "none of this is right, my payout is short by like 600 bucks and I don't get why";
 export const CONCEPT_MENU_MARGIN_PROMPT = "how's the Italian combo doing this month?";
+export const CONCEPT_ADDRESS_PROMPT = "Change my business address";
 
 // ─── Flow registry — single source of truth for showcased flows ──────────────
 // One record per welcome-view card. The slug map, the trigger-prompt list, and
@@ -168,6 +169,15 @@ export const FLOW_DEFS: FlowDef[] = [
     key: CONCEPT_FLOW16_PROMPT,
     slug: "16",
     description: "Bank account change submitted as a verified request, not applied directly — the guardrail-write reference pattern.",
+  },
+  {
+    num: 19,
+    section: "merchant",
+    title: "Address Change",
+    badge: "Chat + map",
+    key: CONCEPT_ADDRESS_PROMPT,
+    slug: "19",
+    description: "Update a business address in chat — Nanci renders the current and proposed locations on an inline map to confirm before saving.",
   },
   {
     num: 17,
@@ -629,7 +639,8 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     {
       role: "assistant",
       content: "Here it is. It is already resolved in your favor, so the $15 will be credited back on next month's statement.",
-      panel: "chargeback-status",
+      panel: "fee-summary",
+      view: "chargeback",
       suggestions: otherMerchantPrompts(CONCEPT_FLOW14_PROMPT),
     },
   ],
@@ -671,6 +682,16 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       content: "I can update that. Current account ends 4432. Enter the new routing and account number and I will validate them before anything changes.",
       panel: "account-change",
     },
+  ],
+
+  // ── Address Change (chat + inline map) — ported from the persona embed flow ──
+  [CONCEPT_ADDRESS_PROMPT]: [
+    { role: "user", content: CONCEPT_ADDRESS_PROMPT },
+    { role: "assistant", content: "Sure. Your current business address on file is:\n\n142 Oak Street, Austin, TX 78701\n\nWhat would you like to change it to? Please include street, city, state, and ZIP.", map: { address: "142 Oak Street, Austin, TX 78701", lat: 30.2645, lng: -97.7430 } },
+    { role: "user", content: "456 Market St, San Francisco, CA 94105" },
+    { role: "assistant", content: "Got it — just to confirm, you'd like to update your business address from 142 Oak Street, Austin, TX 78701 to:\n\n456 Market St, San Francisco, CA 94105\n\nIs that correct?\n\n{{MAP}}", map: { address: "456 Market St, San Francisco, CA 94105", lat: 37.7915, lng: -122.3972 } },
+    { role: "user", content: "Yes, that's correct." },
+    { role: "assistant", content: "Your change request has been submitted for review — I can't update account details like your business address directly, so this goes to the team that can. Once it's approved, the change to 456 Market St, San Francisco, CA 94105 will be reflected on your account, typically within 1–2 business days. You'll get a confirmation email at your primary address.", suggestions: otherMerchantPrompts(CONCEPT_ADDRESS_PROMPT) },
   ],
 
   // ── Flow 9: Escalation ─────────────────────────────────────────────────────

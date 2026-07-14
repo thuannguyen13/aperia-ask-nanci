@@ -14,7 +14,6 @@ import { BarometerReportPanel } from "./BarometerReportPanel"
 import { CoastalRiskPanel } from "./CoastalRiskPanel"
 import { PendingDepositsPanel } from "./PendingDepositsPanel"
 import { FeeSummaryPanel } from "./FeeSummaryPanel"
-import { ChargebackStatusPanel } from "./ChargebackStatusPanel"
 import { SalesSnapshotPanel } from "./SalesSnapshotPanel"
 import { SalesDrilldownPanel } from "./SalesDrilldownPanel"
 import { AccountChangePanel } from "./AccountChangePanel"
@@ -50,7 +49,6 @@ export const PANELS = {
   "pending-deposits":    { component: PendingDepositsPanel },
   "flagged-transaction": { component: FlaggedTransactionPanel },
   "fee-summary":         { component: FeeSummaryPanel },
-  "chargeback-status":   { component: ChargebackStatusPanel },
   "sales-snapshot":      { component: SalesSnapshotPanel },
   "sales-drilldown":     { component: SalesDrilldownPanel },
   "account-change":      { component: AccountChangePanel },
