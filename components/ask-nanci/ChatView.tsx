@@ -32,12 +32,17 @@ export function ChatView() {
 
         {chatState === "thinking" && <ThinkingIndicator />}
 
+        {/* Same wrapper + key as committed messages: pendingBot.id equals the
+            id it commits under, so React reconciles the two instead of remounting
+            (which reloaded the map iframe — a flash between turns). */}
         {chatState === "streaming" && pendingBot && (
-          <BotMessage
-            message={pendingBot}
-            displayedContent={pendingBot.content}
-            showExtras={false}
-          />
+          <div key={pendingBot.id}>
+            <BotMessage
+              message={pendingBot}
+              displayedContent={pendingBot.content}
+              showExtras={false}
+            />
+          </div>
         )}
 
         <div ref={spacerRef} className="shrink-0" />
