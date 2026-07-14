@@ -2,7 +2,7 @@
 
 import { Landmark, ArrowRight, CheckCircle2, Clock } from "lucide-react"
 import { Button, Input, InputOTP, InputOTPGroup, InputOTPSlot, Label } from "aperia-ds5"
-import { useAskNanci } from "@/contexts/AskNanciContext"
+import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { CURRENT_ACCOUNT, NEW_ACCOUNT, CONFIRMATION_EMAIL, CONFIRMED_AT, REQUEST_REFERENCE } from "@/lib/ask-nanci/data/panels/account-change"
 import { PanelShell, PanelHeader, Callout, NanciInsight } from "@/components/ask-nanci/shared"
 
@@ -123,19 +123,20 @@ function Step3() {
 }
 
 export function AccountChangePanel() {
-  const { closeDynamicPanel, accountChangeStep, submitAccountChangeDetails, goBackAccountChangeStep, confirmAccountChange } = useAskNanci()
+  const { closeDynamicPanel, submitAccountChangeDetails, goBackAccountChangeStep, confirmAccountChange } = useAskNanci()
+  const view = usePanelView("account-change", "details")
 
   return (
     <PanelShell>
       <PanelHeader
-        title={accountChangeStep === 2 ? "Confirm Account Change" : "Deposit Account"}
+        title={view === "confirm" ? "Confirm Account Change" : "Deposit Account"}
         size="lg"
         onClose={() => closeDynamicPanel("account-change")}
       />
 
-      {accountChangeStep === 1 && <Step1 onSubmit={submitAccountChangeDetails} />}
-      {accountChangeStep === 2 && <Step2 onBack={goBackAccountChangeStep} onConfirm={confirmAccountChange} />}
-      {accountChangeStep === 3 && <Step3 />}
+      {view === "details" && <Step1 onSubmit={submitAccountChangeDetails} />}
+      {view === "confirm" && <Step2 onBack={goBackAccountChangeStep} onConfirm={confirmAccountChange} />}
+      {view === "done" && <Step3 />}
     </PanelShell>
   )
 }

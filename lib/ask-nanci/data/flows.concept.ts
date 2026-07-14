@@ -664,7 +664,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     {
       role: "assistant",
       content: "I can update that. Current account ends 4432. Enter the new routing and account number and I will validate them before anything changes.",
-      openDynamicPanel: "account-change",
+      panel: "account-change",
     },
   ],
 

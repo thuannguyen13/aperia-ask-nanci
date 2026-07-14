@@ -85,7 +85,6 @@ interface AskNanciCtx {
   closeAllNewPanels: () => void
   submitDisputeDraft: () => void
   declineReportFiltered: boolean
-  accountChangeStep: 1 | 2 | 3
   submitAccountChangeDetails: () => void
   goBackAccountChangeStep: () => void
   confirmAccountChange: () => void
@@ -141,7 +140,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [closingPanels, setClosingPanels] = useState<string[]>([])
   const { stack: dynamicPanels, openDynamic, closeDynamic: closeDynamicPanel, resetDynamic } = usePanelStack()
   const [declineReportFiltered, setDeclineReportFiltered] = useState(false)
-  const [accountChangeStep, setAccountChangeStep] = useState<1 | 2 | 3>(1)
   // Unified panel view state (concept-flow pipeline): one map replaces the per-flow
   // phase enums. A panel reads its view via usePanelView(id, fallback).
   const [panelViews, setPanelViews] = useState<Record<string, string>>({})
@@ -332,7 +330,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     if (turn.advanceStepUp) { setStepUpPanelStep((s) => Math.min(3, s + 1) as 1 | 2 | 3) }
     if (turn.openBatchPanel) { setBatchPanelOpen(true) }
     if (turn.openPanel) { setOpenPanels((prev) => prev.includes(turn.openPanel!) ? prev : [...prev, turn.openPanel!]) }
-    if (turn.openPanel === "account-change" || turn.openDynamicPanel === "account-change") { setAccountChangeStep(1) }
     if (turn.openDynamicPanel) { openDynamic(turn.openDynamicPanel) }
     // Unified vocabulary: `panel` opens (idempotent); `view` sets its view, else the
     // panel resets to its own default view on open.
@@ -467,7 +464,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setOpenPanels([])
     resetDynamic()
     setDeclineReportFiltered(false)
-    setAccountChangeStep(1)
     resetPanelViews()
   }, [])
 
@@ -502,7 +498,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   }, [])
 
   const submitAccountChangeDetails = useCallback(() => {
-    setAccountChangeStep(2)
+    setPanelView("account-change", "confirm")
     setMessages((prev) => [...prev, { id: newSessionId(), role: "user" as const, content: "Request Changes" }])
     setChatState("thinking")
     sleep(600).then(() => streamAssistantReply(
@@ -511,11 +507,11 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   }, [streamAssistantReply])
 
   const goBackAccountChangeStep = useCallback(() => {
-    setAccountChangeStep(1)
+    setPanelView("account-change", "details")
   }, [])
 
   const confirmAccountChange = useCallback(() => {
-    setAccountChangeStep(3)
+    setPanelView("account-change", "done")
     setMessages((prev) => [...prev, { id: newSessionId(), role: "user" as const, content: "Confirm" }])
     setChatState("thinking")
     sleep(600).then(() => streamAssistantReply(
@@ -563,7 +559,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setOpenPanels([])
     resetDynamic()
     setDeclineReportFiltered(false)
-    setAccountChangeStep(1)
     resetPanelViews()
   }, [])
 
@@ -582,7 +577,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setStepUpPanelStep(1)
     setBatchPanelOpen(false)
     setDeclineReportFiltered(false)
-    setAccountChangeStep(1)
     setProactiveNotificationActive(false)
     resetPanelViews()
     setTimeout(() => playConceptScripted(autoPlayFlow), 300)
@@ -642,7 +636,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       openPanels, closingPanels, closePanel, closeAllNewPanels, submitDisputeDraft,
       dynamicPanels, closeDynamicPanel,
       declineReportFiltered,
-      accountChangeStep, submitAccountChangeDetails, goBackAccountChangeStep, confirmAccountChange, requestDepositNotify,
+      submitAccountChangeDetails, goBackAccountChangeStep, confirmAccountChange, requestDepositNotify,
       panelViews,
     }}>
       {children}
