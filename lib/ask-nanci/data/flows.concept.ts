@@ -48,12 +48,14 @@ export interface FlowDef {
   proactive?: boolean; // card shows "Simulate login"; excluded from CONCEPT_ALL_PROMPTS
   slug?: string; // ?mode=concept-embed&flow=<slug>
   altEntries?: { slug: string; key: string }[]; // additional embed entries into this flow
+  followups?: string[]; // continuation keys kept in-session (derive CONCEPT_NO_RESET_PROMPTS)
+  keepSession?: boolean; // this flow's own key is reachable mid-session — don't reset on it
 }
 
 export const FLOW_DEFS: FlowDef[] = [
   // ── Interaction patterns ──
   { num: 1, section: "pattern", title: "Simple Update", badge: "Chat only", key: "Update my phone number", description: "Update a phone number — AI confirms and shows an audit record." },
-  { num: 2, section: "pattern", title: "Data Lookup", badge: "Chat + panel", key: CONCEPT_FLOW2_PROMPT, slug: "2", description: "Merchant volume table opens in a side panel, sortable by column." },
+  { num: 2, section: "pattern", title: "Data Lookup", badge: "Chat + panel", key: CONCEPT_FLOW2_PROMPT, slug: "2", followups: [CONCEPT_FLOW2_FOLLOWUP], description: "Merchant volume table opens in a side panel, sortable by column." },
   {
     num: 3,
     section: "pattern",
@@ -78,6 +80,7 @@ export const FLOW_DEFS: FlowDef[] = [
     key: CONCEPT_FLOW6_KEY,
     slug: "6",
     proactive: true,
+    keepSession: true,
     description: "AI speaks first on login — flags a held batch and opens the detail panel.",
   },
   {
@@ -94,6 +97,7 @@ export const FLOW_DEFS: FlowDef[] = [
     title: "Bulk Action",
     badge: "Bulk · Multi-panel",
     key: "Show me merchants with decline rates above 15% last week",
+    followups: [CONCEPT_FLOW8_FOLLOWUP, CONCEPT_FLOW8_FINAL, "Draft an outreach email for all of them"],
     description: "Analyst targets high-decline merchants — filtered table, email draft, and bulk send in chat.",
   },
   {
@@ -102,6 +106,7 @@ export const FLOW_DEFS: FlowDef[] = [
     title: "Risk Investigation",
     badge: "Risk · Multi-panel",
     key: "Show me everything unusual about Bayside Imports in the last 90 days",
+    followups: [CONCEPT_FLOW10_FOLLOWUP, CONCEPT_FLOW10_FOLLOWUP2, "Yes, and put a temporary funding hold on the account"],
     description: "Risk analyst investigates a suspicious merchant — AI flags anomalies, panels open as evidence.",
   },
   {
@@ -110,6 +115,8 @@ export const FLOW_DEFS: FlowDef[] = [
     title: "Work Queue",
     badge: "ISO · Queue",
     key: "Show me my work queue",
+    keepSession: true,
+    followups: [CONCEPT_FLOW11_QUICKWINS, CONCEPT_FLOW11_APPROVE, "Now show me the Processor X cases", "Yes, send the template and mark them"],
     description: "AI triages 47 cases on login — batch approvals, grouped issue, email template in one flow.",
   },
   {
@@ -120,6 +127,7 @@ export const FLOW_DEFS: FlowDef[] = [
     key: CONCEPT_FLOW12_PROMPT,
     slug: "12",
     altEntries: [{ slug: "11", key: CONCEPT_DETECT_WELCOME_KEY }],
+    followups: [CONCEPT_FLOW12_CONTINUE_KEY, CONCEPT_DQ_OPEN_KEY, CONCEPT_DQ_COASTAL_KEY, CONCEPT_DQ_ESCALATE_KEY],
     description: "Risk analyst works a Detection Queue assignment — Barometer Report, risk profile, and case escalation open side by side.",
   },
 
@@ -149,6 +157,7 @@ export const FLOW_DEFS: FlowDef[] = [
     badge: "Chat + panel",
     key: CONCEPT_FLOW15_PROMPT,
     slug: "15",
+    followups: [CONCEPT_FLOW15_FOLLOWUP],
     description: "Week-over-week sales with an AI-authored driver line and a same-panel drill-in.",
   },
   {
@@ -202,27 +211,11 @@ export const CONCEPT_ALL_PROMPTS = [...FLOW_DEFS]
   .sort((a, b) => a.num - b.num)
   .map((f) => f.key);
 
-export const CONCEPT_NO_RESET_PROMPTS = new Set([
-  CONCEPT_FLOW2_FOLLOWUP,
-  CONCEPT_FLOW6_KEY,
-  CONCEPT_FLOW8_FOLLOWUP,
-  CONCEPT_FLOW8_FINAL,
-  "Draft an outreach email for all of them",
-  CONCEPT_FLOW10_FOLLOWUP,
-  CONCEPT_FLOW10_FOLLOWUP2,
-  "Yes, and put a temporary funding hold on the account",
-  "Show me my work queue",
-  CONCEPT_FLOW11_QUICKWINS,
-  CONCEPT_FLOW11_APPROVE,
-  "Now show me the Processor X cases",
-  "Yes, send the template and mark them",
-  // Detection Queue steps: continue the session rather than resetting it
-  CONCEPT_FLOW12_CONTINUE_KEY,
-  CONCEPT_DQ_OPEN_KEY,
-  CONCEPT_DQ_COASTAL_KEY,
-  CONCEPT_DQ_ESCALATE_KEY,
-  // Sales Snapshot: drill-down follow-up continues the session rather than resetting it
-  CONCEPT_FLOW15_FOLLOWUP,
+// Derived — a prompt that continues an in-progress flow must not reset the session.
+// Owned by each flow via `keepSession` (its own key) + `followups` (continuation keys).
+export const CONCEPT_NO_RESET_PROMPTS = new Set<string>([
+  ...FLOW_DEFS.filter((f) => f.keepSession).map((f) => f.key),
+  ...FLOW_DEFS.flatMap((f) => f.followups ?? []),
 ]);
 
 // ─── Sheet action data (populated at module load) ─────────────────────────────
