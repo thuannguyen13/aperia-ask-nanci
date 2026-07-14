@@ -585,20 +585,21 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     {
       role: "assistant",
       content: "You have three batches pending. Friday and Saturday are in transit, expected in your account ending ••4432 tomorrow morning. Sunday's batch is on a temporary hold.",
-      openDynamicPanel: "pending-deposits",
+      panel: "pending-deposits",
     },
     { role: "user", content: "Why's Sunday held?" },
     {
       role: "assistant",
       content:
         "A single $2,190 transaction triggered a routine review — larger than your typical ticket. No action needed on your end. It usually clears within one business day, so expected Wednesday. I can notify you the moment it funds.",
-      openDynamicPanel: "flagged-transaction",
+      panel: "flagged-transaction",
     },
     { role: "user", content: "Yes, do that" },
     {
       role: "assistant",
       content: "Done. You'll get a notification when Sunday's batch funds. Friday and Saturday total $4,860, landing tomorrow.",
-      depositNotifyRequested: true,
+      panel: "flagged-transaction",
+      view: "notified",
       suggestions: CONCEPT_ALL_PROMPTS,
     },
   ],
@@ -609,20 +610,21 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     {
       role: "assistant",
       content: "They rose $117 versus April. Almost all of it is one driver: your volume was up 18%, so per-transaction fees scaled with it. Your rate barely moved.",
-      openDynamicPanel: "fee-summary",
+      panel: "fee-summary",
     },
     { role: "user", content: "so it's just because I sold more?" },
     {
       role: "assistant",
       content:
         "Correct. Your effective rate held roughly steady — 2.67% to 2.71%. You paid more in total mostly because you processed more. The one exception is a $15 chargeback fee from a single dispute on May 3, which is what nudged the rate up slightly.",
-      highlightFeeVolumeRow: true,
+      panel: "fee-summary",
+      view: "highlighted",
     },
     { role: "user", content: "ok that makes sense. show me that chargeback" },
     {
       role: "assistant",
       content: "Here it is. It is already resolved in your favor, so the $15 will be credited back on next month's statement.",
-      openDynamicPanel: "chargeback-status",
+      panel: "chargeback-status",
       suggestions: CONCEPT_ALL_PROMPTS,
     },
   ],
@@ -634,14 +636,14 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       role: "assistant",
       content:
         "Up 15% vs last week — you brought in $18,240 against $15,900, driven almost entirely by Saturday. You ran 96 transactions that day versus a weekday average of 60, while your average ticket held steady around $29–43. This was a busier week, not bigger baskets. Tuesday was your softest day at $1,980.",
-      openDynamicPanel: "sales-snapshot",
+      panel: "sales-snapshot",
     },
     { role: "user", content: "What drove Saturday?" },
     {
       role: "assistant",
       content:
         "Saturday was your best day this week at $4,110. Both traffic and basket size were up — you ran 96 transactions versus a weekday average of 78, and your average ticket rose to $42.81 versus a weekday average of $29.43.",
-      openDynamicPanel: "sales-drilldown",
+      panel: "sales-drilldown",
       suggestions: [CONCEPT_FLOW15_FOLLOWUP],
     },
   ],

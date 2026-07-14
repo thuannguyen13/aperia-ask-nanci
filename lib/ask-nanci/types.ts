@@ -56,8 +56,6 @@ export interface ConceptScriptedTurn extends ScriptedTurn {
   widget?: "ai-triage-summary"
   widgetDelay?: number
   pauseAfter?: number
-  highlightFeeVolumeRow?: true
-  depositNotifyRequested?: true
 }
 
 // ─── API / user types ──────────────────────────────────────────────────────────

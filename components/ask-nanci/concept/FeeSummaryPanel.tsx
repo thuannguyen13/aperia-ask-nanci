@@ -1,12 +1,13 @@
 "use client"
 
 import { cn } from "aperia-ds5/utils"
-import { useAskNanci } from "@/contexts/AskNanciContext"
+import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { DRIVER_SUMMARY, EFFECTIVE_RATE, VOLUME, FEES, FEES_TOTAL } from "@/lib/ask-nanci/data/panels/fee-summary"
 import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelTable, Th, Td, formatCurrency } from "@/components/ask-nanci/shared"
 
 export function FeeSummaryPanel() {
-  const { closeDynamicPanel, feeVolumeRowHighlighted } = useAskNanci()
+  const { closeDynamicPanel } = useAskNanci()
+  const highlighted = usePanelView("fee-summary", "default") === "highlighted"
 
   return (
     <PanelShell>
@@ -68,7 +69,7 @@ export function FeeSummaryPanel() {
               </tr>
             </thead>
             <tbody>
-              <tr className={cn(feeVolumeRowHighlighted ? "bg-blue-50 dark:bg-blue-950/20" : "")}>
+              <tr className={cn(highlighted ? "bg-blue-50 dark:bg-blue-950/20" : "")}>
                 <Td></Td>
                 <Td align="right" mono>{formatCurrency(VOLUME.april)}</Td>
                 <Td align="right" mono>{formatCurrency(VOLUME.may)}</Td>

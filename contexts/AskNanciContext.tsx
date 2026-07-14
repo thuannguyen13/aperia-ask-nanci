@@ -85,12 +85,10 @@ interface AskNanciCtx {
   closeAllNewPanels: () => void
   submitDisputeDraft: () => void
   declineReportFiltered: boolean
-  feeVolumeRowHighlighted: boolean
   accountChangeStep: 1 | 2 | 3
   submitAccountChangeDetails: () => void
   goBackAccountChangeStep: () => void
   confirmAccountChange: () => void
-  depositNotifyRequested: boolean
   requestDepositNotify: () => void
   panelViews: Record<string, string>
 }
@@ -143,9 +141,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [closingPanels, setClosingPanels] = useState<string[]>([])
   const { stack: dynamicPanels, openDynamic, closeDynamic: closeDynamicPanel, resetDynamic } = usePanelStack()
   const [declineReportFiltered, setDeclineReportFiltered] = useState(false)
-  const [feeVolumeRowHighlighted, setFeeVolumeRowHighlighted] = useState(false)
   const [accountChangeStep, setAccountChangeStep] = useState<1 | 2 | 3>(1)
-  const [depositNotifyRequested, setDepositNotifyRequested] = useState(false)
   // Unified panel view state (concept-flow pipeline): one map replaces the per-flow
   // phase enums. A panel reads its view via usePanelView(id, fallback).
   const [panelViews, setPanelViews] = useState<Record<string, string>>({})
@@ -346,8 +342,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       else clearPanelView(turn.panel)
     }
     if (turn.filterDeclineReport) { setDeclineReportFiltered(true) }
-    if (turn.highlightFeeVolumeRow) { setFeeVolumeRowHighlighted(true) }
-    if (turn.depositNotifyRequested) { setDepositNotifyRequested(true) }
   }, [])
 
   const playConceptScripted = useCallback((prompt: string) => {
@@ -473,14 +467,12 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setOpenPanels([])
     resetDynamic()
     setDeclineReportFiltered(false)
-    setFeeVolumeRowHighlighted(false)
     setAccountChangeStep(1)
-    setDepositNotifyRequested(false)
     resetPanelViews()
   }, [])
 
   const requestDepositNotify = useCallback(() => {
-    setDepositNotifyRequested(true)
+    setPanelView("flagged-transaction", "notified")
     setMessages((prev) => [
       ...prev,
       { id: newSessionId(), role: "assistant" as const, content: "Done. You'll get a notification when Sunday's batch funds.", suggestions: CONCEPT_ALL_PROMPTS },
@@ -571,9 +563,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setOpenPanels([])
     resetDynamic()
     setDeclineReportFiltered(false)
-    setFeeVolumeRowHighlighted(false)
     setAccountChangeStep(1)
-    setDepositNotifyRequested(false)
     resetPanelViews()
   }, [])
 
@@ -592,9 +582,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setStepUpPanelStep(1)
     setBatchPanelOpen(false)
     setDeclineReportFiltered(false)
-    setFeeVolumeRowHighlighted(false)
     setAccountChangeStep(1)
-    setDepositNotifyRequested(false)
     setProactiveNotificationActive(false)
     resetPanelViews()
     setTimeout(() => playConceptScripted(autoPlayFlow), 300)
@@ -654,7 +642,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       openPanels, closingPanels, closePanel, closeAllNewPanels, submitDisputeDraft,
       dynamicPanels, closeDynamicPanel,
       declineReportFiltered,
-      feeVolumeRowHighlighted, accountChangeStep, submitAccountChangeDetails, goBackAccountChangeStep, confirmAccountChange, depositNotifyRequested, requestDepositNotify,
+      accountChangeStep, submitAccountChangeDetails, goBackAccountChangeStep, confirmAccountChange, requestDepositNotify,
       panelViews,
     }}>
       {children}

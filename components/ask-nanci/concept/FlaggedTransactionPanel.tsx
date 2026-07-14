@@ -2,12 +2,13 @@
 
 import { Bell, Check } from "lucide-react"
 import { Button } from "aperia-ds5"
-import { useAskNanci } from "@/contexts/AskNanciContext"
+import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { HELD_TXN } from "@/lib/ask-nanci/data/panels/pending-deposits"
 import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, formatCurrency } from "@/components/ask-nanci/shared"
 
 export function FlaggedTransactionPanel() {
-  const { closeDynamicPanel, depositNotifyRequested, requestDepositNotify } = useAskNanci()
+  const { closeDynamicPanel, requestDepositNotify } = useAskNanci()
+  const depositNotifyRequested = usePanelView("flagged-transaction", "default") === "notified"
 
   return (
     <PanelShell>
