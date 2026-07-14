@@ -3,8 +3,10 @@
 // This file re-exports everything so existing imports don't change.
 
 export type { ConceptScriptedTurn } from "./types"
+export type { FlowDef } from "./data/flows.concept"
 
 export {
+  FLOW_DEFS,
   CONCEPT_FLOW2_PROMPT,
   CONCEPT_FLOW2_FOLLOWUP,
   CONCEPT_FLOW6_KEY,

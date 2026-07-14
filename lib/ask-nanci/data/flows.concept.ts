@@ -32,41 +32,80 @@ export const CONCEPT_FLOW16_PROMPT  = "I changed banks, send my deposits to the 
 export const CONCEPT_FLOW9_PROMPT   = "none of this is right, my payout is short by like 600 bucks and I don't get why"
 export const CONCEPT_MENU_MARGIN_PROMPT = "how's the Italian combo doing this month?"
 
-// Registry: numeric flow number (as string) → CONCEPT_SCRIPTED_CONVERSATIONS key.
-// Add one line here to make any flow embeddable via ?mode=concept-embed&flow=<number>.
-export const CONCEPT_FLOW_SLUGS: Record<string, string> = {
-  "2":  CONCEPT_FLOW2_PROMPT,
-  "5":  "Change my MID to a new one",
-  "6":  CONCEPT_FLOW6_KEY,
-  "9":  CONCEPT_FLOW9_PROMPT,
-  "11": CONCEPT_DETECT_WELCOME_KEY,
-  "12": CONCEPT_FLOW12_PROMPT,
-  "13": CONCEPT_FLOW13_PROMPT,
-  "14": CONCEPT_FLOW14_PROMPT,
-  "15": CONCEPT_FLOW15_PROMPT,
-  "16": CONCEPT_FLOW16_PROMPT,
-  "18": CONCEPT_MENU_MARGIN_PROMPT,
+// ─── Flow registry — single source of truth for showcased flows ──────────────
+// One record per welcome-view card. The slug map, the trigger-prompt list, and
+// the welcome cards all derive from this: add a flow here (+ its conversation
+// below) and it lights up everywhere. `num` is display order; `slug` is the embed
+// ?flow=<n> entry (independent of num); `altEntries` are extra embed entry points
+// into the same flow (e.g. the Detection greeting).
+export interface FlowDef {
+  num: number
+  title: string
+  badge: string
+  description: string
+  section: "pattern" | "merchant"
+  key: string                                   // conversation key (also the "Try it" prompt unless proactive)
+  proactive?: boolean                           // card shows "Simulate login"; excluded from CONCEPT_ALL_PROMPTS
+  slug?: string                                 // ?mode=concept-embed&flow=<slug>
+  altEntries?: { slug: string; key: string }[]  // additional embed entries into this flow
 }
 
-// Prompts that trigger scripted concept flows (used to guard handlePrompt routing).
-export const CONCEPT_ALL_PROMPTS = [
-  "Update my phone number",
-  CONCEPT_FLOW2_PROMPT,
-  "Change my deposit bank account",
-  "I need to change my deposit account to a new bank",
-  "Change my MID to a new one",
-  "Pull up the case for Oak Street Coffee",
-  "Show me merchants with decline rates above 15% last week",
-  "Show me everything unusual about Bayside Imports in the last 90 days",
-  "Show me my work queue",
-  CONCEPT_FLOW12_PROMPT,
-  CONCEPT_FLOW13_PROMPT,
-  CONCEPT_FLOW14_PROMPT,
-  CONCEPT_FLOW15_PROMPT,
-  CONCEPT_FLOW16_PROMPT,
-  CONCEPT_FLOW9_PROMPT,
-  CONCEPT_MENU_MARGIN_PROMPT,
+export const FLOW_DEFS: FlowDef[] = [
+  // ── Interaction patterns ──
+  { num: 1,  section: "pattern", title: "Simple Update",       badge: "Chat only",          key: "Update my phone number",
+    description: "Update a phone number — AI confirms and shows an audit record." },
+  { num: 2,  section: "pattern", title: "Data Lookup",         badge: "Chat + panel",       key: CONCEPT_FLOW2_PROMPT, slug: "2",
+    description: "Merchant volume table opens in a side panel, sortable by column." },
+  { num: 3,  section: "pattern", title: "Panel as Form",       badge: "Chat + form",        key: "Change my deposit bank account",
+    description: "Pre-filled bank account form — submit from the panel, AI confirms." },
+  { num: 4,  section: "pattern", title: "Step-up Auth",        badge: "Multi-step",         key: "I need to change my deposit account to a new bank",
+    description: "Financial change requires identity verification before the form unlocks." },
+  { num: 6,  section: "pattern", title: "Proactive Surfacing", badge: "AI-initiated",       key: CONCEPT_FLOW6_KEY, slug: "6", proactive: true,
+    description: "AI speaks first on login — flags a held batch and opens the detail panel." },
+  { num: 7,  section: "pattern", title: "Case Management",     badge: "ISO · Multi-panel",  key: "Pull up the case for Oak Street Coffee",
+    description: "Service agent works a chargeback — case, transaction, and dispute draft open side by side." },
+  { num: 8,  section: "pattern", title: "Bulk Action",         badge: "Bulk · Multi-panel", key: "Show me merchants with decline rates above 15% last week",
+    description: "Analyst targets high-decline merchants — filtered table, email draft, and bulk send in chat." },
+  { num: 10, section: "pattern", title: "Risk Investigation",  badge: "Risk · Multi-panel", key: "Show me everything unusual about Bayside Imports in the last 90 days",
+    description: "Risk analyst investigates a suspicious merchant — AI flags anomalies, panels open as evidence." },
+  { num: 11, section: "pattern", title: "Work Queue",          badge: "ISO · Queue",        key: "Show me my work queue",
+    description: "AI triages 47 cases on login — batch approvals, grouped issue, email template in one flow." },
+  { num: 12, section: "pattern", title: "Detection Queue",     badge: "Risk · Looping",     key: CONCEPT_FLOW12_PROMPT, slug: "12",
+    altEntries: [{ slug: "11", key: CONCEPT_DETECT_WELCOME_KEY }],
+    description: "Risk analyst works a Detection Queue assignment — Barometer Report, risk profile, and case escalation open side by side." },
+
+  // ── Merchant money questions ──
+  { num: 13, section: "merchant", title: "Deposit Tracker",      badge: "Chat + panel", key: CONCEPT_FLOW13_PROMPT, slug: "13",
+    description: "Pending batches with a held-transaction explainer — the AI reasons about why, not just a status label." },
+  { num: 14, section: "merchant", title: "Fee Change Explainer", badge: "Chat + panel", key: CONCEPT_FLOW14_PROMPT, slug: "14",
+    description: "Statement went up — AI attributes the delta to volume, then chains into the one real exception." },
+  { num: 15, section: "merchant", title: "Sales Snapshot",       badge: "Chat + panel", key: CONCEPT_FLOW15_PROMPT, slug: "15",
+    description: "Week-over-week sales with an AI-authored driver line and a same-panel drill-in." },
+  { num: 16, section: "merchant", title: "Account Change",       badge: "Multi-step",   key: CONCEPT_FLOW16_PROMPT, slug: "16",
+    description: "Bank account change submitted as a verified request, not applied directly — the guardrail-write reference pattern." },
+  { num: 17, section: "merchant", title: "Escalation",           badge: "Chat + panel", key: CONCEPT_FLOW9_PROMPT, slug: "9",
+    description: "AI can't resolve a payout shortfall — hands off to a human with the batch context already attached, never a dead end." },
+  { num: 18, section: "merchant", title: "Menu Margin Truth",    badge: "Chat + panel", key: CONCEPT_MENU_MARGIN_PROMPT, slug: "18",
+    description: "Best-seller by volume isn't the best earner — Nanci joins sales and ingredient cost to rank the menu by profit, insight only she can surface." },
+  { num: 5,  section: "merchant", title: "Error Recovery",       badge: "Chat only",    key: "Change my MID to a new one", slug: "5",
+    description: "AI can't change a MID — diagnoses intent, offers alternatives via chips." },
 ]
+
+// Derived — do not hand-maintain; add to FLOW_DEFS above instead.
+// ?mode=concept-embed&flow=<slug> → conversation key.
+export const CONCEPT_FLOW_SLUGS: Record<string, string> = Object.fromEntries(
+  FLOW_DEFS.flatMap((f) => [
+    ...(f.slug ? [[f.slug, f.key] as [string, string]] : []),
+    ...(f.altEntries?.map((e) => [e.slug, e.key] as [string, string]) ?? []),
+  ]),
+)
+
+// Trigger prompts (routing guard + recycled as end-of-flow suggestion chips), in
+// ascending card number. Proactive flows have no prompt and are excluded.
+export const CONCEPT_ALL_PROMPTS = [...FLOW_DEFS]
+  .filter((f) => !f.proactive)
+  .sort((a, b) => a.num - b.num)
+  .map((f) => f.key)
 
 export const CONCEPT_NO_RESET_PROMPTS = new Set([
   CONCEPT_FLOW2_FOLLOWUP,

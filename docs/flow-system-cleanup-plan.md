@@ -61,7 +61,8 @@ advance style: direct callbacks for Account Change (`AskNanciContext.tsx:505-526
 | **T0a** | Delete `CONCEPT_WELCOME_KEY` orphan + unused import | ~5 min | Removes dead conversation & import | None |
 | **T0b** | Delete `loopToPrompt` (dead field + branch) | ~10 min | Removes lying "loops automatically" path | Low (confirm Flow 12 never loops) |
 | **T0c** | Fix "Ten interaction patterns" copy | ~2 min | Header no longer wrong | None |
-| **T1** | **One flow registry** — derive slugs/all-prompts/no-reset/cards from one record array | ~1.5–2 hr | 12 sites → ~2; fixes 9-vs-17 & slug-11 by construction | Low (pure derivation; equality diff must be empty) |
+| **T1a** ✅ done | **Flow registry** (`FLOW_DEFS` in flows.concept.ts) — derive slugs/all-prompts/welcome-cards from one record array | ~1 hr | add a showcased flow = 1 registry row + its conversation | Low — verified byte-identical (data + cards), tsc clean, embed smoke green |
+| **T1b** | Numbering normalization — make `num` authoritative (Escalation 17→9), model Detection as one flow w/ two entries, renumber cards to match slugs | ~1 hr | kills num-vs-slug drift | Low-Med — visible card-number change; verify via card-snapshot allowlist. NOTE: ALL_PROMPTS is num-sorted, so renumbering reorders the end-of-flow chips — intended, allowlist it |
 | **T2** | Generic `phase` mechanism — ~10 phase `useState`s → 1 map, 8 `advance*` fields → 1 field | ~3–4 hr | Kills triple-reset drift; shrinks 660-line context | Medium (touches every stateful flow) |
 | **T3** | Unify panel mounting — form/stepup/batch onto dynamic stack; retire dead `mapPanelsToSlots` | ~2–3 hr | One panel system instead of four | Medium (reworks Flows 3/4/6) |
 
