@@ -47,6 +47,10 @@ export interface ConceptScriptedTurn extends ScriptedTurn {
   openBatchPanel?: true
   openPanel?: PanelId
   openDynamicPanel?: DynamicPanelId
+  // Unified panel vocabulary (concept-flow pipeline): `panel` ensures a panel is
+  // open; add `view` to set its view. Replacing the open*/advance* fields flow by flow.
+  panel?: PanelId
+  view?: string
   filterDeclineReport?: true
   advanceWorkQueue?: "quick-wins" | "outage"
   closeAllPanels?: true
@@ -56,7 +60,6 @@ export interface ConceptScriptedTurn extends ScriptedTurn {
   highlightFeeVolumeRow?: true
   depositNotifyRequested?: true
   advanceEscalation?: "paths" | "booked"
-  advanceMenuMargin?: "margin" | "compare"
   advanceMerchantVolume?: "top5"
 }
 

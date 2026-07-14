@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useCallback, useRef, useEffect } from "react"
-import type { Message, Session, Source, UsageData, ConceptScriptedTurn, DynamicPanelId } from "@/lib/ask-nanci/types"
+import type { Message, Session, Source, UsageData, ConceptScriptedTurn, PanelId, DynamicPanelId } from "@/lib/ask-nanci/types"
 import { usePanelStack } from "@/lib/ask-nanci/use-panel-stack"
 import {
   fetchSessions,
@@ -80,8 +80,8 @@ interface AskNanciCtx {
   openPanels: string[]
   closingPanels: string[]
   closePanel: (type: string) => void
-  dynamicPanels: DynamicPanelId[]
-  closeDynamicPanel: (id: DynamicPanelId) => void
+  dynamicPanels: PanelId[]
+  closeDynamicPanel: (id: PanelId) => void
   closeAllNewPanels: () => void
   submitDisputeDraft: () => void
   declineReportFiltered: boolean
@@ -94,8 +94,8 @@ interface AskNanciCtx {
   depositNotifyRequested: boolean
   requestDepositNotify: () => void
   escalationPhase: "detail" | "paths" | "booked"
-  menuMarginPhase: "volume" | "margin" | "compare"
   merchantVolumePhase: "full" | "top5"
+  panelViews: Record<string, string>
 }
 
 const Ctx = createContext<AskNanciCtx | null>(null)
@@ -104,6 +104,12 @@ export function useAskNanci() {
   const ctx = useContext(Ctx)
   if (!ctx) throw new Error("useAskNanci must be used inside AskNanciProvider")
   return ctx
+}
+
+// A panel reads its current view via this hook, falling back to its own default
+// when a flow hasn't set one. Replaces the per-flow phase enums.
+export function usePanelView(id: PanelId, fallback: string): string {
+  return useAskNanci().panelViews[id] ?? fallback
 }
 
 export function AskNanciProvider({ children, isEmbed = false, embedVariant = null, isConceptVersion = false, autoPlayFlow = null }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null; isConceptVersion?: boolean; autoPlayFlow?: string | null }) {
@@ -145,8 +151,10 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [accountChangeStep, setAccountChangeStep] = useState<1 | 2 | 3>(1)
   const [depositNotifyRequested, setDepositNotifyRequested] = useState(false)
   const [escalationPhase, setEscalationPhase] = useState<"detail" | "paths" | "booked">("detail")
-  const [menuMarginPhase, setMenuMarginPhase] = useState<"volume" | "margin" | "compare">("volume")
   const [merchantVolumePhase, setMerchantVolumePhase] = useState<"full" | "top5">("full")
+  // Unified panel view state (concept-flow pipeline): one map replaces the per-flow
+  // phase enums. A panel reads its view via usePanelView(id, fallback).
+  const [panelViews, setPanelViews] = useState<Record<string, string>>({})
   const [proactiveNotificationActive, setProactiveNotificationActive] = useState(false)
   const stopRef = useRef<boolean>(false)
   const scriptStopRef = useRef<boolean>(false)
@@ -314,6 +322,20 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     run()
   }, [])
 
+  // Unified panel view setters (concept-flow pipeline).
+  const setPanelView = useCallback((id: PanelId, view: string) => {
+    setPanelViews((prev) => ({ ...prev, [id]: view }))
+  }, [])
+  const clearPanelView = useCallback((id: PanelId) => {
+    setPanelViews((prev) => {
+      if (!(id in prev)) return prev
+      const next = { ...prev }
+      delete next[id]
+      return next
+    })
+  }, [])
+  const resetPanelViews = useCallback(() => setPanelViews({}), [])
+
   const applyTurnEffects = useCallback((turn: ConceptScriptedTurn, prompt: string) => {
     if (turn.openFormPanel) { setFormPanelOpen(true) }
     if (turn.openStepUpPanel) { setStepUpPanelOpen(true); setStepUpPanelStep(1) }
@@ -322,16 +344,21 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     if (turn.openPanel) { setOpenPanels((prev) => prev.includes(turn.openPanel!) ? prev : [...prev, turn.openPanel!]) }
     if (turn.openPanel === "account-change" || turn.openDynamicPanel === "account-change") { setAccountChangeStep(1) }
     if (turn.openDynamicPanel === "escalation") { setEscalationPhase("detail") }
-    if (turn.openDynamicPanel === "menu-performance") { setMenuMarginPhase("volume") }
     if (turn.openDynamicPanel === "merchant-volume") { setMerchantVolumePhase("full") }
     if (turn.openDynamicPanel === "work-queue") { setWorkQueuePhase("quick-wins") }
     if (turn.openDynamicPanel) { openDynamic(turn.openDynamicPanel) }
+    // Unified vocabulary: `panel` opens (idempotent); `view` sets its view, else the
+    // panel resets to its own default view on open.
+    if (turn.panel) {
+      openDynamic(turn.panel)
+      if (turn.view) setPanelView(turn.panel, turn.view)
+      else clearPanelView(turn.panel)
+    }
     if (turn.filterDeclineReport) { setDeclineReportFiltered(true) }
     if (turn.advanceWorkQueue) { setWorkQueuePhase(turn.advanceWorkQueue) }
     if (turn.highlightFeeVolumeRow) { setFeeVolumeRowHighlighted(true) }
     if (turn.depositNotifyRequested) { setDepositNotifyRequested(true) }
     if (turn.advanceEscalation) { setEscalationPhase(turn.advanceEscalation) }
-    if (turn.advanceMenuMargin) { setMenuMarginPhase(turn.advanceMenuMargin) }
     if (turn.advanceMerchantVolume) { setMerchantVolumePhase(turn.advanceMerchantVolume) }
   }, [])
 
@@ -463,8 +490,8 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setAccountChangeStep(1)
     setDepositNotifyRequested(false)
     setEscalationPhase("detail")
-    setMenuMarginPhase("volume")
     setMerchantVolumePhase("full")
+    resetPanelViews()
   }, [])
 
   const requestDepositNotify = useCallback(() => {
@@ -564,6 +591,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setAccountChangeStep(1)
     setDepositNotifyRequested(false)
     setMerchantVolumePhase("full")
+    resetPanelViews()
   }, [])
 
   const replayFlow: (() => void) | null = autoPlayFlow ? useCallback(() => {
@@ -587,6 +615,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setDepositNotifyRequested(false)
     setMerchantVolumePhase("full")
     setProactiveNotificationActive(false)
+    resetPanelViews()
     setTimeout(() => playConceptScripted(autoPlayFlow), 300)
   }, []) : null
 
@@ -646,8 +675,8 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       declineReportFiltered, workQueuePhase,
       feeVolumeRowHighlighted, accountChangeStep, submitAccountChangeDetails, goBackAccountChangeStep, confirmAccountChange, depositNotifyRequested, requestDepositNotify,
       escalationPhase,
-      menuMarginPhase,
       merchantVolumePhase,
+      panelViews,
     }}>
       {children}
     </Ctx.Provider>

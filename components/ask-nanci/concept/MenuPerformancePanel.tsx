@@ -1,6 +1,6 @@
 "use client"
 
-import { useAskNanci } from "@/contexts/AskNanciContext"
+import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { MENU_ITEMS, HERO_ITEM } from "@/lib/ask-nanci/data/panels/menu-margin"
 import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelTable, Th, formatCurrency } from "@/components/ask-nanci/shared"
 
@@ -74,7 +74,8 @@ function ProfitTable({ compact }: { compact?: boolean }) {
 }
 
 export function MenuPerformancePanel() {
-  const { closeDynamicPanel, menuMarginPhase } = useAskNanci()
+  const { closeDynamicPanel } = useAskNanci()
+  const view = usePanelView("menu-performance", "volume")
 
   return (
     <PanelShell>
@@ -86,23 +87,23 @@ export function MenuPerformancePanel() {
       />
 
       <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
-        <NanciInsight>{menuMarginPhase === "margin" ? MARGIN_REVEAL_CALLOUT : VOLUME_LEADER_CALLOUT}</NanciInsight>
+        <NanciInsight>{view ==="margin" ? MARGIN_REVEAL_CALLOUT : VOLUME_LEADER_CALLOUT}</NanciInsight>
 
-        {menuMarginPhase === "volume" && (
+        {view ==="volume" && (
           <div>
             <p className="mb-2 text-base font-bold text-foreground">Products by Volume</p>
             <VolumeTable />
           </div>
         )}
 
-        {menuMarginPhase === "margin" && (
+        {view ==="margin" && (
           <div>
             <p className="mb-2 text-base font-bold text-foreground">Products by Profit</p>
             <ProfitTable />
           </div>
         )}
 
-        {menuMarginPhase === "compare" && (
+        {view ==="compare" && (
           <div className="flex gap-4">
             <div className="flex-1">
               <p className="mb-2 text-base font-bold text-foreground">Products by Volume</p>
