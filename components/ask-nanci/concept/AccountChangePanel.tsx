@@ -1,7 +1,7 @@
 "use client"
 
 import { Landmark, ArrowRight, CheckCircle2, Clock, Lock } from "lucide-react"
-import { Button, Input, InputOTP, InputOTPGroup, InputOTPSlot, Label } from "aperia-ds5"
+import { Button, Input, InputOTP, InputOTPGroup, InputOTPSlot, Label, Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "aperia-ds5"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { CURRENT_ACCOUNT, NEW_ACCOUNT, CONFIRMATION_EMAIL, CONFIRMED_AT, REQUEST_REFERENCE } from "@/lib/ask-nanci/data/panels/account-change"
 import { PanelShell, PanelHeader, Callout, NanciInsight } from "@/components/ask-nanci/shared"
@@ -20,6 +20,31 @@ function AccountRow({ last4, className }: { last4: string; className?: string })
   )
 }
 
+// A field with a "Secure" lock icon on the right; the lock is a tooltip trigger.
+function SecureInput({ id, label, placeholder }: { id: string; label: string; placeholder: string }) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <Label htmlFor={id} className="text-xs">{label}</Label>
+      <div className="relative">
+        <Input id={id} placeholder={placeholder} className="pr-9" />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              tabIndex={-1}
+              aria-label="Secure"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground"
+            >
+              <Lock className="size-4" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="top">Secure</TooltipContent>
+        </Tooltip>
+      </div>
+    </div>
+  )
+}
+
 function Step1({ onSubmit }: { onSubmit: () => void }) {
   return (
     <div className="flex flex-1 flex-col overflow-y-auto px-4 py-3 gap-4">
@@ -30,22 +55,12 @@ function Step1({ onSubmit }: { onSubmit: () => void }) {
 
       <div>
         <p className="mb-2 text-base font-bold text-foreground">New Account</p>
-        <div className="flex flex-col gap-3">
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="new-routing" className="text-xs">Routing Number</Label>
-            <div className="relative">
-              <Input id="new-routing" placeholder="9 Digits" className="pr-9" />
-              <Lock className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            </div>
+        <TooltipProvider delayDuration={300}>
+          <div className="flex flex-col gap-3">
+            <SecureInput id="new-routing" label="Routing Number" placeholder="9 Digits" />
+            <SecureInput id="new-account" label="Account Number" placeholder="Enter Account Number" />
           </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="new-account" className="text-xs">Account Number</Label>
-            <div className="relative">
-              <Input id="new-account" placeholder="Enter Account Number" className="pr-9" />
-              <Lock className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            </div>
-          </div>
-        </div>
+        </TooltipProvider>
       </div>
 
       <Button className="w-full" onClick={onSubmit}>Request Changes</Button>
