@@ -248,6 +248,33 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     stopRef.current = true
   }, [])
 
+  // Stream `text` word-by-word into pendingBot, then commit it to messages.
+  // The one place all three scripted playback paths do token-streaming.
+  const streamWords = useCallback((
+    text: string,
+    opts: { id?: string; extra?: Partial<Message>; shouldStop?: () => boolean; onDone?: () => void } = {},
+  ) =>
+    new Promise<void>((resolve) => {
+      const botMsg: Message = { id: opts.id ?? newSessionId(), role: "assistant", content: "" }
+      setChatState("streaming")
+      const chunks = text.match(/\S+\s*/g) ?? []   // word-boundary chunks mimic token streaming
+      let i = 0
+      const tick = () => {
+        if (opts.shouldStop?.()) { setPendingBot(null); resolve(); return }
+        if (i >= chunks.length) {
+          setMessages((prev) => [...prev, { ...botMsg, content: text, ...opts.extra }])
+          setPendingBot(null)
+          opts.onDone?.()
+          resolve()
+          return
+        }
+        botMsg.content += chunks[i++]
+        setPendingBot({ ...botMsg })
+        setTimeout(tick, 50 + Math.random() * 70)
+      }
+      tick()
+    }), [])
+
   const playScripted = useCallback((prompt: string) => {
     const script = SCRIPTED_CONVERSATIONS[prompt]
     if (!script) return
@@ -258,25 +285,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setPendingBot(null)
 
     const streamText = (turn: typeof script[number], id: string) =>
-      new Promise<void>((resolve) => {
-        const botMsg = { id, role: "assistant" as const, content: "" }
-        setChatState("streaming")
-        // Split into word-boundary chunks to mimic real token streaming
-        const chunks = turn.content.match(/\S+\s*/g) ?? []
-        let chunkIdx = 0
-        const emitNext = () => {
-          if (chunkIdx >= chunks.length) {
-            setMessages((prev) => [...prev, { ...botMsg, content: turn.content, ...(turn.map ? { map: turn.map } : {}) }])
-            setPendingBot(null)
-            resolve()
-            return
-          }
-          botMsg.content += chunks[chunkIdx++]
-          setPendingBot({ ...botMsg })
-          setTimeout(emitNext, 50 + Math.random() * 70)
-        }
-        emitNext()
-      })
+      streamWords(turn.content, { id, extra: turn.map ? { map: turn.map } : undefined })
 
     const run = async () => {
       for (let i = 0; i < script.length; i++) {
@@ -335,25 +344,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setPendingBot(null)
 
     const streamText = (text: string, id: string) =>
-      new Promise<void>((resolve) => {
-        const botMsg: Message = { id, role: "assistant", content: "" }
-        setChatState("streaming")
-        const chunks = text.match(/\S+\s*/g) ?? []
-        let chunkIdx = 0
-        const emitNext = () => {
-          if (scriptStopRef.current) { setPendingBot(null); resolve(); return }
-          if (chunkIdx >= chunks.length) {
-            setMessages((prev) => [...prev, { ...botMsg, content: text }])
-            setPendingBot(null)
-            resolve()
-            return
-          }
-          botMsg.content += chunks[chunkIdx++]
-          setPendingBot({ ...botMsg })
-          setTimeout(emitNext, 50 + Math.random() * 70)
-        }
-        emitNext()
-      })
+      streamWords(text, { id, shouldStop: () => scriptStopRef.current })
 
     // If the script starts with an assistant turn (no leading user message),
     // show the thinking indicator immediately so there's feedback on click.
@@ -451,27 +442,11 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     ])
   }, [])
 
-  const streamAssistantReply = useCallback((content: string, extra?: Partial<Message>) => {
-    return new Promise<void>((resolve) => {
-      const botMsg: Message = { id: newSessionId(), role: "assistant", content: "" }
-      setChatState("streaming")
-      const chunks = content.match(/\S+\s*/g) ?? []
-      let chunkIdx = 0
-      const emitNext = () => {
-        if (chunkIdx >= chunks.length) {
-          setMessages((prev) => [...prev, { ...botMsg, content, ...extra }])
-          setPendingBot(null)
-          setChatState("idle")
-          resolve()
-          return
-        }
-        botMsg.content += chunks[chunkIdx++]
-        setPendingBot({ ...botMsg })
-        setTimeout(emitNext, 50 + Math.random() * 70)
-      }
-      emitNext()
-    })
-  }, [])
+  const streamAssistantReply = useCallback(
+    (content: string, extra?: Partial<Message>) =>
+      streamWords(content, { extra, onDone: () => setChatState("idle") }),
+    [streamWords],
+  )
 
   const submitAccountChangeDetails = useCallback(() => {
     setPanelView("account-change", "confirm")
