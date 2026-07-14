@@ -1,6 +1,6 @@
 "use client"
 
-import { Landmark, ArrowRight, CheckCircle2, Clock } from "lucide-react"
+import { Landmark, ArrowRight, CheckCircle2, Clock, Lock } from "lucide-react"
 import { Button, Input, InputOTP, InputOTPGroup, InputOTPSlot, Label } from "aperia-ds5"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { CURRENT_ACCOUNT, NEW_ACCOUNT, CONFIRMATION_EMAIL, CONFIRMED_AT, REQUEST_REFERENCE } from "@/lib/ask-nanci/data/panels/account-change"
@@ -33,11 +33,17 @@ function Step1({ onSubmit }: { onSubmit: () => void }) {
         <div className="flex flex-col gap-3">
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="new-routing" className="text-xs">Routing Number</Label>
-            <Input id="new-routing" placeholder="9 Digits" />
+            <div className="relative">
+              <Input id="new-routing" placeholder="9 Digits" className="pr-9" />
+              <Lock className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            </div>
           </div>
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="new-account" className="text-xs">Account Number</Label>
-            <Input id="new-account" placeholder="Enter Account Number" />
+            <div className="relative">
+              <Input id="new-account" placeholder="Enter Account Number" className="pr-9" />
+              <Lock className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            </div>
           </div>
         </div>
       </div>
