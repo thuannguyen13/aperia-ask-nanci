@@ -1,3 +1,7 @@
+// PanelId is derived from the panel registry — add a panel there, not here.
+import type { PanelId } from "@/components/ask-nanci/concept/panel-registry"
+export type { PanelId }
+
 export type MessageRole = "user" | "assistant"
 
 // ─── Demo data types ───────────────────────────────────────────────────────────
@@ -24,15 +28,6 @@ export interface ScriptedTurn {
   map?: MapWidget
 }
 
-export type PanelId =
-  | "case" | "transaction-receipt" | "dispute-draft"
-  | "decline-report" | "email-draft"
-  | "risk-flags" | "volume-settlement" | "change-log"
-  | "work-queue"
-  | "detection-queue" | "barometer-report" | "coastal-risk"
-  | "pending-deposits" | "flagged-transaction" | "fee-summary" | "chargeback-status"
-  | "sales-snapshot" | "sales-drilldown" | "account-change" | "escalation"
-  | "menu-performance" | "menu-cost-detail" | "merchant-volume"
 
 // Panel ids that flow through the dynamic panel stack (usePanelStack) instead
 // of the legacy hardcoded mapPanelsToSlots switch in ConceptPanelArea.

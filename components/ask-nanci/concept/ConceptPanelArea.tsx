@@ -17,29 +17,7 @@ function useIsSmallScreen() {
   }, [])
   return isSmall
 }
-import { CaseDetailPanel } from "./CaseDetailPanel"
-import { TransactionReceiptPanel } from "./TransactionReceiptPanel"
-import { DisputeDraftPanel } from "./DisputeDraftPanel"
-import { DeclineReportPanel } from "./DeclineReportPanel"
-import { EmailDraftPanel } from "./EmailDraftPanel"
-import { RiskFlagsPanel } from "./RiskFlagsPanel"
-import { VolumeSettlementPanel } from "./VolumeSettlementPanel"
-import { ChangeLogPanel } from "./ChangeLogPanel"
-import { WorkQueuePanel } from "./WorkQueuePanel"
-import { DetectionQueuePanel } from "./DetectionQueuePanel"
-import { BarometerReportPanel } from "./BarometerReportPanel"
-import { CoastalRiskPanel } from "./CoastalRiskPanel"
-import { PendingDepositsPanel } from "./PendingDepositsPanel"
-import { FeeSummaryPanel } from "./FeeSummaryPanel"
-import { ChargebackStatusPanel } from "./ChargebackStatusPanel"
-import { SalesSnapshotPanel } from "./SalesSnapshotPanel"
-import { SalesDrilldownPanel } from "./SalesDrilldownPanel"
-import { AccountChangePanel } from "./AccountChangePanel"
-import { FlaggedTransactionPanel } from "./FlaggedTransactionPanel"
-import { EscalationPanel } from "./EscalationPanel"
-import { MenuPerformancePanel } from "./MenuPerformancePanel"
-import { CostDetailPanel } from "./CostDetailPanel"
-import { MerchantVolumePanel } from "./MerchantVolumePanel"
+import { PANELS } from "./panel-registry"
 
 type Slots = { A: PanelId | null; B: PanelId | null; C: PanelId | null; D: PanelId | null }
 
@@ -99,31 +77,8 @@ function slotsFromDynamicPanels(stack: PanelId[]): Slots {
 }
 
 function PanelContent({ id }: { id: PanelId }) {
-  switch (id) {
-    case "case":                return <CaseDetailPanel />
-    case "transaction-receipt": return <TransactionReceiptPanel />
-    case "dispute-draft":       return <DisputeDraftPanel />
-    case "decline-report":      return <DeclineReportPanel />
-    case "email-draft":         return <EmailDraftPanel />
-    case "risk-flags":          return <RiskFlagsPanel />
-    case "volume-settlement":   return <VolumeSettlementPanel />
-    case "change-log":          return <ChangeLogPanel />
-    case "work-queue":          return <WorkQueuePanel />
-    case "detection-queue":     return <DetectionQueuePanel />
-    case "barometer-report":    return <BarometerReportPanel />
-    case "coastal-risk":        return <CoastalRiskPanel />
-    case "pending-deposits":    return <PendingDepositsPanel />
-    case "flagged-transaction": return <FlaggedTransactionPanel />
-    case "fee-summary":         return <FeeSummaryPanel />
-    case "chargeback-status":   return <ChargebackStatusPanel />
-    case "sales-snapshot":      return <SalesSnapshotPanel />
-    case "sales-drilldown":     return <SalesDrilldownPanel />
-    case "account-change":      return <AccountChangePanel />
-    case "escalation":          return <EscalationPanel />
-    case "menu-performance":    return <MenuPerformancePanel />
-    case "menu-cost-detail":    return <CostDetailPanel />
-    case "merchant-volume":     return <MerchantVolumePanel />
-  }
+  const Panel = PANELS[id].component
+  return <Panel />
 }
 
 function SlotWrapper({ id, closing, children }: { id: PanelId | null | undefined; closing: string[]; children: ReactNode }) {
