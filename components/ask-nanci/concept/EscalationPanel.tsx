@@ -2,7 +2,7 @@
 
 import { Phone, Ticket, CheckCircle2 } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
-import { useAskNanci } from "@/contexts/AskNanciContext"
+import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { PAYOUT_DISCREPANCY, ESCALATION_PATHS, ESCALATION_BOOKING } from "@/lib/ask-nanci/data/panels/escalation"
 import { PanelShell, PanelHeader, PanelExportButton, PanelTable, Th, formatCurrency } from "@/components/ask-nanci/shared"
 
@@ -19,7 +19,8 @@ const DETAIL_ROWS: [string, string][] = [
 ]
 
 export function EscalationPanel() {
-  const { closeDynamicPanel, escalationPhase } = useAskNanci()
+  const { closeDynamicPanel } = useAskNanci()
+  const view = usePanelView("escalation", "detail")
 
   return (
     <PanelShell>
@@ -54,13 +55,13 @@ export function EscalationPanel() {
           </tbody>
         </PanelTable>
 
-        {(escalationPhase === "paths" || escalationPhase === "booked") && (
+        {(view === "paths" || view === "booked") && (
           <div>
             <p className="mb-2 text-[9px] font-bold tracking-[0.12em] uppercase text-muted-foreground">Escalate to Settlement Team</p>
             <div className="space-y-2">
               {ESCALATION_PATHS.map((path) => {
                 const Icon = PATH_ICONS[path.id]
-                const chosen = escalationPhase === "booked" && path.id === "call"
+                const chosen = view === "booked" && path.id === "call"
                 return (
                   <div
                     key={path.id}
@@ -83,7 +84,7 @@ export function EscalationPanel() {
           </div>
         )}
 
-        {escalationPhase === "booked" && (
+        {view === "booked" && (
           <div className="flex flex-col items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-4 text-center dark:border-green-800 dark:bg-green-950/20">
             <div className="flex size-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/40">
               <CheckCircle2 className="size-5 text-green-600 dark:text-green-400" />

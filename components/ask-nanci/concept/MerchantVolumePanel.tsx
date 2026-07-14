@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Badge } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
-import { useAskNanci } from "@/contexts/AskNanciContext"
+import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { MERCHANT_VOLUME_DATA } from "@/lib/ask-nanci/concept-config"
 import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelTable, Th, formatCurrency } from "@/components/ask-nanci/shared"
 
@@ -22,10 +22,11 @@ const leader = [...MERCHANT_VOLUME_DATA].sort((a, b) => b.volume - a.volume)[0]
 const TD = "px-3 py-2 font-mono text-foreground"
 
 export function MerchantVolumePanel() {
-  const { closeDynamicPanel, merchantVolumePhase } = useAskNanci()
+  const { closeDynamicPanel } = useAskNanci()
+  const view = usePanelView("merchant-volume", "full")
   const [sortKey, setSortKey] = useState<SortKey>("volume")
 
-  const topN = merchantVolumePhase === "top5" ? 5 : 10
+  const topN = view === "top5" ? 5 : 10
   const rows = [...MERCHANT_VOLUME_DATA].sort((a, b) => b[sortKey] - a[sortKey]).slice(0, topN)
 
   return (
@@ -40,7 +41,7 @@ export function MerchantVolumePanel() {
 
       <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
         <NanciInsight>
-              {merchantVolumePhase === "top5"
+              {view === "top5"
                 ? <>Your top 5 by volume. <span className="font-bold">{leader.merchant}</span> still leads at ${leader.volume.toLocaleString()} across {leader.txnCount.toLocaleString()} transactions. Sort by any column to reorder.</>
                 : <><span className="font-bold">{leader.merchant}</span> leads the week at ${leader.volume.toLocaleString()} across {leader.txnCount.toLocaleString()} transactions — the highest average ticket earners rank lower on count. Sort by any column to reorder.</>}
         </NanciInsight>

@@ -52,15 +52,12 @@ export interface ConceptScriptedTurn extends ScriptedTurn {
   panel?: PanelId
   view?: string
   filterDeclineReport?: true
-  advanceWorkQueue?: "quick-wins" | "outage"
   closeAllPanels?: true
   widget?: "ai-triage-summary"
   widgetDelay?: number
   pauseAfter?: number
   highlightFeeVolumeRow?: true
   depositNotifyRequested?: true
-  advanceEscalation?: "paths" | "booked"
-  advanceMerchantVolume?: "top5"
 }
 
 // ─── API / user types ──────────────────────────────────────────────────────────

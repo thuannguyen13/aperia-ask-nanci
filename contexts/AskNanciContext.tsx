@@ -85,7 +85,6 @@ interface AskNanciCtx {
   closeAllNewPanels: () => void
   submitDisputeDraft: () => void
   declineReportFiltered: boolean
-  workQueuePhase: "triage" | "quick-wins" | "outage"
   feeVolumeRowHighlighted: boolean
   accountChangeStep: 1 | 2 | 3
   submitAccountChangeDetails: () => void
@@ -93,8 +92,6 @@ interface AskNanciCtx {
   confirmAccountChange: () => void
   depositNotifyRequested: boolean
   requestDepositNotify: () => void
-  escalationPhase: "detail" | "paths" | "booked"
-  merchantVolumePhase: "full" | "top5"
   panelViews: Record<string, string>
 }
 
@@ -146,12 +143,9 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [closingPanels, setClosingPanels] = useState<string[]>([])
   const { stack: dynamicPanels, openDynamic, closeDynamic: closeDynamicPanel, resetDynamic } = usePanelStack()
   const [declineReportFiltered, setDeclineReportFiltered] = useState(false)
-  const [workQueuePhase, setWorkQueuePhase] = useState<"triage" | "quick-wins" | "outage">("triage")
   const [feeVolumeRowHighlighted, setFeeVolumeRowHighlighted] = useState(false)
   const [accountChangeStep, setAccountChangeStep] = useState<1 | 2 | 3>(1)
   const [depositNotifyRequested, setDepositNotifyRequested] = useState(false)
-  const [escalationPhase, setEscalationPhase] = useState<"detail" | "paths" | "booked">("detail")
-  const [merchantVolumePhase, setMerchantVolumePhase] = useState<"full" | "top5">("full")
   // Unified panel view state (concept-flow pipeline): one map replaces the per-flow
   // phase enums. A panel reads its view via usePanelView(id, fallback).
   const [panelViews, setPanelViews] = useState<Record<string, string>>({})
@@ -343,9 +337,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     if (turn.openBatchPanel) { setBatchPanelOpen(true) }
     if (turn.openPanel) { setOpenPanels((prev) => prev.includes(turn.openPanel!) ? prev : [...prev, turn.openPanel!]) }
     if (turn.openPanel === "account-change" || turn.openDynamicPanel === "account-change") { setAccountChangeStep(1) }
-    if (turn.openDynamicPanel === "escalation") { setEscalationPhase("detail") }
-    if (turn.openDynamicPanel === "merchant-volume") { setMerchantVolumePhase("full") }
-    if (turn.openDynamicPanel === "work-queue") { setWorkQueuePhase("quick-wins") }
     if (turn.openDynamicPanel) { openDynamic(turn.openDynamicPanel) }
     // Unified vocabulary: `panel` opens (idempotent); `view` sets its view, else the
     // panel resets to its own default view on open.
@@ -355,11 +346,8 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       else clearPanelView(turn.panel)
     }
     if (turn.filterDeclineReport) { setDeclineReportFiltered(true) }
-    if (turn.advanceWorkQueue) { setWorkQueuePhase(turn.advanceWorkQueue) }
     if (turn.highlightFeeVolumeRow) { setFeeVolumeRowHighlighted(true) }
     if (turn.depositNotifyRequested) { setDepositNotifyRequested(true) }
-    if (turn.advanceEscalation) { setEscalationPhase(turn.advanceEscalation) }
-    if (turn.advanceMerchantVolume) { setMerchantVolumePhase(turn.advanceMerchantVolume) }
   }, [])
 
   const playConceptScripted = useCallback((prompt: string) => {
@@ -444,7 +432,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
             setClosingPanels([])
             setOpenPanels([])
             setDeclineReportFiltered(false)
-            setWorkQueuePhase("triage")
+            resetPanelViews()
           }
           if (i === script.length - 1) {
             setChatState("idle")
@@ -485,12 +473,9 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setOpenPanels([])
     resetDynamic()
     setDeclineReportFiltered(false)
-    setWorkQueuePhase("triage")
     setFeeVolumeRowHighlighted(false)
     setAccountChangeStep(1)
     setDepositNotifyRequested(false)
-    setEscalationPhase("detail")
-    setMerchantVolumePhase("full")
     resetPanelViews()
   }, [])
 
@@ -586,11 +571,9 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setOpenPanels([])
     resetDynamic()
     setDeclineReportFiltered(false)
-    setWorkQueuePhase("triage")
     setFeeVolumeRowHighlighted(false)
     setAccountChangeStep(1)
     setDepositNotifyRequested(false)
-    setMerchantVolumePhase("full")
     resetPanelViews()
   }, [])
 
@@ -609,11 +592,9 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setStepUpPanelStep(1)
     setBatchPanelOpen(false)
     setDeclineReportFiltered(false)
-    setWorkQueuePhase("triage")
     setFeeVolumeRowHighlighted(false)
     setAccountChangeStep(1)
     setDepositNotifyRequested(false)
-    setMerchantVolumePhase("full")
     setProactiveNotificationActive(false)
     resetPanelViews()
     setTimeout(() => playConceptScripted(autoPlayFlow), 300)
@@ -672,10 +653,8 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       triggerProactiveFlow, proactiveNotificationActive, activateProactiveNotification,
       openPanels, closingPanels, closePanel, closeAllNewPanels, submitDisputeDraft,
       dynamicPanels, closeDynamicPanel,
-      declineReportFiltered, workQueuePhase,
+      declineReportFiltered,
       feeVolumeRowHighlighted, accountChangeStep, submitAccountChangeDetails, goBackAccountChangeStep, confirmAccountChange, depositNotifyRequested, requestDepositNotify,
-      escalationPhase,
-      merchantVolumePhase,
       panelViews,
     }}>
       {children}

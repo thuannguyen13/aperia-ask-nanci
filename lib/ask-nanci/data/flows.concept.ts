@@ -267,7 +267,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     {
       role: "assistant",
       content: "Here's your merchant volume for the week of May 15–21. I've opened the full breakdown in the panel — you can sort by any column.",
-      openDynamicPanel: "merchant-volume",
+      panel: "merchant-volume",
       pauseAfter: 800,
     },
   ],
@@ -276,7 +276,8 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     {
       role: "assistant",
       content: "Got it — filtered to your top 5 by volume.",
-      advanceMerchantVolume: "top5",
+      panel: "merchant-volume",
+      view: "top5",
       suggestions: ["Show me merchants with decline rates above 15% last week", CONCEPT_FLOW2_PROMPT],
     },
   ],
@@ -463,8 +464,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       role: "assistant",
       content:
         "Filtered to 12 document-approval cases. All need your sign-off — the merchant submitted the doc, I've flagged anything that looks off. Review them one at a time or batch-approve after a quick scan?",
-      openDynamicPanel: "work-queue",
-      advanceWorkQueue: "quick-wins",
+      panel: "work-queue",
       suggestions: [CONCEPT_FLOW11_APPROVE],
     },
   ],
@@ -478,7 +478,8 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       role: "assistant",
       content:
         "8 cases grouped under one issue — Processor X posted an outage at 6:14am, ETA noon. Suggested action: send a templated update to all 8, mark as Waiting on Vendor, auto-close on resolution. Do that?",
-      advanceWorkQueue: "outage",
+      panel: "work-queue",
+      view: "outage",
       suggestions: ["Yes, send the template and mark them"],
     },
   ],
@@ -672,20 +673,22 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       role: "assistant",
       content:
         "That is worth a person's eyes, and I do not want to guess on missing money. Here is what I have gathered so you do not have to repeat it: expected payout $3,400, received $2,800, for the batch dated May 12.",
-      openDynamicPanel: "escalation",
+      panel: "escalation",
     },
     { role: "user", content: "yeah exactly" },
     {
       role: "assistant",
       content:
         "I can get you to the settlement team two ways. Book a call, next slot is today at 4:30, or file a ticket now and they reach you within 4 business hours. Both carry the batch details I just pulled.",
-      advanceEscalation: "paths",
+      panel: "escalation",
+      view: "paths",
     },
     { role: "user", content: "book the 4:30" },
     {
       role: "assistant",
       content: "Booked for 4:30 today. Reference SR-2205. The team will have the batch discrepancy in front of them, so you can pick up where we left off.",
-      advanceEscalation: "booked",
+      panel: "escalation",
+      view: "booked",
       suggestions: CONCEPT_ALL_PROMPTS,
     },
   ],
