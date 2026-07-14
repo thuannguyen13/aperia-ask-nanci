@@ -2,8 +2,8 @@
 
 import { X, Check } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
-import { useAskNanci } from "@/contexts/AskNanciContext"
-import { SidebarPanelShell, PanelTable, Th, Td } from "@/components/ask-nanci/shared"
+import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
+import { PanelShell, PanelTable, Th, Td } from "@/components/ask-nanci/shared"
 
 const STEPS = ["Verify Identity", "New Account", "Review & Confirm"] as const
 
@@ -147,26 +147,27 @@ function Step3({ onSubmit }: { onSubmit: () => void }) {
 }
 
 export function StepUpAuthPanel() {
-  const { stepUpPanelOpen, setStepUpPanelOpen, stepUpPanelStep, submitStepUpPanel } = useAskNanci()
+  const { closeDynamicPanel, submitStepUpPanel } = useAskNanci()
+  const step = Number(usePanelView("step-up-auth", "1")) as 1 | 2 | 3
 
   return (
-    <SidebarPanelShell isOpen={stepUpPanelOpen} width="420px" side="right">
+    <PanelShell>
       <div className="flex shrink-0 items-center justify-between px-4 py-3">
         <h2 className="text-base font-semibold text-foreground">Change Deposit Account</h2>
         <button
-          onClick={() => setStepUpPanelOpen(false)}
+          onClick={() => closeDynamicPanel("step-up-auth")}
           className="rounded-full p-1.5 text-muted-foreground hover:bg-muted"
           aria-label="Close"
         >
           <X className="size-4" />
         </button>
       </div>
-      <StepIndicator current={stepUpPanelStep} />
+      <StepIndicator current={step} />
       <div className="flex flex-col flex-1 overflow-auto">
-        {stepUpPanelStep === 1 && <Step1 />}
-        {stepUpPanelStep === 2 && <Step2 />}
-        {stepUpPanelStep === 3 && <Step3 onSubmit={submitStepUpPanel} />}
+        {step === 1 && <Step1 />}
+        {step === 2 && <Step2 />}
+        {step === 3 && <Step3 onSubmit={submitStepUpPanel} />}
       </div>
-    </SidebarPanelShell>
+    </PanelShell>
   )
 }

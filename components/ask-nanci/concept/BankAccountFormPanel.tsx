@@ -4,10 +4,10 @@ import { useState } from "react"
 import { X, CheckCircle2 } from "lucide-react"
 import { Button, Input, Label, Separator } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { SidebarPanelShell } from "@/components/ask-nanci/shared"
+import { PanelShell } from "@/components/ask-nanci/shared"
 
 export function BankAccountFormPanel() {
-  const { formPanelOpen, setFormPanelOpen, submitFormPanel } = useAskNanci()
+  const { closeDynamicPanel, submitFormPanel } = useAskNanci()
   const [submitted, setSubmitted] = useState(false)
 
   const handleSubmit = () => {
@@ -19,14 +19,14 @@ export function BankAccountFormPanel() {
   }
 
   return (
-    <SidebarPanelShell isOpen={formPanelOpen} width="420px" side="left">
+    <PanelShell>
       {/* Header */}
       <div className="flex shrink-0 items-center justify-between gap-3 border-b px-4 py-3">
         <div className="min-w-0">
           <p className="text-sm font-semibold text-foreground">Deposit Account Update</p>
           <p className="text-xs text-muted-foreground">Review and confirm to apply changes</p>
         </div>
-        <Button variant="ghost" size="icon" onClick={() => setFormPanelOpen(false)}>
+        <Button variant="ghost" size="icon" onClick={() => closeDynamicPanel("bank-account-form")}>
           <X className="size-4" />
         </Button>
       </div>
@@ -102,6 +102,6 @@ export function BankAccountFormPanel() {
           <Button className="w-full" onClick={handleSubmit}>Confirm &amp; Submit</Button>
         </div>
       )}
-    </SidebarPanelShell>
+    </PanelShell>
   )
 }

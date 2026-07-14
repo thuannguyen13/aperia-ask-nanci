@@ -31,10 +31,6 @@ export interface ScriptedTurn {
 export interface ConceptScriptedTurn extends ScriptedTurn {
   sheetAction?: SheetActionData
   suggestions?: string[]
-  openFormPanel?: true
-  openStepUpPanel?: true
-  advanceStepUp?: true
-  openBatchPanel?: true
   // Unified panel vocabulary (concept-flow pipeline): `panel` ensures a panel is
   // open; add `view` to set its view; `closePanel` closes one panel (e.g. replace).
   panel?: PanelId

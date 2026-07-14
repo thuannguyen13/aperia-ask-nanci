@@ -23,6 +23,9 @@ import { EscalationPanel } from "./EscalationPanel"
 import { MenuPerformancePanel } from "./MenuPerformancePanel"
 import { CostDetailPanel } from "./CostDetailPanel"
 import { MerchantVolumePanel } from "./MerchantVolumePanel"
+import { BankAccountFormPanel } from "./BankAccountFormPanel"
+import { StepUpAuthPanel } from "./StepUpAuthPanel"
+import { BatchDetailPanel } from "./BatchDetailPanel"
 
 // The single registry of concept panels. Add a panel here (+ its component) and it
 // becomes renderable everywhere — `PanelId` is derived from these keys, so there is
@@ -55,6 +58,9 @@ export const PANELS = {
   "menu-performance":    { component: MenuPerformancePanel },
   "menu-cost-detail":    { component: CostDetailPanel },
   "merchant-volume":     { component: MerchantVolumePanel },
+  "bank-account-form":   { component: BankAccountFormPanel },
+  "step-up-auth":        { component: StepUpAuthPanel },
+  "batch-detail":        { component: BatchDetailPanel },
 } satisfies Record<string, PanelDef>
 
 export type PanelId = keyof typeof PANELS

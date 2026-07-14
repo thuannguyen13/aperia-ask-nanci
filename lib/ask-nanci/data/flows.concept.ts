@@ -286,7 +286,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   "Change my deposit bank account": [
     { role: "user", content: "Change my deposit bank account" },
     { role: "assistant", content: "Sure. I've pulled up your current deposit account details in the panel. Review and update as needed, then hit Submit." },
-    { role: "assistant", content: "Your current deposit account on file: routing •••• 4892, account •••• 7823 (Checking).", openFormPanel: true },
+    { role: "assistant", content: "Your current deposit account on file: routing •••• 4892, account •••• 7823 (Checking).", panel: "bank-account-form" },
   ],
 
   // ── Flow 4: Step-up Auth ──────────────────────────────────────────────────
@@ -295,19 +295,21 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     {
       role: "assistant",
       content: "That's a financial change — I'll need to verify it's you first. Sending a 6-digit code to your phone ending in 0142. Enter it in the panel when you have it.",
-      openStepUpPanel: true,
+      panel: "step-up-auth",
     },
     { role: "user", content: "Done" },
     {
       role: "assistant",
       content: "Verified. Enter your new bank account details in the panel — routing number, account number, and account type.",
-      advanceStepUp: true,
+      panel: "step-up-auth",
+      view: "2",
     },
     { role: "user", content: "Submitted" },
     {
       role: "assistant",
       content: "Review your new account details in the panel and confirm when ready.",
-      advanceStepUp: true,
+      panel: "step-up-auth",
+      view: "3",
     },
   ],
 
@@ -569,7 +571,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       role: "assistant",
       content:
         "Looking… Batch #4471 is held for review. One transaction over your single-ticket limit: $2,840 from a regular customer. I've opened the batch details in the panel. Want me to submit a review request?",
-      openBatchPanel: true,
+      panel: "batch-detail",
       suggestions: ["Yes, submit the review request", "Show me the transaction"],
     },
     { role: "user", content: "Yes, submit the review request" },

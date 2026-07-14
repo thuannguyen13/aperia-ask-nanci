@@ -4,22 +4,22 @@ import { X } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { BATCH_TRANSACTIONS } from "@/lib/ask-nanci/data/panels/batch-detail"
-import { SidebarPanelShell, Callout, PanelTable, Th, Td, formatCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, Callout, PanelTable, Th, Td, formatCurrency } from "@/components/ask-nanci/shared"
 
 export function BatchDetailPanel() {
-  const { batchPanelOpen, setBatchPanelOpen } = useAskNanci()
+  const { closeDynamicPanel } = useAskNanci()
 
   const total = BATCH_TRANSACTIONS.reduce((sum, t) => sum + t.amount, 0)
 
   return (
-    <SidebarPanelShell isOpen={batchPanelOpen} width="480px" side="right">
+    <PanelShell>
       <div className="flex shrink-0 items-center justify-between px-4 py-3 border-b">
         <div>
           <h2 className="text-base font-semibold text-foreground">Batch #4471</h2>
           <p className="text-xs text-muted-foreground">May 20 · {BATCH_TRANSACTIONS.length} transactions · {formatCurrency(total)}</p>
         </div>
         <button
-          onClick={() => setBatchPanelOpen(false)}
+          onClick={() => closeDynamicPanel("batch-detail")}
           className="rounded-full p-1.5 text-muted-foreground hover:bg-muted"
           aria-label="Close"
         >
@@ -63,6 +63,6 @@ export function BatchDetailPanel() {
           </tbody>
         </PanelTable>
       </div>
-    </SidebarPanelShell>
+    </PanelShell>
   )
 }

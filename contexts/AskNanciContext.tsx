@@ -64,16 +64,8 @@ interface AskNanciCtx {
   onboardingOpen: boolean
   setOnboardingOpen: (open: boolean) => void
   isConceptVersion: boolean
-  formPanelOpen: boolean
-  setFormPanelOpen: (open: boolean) => void
   submitFormPanel: () => void
-  stepUpPanelOpen: boolean
-  setStepUpPanelOpen: (open: boolean) => void
-  stepUpPanelStep: 1 | 2 | 3
-  advanceStepUpPanel: () => void
   submitStepUpPanel: () => void
-  batchPanelOpen: boolean
-  setBatchPanelOpen: (open: boolean) => void
   triggerProactiveFlow: () => void
   proactiveNotificationActive: boolean
   activateProactiveNotification: () => void
@@ -131,10 +123,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [onboardingOpen, setOnboardingOpen] = useState(false)
-  const [formPanelOpen, setFormPanelOpen] = useState(false)
-  const [stepUpPanelOpen, setStepUpPanelOpen] = useState(false)
-  const [stepUpPanelStep, setStepUpPanelStep] = useState<1 | 2 | 3>(1)
-  const [batchPanelOpen, setBatchPanelOpen] = useState(false)
   const [closingPanels, setClosingPanels] = useState<string[]>([])
   const { stack: dynamicPanels, openDynamic, closeDynamic: closeDynamicPanel, resetDynamic } = usePanelStack()
   const [declineReportFiltered, setDeclineReportFiltered] = useState(false)
@@ -323,10 +311,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const resetPanelViews = useCallback(() => setPanelViews({}), [])
 
   const applyTurnEffects = useCallback((turn: ConceptScriptedTurn, prompt: string) => {
-    if (turn.openFormPanel) { setFormPanelOpen(true) }
-    if (turn.openStepUpPanel) { setStepUpPanelOpen(true); setStepUpPanelStep(1) }
-    if (turn.advanceStepUp) { setStepUpPanelStep((s) => Math.min(3, s + 1) as 1 | 2 | 3) }
-    if (turn.openBatchPanel) { setBatchPanelOpen(true) }
     // Unified vocabulary: `panel` opens (idempotent); `view` sets its view, else the
     // panel resets to its own default view on open; `closePanel` closes one panel.
     if (turn.panel) {
@@ -433,25 +417,20 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   }, [])
 
   const submitFormPanel = useCallback(() => {
-    setFormPanelOpen(false)
+    closeDynamicPanel("bank-account-form")
     setMessages((prev) => [
       ...prev,
       { id: newSessionId(), role: "assistant" as const, content: "Done — your deposit bank account has been updated. Changes take effect within 1–2 business days.", suggestions: CONCEPT_ALL_PROMPTS },
     ])
-  }, [])
-
-  const advanceStepUpPanel = useCallback(() => {
-    setStepUpPanelStep((s) => Math.min(3, s + 1) as 1 | 2 | 3)
-  }, [])
+  }, [closeDynamicPanel])
 
   const submitStepUpPanel = useCallback(() => {
-    setStepUpPanelOpen(false)
-    setStepUpPanelStep(1)
+    closeDynamicPanel("step-up-auth")
     setMessages((prev) => [
       ...prev,
       { id: newSessionId(), role: "assistant" as const, content: "New account confirmed and submitted. Micro-deposits will arrive in 1–2 business days — I'll notify you when they're ready to verify. Deposits continue to your current account until then.", suggestions: CONCEPT_ALL_PROMPTS },
     ])
-  }, [])
+  }, [closeDynamicPanel])
 
   // Every panel is now on the dynamic stack; closePanel(id) just closes it there.
   const closePanel = useCallback((id: string) => {
@@ -549,10 +528,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     sessionIdRef.current = newSessionId()
     setPendingBot(null)
     setError(null)
-    setFormPanelOpen(false)
-    setStepUpPanelOpen(false)
-    setStepUpPanelStep(1)
-    setBatchPanelOpen(false)
     resetDynamic()
     setDeclineReportFiltered(false)
     resetPanelViews()
@@ -567,10 +542,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setError(null)
     resetDynamic()
     setClosingPanels([])
-    setFormPanelOpen(false)
-    setStepUpPanelOpen(false)
-    setStepUpPanelStep(1)
-    setBatchPanelOpen(false)
     setDeclineReportFiltered(false)
     setProactiveNotificationActive(false)
     resetPanelViews()
@@ -624,9 +595,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       mobileSidebarOpen, setMobileSidebarOpen,
       onboardingOpen, setOnboardingOpen,
       isConceptVersion,
-      formPanelOpen, setFormPanelOpen, submitFormPanel,
-      stepUpPanelOpen, setStepUpPanelOpen, stepUpPanelStep, advanceStepUpPanel, submitStepUpPanel,
-      batchPanelOpen, setBatchPanelOpen,
+      submitFormPanel, submitStepUpPanel,
       triggerProactiveFlow, proactiveNotificationActive, activateProactiveNotification,
       closingPanels, closePanel, closeAllNewPanels, submitDisputeDraft,
       dynamicPanels, closeDynamicPanel,

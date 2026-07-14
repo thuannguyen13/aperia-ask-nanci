@@ -10,9 +10,6 @@ import { AskNanciProvider, useAskNanci } from "@/contexts/AskNanciContext"
 import { parseMode, CONCEPT_FLOW_SLUGS, type EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
 import { Sidebar } from "./Sidebar"
 import { TeachNanciPanel } from "./TeachNanciPanel"
-import { BankAccountFormPanel } from "./concept/BankAccountFormPanel"
-import { StepUpAuthPanel } from "./concept/StepUpAuthPanel"
-import { BatchDetailPanel } from "./concept/BatchDetailPanel"
 import { ConceptPanelArea } from "./concept/ConceptPanelArea"
 import { TokenLimitDialog } from "./TokenLimitDialog"
 import { OnboardingDialog } from "./OnboardingDialog"
@@ -78,12 +75,7 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
       {showDQ ? (
         <ConceptPanelArea fillWidth visible={dqVisible} />
       ) : (
-        <>
-          <BankAccountFormPanel />
-          <StepUpAuthPanel />
-          <BatchDetailPanel />
-          <ConceptPanelArea />
-        </>
+        <ConceptPanelArea />
       )}
     </div>
   )
