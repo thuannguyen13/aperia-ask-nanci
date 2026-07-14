@@ -1,11 +1,9 @@
 import { useCallback, useState } from "react"
 import type { PanelId } from "./types"
 
-// Ordered list of open "dynamic" panels (new mechanism), separate from the
-// legacy `openPanels` array used by the 11 hardcoded scripted flows.
-// Insertion order doubles as slot order — see ConceptPanelArea's
-// slotsFromDynamicPanels(). Capped at 3 because chat occupies the conceptual
-// 4th slot without being a literal entry in this array.
+// Ordered list of open concept panels. Insertion order is render order in
+// ConceptPanelArea (stacked vertically). Capped at 3 — chat occupies the
+// conceptual 4th slot without being a literal entry in this array.
 export function usePanelStack() {
   const [stack, setStack] = useState<PanelId[]>([])
 

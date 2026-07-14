@@ -362,19 +362,19 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       role: "assistant",
       content:
         "Reopening Case #CS-8821 — chargeback dispute for a $284.50 transaction on May 14. Last activity: you uploaded the signed receipt yesterday. The merchant called this morning — call notes are linked.",
-      openPanel: "case",
+      panel: "case",
     },
     { role: "user", content: "Show me the transaction and the receipt side by side" },
     {
       role: "assistant",
       content: "Transaction detail on the left, uploaded receipt on the right. Signature looks consistent with the cardholder's prior transactions — I checked the last six.",
-      openPanel: "transaction-receipt",
+      panel: "transaction-receipt",
     },
     { role: "user", content: "Draft a response to the chargeback citing the signed receipt and the customer's prior history" },
     {
       role: "assistant",
       content: "Draft ready. References the receipt, the six prior signed transactions, and the no-refund policy printed on the receipt itself. Review and submit?",
-      openPanel: "dispute-draft",
+      panel: "dispute-draft",
     },
     { role: "user", content: "Submit" },
     {
@@ -387,7 +387,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   // ── Flow 8: Bulk Action ───────────────────────────────────────────────────
   "Show me merchants with decline rates above 15% last week": [
     { role: "user", content: "Show me merchants with decline rates above 15% last week" },
-    { role: "assistant", content: "Found 38 merchants across 7 ISOs sorted by decline rate. Panel open — you can sort by column.", openPanel: "decline-report", suggestions: [CONCEPT_FLOW8_FOLLOWUP] },
+    { role: "assistant", content: "Found 38 merchants across 7 ISOs sorted by decline rate. Panel open — you can sort by column.", panel: "decline-report", suggestions: [CONCEPT_FLOW8_FOLLOWUP] },
   ],
   [CONCEPT_FLOW8_FOLLOWUP]: [
     { role: "user", content: CONCEPT_FLOW8_FOLLOWUP },
@@ -398,7 +398,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     {
       role: "assistant",
       content: "Drafted. Each email pulls the merchant's name, decline rate, and routes replies to their ISO. Review the template in the panel.",
-      openPanel: "email-draft",
+      panel: "email-draft",
       suggestions: [CONCEPT_FLOW8_FINAL],
     },
   ],
@@ -418,7 +418,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       role: "assistant",
       content:
         "Six flags worth a look:\n- Transaction volume up 340% in last 30 days\n- Average ticket size doubled\n- 23% of transactions are CNP from new BINs\n- Three chargebacks filed this week (prior 90: zero)\n- Settlement account changed 18 days ago\n- Business address updated 12 days ago\n\nPull the underlying data for any of these?",
-      openPanel: "risk-flags",
+      panel: "risk-flags",
       suggestions: [CONCEPT_FLOW10_FOLLOWUP],
     },
   ],
@@ -427,7 +427,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     {
       role: "assistant",
       content: "Volume chart on the left, account change history on the right with old and new account details.",
-      openPanel: "volume-settlement",
+      panel: "volume-settlement",
       suggestions: [CONCEPT_FLOW10_FOLLOWUP2],
     },
   ],
@@ -436,7 +436,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     {
       role: "assistant",
       content: "Three users — two from the assigned ISO, one from your team last month. Want me to flag the case for senior review?",
-      openPanel: "change-log",
+      panel: "change-log",
       suggestions: ["Yes, and put a temporary funding hold on the account"],
     },
   ],
@@ -510,7 +510,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     {
       role: "assistant",
       content: "Your Detection Queue has an active assignment: **High Velocity Watch**. 14 merchants triggered since yesterday — 3 with risk scores above 80.\n\nWant me to open the Barometer Report?",
-      openPanel: "detection-queue",
+      panel: "detection-queue",
       suggestions: [CONCEPT_DQ_OPEN_KEY],
     },
   ],
@@ -522,7 +522,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       role: "assistant",
       content:
         "Morning. Your Detection Queue has an active assignment: **High Velocity Watch**. 14 merchants triggered since yesterday — 3 with risk scores above 80.\n\nWant me to open the Barometer Report?",
-      openPanel: "detection-queue",
+      panel: "detection-queue",
       suggestions: [CONCEPT_DQ_OPEN_KEY],
     },
   ],
@@ -532,7 +532,8 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     {
       role: "assistant",
       content: "Opening Barometer Report for High Velocity Watch. 3 merchants are flagged above risk score 80. Coastal Merchant Solutions is the highest — score 89, triggered on 4 rules.",
-      openPanel: "barometer-report",
+      panel: "barometer-report",
+      closePanel: "detection-queue",
       suggestions: [CONCEPT_DQ_COASTAL_KEY],
     },
   ],
@@ -542,7 +543,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     {
       role: "assistant",
       content: "Score climbed from 44 to 89 in 52 days. Settlement account and address both changed within the last 10 days.",
-      openPanel: "coastal-risk",
+      panel: "coastal-risk",
       suggestions: [CONCEPT_DQ_ESCALATE_KEY],
     },
   ],

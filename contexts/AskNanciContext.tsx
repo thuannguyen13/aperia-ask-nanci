@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useCallback, useRef, useEffect } from "react"
-import type { Message, Session, Source, UsageData, ConceptScriptedTurn, PanelId, DynamicPanelId } from "@/lib/ask-nanci/types"
+import type { Message, Session, Source, UsageData, ConceptScriptedTurn, PanelId } from "@/lib/ask-nanci/types"
 import { usePanelStack } from "@/lib/ask-nanci/use-panel-stack"
 import {
   fetchSessions,
@@ -77,7 +77,6 @@ interface AskNanciCtx {
   triggerProactiveFlow: () => void
   proactiveNotificationActive: boolean
   activateProactiveNotification: () => void
-  openPanels: string[]
   closingPanels: string[]
   closePanel: (type: string) => void
   dynamicPanels: PanelId[]
@@ -136,7 +135,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [stepUpPanelOpen, setStepUpPanelOpen] = useState(false)
   const [stepUpPanelStep, setStepUpPanelStep] = useState<1 | 2 | 3>(1)
   const [batchPanelOpen, setBatchPanelOpen] = useState(false)
-  const [openPanels, setOpenPanels] = useState<string[]>([])
   const [closingPanels, setClosingPanels] = useState<string[]>([])
   const { stack: dynamicPanels, openDynamic, closeDynamic: closeDynamicPanel, resetDynamic } = usePanelStack()
   const [declineReportFiltered, setDeclineReportFiltered] = useState(false)
@@ -329,15 +327,14 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     if (turn.openStepUpPanel) { setStepUpPanelOpen(true); setStepUpPanelStep(1) }
     if (turn.advanceStepUp) { setStepUpPanelStep((s) => Math.min(3, s + 1) as 1 | 2 | 3) }
     if (turn.openBatchPanel) { setBatchPanelOpen(true) }
-    if (turn.openPanel) { setOpenPanels((prev) => prev.includes(turn.openPanel!) ? prev : [...prev, turn.openPanel!]) }
-    if (turn.openDynamicPanel) { openDynamic(turn.openDynamicPanel) }
     // Unified vocabulary: `panel` opens (idempotent); `view` sets its view, else the
-    // panel resets to its own default view on open.
+    // panel resets to its own default view on open; `closePanel` closes one panel.
     if (turn.panel) {
       openDynamic(turn.panel)
       if (turn.view) setPanelView(turn.panel, turn.view)
       else clearPanelView(turn.panel)
     }
+    if (turn.closePanel) { closeDynamicPanel(turn.closePanel) }
     if (turn.filterDeclineReport) { setDeclineReportFiltered(true) }
   }, [])
 
@@ -414,14 +411,14 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
           if (turn.closeAllPanels) {
             await sleep(600)
             // Stagger panels closed — right column first, then left
-            const current = [...openPanels]
+            const current = [...dynamicPanels]
             const rightFirst = ["coastal-risk", "transaction-receipt", "email-draft", "change-log"]
             const first = current.find(p => rightFirst.includes(p))
             const rest = current.filter(p => p !== first)
             if (first) { setClosingPanels([first]); await sleep(350) }
             if (rest.length) { setClosingPanels(current); await sleep(350) }
             setClosingPanels([])
-            setOpenPanels([])
+            resetDynamic()
             setDeclineReportFiltered(false)
             resetPanelViews()
           }
@@ -456,12 +453,12 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     ])
   }, [])
 
-  const closePanel = useCallback((type: string) => {
-    setOpenPanels((prev) => prev.filter((p) => p !== type))
-  }, [])
+  // Every panel is now on the dynamic stack; closePanel(id) just closes it there.
+  const closePanel = useCallback((id: string) => {
+    closeDynamicPanel(id as PanelId)
+  }, [closeDynamicPanel])
 
   const closeAllNewPanels = useCallback(() => {
-    setOpenPanels([])
     resetDynamic()
     setDeclineReportFiltered(false)
     resetPanelViews()
@@ -521,7 +518,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   }, [streamAssistantReply])
 
   const submitDisputeDraft = useCallback(() => {
-    setOpenPanels([])
+    resetDynamic()
     setMessages((prev) => [
       ...prev,
       { id: newSessionId(), role: "assistant" as const, content: "Submitted to the processor. Case status updated to Dispute Filed. Next deadline: processor response due May 28.", suggestions: CONCEPT_ALL_PROMPTS },
@@ -556,7 +553,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setStepUpPanelOpen(false)
     setStepUpPanelStep(1)
     setBatchPanelOpen(false)
-    setOpenPanels([])
     resetDynamic()
     setDeclineReportFiltered(false)
     resetPanelViews()
@@ -569,7 +565,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setChatState("idle")
     setPendingBot(null)
     setError(null)
-    setOpenPanels([])
     resetDynamic()
     setClosingPanels([])
     setFormPanelOpen(false)
@@ -633,7 +628,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       stepUpPanelOpen, setStepUpPanelOpen, stepUpPanelStep, advanceStepUpPanel, submitStepUpPanel,
       batchPanelOpen, setBatchPanelOpen,
       triggerProactiveFlow, proactiveNotificationActive, activateProactiveNotification,
-      openPanels, closingPanels, closePanel, closeAllNewPanels, submitDisputeDraft,
+      closingPanels, closePanel, closeAllNewPanels, submitDisputeDraft,
       dynamicPanels, closeDynamicPanel,
       declineReportFiltered,
       submitAccountChangeDetails, goBackAccountChangeStep, confirmAccountChange, requestDepositNotify,

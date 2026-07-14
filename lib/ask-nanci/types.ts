@@ -28,16 +28,6 @@ export interface ScriptedTurn {
   map?: MapWidget
 }
 
-
-// Panel ids that flow through the dynamic panel stack (usePanelStack) instead
-// of the legacy hardcoded mapPanelsToSlots switch in ConceptPanelArea.
-export type DynamicPanelId =
-  | "pending-deposits" | "flagged-transaction"
-  | "fee-summary" | "chargeback-status"
-  | "sales-snapshot" | "sales-drilldown" | "account-change" | "escalation"
-  | "menu-performance" | "menu-cost-detail"
-  | "merchant-volume" | "work-queue"
-
 export interface ConceptScriptedTurn extends ScriptedTurn {
   sheetAction?: SheetActionData
   suggestions?: string[]
@@ -45,12 +35,11 @@ export interface ConceptScriptedTurn extends ScriptedTurn {
   openStepUpPanel?: true
   advanceStepUp?: true
   openBatchPanel?: true
-  openPanel?: PanelId
-  openDynamicPanel?: DynamicPanelId
   // Unified panel vocabulary (concept-flow pipeline): `panel` ensures a panel is
-  // open; add `view` to set its view. Replacing the open*/advance* fields flow by flow.
+  // open; add `view` to set its view; `closePanel` closes one panel (e.g. replace).
   panel?: PanelId
   view?: string
+  closePanel?: PanelId
   filterDeclineReport?: true
   closeAllPanels?: true
   widget?: "ai-triage-summary"

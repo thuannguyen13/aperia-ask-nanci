@@ -36,8 +36,8 @@ function ReplayButton() {
 }
 
 function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode; noSidebar?: boolean }) {
-  const { openPanels } = useAskNanci()
-  const isDQ = openPanels.some((p) => DQ_PANELS.has(p))
+  const { dynamicPanels } = useAskNanci()
+  const isDQ = dynamicPanels.some((p) => DQ_PANELS.has(p))
   const [showDQ, setShowDQ] = useState(false)
   const [dqVisible, setDqVisible] = useState(false)
   // Tracks whether the non-DQ chat just appeared so we can fade it in
