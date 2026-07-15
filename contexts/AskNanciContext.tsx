@@ -343,6 +343,47 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     if (turn.filterDeclineReport) { setDeclineReportFiltered(true) }
   }, [])
 
+  // Shared assistant-turn playback for both players (manual runConceptStep + auto
+  // runConceptAuto): stream the reply, attach any sheet/suggestions/widget/map,
+  // apply panel effects, and stagger a closeAll if the turn asks for it. `suggestions`
+  // differs per caller (manual falls back to the next question), so it's passed in.
+  const playAssistantTurn = useCallback(async (turn: ConceptScriptedTurn, suggestions: string[] | undefined) => {
+    await streamWords(turn.content, { id: newSessionId(), shouldStop: () => scriptStopRef.current })
+    if (turn.widgetDelay) await sleep(turn.widgetDelay)
+    if (turn.sheetAction || suggestions || turn.widget || turn.map) {
+      setMessages((prev) => {
+        const next = [...prev]
+        const last = next[next.length - 1]
+        if (last && last.role === "assistant") {
+          next[next.length - 1] = {
+            ...last,
+            ...(turn.sheetAction ? { sheetAction: turn.sheetAction } : {}),
+            ...(suggestions ? { suggestions } : {}),
+            ...(turn.widget ? { widget: turn.widget } : {}),
+            ...(turn.map ? { map: turn.map } : {}),
+          }
+        }
+        return next
+      })
+    }
+    if (turn.pauseAfter) await sleep(turn.pauseAfter)
+    applyTurnEffects(turn)
+    if (turn.closeAllPanels) {
+      await sleep(600)
+      // Stagger panels closed — right column first, then left.
+      const current = [...dynamicPanels]
+      const rightFirst = ["coastal-risk", "transaction-receipt", "email-draft", "change-log"]
+      const first = current.find(p => rightFirst.includes(p))
+      const rest = current.filter(p => p !== first)
+      if (first) { setClosingPanels([first]); await sleep(350) }
+      if (rest.length) { setClosingPanels(current); await sleep(350) }
+      setClosingPanels([])
+      resetDynamic()
+      setDeclineReportFiltered(false)
+      resetPanelViews()
+    }
+  }, [streamWords, applyTurnEffects, dynamicPanels])
+
   // Play one manual step of the active flow: the pending user turn (if any) plus the
   // assistant turn(s) that follow, then stop and surface the next user question as a
   // suggestion pill. Clicking it calls this again — flows never auto-advance.
@@ -370,44 +411,10 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       const turn = script[i]
       await sleep(turn.widget ? 1200 : 1000)
       if (scriptStopRef.current) return
-      await streamWords(turn.content, { id: newSessionId(), shouldStop: () => scriptStopRef.current })
-      if (turn.widgetDelay) await sleep(turn.widgetDelay)
-
       const nextIsUser = script[i + 1]?.role === "user"
       // The pill is the authored suggestions if present, else the next user question.
       const suggestions = turn.suggestions ?? (nextIsUser ? [script[i + 1].content] : undefined)
-      if (turn.sheetAction || suggestions || turn.widget || turn.map) {
-        setMessages((prev) => {
-          const next = [...prev]
-          const last = next[next.length - 1]
-          if (last && last.role === "assistant") {
-            next[next.length - 1] = {
-              ...last,
-              ...(turn.sheetAction ? { sheetAction: turn.sheetAction } : {}),
-              ...(suggestions ? { suggestions } : {}),
-              ...(turn.widget ? { widget: turn.widget } : {}),
-              ...(turn.map ? { map: turn.map } : {}),
-            }
-          }
-          return next
-        })
-      }
-      if (turn.pauseAfter) await sleep(turn.pauseAfter)
-      applyTurnEffects(turn)
-      if (turn.closeAllPanels) {
-        await sleep(600)
-        // Stagger panels closed — right column first, then left
-        const current = [...dynamicPanels]
-        const rightFirst = ["coastal-risk", "transaction-receipt", "email-draft", "change-log"]
-        const first = current.find(p => rightFirst.includes(p))
-        const rest = current.filter(p => p !== first)
-        if (first) { setClosingPanels([first]); await sleep(350) }
-        if (rest.length) { setClosingPanels(current); await sleep(350) }
-        setClosingPanels([])
-        resetDynamic()
-        setDeclineReportFiltered(false)
-        resetPanelViews()
-      }
+      await playAssistantTurn(turn, suggestions)
       i++
       // Stop unless the next turn is another consecutive assistant turn.
       if (script[i]?.role !== "assistant") break
@@ -416,7 +423,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     // Park at the next user turn (wait for the pill click) or end the flow.
     activeFlowRef.current = script[i]?.role === "user" ? { script, cursor: i } : null
     setChatState("idle")
-  }, [streamWords, applyTurnEffects, dynamicPanels])
+  }, [playAssistantTurn, applyTurnEffects])
 
   // Auto-play (non-manual flows): run the whole script start to finish, advancing
   // user turns on a timer. This is the original behavior for the interaction-pattern
@@ -435,43 +442,11 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       } else {
         await sleep(1800)
         if (scriptStopRef.current) break
-        await streamWords(turn.content, { id: newSessionId(), shouldStop: () => scriptStopRef.current })
-        if (turn.widgetDelay) await sleep(turn.widgetDelay)
-        if (turn.sheetAction || turn.suggestions || turn.widget || turn.map) {
-          setMessages((prev) => {
-            const next = [...prev]
-            const last = next[next.length - 1]
-            if (last && last.role === "assistant") {
-              next[next.length - 1] = {
-                ...last,
-                ...(turn.sheetAction ? { sheetAction: turn.sheetAction } : {}),
-                ...(turn.suggestions ? { suggestions: turn.suggestions } : {}),
-                ...(turn.widget ? { widget: turn.widget } : {}),
-                ...(turn.map ? { map: turn.map } : {}),
-              }
-            }
-            return next
-          })
-        }
-        if (turn.pauseAfter) await sleep(turn.pauseAfter)
-        applyTurnEffects(turn)
-        if (turn.closeAllPanels) {
-          await sleep(600)
-          const current = [...dynamicPanels]
-          const rightFirst = ["coastal-risk", "transaction-receipt", "email-draft", "change-log"]
-          const first = current.find(p => rightFirst.includes(p))
-          const rest = current.filter(p => p !== first)
-          if (first) { setClosingPanels([first]); await sleep(350) }
-          if (rest.length) { setClosingPanels(current); await sleep(350) }
-          setClosingPanels([])
-          resetDynamic()
-          setDeclineReportFiltered(false)
-          resetPanelViews()
-        }
+        await playAssistantTurn(turn, turn.suggestions)
         if (i === script.length - 1) setChatState("idle")
       }
     }
-  }, [streamWords, applyTurnEffects, dynamicPanels])
+  }, [playAssistantTurn, applyTurnEffects])
 
   const playConceptScripted = useCallback((prompt: string) => {
     const script = CONCEPT_SCRIPTED_CONVERSATIONS[prompt]
