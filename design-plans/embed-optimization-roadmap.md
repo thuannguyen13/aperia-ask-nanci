@@ -7,11 +7,23 @@ but sits on one monolithic `AskNanciContext`. The safe/verifiable remediation is
 done blind because they'd break the working demo without a runtime test net.
 
 ## Done (committed on this branch)
-- CI gate (`.github/workflows/ci.yml`) — typecheck/lint/check:flows/test on push & PR.
+- CI gate (`.github/workflows/ci.yml`) — typecheck/lint/check:flows/test + a separate E2E job on push & PR.
 - Removed dead code: orphaned `charts` route, unused `playwright`, hardcoded LAN IP → `DEV_ORIGIN` env.
 - App Router boundaries: `error.tsx` / `loading.tsx` / `not-found.tsx` / `global-error.tsx`.
-- +34 tests (49 total): flow registry, keyword engine, `usePanelStack`, formatters.
+- +34 unit tests (49 total): flow registry, keyword engine, `usePanelStack`, formatters.
 - Fixed stale `CLAUDE.md` panel-wiring API.
+- Fixed 2 dead pills (proactive-flow) → registered as fake follow-ups; guard test tightened to zero.
+- **E2E safety net:** Playwright smoke suite (`e2e/concept-flows.spec.ts`, 3 tests) covering streaming +
+  panel-open, wired into CI. Local runs need the default dev server free (shared Turbopack `.next` lock).
+- **P0 step 1 (done, e2e-verified):** deduped `runConceptStep`/`runConceptAuto` into one `playAssistantTurn`.
+- **P0 step 2 (done, e2e-verified):** `pendingBot` moved to a dedicated `ChatStreamProvider`
+  (state/setter split-context) — kills the per-token re-render fan-out across ~40 consumers.
+
+## Remaining (lower value now / separate projects)
+The per-token perf problem — the headline of the P0 section below — is SOLVED. What's left of the context
+split (extract the playback engine to its own module; carve Session/Sources/UI providers; memoize provider
+values; relocate interactive-panel handlers) is now tidiness with diminishing returns, since `chatState`
+only re-renders on phase boundaries (3–4×/message). P1 and P2 remain genuine follow-on projects.
 
 ---
 
