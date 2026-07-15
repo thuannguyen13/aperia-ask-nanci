@@ -28,6 +28,15 @@ export interface ScriptedTurn {
   map?: MapWidget
 }
 
+// A discrete panel effect — the normalized unit that both scripted turns and a
+// real backend stream (see ChatStreamChunk's `action` variant) drive through the
+// single applyPanelAction handler. `closeAllPanels` stays a player-level animated
+// teardown, so it is intentionally not a discrete action here.
+export type PanelAction =
+  | { op: "open"; id: PanelId; view?: string }
+  | { op: "close"; id: PanelId }
+  | { op: "filterDeclineReport" }
+
 export interface ConceptScriptedTurn extends ScriptedTurn {
   sheetAction?: SheetActionData
   suggestions?: string[]

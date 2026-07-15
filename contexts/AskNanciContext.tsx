@@ -1,8 +1,9 @@
 "use client"
 
 import { createContext, useContext, useState, useCallback, useRef, useEffect } from "react"
-import type { Message, Session, Source, UsageData, ConceptScriptedTurn, PanelId } from "@/lib/ask-nanci/types"
+import type { Message, Session, Source, UsageData, ConceptScriptedTurn, PanelId, PanelAction } from "@/lib/ask-nanci/types"
 import { usePanelStack } from "@/lib/ask-nanci/use-panel-stack"
+import { turnToPanelActions } from "@/lib/ask-nanci/panel-actions"
 import { usePendingBotSetter } from "@/contexts/ChatStreamContext"
 import {
   fetchSessions,
@@ -333,17 +334,28 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   }, [])
   const resetPanelViews = useCallback(() => setPanelViews({}), [])
 
-  const applyTurnEffects = useCallback((turn: ConceptScriptedTurn) => {
-    // Unified vocabulary: `panel` opens (idempotent); `view` sets its view, else the
-    // panel resets to its own default view on open; `closePanel` closes one panel.
-    if (turn.panel) {
-      openDynamic(turn.panel)
-      if (turn.view) setPanelView(turn.panel, turn.view)
-      else clearPanelView(turn.panel)
+  // The single place a panel effect is applied — driven by both scripted turns (via
+  // applyTurnEffects → turnToPanelActions) and a real backend stream ("action" chunk).
+  const applyPanelAction = useCallback((action: PanelAction) => {
+    switch (action.op) {
+      case "open":
+        openDynamic(action.id)
+        // With a view, set it; without, reset the panel to its own default view.
+        if (action.view) setPanelView(action.id, action.view)
+        else clearPanelView(action.id)
+        break
+      case "close":
+        closeDynamicPanel(action.id)
+        break
+      case "filterDeclineReport":
+        setDeclineReportFiltered(true)
+        break
     }
-    if (turn.closePanel) { closeDynamicPanel(turn.closePanel) }
-    if (turn.filterDeclineReport) { setDeclineReportFiltered(true) }
   }, [])
+
+  const applyTurnEffects = useCallback((turn: ConceptScriptedTurn) => {
+    turnToPanelActions(turn).forEach(applyPanelAction)
+  }, [applyPanelAction])
 
   // Shared assistant-turn playback for both players (manual runConceptStep + auto
   // runConceptAuto): stream the reply, attach any sheet/suggestions/widget/map,

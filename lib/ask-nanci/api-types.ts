@@ -1,4 +1,4 @@
-import type { Message, Session, Source, ChartWidget, MapWidget } from "./types"
+import type { Message, Session, Source, ChartWidget, MapWidget, PanelAction } from "./types"
 
 // ─── Chat ─────────────────────────────────────────────────────────────────────
 
@@ -15,6 +15,7 @@ export type ChatStreamChunk =
   | { type: "sources"; items: Source[] }
   | { type: "chart"; data: ChartWidget }
   | { type: "map"; data: MapWidget }
+  | { type: "action"; action: PanelAction } // a real backend drives panels through this
   | { type: "done" }
   | { type: "error"; message: string }
 
