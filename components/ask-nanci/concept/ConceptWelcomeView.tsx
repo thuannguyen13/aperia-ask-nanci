@@ -27,8 +27,8 @@ const BADGE_COLORS: Record<string, string> = {
   "Risk · Looping":  "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",
 }
 
-// Merchant Money cards use the marketing site's solid-blue badge regardless of label.
-const MARKETING_BADGE = "bg-blue-600 text-white"
+// Merchant Money cards use the marketing site's solid-blue category badge.
+const MARKETING_BADGE = "bg-blue-600 text-white uppercase tracking-wide"
 
 export function ConceptWelcomeView() {
   const { handlePrompt, triggerProactiveFlow, activateProactiveNotification, embedVariant } = useAskNanci()
