@@ -59,7 +59,26 @@ merge-conflict risk in one place.
 there's no test that catches a behavior regression yet. Do step 2 only with the dev server
 open. If a step can't be verified live, stop.
 
-## P1 — Panel-action protocol (the real fake→real bridge)
+## STATUS UPDATE
+
+- **P0:** high-value work DONE + e2e-verified (playback dedup `52dcfa2`; `pendingBot` split
+  `c368ae6` kills the per-token fan-out). Remaining P0 (Session/UI provider splits, memoization)
+  is optional tidiness — deferred.
+- **P1:** DONE + e2e-verified (`0e07067`). Panel effects normalized into a `PanelAction` protocol:
+  pure `turnToPanelActions()` mapper + single `applyPanelAction()` applier back `applyTurnEffects`;
+  `ChatStreamChunk` gained an `action` variant as the backend seam. The one remaining wire (a real
+  backend emitting `action` chunks → one `applyPanelAction` call in the `sendMessage` stream loop)
+  is intentionally NOT added — there is no emitter yet, so it would be dead code.
+- **P2 — BLOCKED (not built, by design).** Verified: all 24 concept panels are `"use client"` and
+  read client context (`usePanelView`/`useAskNanci`); zero server data fetching. RSC only helps a
+  component that renders server-fetched data and sheds interactivity — none of these do. Their data
+  IS client mock state mutated by the scripted flows. RSC migration requires a real backend/data
+  model to exist first; forcing it now would hardcode data into server components and break the
+  interactive demo. Revisit only after a real API exists (which also connects P1's `action` seam).
+
+---
+
+## P1 — Panel-action protocol (the real fake→real bridge)  ✅ done, see status above
 
 **Why:** the concept flows open panels / set views by directly mutating React state; the
 `ChatStreamChunk` protocol has no vocabulary for "open panel / set view / filter." So
