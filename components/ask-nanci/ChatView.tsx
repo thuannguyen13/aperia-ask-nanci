@@ -1,16 +1,23 @@
 "use client"
 
+import { ArrowDown } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { useChatScroll } from "@/hooks/useChatScroll"
 import { UserMessage, BotMessage } from "./ChatMessage"
 import { ThinkingIndicator } from "./ThinkingIndicator"
 
+// Dormant: the scroll-to-bottom affordance is fully built below but shipped off.
+// Flip to `true` to activate it (see design-plans / useChatScroll JSDoc).
+const ENABLE_SCROLL_TO_BOTTOM_BUTTON = false
+
 export function ChatView() {
   const { messages, chatState, pendingBot } = useAskNanci()
-  const { containerRef, spacerRef, lastUserMsgRef } = useChatScroll(chatState, pendingBot?.content)
+  const { containerRef, spacerRef, lastUserMsgRef, isPinnedToBottom, scrollToBottom } =
+    useChatScroll({ phase: chatState === "thinking" ? "awaiting" : chatState })
 
   return (
-    <div ref={containerRef} className="flex-1 min-h-0 overflow-y-auto">
+    <div className="relative flex-1 min-h-0">
+      <div ref={containerRef} className="h-full overflow-y-auto">
       <div className="mx-auto w-full max-w-[800px] flex flex-col gap-0 pt-4">
         {messages.map((msg, i) => {
           const isLastMsg = i === messages.length - 1
@@ -47,6 +54,17 @@ export function ChatView() {
 
         <div ref={spacerRef} className="shrink-0" />
       </div>
+      </div>
+
+      {ENABLE_SCROLL_TO_BOTTOM_BUTTON && !isPinnedToBottom && (
+        <button
+          onClick={scrollToBottom}
+          aria-label="Scroll to latest"
+          className="absolute bottom-4 left-1/2 flex size-9 -translate-x-1/2 items-center justify-center rounded-full border bg-background shadow-md transition-colors hover:bg-muted"
+        >
+          <ArrowDown className="size-4 text-foreground" />
+        </button>
+      )}
     </div>
   )
 }
