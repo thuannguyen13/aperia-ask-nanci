@@ -79,8 +79,14 @@ export const CONCEPT_FLOW19_FOLLOWUPS = [
 
 // Every fake follow-up across flows — handlePrompt treats these as no-op decoration.
 // Add each flow's follow-up array here as the treatment rolls out.
+// Flow 6 (proactive auto-play): decorative "road not taken" pills on non-final turns.
+// The flow auto-advances down its scripted branch, so these are never the real path —
+// register them as fake so a click is a no-op instead of falling through to sendMessage.
+const CONCEPT_FLOW6_FOLLOWUPS_FAKE = ["Show my statement", "Show me the transaction"];
+
 export const CONCEPT_FAKE_FOLLOWUPS = new Set<string>([
   ...CONCEPT_FLOW5_FOLLOWUPS,
+  ...CONCEPT_FLOW6_FOLLOWUPS_FAKE,
   ...CONCEPT_FLOW13_FOLLOWUPS,
   ...CONCEPT_FLOW14_FOLLOWUPS,
   ...CONCEPT_FLOW15_FOLLOWUPS_FAKE,

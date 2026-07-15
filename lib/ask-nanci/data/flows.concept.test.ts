@@ -6,7 +6,6 @@ import {
   CONCEPT_FLOW_SLUGS,
   CONCEPT_ALL_PROMPTS,
   CONCEPT_MANUAL_PROMPTS,
-  CONCEPT_FLOW6_KEY,
 } from "../concept-config"
 import type { ConceptScriptedTurn } from "../types"
 
@@ -103,14 +102,10 @@ describe("concept routing tables", () => {
     }
   })
 
-  it("only leaves decorative alternate-branch pills unrouted — and only in the auto-play proactive flow's non-final turns", () => {
-    // Guards the current state: the two 'road not taken' pills in the auto-playing
-    // proactive flow are the ONLY dead pills. Any new dead pill anywhere else fails.
+  it("has no dead pills — every suggestion routes, is a known fake follow-up, or continues the flow", () => {
+    // The two proactive-flow "road not taken" pills are now registered fake follow-ups,
+    // so nothing should fall through to sendMessage. Any new dead pill fails here.
     const dead = allSuggestions().filter((s) => classify(s.sugg, s.flowKey) === "dead")
-    for (const d of dead) {
-      expect(d.flowKey).toBe(CONCEPT_FLOW6_KEY)
-      expect(d.isFinalTurn).toBe(false)
-    }
-    expect(new Set(dead.map((d) => d.sugg))).toEqual(new Set(["Show my statement", "Show me the transaction"]))
+    expect(dead.map((d) => `${d.flowKey} → "${d.sugg}"`)).toEqual([])
   })
 })
