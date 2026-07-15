@@ -18,10 +18,17 @@ import type { CurrentUser, PromptCategory } from "@/lib/ask-nanci/api"
 import { MOCK_USAGE, DEFAULT_CURRENT_USER } from "@/lib/ask-nanci/mock-data"
 import { EMBED_DEMO_SOURCES, EMBED_BUSINESS_OWNER_DEMO_SOURCES, EMBED_ISO_DEMO_SOURCES, EMBED_VW_DEMO_SOURCES, SCRIPTED_CONVERSATIONS } from "@/lib/ask-nanci/embed-demo-config"
 import type { EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
-import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_ALL_PROMPTS, CONCEPT_NO_RESET_PROMPTS } from "@/lib/ask-nanci/concept-config"
+import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_ALL_PROMPTS, CONCEPT_NO_RESET_PROMPTS, CONCEPT_MANUAL_PROMPTS } from "@/lib/ask-nanci/concept-config"
 import { CLOVER_SOURCE_ID, ONBOARDING_KEY } from "@/lib/ask-nanci/sourceStore"
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
+
+// Once the conversation moves past an assistant message (a new user turn is sent),
+// drop that message's suggestion pills so a clicked pill doesn't linger.
+const withClearedSuggestions = (msgs: Message[]): Message[] =>
+  msgs.map((m, i) =>
+    i === msgs.length - 1 && m.role === "assistant" && m.suggestions ? { ...m, suggestions: undefined } : m,
+  )
 
 type ChatView = "welcome" | "chat"
 type ChatState = "idle" | "thinking" | "streaming"
@@ -133,6 +140,9 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [proactiveNotificationActive, setProactiveNotificationActive] = useState(false)
   const stopRef = useRef<boolean>(false)
   const scriptStopRef = useRef<boolean>(false)
+  // Manual-stepping playback: the active scripted flow and the index of the next
+  // turn to play. A flow advances one step per suggestion-pill click, never auto-runs.
+  const activeFlowRef = useRef<{ script: ConceptScriptedTurn[]; cursor: number } | null>(null)
   const sessionIdRef = useRef<string>(newSessionId())
 
   useEffect(() => {
@@ -332,6 +342,136 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     if (turn.filterDeclineReport) { setDeclineReportFiltered(true) }
   }, [])
 
+  // Play one manual step of the active flow: the pending user turn (if any) plus the
+  // assistant turn(s) that follow, then stop and surface the next user question as a
+  // suggestion pill. Clicking it calls this again — flows never auto-advance.
+  const runConceptStep = useCallback(async () => {
+    const flow = activeFlowRef.current
+    if (!flow) return
+    const { script } = flow
+    scriptStopRef.current = false
+    let i = flow.cursor
+
+    // Leading user turn — appears immediately, as if the merchant just sent it.
+    if (script[i]?.role === "user") {
+      const turn = script[i]
+      await sleep(250)
+      if (scriptStopRef.current) return
+      setMessages((prev) => [...withClearedSuggestions(prev), { id: newSessionId(), role: "user" as const, content: turn.content }])
+      applyTurnEffects(turn)
+      if (turn.pauseAfter) await sleep(turn.pauseAfter)
+      setChatState("thinking")
+      i++
+    }
+
+    // Stream the assistant turn(s) up to the next user turn (or end of script).
+    while (i < script.length && script[i].role === "assistant") {
+      const turn = script[i]
+      await sleep(turn.widget ? 1200 : 1000)
+      if (scriptStopRef.current) return
+      await streamWords(turn.content, { id: newSessionId(), shouldStop: () => scriptStopRef.current })
+      if (turn.widgetDelay) await sleep(turn.widgetDelay)
+
+      const nextIsUser = script[i + 1]?.role === "user"
+      // The pill is the authored suggestions if present, else the next user question.
+      const suggestions = turn.suggestions ?? (nextIsUser ? [script[i + 1].content] : undefined)
+      if (turn.sheetAction || suggestions || turn.widget || turn.map) {
+        setMessages((prev) => {
+          const next = [...prev]
+          const last = next[next.length - 1]
+          if (last && last.role === "assistant") {
+            next[next.length - 1] = {
+              ...last,
+              ...(turn.sheetAction ? { sheetAction: turn.sheetAction } : {}),
+              ...(suggestions ? { suggestions } : {}),
+              ...(turn.widget ? { widget: turn.widget } : {}),
+              ...(turn.map ? { map: turn.map } : {}),
+            }
+          }
+          return next
+        })
+      }
+      if (turn.pauseAfter) await sleep(turn.pauseAfter)
+      applyTurnEffects(turn)
+      if (turn.closeAllPanels) {
+        await sleep(600)
+        // Stagger panels closed — right column first, then left
+        const current = [...dynamicPanels]
+        const rightFirst = ["coastal-risk", "transaction-receipt", "email-draft", "change-log"]
+        const first = current.find(p => rightFirst.includes(p))
+        const rest = current.filter(p => p !== first)
+        if (first) { setClosingPanels([first]); await sleep(350) }
+        if (rest.length) { setClosingPanels(current); await sleep(350) }
+        setClosingPanels([])
+        resetDynamic()
+        setDeclineReportFiltered(false)
+        resetPanelViews()
+      }
+      i++
+      // Stop unless the next turn is another consecutive assistant turn.
+      if (script[i]?.role !== "assistant") break
+    }
+
+    // Park at the next user turn (wait for the pill click) or end the flow.
+    activeFlowRef.current = script[i]?.role === "user" ? { script, cursor: i } : null
+    setChatState("idle")
+  }, [streamWords, applyTurnEffects, dynamicPanels])
+
+  // Auto-play (non-manual flows): run the whole script start to finish, advancing
+  // user turns on a timer. This is the original behavior for the interaction-pattern
+  // flows; Merchant Money flows step manually via runConceptStep instead.
+  const runConceptAuto = useCallback(async (script: ConceptScriptedTurn[]) => {
+    for (let i = 0; i < script.length; i++) {
+      if (scriptStopRef.current) break
+      const turn = script[i]
+      if (turn.role === "user") {
+        await sleep(i === 0 ? 1000 : 1800)
+        if (scriptStopRef.current) break
+        setMessages((prev) => [...withClearedSuggestions(prev), { id: newSessionId(), role: "user" as const, content: turn.content }])
+        if (turn.pauseAfter) await sleep(turn.pauseAfter)
+        applyTurnEffects(turn)
+        setChatState("thinking")
+      } else {
+        await sleep(1800)
+        if (scriptStopRef.current) break
+        await streamWords(turn.content, { id: newSessionId(), shouldStop: () => scriptStopRef.current })
+        if (turn.widgetDelay) await sleep(turn.widgetDelay)
+        if (turn.sheetAction || turn.suggestions || turn.widget || turn.map) {
+          setMessages((prev) => {
+            const next = [...prev]
+            const last = next[next.length - 1]
+            if (last && last.role === "assistant") {
+              next[next.length - 1] = {
+                ...last,
+                ...(turn.sheetAction ? { sheetAction: turn.sheetAction } : {}),
+                ...(turn.suggestions ? { suggestions: turn.suggestions } : {}),
+                ...(turn.widget ? { widget: turn.widget } : {}),
+                ...(turn.map ? { map: turn.map } : {}),
+              }
+            }
+            return next
+          })
+        }
+        if (turn.pauseAfter) await sleep(turn.pauseAfter)
+        applyTurnEffects(turn)
+        if (turn.closeAllPanels) {
+          await sleep(600)
+          const current = [...dynamicPanels]
+          const rightFirst = ["coastal-risk", "transaction-receipt", "email-draft", "change-log"]
+          const first = current.find(p => rightFirst.includes(p))
+          const rest = current.filter(p => p !== first)
+          if (first) { setClosingPanels([first]); await sleep(350) }
+          if (rest.length) { setClosingPanels(current); await sleep(350) }
+          setClosingPanels([])
+          resetDynamic()
+          setDeclineReportFiltered(false)
+          resetPanelViews()
+        }
+        if (i === script.length - 1) setChatState("idle")
+      }
+    }
+  }, [streamWords, applyTurnEffects, dynamicPanels])
+
   const playConceptScripted = useCallback((prompt: string) => {
     const script = CONCEPT_SCRIPTED_CONVERSATIONS[prompt]
     if (!script) return
@@ -343,71 +483,24 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     }
     setChatState("idle")
     setPendingBot(null)
-
-    const streamText = (text: string, id: string) =>
-      streamWords(text, { id, shouldStop: () => scriptStopRef.current })
-
-    // If the script starts with an assistant turn (no leading user message),
-    // show the thinking indicator immediately so there's feedback on click.
+    // If the script opens with an assistant turn, show the thinking indicator now.
     if (script[0]?.role === "assistant") setChatState("thinking")
 
-    const run = async () => {
-      for (let i = 0; i < script.length; i++) {
-        if (scriptStopRef.current) break
-        const turn = script[i]
-        if (turn.role === "user") {
-          await sleep(i === 0 ? 1000 : 1800)
-          if (scriptStopRef.current) break
-          setMessages((prev) => [...prev, { id: newSessionId(), role: "user" as const, content: turn.content }])
-          if (turn.pauseAfter) await sleep(turn.pauseAfter)
-          applyTurnEffects(turn)
-          setChatState("thinking")
-        } else {
-          await sleep(1800)
-          if (scriptStopRef.current) break
-          await streamText(turn.content, newSessionId())
-          if (turn.widgetDelay) await sleep(turn.widgetDelay)
-          if (turn.sheetAction || turn.suggestions || turn.widget || turn.map) {
-            setMessages((prev) => {
-              const next = [...prev]
-              const last = next[next.length - 1]
-              if (last && last.role === "assistant") {
-                next[next.length - 1] = {
-                  ...last,
-                  ...(turn.sheetAction ? { sheetAction: turn.sheetAction } : {}),
-                  ...(turn.suggestions ? { suggestions: turn.suggestions } : {}),
-                  ...(turn.widget ? { widget: turn.widget } : {}),
-                  ...(turn.map ? { map: turn.map } : {}),
-                }
-              }
-              return next
-            })
-          }
-          if (turn.pauseAfter) await sleep(turn.pauseAfter)
-          applyTurnEffects(turn)
-          if (turn.closeAllPanels) {
-            await sleep(600)
-            // Stagger panels closed — right column first, then left
-            const current = [...dynamicPanels]
-            const rightFirst = ["coastal-risk", "transaction-receipt", "email-draft", "change-log"]
-            const first = current.find(p => rightFirst.includes(p))
-            const rest = current.filter(p => p !== first)
-            if (first) { setClosingPanels([first]); await sleep(350) }
-            if (rest.length) { setClosingPanels(current); await sleep(350) }
-            setClosingPanels([])
-            resetDynamic()
-            setDeclineReportFiltered(false)
-            resetPanelViews()
-          }
-          if (i === script.length - 1) {
-            setChatState("idle")
-          }
-        }
-      }
+    if (CONCEPT_MANUAL_PROMPTS.has(prompt)) {
+      // Merchant Money flows: step one turn per pill click.
+      activeFlowRef.current = { script, cursor: 0 }
+      runConceptStep()
+    } else {
+      // Everything else auto-plays as before.
+      activeFlowRef.current = null
+      runConceptAuto(script)
     }
+  }, [runConceptStep, runConceptAuto])
 
-    run()
-  }, [])
+  // Advance the active flow one step when its next-question pill is clicked.
+  const advanceConceptFlow = useCallback(() => {
+    if (activeFlowRef.current) runConceptStep()
+  }, [runConceptStep])
 
   const submitFormPanel = useCallback(() => {
     closeDynamicPanel("bank-account-form")
@@ -437,7 +530,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   }, [])
 
   const requestDepositNotify = useCallback(() => {
-    setPanelView("flagged-transaction", "notified")
+    setPanelView("pending-deposits", "notified")
     setMessages((prev) => [
       ...prev,
       { id: newSessionId(), role: "assistant" as const, content: "Done. You'll get a notification when Sunday's batch funds.", suggestions: CONCEPT_ALL_PROMPTS },
@@ -490,14 +583,24 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   }, [playConceptScripted])
 
   const handlePrompt = useCallback((prompt: string) => {
-    if (isConceptVersion && CONCEPT_SCRIPTED_CONVERSATIONS[prompt]) playConceptScripted(prompt)
-    else if (isEmbed && SCRIPTED_CONVERSATIONS[prompt]) playScripted(prompt)
-    else sendMessage(prompt)
-  }, [isConceptVersion, isEmbed, sendMessage, playScripted, playConceptScripted])
+    if (isConceptVersion) {
+      // A pill that matches the active flow's pending user turn steps it forward,
+      // rather than restarting a flow keyed by that same text.
+      const flow = activeFlowRef.current
+      if (flow && flow.script[flow.cursor]?.role === "user" && flow.script[flow.cursor].content === prompt) {
+        advanceConceptFlow()
+        return
+      }
+      if (CONCEPT_SCRIPTED_CONVERSATIONS[prompt]) { playConceptScripted(prompt); return }
+    }
+    if (isEmbed && SCRIPTED_CONVERSATIONS[prompt]) { playScripted(prompt); return }
+    sendMessage(prompt)
+  }, [isConceptVersion, isEmbed, sendMessage, playScripted, playConceptScripted, advanceConceptFlow])
 
   const startNewChat = useCallback(() => {
     stopRef.current = true
     scriptStopRef.current = true
+    activeFlowRef.current = null
     setView("welcome")
     setMessages([])
     setChatState("idle")
@@ -515,6 +618,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     if (!autoPlayFlow) return
     scriptStopRef.current = true
     stopRef.current = true
+    activeFlowRef.current = null
     setMessages([])
     setChatState("idle")
     setPendingBot(null)

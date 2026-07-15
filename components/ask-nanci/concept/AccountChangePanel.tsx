@@ -8,12 +8,12 @@ import { PanelShell, PanelHeader, Callout, NanciInsight } from "@/components/ask
 
 function AccountRow({ last4, className }: { last4: string; className?: string }) {
   return (
-    <div className={`flex flex-1 items-center gap-3 rounded-lg border px-3 py-3 ${className ?? ""}`}>
-      <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted">
-        <Landmark className="size-4 text-muted-foreground" />
+    <div className={`flex flex-1 items-center gap-3 rounded-lg border px-4 py-3.5 ${className ?? ""}`}>
+      <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted">
+        <Landmark className="size-5 text-muted-foreground" />
       </div>
       <div>
-        <p className="font-mono text-sm text-foreground">••••••••••{last4}</p>
+        <p className="font-mono text-base text-foreground">************{last4}</p>
         <p className="text-xs text-muted-foreground">Receiving Deposits</p>
       </div>
     </div>
@@ -114,29 +114,31 @@ function Step2({ onBack, onConfirm }: { onBack: () => void; onConfirm: () => voi
 
 function Step3() {
   return (
-    <div className="flex flex-1 flex-col overflow-y-auto px-4 py-3 gap-4">
+    <div className="flex flex-1 flex-col overflow-y-auto px-4 py-3 gap-6">
       <NanciInsight>
-        <span className="font-bold">Request Submitted</span> — a request to route deposits to ••••••••••{NEW_ACCOUNT.last4} was sent for verification. Deposits continue going to your current account until it clears, typically within 1–2 business days. A confirmation was sent to {CONFIRMATION_EMAIL} for your records.
+        <span className="font-bold">Request Submitted</span> — a request to route deposits to ************{NEW_ACCOUNT.last4} was sent for verification. Deposits continue going to your current account until it clears, typically within 1–2 business days. A confirmation was sent to {CONFIRMATION_EMAIL} for your records.
       </NanciInsight>
 
-      <div className="flex flex-1 flex-col items-center justify-center gap-3">
-        <div className="flex size-14 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/40">
-          <Clock className="size-7 text-amber-600 dark:text-amber-400" />
+      <div className="flex flex-col items-center gap-3 pt-2">
+        <div className="flex size-14 items-center justify-center rounded-full bg-amber-400">
+          <Clock className="size-7 text-amber-950" />
         </div>
         <div className="text-center">
-          <p className="text-base font-semibold text-foreground">Request Submitted</p>
-          <p className="text-xs text-muted-foreground">Submitted today at {CONFIRMED_AT} · Reference {REQUEST_REFERENCE}</p>
+          <p className="text-xl font-bold text-foreground">Request Submitted</p>
+          <p className="mt-1 text-sm text-muted-foreground">Submitted today at {CONFIRMED_AT} · Reference {REQUEST_REFERENCE}</p>
         </div>
-        <div className="flex w-full max-w-sm items-end gap-2">
-          <div className="flex-1">
-            <p className="mb-1.5 text-[9px] font-bold tracking-[0.12em] uppercase text-muted-foreground">Current</p>
-            <AccountRow last4={CURRENT_ACCOUNT.last4} />
-          </div>
-          <ArrowRight className="mb-3 size-4 shrink-0 text-muted-foreground" />
-          <div className="flex-1">
-            <p className="mb-1.5 text-[9px] font-bold tracking-[0.12em] uppercase text-muted-foreground">Requested</p>
-            <AccountRow last4={NEW_ACCOUNT.last4} />
-          </div>
+      </div>
+
+      <div className="w-full space-y-2">
+        <div className="flex items-center gap-3">
+          <p className="flex-1 text-base font-medium text-foreground">Current</p>
+          <span className="size-4 shrink-0" />
+          <p className="flex-1 text-base font-medium text-foreground">Requested</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <AccountRow last4={CURRENT_ACCOUNT.last4} />
+          <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
+          <AccountRow last4={NEW_ACCOUNT.last4} />
         </div>
       </div>
     </div>

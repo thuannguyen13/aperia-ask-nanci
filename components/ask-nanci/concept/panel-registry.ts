@@ -17,7 +17,6 @@ import { FeeSummaryPanel } from "./FeeSummaryPanel"
 import { SalesSnapshotPanel } from "./SalesSnapshotPanel"
 import { SalesDrilldownPanel } from "./SalesDrilldownPanel"
 import { AccountChangePanel } from "./AccountChangePanel"
-import { FlaggedTransactionPanel } from "./FlaggedTransactionPanel"
 import { EscalationPanel } from "./EscalationPanel"
 import { MenuPerformancePanel } from "./MenuPerformancePanel"
 import { CostDetailPanel } from "./CostDetailPanel"
@@ -47,7 +46,6 @@ export const PANELS = {
   "barometer-report":    { component: BarometerReportPanel },
   "coastal-risk":        { component: CoastalRiskPanel },
   "pending-deposits":    { component: PendingDepositsPanel },
-  "flagged-transaction": { component: FlaggedTransactionPanel },
   "fee-summary":         { component: FeeSummaryPanel },
   "sales-snapshot":      { component: SalesSnapshotPanel },
   "sales-drilldown":     { component: SalesDrilldownPanel },

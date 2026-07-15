@@ -26,8 +26,8 @@ export const CONCEPT_DQ_ESCALATE_KEY = "Escalate this one and open a risk case."
 
 export const CONCEPT_FLOW13_PROMPT = "When's my money from the weekend hitting?";
 export const CONCEPT_FLOW14_PROMPT = "my fees went up this month, what happened?";
-export const CONCEPT_FLOW15_PROMPT = "How'd this week go vs last week?";
-export const CONCEPT_FLOW15_FOLLOWUP = "Was there a slow day too?";
+export const CONCEPT_FLOW15_PROMPT = "how'd this week go vs last week?";
+export const CONCEPT_FLOW15_FOLLOWUP = "nice. was there a slow day?";
 export const CONCEPT_FLOW16_PROMPT = "I changed banks, send my deposits to the new account";
 export const CONCEPT_FLOW9_PROMPT = "none of this is right, my payout is short by like 600 bucks and I don't get why";
 export const CONCEPT_MENU_MARGIN_PROMPT = "how's the Italian combo doing this month?";
@@ -51,6 +51,7 @@ export interface FlowDef {
   altEntries?: { slug: string; key: string }[]; // additional embed entries into this flow
   followups?: string[]; // continuation keys kept in-session (derive CONCEPT_NO_RESET_PROMPTS)
   keepSession?: boolean; // this flow's own key is reachable mid-session — don't reset on it
+  manual?: boolean; // step one turn per pill click instead of auto-playing the script
 }
 
 export const FLOW_DEFS: FlowDef[] = [
@@ -177,7 +178,7 @@ export const FLOW_DEFS: FlowDef[] = [
     badge: "Chat + map",
     key: CONCEPT_ADDRESS_PROMPT,
     slug: "19",
-    description: "Update a business address in chat — Nanci renders the current and proposed locations on an inline map to confirm before saving.",
+    description: "A business address change, confirmed on an inline map — Nanci shows the current and new locations, then submits it as a request rather than editing your account directly.",
   },
   {
     num: 17,
@@ -236,6 +237,17 @@ export const CONCEPT_NO_RESET_PROMPTS = new Set<string>([
   ...FLOW_DEFS.filter((f) => f.keepSession).map((f) => f.key),
   ...FLOW_DEFS.flatMap((f) => f.followups ?? []),
 ]);
+
+// Flows that step one turn per suggestion-pill click instead of auto-playing.
+// Defaults to the Merchant Money section; a flow's `manual` prop overrides it.
+// Includes each flow's followup/alt-entry keys so continuations step too.
+export const CONCEPT_MANUAL_PROMPTS = new Set<string>(
+  FLOW_DEFS.filter((f) => f.manual ?? f.section === "merchant").flatMap((f) => [
+    f.key,
+    ...(f.followups ?? []),
+    ...(f.altEntries?.map((e) => e.key) ?? []),
+  ]),
+);
 
 // ─── Sheet action data (populated at module load) ─────────────────────────────
 
@@ -599,7 +611,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     { role: "user", content: CONCEPT_FLOW13_PROMPT },
     {
       role: "assistant",
-      content: "You have three batches pending. Friday and Saturday are in transit, expected in your account ending ••4432 tomorrow morning. Sunday's batch is on a temporary hold.",
+      content: "You have $8,435 coming in total. Your $940 in cash deposits already posted. On the card side, three batches are pending: Friday and Saturday are in transit, expected in your account ending ••4432 tomorrow morning, and Sunday's batch is on a temporary hold.",
       panel: "pending-deposits",
     },
     { role: "user", content: "Why's Sunday held?" },
@@ -607,13 +619,14 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       role: "assistant",
       content:
         "A single $2,190 transaction triggered a routine review — larger than your typical ticket. No action needed on your end. It usually clears within one business day, so expected Wednesday. I can notify you the moment it funds.",
-      panel: "flagged-transaction",
+      panel: "pending-deposits",
+      view: "flagged",
     },
     { role: "user", content: "Yes, do that" },
     {
       role: "assistant",
       content: "Done. You'll get a notification when Sunday's batch funds. Friday and Saturday total $4,860, landing tomorrow.",
-      panel: "flagged-transaction",
+      panel: "pending-deposits",
       view: "notified",
       suggestions: otherMerchantPrompts(CONCEPT_FLOW13_PROMPT),
     },
@@ -650,15 +663,13 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     { role: "user", content: CONCEPT_FLOW15_PROMPT },
     {
       role: "assistant",
-      content:
-        "Up 15% vs last week — you brought in $18,240 against $15,900, driven almost entirely by Saturday. You ran 96 transactions that day versus a weekday average of 60, while your average ticket held steady around $29–43. This was a busier week, not bigger baskets. Tuesday was your softest day at $1,980.",
+      content: "Up. $18,240 this week against $15,900 last week, a 15% lift. Saturday was your best day at $4,110.",
       panel: "sales-snapshot",
     },
-    { role: "user", content: "What drove Saturday?" },
+    { role: "user", content: "what drove saturday?" },
     {
       role: "assistant",
-      content:
-        "Saturday was your best day this week at $4,110. Both traffic and basket size were up — you ran 96 transactions versus a weekday average of 78, and your average ticket rose to $42.81 versus a weekday average of $29.43.",
+      content: "Higher ticket count, not bigger tickets. You ran 96 transactions versus a weekday average of 60. Average ticket held steady around $43.",
       panel: "sales-drilldown",
       suggestions: [CONCEPT_FLOW15_FOLLOWUP],
     },

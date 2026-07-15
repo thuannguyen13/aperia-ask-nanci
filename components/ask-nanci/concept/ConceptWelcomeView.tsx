@@ -16,6 +16,7 @@ const MONEY_FLOWS = FLOW_DEFS.filter((f) => f.section === "merchant")
 const BADGE_COLORS: Record<string, string> = {
   "Chat only":       "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",
   "Chat + panel":    "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300",
+  "Chat + map":      "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400",
   "Chat + form":     "bg-violet-100 text-violet-600 dark:bg-violet-900/30 dark:text-violet-300",
   "Multi-step":      "bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400",
   "AI-initiated":    "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",

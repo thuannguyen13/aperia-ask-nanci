@@ -23,7 +23,7 @@ export function SalesDrilldownPanel() {
 
       <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
         <NanciInsight>
-              Saturday was your best day this week at {formatCurrency(SATURDAY_DRILLDOWN.sales)}. Both traffic and basket size were up — you ran {SATURDAY_DRILLDOWN.transactions} transactions versus a weekday average of {WEEKDAY_AVG_TRANSACTIONS}, and your average ticket rose to {formatCurrency(SATURDAY_DRILLDOWN.avgTicket)} versus a weekday average of {formatCurrency(WEEKDAY_AVG_TICKET)}.
+              Saturday was your best day at {formatCurrency(SATURDAY_DRILLDOWN.sales)}, and it was traffic — not ticket size. You ran {SATURDAY_DRILLDOWN.transactions} transactions versus a weekday average of {WEEKDAY_AVG_TRANSACTIONS}, while your average ticket held steady at {formatCurrency(SATURDAY_DRILLDOWN.avgTicket)} against a {formatCurrency(WEEKDAY_AVG_TICKET)} weekday average.
         </NanciInsight>
 
         <div>
