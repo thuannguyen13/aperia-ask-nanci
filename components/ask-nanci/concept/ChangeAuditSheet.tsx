@@ -118,7 +118,7 @@ export function ChangeAuditSheet({ open, onOpenChange, data }: Props) {
             )}
             <Row label={submitted ? "Submitted At" : "Changed At"} value={data.timestamp} />
             <Separator />
-            <Row label={submitted ? "Submitted By" : "Changed By"} value="AI — via chat" />
+            <Row label={submitted ? "Submitted By" : "Changed By"} value="Ask Nanci" />
             <Separator />
             <Row label="Status" value={submitted ? "Pending review" : "Completed"} amber={submitted} />
           </div>
