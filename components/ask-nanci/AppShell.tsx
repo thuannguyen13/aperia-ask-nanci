@@ -7,6 +7,7 @@ import Image from "next/image"
 import { useTheme } from "next-themes"
 import { Button } from "aperia-ds5"
 import { AskNanciProvider, useAskNanci } from "@/contexts/AskNanciContext"
+import { ChatStreamProvider } from "@/contexts/ChatStreamContext"
 import { parseMode, CONCEPT_FLOW_SLUGS, type EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
 import { Sidebar } from "./Sidebar"
 import { TeachNanciPanel } from "./TeachNanciPanel"
@@ -113,6 +114,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     const config = EMBED_CONFIG[embedVariant!]
     const isConceptEmbed = embedVariant === "concept-embed"
     return (
+      <ChatStreamProvider>
       <AskNanciProvider isEmbed embedVariant={embedVariant} isConceptVersion={isConceptVersion} autoPlayFlow={autoPlayFlow}>
         <div
           data-embed={embedVariant}
@@ -137,10 +139,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
         <TokenLimitDialog />
       </AskNanciProvider>
+      </ChatStreamProvider>
     )
   }
 
   return (
+    <ChatStreamProvider>
     <AskNanciProvider isConceptVersion={isConceptVersion}>
       <div data-embed="concept" data-theme={CONCEPT_CONFIG.theme} className="relative flex h-screen flex-col md:px-2 md:pb-2">
         {/* Top bar */}
@@ -171,5 +175,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <SettingsDialog />
       <DarkModeToggle />
     </AskNanciProvider>
+    </ChatStreamProvider>
   )
 }

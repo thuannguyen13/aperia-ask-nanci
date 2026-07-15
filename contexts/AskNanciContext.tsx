@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useCallback, useRef, useEffect } from "react"
 import type { Message, Session, Source, UsageData, ConceptScriptedTurn, PanelId } from "@/lib/ask-nanci/types"
 import { usePanelStack } from "@/lib/ask-nanci/use-panel-stack"
+import { usePendingBotSetter } from "@/contexts/ChatStreamContext"
 import {
   fetchSessions,
   persistSession,
@@ -42,7 +43,6 @@ interface AskNanciCtx {
   chatState: ChatState
   sessions: Session[]
   activeSessionId: string | null
-  pendingBot: Message | null
   sendMessage: (text: string) => void
   handlePrompt: (prompt: string) => void
   stopAnimation: () => void
@@ -112,7 +112,9 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [chatState, setChatState] = useState<ChatState>("idle")
   const [sessions, setSessions] = useState<Session[]>([])
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null)
-  const [pendingBot, setPendingBot] = useState<Message | null>(null)
+  // pendingBot lives in ChatStreamContext (see that file): its per-token churn must
+  // not re-render this provider's ~40 consumers. We only ever write it here.
+  const setPendingBot = usePendingBotSetter()
   const [sources, setSourcesState] = useState<Source[]>(
     isEmbed ? (
       embedVariant === "business-owner" ? EMBED_BUSINESS_OWNER_DEMO_SOURCES :
@@ -645,7 +647,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     <Ctx.Provider value={{
       isEmbed, embedVariant,
       view, messages, chatState, sessions, activeSessionId,
-      pendingBot,
       sendMessage, handlePrompt, stopAnimation, startNewChat, replayFlow, resumeSession,
       deleteSessionById,
       sources, setSources: handleSetSources, thinking,

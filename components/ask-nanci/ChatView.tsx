@@ -2,6 +2,7 @@
 
 import { ArrowDown } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
+import { usePendingBot } from "@/contexts/ChatStreamContext"
 import { useChatScroll } from "@/hooks/useChatScroll"
 import { UserMessage, BotMessage } from "./ChatMessage"
 import { ThinkingIndicator } from "./ThinkingIndicator"
@@ -11,7 +12,8 @@ import { ThinkingIndicator } from "./ThinkingIndicator"
 const ENABLE_SCROLL_TO_BOTTOM_BUTTON = false
 
 export function ChatView() {
-  const { messages, chatState, pendingBot } = useAskNanci()
+  const { messages, chatState } = useAskNanci()
+  const pendingBot = usePendingBot()
   const { containerRef, spacerRef, lastUserMsgRef, isPinnedToBottom, scrollToBottom } =
     useChatScroll({ phase: chatState === "thinking" ? "awaiting" : chatState })
 
