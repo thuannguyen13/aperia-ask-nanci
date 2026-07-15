@@ -5,7 +5,7 @@ import { MessageCirclePlus, PanelLeft, Settings, Moon } from "lucide-react"
 import Image from "next/image"
 import { useTheme } from "next-themes"
 import {
-  Avatar, AvatarFallback, Button, Switch, Tooltip, TooltipTrigger, TooltipContent,
+  Avatar, AvatarFallback, Button, Switch, Tooltip, TooltipTrigger, TooltipContent, TooltipProvider,
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
   DropdownMenuLabel, DropdownMenuItem,
 } from "aperia-ds5"
@@ -113,12 +113,13 @@ export function Sidebar() {
         )}
       </div>
 
-      {/* Scrollable body */}
-      <div className="flex flex-1 flex-col overflow-y-auto pb-60 min-w-12">
-        <div className={cn("p-2", !isMobile && collapsed && "px-1")}>
-          <SidebarItem icon={MessageCirclePlus} label="New Chat" collapsed={!isMobile && collapsed} onClick={startNewChat} />
-        </div>
+      {/* New Chat — stays onscreen above the scroll area */}
+      <div className={cn("shrink-0 min-w-12 p-2", !isMobile && collapsed && "px-1")}>
+        <SidebarItem icon={MessageCirclePlus} label="New Chat" collapsed={!isMobile && collapsed} onClick={startNewChat} />
+      </div>
 
+      {/* Scrollable recent-chat history */}
+      <div className="flex flex-1 flex-col overflow-y-auto min-h-0 pb-2 min-w-12">
         {/* Recent chats — hidden when collapsed */}
         {(isMobile || !collapsed) && sessions.length > 0 && (
           <div className="p-2">
@@ -152,13 +153,8 @@ export function Sidebar() {
         )}
       </div>
 
-      {/* Footer — pinned to bottom */}
-      <div
-        className={cn(
-          "absolute bottom-0 left-0 right-0 p-2 pb-3 transition-[width,opacity] duration-200",
-          !isMobile && collapsed ? "w-12" : "w-64",
-        )}
-      >
+      {/* Footer — in-flow, sits below the scroll area (no overlap, no reserved padding) */}
+      <div className="shrink-0 bg-sidebar p-2 pb-3 min-w-[256px]">
         {/* Cards — hidden when collapsed */}
         {(isMobile || !collapsed) && (
           <div className="flex flex-col gap-2 mb-4">
@@ -232,7 +228,7 @@ export function Sidebar() {
   )
 
   return (
-    <>
+    <TooltipProvider delayDuration={300}>
       <ConnectWizard
         open={wizardOpen}
         onClose={() => setWizardOpen(false)}
@@ -266,6 +262,6 @@ export function Sidebar() {
       >
         {sidebarContent(true)}
       </aside>
-    </>
+    </TooltipProvider>
   )
 }
