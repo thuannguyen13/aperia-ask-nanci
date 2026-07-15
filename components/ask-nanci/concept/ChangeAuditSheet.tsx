@@ -27,13 +27,21 @@ function Row({ label, value, muted, highlight, amber }: { label: string; value: 
 // Flow-16-style value card (icon swatch + value + sublabel).
 function ValueCard({ value, sublabel, iconKind }: { value: string; sublabel: string; iconKind?: "address" | "bank" | "name" }) {
   const Icon = iconKind === "bank" ? Landmark : iconKind === "name" ? Store : MapPin
+  // US-style two-line address: street on line 1 (keeps trailing comma), city/state/zip on line 2.
+  // Split on the first comma only; gated to addresses so "Company, LLC" name cards stay one line.
+  const comma = value.indexOf(",")
+  const lines = iconKind === "address" && comma !== -1
+    ? [value.slice(0, comma + 1), value.slice(comma + 1).trim()]
+    : [value]
   return (
     <div className="flex flex-1 items-center gap-3 rounded-lg border px-4 py-3.5">
       <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted">
         <Icon className="size-5 text-muted-foreground" />
       </div>
       <div className="min-w-0">
-        <p className="text-base text-foreground">{value}</p>
+        {lines.map((line, i) => (
+          <p key={i} className="text-base leading-snug text-foreground">{line}</p>
+        ))}
         <p className="text-xs text-muted-foreground">{sublabel}</p>
       </div>
     </div>

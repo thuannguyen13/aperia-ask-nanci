@@ -335,6 +335,7 @@ const FLOW19_SHEET: SheetActionData = {
   status: "submitted",
   reference: "AD-3307",
   sentTo: "Account Services team",
+  iconKind: "address",
 };
 
 // ─── Scripted conversations ───────────────────────────────────────────────────
