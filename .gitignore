@@ -8,3 +8,9 @@ References/
 wiki
 .claude/settings.local.json
 .superpowers/
+
+# Playwright
+test-results/
+playwright-report/
+/e2e/.cache
+.playwright/
