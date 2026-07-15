@@ -85,17 +85,18 @@ These keep every panel looking like one system. They're extracted from the exist
 
 8. **Reuse `PanelHeader` / `PanelShell` / `Callout` — never rebuild the header or a callout box inline.** If a panel needs something those don't support, extend the shared component, don't fork it locally.
 
-### Two panel types
+### One unified panel stack
 
-**Simple panels** — single-purpose, own their own open/close state via a dedicated context boolean (e.g. `reportPanelOpen`, `formPanelOpen`). Used when only one instance of that panel can ever be open. Rendered as direct siblings to the main content area inside `AppShell`.
+There is no longer a "simple vs multi" split — every concept panel goes through one path.
 
-**Multi panels** — registered in the `openPanels: string[]` array in context. Opened with `openPanel(id)`, closed with `closePanel(id)` or `closeAllNewPanels()`. Rendered and laid out by `ConceptPanelArea`, which maps panel IDs to grid slots (A/B/C/D) and wraps them in `ResizablePanelGroup`.
-
-Use a simple panel for standalone flows (one panel at a time). Use a multi panel when the flow may open 2–3 panels side by side.
+- **Registry.** Every panel is an entry in the `PANELS` map in `components/ask-nanci/concept/panel-registry.ts`. `PanelId` is derived from its keys (`export type PanelId = keyof typeof PANELS`), so adding a key is all it takes to make a panel referenceable everywhere — there is no separate union to keep in sync. Panels that used to be one-off "simple" panels (`bank-account-form`, `step-up-auth`, `batch-detail`) are ordinary entries in this same map.
+- **Open stack.** The open panels are an ordered `PanelId[]` managed by `usePanelStack` (`lib/ask-nanci/use-panel-stack.ts`) and exposed from `AskNanciContext` as `dynamicPanels`. Insertion order is render order; the stack is capped at 3 (chat is the conceptual 4th slot). Helpers: `openDynamic(id)` pushes a panel (idempotent — no-op if already open), `closeDynamicPanel(id)` / `closePanel(id)` removes one, `closeAllNewPanels()` / `resetDynamic()` clears the stack (and also resets per-panel views + the decline-report filter).
+- **Layout.** `ConceptPanelArea` (`components/ask-nanci/concept/ConceptPanelArea.tsx`) renders `dynamicPanels`: each panel is one equal-height `PanelBox`, looked up by ID in `PANELS` and stacked vertically with a gap, in open order. There are no A/B/C/D grid slots and no `ResizablePanelGroup` in this layout.
+- **Per-panel view state.** A separate `panelViews` record (`PanelId → view string`) is set by `setPanelView(id, view)` and cleared by `clearPanelView(id)`. This is what a turn's `view` field drives — the same panel component can render different views over the flow without being reopened.
 
 ### Panel component structure
 
-Every panel — simple or multi — follows the same internal layout:
+Every panel follows the same internal layout:
 
 ```tsx
 <div className="flex h-full flex-col overflow-hidden">
@@ -114,7 +115,7 @@ Every panel — simple or multi — follows the same internal layout:
 
 - Header is `shrink-0`, body is `flex-1` — never let the header scroll away
 - Always include a close (`X`) button in the header
-- Simple panels close via their own context setter; multi panels call `closePanel(id)`
+- Every panel closes the same way: call `closePanel(id)` (which removes it from the `dynamicPanels` stack)
 
 ### Animating open/close
 
@@ -136,31 +137,29 @@ Panels slide in by transitioning `width` and `opacity`. The panel is always moun
 
 ### Opening panels from scripted flows
 
-In `CONCEPT_SCRIPTED_CONVERSATIONS`, use turn fields to trigger panel opens:
+In `CONCEPT_SCRIPTED_CONVERSATIONS` turns, these fields drive panel effects (the real fields on `ConceptScriptedTurn` in `lib/ask-nanci/types.ts`). They're consumed by `applyTurnEffects` in `AskNanciContext.tsx`:
 
-- `openPanel: "panel-id"` — opens a multi panel via `openPanels`
-- `openFormPanel: true` — opens the bank account form panel
-- `openStepUpPanel: true` — opens step-up auth panel
-- `closeAllPanels: true` — resets all open panels
+- `panel: "panel-id"` — ensures that panel is open (idempotent push onto the `dynamicPanels` stack)
+- `view: "view-name"` — sets that panel's view; if omitted when `panel` is set, the panel resets to its own default view on open. Use together with `panel`.
+- `closePanel: "panel-id"` — closes one panel (e.g. to replace it with another)
+- `filterDeclineReport: true` — switches the decline-report panel into its filtered view
+- `closeAllPanels: true` — resets all open panels (with a staggered close animation), plus panel views and the decline-report filter
 
-### Adding a new multi panel
+### Adding a new panel
 
 1. Create the panel component in `components/ask-nanci/concept/`
-2. Add its ID to the `PanelId` union in `ConceptPanelArea.tsx`
-3. Add a `case` for it in the `PanelContent` switch
-4. Add it to the relevant flow's slot mapping in `mapPanelsToSlots`
-5. Import and add a `case` for `turn.openPanel` in `playConceptScripted` if script-driven
+2. Import it and add a key + `{ component }` entry to the `PANELS` map in `panel-registry.ts` — `PanelId` updates automatically. There is no `PanelId` union to edit, no `PanelContent` switch, and no slot mapping.
+3. To open it from a script, set `panel: "<its-key>"` on a turn (see above). No per-panel `case` in `playConceptScripted` is needed — `applyTurnEffects` opens any registered panel generically.
 
 ### Adding a new concept scripted flow
 
-1. Add the trigger prompt string to `CONCEPT_ALL_PROMPTS` in `concept-config.ts`
-2. Add any follow-up prompts (continuations that shouldn't reset the session) to `CONCEPT_NO_RESET_PROMPTS`
-3. Add the full turn sequence to `CONCEPT_SCRIPTED_CONVERSATIONS` keyed by the trigger prompt
-4. Wire panel opens in the turn objects:
-   - `openPanel: "panel-id"` for multi panels
-   - `openFormPanel: true` / `openStepUpPanel: true` / `openBatchPanel: true` for simple panels
+1. Add a flow definition to `FLOW_DEFS` in `lib/ask-nanci/data/flows.concept.ts`. The prompt lists are all *derived* from it — do not hand-edit them: `CONCEPT_ALL_PROMPTS` (from each flow's `key`), `CONCEPT_NO_RESET_PROMPTS` (from `keepSession` + `followups`), and `CONCEPT_MANUAL_PROMPTS` (from `manual`/`section` + `followups`).
+2. Add the full turn sequence to `CONCEPT_SCRIPTED_CONVERSATIONS` keyed by the flow's `key`.
+3. Wire panel effects in the turn objects with the real fields (see "Opening panels from scripted flows" above):
+   - `panel: "panel-id"` to open a panel, optionally with `view: "view-name"`
+   - `closePanel: "panel-id"` to close one, `filterDeclineReport: true` for the decline-report filter
    - `closeAllPanels: true` to reset at end of flow
-5. If the flow needs a new multi panel, follow "Adding a new multi panel" above first
+4. If the flow needs a new panel, follow "Adding a new panel" above first
 
 ## Demo content
 
