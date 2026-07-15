@@ -809,7 +809,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     {
       role: "assistant",
       content:
-        "Three imported meats carry it. Prosciutto and mortadella together are 60% of the ingredient cost. The provolone and bread are minor. Nothing here is wrong, it is just an expensive sandwich to build.",
+        "Three imported meats carry it. Prosciutto and mortadella together are 60% of the ingredient cost. The provolone and bread are minor. Nothing here is wrong, it is just an expensive sandwich to make.",
       panel: "menu-cost-detail",
       suggestions: CONCEPT_FLOW18_FOLLOWUPS,
     },

@@ -17,7 +17,7 @@ export function CostDetailPanel() {
       />
 
       <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
-        <NanciInsight>Three imported meats carry it. Prosciutto and mortadella together are 60% of the ingredient cost. The provolone and bread are minor. Nothing here is wrong — it&apos;s just an expensive sandwich to build.</NanciInsight>
+        <NanciInsight>Three imported meats carry it. Prosciutto and mortadella together are 60% of the ingredient cost. The provolone and bread are minor. Nothing here is wrong — it&apos;s just an expensive sandwich to make.</NanciInsight>
 
         <div>
           <p className="mb-2 text-base font-bold text-foreground">Ingredient Cost per Sandwich</p>
