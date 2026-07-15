@@ -101,15 +101,20 @@ export function Sidebar() {
             <PanelLeft className="size-4" />
           </button>
         ) : (
-          <button
-            onClick={() => setCollapsed(true)}
-            className={cn(
-              "flex size-6 items-center justify-center rounded text-foreground hover:bg-muted transition-colors",
-              collapsed && "pointer-events-none opacity-0",
-            )}
-          >
-            <PanelLeft className="size-4" />
-          </button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={() => setCollapsed(true)}
+                className={cn(
+                  "flex size-6 items-center justify-center rounded text-foreground hover:bg-muted transition-colors",
+                  collapsed && "pointer-events-none opacity-0",
+                )}
+              >
+                <PanelLeft className="size-4" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Collapse sidebar</TooltipContent>
+          </Tooltip>
         )}
       </div>
 
