@@ -83,7 +83,11 @@ export interface SheetActionData {
   fromValue: string
   toValue: string
   timestamp: string
-  status: "completed"
+  // "completed" = AI applied it directly; "submitted" = sent to a team for review.
+  status: "completed" | "submitted"
+  reference?: string // request reference shown in the submitted-variant hero
+  sentTo?: string // submitted-variant only: the team/queue the request was routed to
+  iconKind?: "address" | "bank" | "name" // icon used in the submitted-variant value cards
 }
 
 export interface Message {

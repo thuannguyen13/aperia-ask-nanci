@@ -1,9 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { CheckCircle2, X } from "lucide-react"
+import { CheckCircle2 } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from "aperia-ds5"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { DRIVER_SUMMARY, EFFECTIVE_RATE, VOLUME, FEES, FEES_TOTAL } from "@/lib/ask-nanci/data/panels/fee-summary"
 import { CHARGEBACK } from "@/lib/ask-nanci/data/panels/chargeback-status"
@@ -14,7 +13,7 @@ import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, Callout, Pane
 const HIGHLIGHT_MS = 2600
 
 export function FeeSummaryPanel() {
-  const { closeDynamicPanel, clearPanelView } = useAskNanci()
+  const { closeDynamicPanel } = useAskNanci()
   const view = usePanelView("fee-summary", "default")
 
   // Show the highlight briefly when the flow sets it, then drop it on a timer.
@@ -26,10 +25,6 @@ export function FeeSummaryPanel() {
     return () => clearTimeout(t)
   }, [view])
 
-  // vaul renders the drawer into this element (callback ref → re-render once set);
-  // the translateZ containing block keeps its fixed overlay + content inside the panel.
-  const [drawerHost, setDrawerHost] = useState<HTMLDivElement | null>(null)
-
   return (
     <PanelShell>
       <PanelHeader
@@ -39,8 +34,7 @@ export function FeeSummaryPanel() {
         onClose={() => closeDynamicPanel("fee-summary")}
       />
 
-      <div ref={setDrawerHost} className="relative flex-1 overflow-hidden [transform:translateZ(0)] [&_[data-slot=drawer-overlay]]:!bg-black/40">
-        <div className="h-full overflow-auto px-4 py-3 space-y-5">
+      <div className="flex-1 overflow-auto px-4 py-3 space-y-5">
           <NanciInsight>
                 <span className="font-bold">+{formatCurrency(DRIVER_SUMMARY.deltaAmount)} vs April</span> — almost all of it is volume. You processed {DRIVER_SUMMARY.volumeChangePct}% more transactions this month. Your effective rate held roughly steady at {EFFECTIVE_RATE.april}–{EFFECTIVE_RATE.may}; the small uptick is entirely the one-time {formatCurrency(DRIVER_SUMMARY.chargebackFee)} chargeback fee from a dispute on May 3, not a pricing change.
           </NanciInsight>
@@ -141,33 +135,19 @@ export function FeeSummaryPanel() {
               </tbody>
             </PanelTable>
           </div>
-        </div>
-
-        {/* Chargeback detail — too small for its own panel, so it slides in as a
-            right drawer contained within this panel (dim overlay via modal). */}
-        <Drawer
-          direction="right"
-          open={view === "chargeback"}
-          onOpenChange={(open) => { if (!open) clearPanelView("fee-summary") }}
-          container={drawerHost}
-        >
-          <DrawerContent className="absolute data-[vaul-drawer-direction=right]:inset-y-2 data-[vaul-drawer-direction=right]:right-2 data-[vaul-drawer-direction=right]:w-[320px] data-[vaul-drawer-direction=right]:max-w-[85%] data-[vaul-drawer-direction=right]:rounded-xl data-[vaul-drawer-direction=right]:border">
-            <DrawerHeader className="flex-row items-center justify-between gap-2 border-b py-3">
-              <DrawerTitle className="text-sm">{formatCurrency(CHARGEBACK.amount)} Chargeback Fee</DrawerTitle>
-              <DrawerClose className="text-muted-foreground hover:text-foreground" aria-label="Close">
-                <X className="size-4" />
-              </DrawerClose>
-            </DrawerHeader>
-
-            <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
-              <Callout variant="green">
-                <div className="flex items-center gap-1.5">
-                  <CheckCircle2 className="size-4 shrink-0" />
-                  {CHARGEBACK.resolution} — {CHARGEBACK.creditNote}
-                </div>
-              </Callout>
-
-              <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
+        {/* Chargeback detail — the answer to "show me that chargeback"; renders inline
+            as the reason this view opened (green-tinted = resolved in the merchant's favor). */}
+        {view === "chargeback" && (
+          <div className="flex flex-col gap-3">
+            <p className="text-base font-bold text-foreground">{formatCurrency(CHARGEBACK.amount)} chargeback fee · {CHARGEBACK.disputeDate}</p>
+            <Callout variant="green">
+              <div className="flex items-center gap-1.5">
+                <CheckCircle2 className="size-4 shrink-0" />
+                {CHARGEBACK.resolution} — {CHARGEBACK.creditNote}
+              </div>
+            </Callout>
+            <div className="rounded-xl border bg-background p-4">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                 {[
                   ["Case", CHARGEBACK.caseId],
                   ["Amount", formatCurrency(CHARGEBACK.amount)],
@@ -175,14 +155,14 @@ export function FeeSummaryPanel() {
                   ["Status", "Closed — merchant favor"],
                 ].map(([label, value]) => (
                   <div key={label}>
-                    <p className="text-[9px] text-muted-foreground">{label}</p>
-                    <p className="font-mono text-xs font-medium text-foreground">{value}</p>
+                    <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-muted-foreground">{label}</p>
+                    <p className="mt-0.5 font-mono text-xs font-medium text-foreground">{value}</p>
                   </div>
                 ))}
               </div>
             </div>
-          </DrawerContent>
-        </Drawer>
+          </div>
+        )}
       </div>
     </PanelShell>
   )

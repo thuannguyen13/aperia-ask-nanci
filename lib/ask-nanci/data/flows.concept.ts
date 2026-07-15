@@ -33,6 +33,55 @@ export const CONCEPT_FLOW9_PROMPT = "none of this is right, my payout is short b
 export const CONCEPT_MENU_MARGIN_PROMPT = "how's the Italian combo doing this month?";
 export const CONCEPT_ADDRESS_PROMPT = "Change my business address";
 
+// Fake end-of-flow follow-up questions — shown for realism only, with no scripted
+// conversation behind them. Clicking one is a no-op (see CONCEPT_FAKE_FOLLOWUPS).
+export const CONCEPT_FLOW13_FOLLOWUPS = [
+  "Investigate payout discrepancy",
+  "Compare this week vs last week",
+  "Review this month's fee changes",
+  "Update deposit bank account",
+];
+
+export const CONCEPT_FLOW14_FOLLOWUPS = [
+  "Investigate payout discrepancy",
+  "Compare this week vs last week",
+  "Check weekend deposit timing",
+];
+
+export const CONCEPT_FLOW15_FOLLOWUPS_FAKE = [
+  "Check weekend deposit timing",
+  "Review this month's fee changes",
+  "Investigate payout discrepancy",
+];
+
+export const CONCEPT_FLOW16_FOLLOWUPS = [
+  "Check weekend deposit timing",
+  "Investigate payout discrepancy",
+  "Update phone number",
+  "Compare this week vs last week",
+];
+
+export const CONCEPT_FLOW18_FOLLOWUPS = [
+  "Compare this week vs last week",
+  "Review this month's fee changes",
+];
+
+export const CONCEPT_FLOW19_FOLLOWUPS = [
+  "Update payment processor MID",
+  "Update deposit bank account",
+];
+
+// Every fake follow-up across flows — handlePrompt treats these as no-op decoration.
+// Add each flow's follow-up array here as the treatment rolls out.
+export const CONCEPT_FAKE_FOLLOWUPS = new Set<string>([
+  ...CONCEPT_FLOW13_FOLLOWUPS,
+  ...CONCEPT_FLOW14_FOLLOWUPS,
+  ...CONCEPT_FLOW15_FOLLOWUPS_FAKE,
+  ...CONCEPT_FLOW16_FOLLOWUPS,
+  ...CONCEPT_FLOW18_FOLLOWUPS,
+  ...CONCEPT_FLOW19_FOLLOWUPS,
+]);
+
 // ─── Flow registry — single source of truth for showcased flows ──────────────
 // One record per welcome-view card. The slug map, the trigger-prompt list, and
 // the welcome cards all derive from this: add a flow here (+ its conversation
@@ -205,6 +254,7 @@ export const FLOW_DEFS: FlowDef[] = [
     badge: "Chat only",
     key: "Change my MID to a new one",
     slug: "5",
+    followups: ["Update my DBA name"],
     description: "AI can't change a MID — diagnoses intent, offers alternatives via chips.",
   },
 ];
@@ -263,8 +313,21 @@ const FLOW5_SHEET: SheetActionData = {
   field: "DBA Name",
   fromValue: "Walker's Books",
   toValue: "Walker Bistro",
-  timestamp: new Date().toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }),
-  status: "completed",
+  timestamp: "Today, 11:20 AM",
+  status: "submitted",
+  reference: "DBA-4416",
+  sentTo: "Merchant Support team",
+  iconKind: "name",
+};
+
+const FLOW19_SHEET: SheetActionData = {
+  field: "Business Address",
+  fromValue: "142 Oak Street, Austin, TX 78701",
+  toValue: "456 Market St, San Francisco, CA 94105",
+  timestamp: "Today, 2:14 PM",
+  status: "submitted",
+  reference: "AD-3307",
+  sentTo: "Account Services team",
 };
 
 // ─── Scripted conversations ───────────────────────────────────────────────────
@@ -342,14 +405,8 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     { role: "user", content: "Change my MID to a new one" },
     {
       role: "assistant",
-      content: "I can't change the MID itself — that's assigned by the processor and requires a new application. Here's what I can help with instead:",
-      suggestions: ["Update my DBA name", "Start a new MID application", "Connect me with my ISO"],
-    },
-    { role: "user", content: "I want my receipts to show a different business name" },
-    {
-      role: "assistant",
-      content: "Got it — that's a DBA update, not a MID change. Want to update it now?",
-      suggestions: ["Yes, update my DBA name"],
+      content: "I can't change the MID itself — that's assigned by the processor and requires a new application. But if the goal is a different business name on receipts, that's a DBA update I can do.",
+      suggestions: ["Update my DBA name"],
     },
   ],
 
@@ -357,27 +414,13 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     { role: "user", content: "Update my DBA name" },
     { role: "assistant", content: 'Your current DBA name on file is "Walker\'s Books". What would you like to change it to?' },
     { role: "user", content: "Walker Bistro" },
-    { role: "assistant", content: 'To confirm — updating your DBA name from "Walker\'s Books" to "Walker Bistro". This is what appears on receipts and cardholder statements. Correct?' },
+    { role: "assistant", content: 'To confirm — submit a request to change your DBA name from "Walker\'s Books" to "Walker Bistro"? This is what appears on receipts and cardholder statements.' },
     { role: "user", content: "Yes, go ahead." },
     {
       role: "assistant",
-      content: 'Done — DBA name updated to "Walker Bistro". Receipts and statements will reflect the new name starting with your next batch.',
+      content: 'Your DBA name change has been submitted for review — I can\'t update what appears on receipts directly, so this goes to the team that can. Once it\'s approved, "Walker Bistro" will show on receipts and statements, typically within 1–2 business days.',
       sheetAction: FLOW5_SHEET,
-      suggestions: ["Pull up the case for Oak Street Coffee", "Show me merchants with decline rates above 15% last week"],
-    },
-  ],
-
-  "Yes, update my DBA name": [
-    { role: "user", content: "Yes, update my DBA name" },
-    { role: "assistant", content: "What would you like the new DBA name to be?" },
-    { role: "user", content: "Walker Bistro" },
-    { role: "assistant", content: 'To confirm — updating DBA from "Walker\'s Books" to "Walker Bistro". Correct?' },
-    { role: "user", content: "Yes." },
-    {
-      role: "assistant",
-      content: 'Done — DBA name updated to "Walker Bistro". Receipts will reflect this starting with your next batch.',
-      sheetAction: FLOW5_SHEET,
-      suggestions: ["Pull up the case for Oak Street Coffee", "Show me merchants with decline rates above 15% last week"],
+      suggestions: otherMerchantPrompts("Change my MID to a new one"),
     },
   ],
 
@@ -628,7 +671,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       content: "Done. You'll get a notification when Sunday's batch funds. Friday and Saturday total $4,860, landing tomorrow.",
       panel: "pending-deposits",
       view: "notified",
-      suggestions: otherMerchantPrompts(CONCEPT_FLOW13_PROMPT),
+      suggestions: CONCEPT_FLOW13_FOLLOWUPS,
     },
   ],
 
@@ -654,7 +697,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       content: "Here it is. It is already resolved in your favor, so the $15 will be credited back on next month's statement.",
       panel: "fee-summary",
       view: "chargeback",
-      suggestions: otherMerchantPrompts(CONCEPT_FLOW14_PROMPT),
+      suggestions: CONCEPT_FLOW14_FOLLOWUPS,
     },
   ],
 
@@ -679,7 +722,9 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     {
       role: "assistant",
       content: "Tuesday, at $1,980. Weather was rough that day if that tracks with what you saw in-store.",
-      suggestions: otherMerchantPrompts(CONCEPT_FLOW15_PROMPT),
+      panel: "sales-snapshot",
+      view: "slow",
+      suggestions: CONCEPT_FLOW15_FOLLOWUPS_FAKE,
     },
   ],
 
@@ -702,7 +747,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     { role: "user", content: "456 Market St, San Francisco, CA 94105" },
     { role: "assistant", content: "Got it — just to confirm, you'd like to update your business address from 142 Oak Street, Austin, TX 78701 to:\n\n456 Market St, San Francisco, CA 94105\n\nIs that correct?\n\n{{MAP}}", map: { address: "456 Market St, San Francisco, CA 94105", lat: 37.7915, lng: -122.3972 } },
     { role: "user", content: "Yes, that's correct." },
-    { role: "assistant", content: "Your change request has been submitted for review — I can't update account details like your business address directly, so this goes to the team that can. Once it's approved, the change to 456 Market St, San Francisco, CA 94105 will be reflected on your account, typically within 1–2 business days. You'll get a confirmation email at your primary address.", suggestions: otherMerchantPrompts(CONCEPT_ADDRESS_PROMPT) },
+    { role: "assistant", content: "Your change request has been submitted for review — I can't update account details like your business address directly, so this goes to the team that can. Once it's approved, the change to 456 Market St, San Francisco, CA 94105 will be reflected on your account, typically within 1–2 business days. You'll get a confirmation email at your primary address.", sheetAction: FLOW19_SHEET, suggestions: CONCEPT_FLOW19_FOLLOWUPS },
   ],
 
   // ── Flow 9: Escalation ─────────────────────────────────────────────────────
@@ -758,7 +803,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       content:
         "Three imported meats carry it. Prosciutto and mortadella together are 60% of the ingredient cost. The provolone and bread are minor. Nothing here is wrong, it is just an expensive sandwich to build.",
       panel: "menu-cost-detail",
-      suggestions: otherMerchantPrompts(CONCEPT_MENU_MARGIN_PROMPT),
+      suggestions: CONCEPT_FLOW18_FOLLOWUPS,
     },
   ],
 };

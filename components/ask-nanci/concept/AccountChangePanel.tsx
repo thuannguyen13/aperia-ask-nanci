@@ -1,10 +1,10 @@
 "use client"
 
-import { Landmark, ArrowRight, CheckCircle2, Clock, Lock } from "lucide-react"
+import { Landmark, ArrowRight, CheckCircle2, Lock } from "lucide-react"
 import { Button, Input, InputOTP, InputOTPGroup, InputOTPSlot, Label, Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "aperia-ds5"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
-import { CURRENT_ACCOUNT, NEW_ACCOUNT, CONFIRMATION_EMAIL, CONFIRMED_AT, REQUEST_REFERENCE } from "@/lib/ask-nanci/data/panels/account-change"
-import { PanelShell, PanelHeader, Callout, NanciInsight } from "@/components/ask-nanci/shared"
+import { CURRENT_ACCOUNT, NEW_ACCOUNT, CONFIRMATION_EMAIL } from "@/lib/ask-nanci/data/panels/account-change"
+import { PanelShell, PanelHeader, Callout } from "@/components/ask-nanci/shared"
 
 function AccountRow({ last4, className }: { last4: string; className?: string }) {
   return (
@@ -112,39 +112,6 @@ function Step2({ onBack, onConfirm }: { onBack: () => void; onConfirm: () => voi
   )
 }
 
-function Step3() {
-  return (
-    <div className="flex flex-1 flex-col overflow-y-auto px-4 py-3 gap-6">
-      <NanciInsight>
-        <span className="font-bold">Request Submitted</span> — a request to route deposits to ************{NEW_ACCOUNT.last4} was sent for verification. Deposits continue going to your current account until it clears, typically within 1–2 business days. A confirmation was sent to {CONFIRMATION_EMAIL} for your records.
-      </NanciInsight>
-
-      <div className="flex flex-col items-center gap-3 pt-2">
-        <div className="flex size-14 items-center justify-center rounded-full bg-amber-400">
-          <Clock className="size-7 text-amber-950" />
-        </div>
-        <div className="text-center">
-          <p className="text-xl font-bold text-foreground">Request Submitted</p>
-          <p className="mt-1 text-sm text-muted-foreground">Submitted today at {CONFIRMED_AT} · Reference {REQUEST_REFERENCE}</p>
-        </div>
-      </div>
-
-      <div className="w-full space-y-2">
-        <div className="flex items-center gap-3">
-          <p className="flex-1 text-base font-medium text-foreground">Current</p>
-          <span className="size-4 shrink-0" />
-          <p className="flex-1 text-base font-medium text-foreground">Requested</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <AccountRow last4={CURRENT_ACCOUNT.last4} />
-          <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
-          <AccountRow last4={NEW_ACCOUNT.last4} />
-        </div>
-      </div>
-    </div>
-  )
-}
-
 export function AccountChangePanel() {
   const { closeDynamicPanel, submitAccountChangeDetails, goBackAccountChangeStep, confirmAccountChange } = useAskNanci()
   const view = usePanelView("account-change", "details")
@@ -159,7 +126,6 @@ export function AccountChangePanel() {
 
       {view === "details" && <Step1 onSubmit={submitAccountChangeDetails} />}
       {view === "confirm" && <Step2 onBack={goBackAccountChangeStep} onConfirm={confirmAccountChange} />}
-      {view === "done" && <Step3 />}
     </PanelShell>
   )
 }

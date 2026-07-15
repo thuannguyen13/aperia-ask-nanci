@@ -1,13 +1,46 @@
 "use client"
 
 import { memo, useState } from "react"
-import type { Message } from "@/lib/ask-nanci/types"
+import { FileText, ArrowUpRight, Clock, Check } from "lucide-react"
+import type { Message, SheetActionData } from "@/lib/ask-nanci/types"
 import { ChatCitedSources } from "./ChatCitedSources"
 import { SuggestedQuestions } from "./SuggestedQuestions"
 import { MessageChart } from "./MessageChart"
 import { MessageMap } from "./MessageMap"
 import { ChangeAuditSheet } from "./concept/ChangeAuditSheet"
 import { AiTriageSummaryWidget } from "./AiTriageSummaryWidget"
+
+// Attachment-style card that opens the change-request/confirmation drawer — more
+// noticeable than a plain text link.
+function ChangeRequestCard({ data, onClick }: { data: SheetActionData; onClick: () => void }) {
+  const submitted = data.status === "submitted"
+  const title = submitted ? "Change request submitted" : "Change confirmation"
+  const subtitle = submitted
+    ? `${data.field}${data.reference ? ` · Ref ${data.reference}` : ""}`
+    : `${data.field} · Completed`
+  return (
+    <button
+      onClick={onClick}
+      className="mt-2 flex w-full items-center gap-3 rounded-xl border bg-gray-100 px-3 py-2.5 text-left transition-colors hover:border-ring hover:bg-gray-200 dark:bg-gray-800/50 dark:hover:bg-gray-800/80"
+    >
+      <div className="relative flex size-10 shrink-0 items-center justify-center rounded-lg border bg-background">
+        <FileText className="size-5 text-muted-foreground" />
+        {/* Status pip — quick-look request state on the thumbnail. */}
+        <span className={`absolute -bottom-1 -right-1 flex size-4 items-center justify-center rounded-full ring-2 ring-background ${submitted ? "bg-amber-400" : "bg-green-500"}`}>
+          {submitted ? <Clock className="size-2.5 text-amber-950" /> : <Check className="size-2.5 text-white" />}
+        </span>
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-semibold text-foreground">{title}</p>
+        <p className="truncate text-xs text-muted-foreground">{subtitle}</p>
+      </div>
+      <span className="flex shrink-0 items-center gap-1.5 rounded-lg border bg-background px-3 py-1.5 text-xs font-medium text-foreground">
+        {submitted ? "View request" : "View change"}
+        <ArrowUpRight className="size-3.5" />
+      </span>
+    </button>
+  )
+}
 
 function parseMarkdown(text: string): React.ReactNode[] {
   const parts = text.split(/(\*\*[^*]+\*\*)/g)
@@ -148,12 +181,7 @@ function BotMessageBase({
         )}
         {showExtras && message.sheetAction && (
           <>
-            <button
-              onClick={() => setSheetOpen(true)}
-              className="mt-2 text-xs font-medium text-primary underline-offset-2 hover:underline"
-            >
-              [view change]
-            </button>
+            <ChangeRequestCard data={message.sheetAction} onClick={() => setSheetOpen(true)} />
             <ChangeAuditSheet open={sheetOpen} onOpenChange={setSheetOpen} data={message.sheetAction} />
           </>
         )}

@@ -1,11 +1,13 @@
 "use client"
 
-import { useAskNanci } from "@/contexts/AskNanciContext"
+import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { WEEK_COMPARE, DAILY_SALES, WEEKDAY_AVG_TRANSACTIONS, SATURDAY_DRILLDOWN, SLOWEST_DAY } from "@/lib/ask-nanci/data/panels/sales-snapshot"
 import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelTable, Th, Td, formatCurrency } from "@/components/ask-nanci/shared"
 
 export function SalesSnapshotPanel() {
   const { closeDynamicPanel } = useAskNanci()
+  // The slow-day follow-up turn sets this view so the table can flag the slowest day.
+  const slowHighlighted = usePanelView("sales-snapshot", "default") === "slow"
 
   return (
     <PanelShell>
@@ -68,16 +70,29 @@ export function SalesSnapshotPanel() {
               </tr>
             </thead>
             <tbody>
-              {DAILY_SALES.map((d) => (
-                <tr key={d.day} className={d.isBest ? "bg-green-50 dark:bg-green-950/20" : ""}>
-                  <Td>{d.date}</Td>
-                  <Td align="right" mono className={d.isBest ? "font-semibold text-green-700 dark:text-green-400" : undefined}>
-                    {formatCurrency(d.sales)}
-                  </Td>
-                  <Td align="right" mono>{d.transactions}</Td>
-                  <Td align="right" mono>{formatCurrency(d.avgTicket)}</Td>
-                </tr>
-              ))}
+              {DAILY_SALES.map((d) => {
+                const isSlow = slowHighlighted && d.day === SLOWEST_DAY.day
+                return (
+                  <tr
+                    key={d.day}
+                    className={d.isBest ? "bg-green-50 dark:bg-green-950/20" : isSlow ? "bg-amber-50 dark:bg-amber-950/20" : ""}
+                  >
+                    <Td>
+                      <span className="font-medium text-foreground">{d.day.slice(0, 3)}</span>
+                      <span className="text-muted-foreground"> · {d.date}</span>
+                    </Td>
+                    <Td
+                      align="right"
+                      mono
+                      className={d.isBest ? "font-semibold text-green-700 dark:text-green-400" : isSlow ? "font-semibold text-amber-700 dark:text-amber-400" : undefined}
+                    >
+                      {formatCurrency(d.sales)}
+                    </Td>
+                    <Td align="right" mono>{d.transactions}</Td>
+                    <Td align="right" mono>{formatCurrency(d.avgTicket)}</Td>
+                  </tr>
+                )
+              })}
             </tbody>
           </PanelTable>
         </div>

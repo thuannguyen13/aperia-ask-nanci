@@ -27,6 +27,9 @@ const BADGE_COLORS: Record<string, string> = {
   "Risk · Looping":  "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",
 }
 
+// Merchant Money cards use the marketing site's solid-blue badge regardless of label.
+const MARKETING_BADGE = "bg-blue-600 text-white"
+
 export function ConceptWelcomeView() {
   const { handlePrompt, triggerProactiveFlow, activateProactiveNotification, embedVariant } = useAskNanci()
   const [proactiveAlertVisible, setProactiveAlertVisible] = useState(false)
@@ -127,7 +130,7 @@ function FlowGrid({ flows, onTryIt, onSimulateLogin }: { flows: FlowDef[]; onTry
               </span>
               <h3 className="text-sm font-semibold text-foreground">{flow.title}</h3>
             </div>
-            <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${BADGE_COLORS[flow.badge] ?? ""}`}>
+            <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${flow.section === "merchant" ? MARKETING_BADGE : BADGE_COLORS[flow.badge] ?? ""}`}>
               {flow.badge}
             </span>
           </div>

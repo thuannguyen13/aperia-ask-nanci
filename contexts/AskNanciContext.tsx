@@ -18,7 +18,8 @@ import type { CurrentUser, PromptCategory } from "@/lib/ask-nanci/api"
 import { MOCK_USAGE, DEFAULT_CURRENT_USER } from "@/lib/ask-nanci/mock-data"
 import { EMBED_DEMO_SOURCES, EMBED_BUSINESS_OWNER_DEMO_SOURCES, EMBED_ISO_DEMO_SOURCES, EMBED_VW_DEMO_SOURCES, SCRIPTED_CONVERSATIONS } from "@/lib/ask-nanci/embed-demo-config"
 import type { EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
-import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_ALL_PROMPTS, CONCEPT_NO_RESET_PROMPTS, CONCEPT_MANUAL_PROMPTS } from "@/lib/ask-nanci/concept-config"
+import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_ALL_PROMPTS, CONCEPT_NO_RESET_PROMPTS, CONCEPT_MANUAL_PROMPTS, CONCEPT_FLOW16_FOLLOWUPS, CONCEPT_FAKE_FOLLOWUPS } from "@/lib/ask-nanci/concept-config"
+import { ACCOUNT_CHANGE_SHEET } from "@/lib/ask-nanci/data/panels/account-change"
 import { CLOVER_SOURCE_ID, ONBOARDING_KEY } from "@/lib/ask-nanci/sourceStore"
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
@@ -557,14 +558,15 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   }, [])
 
   const confirmAccountChange = useCallback(() => {
-    setPanelView("account-change", "done")
+    // Confirmation is a drawer (ChangeAuditSheet), not a panel view — close the panel.
+    closeDynamicPanel("account-change")
     setMessages((prev) => [...prev, { id: newSessionId(), role: "user" as const, content: "Confirm" }])
     setChatState("thinking")
     sleep(600).then(() => streamAssistantReply(
       "Request submitted at 3:40 PM. A confirmation was sent to the email teresawalker@example.com. Deposits continue going to your current account until the new one is verified — typically within 1–2 business days. I'll notify you once it's active.",
-      { suggestions: CONCEPT_ALL_PROMPTS }
+      { sheetAction: ACCOUNT_CHANGE_SHEET, suggestions: CONCEPT_FLOW16_FOLLOWUPS }
     ))
-  }, [streamAssistantReply])
+  }, [streamAssistantReply, closeDynamicPanel])
 
   const submitDisputeDraft = useCallback(() => {
     resetDynamic()
@@ -584,6 +586,8 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
 
   const handlePrompt = useCallback((prompt: string) => {
     if (isConceptVersion) {
+      // Fake end-of-flow follow-ups are decorative only — no conversation behind them.
+      if (CONCEPT_FAKE_FOLLOWUPS.has(prompt)) return
       // A pill that matches the active flow's pending user turn steps it forward,
       // rather than restarting a flow keyed by that same text.
       const flow = activeFlowRef.current
