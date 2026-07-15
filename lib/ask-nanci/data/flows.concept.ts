@@ -35,6 +35,11 @@ export const CONCEPT_ADDRESS_PROMPT = "Change my business address";
 
 // Fake end-of-flow follow-up questions — shown for realism only, with no scripted
 // conversation behind them. Clicking one is a no-op (see CONCEPT_FAKE_FOLLOWUPS).
+export const CONCEPT_FLOW5_FOLLOWUPS = [
+  "Compare this week vs last week",
+  "Review this month's fee changes",
+];
+
 export const CONCEPT_FLOW13_FOLLOWUPS = [
   "Investigate payout discrepancy",
   "Compare this week vs last week",
@@ -74,6 +79,7 @@ export const CONCEPT_FLOW19_FOLLOWUPS = [
 // Every fake follow-up across flows — handlePrompt treats these as no-op decoration.
 // Add each flow's follow-up array here as the treatment rolls out.
 export const CONCEPT_FAKE_FOLLOWUPS = new Set<string>([
+  ...CONCEPT_FLOW5_FOLLOWUPS,
   ...CONCEPT_FLOW13_FOLLOWUPS,
   ...CONCEPT_FLOW14_FOLLOWUPS,
   ...CONCEPT_FLOW15_FOLLOWUPS_FAKE,
@@ -420,7 +426,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       role: "assistant",
       content: 'Your DBA name change has been submitted for review — I can\'t update what appears on receipts directly, so this goes to the team that can. Once it\'s approved, "Walker Bistro" will show on receipts and statements, typically within 1–2 business days.',
       sheetAction: FLOW5_SHEET,
-      suggestions: otherMerchantPrompts("Change my MID to a new one"),
+      suggestions: CONCEPT_FLOW5_FOLLOWUPS,
     },
   ],
 
