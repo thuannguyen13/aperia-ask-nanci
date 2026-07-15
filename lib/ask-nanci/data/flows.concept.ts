@@ -408,7 +408,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
 
   // ── Flow 5: Error Recovery ────────────────────────────────────────────────
   "Change my MID to a new one": [
-    { role: "user", content: "Change my MID to a new one" },
+    { role: "user", content: "Update payment processor MID" },
     {
       role: "assistant",
       content: "I can't change the MID itself — that's assigned by the processor and requires a new application. But if the goal is a different business name on receipts, that's a DBA update I can do.",
