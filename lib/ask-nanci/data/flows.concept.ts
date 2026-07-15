@@ -728,7 +728,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     { role: "user", content: CONCEPT_FLOW15_FOLLOWUP },
     {
       role: "assistant",
-      content: "Tuesday, at $1,980. Weather was rough that day if that tracks with what you saw in-store.",
+      content: "Tuesday, at $1,980 — your slowest by a good margin. I can't tell why from the sales data alone; anything different in-store that day?",
       panel: "sales-snapshot",
       view: "slow",
       suggestions: CONCEPT_FLOW15_FOLLOWUPS_FAKE,
