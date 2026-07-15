@@ -25,7 +25,8 @@ function Row({ label, value, muted, highlight, amber }: { label: string; value: 
 }
 
 // Flow-16-style value card (icon swatch + value + sublabel).
-function ValueCard({ value, sublabel, iconKind }: { value: string; sublabel: string; iconKind?: "address" | "bank" | "name" }) {
+// `highlight` tints it blue (design system: blue = informational) to hint it's the new value.
+function ValueCard({ value, sublabel, iconKind, highlight }: { value: string; sublabel: string; iconKind?: "address" | "bank" | "name"; highlight?: boolean }) {
   const Icon = iconKind === "bank" ? Landmark : iconKind === "name" ? Store : MapPin
   // US-style two-line address: street on line 1 (keeps trailing comma), city/state/zip on line 2.
   // Split on the first comma only; gated to addresses so "Company, LLC" name cards stay one line.
@@ -34,8 +35,8 @@ function ValueCard({ value, sublabel, iconKind }: { value: string; sublabel: str
     ? [value.slice(0, comma + 1), value.slice(comma + 1).trim()]
     : [value]
   return (
-    <div className="flex flex-1 items-center gap-3 rounded-lg border px-4 py-3.5">
-      <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted">
+    <div className={`flex flex-1 items-center gap-3 rounded-lg border px-4 py-3.5 ${highlight ? "border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/20" : ""}`}>
+      <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-foreground/[0.06]">
         <Icon className="size-5 text-muted-foreground" />
       </div>
       <div className="min-w-0">
@@ -87,12 +88,12 @@ export function ChangeAuditSheet({ open, onOpenChange, data }: Props) {
               <div className="flex items-center gap-3">
                 <p className="flex-1 text-base font-medium text-foreground">Current</p>
                 <span className="size-4 shrink-0" />
-                <p className="flex-1 text-base font-medium text-foreground">Requested</p>
+                <p className="flex-1 text-base font-medium text-foreground">New</p>
               </div>
               <div className="flex items-center gap-3">
                 <ValueCard value={data.fromValue} sublabel={data.field} iconKind={data.iconKind} />
                 <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
-                <ValueCard value={data.toValue} sublabel={data.field} iconKind={data.iconKind} />
+                <ValueCard value={data.toValue} sublabel={data.field} iconKind={data.iconKind} highlight />
               </div>
             </div>
           )}
@@ -116,7 +117,7 @@ export function ChangeAuditSheet({ open, onOpenChange, data }: Props) {
                 <Separator />
               </>
             )}
-            <Row label={submitted ? "Submitted At" : "Changed At"} value={data.timestamp} />
+            <Row label={submitted ? "Submitted On" : "Changed At"} value={data.timestamp} />
             <Separator />
             <Row label={submitted ? "Submitted By" : "Changed By"} value="Ask Nanci" />
             <Separator />
