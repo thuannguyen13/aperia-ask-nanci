@@ -1,0 +1,89 @@
+// Aperia Risk — Barometer Report merchant list + Risk Report detail.
+// ponytail: illustrative demo data for the detection-queue narrative, not a live feed.
+
+export type RiskLevel = "High" | "Medium" | "Low"
+export type WorkStatus = "mark-work" | "wip" | "worked"
+
+export interface RiskMerchant {
+  id: string
+  name: string
+  alertTag: number // red triangle count
+  listTag: number // yellow list count
+  vw: number // VisionWeb score /100
+  mc: number // MC/Brighterion score /1000
+  risk: RiskLevel
+  status: WorkStatus
+}
+
+// Merchant List shown on the Barometer Report (Figma order = descending VW score).
+export const RISK_MERCHANTS: RiskMerchant[] = [
+  { id: "regency",   name: "REGENCY FURNITURE MANCHESTER",   alertTag: 3, listTag: 4, vw: 89, mc: 940, risk: "High",   status: "mark-work" },
+  { id: "pbbiller",  name: "PBBILLER.COM",                   alertTag: 3, listTag: 2, vw: 83, mc: 920, risk: "High",   status: "wip" },
+  { id: "ashley",    name: "ASHLEY HOMESTORE - MECHANICSBU", alertTag: 4, listTag: 1, vw: 81, mc: 830, risk: "High",   status: "worked" },
+  { id: "jbhealth",  name: "JB HEALTH SHOP",                 alertTag: 3, listTag: 4, vw: 74, mc: 760, risk: "Medium", status: "wip" },
+  { id: "jbvitality",name: "JB VITALITY BEAUTY",             alertTag: 8, listTag: 3, vw: 71, mc: 720, risk: "Medium", status: "worked" },
+  { id: "icupid",    name: "ICUPID.COM",                     alertTag: 2, listTag: 4, vw: 68, mc: 640, risk: "Medium", status: "mark-work" },
+  { id: "fitnesshub",name: "FITNESSHUB.CLUB",                alertTag: 3, listTag: 1, vw: 65, mc: 640, risk: "Medium", status: "mark-work" },
+  { id: "powerpth",  name: "POWERPTH.COM",                   alertTag: 4, listTag: 4, vw: 62, mc: 600, risk: "Medium", status: "mark-work" },
+  { id: "probiller", name: "PROBILLER.COM",                  alertTag: 1, listTag: 3, vw: 59, mc: 610, risk: "Medium", status: "mark-work" },
+]
+
+export const findMerchant = (id: string) => RISK_MERCHANTS.find((m) => m.id === id)
+
+// Risk Report detail. Fully specified for Regency (the drill-in from the Figma);
+// other merchants render from their list row + these shared defaults.
+export interface RiskReportDetail {
+  mid: string
+  violations: number
+  inQueues: number
+  vwDelta30: string
+  vwParams: number
+  mcDelta7: string
+  mcDelta30: string
+  mcParams: number
+  mcTxns: string
+  mccPercentile: string
+  lastUpdate: string
+  profile: { status: string; profile: string; multiWatch: string; classification: string }
+  account: { lastBatch: string; lastStatement: string; sicMcc: string; phone: string; address: string }
+}
+
+export const RISK_REPORT_DETAILS: Record<string, RiskReportDetail> = {
+  regency: {
+    mid: "4783790283001691",
+    violations: 3,
+    inQueues: 4,
+    vwDelta30: "+28",
+    vwParams: 3,
+    mcDelta7: "+180",
+    mcDelta30: "+410",
+    mcParams: 6,
+    mcTxns: "1,247 Transactions last 30 Days",
+    mccPercentile: "MCC 6051 Top",
+    lastUpdate: "05/03/2026 06:14 AM",
+    profile: { status: "In Review", profile: "No-Profile", multiWatch: "ISO", classification: "—" },
+    account: { lastBatch: "05/12/2026", lastStatement: "05/12/2026", sicMcc: "5099", phone: "(972) 392-2882", address: "PAPILLION, FL 010853016" },
+  },
+}
+
+// Fallback detail so any merchant row drills into a plausible report.
+export const DEFAULT_RISK_DETAIL: RiskReportDetail = {
+  mid: "4783790283000000",
+  violations: 2,
+  inQueues: 2,
+  vwDelta30: "+12",
+  vwParams: 2,
+  mcDelta7: "+40",
+  mcDelta30: "+120",
+  mcParams: 4,
+  mcTxns: "820 Transactions last 30 Days",
+  mccPercentile: "MCC 5999 Top",
+  lastUpdate: "05/03/2026 06:14 AM",
+  profile: { status: "In Review", profile: "No-Profile", multiWatch: "ISO", classification: "—" },
+  account: { lastBatch: "05/12/2026", lastStatement: "05/12/2026", sicMcc: "5999", phone: "(972) 000-0000", address: "PAPILLION, FL 010853016" },
+}
+
+// Transaction Volume Analysis rows (illustrative — mostly zero, matching the Figma).
+export const TXN_VOLUME_ROWS = [
+  "Today", "7-Day", "30-Day", "Monthly Average", "Contract Expected", "June 2026", "May 2026", "April 2026",
+]

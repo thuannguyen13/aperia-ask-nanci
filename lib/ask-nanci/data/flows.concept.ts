@@ -3,6 +3,7 @@
 // concept-config.ts re-exports everything so existing imports don't change.
 
 import type { ConceptScriptedTurn, SheetActionData } from "../types";
+import { RISK_LANDING_CONVERSATIONS } from "./risk-conversations";
 
 // ─── Flow-key constants ───────────────────────────────────────────────────────
 
@@ -372,6 +373,8 @@ const FLOW19_SHEET: SheetActionData = {
 // ─── Scripted conversations ───────────────────────────────────────────────────
 
 export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
+  // Aperia Risk skin — landing quick-action / Nanci's-take chat answers.
+  ...RISK_LANDING_CONVERSATIONS,
   // ── Flow 1: Simple Update ─────────────────────────────────────────────────
   "Update my phone number": [
     { role: "user", content: "Update my phone number" },
