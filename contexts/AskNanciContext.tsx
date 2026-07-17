@@ -154,6 +154,9 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     fetchPromptCategories().then(setPromptCategories)
     fetchAllQuestions().then(setAllQuestions)
     if (!isEmbed) fetchSources().then(setSourcesState)
+    // ponytail: must stay in the effect — a lazy useState initializer would read
+    // localStorage on the client but not the server, mismatching Dialog's `open` on hydrate.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!localStorage.getItem(ONBOARDING_KEY)) setOnboardingOpen(true)
   }, [isEmbed])
 
