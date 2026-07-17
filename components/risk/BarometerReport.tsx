@@ -34,12 +34,14 @@ function ActionButton({ status, onMarkWork }: { status: WorkStatus; onMarkWork: 
   return <Button size="sm" className="w-32 justify-between" onClick={onMarkWork}><span>Mark Work</span><ChevronDown className="size-3.5" /></Button>
 }
 
-export function BarometerReport({ onBack, onOpenMerchant }: { onBack: () => void; onOpenMerchant: (id: string) => void }) {
+export function BarometerReport({ filter, onBack, onOpenMerchant }: { filter?: "critical" | null; onBack: () => void; onOpenMerchant: (id: string) => void }) {
   // Local work-status so the demo's Mark Work is clickable (happy path).
   const [statuses, setStatuses] = useState<Record<string, WorkStatus>>(
     () => Object.fromEntries(RISK_MERCHANTS.map((m) => [m.id, m.status])),
   )
   const markWork = (id: string) => setStatuses((s) => ({ ...s, [id]: "worked" }))
+  // "critical" chip → only the High-risk merchants (both models critical).
+  const merchants = filter === "critical" ? RISK_MERCHANTS.filter((m) => m.risk === "High") : RISK_MERCHANTS
 
   return (
     <div className="flex min-w-0 flex-1 flex-col overflow-y-auto p-4 md:p-6">
@@ -64,7 +66,10 @@ export function BarometerReport({ onBack, onOpenMerchant }: { onBack: () => void
       {/* Merchant list */}
       <div className="mt-6">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-base font-semibold text-foreground">Merchant List</h2>
+          <h2 className="text-base font-semibold text-foreground">
+            Merchant List
+            {filter === "critical" && <span className="ml-2 rounded bg-rose-100 px-1.5 py-0.5 text-xs font-medium text-rose-700 dark:bg-rose-900/40 dark:text-rose-300">VW + MC critical</span>}
+          </h2>
           <div className="flex items-center gap-2">
             <Button variant="secondary" size="sm"><SlidersHorizontal className="size-4" /> Filter</Button>
             <Button variant="secondary" size="sm"><Download className="size-4" /> Export</Button>
@@ -88,7 +93,7 @@ export function BarometerReport({ onBack, onOpenMerchant }: { onBack: () => void
               </tr>
             </thead>
             <tbody>
-              {RISK_MERCHANTS.map((m) => (
+              {merchants.map((m) => (
                 <tr key={m.id} className="border-b last:border-0">
                   <td className="px-4 py-2.5">
                     <button onClick={() => onOpenMerchant(m.id)} className="max-w-[220px] truncate font-medium text-primary hover:underline">{m.name}</button>

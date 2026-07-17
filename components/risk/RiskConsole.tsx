@@ -24,6 +24,9 @@ export function RiskConsole() {
   const { view, startNewChat } = useAskNanci()
   const [dest, setDest] = useState<Dest>("ask-nanci")
   const [merchantId, setMerchantId] = useState<string | null>(null)
+  const [barometerFilter, setBarometerFilter] = useState<"critical" | null>(null)
+
+  const openBarometer = (filter: "critical" | null = null) => { setBarometerFilter(filter); setDest("barometer-report") }
 
   // The Detection Queue nav item stays highlighted across its child reports.
   const inQueue = dest === "detection-queue" || dest === "barometer-report" || dest === "risk-report"
@@ -51,9 +54,9 @@ export function RiskConsole() {
       <div className="flex min-w-0 flex-1 py-1 pr-1">
         <div className="flex min-w-0 flex-1 overflow-hidden rounded-xl border bg-background md:rounded-2xl">
           {dest === "detection-queue" ? (
-            <DetectionQueue onBarometer={() => setDest("barometer-report")} />
+            <DetectionQueue onBarometer={() => openBarometer()} />
           ) : dest === "barometer-report" ? (
-            <BarometerReport onBack={() => setDest("detection-queue")} onOpenMerchant={openMerchant} />
+            <BarometerReport filter={barometerFilter} onBack={() => setDest("detection-queue")} onOpenMerchant={openMerchant} />
           ) : dest === "risk-report" && merchantId ? (
             <RiskReport merchantId={merchantId} onBreadcrumb={setDest} />
           ) : dest === "dashboard" ? (
@@ -70,7 +73,7 @@ export function RiskConsole() {
               </div>
             </div>
           ) : (
-            <RiskLanding />
+            <RiskLanding onOpenView={(_dest, f) => openBarometer(f ?? null)} />
           )}
         </div>
       </div>

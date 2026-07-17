@@ -5,15 +5,22 @@ import { BarChartBig, Clock5 } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { ChatInput } from "@/components/ask-nanci/ChatInput"
 import { ExplorePrompts } from "@/components/ask-nanci/ExplorePrompts"
-import { RISK_HEADLINE_STATS, RISK_QUICK_ACTIONS, RISK_NANCI_TAKES } from "@/lib/ask-nanci/data/risk-landing"
+import { RISK_HEADLINE_STATS, RISK_QUICK_ACTIONS, RISK_NANCI_TAKES, type RiskChipDest, type RiskChipFilter } from "@/lib/ask-nanci/data/risk-landing"
 
 // Ask Nanci home for the Aperia Risk skin. Reuses ChatInput + ExplorePrompts +
 // recent-chats from context; the greeting/stat-line/quick-actions/Nanci's-take
 // sections are the risk-specific additions (Figma: "Aperia Risk Home Page").
-export function RiskLanding() {
+// A chip with a `dest` jumps straight to a risk destination (via onOpenView);
+// otherwise it asks Nanci and the answer streams into the chat.
+export function RiskLanding({ onOpenView }: { onOpenView?: (dest: RiskChipDest, filter?: RiskChipFilter) => void }) {
   const { handlePrompt, sessions, resumeSession, currentUser } = useAskNanci()
   const firstName = currentUser?.name.split(" ")[0] ?? "there"
   const recent = sessions.slice(0, 3)
+
+  const runChip = (chip: { prompt: string; dest?: RiskChipDest; filter?: RiskChipFilter }) => {
+    if (chip.dest && onOpenView) onOpenView(chip.dest, chip.filter)
+    else handlePrompt(chip.prompt)
+  }
 
   return (
     <div className="flex flex-1 flex-col items-center overflow-y-auto px-4 py-8 md:px-8 md:py-12">
@@ -34,10 +41,12 @@ export function RiskLanding() {
 
         {/* Quick-action chips */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {RISK_QUICK_ACTIONS.map(({ label, icon: Icon, iconCls, prompt }) => (
+          {RISK_QUICK_ACTIONS.map((chip) => {
+            const { label, icon: Icon, iconCls } = chip
+            return (
             <button
               key={label}
-              onClick={() => handlePrompt(prompt)}
+              onClick={() => runChip(chip)}
               className="flex items-center gap-2 rounded-xl border bg-card px-3 py-2.5 text-left transition-colors hover:bg-muted"
             >
               <span className={`flex size-7 shrink-0 items-center justify-center rounded-lg ${iconCls}`}>
@@ -45,7 +54,7 @@ export function RiskLanding() {
               </span>
               <span className="text-sm font-medium text-foreground">{label}</span>
             </button>
-          ))}
+          )})}
         </div>
 
         {/* Nanci's take on today */}
@@ -61,7 +70,7 @@ export function RiskLanding() {
             {RISK_NANCI_TAKES.map((take) => (
               <button
                 key={take.title}
-                onClick={() => handlePrompt(take.prompt)}
+                onClick={() => runChip(take)}
                 className="flex gap-2.5 rounded-2xl border bg-card p-4 text-left transition-colors hover:bg-muted"
               >
                 <span className={`mt-1 size-2 shrink-0 rounded-full ${take.dot}`} />
