@@ -9,6 +9,7 @@ import { Button } from "aperia-ds5"
 import { AskNanciProvider, useAskNanci } from "@/contexts/AskNanciContext"
 import { ChatStreamProvider } from "@/contexts/ChatStreamContext"
 import { parseMode, CONCEPT_FLOW_SLUGS, type EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
+import { AppFrame } from "./AppFrame"
 import { Sidebar } from "./Sidebar"
 import { TeachNanciPanel } from "./TeachNanciPanel"
 import { ConceptPanelArea } from "./concept/ConceptPanelArea"
@@ -146,29 +147,29 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <ChatStreamProvider>
     <AskNanciProvider isConceptVersion={isConceptVersion}>
-      <div data-embed="concept" data-theme={CONCEPT_CONFIG.theme} className="relative flex h-screen flex-col md:px-2 md:pb-2">
-        {/* Top bar */}
-        <div className="relative z-10 flex h-10 shrink-0 items-center justify-center">
-          <div className="absolute left-0 flex items-center md:hidden">
-            <MobileSidebarToggle />
-          </div>
-          <Image src={CONCEPT_CONFIG.logo} alt={CONCEPT_CONFIG.alt} width={120} height={24} className="h-6 w-auto" />
-        </div>
-
-        <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden md:rounded-2xl bg-sidebar shadow-sm">
-          <Sidebar />
-          {isConceptVersion ? (
-            <ConceptContentArea>{children}</ConceptContentArea>
-          ) : (
-            <div className="flex min-w-0 flex-1 py-1 pr-1">
-              <TeachNanciPanel />
-              <div className="flex min-w-0 flex-1 overflow-hidden rounded-xl md:rounded-2xl border bg-background">
-                {children}
-              </div>
+      <AppFrame
+        theme={CONCEPT_CONFIG.theme}
+        topBar={
+          <div className="relative z-10 flex h-10 shrink-0 items-center justify-center">
+            <div className="absolute left-0 flex items-center md:hidden">
+              <MobileSidebarToggle />
             </div>
-          )}
-        </div>
-      </div>
+            <Image src={CONCEPT_CONFIG.logo} alt={CONCEPT_CONFIG.alt} width={120} height={24} className="h-6 w-auto" />
+          </div>
+        }
+        sidebar={<Sidebar />}
+      >
+        {isConceptVersion ? (
+          <ConceptContentArea>{children}</ConceptContentArea>
+        ) : (
+          <div className="flex min-w-0 flex-1 py-1 pr-1">
+            <TeachNanciPanel />
+            <div className="flex min-w-0 flex-1 overflow-hidden rounded-xl md:rounded-2xl border bg-background">
+              {children}
+            </div>
+          </div>
+        )}
+      </AppFrame>
 
       <TokenLimitDialog />
       <OnboardingDialog />

@@ -51,7 +51,12 @@ function SidebarItem({
   )
 }
 
-export function Sidebar() {
+// When `menu` is provided the rail renders a fixed nav list (e.g. the Aperia Risk
+// skin) instead of New Chat + recent chats, and hides the Teach Nanci / Usage cards.
+// `brand` swaps the header wordmark. Both optional — default behavior is unchanged.
+type SidebarNavItem = { icon: React.ElementType; label: string; active?: boolean; onClick?: () => void }
+
+export function Sidebar({ menu, brand }: { menu?: SidebarNavItem[]; brand?: { label: string; badge?: string } } = {}) {
   const { sessions, activeSessionId, startNewChat, resumeSession, deleteSessionById, setKbOpen, mobileSidebarOpen, setMobileSidebarOpen, currentUser } = useAskNanci()
   const [collapsed, setCollapsed] = useState(false)
   const [wizardOpen, setWizardOpen] = useState(false)
@@ -82,6 +87,13 @@ export function Sidebar() {
               </TooltipTrigger>
               <TooltipContent side="right">Expand sidebar</TooltipContent>
             </Tooltip>
+          ) : brand ? (
+            <>
+              <span className="text-[15px] font-semibold tracking-tight text-foreground whitespace-nowrap">{brand.label}</span>
+              {brand.badge && (
+                <span className="rounded bg-foreground px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-background">{brand.badge}</span>
+              )}
+            </>
           ) : (
             <>
               <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="Ask Nanci" width={24} height={24} />
@@ -118,15 +130,28 @@ export function Sidebar() {
         )}
       </div>
 
-      {/* New Chat — stays onscreen above the scroll area */}
+      {/* Nav list (menu mode) or New Chat — stays onscreen above the scroll area */}
       <div className={cn("shrink-0 min-w-12 p-2", !isMobile && collapsed && "px-1")}>
-        <SidebarItem icon={MessageCirclePlus} label="New Chat" collapsed={!isMobile && collapsed} onClick={startNewChat} />
+        {menu ? (
+          menu.map((item) => (
+            <SidebarItem
+              key={item.label}
+              icon={item.icon}
+              label={item.label}
+              collapsed={!isMobile && collapsed}
+              onClick={item.onClick}
+              className={item.active ? "bg-muted font-medium" : undefined}
+            />
+          ))
+        ) : (
+          <SidebarItem icon={MessageCirclePlus} label="New Chat" collapsed={!isMobile && collapsed} onClick={startNewChat} />
+        )}
       </div>
 
       {/* Scrollable recent-chat history */}
       <div className="flex flex-1 flex-col overflow-y-auto min-h-0 pb-2 min-w-12">
-        {/* Recent chats — hidden when collapsed */}
-        {(isMobile || !collapsed) && sessions.length > 0 && (
+        {/* Recent chats — hidden when collapsed or in menu mode */}
+        {!menu && (isMobile || !collapsed) && sessions.length > 0 && (
           <div className="p-2">
             <p className="mb-1 flex h-8 items-center px-2 text-xs font-medium text-foreground opacity-70">
               Recent Chat
@@ -160,8 +185,8 @@ export function Sidebar() {
 
       {/* Footer — in-flow, sits below the scroll area (no overlap, no reserved padding) */}
       <div className="shrink-0 bg-sidebar p-2 pb-3 min-w-[256px]">
-        {/* Cards — hidden when collapsed */}
-        {(isMobile || !collapsed) && (
+        {/* Cards — hidden when collapsed or in menu mode */}
+        {!menu && (isMobile || !collapsed) && (
           <div className="flex flex-col gap-2 mb-4">
             
               <div className="relative bg-card rounded-[10px] border p-4 shadow-sm overflow-hidden">
