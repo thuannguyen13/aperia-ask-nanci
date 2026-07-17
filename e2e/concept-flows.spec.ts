@@ -54,6 +54,38 @@ test("data-lookup flow streams an answer and opens the volume panel", async ({ p
   await expect(page.getByText("Volume by Merchant")).toBeVisible({ timeout: STREAM_TIMEOUT })
 })
 
+// Offer flows are manual-step: the answer shows Yes/No pills, tapping "Yes, show me"
+// opens the ranked offer list, then Apply → pre-filled form → Submit drops a
+// pending-review request card into chat. Exercises the whole panel→form→success path.
+test("credit-card offer flow: list → application → pending-review card", async ({ page }) => {
+  await askPrompt(page, "Who am I paying the most on food cost?")
+  await expect(page.getByText(/largest food-cost vendor/)).toBeVisible({ timeout: STREAM_TIMEOUT })
+
+  await page.getByRole("button", { name: "Yes, show me" }).click()
+  await expect(page.getByText("Best Business Credit Cards of July 2026")).toBeVisible({ timeout: STREAM_TIMEOUT })
+
+  // Apply on the first card → pre-filled form (business name is pre-populated).
+  await page.getByRole("button", { name: /Apply Now/ }).first().click()
+  await expect(page.locator('input[value="Sunrise Bistro LLC"]')).toBeVisible()
+
+  await page.getByRole("button", { name: "Submit Application" }).click()
+  await expect(page.getByText("Credit card request submitted")).toBeVisible({ timeout: STREAM_TIMEOUT })
+})
+
+test("business-loan offer flow: list → application → pending-review card", async ({ page }) => {
+  await askPrompt(page, "Do I have enough money for payroll?")
+  await expect(page.getByText(/projected to be/)).toBeVisible({ timeout: STREAM_TIMEOUT })
+
+  await page.getByRole("button", { name: "Yes, show me" }).click()
+  await expect(page.getByText("Best Small Business Loans of July 2026")).toBeVisible({ timeout: STREAM_TIMEOUT })
+
+  await page.getByRole("button", { name: /See Loan Options/ }).first().click()
+  await expect(page.locator('input[value="Sunrise Bistro LLC"]')).toBeVisible()
+
+  await page.getByRole("button", { name: "Submit Application" }).click()
+  await expect(page.getByText("Loan request submitted")).toBeVisible({ timeout: STREAM_TIMEOUT })
+})
+
 test("sales flow opens the weekly sales panel", async ({ page }) => {
   await askPrompt(page, "how'd this week go vs last week?")
 

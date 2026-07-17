@@ -32,6 +32,12 @@ export const CONCEPT_FLOW16_PROMPT = "I changed banks, send my deposits to the n
 export const CONCEPT_FLOW9_PROMPT = "none of this is right, my payout is short by like 600 bucks and I don't get why";
 export const CONCEPT_MENU_MARGIN_PROMPT = "how's the Italian combo doing this month?";
 export const CONCEPT_ADDRESS_PROMPT = "Change my business address";
+export const CONCEPT_CREDIT_CARD_PROMPT = "Who am I paying the most on food cost?";
+export const CONCEPT_BUSINESS_LOAN_PROMPT = "Do I have enough money for payroll?";
+// Both offer flows share the same accept/decline pills (matched per-active-flow, so
+// reuse is safe). "No, ignore for now" is decorative — registered as a fake follow-up.
+export const CONCEPT_OFFER_YES = "Yes, show me";
+export const CONCEPT_OFFER_NO = "No, ignore for now";
 
 // Fake end-of-flow follow-up questions — shown for realism only, with no scripted
 // conversation behind them. Clicking one is a no-op (see CONCEPT_FAKE_FOLLOWUPS).
@@ -85,6 +91,7 @@ export const CONCEPT_FLOW19_FOLLOWUPS = [
 const CONCEPT_FLOW6_FOLLOWUPS_FAKE = ["Show my statement", "Show me the transaction"];
 
 export const CONCEPT_FAKE_FOLLOWUPS = new Set<string>([
+  CONCEPT_OFFER_NO,
   ...CONCEPT_FLOW5_FOLLOWUPS,
   ...CONCEPT_FLOW6_FOLLOWUPS_FAKE,
   ...CONCEPT_FLOW13_FOLLOWUPS,
@@ -269,6 +276,24 @@ export const FLOW_DEFS: FlowDef[] = [
     slug: "5",
     followups: ["Update my DBA name"],
     description: "AI can't change a MID — diagnoses intent, offers alternatives via chips.",
+  },
+  {
+    num: 20,
+    section: "merchant",
+    title: "Credit Card Offer",
+    badge: "Financing",
+    key: CONCEPT_CREDIT_CARD_PROMPT,
+    slug: "20",
+    description: "A vendor-spend spike leads into a ranked business-card list — tap any card to submit a pre-filled application, sent as a request rather than an instant approval.",
+  },
+  {
+    num: 21,
+    section: "merchant",
+    title: "Business Loan Offer",
+    badge: "Financing",
+    key: CONCEPT_BUSINESS_LOAN_PROMPT,
+    slug: "21",
+    description: "A projected payroll shortfall leads into a ranked lender list — tap any option to submit a pre-filled application, handed off to the account services team for review.",
   },
 ];
 
@@ -818,6 +843,44 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
         "Three imported meats carry it. Prosciutto and mortadella together are 60% of the ingredient cost. The provolone and bread are minor. Nothing here is wrong, it is just an expensive sandwich to make.",
       panel: "menu-cost-detail",
       suggestions: CONCEPT_FLOW18_FOLLOWUPS,
+    },
+  ],
+
+  // ── Flow 20: Credit Card Offer ────────────────────────────────────────────
+  // A cost-spike answer nudges toward a card; "Yes" opens the ranked offer list.
+  // The application form + pending-review success live in the panel (submitOfferApplication).
+  [CONCEPT_CREDIT_CARD_PROMPT]: [
+    { role: "user", content: CONCEPT_CREDIT_CARD_PROMPT },
+    {
+      role: "assistant",
+      content:
+        "Your largest food-cost vendor over the last 30 days is **Sysco Foodservice** — $18,420, about 34% of total food spend, up 6% from last month.\n\nIt might help to manage your spend with a business card built for this kind of purchasing — want me to show you what's available?",
+      source: "Vendor Spend Breakdown",
+      suggestions: [CONCEPT_OFFER_YES, CONCEPT_OFFER_NO],
+    },
+    { role: "user", content: CONCEPT_OFFER_YES },
+    {
+      role: "assistant",
+      content: "Here are cards that fit how you spend — tap any one to apply and I'll pre-fill the details I already have.",
+      panel: "credit-card-offer",
+    },
+  ],
+
+  // ── Flow 21: Business Loan Offer ──────────────────────────────────────────
+  [CONCEPT_BUSINESS_LOAN_PROMPT]: [
+    { role: "user", content: CONCEPT_BUSINESS_LOAN_PROMPT },
+    {
+      role: "assistant",
+      content:
+        "Looking at your current balance and upcoming payroll run, you're projected to be **$4,230 short** on Friday. Two open invoices ($6,800 total) aren't expected to land until early next week — after payroll is due.\n\nIt might help to cover the gap with a short-term option — want me to show you what's available?",
+      source: "Cash Flow Forecast",
+      suggestions: [CONCEPT_OFFER_YES, CONCEPT_OFFER_NO],
+    },
+    { role: "user", content: CONCEPT_OFFER_YES },
+    {
+      role: "assistant",
+      content: "Here are lenders that could cover the gap — tap any option to see terms and apply; I'll pre-fill what I know.",
+      panel: "business-loan-offer",
     },
   ],
 };

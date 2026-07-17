@@ -39,6 +39,7 @@ export type PanelAction =
 
 export interface ConceptScriptedTurn extends ScriptedTurn {
   sheetAction?: SheetActionData
+  source?: string
   suggestions?: string[]
   // Unified panel vocabulary (concept-flow pipeline): `panel` ensures a panel is
   // open; add `view` to set its view; `closePanel` closes one panel (e.g. replace).
@@ -89,14 +90,19 @@ export interface ChartWidget {
 
 export interface SheetActionData {
   field: string
-  fromValue: string
-  toValue: string
+  fromValue?: string // omitted for the offer-request variant (no from→to change)
+  toValue?: string
   timestamp: string
   // "completed" = AI applied it directly; "submitted" = sent to a team for review.
   status: "completed" | "submitted"
   reference?: string // request reference shown in the submitted-variant hero
   sentTo?: string // submitted-variant only: the team/queue the request was routed to
   iconKind?: "address" | "bank" | "name" // icon used in the submitted-variant value cards
+  // Offer-request variant (credit-card/loan flows): when set, the drawer drops the
+  // from→to value cards and relabels "Field" → "File"; `product` is the offer shown
+  // in the chat card subtitle. See credit-card-offer / business-loan-offer flows.
+  requestLabel?: string
+  product?: string
 }
 
 export interface Message {
@@ -108,6 +114,7 @@ export interface Message {
   chart?: ChartWidget
   map?: MapWidget
   sheetAction?: SheetActionData
+  source?: string // muted "Source: …" attribution line under a scripted answer
   widget?: "ai-triage-summary"
   /** True when the stream ended (user stopped or natural completion). Prevents re-appending a partial response on session resume. */
   stopped?: boolean

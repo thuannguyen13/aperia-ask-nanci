@@ -51,6 +51,8 @@ function ValueCard({ value, sublabel, iconKind, highlight }: { value: string; su
 
 export function ChangeAuditSheet({ open, onOpenChange, data }: Props) {
   const submitted = data.status === "submitted"
+  // Offer-request variant: no from→to change to show, "Field" reads as "File".
+  const isRequest = !!data.requestLabel
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" showCloseButton className={`flex flex-col ${submitted ? "w-[92vw] sm:w-[680px] sm:!max-w-[680px]" : "w-[400px] sm:w-[480px]"}`}>
@@ -83,7 +85,7 @@ export function ChangeAuditSheet({ open, onOpenChange, data }: Props) {
             </div>
           )}
 
-          {submitted && (
+          {submitted && !isRequest && (
             <div className="w-full space-y-2">
               <div className="flex items-center gap-3">
                 <p className="flex-1 text-base font-medium text-foreground">Current</p>
@@ -91,9 +93,9 @@ export function ChangeAuditSheet({ open, onOpenChange, data }: Props) {
                 <p className="flex-1 text-base font-medium text-foreground">New</p>
               </div>
               <div className="flex items-center gap-3">
-                <ValueCard value={data.fromValue} sublabel={data.field} iconKind={data.iconKind} />
+                <ValueCard value={data.fromValue ?? ""} sublabel={data.field} iconKind={data.iconKind} />
                 <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
-                <ValueCard value={data.toValue} sublabel={data.field} iconKind={data.iconKind} highlight />
+                <ValueCard value={data.toValue ?? ""} sublabel={data.field} iconKind={data.iconKind} highlight />
               </div>
             </div>
           )}
@@ -101,13 +103,13 @@ export function ChangeAuditSheet({ open, onOpenChange, data }: Props) {
           <Separator />
 
           <div className="flex flex-col">
-            <Row label="Field" value={data.field} />
+            <Row label={isRequest ? "File" : "Field"} value={isRequest ? data.requestLabel! : data.field} />
             <Separator />
             {!submitted && (
               <>
-                <Row label="Previous Value" value={data.fromValue} muted />
+                <Row label="Previous Value" value={data.fromValue ?? ""} muted />
                 <Separator />
-                <Row label="New Value" value={data.toValue} highlight />
+                <Row label="New Value" value={data.toValue ?? ""} highlight />
                 <Separator />
               </>
             )}

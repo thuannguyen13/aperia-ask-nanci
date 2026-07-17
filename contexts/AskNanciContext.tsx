@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useCallback, useRef, useEffect } from "react"
-import type { Message, Session, Source, UsageData, ConceptScriptedTurn, PanelId, PanelAction } from "@/lib/ask-nanci/types"
+import type { Message, Session, Source, UsageData, ConceptScriptedTurn, PanelId, PanelAction, SheetActionData } from "@/lib/ask-nanci/types"
 import { usePanelStack } from "@/lib/ask-nanci/use-panel-stack"
 import { turnToPanelActions } from "@/lib/ask-nanci/panel-actions"
 import { usePendingBotSetter } from "@/contexts/ChatStreamContext"
@@ -74,6 +74,7 @@ interface AskNanciCtx {
   setOnboardingOpen: (open: boolean) => void
   isConceptVersion: boolean
   submitFormPanel: () => void
+  submitOfferApplication: (panelId: PanelId, message: string, sheetAction: SheetActionData) => void
   submitStepUpPanel: () => void
   triggerProactiveFlow: () => void
   proactiveNotificationActive: boolean
@@ -367,7 +368,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const playAssistantTurn = useCallback(async (turn: ConceptScriptedTurn, suggestions: string[] | undefined) => {
     await streamWords(turn.content, { id: newSessionId(), shouldStop: () => scriptStopRef.current })
     if (turn.widgetDelay) await sleep(turn.widgetDelay)
-    if (turn.sheetAction || suggestions || turn.widget || turn.map) {
+    if (turn.sheetAction || suggestions || turn.widget || turn.map || turn.source) {
       setMessages((prev) => {
         const next = [...prev]
         const last = next[next.length - 1]
@@ -378,6 +379,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
             ...(suggestions ? { suggestions } : {}),
             ...(turn.widget ? { widget: turn.widget } : {}),
             ...(turn.map ? { map: turn.map } : {}),
+            ...(turn.source ? { source: turn.source } : {}),
           }
         }
         return next
@@ -500,6 +502,17 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setMessages((prev) => [
       ...prev,
       { id: newSessionId(), role: "assistant" as const, content: "Done — your deposit bank account has been updated. Changes take effect within 1–2 business days.", suggestions: CONCEPT_ALL_PROMPTS },
+    ])
+  }, [closeDynamicPanel])
+
+  // Offer flows (credit-card-offer / business-loan-offer): the panel's form submit
+  // closes the panel and drops the pending-review success message + audit card. The
+  // message/sheetAction are built in the panel from the offer the merchant chose.
+  const submitOfferApplication = useCallback((panelId: PanelId, message: string, sheetAction: SheetActionData) => {
+    closeDynamicPanel(panelId)
+    setMessages((prev) => [
+      ...prev,
+      { id: newSessionId(), role: "assistant" as const, content: message, sheetAction, suggestions: CONCEPT_ALL_PROMPTS },
     ])
   }, [closeDynamicPanel])
 
@@ -674,7 +687,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       mobileSidebarOpen, setMobileSidebarOpen,
       onboardingOpen, setOnboardingOpen,
       isConceptVersion,
-      submitFormPanel, submitStepUpPanel,
+      submitFormPanel, submitOfferApplication, submitStepUpPanel,
       triggerProactiveFlow, proactiveNotificationActive, activateProactiveNotification,
       closingPanels, closePanel, closeAllNewPanels, submitDisputeDraft,
       dynamicPanels, closeDynamicPanel,

@@ -14,10 +14,16 @@ import { AiTriageSummaryWidget } from "./AiTriageSummaryWidget"
 // noticeable than a plain text link.
 function ChangeRequestCard({ data, onClick }: { data: SheetActionData; onClick: () => void }) {
   const submitted = data.status === "submitted"
-  const title = submitted ? "Change request submitted" : "Change confirmation"
-  const subtitle = submitted
-    ? `${data.field}${data.reference ? ` · Ref ${data.reference}` : ""}`
-    : `${data.field} · Completed`
+  // Offer-request variant (credit-card/loan): "<X> request submitted" + the offer name.
+  const isRequest = !!data.requestLabel
+  const title = isRequest
+    ? `${data.requestLabel} submitted`
+    : submitted ? "Change request submitted" : "Change confirmation"
+  const subtitle = isRequest
+    ? `${data.product ?? ""}${data.reference ? ` · Ref ${data.reference}` : ""}`
+    : submitted
+      ? `${data.field}${data.reference ? ` · Ref ${data.reference}` : ""}`
+      : `${data.field} · Completed`
   return (
     <button
       onClick={onClick}
@@ -176,6 +182,9 @@ function BotMessageBase({
             <div>{renderContent(displayedContent)}</div>
           )}
         </div>
+        {showExtras && message.source && (
+          <p className="mt-1.5 text-xs text-muted-foreground">Source: {message.source}</p>
+        )}
         {showExtras && message.widget === "ai-triage-summary" && (
           <AiTriageSummaryWidget />
         )}
