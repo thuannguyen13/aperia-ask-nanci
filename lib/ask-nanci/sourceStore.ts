@@ -3,7 +3,7 @@ import { generateId } from "./utils"
 
 const SOURCES_KEY = "asknanci_sources"
 
-export const FOUNDATION_SOURCE_ID = "clover-built-in"
+export const FOUNDATION_SOURCE_ID = "foundation-built-in"
 export const ONBOARDING_KEY   = "ask_nanci_onboarded"
 
 // The pre-configured foundation datasource the product ships with (the dataset a

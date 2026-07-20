@@ -28,16 +28,6 @@ const ACCESS_ONE_SOURCE: Source = {
   addedAt: 0,
 }
 
-const APERIA_SOURCE: Source = {
-  id: FOUNDATION_SOURCE_ID,
-  name: "VisionWeb",
-  kind: "bank",
-  institution: "VisionWeb Data",
-  logo: "/logos/aperia.svg",
-  active: true,
-  addedAt: 0,
-}
-
 // ─── Per-variant source lists ─────────────────────────────────────────────────
 
 export const EMBED_DEMO_SOURCES: Source[] = [
@@ -58,7 +48,7 @@ export const EMBED_VW_DEMO_SOURCES: Source[] = EMBED_DEMO_SOURCES.map((s) =>
 )
 
 export const EMBED_ISO_DEMO_SOURCES: Source[] = [
-  APERIA_SOURCE,
+  FOUNDATION_SOURCE,
   { id: "iso-alloy",   name: "Alloy",            kind: "bank", institution: "Alloy",            logo: "/iso/alloy.svg",         active: true, addedAt: 0 },
   { id: "iso-middesk", name: "Middesk",           kind: "bank", institution: "Middesk",           logo: "/iso/middesk.svg",       active: true, addedAt: 0 },
   { id: "iso-visa",    name: "Visa",              kind: "bank", institution: "Visa",              logo: "/iso/visa.svg",          active: true, addedAt: 0 },

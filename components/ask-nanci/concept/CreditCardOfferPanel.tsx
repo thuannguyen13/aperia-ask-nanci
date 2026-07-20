@@ -37,7 +37,7 @@ function OfferList({ onApply }: { onApply: (c: CardOffer) => void }) {
               <p className="truncate text-xs text-muted-foreground">Best for {c.bestFor}</p>
             </div>
             <Button size="sm" variant="outline" className="shrink-0" onClick={() => onApply(c)}>
-              Apply This <ArrowRight className="size-3.5" />
+              Apply for Credit Card <ArrowRight className="size-3.5" />
             </Button>
           </div>
           <StatStrip stats={cardStats(c)} />
