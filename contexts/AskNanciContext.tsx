@@ -22,7 +22,7 @@ import { EMBED_DEMO_SOURCES, EMBED_BUSINESS_OWNER_DEMO_SOURCES, EMBED_ISO_DEMO_S
 import type { EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
 import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_ALL_PROMPTS, CONCEPT_NO_RESET_PROMPTS, CONCEPT_MANUAL_PROMPTS, CONCEPT_FLOW16_FOLLOWUPS, CONCEPT_FAKE_FOLLOWUPS, CONCEPT_CHAT_TITLES } from "@/lib/ask-nanci/concept-config"
 import { ACCOUNT_CHANGE_SHEET } from "@/lib/ask-nanci/data/panels/account-change"
-import { CLOVER_SOURCE_ID, ONBOARDING_KEY } from "@/lib/ask-nanci/sourceStore"
+import { FOUNDATION_SOURCE_ID, ONBOARDING_KEY } from "@/lib/ask-nanci/sourceStore"
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
@@ -670,7 +670,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
 
   const handleSetSources = useCallback((next: Source[]) => {
     setSourcesState(next)
-    persistSources(next.filter((s) => s.id !== CLOVER_SOURCE_ID))
+    persistSources(next.filter((s) => s.id !== FOUNDATION_SOURCE_ID))
   }, [])
 
   const openSettings = useCallback(() => {

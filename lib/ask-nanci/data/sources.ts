@@ -2,12 +2,24 @@
 // Swap with real API data when wiring the backend.
 
 import type { Source } from "../types"
-import { CLOVER_SOURCE, CLOVER_SOURCE_ID } from "../sourceStore"
+import { FOUNDATION_SOURCE, FOUNDATION_SOURCE_ID } from "../sourceStore"
 
 // ─── Internal build blocks ────────────────────────────────────────────────────
+// Per-host foundation sources (all share FOUNDATION_SOURCE_ID so the "is built-in?"
+// checks stay theme-agnostic). FOUNDATION_SOURCE itself is VisionWeb (see sourceStore).
+
+const CLOVER_SOURCE: Source = {
+  id: FOUNDATION_SOURCE_ID,
+  name: "Clover",
+  kind: "bank",
+  institution: "Clover Data",
+  logo: "/ask-nanci/clover-logo-color.svg",
+  active: true,
+  addedAt: 0,
+}
 
 const ACCESS_ONE_SOURCE: Source = {
-  id: CLOVER_SOURCE_ID,
+  id: FOUNDATION_SOURCE_ID,
   name: "AccessOne",
   kind: "bank",
   institution: "AccessOne Data",
@@ -17,21 +29,11 @@ const ACCESS_ONE_SOURCE: Source = {
 }
 
 const APERIA_SOURCE: Source = {
-  id: CLOVER_SOURCE_ID,
+  id: FOUNDATION_SOURCE_ID,
   name: "VisionWeb",
   kind: "bank",
   institution: "VisionWeb Data",
   logo: "/logos/aperia.svg",
-  active: true,
-  addedAt: 0,
-}
-
-const VISION_WEB_SOURCE: Source = {
-  id: CLOVER_SOURCE_ID,
-  name: "VisionWeb",
-  kind: "bank",
-  institution: "VisionWeb Data",
-  logo: "/logos/vision-web-source-logo.svg",
   active: true,
   addedAt: 0,
 }
@@ -48,11 +50,11 @@ export const EMBED_DEMO_SOURCES: Source[] = [
 ]
 
 export const EMBED_BUSINESS_OWNER_DEMO_SOURCES: Source[] = EMBED_DEMO_SOURCES.map((s) =>
-  s.id === CLOVER_SOURCE_ID ? ACCESS_ONE_SOURCE : s
+  s.id === FOUNDATION_SOURCE_ID ? ACCESS_ONE_SOURCE : s
 )
 
 export const EMBED_VW_DEMO_SOURCES: Source[] = EMBED_DEMO_SOURCES.map((s) =>
-  s.id === CLOVER_SOURCE_ID ? VISION_WEB_SOURCE : s
+  s.id === FOUNDATION_SOURCE_ID ? FOUNDATION_SOURCE : s
 )
 
 export const EMBED_ISO_DEMO_SOURCES: Source[] = [

@@ -6,7 +6,7 @@ import { useEffect, useState } from "react"
 import { Button, Dialog, DialogContent, DialogTitle } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { ConnectWizard } from "./ConnectWizard"
-import { CLOVER_SOURCE, ONBOARDING_KEY, readSources } from "@/lib/ask-nanci/sourceStore"
+import { FOUNDATION_SOURCE, ONBOARDING_KEY, readSources } from "@/lib/ask-nanci/sourceStore"
 
 
 const ROW1 = [
@@ -60,7 +60,7 @@ export function OnboardingDialog() {
   }, [onboardingOpen])
 
   function handleLinked() {
-    setSources([CLOVER_SOURCE, ...readSources()])
+    setSources([FOUNDATION_SOURCE, ...readSources()])
     setWizardOpen(false)
     setOnboardingOpen(false)
     localStorage.setItem(ONBOARDING_KEY, "1")

@@ -3,15 +3,19 @@ import { generateId } from "./utils"
 
 const SOURCES_KEY = "asknanci_sources"
 
-export const CLOVER_SOURCE_ID = "clover-built-in"
+export const FOUNDATION_SOURCE_ID = "clover-built-in"
 export const ONBOARDING_KEY   = "ask_nanci_onboarded"
 
-export const CLOVER_SOURCE: Source = {
-  id: CLOVER_SOURCE_ID,
-  name: "Clover",
+// The pre-configured foundation datasource the product ships with (the dataset a
+// merchant's own added accounts layer on top of). Its value is per-host/theme —
+// the Titan theme (localhost:3000, non-embed) foundation is VisionWeb. Embed
+// variants swap this slot via data/sources.ts (keyed off FOUNDATION_SOURCE_ID).
+export const FOUNDATION_SOURCE: Source = {
+  id: FOUNDATION_SOURCE_ID,
+  name: "VisionWeb",
   kind: "bank",
-  institution: "Clover Data",
-  logo: "/ask-nanci/clover-logo-color.svg",
+  institution: "VisionWeb Data",
+  logo: "/logos/vision-web-source-logo.svg",
   active: true,
   addedAt: 0,
 }

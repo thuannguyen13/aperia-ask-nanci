@@ -25,7 +25,7 @@ import {
   deleteSession,
 } from "./sessionStore"
 import {
-  CLOVER_SOURCE,
+  FOUNDATION_SOURCE,
   readSources,
   writeSources,
   addFileSource,
@@ -63,7 +63,7 @@ export async function* streamChat(
   const map = match?.map
 
   // Cycle through active sources during thinking phase (BE: replace with real thinking chunks)
-  const thinkingSources = activeSources.length ? activeSources : [CLOVER_SOURCE]
+  const thinkingSources = activeSources.length ? activeSources : [FOUNDATION_SOURCE]
   for (const source of thinkingSources) {
     yield { type: "thinking", source }
     await new Promise((r) => setTimeout(r, 1200))
@@ -121,7 +121,7 @@ export function newSessionId(): string {
 // ─── Sources ──────────────────────────────────────────────────────────────────
 
 export async function fetchSources(): Promise<Source[]> {
-  return [CLOVER_SOURCE, ...readSources()]
+  return [FOUNDATION_SOURCE, ...readSources()]
 }
 
 export async function persistSources(sources: Source[]): Promise<void> {

@@ -7,7 +7,7 @@ import { Button, Switch, Separator, Card, CardContent, ScrollArea } from "aperia
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { CLOVER_SOURCE, addFileSources, toggleSource, removeSource, readSources } from "@/lib/ask-nanci/sourceStore"
+import { FOUNDATION_SOURCE, addFileSources, toggleSource, removeSource, readSources } from "@/lib/ask-nanci/sourceStore"
 import { SourceIcon } from "./SourceIcon"
 import type { Source } from "@/lib/ask-nanci/types"
 import { ConnectWizard } from "./ConnectWizard"
@@ -45,7 +45,7 @@ function FileTypeIcon({ name }: { name: string }) {
 // ─── Source row ──────────────────────────────────────────────────────────────
 
 function SourceRow({ source, onToggle, onRemove }: { source: Source; onToggle: () => void; onRemove: () => void }) {
-  const isBuiltIn = source.id === CLOVER_SOURCE.id
+  const isBuiltIn = source.id === FOUNDATION_SOURCE.id
   return (
     <div className={`flex items-center gap-3 py-2.5 ${!source.active ? "opacity-50" : ""}`}>
       {isBuiltIn
@@ -77,10 +77,13 @@ export function TeachNanciPanel() {
   const fileRef = useRef<HTMLInputElement>(null)
   const [wizardOpen, setWizardOpen] = useState(false)
 
-  const userSources = sources.filter((s) => s.id !== CLOVER_SOURCE.id)
+  const userSources = sources.filter((s) => s.id !== FOUNDATION_SOURCE.id)
   const hasSources = userSources.length > 0
+  // The active host's foundation source (VisionWeb non-embed, Clover in the clover
+  // demo, etc.), so the "…Data Added" pill reflects the theme, not a hardcoded brand.
+  const builtIn = sources.find((s) => s.id === FOUNDATION_SOURCE.id) ?? FOUNDATION_SOURCE
 
-  function refresh() { setSources([CLOVER_SOURCE, ...readSources()]) }
+  function refresh() { setSources([FOUNDATION_SOURCE, ...readSources()]) }
   function handleToggle(id: string) { toggleSource(id); refresh() }
   function handleRemove(id: string) { removeSource(id); refresh() }
 
@@ -139,8 +142,8 @@ export function TeachNanciPanel() {
             </div>
 
             <div className="flex items-center justify-center gap-2 rounded-md border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/20 px-3 py-2">
-              <Image src="/ask-nanci/clover-logo-color.svg" alt="Clover" width={16} height={16} className="size-4 shrink-0" />
-              <span className="text-sm font-medium text-foreground">Clover Data Added</span>
+              <Image src={builtIn.logo!} alt={builtIn.name} width={16} height={16} className="size-4 shrink-0" />
+              <span className="text-sm font-medium text-foreground">{builtIn.institution} Added</span>
             </div>
 
             {hasSources ? (

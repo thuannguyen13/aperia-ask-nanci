@@ -86,7 +86,7 @@ describe("streamChat", () => {
     expect(textOf(chunks)).toBe(findResponse("chargebacks")!.content)
   })
 
-  it("emits one thinking chunk per active source (falling back to the built-in Clover source)", async () => {
+  it("emits one thinking chunk per active source (falling back to the built-in foundation source)", async () => {
     const noSources = await drain(streamChat([user("yesterday")], [], "s1"))
     expect(noSources.filter((c) => c.type === "thinking")).toHaveLength(1)
 
