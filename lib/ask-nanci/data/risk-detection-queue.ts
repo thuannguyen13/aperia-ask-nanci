@@ -24,9 +24,9 @@ export const DETECTION_QUEUE: DetectionQueueData = {
   code: "DQ",
   eligibleMerchants: 4036,
   statuses: [
-    { key: "alerted", label: "Alerted",          count: 357, amount: 84901.89, color: "orange",  bar: 10 },
-    { key: "ready",   label: "Ready to work",    count: 11,  amount: 84901.89, color: "teal",    bar: 11 },
-    { key: "wip",     label: "Work in progress", count: 0,   amount: 0,        color: "amber",   bar: 5 },
+    { key: "alerted", label: "Alerted",          count: 357, amount: 84901.89, color: "orange",  bar: 9 },
+    { key: "ready",   label: "Ready to work",    count: 11,  amount: 84901.89, color: "teal",    bar: 9 },
+    { key: "wip",     label: "Work in progress", count: 0,   amount: 0,        color: "amber",   bar: 2.5 },
     { key: "worked",  label: "Worked",           count: 0,   amount: 0,        color: "emerald", bar: 0.5 },
   ],
 }
