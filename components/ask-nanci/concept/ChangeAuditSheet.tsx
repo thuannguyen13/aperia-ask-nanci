@@ -57,7 +57,7 @@ export function ChangeAuditSheet({ open, onOpenChange, data }: Props) {
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" showCloseButton className={`flex flex-col ${submitted ? "w-[92vw] sm:w-[680px] sm:!max-w-[680px]" : "w-[400px] sm:w-[480px]"}`}>
         <SheetHeader>
-          <SheetTitle>{submitted ? "Change Request Submitted" : "Change Confirmation"}</SheetTitle>
+          <SheetTitle>{isRequest ? (data.submittedTitle ?? "Request Submitted") : submitted ? "Change Request Submitted" : "Change Confirmation"}</SheetTitle>
           {/* Kept sr-only on the submitted variant for a11y (Radix needs a description). */}
           <SheetDescription className={submitted ? "sr-only" : undefined}>
             {submitted ? "Record of this change request." : "Audit record for this account update."}
@@ -71,7 +71,7 @@ export function ChangeAuditSheet({ open, onOpenChange, data }: Props) {
                 <Clock className="size-7 text-amber-950" />
               </div>
               <div className="text-center">
-                <p className="text-xl font-bold text-foreground">Request Submitted</p>
+                <p className="text-xl font-bold text-foreground">{data.submittedTitle ?? "Request Submitted"}</p>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Submitted {data.timestamp}{data.reference ? ` · Reference ${data.reference}` : ""}
                 </p>

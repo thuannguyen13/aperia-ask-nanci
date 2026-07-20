@@ -33,6 +33,7 @@ export {
   CONCEPT_MANUAL_PROMPTS,
   CONCEPT_SCRIPTED_CONVERSATIONS,
   CONCEPT_FLOW_SLUGS,
+  CONCEPT_CHAT_TITLES,
 } from "./data/flows.concept"
 
 export { MERCHANT_VOLUME_DATA } from "./data/merchants"

@@ -10,9 +10,9 @@ import {
 } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 
-// Brand logo with an icon fallback: shows /logos/<id>.png if it loads, otherwise the
-// provided icon. Logos are optional — the panels look complete whether or not the
-// images have been dropped into public/logos/ (see scripts/fetch-offer-logos.sh).
+// Brand logo with an icon fallback: shows the offer's `logo` image if it loads,
+// otherwise the provided monogram. Images are optional — the panels look complete
+// whether or not the art has been dropped into public/<flow>-offer/.
 export function OfferLogo({ src, alt, fallback, className }: { src?: string; alt: string; fallback: React.ReactNode; className?: string }) {
   const [errored, setErrored] = useState(false)
   return (
@@ -45,12 +45,12 @@ export function OfferField({ label, value }: { label: string; value: string }) {
   )
 }
 
-export function OfferSelect({ label, value, options }: { label: string; value: string; options: string[] }) {
+export function OfferSelect({ label, value, options, placeholder }: { label: string; value: string; options: string[]; placeholder?: string }) {
   return (
     <div className="flex flex-col gap-1.5">
       <Label className={LABEL}>{label}</Label>
-      <Select defaultValue={value}>
-        <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+      <Select defaultValue={value || undefined}>
+        <SelectTrigger className="w-full"><SelectValue placeholder={placeholder} /></SelectTrigger>
         <SelectContent>
           {options.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
         </SelectContent>

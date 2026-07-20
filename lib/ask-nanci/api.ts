@@ -105,8 +105,8 @@ export async function fetchSessions(): Promise<Session[]> {
 }
 
 // Real: PUT /api/nanci/sessions/:id
-export async function persistSession(messages: Message[], id: string): Promise<Session> {
-  return saveSession(messages, id)
+export async function persistSession(messages: Message[], id: string, titleOverride?: string): Promise<Session> {
+  return saveSession(messages, id, titleOverride)
 }
 
 // Real: DELETE /api/nanci/sessions/:id

@@ -11,18 +11,15 @@ export interface CardOffer {
   rewardsRate: string
   introOffer: string
   approvalChance: ApprovalChance
-  logo: string // /logos/<id>.png — optional at runtime (monogram fallback if missing)
+  logo: string // /credit-card-offer/<file>.png — optional at runtime (monogram fallback if missing)
   mark: string // brand monogram label shown until the logo image loads
   color: string // brand color behind the monogram
 }
 
+// Single Mastercard-branded offer — the demo targets one card, not a ranked list.
+// Drop the card art at public/credit-card-offer/svb-business-card.png (monogram fallback until then).
 export const CREDIT_CARD_OFFERS: CardOffer[] = [
-  { id: "ink-unlimited",   name: "Ink Business Unlimited® Credit Card",          bestFor: "Overall business credit card",     annualFee: "$0",                         rewardsRate: "1.5%–5% Cashback", introOffer: "$1,000",         approvalChance: "High",   logo: "/logos/ink-unlimited.png",   mark: "Chase", color: "#117ACA" },
-  { id: "spark-cash-plus", name: "Capital One Spark Cash Plus",                  bestFor: "No preset spending limit",          annualFee: "$150",                       rewardsRate: "2%–5% Cashback",   introOffer: "$2,000",         approvalChance: "High",   logo: "/logos/spark-cash-plus.png", mark: "C1",    color: "#004977" },
-  { id: "spark-cash",      name: "Capital One Spark Cash",                       bestFor: "No foreign transaction fees",       annualFee: "$0 first year, then $95",    rewardsRate: "2%–5% Cashback",   introOffer: "$1,000",         approvalChance: "Medium", logo: "/logos/spark-cash.png",      mark: "C1",    color: "#004977" },
-  { id: "amex-blue",       name: "The American Express Blue Business Cash™ Card", bestFor: "New businesses",                    annualFee: "$0",                         rewardsRate: "1%–2% Cashback",   introOffer: "$250",           approvalChance: "Medium", logo: "/logos/amex-blue.png",       mark: "AmEx",  color: "#006FCF" },
-  { id: "ink-preferred",   name: "Ink Business Preferred® Credit Card",          bestFor: "Bonus category travel rewards",     annualFee: "$95",                        rewardsRate: "1x–5x Points",     introOffer: "100,000 Points", approvalChance: "Low",    logo: "/logos/ink-preferred.png",   mark: "Chase", color: "#117ACA" },
-  { id: "spark-select",    name: "Capital One Spark Cash Select",                bestFor: "Unlimited 1.5% cash back",          annualFee: "$0",                         rewardsRate: "1.5%–5% Cashback", introOffer: "$750",           approvalChance: "Low",    logo: "/logos/spark-select.png",    mark: "C1",    color: "#004977" },
+  { id: "svb-business", name: "Silicon Valley Bank Business Card", bestFor: "Overall business credit card", annualFee: "$0", rewardsRate: "1.5%-5% | Cashback", introOffer: "$1,000", approvalChance: "High", logo: "/credit-card-offer/svb-business-card.png", mark: "SVB", color: "#1B4D6B" },
 ]
 
 // Pre-filled from the merchant's connected data (see CARD_APPLICANT usage in the form view).
@@ -35,8 +32,8 @@ export const CARD_APPLICANT = {
   businessAddress: "128 Main St, Allen, TX 75013",
   email: "teresawalker@example.com",
   phone: "(214) 555-0148",
-  requestedLimit: "$50,000",
-  avgMonthlyCardSpend: "$18,420",
+  requestedLimit: "$0",
+  avgMonthlyCardSpend: "$0",
 }
 
 export const CARD_LIST_INSIGHT =
@@ -44,4 +41,4 @@ export const CARD_LIST_INSIGHT =
 
 export const CARD_REQUEST_REF = "AD-3308"
 export const CARD_SUCCESS_MESSAGE =
-  "Your card request has been submitted for review. Once it's approved, you'll get a confirmation email at your primary address."
+  "Your credit card request has been submitted for review. Once it's approved, you'll get a confirmation email at your primary address."

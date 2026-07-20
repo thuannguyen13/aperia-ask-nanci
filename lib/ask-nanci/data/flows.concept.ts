@@ -40,6 +40,14 @@ export const CONCEPT_BUSINESS_LOAN_PROMPT = "Do I have enough money for payroll?
 export const CONCEPT_OFFER_YES = "Yes, show me";
 export const CONCEPT_OFFER_NO = "No, ignore for now";
 
+// Curated conversation titles (chat-column header + sidebar item). Figma shows a
+// summarized title, not the raw first prompt. Keyed by the flow's opening prompt;
+// add entries here as each flow's Figma frame specifies a title.
+export const CONCEPT_CHAT_TITLES: Record<string, string> = {
+  [CONCEPT_CREDIT_CARD_PROMPT]: "Top Food Cost Vendor",
+  [CONCEPT_BUSINESS_LOAN_PROMPT]: "Payroll Funds Check",
+};
+
 // Fake end-of-flow follow-up questions — shown for realism only, with no scripted
 // conversation behind them. Clicking one is a no-op (see CONCEPT_FAKE_FOLLOWUPS).
 export const CONCEPT_FLOW5_FOLLOWUPS = [
@@ -857,16 +865,13 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     {
       role: "assistant",
       content:
-        "Your largest food-cost vendor over the last 30 days is **Sysco Foodservice** — $18,420, about 34% of total food spend, up 6% from last month.\n\nIt might help to manage your spend with a business card built for this kind of purchasing — want me to show you what's available?",
+        "Your largest food-cost vendor over the last 30 days is **Sysco Foodservice** — $18,420, about 34% of total food spend, up 6% from last month.\n\nThere's a way to manage your business spend like this more efficiently. Want me to show you what's available?",
       source: "Vendor Spend Breakdown",
       suggestions: [CONCEPT_OFFER_YES, CONCEPT_OFFER_NO],
     },
-    { role: "user", content: CONCEPT_OFFER_YES },
-    {
-      role: "assistant",
-      content: "Here are cards that fit how you spend — tap any one to apply and I'll pre-fill the details I already have.",
-      panel: "credit-card-offer",
-    },
+    // "Yes, show me" opens the panel directly — no assistant bubble (per Figma);
+    // the panel's own NanciInsight carries the framing.
+    { role: "user", content: CONCEPT_OFFER_YES, panel: "credit-card-offer" },
   ],
 
   // ── Flow 21: Business Loan Offer ──────────────────────────────────────────
@@ -875,15 +880,11 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     {
       role: "assistant",
       content:
-        "Looking at your current balance and upcoming payroll run, you're projected to be **$4,230 short** on Friday. Two open invoices ($6,800 total) aren't expected to land until early next week — after payroll is due.\n\nIt might help to cover the gap with a short-term option — want me to show you what's available?",
+        "Looking at your current balance and upcoming payroll run, you're projected to be **$4,230 short** on Friday. Two open invoices ($6,800 total) aren't expected to land until early next week — after payroll is due.\n\nThere's a way to manage your business spend and cover this gap. Want me to show you what's available?",
       source: "Cash Flow Forecast",
       suggestions: [CONCEPT_OFFER_YES, CONCEPT_OFFER_NO],
     },
-    { role: "user", content: CONCEPT_OFFER_YES },
-    {
-      role: "assistant",
-      content: "Here are lenders that could cover the gap — tap any option to see terms and apply; I'll pre-fill what I know.",
-      panel: "business-loan-offer",
-    },
+    // "Yes, show me" opens the panel directly — no assistant bubble (per Figma).
+    { role: "user", content: CONCEPT_OFFER_YES, panel: "business-loan-offer" },
   ],
 };

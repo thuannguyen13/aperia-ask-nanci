@@ -103,6 +103,7 @@ export interface SheetActionData {
   // in the chat card subtitle. See credit-card-offer / business-loan-offer flows.
   requestLabel?: string
   product?: string
+  submittedTitle?: string // offer-request hero/title override (default "Request Submitted")
 }
 
 export interface Message {

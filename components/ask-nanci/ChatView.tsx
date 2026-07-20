@@ -4,6 +4,7 @@ import { ArrowDown } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { usePendingBot } from "@/contexts/ChatStreamContext"
 import { useChatScroll } from "@/hooks/useChatScroll"
+import { PanelHeader } from "./shared"
 import { UserMessage, BotMessage } from "./ChatMessage"
 import { ThinkingIndicator } from "./ThinkingIndicator"
 
@@ -12,13 +13,18 @@ import { ThinkingIndicator } from "./ThinkingIndicator"
 const ENABLE_SCROLL_TO_BOTTOM_BUTTON = false
 
 export function ChatView() {
-  const { messages, chatState } = useAskNanci()
+  const { messages, chatState, chatTitle } = useAskNanci()
   const pendingBot = usePendingBot()
   const { containerRef, spacerRef, lastUserMsgRef, isPinnedToBottom, scrollToBottom } =
     useChatScroll({ phase: chatState === "thinking" ? "awaiting" : chatState })
 
   return (
-    <div className="relative flex-1 min-h-0">
+    <div className="relative flex h-full min-h-0 flex-1 flex-col">
+      {/* Conversation title — the shared PanelHeader (no close button), above the
+          scroll area so it hugs the left on wide panes instead of centering with
+          the messages. `size="lg"` is the borderless, bolder title variant. */}
+      {chatTitle && <PanelHeader title={chatTitle} size="lg" />}
+      <div className="relative min-h-0 flex-1">
       <div ref={containerRef} className="h-full overflow-y-auto">
       <div className="mx-auto w-full max-w-[800px] flex flex-col gap-0 pt-4">
         {messages.map((msg, i) => {
@@ -67,6 +73,7 @@ export function ChatView() {
           <ArrowDown className="size-4 text-foreground" />
         </button>
       )}
+      </div>
     </div>
   )
 }

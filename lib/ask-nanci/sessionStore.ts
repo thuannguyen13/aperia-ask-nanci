@@ -22,11 +22,11 @@ export function writeSessions(sessions: Session[]): void {
   }
 }
 
-export function saveSession(messages: Message[], existingId?: string): Session {
+export function saveSession(messages: Message[], existingId?: string, titleOverride?: string): Session {
   const sessions = readSessions()
   const id = existingId ?? generateId()
   const firstUser = messages.find((m) => m.role === "user")
-  const title = firstUser ? truncate(firstUser.content, 60) : "Untitled chat"
+  const title = titleOverride ?? (firstUser ? truncate(firstUser.content, 60) : "Untitled chat")
 
   const session: Session = { id, title, messages, updatedAt: Date.now() }
   const idx = sessions.findIndex((s) => s.id === id)

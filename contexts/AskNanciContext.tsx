@@ -20,7 +20,7 @@ import type { CurrentUser, PromptCategory } from "@/lib/ask-nanci/api"
 import { MOCK_USAGE, DEFAULT_CURRENT_USER } from "@/lib/ask-nanci/mock-data"
 import { EMBED_DEMO_SOURCES, EMBED_BUSINESS_OWNER_DEMO_SOURCES, EMBED_ISO_DEMO_SOURCES, EMBED_VW_DEMO_SOURCES, SCRIPTED_CONVERSATIONS } from "@/lib/ask-nanci/embed-demo-config"
 import type { EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
-import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_ALL_PROMPTS, CONCEPT_NO_RESET_PROMPTS, CONCEPT_MANUAL_PROMPTS, CONCEPT_FLOW16_FOLLOWUPS, CONCEPT_FAKE_FOLLOWUPS } from "@/lib/ask-nanci/concept-config"
+import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_ALL_PROMPTS, CONCEPT_NO_RESET_PROMPTS, CONCEPT_MANUAL_PROMPTS, CONCEPT_FLOW16_FOLLOWUPS, CONCEPT_FAKE_FOLLOWUPS, CONCEPT_CHAT_TITLES } from "@/lib/ask-nanci/concept-config"
 import { ACCOUNT_CHANGE_SHEET } from "@/lib/ask-nanci/data/panels/account-change"
 import { CLOVER_SOURCE_ID, ONBOARDING_KEY } from "@/lib/ask-nanci/sourceStore"
 
@@ -42,6 +42,7 @@ interface AskNanciCtx {
   view: ChatView
   messages: Message[]
   chatState: ChatState
+  chatTitle: string | null
   sessions: Session[]
   activeSessionId: string | null
   sendMessage: (text: string) => void
@@ -165,7 +166,10 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
 
 
   const persistAndReload = useCallback(async (msgs: Message[]) => {
-    await persistSession(msgs, sessionIdRef.current)
+    // Concept flows carry a curated title (Figma) instead of the raw first prompt.
+    const firstUser = msgs.find((m) => m.role === "user")
+    const titleOverride = firstUser ? CONCEPT_CHAT_TITLES[firstUser.content] : undefined
+    await persistSession(msgs, sessionIdRef.current, titleOverride)
     fetchSessions().then(setSessions)
   }, [])
 
@@ -673,10 +677,14 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setSettingsOpen(true)
   }, [])
 
+  // Curated chat-column title (Figma) for the active concept conversation, else null.
+  const firstUserContent = messages.find((m) => m.role === "user")?.content
+  const chatTitle = isConceptVersion && firstUserContent ? (CONCEPT_CHAT_TITLES[firstUserContent] ?? null) : null
+
   return (
     <Ctx.Provider value={{
       isEmbed, embedVariant,
-      view, messages, chatState, sessions, activeSessionId,
+      view, messages, chatState, chatTitle, sessions, activeSessionId,
       sendMessage, handlePrompt, stopAnimation, startNewChat, replayFlow, resumeSession,
       deleteSessionById,
       sources, setSources: handleSetSources, thinking,

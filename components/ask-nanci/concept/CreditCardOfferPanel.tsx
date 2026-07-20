@@ -29,14 +29,14 @@ function OfferList({ onApply }: { onApply: (c: CardOffer) => void }) {
     <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
       <NanciInsight>{CARD_LIST_INSIGHT}</NanciInsight>
       {CREDIT_CARD_OFFERS.map((c) => (
-        <div key={c.id} className="space-y-2 rounded-xl border p-3">
+        <div key={c.id} className="space-y-2 rounded-lg border p-3">
           <div className="flex items-center gap-3">
             {cardLogo(c)}
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold text-foreground">{c.name}</p>
               <p className="truncate text-xs text-muted-foreground">Best for {c.bestFor}</p>
             </div>
-            <Button size="sm" variant="secondary" className="shrink-0" onClick={() => onApply(c)}>
+            <Button size="sm" variant="outline" className="shrink-0" onClick={() => onApply(c)}>
               Apply Now <ArrowRight className="size-3.5" />
             </Button>
           </div>
@@ -50,9 +50,9 @@ function OfferList({ onApply }: { onApply: (c: CardOffer) => void }) {
 function ApplicationForm({ offer, onBack, onSubmit }: { offer: CardOffer; onBack: () => void; onSubmit: () => void }) {
   return (
     <div className="flex-1 overflow-auto px-4 py-3 space-y-5">
-      <button onClick={onBack} className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-foreground">
+      <Button variant="outline" size="sm" onClick={onBack}>
         <ArrowLeft className="size-3.5" /> Back
-      </button>
+      </Button>
 
       <div className="space-y-2 rounded-xl border p-3">
         <div className="flex items-center gap-3">
@@ -68,7 +68,7 @@ function ApplicationForm({ offer, onBack, onSubmit }: { offer: CardOffer; onBack
       <ApplicantFields applicant={CARD_APPLICANT} />
 
       <div className="flex flex-col gap-3">
-        <SectionLabel>Card Details</SectionLabel>
+        <SectionLabel>Business Info</SectionLabel>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <OfferField label="Requested Credit Limit" value={CARD_APPLICANT.requestedLimit} />
           <OfferField label="Avg. Monthly Card Spend" value={CARD_APPLICANT.avgMonthlyCardSpend} />
@@ -76,7 +76,7 @@ function ApplicationForm({ offer, onBack, onSubmit }: { offer: CardOffer; onBack
       </div>
 
       <div className="flex items-center gap-2">
-        <Checkbox id="cc-consent" defaultChecked />
+        <Checkbox id="cc-consent" />
         <Label htmlFor="cc-consent" className="text-xs text-foreground">I authorize a review of my business financials</Label>
       </div>
 
@@ -95,7 +95,7 @@ export function CreditCardOfferPanel() {
       field: "Credit card request",
       requestLabel: "Credit card request",
       product: selected.name,
-      sentTo: selected.name,
+      sentTo: `${selected.name} Team`,
       reference: CARD_REQUEST_REF,
       timestamp: "Today, 2:14 PM",
       status: "submitted",
@@ -105,7 +105,7 @@ export function CreditCardOfferPanel() {
   return (
     <PanelShell>
       <PanelHeader
-        title={selected ? selected.name : "Best Business Credit Cards of July 2026"}
+        title={selected ? "Credit Card Application" : "Best Business Credit Cards of July 2026"}
         size="lg"
         actions={selected ? undefined : <PanelExportButton />}
         onClose={() => closeDynamicPanel(PANEL_ID)}
