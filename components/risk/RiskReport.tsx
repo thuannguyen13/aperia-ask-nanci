@@ -2,7 +2,10 @@
 
 import { useState } from "react"
 import { MoreHorizontal, FileText, FolderPlus, ChevronDown, Check, CircleCheckBig } from "lucide-react"
-import { Button } from "aperia-ds5"
+import {
+  Button, Label, Textarea, RadioGroup, RadioGroupItem,
+  Popover, PopoverTrigger, PopoverContent,
+} from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
 import { useRiskNav } from "./RiskNavContext"
@@ -49,6 +52,82 @@ function ScoreCard({ brand, score, max, level, deltas, params, extra }: {
 const ACTIVITY_TABS = ["Transactions", "Notes and Case History", "Batch and Chargebacks", "ACH Returns", "Related Merchants"]
 const TXN_COLS = ["CB #", "CB % by #", "CB $", "CB % by $", "RDR #", "RDR $"]
 
+// Row-major order → grid-cols-2 matches the Figma two-column layout.
+const DISPOSITIONS = [
+  "Cleared — No Action", "Hold Funds",
+  "Escalated — Phase 2", "Termination Recommended",
+  "Contact Merchant", "Other (Specify)",
+]
+
+// "Mark Work and Disposition" — opens from the Mark Work dropdown. One radio group
+// (Work in Progress + 6 dispositions are mutually exclusive) plus a note.
+function MarkWorkPopover({ worked, onSubmit }: { worked: boolean; onSubmit: (choice: string, note: string) => void }) {
+  const [open, setOpen] = useState(false)
+  const [choice, setChoice] = useState("")
+  const [note, setNote] = useState("")
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button size="sm" className="justify-between gap-1">
+          {worked ? <span className="flex items-center gap-1"><Check className="size-3.5" /> Worked</span> : "Mark Work"}
+          <ChevronDown className="size-3.5" />
+        </Button>
+      </PopoverTrigger>
+      {/* Popover portals outside the [data-theme="aperia"] scope, so carry just the
+          aperia accent tokens (not its page-background gradient) onto the content. */}
+      <PopoverContent
+        align="end"
+        className="w-[440px] p-0"
+        style={{ "--primary": "#002F67", "--color-primary": "#002F67", "--ring": "#002F67" } as React.CSSProperties}
+      >
+        <div className="border-b px-4 py-3">
+          <p className="text-sm font-semibold text-foreground">Mark Work and Disposition</p>
+        </div>
+
+        <RadioGroup value={choice} onValueChange={setChoice} className="space-y-4 px-4 py-3">
+          <div className="space-y-2">
+            <Label className="text-xs font-semibold text-muted-foreground">Mark Work</Label>
+            <div className="flex items-center gap-2">
+              <RadioGroupItem value="Work in Progress" id="mw-wip" />
+              <Label htmlFor="mw-wip" className="text-sm font-normal">Work in Progress</Label>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-xs font-semibold text-muted-foreground">Disposition</Label>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+              {DISPOSITIONS.map((d) => (
+                <div key={d} className="flex items-center gap-2">
+                  <RadioGroupItem value={d} id={`mw-${d}`} />
+                  <Label htmlFor={`mw-${d}`} className="text-sm font-normal">{d}</Label>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-xs font-semibold text-muted-foreground">Note</Label>
+            <Textarea
+              value={note}
+              onChange={(e) => setNote(e.target.value.slice(0, 7000))}
+              placeholder="Enter note..."
+              rows={note ? 5 : 1}
+              className="resize-none"
+            />
+            {note && <p className="text-xs text-muted-foreground">{note.length.toLocaleString()}/7,000 characters</p>}
+          </div>
+        </RadioGroup>
+
+        <div className="flex justify-end gap-2 px-4 pb-3">
+          <Button variant="secondary" size="sm" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button size="sm" disabled={!choice} onClick={() => { onSubmit(choice, note); setOpen(false) }}>Submit</Button>
+        </div>
+      </PopoverContent>
+    </Popover>
+  )
+}
+
 export function RiskReport() {
   const nav = useRiskNav()
   const m = findMerchant(nav.merchantId ?? "")
@@ -56,6 +135,7 @@ export function RiskReport() {
   const [noteOpen, setNoteOpen] = useState(false)
   const [note, setNote] = useState("")
   const [worked, setWorked] = useState(false)
+  const [disposition, setDisposition] = useState("")
 
   if (!m) return null
 
@@ -77,7 +157,9 @@ export function RiskReport() {
       {worked && (
         <div className="mb-3 flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800 dark:border-green-900 dark:bg-green-950/30 dark:text-green-300">
           <CircleCheckBig className="size-4 shrink-0" />
-          Marked worked — the updated status will reflect on VisionWeb.
+          {disposition === "Work in Progress"
+            ? "Marked Work in Progress — saved to this merchant's case history."
+            : `Disposition set to ${disposition} — the updated status will reflect on VisionWeb.`}
         </div>
       )}
 
@@ -94,10 +176,7 @@ export function RiskReport() {
           <Button variant="secondary" size="icon-sm"><MoreHorizontal className="size-4" /></Button>
           <Button variant="secondary" size="sm" onClick={() => setNoteOpen((o) => !o)}><FileText className="size-4" /> Add Notes</Button>
           <Button variant="secondary" size="sm"><FolderPlus className="size-4" /> Open New Case</Button>
-          <Button size="sm" className="justify-between gap-1" onClick={() => setWorked(true)}>
-            {worked ? <span className="flex items-center gap-1"><Check className="size-3.5" /> Worked</span> : "Mark Work"}
-            <ChevronDown className="size-3.5" />
-          </Button>
+          <MarkWorkPopover worked={worked} onSubmit={(choice) => { setWorked(true); setDisposition(choice) }} />
         </div>
 
         {/* Add Notes popover */}
