@@ -6,8 +6,7 @@ import { Button } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { RISK_NANCI_TAKES } from "@/lib/ask-nanci/data/risk-landing"
 import { DASH_KPIS, DASH_INSIGHTS, type DashChartId, type DashInsight } from "@/lib/ask-nanci/data/risk-dashboard"
-import { ScatterQuadrant } from "./ScatterQuadrant"
-import { AlertVolumeBars } from "./AlertVolumeBars"
+import { DashChart, CHART_TITLES } from "./charts"
 import { DashboardInsightPanel } from "./DashboardInsightPanel"
 
 // A dashboard chart panel — title + AI/menu affordances + highlight ring when the
@@ -93,14 +92,18 @@ export function Dashboard({ onOpenDetectionQueue, onOpenCritical }: { onOpenDete
           ))}
         </div>
 
-        {/* Chart grid (phase 1: scatter + alert volume) */}
+        {/* Chart grid — Figma layout */}
         <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
-          <ChartPanel id="scatter" title="VW Risk Score vs. Mastercard Score — Live Alerted Portfolio" active={isOn("scatter")} dim={anyActive && !isOn("scatter")}>
-            <ScatterQuadrant />
-          </ChartPanel>
-          <ChartPanel id="alert-volume" title="Alert Volume by Assignment" active={isOn("alert-volume")} dim={anyActive && !isOn("alert-volume")}>
-            <AlertVolumeBars />
-          </ChartPanel>
+          {(["high-risk", "scatter", "param-heat", "alert-volume"] as DashChartId[]).map((id) => (
+            <ChartPanel key={id} id={id} title={CHART_TITLES[id]} active={isOn(id)} dim={anyActive && !isOn(id)}>
+              <DashChart id={id} />
+            </ChartPanel>
+          ))}
+          <div className="lg:col-span-2">
+            <ChartPanel id="realert" title={CHART_TITLES.realert} active={isOn("realert")} dim={anyActive && !isOn("realert")}>
+              <DashChart id="realert" />
+            </ChartPanel>
+          </div>
         </div>
       </div>
 

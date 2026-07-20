@@ -3,8 +3,7 @@
 import Image from "next/image"
 import { X, Download } from "lucide-react"
 import { Button } from "aperia-ds5"
-import { AlertVolumeBars } from "./AlertVolumeBars"
-import { ScatterQuadrant } from "./ScatterQuadrant"
+import { DashChart } from "./charts"
 import type { DashInsight } from "@/lib/ask-nanci/data/risk-dashboard"
 
 // The Ask Nanci panel that docks on the right when a "take" is opened: explains the
@@ -41,7 +40,7 @@ export function DashboardInsightPanel({
             <span className="text-xs font-semibold text-foreground">{title}</span>
             <Button variant="secondary" size="xs"><Download className="size-3" /> Export</Button>
           </div>
-          {focusChart === "scatter" ? <ScatterQuadrant /> : <AlertVolumeBars />}
+          <DashChart id={focusChart} />
         </div>
 
         <div>
