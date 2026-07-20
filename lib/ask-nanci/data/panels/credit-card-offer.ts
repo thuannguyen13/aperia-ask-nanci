@@ -37,8 +37,8 @@ export const CARD_APPLICANT = {
 }
 
 export const CARD_LIST_INSIGHT =
-  "Based on what we know about your business, here are cards you may qualify for. Estimated cashback uses each card's lowest published rate against your $18,420/mo Sysco spend, since exact category bonuses vary by issuer. Actual returns could be higher."
+  "Sysco is your largest recurring cost at $18,420/mo. Running that spend through the Silicon Valley Bank Business Card earns cashback on every order — about $276/mo back at the 1.5% base rate, more in bonus categories — with a $0 annual fee and a $1,000 intro offer. Based on your business, you're a strong approval fit."
 
 export const CARD_REQUEST_REF = "AD-3308"
 export const CARD_SUCCESS_MESSAGE =
-  "Your credit card request has been submitted for review. Once it's approved, you'll get a confirmation email at your primary address."
+  "Your credit card application request has been submitted for review. Once it's approved, you'll get a confirmation email — and your new card will arrive in the mail within 7–10 business days."

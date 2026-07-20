@@ -518,7 +518,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     closeDynamicPanel(panelId)
     setMessages((prev) => [
       ...prev,
-      { id: newSessionId(), role: "assistant" as const, content: message, sheetAction, suggestions: CONCEPT_ALL_PROMPTS },
+      { id: newSessionId(), role: "assistant" as const, content: message, sheetAction },
     ])
   }, [closeDynamicPanel])
 

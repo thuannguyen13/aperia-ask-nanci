@@ -37,7 +37,7 @@ function OfferList({ onApply }: { onApply: (c: CardOffer) => void }) {
               <p className="truncate text-xs text-muted-foreground">Best for {c.bestFor}</p>
             </div>
             <Button size="sm" variant="outline" className="shrink-0" onClick={() => onApply(c)}>
-              Apply Now <ArrowRight className="size-3.5" />
+              Apply This <ArrowRight className="size-3.5" />
             </Button>
           </div>
           <StatStrip stats={cardStats(c)} />
@@ -92,10 +92,11 @@ export function CreditCardOfferPanel() {
   const submit = () => {
     if (!selected) return
     submitOfferApplication(PANEL_ID, CARD_SUCCESS_MESSAGE, {
-      field: "Credit card request",
-      requestLabel: "Credit card request",
+      field: "Credit card application",
+      requestLabel: "Credit card application",
+      submittedTitle: "Credit Card Application Submitted",
       product: selected.name,
-      sentTo: `${selected.name} Team`,
+      sentTo: selected.name.replace(/ Business Card$/, ""), // "Silicon Valley Bank Business Card" → "Silicon Valley Bank"
       reference: CARD_REQUEST_REF,
       timestamp: "Today, 2:14 PM",
       status: "submitted",

@@ -34,7 +34,7 @@ function OfferList({ onApply }: { onApply: (l: LoanOffer) => void }) {
             {lenderLogo(l)}
             <p className="min-w-0 flex-1 truncate text-sm font-semibold text-foreground">{l.product}</p>
             <Button size="sm" variant="outline" className="shrink-0" onClick={() => onApply(l)}>
-              See Loan Options <ArrowRight className="size-3.5" />
+              Apply This <ArrowRight className="size-3.5" />
             </Button>
           </div>
           <StatStrip stats={loanStats(l)} />
