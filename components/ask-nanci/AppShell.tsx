@@ -8,10 +8,11 @@ import { useTheme } from "next-themes"
 import { Button } from "aperia-ds5"
 import { AskNanciProvider, useAskNanci } from "@/contexts/AskNanciContext"
 import { ChatStreamProvider } from "@/contexts/ChatStreamContext"
-import { parseMode, CONCEPT_FLOW_SLUGS, type EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
+import { parseMode, CONCEPT_FLOW_SLUGS, CONCEPT_EMBED_FLOW_LAYOUTS, type EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
 import { AppFrame } from "./AppFrame"
 import { Sidebar } from "./Sidebar"
 import { TeachNanciPanel } from "./TeachNanciPanel"
+import { ServiceMarketplacePanel } from "./ServiceMarketplacePanel"
 import { ConceptPanelArea } from "./concept/ConceptPanelArea"
 import { TokenLimitDialog } from "./TokenLimitDialog"
 import { OnboardingDialog } from "./OnboardingDialog"
@@ -64,6 +65,8 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
   return (
     <div className={`flex min-w-0 flex-1 py-1 pr-1${noSidebar ? " pl-1" : ""}`}>
       <TeachNanciPanel />
+      {/* Marketplace panel only where a sidebar can open it (not the compact widget). */}
+      {!noSidebar && <ServiceMarketplacePanel />}
       {/* Chat is always mounted at this position so React never remounts it.
           It stays on the left in every mode (matching the latest flows); in DQ mode it
           just shrinks to a fixed width while the panel area fills the space to its right. */}
@@ -98,6 +101,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { isEmbed, embedVariant, isConceptVersion } = parseMode(searchParams.get("mode"))
   const rawFlow = searchParams.get("flow")
   const autoPlayFlow = (rawFlow && CONCEPT_FLOW_SLUGS[rawFlow]) ?? null
+  // Per-flow embed layout: some flows (e.g. 22, Service Marketplace) render the full
+  // app shell (sidebar + standard welcome) instead of the compact concept-embed widget.
+  const embedLayout = (rawFlow && CONCEPT_EMBED_FLOW_LAYOUTS[rawFlow]) || null
   const { setTheme } = useTheme()
 
   useEffect(() => {
@@ -114,9 +120,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   if (isEmbed) {
     const config = EMBED_CONFIG[embedVariant!]
     const isConceptEmbed = embedVariant === "concept-embed"
+    // Full-app embed flows (e.g. Service Marketplace) render the sidebar + standard
+    // WelcomeView, so they behave like the default app (not the concept demo catalog).
+    const fullApp = !!embedLayout?.fullApp
     return (
       <ChatStreamProvider>
-      <AskNanciProvider isEmbed embedVariant={embedVariant} isConceptVersion={isConceptVersion} autoPlayFlow={autoPlayFlow}>
+      <AskNanciProvider
+        isEmbed
+        embedVariant={embedVariant}
+        isConceptVersion={fullApp ? false : isConceptVersion}
+        autoPlayFlow={autoPlayFlow}
+        initialView={fullApp ? "welcome" : undefined}
+        initialMarketplaceOpen={embedLayout?.openMarketplace}
+      >
         <div
           data-embed={embedVariant}
           data-theme={config.theme}
@@ -124,10 +140,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         >
           <div className="relative z-10 flex h-10 shrink-0 items-center justify-center">
             <Image src={config.logo} alt={config.alt} width={isConceptEmbed ? 120 : 80} height={24} className="h-6 w-auto" />
-            {isConceptEmbed && <ReplayButton />}
+            {isConceptEmbed && !fullApp && <ReplayButton />}
           </div>
           <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden md:rounded-2xl bg-sidebar shadow-sm">
-            {isConceptEmbed ? (
+            {fullApp ? (
+              <>
+                <Sidebar />
+                <div className="flex min-w-0 flex-1 py-1 pr-1 pl-1">
+                  <TeachNanciPanel />
+                  <ServiceMarketplacePanel />
+                  <div className="flex min-w-0 flex-1 overflow-hidden rounded-xl md:rounded-2xl border bg-background">
+                    {children}
+                  </div>
+                </div>
+              </>
+            ) : isConceptEmbed ? (
               <ConceptContentArea noSidebar>{children}</ConceptContentArea>
             ) : (
               <div className="flex min-w-0 flex-1 py-1 px-1">
@@ -164,6 +191,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         ) : (
           <div className="flex min-w-0 flex-1 py-1 pr-1">
             <TeachNanciPanel />
+            <ServiceMarketplacePanel />
             <div className="flex min-w-0 flex-1 overflow-hidden rounded-xl md:rounded-2xl border bg-background">
               {children}
             </div>

@@ -57,6 +57,8 @@ interface AskNanciCtx {
   thinking: { source: Source | null; label: string }
   kbOpen: boolean
   setKbOpen: (open: boolean) => void
+  marketplaceOpen: boolean
+  setMarketplaceOpen: (open: boolean) => void
   draft: string
   setDraft: (text: string) => void
   error: string | null
@@ -111,8 +113,8 @@ export function usePanelView(id: PanelId, fallback: string): string {
   return useAskNanci().panelViews[id] ?? fallback
 }
 
-export function AskNanciProvider({ children, isEmbed = false, embedVariant = null, isConceptVersion = false, autoPlayFlow = null }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null; isConceptVersion?: boolean; autoPlayFlow?: string | null }) {
-  const [view, setView] = useState<ChatView>(embedVariant === "concept-embed" ? "chat" : "welcome")
+export function AskNanciProvider({ children, isEmbed = false, embedVariant = null, isConceptVersion = false, autoPlayFlow = null, initialView, initialMarketplaceOpen = false }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null; isConceptVersion?: boolean; autoPlayFlow?: string | null; initialView?: ChatView; initialMarketplaceOpen?: boolean }) {
+  const [view, setView] = useState<ChatView>(initialView ?? (embedVariant === "concept-embed" ? "chat" : "welcome"))
   const [messages, setMessages] = useState<Message[]>([])
   const [chatState, setChatState] = useState<ChatState>("idle")
   const [sessions, setSessions] = useState<Session[]>([])
@@ -128,7 +130,19 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       EMBED_DEMO_SOURCES) : []
   )
   const [thinking, setThinking] = useState<{ source: Source | null; label: string }>({ source: null, label: "Thinking…" })
-  const [kbOpen, setKbOpen] = useState(false)
+  // Teach Nanci and Service Marketplace are mutually exclusive — opening one
+  // closes the other (one panel per user action). Enforced in the setters so
+  // every call site (sidebar, welcome page) gets the behavior for free.
+  const [kbOpen, setKbOpenState] = useState(false)
+  const [marketplaceOpen, setMarketplaceOpenState] = useState(initialMarketplaceOpen)
+  const setKbOpen = useCallback((open: boolean) => {
+    setKbOpenState(open)
+    if (open) setMarketplaceOpenState(false)
+  }, [])
+  const setMarketplaceOpen = useCallback((open: boolean) => {
+    setMarketplaceOpenState(open)
+    if (open) setKbOpenState(false)
+  }, [])
   const [draft, setDraft] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [usage] = useState<UsageData>(MOCK_USAGE)
@@ -689,6 +703,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       deleteSessionById,
       sources, setSources: handleSetSources, thinking,
       kbOpen, setKbOpen,
+      marketplaceOpen, setMarketplaceOpen,
       draft, setDraft,
       error,
       usage, currentUser, promptCategories, allQuestions,

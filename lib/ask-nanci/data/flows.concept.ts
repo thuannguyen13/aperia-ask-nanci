@@ -312,6 +312,17 @@ export const CONCEPT_FLOW_SLUGS: Record<string, string> = Object.fromEntries(
   FLOW_DEFS.flatMap((f) => [...(f.slug ? [[f.slug, f.key] as [string, string]] : []), ...(f.altEntries?.map((e) => [e.slug, e.key] as [string, string]) ?? [])]),
 );
 
+// Per-flow embed layout overrides (?mode=concept-embed&flow=<slug>). Default
+// concept-embed is the sidebar-less compact chat widget; a flow listed here opts
+// into the full app shell (sidebar + standard welcome page) instead. Extend per flow.
+export interface ConceptEmbedLayout {
+  fullApp: boolean       // render Sidebar + standard WelcomeView instead of the compact widget
+  openMarketplace?: boolean // auto-open the Service Marketplace panel on load
+}
+export const CONCEPT_EMBED_FLOW_LAYOUTS: Record<string, ConceptEmbedLayout> = {
+  "22": { fullApp: true }, // Merchant Service Marketplace — panel opens from the sidebar banner
+};
+
 // Trigger prompts (routing guard + recycled as end-of-flow suggestion chips), in
 // ascending card number. Proactive flows have no prompt and are excluded.
 export const CONCEPT_ALL_PROMPTS = [...FLOW_DEFS]

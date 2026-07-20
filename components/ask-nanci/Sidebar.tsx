@@ -57,7 +57,7 @@ function SidebarItem({
 type SidebarNavItem = { icon: React.ElementType; label: string; active?: boolean; onClick?: () => void }
 
 export function Sidebar({ menu, brand }: { menu?: SidebarNavItem[]; brand?: { label: string; badge?: string } } = {}) {
-  const { sessions, activeSessionId, startNewChat, resumeSession, deleteSessionById, setKbOpen, mobileSidebarOpen, setMobileSidebarOpen, currentUser } = useAskNanci()
+  const { sessions, activeSessionId, startNewChat, resumeSession, deleteSessionById, setKbOpen, setMarketplaceOpen, mobileSidebarOpen, setMobileSidebarOpen, currentUser } = useAskNanci()
   const [collapsed, setCollapsed] = useState(false)
   const [wizardOpen, setWizardOpen] = useState(false)
   const { resolvedTheme, setTheme } = useTheme()
@@ -207,10 +207,21 @@ export function Sidebar({ menu, brand }: { menu?: SidebarNavItem[]; brand?: { la
                   <Settings />
                 </Button>
                 </div>
-                
-                
+
+
               </div>
-            
+
+              {/* Service Marketplace banner (Flow 22) — opens the marketplace panel */}
+              <div className="relative bg-card rounded-[10px] border p-4 shadow-sm overflow-hidden">
+                <p className="text-sm font-semibold text-foreground">Service Marketplace</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Mastercard Services brings financial tools built for businesses like yours, not generic consumer products.
+                </p>
+                <Button className="w-full mt-3" size="sm" onClick={() => setMarketplaceOpen(true)}>
+                  Learn More
+                </Button>
+              </div>
+
             <UsageCard />
           </div>
         )}
