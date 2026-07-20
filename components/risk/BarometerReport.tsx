@@ -48,7 +48,7 @@ export function BarometerReport() {
   const merchants = filter === "critical" ? RISK_MERCHANTS.filter((m) => m.risk === "High") : RISK_MERCHANTS
 
   return (
-    <PanelShell>
+    <PanelShell className="min-w-0 flex-1">
       <PanelHeader
         title="Barometer Report"
         subtitle="04/23/2026"

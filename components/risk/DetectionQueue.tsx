@@ -11,7 +11,7 @@ export function DetectionQueue() {
   const openBarometer = () => nav.openBarometer()
 
   return (
-    <PanelShell>
+    <PanelShell className="min-w-0 flex-1">
       <PanelHeader
         title="Detection Queue"
         size="lg"

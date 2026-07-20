@@ -60,7 +60,7 @@ export function RiskReport() {
   if (!m) return null
 
   return (
-    <PanelShell>
+    <PanelShell className="min-w-0 flex-1">
       <PanelHeader title={m.name} size="lg" onClose={() => nav.go("barometer-report")} />
 
       <div className="flex-1 overflow-y-auto p-4 md:p-6">

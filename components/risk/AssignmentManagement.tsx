@@ -21,7 +21,7 @@ export function AssignmentManagement() {
   const rows = tab === "All" ? ASSIGNMENTS : ASSIGNMENTS.filter((a) => a.status === tab)
 
   return (
-    <PanelShell>
+    <PanelShell className="min-w-0 flex-1">
       <PanelHeader
         title="Assignment Management"
         size="lg"

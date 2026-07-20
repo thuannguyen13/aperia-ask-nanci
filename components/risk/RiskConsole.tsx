@@ -8,6 +8,7 @@ import { AppFrame } from "@/components/ask-nanci/AppFrame"
 import { Sidebar } from "@/components/ask-nanci/Sidebar"
 import { ChatView } from "@/components/ask-nanci/ChatView"
 import { ChatInput } from "@/components/ask-nanci/ChatInput"
+import { ConceptPanelArea } from "@/components/ask-nanci/concept/ConceptPanelArea"
 import { PANELS } from "@/components/ask-nanci/concept/panel-registry"
 import type { PanelId } from "@/lib/ask-nanci/types"
 import { RiskLanding } from "./RiskLanding"
@@ -58,6 +59,7 @@ export function RiskConsole() {
     >
       <RiskNavProvider value={{ go: setDest, openBarometer, openMerchant, merchantId, barometerFilter }}>
         <div className="flex min-w-0 flex-1 py-1 pr-1">
+          {/* Primary box: the active destination panel (or the Ask Nanci home) */}
           <div className="flex min-w-0 flex-1 overflow-hidden rounded-xl border bg-background md:rounded-2xl">
             {ActivePanel ? (
               <ActivePanel />
@@ -74,6 +76,8 @@ export function RiskConsole() {
               <RiskLanding onOpenView={(_dest, f) => openBarometer(f ?? null)} />
             )}
           </div>
+          {/* Side panels (e.g. the Dashboard insight) — siblings, not nested */}
+          <ConceptPanelArea />
         </div>
       </RiskNavProvider>
     </AppFrame>
