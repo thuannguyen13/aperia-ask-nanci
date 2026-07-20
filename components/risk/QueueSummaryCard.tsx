@@ -52,7 +52,7 @@ function StatusChart({ statuses }: { statuses: QueueStatus[] }) {
       <div className="flex flex-col justify-between py-1 text-[10px] tabular-nums text-muted-foreground">
         {CHART_TICKS.map((t) => <span key={t}>{t}</span>)}
       </div>
-      <div className="relative flex flex-1 items-end gap-4 border-l border-b px-4 pb-px pt-1">
+      <div className="relative flex flex-1 items-end gap-4 px-4 pb-px pt-1">
         {CHART_TICKS.map((t) => (
           <div key={t} className="pointer-events-none absolute inset-x-0 border-t border-border/50" style={{ bottom: `${(t / CHART_MAX) * 100}%` }} />
         ))}
@@ -99,13 +99,9 @@ export function QueueSummaryCard({ activeReport = "none", onBarometer }: { activ
       {/* Chart + status grid — white inner card */}
       <div className="mt-4 grid grid-cols-1 gap-4 rounded-lg border bg-background p-4 lg:grid-cols-2">
         <StatusChart statuses={q.statuses} />
-        <div className="grid grid-cols-2 self-center">
-          {q.statuses.map((s, i) => (
-            <StatusCell
-              key={s.key}
-              status={s}
-              className={cn(i % 2 === 0 && "border-r", i < 2 && "border-b")}
-            />
+        <div className="grid grid-cols-2 gap-x-4 gap-y-3 self-center">
+          {q.statuses.map((s) => (
+            <StatusCell key={s.key} status={s} />
           ))}
         </div>
       </div>
