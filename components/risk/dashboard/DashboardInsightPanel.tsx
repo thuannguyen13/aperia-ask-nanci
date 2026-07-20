@@ -3,16 +3,16 @@
 import { Download } from "lucide-react"
 import { Button } from "aperia-ds5"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
-import { PanelShell, PanelHeader, NanciInsight } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
 import { DASH_INSIGHTS } from "@/lib/ask-nanci/data/risk-dashboard"
 import { DashChart } from "./charts"
 import { useRiskNav } from "../RiskNavContext"
 
 const FIRST = Object.keys(DASH_INSIGHTS)[0]
 
-// The Dashboard insight panel — a real registered panel (opened via the panel
-// stack), built from the shared PanelShell / PanelHeader / NanciInsight primitives,
-// same as the Merchant Money flow panels. Reads which insight to show from its view.
+// The Dashboard insight panel — opened via the panel stack when a "take" is clicked.
+// Layout mirrors the Figma Ask Nanci response (node 734:28462): Nanci's read, the
+// numbered insight, an embedded titled card with the focus chart, then action chips.
 export function DashboardInsightPanel() {
   const { closePanel } = useAskNanci()
   const nav = useRiskNav()
@@ -29,26 +29,29 @@ export function DashboardInsightPanel() {
     <PanelShell>
       <PanelHeader title="Ask Nanci" size="lg" onClose={() => closePanel("dashboard-insight")} />
 
-      <div className="flex-1 space-y-4 overflow-auto px-4 py-3">
-        <NanciInsight>{lead}</NanciInsight>
-
+      <div className="flex-1 space-y-4 overflow-auto px-4 py-4 text-sm">
+        {/* Nanci's read + the numbered insight */}
+        <p className="whitespace-pre-line text-foreground">{lead}</p>
         <div>
-          <p className="text-sm font-semibold text-foreground">{heading}</p>
-          <p className="mt-1 text-sm text-muted-foreground">{body}</p>
+          <p className="font-semibold text-foreground">{heading}</p>
+          <p className="mt-2 text-muted-foreground">{body}</p>
         </div>
 
-        {/* Embedded focus chart */}
-        <div className="rounded-xl border p-3">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-xs font-semibold text-foreground">{key}</span>
-            <Button variant="secondary" size="xs"><Download className="size-3" /> Export</Button>
+        {/* Embedded titled card with the focus chart */}
+        <div className="rounded-lg border bg-card">
+          <div className="flex items-center gap-2.5 px-4 py-3">
+            <p className="flex-1 text-base font-semibold text-foreground">{key}</p>
+            <Button variant="secondary" size="sm"><Download className="size-4" /> Export</Button>
           </div>
-          <DashChart id={focusChart} />
+          <div className="px-4 pb-4">
+            <DashChart id={focusChart} />
+          </div>
         </div>
 
+        {/* Action chips */}
         <div>
-          <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.12em] text-muted-foreground">Where do you want to start?</p>
-          <div className="flex flex-col items-start gap-2">
+          <p className="mb-2 text-muted-foreground">Where do you want to start?</p>
+          <div className="flex flex-wrap gap-2">
             {insight.chips.map((c) => (
               <button
                 key={c.label}
