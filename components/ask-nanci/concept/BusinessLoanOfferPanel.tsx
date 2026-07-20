@@ -67,7 +67,7 @@ function ApplicationForm({ offer, onBack, onSubmit }: { offer: LoanOffer; onBack
           <OfferField label="Requested Amount" value={LOAN_APPLICANT.requestedAmount} />
           <OfferSelect label="Repayment Term" value={LOAN_APPLICANT.repaymentTerm} options={["6 months", "60 days", "90 days", "120 days"]} placeholder="Select term" />
           <OfferSelect label="Purpose" value={LOAN_APPLICANT.purpose} options={["Capital Funding", "Payroll", "Inventory", "Equipment", "Other"]} placeholder="Select purpose" />
-          <OfferField label="Avg. Monthly Revenue" value={LOAN_APPLICANT.avgMonthlyRevenue} />
+          <OfferField label="Avg. Monthly Revenue" value={LOAN_APPLICANT.avgMonthlyRevenue} readOnly />
           <OfferSelect label="Funding Account" value={LOAN_APPLICANT.fundingAccount} options={[LOAN_APPLICANT.fundingAccount]} />
         </div>
       </div>

@@ -16,7 +16,7 @@ export interface LoanOffer {
 // Single Mastercard-branded offer — the demo targets one product, not a ranked list.
 // Drop the card art at public/business-loan-offer/mastercard-installments.png (monogram fallback until then).
 export const LOAN_OFFERS: LoanOffer[] = [
-  { id: "mastercard-installments", product: "Mastercard Business Installments", maxAmount: "$5,000,000", minRate: "9.75%", fundsIn: "5–7 days", termLength: "Up to 25 years", logo: "/business-loan-offer/mastercard-installments.png", mark: "MC", color: "#EB001B" },
+  { id: "mastercard-installments", product: "Mastercard Loan on Card", maxAmount: "$5,000,000", minRate: "9.75%", fundsIn: "5–7 days", termLength: "Up to 25 years", logo: "/business-loan-offer/mastercard-installments.png", mark: "MC", color: "#EB001B" },
 ]
 
 // Pre-filled from the merchant's connected data (see LOAN_APPLICANT usage in the form view).
@@ -40,7 +40,7 @@ export const LOAN_LIST_INSIGHT =
   "Rates range 8.5%–39%. Loans with lower rates (Wells Fargo 8.5%, SBA 9.75%) need longer time in business and slower funding. Higher rates (Fundbox 36%, Headway 39%) fund fast with easier qualification."
 
 export const LOAN_REQUEST_REF = "AD-3307"
-export const LOAN_SENT_TO = "Account Services team"
+export const LOAN_SENT_TO = "Mastercard Loan Team"
 export const LOAN_SUBMITTED_TITLE = "Loan Application Submitted"
 export const LOAN_SUCCESS_MESSAGE =
   "Your loan request has been submitted for review. Once it's approved, you'll get a confirmation email at your primary address."

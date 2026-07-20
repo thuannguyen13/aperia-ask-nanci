@@ -36,21 +36,25 @@ export function BrandMonogram({ label, color }: { label: string; color: string }
 
 const LABEL = "text-[13px] font-medium text-foreground"
 
-export function OfferField({ label, value }: { label: string; value: string }) {
+// Pre-filled-from-connected-data fields render read-only: gray fill, no border,
+// full-opacity text (not DS `disabled`, which fades to 50%). Matches the Figma forms.
+const READONLY_FIELD = "bg-muted border-transparent text-foreground cursor-default"
+
+export function OfferField({ label, value, readOnly }: { label: string; value: string; readOnly?: boolean }) {
   return (
     <div className="flex flex-col gap-1.5">
       <Label className={LABEL}>{label}</Label>
-      <Input defaultValue={value} />
+      <Input defaultValue={value} readOnly={readOnly} className={cn(readOnly && READONLY_FIELD)} />
     </div>
   )
 }
 
-export function OfferSelect({ label, value, options, placeholder }: { label: string; value: string; options: string[]; placeholder?: string }) {
+export function OfferSelect({ label, value, options, placeholder, readOnly }: { label: string; value: string; options: string[]; placeholder?: string; readOnly?: boolean }) {
   return (
     <div className="flex flex-col gap-1.5">
       <Label className={LABEL}>{label}</Label>
-      <Select defaultValue={value || undefined}>
-        <SelectTrigger className="w-full"><SelectValue placeholder={placeholder} /></SelectTrigger>
+      <Select defaultValue={value || undefined} disabled={readOnly}>
+        <SelectTrigger className={cn("w-full", readOnly && `${READONLY_FIELD} disabled:opacity-100`)}><SelectValue placeholder={placeholder} /></SelectTrigger>
         <SelectContent>
           {options.map((o) => <SelectItem key={o} value={o}>{o}</SelectItem>)}
         </SelectContent>
@@ -99,20 +103,20 @@ export function ApplicantFields({ applicant }: { applicant: Applicant }) {
       <div className="flex flex-col gap-3">
         <SectionLabel>Business Info</SectionLabel>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <OfferField label="Business Name" value={applicant.businessName} />
-          <OfferField label="EIN (Tax ID)" value={applicant.ein} />
-          <OfferSelect label="Industry" value={applicant.industry} options={INDUSTRIES} />
-          <OfferSelect label="Business Type" value={applicant.businessType} options={BUSINESS_TYPES} />
+          <OfferField label="Business Name" value={applicant.businessName} readOnly />
+          <OfferField label="EIN (Tax ID)" value={applicant.ein} readOnly />
+          <OfferSelect label="Industry" value={applicant.industry} options={INDUSTRIES} readOnly />
+          <OfferSelect label="Business Type" value={applicant.businessType} options={BUSINESS_TYPES} readOnly />
         </div>
       </div>
 
       <div className="flex flex-col gap-3">
         <SectionLabel>Contact Info</SectionLabel>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <OfferField label="Owner Full Name" value={applicant.ownerName} />
-          <OfferField label="Business Address" value={applicant.businessAddress} />
-          <OfferField label="Email" value={applicant.email} />
-          <OfferField label="Phone" value={applicant.phone} />
+          <OfferField label="Owner Full Name" value={applicant.ownerName} readOnly />
+          <OfferField label="Business Address" value={applicant.businessAddress} readOnly />
+          <OfferField label="Email" value={applicant.email} readOnly />
+          <OfferField label="Phone" value={applicant.phone} readOnly />
         </div>
       </div>
     </>
