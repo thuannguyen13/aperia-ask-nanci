@@ -82,7 +82,9 @@ interface AskNanciCtx {
   closingPanels: string[]
   closePanel: (type: string) => void
   dynamicPanels: PanelId[]
+  openDynamic: (id: PanelId) => void
   closeDynamicPanel: (id: PanelId) => void
+  setPanelView: (id: PanelId, view: string) => void
   closeAllNewPanels: () => void
   submitDisputeDraft: () => void
   declineReportFiltered: boolean
@@ -690,7 +692,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       submitFormPanel, submitOfferApplication, submitStepUpPanel,
       triggerProactiveFlow, proactiveNotificationActive, activateProactiveNotification,
       closingPanels, closePanel, closeAllNewPanels, submitDisputeDraft,
-      dynamicPanels, closeDynamicPanel,
+      dynamicPanels, openDynamic, closeDynamicPanel, setPanelView,
       declineReportFiltered,
       submitAccountChangeDetails, goBackAccountChangeStep, confirmAccountChange, requestDepositNotify,
       panelViews, clearPanelView,

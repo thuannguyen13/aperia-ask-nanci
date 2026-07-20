@@ -14,6 +14,7 @@ import { BarometerReport } from "./BarometerReport"
 import { RiskReport } from "./RiskReport"
 import { Dashboard } from "./dashboard/Dashboard"
 import { AssignmentManagement } from "./AssignmentManagement"
+import { RiskNavProvider } from "./RiskNavContext"
 
 // Aperia Risk shell — reuses the app chrome (Sidebar) and chat surface. Ask Nanci is
 // the home; Detection Queue → Barometer Report → Risk Report is the built narrative;
@@ -61,7 +62,9 @@ export function RiskConsole() {
           ) : dest === "risk-report" && merchantId ? (
             <RiskReport merchantId={merchantId} onBreadcrumb={setDest} />
           ) : dest === "dashboard" ? (
-            <Dashboard onOpenDetectionQueue={() => setDest("detection-queue")} onOpenCritical={() => openBarometer("critical")} />
+            <RiskNavProvider value={{ openDetectionQueue: () => setDest("detection-queue"), openCritical: () => openBarometer("critical") }}>
+              <Dashboard />
+            </RiskNavProvider>
           ) : dest === "assignment" ? (
             <AssignmentManagement />
           ) : view === "chat" ? (
