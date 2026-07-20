@@ -4,7 +4,9 @@ import { useState } from "react"
 import { RefreshCw, SlidersHorizontal, Download, Search, ChevronDown, AlertTriangle, ListChecks, Loader2, Check } from "lucide-react"
 import { Button, Input } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
+import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
 import { QueueSummaryCard } from "./QueueSummaryCard"
+import { useRiskNav } from "./RiskNavContext"
 import { RISK_MERCHANTS, type RiskMerchant, type WorkStatus } from "@/lib/ask-nanci/data/risk-merchants"
 
 const RISK_PILL: Record<RiskMerchant["risk"], string> = {
@@ -34,7 +36,9 @@ function ActionButton({ status, onMarkWork }: { status: WorkStatus; onMarkWork: 
   return <Button size="sm" className="w-32 justify-between" onClick={onMarkWork}><span>Mark Work</span><ChevronDown className="size-3.5" /></Button>
 }
 
-export function BarometerReport({ filter, onBack, onOpenMerchant }: { filter?: "critical" | null; onBack: () => void; onOpenMerchant: (id: string) => void }) {
+export function BarometerReport() {
+  const nav = useRiskNav()
+  const filter = nav.barometerFilter
   // Local work-status so the demo's Mark Work is clickable (happy path).
   const [statuses, setStatuses] = useState<Record<string, WorkStatus>>(
     () => Object.fromEntries(RISK_MERCHANTS.map((m) => [m.id, m.status])),
@@ -44,21 +48,21 @@ export function BarometerReport({ filter, onBack, onOpenMerchant }: { filter?: "
   const merchants = filter === "critical" ? RISK_MERCHANTS.filter((m) => m.risk === "High") : RISK_MERCHANTS
 
   return (
-    <div className="flex min-w-0 flex-1 flex-col overflow-y-auto p-4 md:p-6">
+    <PanelShell>
+      <PanelHeader
+        title="Barometer Report"
+        subtitle="04/23/2026"
+        size="lg"
+        actions={<Button variant="secondary" size="sm"><RefreshCw className="size-4" /> Refresh</Button>}
+        onClose={() => nav.go("ask-nanci")}
+      />
+
+      <div className="flex-1 overflow-y-auto p-4 md:p-6">
       {/* Breadcrumb */}
-      <div className="mb-1 flex items-center gap-1.5 text-sm text-muted-foreground">
-        <button onClick={onBack} className="hover:text-foreground hover:underline">Detection Queue</button>
+      <div className="mb-4 flex items-center gap-1.5 text-sm text-muted-foreground">
+        <button onClick={() => nav.go("detection-queue")} className="hover:text-foreground hover:underline">Detection Queue</button>
         <span>›</span>
         <span className="font-medium text-foreground">Barometer Report</span>
-      </div>
-
-      {/* Title */}
-      <div className="mb-4 flex items-start justify-between">
-        <div>
-          <h1 className="text-xl font-semibold text-foreground">Barometer Report</h1>
-          <p className="text-sm text-muted-foreground">04/23/2026</p>
-        </div>
-        <Button variant="secondary" size="sm"><RefreshCw className="size-4" /> Refresh</Button>
       </div>
 
       <QueueSummaryCard activeReport="barometer" />
@@ -96,7 +100,7 @@ export function BarometerReport({ filter, onBack, onOpenMerchant }: { filter?: "
               {merchants.map((m) => (
                 <tr key={m.id} className="border-b last:border-0">
                   <td className="px-4 py-2.5">
-                    <button onClick={() => onOpenMerchant(m.id)} className="max-w-[220px] truncate font-medium text-primary hover:underline">{m.name}</button>
+                    <button onClick={() => nav.openMerchant(m.id)} className="max-w-[220px] truncate font-medium text-primary hover:underline">{m.name}</button>
                   </td>
                   <td className="px-4 py-2.5"><TagBadges alert={m.alertTag} list={m.listTag} /></td>
                   <td className="px-4 py-2.5 tabular-nums text-foreground">{m.vw}</td>
@@ -113,6 +117,7 @@ export function BarometerReport({ filter, onBack, onOpenMerchant }: { filter?: "
           </table>
         </div>
       </div>
-    </div>
+      </div>
+    </PanelShell>
   )
 }

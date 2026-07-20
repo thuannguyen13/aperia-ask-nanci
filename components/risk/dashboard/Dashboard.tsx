@@ -6,6 +6,8 @@ import { Button } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { ConceptPanelArea } from "@/components/ask-nanci/concept/ConceptPanelArea"
+import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
+import { useRiskNav } from "../RiskNavContext"
 import { RISK_NANCI_TAKES } from "@/lib/ask-nanci/data/risk-landing"
 import { DASH_KPIS, DASH_INSIGHTS, type DashChartId } from "@/lib/ask-nanci/data/risk-dashboard"
 import { DashChart, CHART_TITLES } from "./charts"
@@ -34,6 +36,7 @@ function ChartPanel({ id, title, active, dim, children }: { id: DashChartId; tit
 }
 
 export function Dashboard() {
+  const nav = useRiskNav()
   const { dynamicPanels, openDynamic, closeDynamicPanel, setPanelView } = useAskNanci()
   const panelOpen = dynamicPanels.includes(PANEL_ID)
   const activeKey = usePanelView(PANEL_ID, "")
@@ -56,13 +59,14 @@ export function Dashboard() {
 
   return (
     <div className="flex min-w-0 flex-1">
-      <div className="flex min-w-0 flex-1 flex-col overflow-y-auto p-4 md:p-6">
-        {/* Header */}
-        <div className="mb-4 flex items-center justify-between">
-          <h1 className="text-xl font-semibold text-foreground">Dashboard</h1>
-          <Button variant="secondary" size="sm"><Download className="size-4" /> Export</Button>
-        </div>
-
+      <PanelShell className="min-w-0 flex-1">
+        <PanelHeader
+          title="Dashboard"
+          size="lg"
+          actions={<Button variant="secondary" size="sm"><Download className="size-4" /> Export</Button>}
+          onClose={() => nav.go("ask-nanci")}
+        />
+        <div className="flex-1 overflow-y-auto p-4 md:p-6">
         {/* Ask Nanci's take on today */}
         <div className="rounded-xl border border-blue-200 bg-blue-50/60 p-4 dark:border-blue-900 dark:bg-blue-950/20">
           <div className="mb-3 flex items-center gap-2">
@@ -118,7 +122,8 @@ export function Dashboard() {
             </ChartPanel>
           </div>
         </div>
-      </div>
+        </div>
+      </PanelShell>
 
       {/* Insight panel — the real registered panel, rendered through the stack */}
       <ConceptPanelArea />

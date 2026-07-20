@@ -21,8 +21,8 @@ export function DashboardInsightPanel() {
   const { lead, heading, body, focusChart } = insight.panel
 
   const onAction = (a: "detection-queue" | "critical" | "none") => {
-    if (a === "detection-queue") nav.openDetectionQueue()
-    else if (a === "critical") nav.openCritical()
+    if (a === "detection-queue") nav.go("detection-queue")
+    else if (a === "critical") nav.openBarometer("critical")
   }
 
   return (

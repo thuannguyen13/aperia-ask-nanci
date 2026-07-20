@@ -8,27 +8,31 @@ import { AppFrame } from "@/components/ask-nanci/AppFrame"
 import { Sidebar } from "@/components/ask-nanci/Sidebar"
 import { ChatView } from "@/components/ask-nanci/ChatView"
 import { ChatInput } from "@/components/ask-nanci/ChatInput"
+import { PANELS } from "@/components/ask-nanci/concept/panel-registry"
+import type { PanelId } from "@/lib/ask-nanci/types"
 import { RiskLanding } from "./RiskLanding"
-import { DetectionQueue } from "./DetectionQueue"
-import { BarometerReport } from "./BarometerReport"
-import { RiskReport } from "./RiskReport"
-import { Dashboard } from "./dashboard/Dashboard"
-import { AssignmentManagement } from "./AssignmentManagement"
-import { RiskNavProvider } from "./RiskNavContext"
+import { RiskNavProvider, type RiskDest } from "./RiskNavContext"
 
-// Aperia Risk shell — reuses the app chrome (Sidebar) and chat surface. Ask Nanci is
-// the home; Detection Queue → Barometer Report → Risk Report is the built narrative;
-// Dashboard / Assignment Management are not built yet. `dest` selects the destination
-// that overrides the chat/landing; the three queue views share a breadcrumb trail.
-type Dest = "ask-nanci" | "detection-queue" | "barometer-report" | "risk-report" | "dashboard" | "assignment"
+// Aperia Risk shell. Ask Nanci is the home (chat/landing); every other destination
+// is a registered panel rendered full-width through the PANELS registry. Navigation
+// and per-panel selection (current merchant, barometer filter) flow through
+// RiskNavContext since the panels are prop-less.
+const DEST_PANEL: Record<Exclude<RiskDest, "ask-nanci">, PanelId> = {
+  dashboard: "risk-dashboard",
+  "detection-queue": "risk-detection-queue",
+  "barometer-report": "risk-barometer",
+  "risk-report": "risk-risk-report",
+  assignment: "risk-assignments",
+}
 
 export function RiskConsole() {
   const { view, startNewChat } = useAskNanci()
-  const [dest, setDest] = useState<Dest>("ask-nanci")
+  const [dest, setDest] = useState<RiskDest>("ask-nanci")
   const [merchantId, setMerchantId] = useState<string | null>(null)
   const [barometerFilter, setBarometerFilter] = useState<"critical" | null>(null)
 
   const openBarometer = (filter: "critical" | null = null) => { setBarometerFilter(filter); setDest("barometer-report") }
+  const openMerchant = (id: string) => { setMerchantId(id); setDest("risk-report") }
 
   // The Detection Queue nav item stays highlighted across its child reports.
   const inQueue = dest === "detection-queue" || dest === "barometer-report" || dest === "risk-report"
@@ -40,47 +44,38 @@ export function RiskConsole() {
     { icon: ClipboardList, label: "Assignment Management", active: dest === "assignment", onClick: () => setDest("assignment") },
   ]
 
-  const openMerchant = (id: string) => { setMerchantId(id); setDest("risk-report") }
+  const ActivePanel = dest !== "ask-nanci" ? PANELS[DEST_PANEL[dest]].component : null
 
   return (
     <AppFrame
       theme="aperia"
       topBar={
-        // Default theme top bar — the Aperia logo (same structure as AppShell's top bar).
         <div className="relative z-10 flex h-10 shrink-0 items-center justify-center">
           <Image src="/logos/aperia-full.svg" alt="Aperia" width={82} height={24} className="h-6 w-auto" />
         </div>
       }
       sidebar={<Sidebar menu={nav} brand={{ label: "Aperia", badge: "RISK" }} />}
     >
-      <div className="flex min-w-0 flex-1 py-1 pr-1">
-        <div className="flex min-w-0 flex-1 overflow-hidden rounded-xl border bg-background md:rounded-2xl">
-          {dest === "detection-queue" ? (
-            <DetectionQueue onBarometer={() => openBarometer()} />
-          ) : dest === "barometer-report" ? (
-            <BarometerReport filter={barometerFilter} onBack={() => setDest("detection-queue")} onOpenMerchant={openMerchant} />
-          ) : dest === "risk-report" && merchantId ? (
-            <RiskReport merchantId={merchantId} onBreadcrumb={setDest} />
-          ) : dest === "dashboard" ? (
-            <RiskNavProvider value={{ openDetectionQueue: () => setDest("detection-queue"), openCritical: () => openBarometer("critical") }}>
-              <Dashboard />
-            </RiskNavProvider>
-          ) : dest === "assignment" ? (
-            <AssignmentManagement />
-          ) : view === "chat" ? (
-            <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
-              <ChatView />
-              <div className="shrink-0 px-3 pb-3 md:px-4 md:pb-4">
-                <div className="mx-auto w-full max-w-[768px]">
-                  <ChatInput />
+      <RiskNavProvider value={{ go: setDest, openBarometer, openMerchant, merchantId, barometerFilter }}>
+        <div className="flex min-w-0 flex-1 py-1 pr-1">
+          <div className="flex min-w-0 flex-1 overflow-hidden rounded-xl border bg-background md:rounded-2xl">
+            {ActivePanel ? (
+              <ActivePanel />
+            ) : view === "chat" ? (
+              <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
+                <ChatView />
+                <div className="shrink-0 px-3 pb-3 md:px-4 md:pb-4">
+                  <div className="mx-auto w-full max-w-[768px]">
+                    <ChatInput />
+                  </div>
                 </div>
               </div>
-            </div>
-          ) : (
-            <RiskLanding onOpenView={(_dest, f) => openBarometer(f ?? null)} />
-          )}
+            ) : (
+              <RiskLanding onOpenView={(_dest, f) => openBarometer(f ?? null)} />
+            )}
+          </div>
         </div>
-      </div>
+      </RiskNavProvider>
     </AppFrame>
   )
 }

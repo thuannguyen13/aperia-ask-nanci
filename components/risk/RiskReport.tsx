@@ -4,6 +4,8 @@ import { useState } from "react"
 import { MoreHorizontal, FileText, FolderPlus, ChevronDown, Check, CircleCheckBig } from "lucide-react"
 import { Button } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
+import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
+import { useRiskNav } from "./RiskNavContext"
 import { findMerchant, RISK_REPORT_DETAILS, DEFAULT_RISK_DETAIL, TXN_VOLUME_ROWS } from "@/lib/ask-nanci/data/risk-merchants"
 
 function Row({ label, value, pill }: { label: string; value: string; pill?: string }) {
@@ -47,9 +49,10 @@ function ScoreCard({ brand, score, max, level, deltas, params, extra }: {
 const ACTIVITY_TABS = ["Transactions", "Notes and Case History", "Batch and Chargebacks", "ACH Returns", "Related Merchants"]
 const TXN_COLS = ["CB #", "CB % by #", "CB $", "CB % by $", "RDR #", "RDR $"]
 
-export function RiskReport({ merchantId, onBreadcrumb }: { merchantId: string; onBreadcrumb: (dest: "detection-queue" | "barometer-report") => void }) {
-  const m = findMerchant(merchantId)
-  const d = RISK_REPORT_DETAILS[merchantId] ?? DEFAULT_RISK_DETAIL
+export function RiskReport() {
+  const nav = useRiskNav()
+  const m = findMerchant(nav.merchantId ?? "")
+  const d = RISK_REPORT_DETAILS[nav.merchantId ?? ""] ?? DEFAULT_RISK_DETAIL
   const [noteOpen, setNoteOpen] = useState(false)
   const [note, setNote] = useState("")
   const [worked, setWorked] = useState(false)
@@ -57,12 +60,15 @@ export function RiskReport({ merchantId, onBreadcrumb }: { merchantId: string; o
   if (!m) return null
 
   return (
-    <div className="flex min-w-0 flex-1 flex-col overflow-y-auto p-4 md:p-6">
+    <PanelShell>
+      <PanelHeader title={m.name} size="lg" onClose={() => nav.go("barometer-report")} />
+
+      <div className="flex-1 overflow-y-auto p-4 md:p-6">
       {/* Breadcrumb */}
       <div className="mb-2 flex items-center gap-1.5 text-sm text-muted-foreground">
-        <button onClick={() => onBreadcrumb("detection-queue")} className="hover:text-foreground hover:underline">Detection Queue</button>
+        <button onClick={() => nav.go("detection-queue")} className="hover:text-foreground hover:underline">Detection Queue</button>
         <span>›</span>
-        <button onClick={() => onBreadcrumb("barometer-report")} className="hover:text-foreground hover:underline">Barometer Report</button>
+        <button onClick={() => nav.go("barometer-report")} className="hover:text-foreground hover:underline">Barometer Report</button>
         <span>›</span>
         <span className="font-medium text-foreground">Risk Report</span>
       </div>
@@ -79,7 +85,6 @@ export function RiskReport({ merchantId, onBreadcrumb }: { merchantId: string; o
       <div className="relative mb-5 flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-xl font-semibold uppercase text-foreground">{m.name}</h1>
             <span className="flex items-center gap-1 rounded bg-rose-100 px-2 py-0.5 text-xs font-medium text-rose-700 dark:bg-rose-900/40 dark:text-rose-300">⚠ {d.violations} Violations</span>
             <span className="rounded bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">In {d.inQueues} Queues</span>
           </div>
@@ -197,6 +202,7 @@ export function RiskReport({ merchantId, onBreadcrumb }: { merchantId: string; o
           </tbody>
         </table>
       </div>
-    </div>
+      </div>
+    </PanelShell>
   )
 }

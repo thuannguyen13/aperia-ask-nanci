@@ -27,6 +27,11 @@ import { BatchDetailPanel } from "./BatchDetailPanel"
 import { CreditCardOfferPanel } from "./CreditCardOfferPanel"
 import { BusinessLoanOfferPanel } from "./BusinessLoanOfferPanel"
 import { DashboardInsightPanel } from "@/components/risk/dashboard/DashboardInsightPanel"
+import { Dashboard as RiskDashboard } from "@/components/risk/dashboard/Dashboard"
+import { DetectionQueue as RiskDetectionQueue } from "@/components/risk/DetectionQueue"
+import { BarometerReport as RiskBarometer } from "@/components/risk/BarometerReport"
+import { RiskReport as RiskRiskReport } from "@/components/risk/RiskReport"
+import { AssignmentManagement as RiskAssignments } from "@/components/risk/AssignmentManagement"
 
 // The single registry of concept panels. Add a panel here (+ its component) and it
 // becomes renderable everywhere — `PanelId` is derived from these keys, so there is
@@ -63,6 +68,12 @@ export const PANELS = {
   "credit-card-offer":   { component: CreditCardOfferPanel },
   "business-loan-offer": { component: BusinessLoanOfferPanel },
   "dashboard-insight":   { component: DashboardInsightPanel },
+  // Aperia Risk destinations — every risk UI is a registered panel.
+  "risk-dashboard":       { component: RiskDashboard },
+  "risk-detection-queue": { component: RiskDetectionQueue },
+  "risk-barometer":       { component: RiskBarometer },
+  "risk-risk-report":     { component: RiskRiskReport },
+  "risk-assignments":     { component: RiskAssignments },
 } satisfies Record<string, PanelDef>
 
 export type PanelId = keyof typeof PANELS
