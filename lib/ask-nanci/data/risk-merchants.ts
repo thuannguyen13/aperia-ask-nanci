@@ -87,3 +87,42 @@ export const DEFAULT_RISK_DETAIL: RiskReportDetail = {
 export const TXN_VOLUME_ROWS = [
   "Today", "7-Day", "30-Day", "Monthly Average", "Contract Expected", "June 2026", "May 2026", "April 2026",
 ]
+
+// Parameter Violation Details — opened from the "N Violations" pill on the Risk Report.
+export interface ViolationRow {
+  pNum: string; wk: string; alertOn: string; assignment: string; parameter: string
+  reAlert: string; paramIndicator: string; actualIndicator: string
+  paramThreshold: string; actualThreshold: string; disposition: string
+  workedOn: string; userName: string; fileType: string
+}
+
+export const RISK_VIOLATION_CYCLE = "06/25/2026"
+
+const ASSIGNMENT = "Esquire - Phase 2 Parameters - Auths - Detect Q"
+export const VIOLATION_ROWS: ViolationRow[] = [
+  { pNum: "P-MC1", wk: "Ready to Work", alertOn: "05/03/2026 10:10:00 AM", assignment: ASSIGNMENT, parameter: "Score Threshold", reAlert: "No", paramIndicator: "2", actualIndicator: "2", paramThreshold: "N/A", actualThreshold: "N/A", disposition: "-", workedOn: "-", userName: "-", fileType: "Transaction" },
+  { pNum: "P-MC2", wk: "Ready to Work", alertOn: "05/03/2026 06:25:30 AM", assignment: ASSIGNMENT, parameter: "Score Velocity", reAlert: "No", paramIndicator: "1", actualIndicator: "1", paramThreshold: "N/A", actualThreshold: "N/A", disposition: "-", workedOn: "-", userName: "-", fileType: "Transaction" },
+  { pNum: "P-MC3", wk: "Ready to Work", alertOn: "05/03/2026 07:14:30 AM", assignment: ASSIGNMENT, parameter: "High-MC Txn %", reAlert: "No", paramIndicator: "2", actualIndicator: "2", paramThreshold: "N/A", actualThreshold: "N/A", disposition: "-", workedOn: "-", userName: "-", fileType: "Transaction" },
+]
+
+// Merchant Notes — shown in the Risk Report's "Notes and Case History" tab.
+// The Add Notes popover appends new entries to this list.
+export interface NoteEntry { author: string; initials: string; timestamp: string; source: string; body: string }
+export const MERCHANT_NOTES_SEED: NoteEntry[] = [
+  {
+    author: "Teresa Walker",
+    initials: "TW",
+    timestamp: "06/22/2026 02:12:29 PM",
+    source: "Aperia Risk",
+    body: "MC Score 940/1000 (High), +410 (30d), top percentile for MCC 6051 across 1,247 txns. Holding funds pending review given velocity and peer-percentile severity.",
+  },
+]
+
+// Cross-Queue Presence — opened from the "In N Queues" badge on the Risk Report.
+export interface QueueRow { name: string; status: string; alertedAt: string }
+export const CROSS_QUEUE_ROWS: QueueRow[] = [
+  { name: "DQ-Cash Advance", status: "Ready to Work", alertedAt: "alerted 05/03/2026 06:14 AM" },
+  { name: "Phase 2 Parameters", status: "Ready to Work", alertedAt: "alerted 05/03/2026 06:14 AM" },
+  { name: "High Risk DQ — By MCC", status: "Ready to Work", alertedAt: "alerted 05/03/2026 06:14 AM" },
+  { name: "⚹ MC Watch (system)", status: "Ready to Work", alertedAt: "alerted 05/03/2026 06:14 AM" },
+]
