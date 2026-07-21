@@ -4,7 +4,8 @@ import { X } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 
 interface PanelHeaderProps {
-  title: string
+  /** Node, not just string, so a panel can lead its title with a logomark. */
+  title: React.ReactNode
   subtitle?: React.ReactNode
   actions?: React.ReactNode
   /** Omit to render a header with no close button (e.g. the chat column title). */

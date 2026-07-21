@@ -22,7 +22,7 @@ export interface Assignment {
   name: string
   system?: boolean // shows a "System" badge next to the name
   type: string
-  alerted: number
+  alerted: number | null // null → "—", a brand-new assignment that hasn't run yet
   status: AssignmentStatus
   lastProcessed: string
 }

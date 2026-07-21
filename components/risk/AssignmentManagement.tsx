@@ -1,12 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import { RefreshCw, SlidersHorizontal, Plus, ChevronDown, SlidersVertical, Pencil, Copy, Trash2, Download, CircleCheck } from "lucide-react"
+import { RefreshCw, SlidersHorizontal, Plus, ChevronDown, ChevronLeft, ChevronRight, ArrowUpDown, SlidersVertical, Pencil, Copy, Trash2, Download, CircleCheck } from "lucide-react"
 import { Button } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
 import { useRiskNav } from "./RiskNavContext"
-import { AM_INTEGRATION, AM_SUMMARY, ASSIGNMENTS, AM_TOTAL, type AssignmentStatus } from "@/lib/ask-nanci/data/risk-assignments"
+import { CreateAssignment } from "./CreateAssignment"
+import { AM_INTEGRATION, AM_SUMMARY, ASSIGNMENTS, AM_TOTAL, type Assignment, type AssignmentStatus } from "@/lib/ask-nanci/data/risk-assignments"
+import { EXAMPLE_ASSIGNMENT_NAME } from "@/lib/ask-nanci/data/risk-create-assignment"
 
 const TABS: ("All" | AssignmentStatus)[] = ["All", "Active", "Expired"]
 
@@ -18,10 +20,25 @@ const STATUS_PILL: Record<AssignmentStatus, string> = {
 export function AssignmentManagement() {
   const nav = useRiskNav()
   const [tab, setTab] = useState<"All" | AssignmentStatus>("All")
-  const rows = tab === "All" ? ASSIGNMENTS : ASSIGNMENTS.filter((a) => a.status === tab)
+  // Create Assignment replaces the list in place (Figma 219–225); a submitted
+  // assignment lands at the top of the list with a confirmation toast (frame 207).
+  const [creating, setCreating] = useState(false)
+  const [created, setCreated] = useState<Assignment | null>(null)
+  const [toast, setToast] = useState(false)
+
+  const all = created ? [created, ...ASSIGNMENTS] : ASSIGNMENTS
+  const rows = tab === "All" ? all : all.filter((a) => a.status === tab)
+
+  const submit = (name: string) => {
+    setCreated({ name: name.trim() || EXAMPLE_ASSIGNMENT_NAME, type: "DQ", alerted: null, status: "Active", lastProcessed: "06/18/2026" })
+    setCreating(false)
+    setToast(true)
+  }
+
+  if (creating) return <CreateAssignment onCancel={() => setCreating(false)} onSubmit={submit} />
 
   return (
-    <PanelShell className="min-w-0 flex-1">
+    <PanelShell className="relative min-w-0 flex-1">
       <PanelHeader
         title="Assignment Management"
         size="lg"
@@ -29,11 +46,22 @@ export function AssignmentManagement() {
           <>
             <Button variant="secondary" size="sm"><RefreshCw className="size-4" /> Refresh</Button>
             <Button variant="secondary" size="sm"><SlidersHorizontal className="size-4" /> Advanced Filter</Button>
-            <Button size="sm" className="gap-1"><Plus className="size-4" /> Create Assignment <ChevronDown className="size-3.5" /></Button>
+            <Button size="sm" className="gap-1" onClick={() => { setToast(false); setCreating(true) }}>
+              <Plus className="size-4" /> Create Assignment <ChevronDown className="size-3.5" />
+            </Button>
           </>
         }
         onClose={() => nav.go("ask-nanci")}
       />
+
+      {/* Post-submit confirmation (Figma frame 207) */}
+      {toast && (
+        <div className="absolute right-4 top-3 z-20 flex items-center gap-3 rounded-lg border bg-card px-3 py-2 shadow-md">
+          <CircleCheck className="size-4 text-green-600" />
+          <span className="text-sm font-medium text-foreground">Assignment created.</span>
+          <button onClick={() => setToast(false)} className="text-sm text-muted-foreground hover:text-foreground">Close</button>
+        </div>
+      )}
 
       <div className="flex-1 overflow-y-auto p-4 md:p-6">
       {/* Integration card */}
@@ -98,12 +126,11 @@ export function AssignmentManagement() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b bg-muted/40 text-left text-xs text-muted-foreground">
-                <th className="px-4 py-2.5 font-medium">Assignment Name</th>
-                <th className="px-4 py-2.5 font-medium">Type</th>
-                <th className="px-4 py-2.5 font-medium">Alerted Merchant Count</th>
-                <th className="px-4 py-2.5 font-medium">Status</th>
-                <th className="px-4 py-2.5 font-medium">Last Processed Date</th>
-                <th className="px-4 py-2.5 text-right font-medium">Actions</th>
+                {["Assignment Name", "Type", "Alerted Merchant Count", "Status", "Last Processed Date", "Actions"].map((h) => (
+                  <th key={h} className={cn("px-4 py-2.5 font-medium", h === "Actions" && "text-right")}>
+                    <span className="inline-flex items-center gap-1.5">{h} <ArrowUpDown className="size-3 opacity-60" /></span>
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
@@ -114,7 +141,7 @@ export function AssignmentManagement() {
                     {a.system && <span className="ml-2 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">System</span>}
                   </td>
                   <td className="px-4 py-2.5 text-muted-foreground">{a.type}</td>
-                  <td className="px-4 py-2.5 tabular-nums text-foreground">{a.alerted}</td>
+                  <td className="px-4 py-2.5 tabular-nums text-foreground">{a.alerted ?? "—"}</td>
                   <td className="px-4 py-2.5"><span className={cn("rounded px-2 py-0.5 text-xs font-medium", STATUS_PILL[a.status])}>{a.status}</span></td>
                   <td className="px-4 py-2.5 tabular-nums text-muted-foreground">{a.lastProcessed}</td>
                   <td className="px-4 py-2.5">
@@ -131,14 +158,18 @@ export function AssignmentManagement() {
         </div>
 
         {/* Pagination */}
-        <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground">
           <span>Showing {rows.length} of {AM_TOTAL}</span>
           <div className="flex items-center gap-2">
-            <button className="hover:text-foreground">‹ Previous</button>
+            <button className="flex items-center gap-1 hover:text-foreground"><ChevronLeft className="size-4" /> Previous</button>
             {[1, 2, 3].map((p) => (
-              <button key={p} className={cn("size-7 rounded", p === 1 ? "bg-primary text-white" : "hover:bg-muted")}>{p}</button>
+              <button key={p} className={cn("size-7 rounded", p === 1 ? "border bg-background text-foreground" : "hover:bg-muted")}>{p}</button>
             ))}
-            <button className="hover:text-foreground">Next ›</button>
+            <button className="flex items-center gap-1 hover:text-foreground">Next <ChevronRight className="size-4" /></button>
+          </div>
+          <div className="flex items-center gap-2">
+            Rows per page
+            <span className="flex items-center gap-1 rounded-md border bg-background px-2 py-1 text-foreground">10 <ChevronDown className="size-3.5" /></span>
           </div>
         </div>
       </div>
