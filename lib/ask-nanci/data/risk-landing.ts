@@ -26,15 +26,17 @@ export const RISK_QUICK_ACTIONS: { label: string; icon: LucideIcon; iconCls: str
 ]
 
 // "Nanci's take on today" — severity-dot insight cards. dot: semantic color.
-export const RISK_NANCI_TAKES: {
+// A take always answers as a conversation (never jumps to a destination): on the
+// landing that's the chat view, on the Dashboard it's the sibling chat panel.
+export interface RiskTake {
   dot: string
   title: string
   body: string
   badges: { label: string; icon: LucideIcon }[]
   prompt: string
-  dest?: RiskChipDest
-  filter?: RiskChipFilter
-}[] = [
+}
+
+export const RISK_NANCI_TAKES: RiskTake[] = [
   {
     dot: "bg-red-500",
     title: "Alert Volume requires attention",
@@ -55,7 +57,5 @@ export const RISK_NANCI_TAKES: {
     body: "TX and OH merchants — 0553 OH Toledo and 8040 NY Rochester are highest priority with +180 and +140 score deltas.",
     badges: [{ label: "VW vs. MC Scatter", icon: LineChart }, { label: "High Risk Merchants", icon: TriangleAlert }],
     prompt: "Show the 5 merchants that are both VW and MC critical",
-    dest: "barometer-report",
-    filter: "critical",
   },
 ]

@@ -1,10 +1,12 @@
 "use client"
 
+import Image from "next/image"
 import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { Settings } from "lucide-react"
 import { Badge, Button } from "aperia-ds5"
+import { cn } from "aperia-ds5/utils"
 import { formatCurrency } from "@/components/ask-nanci/shared"
-import { DETECTION_QUEUE, type QueueStatus } from "@/lib/ask-nanci/data/risk-detection-queue"
+import { DETECTION_QUEUE, type QueueStatus, type DetectionQueueData } from "@/lib/ask-nanci/data/risk-detection-queue"
 
 // The assignment summary block (name + report switch + KPI row + chart + status grid),
 // shared by the Detection Queue and Barometer Report destinations. Built to the Figma
@@ -75,7 +77,9 @@ function StatusChart({ statuses }: { statuses: QueueStatus[] }) {
           itemStyle={{ padding: 0 }}
           formatter={(value) => [`${Number(value).toLocaleString()} merchants`, ""]}
         />
-        <Bar dataKey="count" radius={8} maxBarSize={52}>
+        {/* minPointSize: a zero status still draws a thin colored line on the
+            baseline, as in the Figma, instead of vanishing. */}
+        <Bar dataKey="count" radius={8} maxBarSize={52} minPointSize={3}>
           {statuses.map((s) => <Cell key={s.key} fill={HEX[s.color]} />)}
         </Bar>
       </BarChart>
@@ -83,31 +87,35 @@ function StatusChart({ statuses }: { statuses: QueueStatus[] }) {
   )
 }
 
-export function QueueSummaryCard({ onBarometer }: { onBarometer?: () => void }) {
-  const q = DETECTION_QUEUE
+export function QueueSummaryCard({ queue = DETECTION_QUEUE, onBarometer }: { queue?: DetectionQueueData; onBarometer?: () => void }) {
+  const q = queue
   const get = (key: QueueStatus["key"]) => q.statuses.find((s) => s.key === key)!
   const alerted = get("alerted")
-  const requeued = get("ready")
   const worked = get("worked")
-  const workedPct = requeued.count ? (worked.count / requeued.count) * 100 : 0
+  const workedPct = q.workedOf ? (worked.count / q.workedOf) * 100 : 0
 
   return (
     <div className="flex flex-col gap-1 rounded-xl bg-muted p-1">
       {/* Header — transparent on the gray card */}
       <div className="flex flex-wrap items-center gap-2 px-3 py-2">
         <p className="min-w-0 flex-1 truncate text-base font-semibold text-foreground">{q.assignment}</p>
+        {q.mastercard && <Image src="/iso/mastercard.svg" alt="Mastercard" width={28} height={20} className="h-5 w-auto shrink-0" />}
         <Badge variant="outline">{q.code}</Badge>
-        <Button variant="outline" size="sm">Security Report</Button>
-        <Button variant="default" size="sm" onClick={onBarometer}>Barometer Report</Button>
-        <Button variant="outline" size="icon-sm"><Settings className="size-4" /></Button>
+        {/* Only a queue with a drill-in handler is actionable. The others keep the
+            same chrome but are inert — nothing behind them in the demo. */}
+        <div className={cn("flex items-center gap-2", !onBarometer && "pointer-events-none")} aria-hidden={!onBarometer}>
+          <Button variant="outline" size="sm" tabIndex={onBarometer ? undefined : -1}>Security Report</Button>
+          <Button variant="default" size="sm" onClick={onBarometer} tabIndex={onBarometer ? undefined : -1}>Barometer Report</Button>
+          <Button variant="outline" size="icon-sm" tabIndex={onBarometer ? undefined : -1}><Settings className="size-4" /></Button>
+        </div>
       </div>
 
       {/* KPI row — transparent */}
       <div className="grid grid-cols-2 gap-4 px-3 py-1 sm:grid-cols-4">
         <Kpi label="Eligible Merchant Count" value={q.eligibleMerchants.toLocaleString()} sub="Merchants" />
         <Kpi label="Alerted" value={alerted.count.toLocaleString()} sub={formatCurrency(alerted.amount)} />
-        <Kpi label="Re-queued" value={requeued.count.toLocaleString()} sub={formatCurrency(requeued.amount)} />
-        <Kpi label="% Worked" value={`${workedPct.toFixed(2)}%`} sub={`${worked.count} of ${requeued.count}`} />
+        <Kpi label="Re-queued" value={q.requeued.count.toLocaleString()} sub={formatCurrency(q.requeued.amount)} />
+        <Kpi label="% Worked" value={`${workedPct.toFixed(2)}%`} sub={`${worked.count} of ${q.workedOf.toLocaleString()}`} />
       </div>
 
       {/* Chart + status grid — white shadowed card */}

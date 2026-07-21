@@ -8,8 +8,9 @@ import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
 import { useRiskNav } from "../RiskNavContext"
 import { RISK_NANCI_TAKES } from "@/lib/ask-nanci/data/risk-landing"
-import { DASH_KPIS, DASH_INSIGHTS, type DashChartId } from "@/lib/ask-nanci/data/risk-dashboard"
+import { DASH_KPIS, DASH_HIGHLIGHTS, type DashChartId } from "@/lib/ask-nanci/data/risk-dashboard"
 import { DashChart, CHART_TITLES } from "./charts"
+import { NanciTakeCard } from "../NanciTakeCard"
 
 const PANEL_ID = "dashboard-insight"
 
@@ -23,7 +24,7 @@ function ChartPanel({ id, title, active, dim, children }: { id: DashChartId; tit
       dim && "opacity-50",
     )} data-chart={id}>
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+        <h3 className="truncate text-base font-semibold text-foreground">{title}</h3>
         <div className="flex items-center gap-1 text-muted-foreground">
           <Sparkles className="size-4 text-primary" />
           <MoreHorizontal className="size-4" />
@@ -40,9 +41,9 @@ export function Dashboard() {
   const panelOpen = dynamicPanels.includes(PANEL_ID)
   const activeKey = usePanelView(PANEL_ID, "")
   const active = panelOpen && activeKey ? activeKey : null
-  const insight = active ? DASH_INSIGHTS[active] ?? null : null
-  const isOn = (id: DashChartId) => insight?.highlight.includes(id) ?? false
-  const anyActive = !!insight
+  const highlight = active ? DASH_HIGHLIGHTS[active] ?? null : null
+  const isOn = (id: DashChartId) => highlight?.includes(id) ?? false
+  const anyActive = !!highlight
 
   // Clicking a take opens/updates the registered insight panel (or closes it if
   // it's already showing that take).
@@ -69,24 +70,13 @@ export function Dashboard() {
         <div className="rounded-xl border border-blue-200 bg-blue-50/60 p-4 dark:border-blue-900 dark:bg-blue-950/20">
           <div className="mb-3 flex items-center gap-2">
             <BarChartBig className="size-4 text-foreground" />
-            <p className="text-sm font-semibold text-foreground">Ask Nanci&apos;s take on today</p>
+            <p className="text-base font-semibold text-foreground">Ask Nanci&apos;s take on today</p>
           </div>
           <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
             {RISK_NANCI_TAKES.map((take) => (
-              <button
-                key={take.title}
-                onClick={() => toggleTake(take.title)}
-                className={cn(
-                  "flex gap-2.5 rounded-lg border bg-card p-3 text-left transition-colors hover:bg-muted",
-                  active === take.title && "border-primary ring-1 ring-primary",
-                )}
-              >
-                <span className={`mt-1 size-2 shrink-0 rounded-full ${take.dot}`} />
-                <div>
-                  <p className="text-xs font-semibold text-foreground">{take.title}</p>
-                  <p className="mt-0.5 text-[11px] leading-relaxed text-muted-foreground">{take.body}</p>
-                </div>
-              </button>
+              // Same card as the landing — but here the answer lands in a sibling
+              // chat panel and the related charts light up behind it.
+              <NanciTakeCard key={take.title} take={take} active={active === take.title} onClick={() => toggleTake(take.title)} />
             ))}
           </div>
         </div>
@@ -94,12 +84,12 @@ export function Dashboard() {
         {/* KPI row */}
         <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
           {DASH_KPIS.map((k) => (
-            <div key={k.label} className="rounded-xl border bg-card p-3">
+            <div key={k.label} className="rounded-xl border bg-card p-4">
               <div className="flex items-center justify-between">
-                <p className="text-xs text-muted-foreground">{k.label}</p>
+                <p className="text-sm text-foreground">{k.label}</p>
                 <k.icon className="size-4 text-muted-foreground" />
               </div>
-              <p className="mt-1 text-2xl font-semibold tabular-nums text-foreground">{k.value}</p>
+              <p className="mt-1 text-[28px] font-bold leading-tight tabular-nums text-foreground">{k.value}</p>
               <p className="text-xs text-muted-foreground">
                 {k.delta && <span className={`font-medium ${k.deltaCls}`}>{k.delta} </span>}{k.sub}
               </p>

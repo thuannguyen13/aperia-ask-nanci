@@ -4,8 +4,8 @@ import Image from "next/image"
 import { BarChartBig, Clock5 } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { ChatInput } from "@/components/ask-nanci/ChatInput"
-import { ExplorePrompts } from "@/components/ask-nanci/ExplorePrompts"
 import { RISK_HEADLINE_STATS, RISK_QUICK_ACTIONS, RISK_NANCI_TAKES, type RiskChipDest, type RiskChipFilter } from "@/lib/ask-nanci/data/risk-landing"
+import { NanciTakeCard } from "./NanciTakeCard"
 
 // Ask Nanci home for the Aperia Risk skin. Reuses ChatInput + ExplorePrompts +
 // recent-chats from context; the greeting/stat-line/quick-actions/Nanci's-take
@@ -68,32 +68,11 @@ export function RiskLanding({ onOpenView }: { onOpenView?: (dest: RiskChipDest, 
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {RISK_NANCI_TAKES.map((take) => (
-              <button
-                key={take.title}
-                onClick={() => runChip(take)}
-                className="flex gap-2.5 rounded-2xl border bg-card p-4 text-left transition-colors hover:bg-muted"
-              >
-                <span className={`mt-1 size-2 shrink-0 rounded-full ${take.dot}`} />
-                <div className="flex flex-col gap-2">
-                  <div className="flex flex-col gap-1">
-                    <p className="text-sm font-semibold text-foreground">{take.title}</p>
-                    <p className="text-xs leading-relaxed text-muted-foreground">{take.body}</p>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {take.badges.map(({ label, icon: Icon }) => (
-                      <span key={label} className="flex items-center gap-1 rounded bg-blue-100 px-1.5 py-0.5 text-[10px] font-semibold text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
-                        <Icon className="size-2.5" /> {label}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </button>
+              // A take never navigates — it answers in the chat view, in place.
+              <NanciTakeCard key={take.title} take={take} onClick={() => handlePrompt(take.prompt)} />
             ))}
           </div>
         </div>
-
-        {/* Common questions — reuse the tabbed ExplorePrompts */}
-        <ExplorePrompts description="Jumpstart your analysis with curated questions." />
 
         {/* Pick up where you left off */}
         {recent.length > 0 && (

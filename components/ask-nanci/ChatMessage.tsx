@@ -9,6 +9,7 @@ import { MessageChart } from "./MessageChart"
 import { MessageMap } from "./MessageMap"
 import { ChangeAuditSheet } from "./concept/ChangeAuditSheet"
 import { AiTriageSummaryWidget } from "./AiTriageSummaryWidget"
+import { DashChartCard } from "@/components/risk/dashboard/DashChartCard"
 
 // Attachment-style card that opens the change-request/confirmation drawer — more
 // noticeable than a plain text link.
@@ -188,6 +189,7 @@ function BotMessageBase({
         {showExtras && message.widget === "ai-triage-summary" && (
           <AiTriageSummaryWidget />
         )}
+        {showExtras && message.dashChart && <DashChartCard id={message.dashChart} />}
         {showExtras && message.sheetAction && (
           <>
             <ChangeRequestCard data={message.sheetAction} onClick={() => setSheetOpen(true)} />

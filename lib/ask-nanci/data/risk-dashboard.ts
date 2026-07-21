@@ -87,48 +87,11 @@ export const REALERT_ROWS: { assignment: string; worked: number; realerted: numb
   { assignment: "MC Velocity (system)",          worked: 68,   realerted: 31,  rate: 45.6, action: "Raise velocity threshold from 15 → 20 pts" },
 ]
 
-// ── Insight → highlight + panel content (keyed by RISK_NANCI_TAKES title) ─────
-export interface DashInsight {
-  highlight: DashChartId[]
-  panel: { lead: string; heading: string; body: string; focusChart: DashChartId }
-  chips: { label: string; action: "detection-queue" | "critical" | "none" }[]
-}
-
-export const DASH_INSIGHTS: Record<string, DashInsight> = {
-  "Alert Volume requires attention": {
-    highlight: ["alert-volume", "realert"],
-    panel: {
-      lead: "Here's my read on today. 364 merchants alerted, 298 ready to work. Three things I'd look at before anything else:",
-      heading: "1. Alert volume is running hot.",
-      body: "357 alerts — 63 more than yesterday. A 20.1% re-alert rate tells me some thresholds are too loose and re-firing on merchants you've already seen. Esquire - Phase 2 is carrying most of the load.",
-      focusChart: "alert-volume",
-    },
-    chips: [
-      { label: "View Re-Alert Breakdown", action: "none" },
-      { label: "Open Detection Queue", action: "detection-queue" },
-    ],
-  },
-  "MC Velocity re-alert rate is 45.6% — highest today": {
-    highlight: ["realert", "param-heat"],
-    panel: {
-      lead: "Here's my read on today. Your noisiest parameter is the one to fix first:",
-      heading: "MC Velocity re-alert rate is 45.6%.",
-      body: "Only 18 alerts, but nearly half are repeats on merchants already surfaced — that's threshold noise, not new risk. Raising the velocity threshold from 15 → 20 points trims the repeats without touching your High-risk accounts.",
-      focusChart: "realert",
-    },
-    chips: [{ label: "Review MC Velocity", action: "none" }],
-  },
-  "5 merchants are both VW critical and MC critical": {
-    highlight: ["scatter", "high-risk"],
-    panel: {
-      lead: "Here's my read on today. Both models agree at the top — that's your strongest signal:",
-      heading: "5 merchants are both VW and MC critical.",
-      body: "They sit in the upper-right of the scatter — critical on both scores. 0553 OH Toledo (+180) and 8040 NY Rochester (+140) lead on score delta and should be worked first.",
-      focusChart: "scatter",
-    },
-    chips: [
-      { label: "Open 5 Critical Merchants", action: "critical" },
-      { label: "Open Detection Queue", action: "detection-queue" },
-    ],
-  },
+// ── Take → the charts its answer points at (keyed by RISK_NANCI_TAKES title) ──
+// Clicking a take opens the sibling chat panel; these charts get ringed and the
+// rest dim, so the answer and the dashboard behind it stay tied together.
+export const DASH_HIGHLIGHTS: Record<string, DashChartId[]> = {
+  "Alert Volume requires attention": ["alert-volume", "realert"],
+  "MC Velocity re-alert rate is 45.6% — highest today": ["realert", "param-heat"],
+  "5 merchants are both VW critical and MC critical": ["scatter", "high-risk"],
 }

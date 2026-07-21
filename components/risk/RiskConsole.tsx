@@ -55,7 +55,10 @@ export function RiskConsole() {
           <Image src="/logos/aperia-full.svg" alt="Aperia" width={82} height={24} className="h-6 w-auto" />
         </div>
       }
-      sidebar={<Sidebar menu={nav} brand={{ label: "Aperia", badge: "RISK" }} />}
+      sidebar={<Sidebar menu={nav} brand={{
+        src: "/logos/logo-aperia-risk.svg", alt: "Aperia Risk", width: 146, height: 33,
+        mark: { src: "/logos/logo-aperia-risk-logomark.svg", width: 29, height: 32 },
+      }} />}
     >
       <RiskNavProvider value={{ go: setDest, openBarometer, openMerchant, merchantId, barometerFilter }}>
         <div className="flex min-w-0 flex-1 py-1 pr-1">

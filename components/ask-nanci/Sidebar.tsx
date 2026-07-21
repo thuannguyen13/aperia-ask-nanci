@@ -53,10 +53,17 @@ function SidebarItem({
 
 // When `menu` is provided the rail renders a fixed nav list (e.g. the Aperia Risk
 // skin) instead of New Chat + recent chats, and hides the Teach Nanci / Usage cards.
-// `brand` swaps the header wordmark. Both optional — default behavior is unchanged.
+// `brand` swaps the header wordmark for a logo. Both optional — default behavior
+// is unchanged.
 type SidebarNavItem = { icon: React.ElementType; label: string; active?: boolean; onClick?: () => void }
+// `mark` is the collapsed-rail logomark; without it the rail falls back to the
+// Ask Nanci logomark.
+type SidebarBrand = {
+  src: string; alt: string; width: number; height: number
+  mark?: { src: string; width: number; height: number }
+}
 
-export function Sidebar({ menu, brand }: { menu?: SidebarNavItem[]; brand?: { label: string; badge?: string } } = {}) {
+export function Sidebar({ menu, brand }: { menu?: SidebarNavItem[]; brand?: SidebarBrand } = {}) {
   const { sessions, activeSessionId, startNewChat, resumeSession, deleteSessionById, setKbOpen, setMarketplaceOpen, mobileSidebarOpen, setMobileSidebarOpen, currentUser } = useAskNanci()
   const [collapsed, setCollapsed] = useState(false)
   const [wizardOpen, setWizardOpen] = useState(false)
@@ -76,11 +83,14 @@ export function Sidebar({ menu, brand }: { menu?: SidebarNavItem[]; brand?: { la
                   className="group relative flex size-6 items-center justify-center"
                 >
                   <Image
-                    src="/ask-nanci/ask-nanci-logomark.svg"
-                    alt="Ask Nanci"
-                    width={24}
-                    height={24}
-                    className="transition-opacity duration-150 group-hover:opacity-0"
+                    src={brand?.mark?.src ?? "/ask-nanci/ask-nanci-logomark.svg"}
+                    alt={brand?.alt ?? "Ask Nanci"}
+                    width={brand?.mark?.width ?? 24}
+                    height={brand?.mark?.height ?? 24}
+                    className={cn(
+                      "h-6 w-auto transition-opacity duration-150 group-hover:opacity-0",
+                      brand?.mark && "dark:invert", // solid-black mark, no brand colors to preserve
+                    )}
                   />
                   <PanelLeft className="absolute size-4 rotate-180 text-foreground opacity-0 transition-opacity duration-150 group-hover:opacity-100" />
                 </button>
@@ -88,12 +98,15 @@ export function Sidebar({ menu, brand }: { menu?: SidebarNavItem[]; brand?: { la
               <TooltipContent side="right">Expand sidebar</TooltipContent>
             </Tooltip>
           ) : brand ? (
-            <>
-              <span className="text-[15px] font-semibold tracking-tight text-foreground whitespace-nowrap">{brand.label}</span>
-              {brand.badge && (
-                <span className="rounded bg-foreground px-1.5 py-0.5 text-[10px] font-bold tracking-wide text-background">{brand.badge}</span>
-              )}
-            </>
+            // invert+hue-rotate keeps the black wordmark legible on dark without
+            // turning the Mastercard roundel cyan — it has baked-in brand colors.
+            <Image
+              src={brand.src}
+              alt={brand.alt}
+              width={brand.width}
+              height={brand.height}
+              className="h-8 w-auto dark:invert dark:hue-rotate-180"
+            />
           ) : (
             <>
               <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="Ask Nanci" width={24} height={24} />

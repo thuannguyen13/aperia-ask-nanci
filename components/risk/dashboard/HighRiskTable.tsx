@@ -1,6 +1,16 @@
 "use client"
 
+import { ChevronsUpDown } from "lucide-react"
 import { HIGH_RISK_MERCHANTS } from "@/lib/ask-nanci/data/risk-dashboard"
+
+// ponytail: display-only sort affordance — the Figma is static, no sorting yet.
+function Th({ children, right }: { children: React.ReactNode; right?: boolean }) {
+  return (
+    <th className={`px-3 py-2 font-medium ${right ? "text-right" : ""}`}>
+      <span className="inline-flex items-center gap-1">{children}<ChevronsUpDown className="size-3 text-muted-foreground" /></span>
+    </th>
+  )
+}
 
 // Merchants whose MC score jumped most — the drivers behind today's risk.
 export function HighRiskTable() {
@@ -8,10 +18,10 @@ export function HighRiskTable() {
     <div className="overflow-hidden rounded-lg border">
       <table className="w-full text-xs">
         <thead>
-          <tr className="border-b bg-muted/40 text-left text-muted-foreground">
-            <th className="px-3 py-2 font-medium">Merchant</th>
-            <th className="px-3 py-2 font-medium">MC Score Change</th>
-            <th className="px-3 py-2 text-right font-medium">Delta</th>
+          <tr className="border-b bg-muted/40 text-left text-foreground">
+            <Th>Merchant</Th>
+            <Th>MC Score Change</Th>
+            <Th right>Delta</Th>
           </tr>
         </thead>
         <tbody>
@@ -19,7 +29,7 @@ export function HighRiskTable() {
             <tr key={m.name} className="border-b last:border-0">
               <td className="px-3 py-2 font-medium text-primary">{m.name}</td>
               <td className="px-3 py-2 tabular-nums text-foreground">{m.from} → {m.to}</td>
-              <td className="px-3 py-2 text-right font-medium tabular-nums text-rose-600 dark:text-rose-400">+{m.delta}</td>
+              <td className="px-3 py-2 text-right tabular-nums text-foreground">+{m.delta}</td>
             </tr>
           ))}
         </tbody>

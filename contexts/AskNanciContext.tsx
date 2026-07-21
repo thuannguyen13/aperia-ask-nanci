@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useCallback, useRef, useEffect } f
 import type { Message, Session, Source, UsageData, ConceptScriptedTurn, PanelId, PanelAction, SheetActionData } from "@/lib/ask-nanci/types"
 import { usePanelStack } from "@/lib/ask-nanci/use-panel-stack"
 import { turnToPanelActions } from "@/lib/ask-nanci/panel-actions"
+import { streamWords as streamWordChunks } from "@/lib/ask-nanci/stream-words"
 import { usePendingBotSetter } from "@/contexts/ChatStreamContext"
 import {
   fetchSessions,
@@ -289,30 +290,19 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
 
   // Stream `text` word-by-word into pendingBot, then commit it to messages.
   // The one place all three scripted playback paths do token-streaming.
-  const streamWords = useCallback((
+  const streamWords = useCallback(async (
     text: string,
     opts: { id?: string; extra?: Partial<Message>; shouldStop?: () => boolean; onDone?: () => void } = {},
-  ) =>
-    new Promise<void>((resolve) => {
-      const botMsg: Message = { id: opts.id ?? newSessionId(), role: "assistant", content: "" }
-      setChatState("streaming")
-      const chunks = text.match(/\S+\s*/g) ?? []   // word-boundary chunks mimic token streaming
-      let i = 0
-      const tick = () => {
-        if (opts.shouldStop?.()) { setPendingBot(null); resolve(); return }
-        if (i >= chunks.length) {
-          setMessages((prev) => [...prev, { ...botMsg, content: text, ...opts.extra }])
-          setPendingBot(null)
-          opts.onDone?.()
-          resolve()
-          return
-        }
-        botMsg.content += chunks[i++]
-        setPendingBot({ ...botMsg })
-        setTimeout(tick, 50 + Math.random() * 70)
-      }
-      tick()
-    }), [])
+  ) => {
+    const botMsg: Message = { id: opts.id ?? newSessionId(), role: "assistant", content: "" }
+    setChatState("streaming")
+    const done = await streamWordChunks(text, (partial) => setPendingBot({ ...botMsg, content: partial }), {
+      shouldStop: opts.shouldStop,
+    })
+    if (done) setMessages((prev) => [...prev, { ...botMsg, content: text, ...opts.extra }])
+    setPendingBot(null)
+    if (done) opts.onDone?.()
+  }, [])
 
   const playScripted = useCallback((prompt: string) => {
     const script = SCRIPTED_CONVERSATIONS[prompt]
@@ -388,7 +378,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const playAssistantTurn = useCallback(async (turn: ConceptScriptedTurn, suggestions: string[] | undefined) => {
     await streamWords(turn.content, { id: newSessionId(), shouldStop: () => scriptStopRef.current })
     if (turn.widgetDelay) await sleep(turn.widgetDelay)
-    if (turn.sheetAction || suggestions || turn.widget || turn.map || turn.source) {
+    if (turn.sheetAction || suggestions || turn.widget || turn.dashChart || turn.map || turn.source) {
       setMessages((prev) => {
         const next = [...prev]
         const last = next[next.length - 1]
@@ -398,6 +388,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
             ...(turn.sheetAction ? { sheetAction: turn.sheetAction } : {}),
             ...(suggestions ? { suggestions } : {}),
             ...(turn.widget ? { widget: turn.widget } : {}),
+            ...(turn.dashChart ? { dashChart: turn.dashChart } : {}),
             ...(turn.map ? { map: turn.map } : {}),
             ...(turn.source ? { source: turn.source } : {}),
           }

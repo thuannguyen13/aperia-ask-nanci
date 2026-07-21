@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import { MoreHorizontal, FileText, FolderPlus, ChevronDown, Check, CircleCheckBig, TriangleAlert, List, ArrowUpDown, Filter, Download, Settings, Pencil, Trash2 } from "lucide-react"
+import { MoreHorizontal, FileText, FolderPlus, ChevronDown, Check, Loader, CircleCheckBig, TriangleAlert, List, ArrowUpDown, Filter, Download, Settings, Pencil, Trash2 } from "lucide-react"
 import {
   Badge, Button, Label, Textarea, RadioGroup, RadioGroupItem,
   Popover, PopoverTrigger, PopoverContent,
@@ -103,29 +103,45 @@ function Row({ label, value, badgeClass }: { label: string; value: string; badge
   )
 }
 
-function ScoreCard({ brand, logo, score, max, level, deltas, params, extra }: {
-  brand: string; logo?: React.ReactNode; score: number; max: number; level: string; deltas: React.ReactNode; params: string; extra?: { label: string; value: string }[]
+// `dark` is the Mastercard treatment (Figma 1029:28244): near-black card with two
+// oversized ellipses bleeding past the edges. Exact hexes from the design — they
+// are a fixed brand surface, not theme tokens, so they don't flip in dark mode.
+function ScoreCard({ brand, logo, score, max, level, deltas, params, extra, dark }: {
+  brand: string; logo?: React.ReactNode; score: number; max: number; level: string; deltas: React.ReactNode; params: string; extra?: { label: string; value: string }[]; dark?: boolean
 }) {
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-xl border bg-card">
-      <div className="p-4">
+    <div className={cn(
+      "relative flex h-full flex-col overflow-hidden rounded-xl border",
+      dark ? "border-transparent bg-[#20201f]" : "bg-card",
+    )}>
+      {dark && (
+        <>
+          <div className="pointer-events-none absolute -right-[206px] -top-[213px] h-[342px] w-[486px] rounded-[50%] bg-black/25" />
+          <div className="pointer-events-none absolute -left-[115px] top-[127px] h-[226px] w-[321px] rounded-[50%] bg-black/20" />
+        </>
+      )}
+      <div className="relative p-4">
         <div className="flex items-center gap-2">
           {logo}
-          <p className="text-base font-semibold text-foreground">{brand}</p>
-          <Badge variant="destructive">{level}</Badge>
+          <p className={cn("text-base font-semibold", dark ? "text-white" : "text-foreground")}>{brand}</p>
+          {/* destructive is a 10%-opacity fill — it blends to pink on white but
+              goes maroon on the dark card, so pin the opaque equivalent there. */}
+          <Badge variant="destructive" className={cn(dark && "bg-red-100 text-red-600")}>{level}</Badge>
         </div>
-        <p className="mt-2 text-3xl font-bold tabular-nums text-rose-600 dark:text-rose-400">{score}<span className="text-lg font-medium text-muted-foreground"> /{max}</span></p>
-        <p className="mt-1 text-xs text-muted-foreground">{deltas}</p>
+        <p className="mt-2 text-3xl font-bold tabular-nums text-rose-600 dark:text-rose-400">
+          {score}<span className={cn("text-lg font-medium", dark ? "text-[#a3a3a3]" : "text-muted-foreground")}> /{max}</span>
+        </p>
+        <p className={cn("mt-1 text-xs", dark ? "text-[#a3a3a3]" : "text-muted-foreground")}>{deltas}</p>
       </div>
-      <div className="flex-1 border-t bg-muted/40 px-4 py-3">
+      <div className={cn("relative flex-1 px-4 py-3", dark ? "bg-[#30302d]" : "border-t bg-muted/40")}>
         <div className="grid grid-cols-[1fr_2fr] items-center gap-2 py-1 text-sm">
-          <span className="text-muted-foreground">Driving Parameters</span>
-          <span className="text-primary">{params}</span>
+          <span className={dark ? "text-[#a3a3a3]" : "text-muted-foreground"}>Driving Parameters</span>
+          <span className={dark ? "text-blue-500" : "text-primary"}>{params}</span>
         </div>
         {extra?.map((e) => (
           <div key={e.label} className="grid grid-cols-[1fr_2fr] items-center gap-2 py-1 text-sm">
-            <span className="text-muted-foreground">{e.label}</span>
-            <span className="text-foreground">{e.value}</span>
+            <span className={dark ? "text-[#a3a3a3]" : "text-muted-foreground"}>{e.label}</span>
+            <span className={dark ? "text-white" : "text-foreground"}>{e.value}</span>
           </div>
         ))}
       </div>
@@ -264,23 +280,35 @@ const DISPOSITIONS = [
   "Contact Merchant", "Other (Specify)",
 ]
 
+// The three states of the split button. Hexes sampled from the design: WIP is
+// yellow-600 (#ca8a02), Worked is green-600 (#16a34a); the default keeps `primary`.
+// The spinner is a status glyph, not a loading affordance — it does not spin.
+type WorkState = "none" | "wip" | "worked"
+const WORK_STATES: Record<WorkState, { label: string; icon?: typeof Check; cls?: string }> = {
+  none:   { label: "Mark Work" },
+  wip:    { label: "WIP",    icon: Loader, cls: "bg-yellow-600 text-white hover:bg-yellow-600/90" },
+  worked: { label: "Worked", icon: Check,  cls: "bg-green-600 text-white hover:bg-green-600/90" },
+}
+
 // "Mark Work and Disposition" — opens from the Mark Work dropdown. One radio group
 // (Work in Progress + 6 dispositions are mutually exclusive) plus a note.
-function MarkWorkPopover({ worked, onSubmit }: { worked: boolean; onSubmit: (choice: string, note: string) => void }) {
+function MarkWorkPopover({ state, onSubmit }: { state: WorkState; onSubmit: (choice: string, note: string) => void }) {
   const [open, setOpen] = useState(false)
   const [choice, setChoice] = useState("")
   const [note, setNote] = useState("")
+  const { label, icon: Icon, cls } = WORK_STATES[state]
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       {/* Figma "ButtonGroup" (split button) — ds5 has no ButtonGroup, so compose two
-          Buttons + a divider: main action on the left, dropdown chevron on the right. */}
+          Buttons + a divider: main action on the left, dropdown chevron on the right.
+          Both halves carry the state color so the group reads as one control. */}
       <div className="inline-flex items-center">
-        <Button size="sm" className="rounded-r-none" onClick={() => setOpen(true)}>
-          {worked ? <><Check className="size-3.5" /> Worked</> : "Mark Work"}
+        <Button size="sm" className={cn("rounded-r-none", cls)} onClick={() => setOpen(true)}>
+          {Icon && <Icon className="size-3.5" />} {label}
         </Button>
         <PopoverTrigger asChild>
-          <Button size="sm" aria-label="Mark work options" className="rounded-l-none border-l border-primary-foreground/25 px-2">
+          <Button size="sm" aria-label="Mark work options" className={cn("rounded-l-none border-l border-white/25 px-2", cls)}>
             <ChevronDown className="size-3.5" />
           </Button>
         </PopoverTrigger>
@@ -345,8 +373,10 @@ export function RiskReport() {
   const d = RISK_REPORT_DETAILS[nav.merchantId ?? ""] ?? DEFAULT_RISK_DETAIL
   const [noteOpen, setNoteOpen] = useState(false)
   const [note, setNote] = useState("")
-  const [worked, setWorked] = useState(false)
+  // The disposition is the single source of truth — "" means untouched, and
+  // "Work in Progress" is the one choice that isn't a terminal disposition.
   const [disposition, setDisposition] = useState("")
+  const workState: WorkState = !disposition ? "none" : disposition === "Work in Progress" ? "wip" : "worked"
   const [activeTab, setActiveTab] = useState("transactions")
   const [notes, setNotes] = useState<NoteEntry[]>(MERCHANT_NOTES_SEED)
 
@@ -375,9 +405,14 @@ export function RiskReport() {
       </div>
 
       {/* Mark-work payoff banner */}
-      {worked && (
-        <div className="mb-3 flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800 dark:border-green-900 dark:bg-green-950/30 dark:text-green-300">
-          <CircleCheckBig className="size-4 shrink-0" />
+      {disposition && (
+        <div className={cn(
+          "mb-3 flex items-center gap-2 rounded-lg border px-3 py-2 text-sm",
+          workState === "wip"
+            ? "border-yellow-200 bg-yellow-50 text-yellow-800 dark:border-yellow-900 dark:bg-yellow-950/30 dark:text-yellow-300"
+            : "border-green-200 bg-green-50 text-green-800 dark:border-green-900 dark:bg-green-950/30 dark:text-green-300",
+        )}>
+          {workState === "wip" ? <Loader className="size-4 shrink-0" /> : <CircleCheckBig className="size-4 shrink-0" />}
           {disposition === "Work in Progress"
             ? "Marked Work in Progress — saved to this merchant's case history."
             : `Disposition set to ${disposition} — the updated status will reflect on VisionWeb.`}
@@ -398,7 +433,7 @@ export function RiskReport() {
           <Button variant="secondary" size="icon-sm"><MoreHorizontal className="size-4" /></Button>
           <Button variant="secondary" size="sm" onClick={() => setNoteOpen((o) => !o)}><FileText className="size-4" /> Add Notes</Button>
           <Button variant="secondary" size="sm"><FolderPlus className="size-4" /> Open New Case</Button>
-          <MarkWorkPopover worked={worked} onSubmit={(choice) => { setWorked(true); setDisposition(choice) }} />
+          <MarkWorkPopover state={workState} onSubmit={(choice) => setDisposition(choice)} />
         </div>
 
         {/* Add Notes popover */}
@@ -431,8 +466,8 @@ export function RiskReport() {
           extra={[{ label: "Last Update", value: d.lastUpdate }]}
         />
         <ScoreCard
-          brand="MC Score" logo={<Image src="/iso/mastercard.svg" alt="Mastercard" width={28} height={20} className="h-5 w-auto" />}
-          score={m.mc} max={1000} level={m.risk}
+          brand="MC Score" logo={<Image src="/logos/mastercard-logomark.svg" alt="Mastercard" width={34} height={20} className="h-5 w-auto" />}
+          score={m.mc} max={1000} level={m.risk} dark
           deltas={<><span className="font-medium text-rose-600 dark:text-rose-400">{d.mcDelta7}</span> last 7 days · <span className="font-medium text-rose-600 dark:text-rose-400">{d.mcDelta30}</span> last 30 days</>}
           params={`${d.mcParams} parameters`}
           extra={[

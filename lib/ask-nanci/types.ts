@@ -1,5 +1,6 @@
 // PanelId is derived from the panel registry — add a panel there, not here.
 import type { PanelId } from "@/components/ask-nanci/concept/panel-registry"
+import type { DashChartId } from "./data/risk-dashboard"
 export type { PanelId }
 
 export type MessageRole = "user" | "assistant"
@@ -49,6 +50,7 @@ export interface ConceptScriptedTurn extends ScriptedTurn {
   filterDeclineReport?: true
   closeAllPanels?: true
   widget?: "ai-triage-summary"
+  dashChart?: DashChartId
   widgetDelay?: number
   pauseAfter?: number
 }
@@ -117,6 +119,7 @@ export interface Message {
   sheetAction?: SheetActionData
   source?: string // muted "Source: …" attribution line under a scripted answer
   widget?: "ai-triage-summary"
+  dashChart?: DashChartId // embeds a live Risk dashboard chart card in the answer
   /** True when the stream ended (user stopped or natural completion). Prevents re-appending a partial response on session resume. */
   stopped?: boolean
 }

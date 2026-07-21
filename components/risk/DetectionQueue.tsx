@@ -4,6 +4,7 @@ import { SlidersHorizontal, RefreshCw } from "lucide-react"
 import { Button } from "aperia-ds5"
 import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
 import { QueueSummaryCard } from "./QueueSummaryCard"
+import { DETECTION_QUEUES } from "@/lib/ask-nanci/data/risk-detection-queue"
 import { useRiskNav } from "./RiskNavContext"
 
 export function DetectionQueue() {
@@ -24,8 +25,12 @@ export function DetectionQueue() {
         onClose={() => nav.go("ask-nanci")}
       />
 
-      <div className="flex-1 overflow-y-auto p-4 md:p-6">
-        <QueueSummaryCard onBarometer={openBarometer} />
+      <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 md:p-6">
+        {DETECTION_QUEUES.map((q, i) => (
+          // Only the first (Mastercard) queue drills into the Barometer Report —
+          // the second card's actions are inert.
+          <QueueSummaryCard key={q.assignment} queue={q} onBarometer={i === 0 ? openBarometer : undefined} />
+        ))}
       </div>
     </PanelShell>
   )
