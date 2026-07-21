@@ -312,7 +312,9 @@ export interface ConceptEmbedLayout {
   openMarketplace?: boolean; // auto-open the Service Marketplace panel on load
 }
 export const CONCEPT_EMBED_FLOW_LAYOUTS: Record<string, ConceptEmbedLayout> = {
-  "22": { fullApp: true }, // Merchant Service Marketplace — panel opens from the sidebar banner
+  // Merchant Service Marketplace — the marketplace IS the destination for this flow,
+  // so it's open on load rather than waiting on the sidebar banner.
+  "22": { fullApp: true, openMarketplace: true },
 };
 
 // Trigger prompts (routing guard + recycled as end-of-flow suggestion chips), in
