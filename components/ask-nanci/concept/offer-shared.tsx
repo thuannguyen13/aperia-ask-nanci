@@ -40,11 +40,13 @@ const LABEL = "text-[13px] font-medium text-foreground"
 // full-opacity text (not DS `disabled`, which fades to 50%). Matches the Figma forms.
 const READONLY_FIELD = "bg-muted border-transparent text-foreground cursor-default"
 
-export function OfferField({ label, value, readOnly }: { label: string; value: string; readOnly?: boolean }) {
+export function OfferField({ label, value, readOnly, hint }: { label: string; value: string; readOnly?: boolean; hint?: string }) {
   return (
     <div className="flex flex-col gap-1.5">
       <Label className={LABEL}>{label}</Label>
       <Input defaultValue={value} readOnly={readOnly} className={cn(readOnly && READONLY_FIELD)} />
+      {/* Says where a pre-filled number came from, so it reads as reasoned, not guessed. */}
+      {hint && <p className="text-[11px] text-muted-foreground">{hint}</p>}
     </div>
   )
 }

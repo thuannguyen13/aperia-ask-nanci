@@ -50,47 +50,19 @@ export const CONCEPT_CHAT_TITLES: Record<string, string> = {
 
 // Fake end-of-flow follow-up questions — shown for realism only, with no scripted
 // conversation behind them. Clicking one is a no-op (see CONCEPT_FAKE_FOLLOWUPS).
-export const CONCEPT_FLOW5_FOLLOWUPS = [
-  "Show yesterday's summary",
-  "Break down my spending",
-  "Check payroll affordability",
-];
+export const CONCEPT_FLOW5_FOLLOWUPS = ["Show yesterday's summary", "Break down my spending", "Check payroll affordability"];
 
-export const CONCEPT_FLOW13_FOLLOWUPS = [
-  "Investigate payout discrepancy",
-  "Compare this week vs last week",
-  "Review this month's fee changes",
-  "Update deposit bank account",
-];
+export const CONCEPT_FLOW13_FOLLOWUPS = ["Investigate payout discrepancy", "Compare this week vs last week", "Review this month's fee changes", "Update deposit bank account"];
 
-export const CONCEPT_FLOW14_FOLLOWUPS = [
-  "Investigate payout discrepancy",
-  "Compare this week vs last week",
-  "Check weekend deposit timing",
-];
+export const CONCEPT_FLOW14_FOLLOWUPS = ["Investigate payout discrepancy", "Compare this week vs last week", "Check weekend deposit timing"];
 
-export const CONCEPT_FLOW15_FOLLOWUPS_FAKE = [
-  "Check weekend deposit timing",
-  "Review this month's fee changes",
-  "Investigate payout discrepancy",
-];
+export const CONCEPT_FLOW15_FOLLOWUPS_FAKE = ["Check weekend deposit timing", "Review this month's fee changes", "Investigate payout discrepancy"];
 
-export const CONCEPT_FLOW16_FOLLOWUPS = [
-  "Check weekend deposit timing",
-  "Investigate payout discrepancy",
-  "Update phone number",
-  "Compare this week vs last week",
-];
+export const CONCEPT_FLOW16_FOLLOWUPS = ["Check weekend deposit timing", "Investigate payout discrepancy", "Update phone number", "Compare this week vs last week"];
 
-export const CONCEPT_FLOW18_FOLLOWUPS = [
-  "Compare this week vs last week",
-  "Review this month's fee changes",
-];
+export const CONCEPT_FLOW18_FOLLOWUPS = ["Compare this week vs last week", "Review this month's fee changes"];
 
-export const CONCEPT_FLOW19_FOLLOWUPS = [
-  "Update payment processor MID",
-  "Update deposit bank account",
-];
+export const CONCEPT_FLOW19_FOLLOWUPS = ["Update payment processor MID", "Update deposit bank account"];
 
 // Every fake follow-up across flows — handlePrompt treats these as no-op decoration.
 // Add each flow's follow-up array here as the treatment rolls out.
@@ -135,7 +107,16 @@ export interface FlowDef {
 export const FLOW_DEFS: FlowDef[] = [
   // ── Interaction patterns ──
   { num: 1, section: "pattern", title: "Simple Update", badge: "Chat only", key: "Update my phone number", description: "Update a phone number — AI confirms and shows an audit record." },
-  { num: 2, section: "pattern", title: "Data Lookup", badge: "Chat + panel", key: CONCEPT_FLOW2_PROMPT, slug: "2", followups: [CONCEPT_FLOW2_FOLLOWUP], description: "Merchant volume table opens in a side panel, sortable by column." },
+  {
+    num: 2,
+    section: "pattern",
+    title: "Data Lookup",
+    badge: "Chat + panel",
+    key: CONCEPT_FLOW2_PROMPT,
+    slug: "2",
+    followups: [CONCEPT_FLOW2_FOLLOWUP],
+    description: "Merchant volume table opens in a side panel, sortable by column.",
+  },
   {
     num: 3,
     section: "pattern",
@@ -316,8 +297,8 @@ export const CONCEPT_FLOW_SLUGS: Record<string, string> = Object.fromEntries(
 // concept-embed is the sidebar-less compact chat widget; a flow listed here opts
 // into the full app shell (sidebar + standard welcome page) instead. Extend per flow.
 export interface ConceptEmbedLayout {
-  fullApp: boolean       // render Sidebar + standard WelcomeView instead of the compact widget
-  openMarketplace?: boolean // auto-open the Service Marketplace panel on load
+  fullApp: boolean; // render Sidebar + standard WelcomeView instead of the compact widget
+  openMarketplace?: boolean; // auto-open the Service Marketplace panel on load
 }
 export const CONCEPT_EMBED_FLOW_LAYOUTS: Record<string, ConceptEmbedLayout> = {
   "22": { fullApp: true }, // Merchant Service Marketplace — panel opens from the sidebar banner
@@ -341,20 +322,13 @@ const otherMerchantPrompts = (self: string) => CONCEPT_MERCHANT_PROMPTS.filter((
 
 // Derived — a prompt that continues an in-progress flow must not reset the session.
 // Owned by each flow via `keepSession` (its own key) + `followups` (continuation keys).
-export const CONCEPT_NO_RESET_PROMPTS = new Set<string>([
-  ...FLOW_DEFS.filter((f) => f.keepSession).map((f) => f.key),
-  ...FLOW_DEFS.flatMap((f) => f.followups ?? []),
-]);
+export const CONCEPT_NO_RESET_PROMPTS = new Set<string>([...FLOW_DEFS.filter((f) => f.keepSession).map((f) => f.key), ...FLOW_DEFS.flatMap((f) => f.followups ?? [])]);
 
 // Flows that step one turn per suggestion-pill click instead of auto-playing.
 // Defaults to the Merchant Money section; a flow's `manual` prop overrides it.
 // Includes each flow's followup/alt-entry keys so continuations step too.
 export const CONCEPT_MANUAL_PROMPTS = new Set<string>(
-  FLOW_DEFS.filter((f) => f.manual ?? f.section === "merchant").flatMap((f) => [
-    f.key,
-    ...(f.followups ?? []),
-    ...(f.altEntries?.map((e) => e.key) ?? []),
-  ]),
+  FLOW_DEFS.filter((f) => f.manual ?? f.section === "merchant").flatMap((f) => [f.key, ...(f.followups ?? []), ...(f.altEntries?.map((e) => e.key) ?? [])]),
 );
 
 // ─── Sheet action data (populated at module load) ─────────────────────────────
@@ -466,7 +440,8 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     { role: "user", content: "Update payment processor MID" },
     {
       role: "assistant",
-      content: "I can't change the MID itself — that's assigned by the processor and requires a new application. But if the goal is a different business name on receipts, that's a DBA update I can do.",
+      content:
+        "I can't change the MID itself — that's assigned by the processor and requires a new application. But if the goal is a different business name on receipts, that's a DBA update I can do.",
       suggestions: ["Update my DBA name"],
     },
   ],
@@ -479,7 +454,8 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     { role: "user", content: "Yes, go ahead." },
     {
       role: "assistant",
-      content: 'Your DBA name change has been submitted for review — I can\'t update what appears on receipts directly, so this goes to the team that can. Once it\'s approved, "Walker Bistro" will show on receipts and statements, typically within 1–2 business days.',
+      content:
+        "Your DBA name change has been submitted for review — I can't update what appears on receipts directly, so this goes to the team that can. Once it's approved, \"Walker Bistro\" will show on receipts and statements, typically within 1–2 business days.",
       sheetAction: FLOW5_SHEET,
       suggestions: CONCEPT_FLOW5_FOLLOWUPS,
     },
@@ -715,7 +691,8 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     { role: "user", content: CONCEPT_FLOW13_PROMPT },
     {
       role: "assistant",
-      content: "You have $8,435 coming in total. Your $940 in cash deposits already posted. On the card side, three batches are pending: Friday and Saturday are in transit, expected in your account ending ••4432 tomorrow morning, and Sunday's batch is on a temporary hold.",
+      content:
+        "You have $8,435 coming in total. Your $940 in cash deposits already posted. On the card side, three batches are pending: Friday and Saturday are in transit, expected in your account ending ••4432 tomorrow morning, and Sunday's batch is on a temporary hold.",
       panel: "pending-deposits",
     },
     { role: "user", content: "Why's Sunday held?" },
@@ -804,11 +781,26 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   // ── Address Change (chat + inline map) — ported from the persona embed flow ──
   [CONCEPT_ADDRESS_PROMPT]: [
     { role: "user", content: CONCEPT_ADDRESS_PROMPT },
-    { role: "assistant", content: "Sure. Your current business address on file is:\n\n142 Oak Street, Austin, TX 78701\n\nWhat would you like to change it to? Please include street, city, state, and ZIP.", map: { address: "142 Oak Street, Austin, TX 78701", lat: 30.2645, lng: -97.7430 } },
+    {
+      role: "assistant",
+      content: "Sure. Your current business address on file is:\n\n142 Oak Street, Austin, TX 78701\n\nWhat would you like to change it to? Please include street, city, state, and ZIP.",
+      map: { address: "142 Oak Street, Austin, TX 78701", lat: 30.2645, lng: -97.743 },
+    },
     { role: "user", content: "456 Market St, San Francisco, CA 94105" },
-    { role: "assistant", content: "Got it — just to confirm, you'd like to update your business address from 142 Oak Street, Austin, TX 78701 to:\n\n456 Market St, San Francisco, CA 94105\n\nIs that correct?\n\n{{MAP}}", map: { address: "456 Market St, San Francisco, CA 94105", lat: 37.7915, lng: -122.3972 } },
+    {
+      role: "assistant",
+      content:
+        "Got it — just to confirm, you'd like to update your business address from 142 Oak Street, Austin, TX 78701 to:\n\n456 Market St, San Francisco, CA 94105\n\nIs that correct?\n\n{{MAP}}",
+      map: { address: "456 Market St, San Francisco, CA 94105", lat: 37.7915, lng: -122.3972 },
+    },
     { role: "user", content: "Yes, that's correct." },
-    { role: "assistant", content: "Your change request has been submitted for review — I can't update account details like your business address directly, so this goes to the team that can. Once it's approved, the change to 456 Market St, San Francisco, CA 94105 will be reflected on your account, typically within 1–2 business days. You'll get a confirmation email at your primary address.", sheetAction: FLOW19_SHEET, suggestions: CONCEPT_FLOW19_FOLLOWUPS },
+    {
+      role: "assistant",
+      content:
+        "Your change request has been submitted for review — I can't update account details like your business address directly, so this goes to the team that can. Once it's approved, the change to 456 Market St, San Francisco, CA 94105 will be reflected on your account, typically within 1–2 business days. You'll get a confirmation email at your primary address.",
+      sheetAction: FLOW19_SHEET,
+      suggestions: CONCEPT_FLOW19_FOLLOWUPS,
+    },
   ],
 
   // ── Flow 9: Escalation ─────────────────────────────────────────────────────
@@ -876,7 +868,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     {
       role: "assistant",
       content:
-        "Your largest food-cost vendor over the last 30 days is **Sysco Foodservice** — $18,420, about 34% of total food spend, up 6% from last month.\n\nThere's a way to manage your business spend like this more efficiently. Want me to show you what's available?",
+        "Your largest food-cost vendor over the last 30 days is **Sysco Foodservice** — $18,420, about 34% of total food spend, up 6% from last month.\n\nYou're paying that by ACH, so it isn't earning anything back. A business card could help you manage this spend and return about $368/mo on Sysco alone.\n\nI've pre-filled an application from your connected accounts, you'd just confirm your credit limit. Want me to open it?",
       source: "Vendor Spend Breakdown",
       suggestions: [CONCEPT_OFFER_YES, CONCEPT_OFFER_NO],
     },

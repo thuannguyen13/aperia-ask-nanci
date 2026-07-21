@@ -2,24 +2,51 @@
 // ponytail: illustrative offer data only; not live lender terms.
 
 export interface LoanOffer {
-  id: string
-  product: string // full display name, e.g. "SBA 7(a) Loan"
-  note: string // one-line terms caveat shown under the product name
-  maxAmount: string
-  minRate: string
-  fundsIn: string
-  termLength: string
-  logo: string // /business-loan-offer/<file>.png — optional at runtime (monogram fallback if missing)
-  mark: string // brand monogram label shown until the logo image loads
-  color: string // brand color behind the monogram
+  id: string;
+  product: string; // what the merchant is offered, e.g. "Loan on Card"
+  note: string; // what the product actually is, in the merchant's terms
+  logo: string; // /business-loan-offer/<file>.png — optional at runtime (monogram fallback if missing)
+  mark: string; // brand monogram label shown until the logo image loads
+  color: string; // brand color behind the monogram
 }
 
-// Single Mastercard-branded offer — the demo targets one product, not a ranked list.
+// Single offer — the demo targets one product, not a ranked list.
 // Drop the card art at public/business-loan-offer/mastercard-installments.png (monogram fallback until then).
 export const LOAN_OFFERS: LoanOffer[] = [
-  { id: "mastercard-installments", product: "Instant Funds via Loan on Card", note: "Up to $5,000,000, funded by a participating lender through Mastercard's card network. Terms confirmed at approval.", maxAmount: "$5,000,000", minRate: "9.75%", fundsIn: "5–7 days", termLength: "Up to 25 years", logo: "/business-loan-offer/mastercard-installments.png", mark: "MC", color: "#EB001B" },
-]
+  {
+    id: "mastercard-installments",
+    product: "Loan on Card",
+    note: "Financing provided by a participating lending partner. Funds delivered to your Business Mastercard, usable the moment they land. Fixed installments, no revolving balance.",
+    logo: "/business-loan-offer/mastercard-installments.png",
+    mark: "MC",
+    color: "#EB001B",
+  },
+];
 
+// The offer sized to THIS shortfall. The program maximums stay in `range` fine print —
+// leading with $5M would make a $4,230 need look like a rounding error.
+export const LOAN_SUGGESTED = {
+  eyebrow: "Suggested for you",
+  amount: "$4,500",
+  cadence: "· 4 weekly payments",
+  why: "Covers Friday's payroll with $270 left over. First payment due after your invoices clear.",
+  range: "Program range: $2,500–$5,000,000, terms up to 25 years. Final rate and terms confirmed at approval.",
+};
+
+// "What this costs", shown above Submit — the cost of the money before the commit,
+// not on a confirmation screen after it. Total and per-payment are derived so the
+// figures can't drift apart; the APR is quoted rather than derived.
+export const LOAN_COST = {
+  title: "What this costs",
+  principal: 4500,
+  payments: 12,
+  cadence: "monthly",
+  perPayment: 423.9,
+  // 12 x $423.90 = $5,086.80 on $4,500 borrowed → 1.938%/mo, i.e. 23.3% nominal APR
+  // (25.9% effective). Quoted rather than solved for at render — see the panel.
+  apr: "23.3%",
+  note: "These figures are an estimate based on your pre-qualified terms. Final cost is confirmed before you accept.",
+};
 // Pre-filled from the merchant's connected data (see LOAN_APPLICANT usage in the form view).
 export const LOAN_APPLICANT = {
   businessName: "Sunrise Bistro LLC",
@@ -30,26 +57,27 @@ export const LOAN_APPLICANT = {
   businessAddress: "128 Main St, Allen, TX 75013",
   email: "teresawalker@example.com",
   phone: "(214) 555-0148",
-  requestedAmount: "$",
-  repaymentTerm: "",
-  purpose: "",
+  requestedAmount: "$4,500",
+  repaymentTerm: "4 weekly payments",
+  purpose: "Payroll",
   avgMonthlyRevenue: "$32,500",
-  fundingAccount: "•••• 4821",
-}
+  fundingAccount: "Business Mastercard ···· 4821",
+};
 
 // The shortfall renders bold mid-sentence (see BusinessLoanOfferPanel).
-export const LOAN_INSIGHT_PRE = "You're "
-export const LOAN_INSIGHT_BOLD = "$4,230 short"
+export const LOAN_INSIGHT_PRE = "You're ";
+export const LOAN_INSIGHT_BOLD = "$4,230 short";
 export const LOAN_INSIGHT_POST =
-  " for Friday's payroll. Loan on Card can cover it — up to $5,000,000 available through Mastercard's network, funds in 5–7 days. Repay once your $6,800 in invoices land next week."
+  " for Friday's payroll. Based on your processing history you're pre-qualified for short-term financing that can help you manage this spend. I've sized it to your gap and scheduled repayment around the $6,800 landing Tuesday.";
 
 export const LOAN_PREFILL_NOTE = {
   title: "Data is pre-filled.",
-  body: "Your application is pre-filled from your connected accounts.",
-}
+  body: "Your business information has been securely verified and pre-filled using your connected financial accounts.",
+};
 
-export const LOAN_REQUEST_REF = "AD-3307"
-export const LOAN_SENT_TO = "Mastercard Loan Team"
-export const LOAN_SUBMITTED_TITLE = "Loan Application Submitted"
-export const LOAN_SUCCESS_MESSAGE =
-  "Your loan request has been submitted for review. Once it's approved, you'll get a confirmation email at your primary address."
+export const LOAN_CONSENT = "I authorize the participating lending partner to review my business information for pre-qualification and financing eligibility.";
+
+export const LOAN_REQUEST_REF = "AD-3307";
+export const LOAN_SENT_TO = "Mastercard Loan Team";
+export const LOAN_SUBMITTED_TITLE = "Loan Application Submitted";
+export const LOAN_SUCCESS_MESSAGE = "Your loan request has been submitted for review. Once it's approved, you'll get a confirmation email at your primary address.";

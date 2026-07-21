@@ -2,22 +2,58 @@
 // ponytail: illustrative offer data only; not live issuer terms.
 
 export interface CardOffer {
-  id: string
-  name: string
-  bestFor: string
-  annualFee: string
-  rewardsRate: string
-  introOffer: string
-  logo: string // /credit-card-offer/<file>.png — optional at runtime (monogram fallback if missing)
-  mark: string // brand monogram label shown until the logo image loads
-  color: string // brand color behind the monogram
+  id: string;
+  name: string;
+  bestFor: string;
+  annualFee: string;
+  rewardsRate: string;
+  introOffer: string;
+  purchaseApr: string;
+  logo: string; // /credit-card-offer/<file>.png — optional at runtime (monogram fallback if missing)
+  mark: string; // brand monogram label shown until the logo image loads
+  color: string; // brand color behind the monogram
 }
 
 // Single offer — the demo targets one card, not a ranked list. Terms are the real
 // published Citi Double Cash terms (citi.com, July 2026).
 export const CREDIT_CARD_OFFERS: CardOffer[] = [
-  { id: "citi-double-cash", name: "Citi Double Cash® Card", bestFor: "Flat-rate cash back on every purchase", annualFee: "$0", rewardsRate: "2% | Cashback", introOffer: "$200", logo: "/credit-card-offer/citi-double-cash.png", mark: "CITI", color: "#056DAE" },
-]
+  {
+    id: "citi-double-cash",
+    name: "Citi Double Cash® Card",
+    bestFor: "Flat 2% back on every purchase — 1% when you buy, 1% as you pay. No category caps or enrollment.",
+    annualFee: "$0",
+    rewardsRate: "2%",
+    introOffer: "$200",
+    purchaseApr: "18.24%–26.99%",
+    logo: "/credit-card-offer/citi-double-cash.png",
+    mark: "CITI",
+    color: "#056DAE",
+  },
+];
+
+// "What this is worth to you" — the reason to switch, in dollars. Stored as numbers
+// so the monthly return, annual total and first-year value are derived, not retyped.
+export const CARD_VALUE = {
+  title: "What this is worth to you",
+  vendor: "Sysco",
+  monthlySpend: 18420,
+  rate: 0.02,
+  introBonus: 200,
+  introThreshold: "$1,500 spend in 6 mo.",
+  caveat:
+    "You would clear the $1,500 bonus threshold in your first three days. This assumes you pay the balance in full each month — carrying a balance at 18.24%–26.99% costs more than 2% returns. Sysco may charge a card-acceptance fee; check before switching from ACH.",
+};
+
+// The disclosures a merchant should see before applying, not after.
+export const CARD_FEES: { label: string; value: string }[] = [
+  { label: "Purchase APR", value: "18.24%–26.99% variable" },
+  { label: "Annual fee", value: "$0" },
+  { label: "Employee cards", value: "$0" },
+  { label: "Foreign transaction fee", value: "3%" },
+  { label: "Late payment fee", value: "Up to $39" },
+  { label: "Cash advance APR", value: "29.99% variable" },
+];
+export const CARD_FEES_TITLE = "Rates and fees";
 
 // Pre-filled from the merchant's connected data (see CARD_APPLICANT usage in the form view).
 export const CARD_APPLICANT = {
@@ -29,21 +65,30 @@ export const CARD_APPLICANT = {
   businessAddress: "128 Main St, Allen, TX 75013",
   email: "teresawalker@example.com",
   phone: "(214) 555-0148",
-  requestedLimit: "$0",
-  avgMonthlyCardSpend: "$0",
-}
+  requestedLimit: "$45,000",
+  requestedLimitHint: "Suggested: ~2× your monthly card-eligible spend",
+  avgMonthlyCardSpend: "$31,800",
+  avgMonthlyCardSpendHint: "From your connected vendor payments",
+  employeeCards: "3 cards (kitchen, FOH, admin)",
+};
 
-// Lead sentence renders bold, the rest regular (see CreditCardOfferPanel).
-export const CARD_INSIGHT_LEAD = "Sysco is your top food-cost vendor at $18,420/mo."
-export const CARD_INSIGHT_BODY =
-  " Running that spend through the Citi Double Cash Card earns 2% back — 1% when you buy, 1% as you pay — about $368/mo on Sysco alone, with no annual fee and a $200 bonus after $1,500 in purchases in your first 6 months."
+export const CARD_EMPLOYEE_CARD_OPTIONS = ["3 cards (kitchen, FOH, admin)", "1 card", "None for now"];
+
+// Two paragraphs: the finding, then the offer. Lead sentence of each renders bold.
+export const CARD_INSIGHT_LEAD = "Sysco is your top food-cost vendor at $18,420/mo";
+export const CARD_INSIGHT_BODY = " — 34% of food spend, up 6% from last month. You're currently paying that by ACH, so it isn't earning anything.";
+export const CARD_INSIGHT_OFFER_PRE = "A business card with 2% cash back would return about ";
+export const CARD_INSIGHT_OFFER_BOLD = "$368/mo";
+export const CARD_INSIGHT_OFFER_POST = " on Sysco alone. Here's an offer you're pre-qualified for.";
 
 export const CARD_PREFILL_NOTE = {
   title: "Data is pre-filled.",
-  body: "Your application is pre-filled from your connected account data.",
-}
+  body: "Your business information has been securely verified and pre-filled using your connected financial accounts.",
+};
 
-export const CARD_REQUEST_REF = "AD-3308"
-export const CARD_SENT_TO = "Citi"
+export const CARD_CONSENT = "I authorize a credit check. I understand this is an application, not a guaranteed approval, and that it may result in a hard inquiry on my personal and business credit.";
+
+export const CARD_REQUEST_REF = "AD-3308";
+export const CARD_SENT_TO = "Citi";
 export const CARD_SUCCESS_MESSAGE =
-  "Your credit card application request has been submitted for review. Once it's approved, you'll get a confirmation email — and your new card will arrive in the mail within 7–10 business days."
+  "Your credit card application has been submitted for review. Once it's approved, you'll get a confirmation email and your new card will arrive in the mail within 7–10 business days.";
