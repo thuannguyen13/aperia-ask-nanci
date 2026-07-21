@@ -313,13 +313,7 @@ function MarkWorkPopover({ state, onSubmit }: { state: WorkState; onSubmit: (cho
           </Button>
         </PopoverTrigger>
       </div>
-      {/* Popover portals outside the [data-theme="aperia"] scope, so carry just the
-          aperia accent tokens (not its page-background gradient) onto the content. */}
-      <PopoverContent
-        align="end"
-        className="w-[440px] p-0"
-        style={{ "--primary": "#002F67", "--color-primary": "#002F67", "--ring": "#002F67" } as React.CSSProperties}
-      >
+      <PopoverContent align="end" className="w-[440px] p-0">
         <div className="border-b px-4 py-3">
           <p className="text-sm font-semibold text-foreground">Mark Work and Disposition</p>
         </div>

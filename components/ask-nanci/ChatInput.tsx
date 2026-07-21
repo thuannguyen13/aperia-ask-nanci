@@ -8,6 +8,7 @@ import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY } from "@/lib/ask-nan
 import { SlashCommandPopover, type SlashAction } from "./SlashCommandPopover"
 import { ChatActiveSources } from "./ChatActiveSources"
 import { ExplorePrompts } from "./ExplorePrompts"
+import { RecentChatsDialog } from "./RecentChatsDialog"
 
 const PROACTIVE_CONTENT = CONCEPT_SCRIPTED_CONVERSATIONS[CONCEPT_FLOW6_KEY][0].content
 
@@ -18,6 +19,7 @@ export function ChatInput() {
 
   const [value, setValue] = useState("")
   const [commonQOpen, setCommonQOpen] = useState(false)
+  const [recentOpen, setRecentOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
   const [notifRead, setNotifRead] = useState(false)
 
@@ -71,6 +73,8 @@ export function ChatInput() {
         <SlashCommandPopover query={slashQuery} onAction={handleSlashAction} />
       )}
 
+      <RecentChatsDialog open={recentOpen} onOpenChange={setRecentOpen} />
+
       <div className="flex flex-col rounded-xl border bg-background dark:bg-input/30 shadow-sm transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50">
         <Textarea
           ref={textareaRef}
@@ -97,7 +101,7 @@ export function ChatInput() {
                 </Tooltip>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <button className="flex h-7 w-7 items-center justify-center bg-secondary text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground">
+                    <button onClick={() => setRecentOpen(true)} className="flex h-7 w-7 items-center justify-center bg-secondary text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground">
                       <Clock5 className="size-3.5" />
                     </button>
                   </TooltipTrigger>

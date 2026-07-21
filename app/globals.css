@@ -17,29 +17,53 @@
   --chart-6: #2C2073;
 }
 
+/* ─── Skins ────────────────────────────────────────────────────────────────────
+   Every brand is one block below. `useAppTheme` (AppFrame.tsx) puts the matching
+   `data-theme` on <html> — not on the app frame — so Radix portals (dialogs,
+   popovers, dropdowns, which mount on <body>) inherit the skin too.
+
+   These are ordinary CSS rules: a brand can override any DS token or add its own
+   selectors here, and the cascade behaves normally. Logo *assets* are the one
+   thing CSS can't express — those live in lib/ask-nanci/data/skins.ts.
+
+   `--app-gradient` is consumed by .app-frame rather than set as a background here,
+   so the page backdrop can never paint itself across a portaled surface. */
+
 [data-theme="clover"] {
-  background: linear-gradient(180deg, #218800 0%, #BFCDC5 200px);
+  --app-gradient: linear-gradient(180deg, #218800 0%, #BFCDC5 200px);
 }
 
-[data-theme="aperia"] {
+[data-theme="aperia"],
+[data-theme="aperia-risk"] {
   --primary: #002F67;
   --color-primary: #002F67;
   --ring: #002F67;
   --sidebar-primary: #002F67;
-  background: linear-gradient(180deg, #002F67 0%, #c5d5ed 200px);
+  --app-gradient: linear-gradient(180deg, #002F67 0%, #c5d5ed 200px);
 }
 
 [data-theme="access-one"] {
   --color-primary: #FC6A25;
   --ring: #FC6A25;
-  background: linear-gradient(180deg, #FC6A25 0%, #fde8d8 200px);
+  --app-gradient: linear-gradient(180deg, #FC6A25 0%, #fde8d8 200px);
 }
 
 [data-theme="vision-web"] {
   --color-primary: #1565C0;
   --ring: #1565C0;
-  background: linear-gradient(180deg, #1565C0 0%, #d0e4f7 200px);
+  --app-gradient: linear-gradient(180deg, #1565C0 0%, #d0e4f7 200px);
 }
+
+.app-frame { background: var(--app-gradient); }
+
+/* Sidebar logos are flat SVGs with baked-in ink, so dark mode inverts them. Scoped
+   per slot + skin so a brand shipping a light-ink logo can opt out with its own rule. */
+html.dark [data-logo="sidebar"],
+html.dark [data-logo="sidebar-collapsed"] { filter: invert(1); }
+
+/* Aperia Risk's wordmark carries the Mastercard roundel — hue-rotate keeps it red
+   rather than letting the invert turn it cyan. */
+html.dark[data-theme="aperia-risk"] [data-logo="sidebar"] { filter: invert(1) hue-rotate(180deg); }
 
 
 @theme inline {

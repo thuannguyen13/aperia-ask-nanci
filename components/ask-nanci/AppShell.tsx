@@ -9,7 +9,8 @@ import { Button } from "aperia-ds5"
 import { AskNanciProvider, useAskNanci } from "@/contexts/AskNanciContext"
 import { ChatStreamProvider } from "@/contexts/ChatStreamContext"
 import { parseMode, CONCEPT_FLOW_SLUGS, CONCEPT_EMBED_FLOW_LAYOUTS, type EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
-import { AppFrame } from "./AppFrame"
+import { AppFrame, useAppTheme } from "./AppFrame"
+import { skin, type SkinId } from "@/lib/ask-nanci/data/skins"
 import { Sidebar } from "./Sidebar"
 import { TeachNanciPanel } from "./TeachNanciPanel"
 import { ServiceMarketplacePanel } from "./ServiceMarketplacePanel"
@@ -102,14 +103,15 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
   )
 }
 
-const CONCEPT_CONFIG = { theme: "aperia", logo: "/logos/titan.svg", alt: "Aperia" }
+// Which skin each surface wears — colors and logos come from SKINS (data/skins.ts).
+const CONCEPT_SKIN: SkinId = "aperia"
 
-const EMBED_CONFIG: Record<EmbedVariant, { theme: string; logo: string; alt: string }> = {
-  clover:           { theme: "clover",      logo: "/logos/clover.svg",          alt: "Clover"     },
-  "business-owner": { theme: "access-one",  logo: "/logos/access-one-logo.svg", alt: "AccessOne"  },
-  iso:              { theme: "aperia",      logo: "/logos/titan.svg",           alt: "Titan"      },
-  "concept-embed":  { theme: "aperia",      logo: "/logos/titan.svg",           alt: "Aperia"     },
-  vw:               { theme: "vision-web",  logo: "/logos/vision-web-logo.svg", alt: "VisionWeb"  },
+const EMBED_SKIN: Record<EmbedVariant, SkinId> = {
+  clover:           "clover",
+  "business-owner": "access-one",
+  iso:              "aperia",
+  "concept-embed":  "aperia",
+  vw:               "vision-web",
 }
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -121,6 +123,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // app shell (sidebar + standard welcome) instead of the compact concept-embed widget.
   const embedLayout = (rawFlow && CONCEPT_EMBED_FLOW_LAYOUTS[rawFlow]) || null
   const { setTheme } = useTheme()
+
+  // Skin tokens go on <html> so portaled surfaces inherit them (see useAppTheme).
+  useAppTheme(isEmbed && embedVariant ? EMBED_SKIN[embedVariant] : CONCEPT_SKIN)
 
   useEffect(() => {
     if (!isEmbed) return
@@ -134,7 +139,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, [isEmbed, setTheme])
 
   if (isEmbed) {
-    const config = EMBED_CONFIG[embedVariant!]
+    const { logos } = skin(EMBED_SKIN[embedVariant!])
     const isConceptEmbed = embedVariant === "concept-embed"
     // Full-app embed flows (e.g. Service Marketplace) render the sidebar + standard
     // WelcomeView, so they behave like the default app (not the concept demo catalog).
@@ -151,11 +156,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       >
         <div
           data-embed={embedVariant}
-          data-theme={config.theme}
-          className="relative flex h-screen flex-col overscroll-contain md:px-2 md:pb-2"
+          className="app-frame relative flex h-screen flex-col overscroll-contain md:px-2 md:pb-2"
         >
           <div className="relative z-10 flex h-10 shrink-0 items-center justify-center">
-            <Image src={config.logo} alt={config.alt} width={isConceptEmbed ? 120 : 80} height={24} className="h-6 w-auto" />
+            <Image data-logo="frame" src={logos.frame.src} alt={logos.frame.alt} width={logos.frame.width} height={logos.frame.height} className="h-6 w-auto" />
             {isConceptEmbed && !fullApp && <ReplayButton />}
           </div>
           <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden md:rounded-2xl bg-sidebar shadow-sm">
@@ -188,13 +192,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <ChatStreamProvider>
     <AskNanciProvider isConceptVersion={isConceptVersion}>
       <AppFrame
-        theme={CONCEPT_CONFIG.theme}
+        skin={CONCEPT_SKIN}
         topBar={
           <div className="relative z-10 flex h-10 shrink-0 items-center justify-center">
             <div className="absolute left-0 flex items-center md:hidden">
               <MobileSidebarToggle />
             </div>
-            <Image src={CONCEPT_CONFIG.logo} alt={CONCEPT_CONFIG.alt} width={120} height={24} className="h-6 w-auto" />
+            <Image data-logo="frame" {...skin(CONCEPT_SKIN).logos.frame} className="h-6 w-auto" />
           </div>
         }
         sidebar={<Sidebar />}

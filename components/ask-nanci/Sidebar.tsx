@@ -12,6 +12,7 @@ import {
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { MARKETPLACE_TITLE } from "@/lib/ask-nanci/data/panels/service-marketplace"
+import type { Skin } from "@/lib/ask-nanci/data/skins"
 import { UsageCard } from "./UsageCard"
 import { ConnectWizard } from "./ConnectWizard"
 
@@ -53,19 +54,15 @@ function SidebarItem({
 }
 
 // When `menu` is provided the rail renders a fixed nav list (e.g. the Aperia Risk
-// skin) instead of New Chat + recent chats, and hides the Teach Nanci / Usage cards.
-// `brand` swaps the header wordmark for a logo. Both optional — default behavior
-// is unchanged.
+// skin) instead of New Chat + Marketplace, and hides the Teach Nanci / Usage cards.
+// `logos` supplies the skin's rail branding (see data/skins.ts); its `sidebar` and
+// `sidebarCollapsed` slots are optional and fall back to the Ask Nanci wordmark and
+// logomark. Both props optional — default behavior is unchanged. Dark-mode treatment
+// of these logos is CSS, keyed off the `data-logo` attributes (globals.css).
 type SidebarNavItem = { icon: React.ElementType; label: string; active?: boolean; onClick?: () => void }
-// `mark` is the collapsed-rail logomark; without it the rail falls back to the
-// Ask Nanci logomark.
-type SidebarBrand = {
-  src: string; alt: string; width: number; height: number
-  mark?: { src: string; width: number; height: number }
-}
 
-export function Sidebar({ menu, brand }: { menu?: SidebarNavItem[]; brand?: SidebarBrand } = {}) {
-  const { sessions, activeSessionId, startNewChat, resumeSession, deleteSessionById, setKbOpen, marketplaceOpen, setMarketplaceOpen, mobileSidebarOpen, setMobileSidebarOpen, currentUser } = useAskNanci()
+export function Sidebar({ menu, logos }: { menu?: SidebarNavItem[]; logos?: Skin["logos"] } = {}) {
+  const { startNewChat, setKbOpen, marketplaceOpen, setMarketplaceOpen, mobileSidebarOpen, setMobileSidebarOpen, currentUser } = useAskNanci()
   const [collapsed, setCollapsed] = useState(false)
   const [wizardOpen, setWizardOpen] = useState(false)
   const { resolvedTheme, setTheme } = useTheme()
@@ -84,29 +81,26 @@ export function Sidebar({ menu, brand }: { menu?: SidebarNavItem[]; brand?: Side
                   className="group relative flex size-6 items-center justify-center"
                 >
                   <Image
-                    src={brand?.mark?.src ?? "/ask-nanci/ask-nanci-logomark.svg"}
-                    alt={brand?.alt ?? "Ask Nanci"}
-                    width={brand?.mark?.width ?? 24}
-                    height={brand?.mark?.height ?? 24}
-                    className={cn(
-                      "h-6 w-auto transition-opacity duration-150 group-hover:opacity-0",
-                      brand?.mark && "dark:invert", // solid-black mark, no brand colors to preserve
-                    )}
+                    data-logo={logos?.sidebarCollapsed ? "sidebar-collapsed" : undefined}
+                    src={logos?.sidebarCollapsed?.src ?? "/ask-nanci/ask-nanci-logomark.svg"}
+                    alt={logos?.sidebarCollapsed?.alt ?? "Ask Nanci"}
+                    width={logos?.sidebarCollapsed?.width ?? 24}
+                    height={logos?.sidebarCollapsed?.height ?? 24}
+                    className="h-6 w-auto transition-opacity duration-150 group-hover:opacity-0"
                   />
                   <PanelLeft className="absolute size-4 rotate-180 text-foreground opacity-0 transition-opacity duration-150 group-hover:opacity-100" />
                 </button>
               </TooltipTrigger>
               <TooltipContent side="right">Expand sidebar</TooltipContent>
             </Tooltip>
-          ) : brand ? (
-            // invert+hue-rotate keeps the black wordmark legible on dark without
-            // turning the Mastercard roundel cyan — it has baked-in brand colors.
+          ) : logos?.sidebar ? (
             <Image
-              src={brand.src}
-              alt={brand.alt}
-              width={brand.width}
-              height={brand.height}
-              className="h-8 w-auto dark:invert dark:hue-rotate-180"
+              data-logo="sidebar"
+              src={logos.sidebar.src}
+              alt={logos.sidebar.alt}
+              width={logos.sidebar.width}
+              height={logos.sidebar.height}
+              className="h-8 w-auto"
             />
           ) : (
             <>
@@ -177,40 +171,7 @@ export function Sidebar({ menu, brand }: { menu?: SidebarNavItem[]; brand?: Side
         )}
       </div>
 
-      {/* Scrollable recent-chat history */}
-      <div className="flex flex-1 flex-col overflow-y-auto min-h-0 pb-2 min-w-12">
-        {/* Recent chats — hidden when collapsed or in menu mode */}
-        {!menu && (isMobile || !collapsed) && sessions.length > 0 && (
-          <div className="p-2">
-            <p className="mb-1 flex h-8 items-center px-2 text-xs font-medium text-foreground opacity-70">
-              Recent Chat
-            </p>
-            {sessions.map((session) => (
-              <div
-                key={session.id}
-                className={cn(
-                  "group flex h-8 w-full items-center rounded-md px-2 text-left hover:bg-muted transition-colors",
-                  session.id === activeSessionId && "bg-muted",
-                )}
-              >
-                <button
-                  className="min-w-0 flex-1 truncate text-sm text-foreground text-left"
-                  onClick={() => { setMarketplaceOpen(false); resumeSession(session.id); if (isMobile) setMobileSidebarOpen(false) }}
-                >
-                  {session.title}
-                </button>
-                <button
-                  className="ml-1 hidden shrink-0 text-muted-foreground hover:text-red-500 group-hover:block transition-colors"
-                  onClick={(e) => { e.stopPropagation(); deleteSessionById(session.id) }}
-                  title="Delete"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      <div className="flex flex-1 flex-col overflow-y-auto min-h-0 pb-2 min-w-12" />
 
       {/* Footer — in-flow, sits below the scroll area (no overlap, no reserved padding) */}
       <div className="shrink-0 bg-sidebar p-2 pb-3 min-w-[256px]">
