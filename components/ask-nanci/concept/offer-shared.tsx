@@ -68,9 +68,9 @@ export function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 // A stat is one label-over-value cell; the strip is the muted rounded box holding them.
-export function StatStrip({ stats }: { stats: { label: string; value: string }[] }) {
+export function StatStrip({ stats, className }: { stats: { label: string; value: string }[]; className?: string }) {
   return (
-    <div className="grid grid-cols-2 gap-x-4 gap-y-3 rounded-lg bg-muted/50 px-4 py-3 sm:grid-cols-4">
+    <div className={cn("grid grid-cols-2 gap-x-4 gap-y-3 rounded-lg bg-muted/50 px-4 py-3 sm:grid-cols-4", className)}>
       {stats.map((s) => (
         <div key={s.label} className="min-w-0">
           <p className="text-[11px] text-muted-foreground">{s.label}</p>
