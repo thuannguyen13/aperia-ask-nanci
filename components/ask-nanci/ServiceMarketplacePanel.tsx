@@ -1,13 +1,14 @@
 "use client"
 
 import { useState } from "react"
-import { Check, Search, SearchX } from "lucide-react"
+import { Search, SearchX } from "lucide-react"
 import {
-  Badge, Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle,
+  Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle,
   InputGroup, InputGroupAddon, InputGroupInput, ScrollArea,
 } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
+import { MarketplaceDetailPanel, AddedBadge, VendorLogo } from "./MarketplaceDetailPanel"
 import {
   MARKETPLACE_CATEGORY,
   MARKETPLACE_EMPTY,
@@ -15,38 +16,22 @@ import {
   MARKETPLACE_SEARCH_PLACEHOLDER,
   MARKETPLACE_SERVICES,
   MARKETPLACE_TITLE,
-  MARKETPLACE_VENDOR,
   type MarketplaceService,
 } from "@/lib/ask-nanci/data/panels/service-marketplace"
 
-// Vendor mark with a text fallback, matching the OfferLogo pattern.
-function VendorLogo() {
-  const [errored, setErrored] = useState(false)
-  if (errored) return <span className="text-xs font-medium text-foreground">{MARKETPLACE_VENDOR.name}</span>
+function ServiceCard({ service, enabled, selected, onClick }: { service: MarketplaceService; enabled: boolean; selected: boolean; onClick: () => void }) {
+  const { icon: Icon, title, description } = service
   return (
-    <img
-      src={MARKETPLACE_VENDOR.logo}
-      alt={MARKETPLACE_VENDOR.name}
-      className="h-4 w-auto"
-      onError={() => setErrored(true)}
-    />
-  )
-}
-
-function ServiceCard({ icon: Icon, title, description, added }: MarketplaceService) {
-  return (
-    <div className="flex min-h-[200px] flex-col gap-3 rounded-lg border px-3 py-2.5">
+    <button
+      onClick={onClick}
+      className={cn(
+        "flex min-h-[200px] flex-col gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors hover:border-ring hover:bg-muted/40",
+        selected && "border-primary ring-1 ring-primary",
+      )}
+    >
       <div className="flex items-start justify-between gap-2">
         <Icon className="size-8 shrink-0 text-foreground" strokeWidth={1.5} />
-        {added && (
-          <Badge
-            variant="outline"
-            className="gap-1 border-green-200 bg-green-50 text-green-700 dark:border-green-900 dark:bg-green-950/40 dark:text-green-400"
-          >
-            <Check className="size-3" />
-            Added
-          </Badge>
-        )}
+        {enabled && <AddedBadge />}
       </div>
       <div className="flex flex-col gap-1">
         <p className="truncate text-sm font-medium text-foreground">{title}</p>
@@ -56,7 +41,7 @@ function ServiceCard({ icon: Icon, title, description, added }: MarketplaceServi
         <span className="text-xs text-muted-foreground">Powered by</span>
         <VendorLogo />
       </div>
-    </div>
+    </button>
   )
 }
 
@@ -67,6 +52,18 @@ function ServiceCard({ icon: Icon, title, description, added }: MarketplaceServi
 export function ServiceMarketplacePanel() {
   const { marketplaceOpen } = useAskNanci()
   const [query, setQuery] = useState("")
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+  // Which add-ons are on. Seeded from the data's `added` flag, then owned here so the
+  // grid badge and the detail panel's Enable button can never disagree.
+  const [enabled, setEnabled] = useState<Set<string>>(
+    () => new Set(MARKETPLACE_SERVICES.filter((s) => s.added).map((s) => s.id)),
+  )
+  const toggle = (id: string) => setEnabled((prev) => {
+    const next = new Set(prev)
+    if (!next.delete(id)) next.add(id)
+    return next
+  })
+  const selected = MARKETPLACE_SERVICES.find((s) => s.id === selectedId) ?? null
 
   const q = query.trim().toLowerCase()
   const services = q
@@ -74,12 +71,8 @@ export function ServiceMarketplacePanel() {
     : MARKETPLACE_SERVICES
 
   return (
-    <div
-      className={cn(
-        "min-w-0 flex-1 flex-col overflow-hidden rounded-xl border bg-background md:rounded-2xl",
-        marketplaceOpen ? "flex" : "hidden",
-      )}
-    >
+    <div className={cn("min-w-0 flex-1 gap-1", marketplaceOpen ? "flex" : "hidden")}>
+    <div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-xl border bg-background md:rounded-2xl">
       {/* Empty 48px header bar, as in the design — the view is left via the sidebar. */}
       <div className="h-12 shrink-0" />
 
@@ -116,13 +109,37 @@ export function ServiceMarketplacePanel() {
             ) : (
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {services.map((service) => (
-                  <ServiceCard key={service.id} {...service} />
+                  <ServiceCard
+                    key={service.id}
+                    service={service}
+                    enabled={enabled.has(service.id)}
+                    selected={service.id === selectedId}
+                    onClick={() => setSelectedId(service.id === selectedId ? null : service.id)}
+                  />
                 ))}
               </div>
             )}
           </div>
         </div>
       </ScrollArea>
+    </div>
+
+      {/* Detail opens as a sibling column, grid stays visible beside it. */}
+      <div
+        className={cn(
+          "hidden h-full shrink-0 flex-col overflow-hidden rounded-xl border bg-background transition-[width,opacity] duration-200 ease-in-out md:flex md:rounded-2xl",
+          selected ? "w-[420px] opacity-100" : "w-0 border-transparent opacity-0 pointer-events-none",
+        )}
+      >
+        {selected && (
+          <MarketplaceDetailPanel
+            service={selected}
+            enabled={enabled.has(selected.id)}
+            onToggle={() => toggle(selected.id)}
+            onClose={() => setSelectedId(null)}
+          />
+        )}
+      </div>
     </div>
   )
 }

@@ -5,7 +5,7 @@ import { Button, Checkbox, Label } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import {
   CREDIT_CARD_OFFERS, CARD_APPLICANT, CARD_INSIGHT_LEAD, CARD_INSIGHT_BODY, CARD_PREFILL_NOTE,
-  CARD_REQUEST_REF, CARD_SUCCESS_MESSAGE,
+  CARD_REQUEST_REF, CARD_SENT_TO, CARD_SUCCESS_MESSAGE,
 } from "@/lib/ask-nanci/data/panels/credit-card-offer"
 import { PanelShell, PanelHeader, NanciInsight, Callout } from "@/components/ask-nanci/shared"
 import { ApplicantFields, BrandMonogram, OfferField, OfferLogo, SectionLabel, StatStrip } from "./offer-shared"
@@ -30,7 +30,7 @@ export function CreditCardOfferPanel() {
       requestLabel: "Credit card application",
       submittedTitle: "Credit Card Application Submitted",
       product: offer.name,
-      sentTo: offer.name.replace(/ Business Card$/, ""), // "Silicon Valley Bank Business Card" → "Silicon Valley Bank"
+      sentTo: CARD_SENT_TO,
       reference: CARD_REQUEST_REF,
       timestamp: "Today, 2:14 PM",
       status: "submitted",

@@ -891,7 +891,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     {
       role: "assistant",
       content:
-        "Looking at your current balance and upcoming payroll run, you're projected to be **$4,230 short** on Friday. Two open invoices ($6,800 total) aren't expected to land until early next week — after payroll is due.\n\nThere's a way to manage your business spend and cover this gap. Want me to show you what's available?",
+        "Looking at your current balance and upcoming payroll run, you're projected to be **$4,230 short** on Friday. Two open invoices ($6,800 total) aren't expected to land until early next week — after payroll is due.\n\nBased on your processing history, you're already qualified for an option that can help you manage this spend and close the gap. Want me to show you the terms?",
       source: "Cash Flow Forecast",
       suggestions: [CONCEPT_OFFER_YES, CONCEPT_OFFER_NO],
     },
