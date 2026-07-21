@@ -1,36 +1,36 @@
 "use client"
 
 import { useEffect } from "react"
-import type { SkinId } from "@/lib/ask-nanci/data/skins"
+import type { ThemeId } from "@/lib/ask-nanci/data/theme-logos"
 
-// The active skin is announced by `data-theme` on <html>, never on the frame div:
+// The active theme is announced by `data-theme` on <html>, never on the frame div:
 // Radix portals mount on <body>, so a theme scoped to the frame leaves dialogs and
 // popovers on the :root palette. The tokens themselves are plain CSS rules in
 // globals.css — deliberately not inline styles, which no stylesheet could override.
-export function useAppTheme(skin: SkinId) {
+export function useAppTheme(theme: ThemeId) {
   useEffect(() => {
-    document.documentElement.dataset.theme = skin
+    document.documentElement.dataset.theme = theme
     return () => { delete document.documentElement.dataset.theme }
-  }, [skin])
+  }, [theme])
 }
 
 // The app theme chrome: the page-gradient frame (`.app-frame`) plus the bg-sidebar
 // rounded card that holds the sidebar + content. The top bar and sidebar are slots
-// so each skin (concept app, Aperia Risk) supplies its own.
+// so each theme (concept app, Aperia Risk) supplies its own.
 export function AppFrame({
-  skin,
+  theme,
   embed = "concept",
   topBar,
   sidebar,
   children,
 }: {
-  skin: SkinId
+  theme: ThemeId
   embed?: string
   topBar: React.ReactNode
   sidebar: React.ReactNode
   children: React.ReactNode
 }) {
-  useAppTheme(skin)
+  useAppTheme(theme)
   return (
     <div data-embed={embed} className="app-frame relative flex h-screen flex-col md:px-2 md:pb-2">
       {topBar}

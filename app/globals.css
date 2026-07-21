@@ -17,14 +17,14 @@
   --chart-6: #2C2073;
 }
 
-/* ─── Skins ────────────────────────────────────────────────────────────────────
+/* ─── Themes ───────────────────────────────────────────────────────────────────
    Every brand is one block below. `useAppTheme` (AppFrame.tsx) puts the matching
    `data-theme` on <html> — not on the app frame — so Radix portals (dialogs,
-   popovers, dropdowns, which mount on <body>) inherit the skin too.
+   popovers, dropdowns, which mount on <body>) inherit the theme too.
 
    These are ordinary CSS rules: a brand can override any DS token or add its own
    selectors here, and the cascade behaves normally. Logo *assets* are the one
-   thing CSS can't express — those live in lib/ask-nanci/data/skins.ts.
+   thing CSS can't express — those live in lib/ask-nanci/data/theme-logos.ts.
 
    `--app-gradient` is consumed by .app-frame rather than set as a background here,
    so the page backdrop can never paint itself across a portaled surface. */
@@ -57,7 +57,7 @@
 .app-frame { background: var(--app-gradient); }
 
 /* Sidebar logos are flat SVGs with baked-in ink, so dark mode inverts them. Scoped
-   per slot + skin so a brand shipping a light-ink logo can opt out with its own rule. */
+   per slot + theme so a brand shipping a light-ink logo can opt out with its own rule. */
 html.dark [data-logo="sidebar"],
 html.dark [data-logo="sidebar-collapsed"] { filter: invert(1); }
 

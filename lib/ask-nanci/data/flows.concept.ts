@@ -394,7 +394,7 @@ const FLOW19_SHEET: SheetActionData = {
 // ─── Scripted conversations ───────────────────────────────────────────────────
 
 export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
-  // Aperia Risk skin — landing quick-action / Nanci's-take chat answers.
+  // Aperia Risk theme — landing quick-action / Nanci's-take chat answers.
   ...RISK_LANDING_CONVERSATIONS,
   // ── Flow 1: Simple Update ─────────────────────────────────────────────────
   "Update my phone number": [

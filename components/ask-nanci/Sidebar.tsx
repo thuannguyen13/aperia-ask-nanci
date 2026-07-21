@@ -12,7 +12,7 @@ import {
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { MARKETPLACE_TITLE } from "@/lib/ask-nanci/data/panels/service-marketplace"
-import type { Skin } from "@/lib/ask-nanci/data/skins"
+import type { ThemeLogos } from "@/lib/ask-nanci/data/theme-logos"
 import { UsageCard } from "./UsageCard"
 import { ConnectWizard } from "./ConnectWizard"
 
@@ -54,14 +54,14 @@ function SidebarItem({
 }
 
 // When `menu` is provided the rail renders a fixed nav list (e.g. the Aperia Risk
-// skin) instead of New Chat + Marketplace, and hides the Teach Nanci / Usage cards.
-// `logos` supplies the skin's rail branding (see data/skins.ts); its `sidebar` and
+// theme) instead of New Chat + Marketplace, and hides the Teach Nanci / Usage cards.
+// `logos` supplies the theme's rail branding (see data/theme-logos.ts); its `sidebar` and
 // `sidebarCollapsed` slots are optional and fall back to the Ask Nanci wordmark and
 // logomark. Both props optional — default behavior is unchanged. Dark-mode treatment
 // of these logos is CSS, keyed off the `data-logo` attributes (globals.css).
 type SidebarNavItem = { icon: React.ElementType; label: string; active?: boolean; onClick?: () => void }
 
-export function Sidebar({ menu, logos }: { menu?: SidebarNavItem[]; logos?: Skin["logos"] } = {}) {
+export function Sidebar({ menu, logos }: { menu?: SidebarNavItem[]; logos?: ThemeLogos } = {}) {
   const { startNewChat, setKbOpen, marketplaceOpen, setMarketplaceOpen, mobileSidebarOpen, setMobileSidebarOpen, currentUser } = useAskNanci()
   const [collapsed, setCollapsed] = useState(false)
   const [wizardOpen, setWizardOpen] = useState(false)

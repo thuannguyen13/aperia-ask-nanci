@@ -13,9 +13,9 @@ import { PANELS } from "@/components/ask-nanci/concept/panel-registry"
 import type { PanelId } from "@/lib/ask-nanci/types"
 import { RiskLanding } from "./RiskLanding"
 import { RiskNavProvider, type RiskDest } from "./RiskNavContext"
-import { skin, type SkinId } from "@/lib/ask-nanci/data/skins"
+import { themeLogos, type ThemeId } from "@/lib/ask-nanci/data/theme-logos"
 
-const SKIN: SkinId = "aperia-risk"
+const THEME: ThemeId = "aperia-risk"
 
 // Aperia Risk shell. Ask Nanci is the home (chat/landing); every other destination
 // is a registered panel rendered full-width through the PANELS registry. Navigation
@@ -52,13 +52,13 @@ export function RiskConsole() {
 
   return (
     <AppFrame
-      skin={SKIN}
+      theme={THEME}
       topBar={
         <div className="relative z-10 flex h-10 shrink-0 items-center justify-center">
-          <Image data-logo="frame" {...skin(SKIN).logos.frame} className="h-6 w-auto" />
+          <Image data-logo="frame" {...themeLogos(THEME).frame} className="h-6 w-auto" />
         </div>
       }
-      sidebar={<Sidebar menu={nav} logos={skin(SKIN).logos} />}
+      sidebar={<Sidebar menu={nav} logos={themeLogos(THEME)} />}
     >
       <RiskNavProvider value={{ go: setDest, openBarometer, openMerchant, merchantId, barometerFilter }}>
         <div className="flex min-w-0 flex-1 py-1 pr-1">

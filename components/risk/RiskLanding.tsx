@@ -7,7 +7,7 @@ import { ChatInput } from "@/components/ask-nanci/ChatInput"
 import { RISK_HEADLINE_STATS, RISK_QUICK_ACTIONS, RISK_NANCI_TAKES, type RiskChipDest, type RiskChipFilter } from "@/lib/ask-nanci/data/risk-landing"
 import { NanciTakeCard } from "./NanciTakeCard"
 
-// Ask Nanci home for the Aperia Risk skin. Reuses ChatInput + ExplorePrompts +
+// Ask Nanci home for the Aperia Risk theme. Reuses ChatInput + ExplorePrompts +
 // recent-chats from context; the greeting/stat-line/quick-actions/Nanci's-take
 // sections are the risk-specific additions (Figma: "Aperia Risk Home Page").
 // A chip with a `dest` jumps straight to a risk destination (via onOpenView);

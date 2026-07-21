@@ -10,7 +10,7 @@ import { AskNanciProvider, useAskNanci } from "@/contexts/AskNanciContext"
 import { ChatStreamProvider } from "@/contexts/ChatStreamContext"
 import { parseMode, CONCEPT_FLOW_SLUGS, CONCEPT_EMBED_FLOW_LAYOUTS, type EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
 import { AppFrame, useAppTheme } from "./AppFrame"
-import { skin, type SkinId } from "@/lib/ask-nanci/data/skins"
+import { themeLogos, type ThemeId } from "@/lib/ask-nanci/data/theme-logos"
 import { Sidebar } from "./Sidebar"
 import { TeachNanciPanel } from "./TeachNanciPanel"
 import { ServiceMarketplacePanel } from "./ServiceMarketplacePanel"
@@ -103,10 +103,11 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
   )
 }
 
-// Which skin each surface wears — colors and logos come from SKINS (data/skins.ts).
-const CONCEPT_SKIN: SkinId = "aperia"
+// Which theme each surface wears: colors live in globals.css under [data-theme],
+// logos in data/theme-logos.ts.
+const CONCEPT_THEME: ThemeId = "aperia"
 
-const EMBED_SKIN: Record<EmbedVariant, SkinId> = {
+const EMBED_THEME: Record<EmbedVariant, ThemeId> = {
   clover:           "clover",
   "business-owner": "access-one",
   iso:              "aperia",
@@ -124,8 +125,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const embedLayout = (rawFlow && CONCEPT_EMBED_FLOW_LAYOUTS[rawFlow]) || null
   const { setTheme } = useTheme()
 
-  // Skin tokens go on <html> so portaled surfaces inherit them (see useAppTheme).
-  useAppTheme(isEmbed && embedVariant ? EMBED_SKIN[embedVariant] : CONCEPT_SKIN)
+  // The theme goes on <html> so portaled surfaces inherit it (see useAppTheme).
+  useAppTheme(isEmbed && embedVariant ? EMBED_THEME[embedVariant] : CONCEPT_THEME)
 
   useEffect(() => {
     if (!isEmbed) return
@@ -139,7 +140,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, [isEmbed, setTheme])
 
   if (isEmbed) {
-    const { logos } = skin(EMBED_SKIN[embedVariant!])
+    const logos = themeLogos(EMBED_THEME[embedVariant!])
     const isConceptEmbed = embedVariant === "concept-embed"
     // Full-app embed flows (e.g. Service Marketplace) render the sidebar + standard
     // WelcomeView, so they behave like the default app (not the concept demo catalog).
@@ -192,13 +193,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <ChatStreamProvider>
     <AskNanciProvider isConceptVersion={isConceptVersion}>
       <AppFrame
-        skin={CONCEPT_SKIN}
+        theme={CONCEPT_THEME}
         topBar={
           <div className="relative z-10 flex h-10 shrink-0 items-center justify-center">
             <div className="absolute left-0 flex items-center md:hidden">
               <MobileSidebarToggle />
             </div>
-            <Image data-logo="frame" {...skin(CONCEPT_SKIN).logos.frame} className="h-6 w-auto" />
+            <Image data-logo="frame" {...themeLogos(CONCEPT_THEME).frame} className="h-6 w-auto" />
           </div>
         }
         sidebar={<Sidebar />}
