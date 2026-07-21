@@ -8,7 +8,6 @@ export interface QueueStatus {
   count: number
   amount: number
   color: "orange" | "teal" | "amber" | "emerald" // semantic left-border / bar color
-  bar: number // chart bar height (0–12 scale) — mirrors the Figma distribution
 }
 
 export interface DetectionQueueData {
@@ -24,9 +23,9 @@ export const DETECTION_QUEUE: DetectionQueueData = {
   code: "DQ",
   eligibleMerchants: 4036,
   statuses: [
-    { key: "alerted", label: "Alerted",          count: 357, amount: 84901.89, color: "orange",  bar: 9 },
-    { key: "ready",   label: "Ready to work",    count: 11,  amount: 84901.89, color: "teal",    bar: 8.8 },
-    { key: "wip",     label: "Work in progress", count: 0,   amount: 0,        color: "amber",   bar: 2.7 },
-    { key: "worked",  label: "Worked",           count: 0,   amount: 0,        color: "emerald", bar: 0.5 },
+    { key: "alerted", label: "Alerted",          count: 357, amount: 84901.89, color: "orange"  },
+    { key: "ready",   label: "Ready to work",    count: 11,  amount: 84901.89, color: "teal"    },
+    { key: "wip",     label: "Work in progress", count: 0,   amount: 0,        color: "amber"   },
+    { key: "worked",  label: "Worked",           count: 0,   amount: 0,        color: "emerald" },
   ],
 }

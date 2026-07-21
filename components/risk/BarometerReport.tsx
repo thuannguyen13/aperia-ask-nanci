@@ -65,7 +65,7 @@ export function BarometerReport() {
         <span className="font-medium text-foreground">Barometer Report</span>
       </div>
 
-      <QueueSummaryCard activeReport="barometer" />
+      <QueueSummaryCard />
 
       {/* Merchant list */}
       <div className="mt-6">

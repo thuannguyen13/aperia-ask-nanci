@@ -1,7 +1,8 @@
 "use client"
 
+import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { Settings } from "lucide-react"
-import { Button } from "aperia-ds5"
+import { Badge, Button } from "aperia-ds5"
 import { formatCurrency } from "@/components/ask-nanci/shared"
 import { DETECTION_QUEUE, type QueueStatus } from "@/lib/ask-nanci/data/risk-detection-queue"
 
@@ -16,9 +17,6 @@ const HEX: Record<QueueStatus["color"], string> = {
   amber:   "#fbbf24", // Work in progress
   emerald: "#0d9488", // Worked
 }
-
-const CHART_MAX = 12
-const CHART_TICKS = [12, 9, 6, 3, 0]
 
 function Kpi({ label, value, sub }: { label: string; value: string; sub: string }) {
   return (
@@ -44,31 +42,48 @@ function StatusCell({ status }: { status: QueueStatus }) {
   )
 }
 
-// Bar chart: horizontal gridlines only (no Y-axis line), tick labels at left.
+// Y ticks: 0 up to the largest count rounded to a nice number (357 → 360), 5 evenly.
+function axisTicks(max: number) {
+  const step = Math.ceil(max / 4 / 10) * 10 || 1
+  return [0, 1, 2, 3, 4].map((i) => i * step)
+}
+
+// Bar chart: one bar per status, height = actual count, axis scaled from the data.
+// Figma (410:27110) has no X labels — the status cells beside it name every bar —
+// so it's gridlines + a left Y axis + four fully-rounded bars, nothing else.
 function StatusChart({ statuses }: { statuses: QueueStatus[] }) {
   return (
-    <div className="flex flex-1 gap-2 py-4 pl-1">
-      <div className="flex flex-col justify-between py-1 text-xs tabular-nums text-muted-foreground">
-        {CHART_TICKS.map((t) => <span key={t}>{t}</span>)}
-      </div>
-      <div className="relative flex flex-1 items-end gap-7 px-2">
-        {CHART_TICKS.map((t) => (
-          <div key={t} className="pointer-events-none absolute inset-x-0 border-t border-border/60" style={{ bottom: `${(t / CHART_MAX) * 100}%` }} />
-        ))}
-        {statuses.map((s) => (
-          <div
-            key={s.key}
-            title={`${s.label}: ${s.count.toLocaleString()}`}
-            className="relative z-10 min-w-0 flex-1 rounded-lg"
-            style={{ height: `${(s.bar / CHART_MAX) * 100}%`, backgroundColor: HEX[s.color] }}
-          />
-        ))}
-      </div>
-    </div>
+    <ResponsiveContainer width="100%" height={152} className="min-w-0 flex-1 [&_*]:outline-none">
+      {/* bottom/top margin keeps the 0 and top ticks from clipping against the card edge */}
+      <BarChart data={statuses} margin={{ top: 10, right: 8, bottom: 10, left: -12 }} barCategoryGap="30%">
+        <CartesianGrid vertical={false} stroke="var(--border)" />
+        <XAxis dataKey="label" hide />
+        <YAxis
+          tick={{ fontSize: 12, fill: "var(--muted-foreground)" }}
+          tickLine={false} axisLine={false} width={44}
+          ticks={axisTicks(Math.max(...statuses.map((s) => s.count)))}
+        />
+        <Tooltip
+          cursor={{ fill: "var(--muted)", radius: 8 }}
+          contentStyle={{
+            background: "var(--popover)", color: "var(--popover-foreground)",
+            border: "1px solid var(--border)", borderRadius: 10, padding: "6px 10px",
+            fontSize: 12, boxShadow: "0 4px 12px rgb(0 0 0 / 0.08)",
+          }}
+          separator=""
+          labelStyle={{ fontWeight: 500, marginBottom: 2 }}
+          itemStyle={{ padding: 0 }}
+          formatter={(value) => [`${Number(value).toLocaleString()} merchants`, ""]}
+        />
+        <Bar dataKey="count" radius={8} maxBarSize={52}>
+          {statuses.map((s) => <Cell key={s.key} fill={HEX[s.color]} />)}
+        </Bar>
+      </BarChart>
+    </ResponsiveContainer>
   )
 }
 
-export function QueueSummaryCard({ activeReport = "none", onBarometer }: { activeReport?: "none" | "barometer"; onBarometer?: () => void }) {
+export function QueueSummaryCard({ onBarometer }: { onBarometer?: () => void }) {
   const q = DETECTION_QUEUE
   const get = (key: QueueStatus["key"]) => q.statuses.find((s) => s.key === key)!
   const alerted = get("alerted")
@@ -81,10 +96,10 @@ export function QueueSummaryCard({ activeReport = "none", onBarometer }: { activ
       {/* Header — transparent on the gray card */}
       <div className="flex flex-wrap items-center gap-2 px-3 py-2">
         <p className="min-w-0 flex-1 truncate text-base font-semibold text-foreground">{q.assignment}</p>
-        <span className="rounded-full border bg-background px-2 py-0.5 text-xs font-medium text-foreground">{q.code}</span>
-        <Button variant="secondary" size="sm">Security Report</Button>
-        <Button variant={activeReport === "barometer" ? "default" : "secondary"} size="sm" onClick={onBarometer}>Barometer Report</Button>
-        <Button variant="secondary" size="icon-sm"><Settings className="size-4" /></Button>
+        <Badge variant="outline">{q.code}</Badge>
+        <Button variant="outline" size="sm">Security Report</Button>
+        <Button variant="default" size="sm" onClick={onBarometer}>Barometer Report</Button>
+        <Button variant="outline" size="icon-sm"><Settings className="size-4" /></Button>
       </div>
 
       {/* KPI row — transparent */}
