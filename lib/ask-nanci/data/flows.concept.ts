@@ -40,6 +40,17 @@ export const CONCEPT_BUSINESS_LOAN_PROMPT = "Do I have enough money for payroll?
 export const CONCEPT_OFFER_YES = "Yes, show me";
 export const CONCEPT_OFFER_NO = "No, ignore for now";
 
+// Declining an offer isn't a dead end: the flow that made the offer gets the last
+// word, restating the problem that is still there. Keyed by flow prompt because both
+// offer flows share the same "No, ignore for now" pill. A flow with no entry here
+// keeps the old no-op behavior (see CONCEPT_FAKE_FOLLOWUPS).
+export const CONCEPT_DECLINE_REPLIES: Record<string, string> = {
+  [CONCEPT_CREDIT_CARD_PROMPT]:
+    "Got it. If you want to look later, just ask me for offers or say \"what could I be earning on Sysco?\" and I'll pull it back up.",
+  [CONCEPT_BUSINESS_LOAN_PROMPT]:
+    "Understood. Just so you're not caught out: you're still projected $4,230 short Friday. If something changes or you want to see options, ask me for financing anytime.",
+};
+
 // Curated conversation titles (chat-column header + sidebar item). Figma shows a
 // summarized title, not the raw first prompt. Keyed by the flow's opening prompt;
 // add entries here as each flow's Figma frame specifies a title.

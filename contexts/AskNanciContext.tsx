@@ -21,7 +21,7 @@ import type { CurrentUser, PromptCategory } from "@/lib/ask-nanci/api"
 import { MOCK_USAGE, DEFAULT_CURRENT_USER } from "@/lib/ask-nanci/mock-data"
 import { EMBED_DEMO_SOURCES, EMBED_BUSINESS_OWNER_DEMO_SOURCES, EMBED_ISO_DEMO_SOURCES, EMBED_VW_DEMO_SOURCES, SCRIPTED_CONVERSATIONS } from "@/lib/ask-nanci/embed-demo-config"
 import type { EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
-import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_ALL_PROMPTS, CONCEPT_NO_RESET_PROMPTS, CONCEPT_MANUAL_PROMPTS, CONCEPT_FLOW16_FOLLOWUPS, CONCEPT_FAKE_FOLLOWUPS, CONCEPT_CHAT_TITLES } from "@/lib/ask-nanci/concept-config"
+import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_ALL_PROMPTS, CONCEPT_NO_RESET_PROMPTS, CONCEPT_MANUAL_PROMPTS, CONCEPT_FLOW16_FOLLOWUPS, CONCEPT_FAKE_FOLLOWUPS, CONCEPT_CHAT_TITLES, CONCEPT_DECLINE_REPLIES, CONCEPT_OFFER_NO } from "@/lib/ask-nanci/concept-config"
 import { ACCOUNT_CHANGE_SHEET } from "@/lib/ask-nanci/data/panels/account-change"
 import { FOUNDATION_SOURCE_ID, ONBOARDING_KEY } from "@/lib/ask-nanci/sourceStore"
 
@@ -165,7 +165,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const scriptStopRef = useRef<boolean>(false)
   // Manual-stepping playback: the active scripted flow and the index of the next
   // turn to play. A flow advances one step per suggestion-pill click, never auto-runs.
-  const activeFlowRef = useRef<{ script: ConceptScriptedTurn[]; cursor: number } | null>(null)
+  const activeFlowRef = useRef<{ key: string; script: ConceptScriptedTurn[]; cursor: number } | null>(null)
   const sessionIdRef = useRef<string>(newSessionId())
 
   useEffect(() => {
@@ -451,7 +451,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     }
 
     // Park at the next user turn (wait for the pill click) or end the flow.
-    activeFlowRef.current = script[i]?.role === "user" ? { script, cursor: i } : null
+    activeFlowRef.current = script[i]?.role === "user" ? { key: flow.key, script, cursor: i } : null
     setChatState("idle")
   }, [playAssistantTurn, applyTurnEffects])
 
@@ -494,7 +494,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
 
     if (CONCEPT_MANUAL_PROMPTS.has(prompt)) {
       // Merchant Money flows: step one turn per pill click.
-      activeFlowRef.current = { script, cursor: 0 }
+      activeFlowRef.current = { key: prompt, script, cursor: 0 }
       runConceptStep()
     } else {
       // Everything else auto-plays as before.
@@ -602,6 +602,17 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
 
   const handlePrompt = useCallback((prompt: string) => {
     if (isConceptVersion) {
+      // Declining an offer gets a real reply when the active flow has one authored —
+      // the pill text is shared across offer flows, so the flow decides what it means.
+      const declineReply = activeFlowRef.current && CONCEPT_DECLINE_REPLIES[activeFlowRef.current.key]
+      if (prompt === CONCEPT_OFFER_NO && declineReply) {
+        activeFlowRef.current = null
+        setMessages((prev) => [...withClearedSuggestions(prev), { id: newSessionId(), role: "user" as const, content: prompt }])
+        setChatState("thinking")
+        // No pills: declining ends the thread, and the reply already says how to come back.
+        sleep(600).then(() => streamAssistantReply(declineReply))
+        return
+      }
       // Fake end-of-flow follow-ups are decorative only — no conversation behind them.
       if (CONCEPT_FAKE_FOLLOWUPS.has(prompt)) return
       // A pill that matches the active flow's pending user turn steps it forward,
@@ -615,7 +626,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     }
     if (isEmbed && SCRIPTED_CONVERSATIONS[prompt]) { playScripted(prompt); return }
     sendMessage(prompt)
-  }, [isConceptVersion, isEmbed, sendMessage, playScripted, playConceptScripted, advanceConceptFlow])
+  }, [isConceptVersion, isEmbed, sendMessage, playScripted, playConceptScripted, advanceConceptFlow, streamAssistantReply])
 
   const startNewChat = useCallback(() => {
     stopRef.current = true
