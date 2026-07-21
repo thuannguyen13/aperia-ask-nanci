@@ -7,6 +7,7 @@ import {
   CONCEPT_ALL_PROMPTS,
   CONCEPT_MANUAL_PROMPTS,
 } from "../concept-config"
+import { RISK_QUICK_ACTIONS, RISK_NANCI_TAKES } from "./risk-landing"
 import type { ConceptScriptedTurn } from "../types"
 
 const CONVERSATIONS = CONCEPT_SCRIPTED_CONVERSATIONS as Record<string, ConceptScriptedTurn[]>
@@ -84,6 +85,10 @@ describe("concept routing tables", () => {
     for (const script of Object.values(CONVERSATIONS)) {
       for (const turn of script) turn.suggestions?.forEach((s) => routed.add(s))
     }
+    // Risk conversations are spread into CONCEPT_SCRIPTED_CONVERSATIONS but reached
+    // from the risk landing's own surfaces, not from FLOW_DEFS or suggestion pills.
+    RISK_QUICK_ACTIONS.forEach((a) => routed.add(a.prompt))
+    RISK_NANCI_TAKES.forEach((t) => routed.add(t.prompt))
     const orphans = [...convKeys].filter((k) => !routed.has(k))
     expect(orphans).toEqual([])
   })
