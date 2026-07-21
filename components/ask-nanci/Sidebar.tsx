@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { MessageCirclePlus, PanelLeft, Settings, Moon } from "lucide-react"
+import { Blocks, MessageCirclePlus, PanelLeft, Settings, Moon } from "lucide-react"
 import Image from "next/image"
 import { useTheme } from "next-themes"
 import {
@@ -11,6 +11,7 @@ import {
 } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
+import { MARKETPLACE_TITLE } from "@/lib/ask-nanci/data/panels/service-marketplace"
 import { UsageCard } from "./UsageCard"
 import { ConnectWizard } from "./ConnectWizard"
 
@@ -64,7 +65,7 @@ type SidebarBrand = {
 }
 
 export function Sidebar({ menu, brand }: { menu?: SidebarNavItem[]; brand?: SidebarBrand } = {}) {
-  const { sessions, activeSessionId, startNewChat, resumeSession, deleteSessionById, setKbOpen, setMarketplaceOpen, mobileSidebarOpen, setMobileSidebarOpen, currentUser } = useAskNanci()
+  const { sessions, activeSessionId, startNewChat, resumeSession, deleteSessionById, setKbOpen, marketplaceOpen, setMarketplaceOpen, mobileSidebarOpen, setMobileSidebarOpen, currentUser } = useAskNanci()
   const [collapsed, setCollapsed] = useState(false)
   const [wizardOpen, setWizardOpen] = useState(false)
   const { resolvedTheme, setTheme } = useTheme()
@@ -157,7 +158,22 @@ export function Sidebar({ menu, brand }: { menu?: SidebarNavItem[]; brand?: Side
             />
           ))
         ) : (
-          <SidebarItem icon={MessageCirclePlus} label="New Chat" collapsed={!isMobile && collapsed} onClick={startNewChat} />
+          <>
+            <SidebarItem
+              icon={MessageCirclePlus}
+              label="New Chat"
+              collapsed={!isMobile && collapsed}
+              onClick={() => { setMarketplaceOpen(false); startNewChat() }}
+            />
+            {/* Marketplace (Flow 22) — a nav destination that takes over the content area */}
+            <SidebarItem
+              icon={Blocks}
+              label={MARKETPLACE_TITLE}
+              collapsed={!isMobile && collapsed}
+              onClick={() => { setMarketplaceOpen(!marketplaceOpen); if (isMobile) setMobileSidebarOpen(false) }}
+              className={marketplaceOpen ? "bg-muted font-medium" : undefined}
+            />
+          </>
         )}
       </div>
 
@@ -179,7 +195,7 @@ export function Sidebar({ menu, brand }: { menu?: SidebarNavItem[]; brand?: Side
               >
                 <button
                   className="min-w-0 flex-1 truncate text-sm text-foreground text-left"
-                  onClick={() => { resumeSession(session.id); if (isMobile) setMobileSidebarOpen(false) }}
+                  onClick={() => { setMarketplaceOpen(false); resumeSession(session.id); if (isMobile) setMobileSidebarOpen(false) }}
                 >
                   {session.title}
                 </button>
@@ -222,17 +238,6 @@ export function Sidebar({ menu, brand }: { menu?: SidebarNavItem[]; brand?: Side
                 </div>
 
 
-              </div>
-
-              {/* Service Marketplace banner (Flow 22) — opens the marketplace panel */}
-              <div className="relative bg-card rounded-[10px] border p-4 shadow-sm overflow-hidden">
-                <p className="text-sm font-semibold text-foreground">Service Marketplace</p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Mastercard Services brings financial tools built for businesses like yours, not generic consumer products.
-                </p>
-                <Button className="w-full mt-3" size="sm" onClick={() => setMarketplaceOpen(true)}>
-                  Learn More
-                </Button>
               </div>
 
             <UsageCard />

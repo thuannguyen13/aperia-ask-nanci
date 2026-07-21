@@ -6,6 +6,7 @@ import { Button, Textarea } from "aperia-ds5"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
 import { UserMessage, BotMessage } from "@/components/ask-nanci/ChatMessage"
+import { ChatActiveSources } from "@/components/ask-nanci/ChatActiveSources"
 import { ThinkingIndicator } from "@/components/ask-nanci/ThinkingIndicator"
 import { streamWords } from "@/lib/ask-nanci/stream-words"
 import { RISK_NANCI_TAKES } from "@/lib/ask-nanci/data/risk-landing"
@@ -39,7 +40,7 @@ export function DashboardInsightPanel() {
 }
 
 function Conversation({ prompt }: { prompt: string }) {
-  const { closePanel } = useAskNanci()
+  const { closePanel, sources } = useAskNanci()
   // Seeded with the question only — the answer streams in, same as the main chat.
   const [messages, setMessages] = useState<Message[]>(() => answerTo(prompt, 0).slice(0, 1))
   // Id of the message currently being typed out — it lives in `messages` and grows
@@ -133,19 +134,25 @@ function Conversation({ prompt }: { prompt: string }) {
         <div ref={endRef} />
       </div>
 
-      <div className="shrink-0 border-t p-3">
-        <div className="flex items-end gap-2">
+      {/* Same shell as the app's ChatInput — bordered box, borderless textarea, the
+          shared sources pill and the send button inside at bottom-right. The rest of
+          ChatInput's toolbar (slash commands, common questions, recent chats) is
+          omitted: it posts into the global chat session this panel deliberately avoids. */}
+      <div className="shrink-0 p-3">
+        <div className="flex flex-col rounded-xl border bg-background shadow-sm transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50 dark:bg-input/30">
           <Textarea
             value={value}
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); ask(value) } }}
             placeholder="Ask anything"
-            rows={1}
-            className="min-h-9 resize-none"
+            className="min-h-[60px] resize-none border-0 bg-transparent text-sm shadow-none focus-visible:border-0 focus-visible:ring-0 dark:bg-transparent"
           />
-          <Button size="sm" disabled={!value.trim() || busy} onClick={() => ask(value)} aria-label="Send">
-            <ArrowUp className="size-4" />
-          </Button>
+          <div className="flex items-center justify-between px-2 pb-2">
+            <ChatActiveSources sources={sources.filter((s) => s.active)} />
+            <Button size="icon-sm" disabled={!value.trim() || busy} onClick={() => ask(value)} aria-label="Send">
+              <ArrowUp />
+            </Button>
+          </div>
         </div>
       </div>
     </PanelShell>

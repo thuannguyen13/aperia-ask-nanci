@@ -39,7 +39,7 @@ export const SCATTER_COLORS: Record<ScatterCat, string> = {
 
 // ── Alert Volume by Assignment (horizontal bars) ─────────────────────────────
 export const ALERT_VOLUME: { name: string; count: number }[] = [
-  { name: "Esquire - Phase 2 Parameters - Au…", count: 357 },
+  { name: "MC - Phase 2 Parameters - Auths…", count: 357 },
   { name: "Low Risk DQ - By MCC", count: 303 },
   { name: "MC Watchlist (system)", count: 52 },
   { name: "High Risk DQ - By MCC", count: 25 },
@@ -94,4 +94,15 @@ export const DASH_HIGHLIGHTS: Record<string, DashChartId[]> = {
   "Alert Volume requires attention": ["alert-volume", "realert"],
   "MC Velocity re-alert rate is 45.6% — highest today": ["realert", "param-heat"],
   "5 merchants are both VW critical and MC critical": ["scatter", "high-risk"],
+}
+
+// Chart → the take its sparkle button asks Nanci about. The inverse of
+// DASH_HIGHLIGHTS, but hand-written because `realert` appears under two takes and
+// belongs to the more specific one (the take that is literally about re-alert rate).
+export const CHART_TAKE: Record<DashChartId, string> = {
+  "alert-volume": "Alert Volume requires attention",
+  realert:        "MC Velocity re-alert rate is 45.6% — highest today",
+  "param-heat":   "MC Velocity re-alert rate is 45.6% — highest today",
+  scatter:        "5 merchants are both VW critical and MC critical",
+  "high-risk":    "5 merchants are both VW critical and MC critical",
 }

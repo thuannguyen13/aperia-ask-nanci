@@ -27,7 +27,7 @@ export interface DetectionQueueData {
 // the second is the non-Mastercard Authorizations assignment.
 export const DETECTION_QUEUES: DetectionQueueData[] = [
   {
-    assignment: "Esquire - Phase 2 Parameters - Auths - Detect Q",
+    assignment: "MC - Phase 2 Parameters - Auths - Detect Q",
     code: "DQ",
     mastercard: true,
     eligibleMerchants: 4036,
@@ -41,7 +41,7 @@ export const DETECTION_QUEUES: DetectionQueueData[] = [
     ],
   },
   {
-    assignment: "Authorizations Assignment",
+    assignment: "Non-MC Authorizations Assignment",
     code: "DQ",
     eligibleMerchants: 1166,
     requeued: { count: 67, amount: 84664.75 },

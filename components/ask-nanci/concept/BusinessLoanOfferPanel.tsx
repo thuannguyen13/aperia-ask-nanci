@@ -47,7 +47,7 @@ export function BusinessLoanOfferPanel() {
 
         {/* The offer being applied for is the reason the panel opened — tinted, not a plain row. */}
         <div className="space-y-2 rounded-xl border border-blue-300 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-950/20">
-          <div className="flex items-start gap-3">
+          <div className="flex items-start gap-2">
             <OfferLogo src={offer.logo} alt={offer.product} className="size-14" fallback={<BrandMonogram label={offer.mark} color={offer.color} />} />
             <div className="min-w-0">
               <p className="text-sm font-semibold text-foreground">{offer.product}</p>

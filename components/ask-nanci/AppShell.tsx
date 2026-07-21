@@ -35,8 +35,22 @@ function ReplayButton() {
   )
 }
 
+// Chat column. The marketplace is a full content-area view, so the chat hides (stays
+// mounted — never remounted) while it's open.
+function ChatArea({ children }: { children: React.ReactNode }) {
+  const { marketplaceOpen } = useAskNanci()
+  return (
+    <>
+      <ServiceMarketplacePanel />
+      <div className={`min-w-0 flex-1 overflow-hidden rounded-xl md:rounded-2xl border bg-background ${marketplaceOpen ? "hidden" : "flex"}`}>
+        {children}
+      </div>
+    </>
+  )
+}
+
 function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode; noSidebar?: boolean }) {
-  const { dynamicPanels } = useAskNanci()
+  const { dynamicPanels, marketplaceOpen } = useAskNanci()
   const isDQ = dynamicPanels.some((p) => DQ_PANELS.has(p))
   const [showDQ, setShowDQ] = useState(false)
   const [dqVisible, setDqVisible] = useState(false)
@@ -71,7 +85,9 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
           It stays on the left in every mode (matching the latest flows); in DQ mode it
           just shrinks to a fixed width while the panel area fills the space to its right. */}
       <div className={
-        showDQ
+        marketplaceOpen
+          ? "hidden"
+          : showDQ
           ? "mr-1 flex w-[320px] shrink-0 overflow-hidden rounded-xl border bg-background md:w-97.5 md:rounded-2xl"
           : `flex min-w-0 flex-1 overflow-hidden rounded-xl md:rounded-2xl border bg-background transition-opacity duration-200 ease-out ${chatFadingIn ? "opacity-0" : "opacity-100"}`
       }>
@@ -148,10 +164,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <Sidebar />
                 <div className="flex min-w-0 flex-1 py-1 pr-1 pl-1">
                   <TeachNanciPanel />
-                  <ServiceMarketplacePanel />
-                  <div className="flex min-w-0 flex-1 overflow-hidden rounded-xl md:rounded-2xl border bg-background">
-                    {children}
-                  </div>
+                  <ChatArea>{children}</ChatArea>
                 </div>
               </>
             ) : isConceptEmbed ? (
@@ -191,10 +204,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         ) : (
           <div className="flex min-w-0 flex-1 py-1 pr-1">
             <TeachNanciPanel />
-            <ServiceMarketplacePanel />
-            <div className="flex min-w-0 flex-1 overflow-hidden rounded-xl md:rounded-2xl border bg-background">
-              {children}
-            </div>
+            <ChatArea>{children}</ChatArea>
           </div>
         )}
       </AppFrame>

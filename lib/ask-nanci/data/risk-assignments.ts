@@ -29,7 +29,7 @@ export interface Assignment {
 
 export const ASSIGNMENTS: Assignment[] = [
   { name: "MC Watch", system: true, type: "DQ", alerted: 67, status: "Active",  lastProcessed: "05/06/2026" },
-  { name: "Esquire - Phase 2 Parameters - Auths - Detect Q", type: "DQ", alerted: 7,  status: "Active",  lastProcessed: "05/06/2026" },
+  { name: "MC - Phase 2 Parameters - Auths - Detect Q", type: "DQ", alerted: 7,  status: "Active",  lastProcessed: "05/06/2026" },
   { name: "Esquire - Phase 2 Parameters - Detect Q",         type: "DQ", alerted: 37, status: "Expired", lastProcessed: "05/06/2026" },
   { name: "High Risk Detection Queue",                       type: "DQ", alerted: 25, status: "Active",  lastProcessed: "05/06/2026" },
   { name: "High Risk Detection Queue - By MCC",              type: "DQ", alerted: 3,  status: "Active",  lastProcessed: "05/06/2026" },

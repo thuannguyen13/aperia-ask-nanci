@@ -8,7 +8,7 @@ import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
 import { useRiskNav } from "../RiskNavContext"
 import { RISK_NANCI_TAKES } from "@/lib/ask-nanci/data/risk-landing"
-import { DASH_KPIS, DASH_HIGHLIGHTS, type DashChartId } from "@/lib/ask-nanci/data/risk-dashboard"
+import { DASH_KPIS, DASH_HIGHLIGHTS, CHART_TAKE, type DashChartId } from "@/lib/ask-nanci/data/risk-dashboard"
 import { DashChart, CHART_TITLES } from "./charts"
 import { NanciTakeCard } from "../NanciTakeCard"
 
@@ -16,21 +16,28 @@ const PANEL_ID = "dashboard-insight"
 
 // A dashboard chart panel — title + AI/menu affordances + highlight ring when the
 // active insight points at it.
-function ChartPanel({ id, title, active, dim, children }: { id: DashChartId; title: string; active: boolean; dim: boolean; children: React.ReactNode }) {
+function ChartPanel({ id, title, active, dim, onAsk, children }: { id: DashChartId; title: string; active: boolean; dim: boolean; onAsk: () => void; children: React.ReactNode }) {
   return (
     <div className={cn(
-      "rounded-xl border bg-card p-4 transition-all",
+      "flex h-full flex-col rounded-xl border bg-card p-4 transition-all",
       active && "border-primary ring-1 ring-primary",
       dim && "opacity-50",
     )} data-chart={id}>
       <div className="mb-3 flex items-center justify-between">
         <h3 className="truncate text-base font-semibold text-foreground">{title}</h3>
-        <div className="flex items-center gap-1 text-muted-foreground">
-          <Sparkles className="size-4 text-primary" />
-          <MoreHorizontal className="size-4" />
+        <div className="flex shrink-0 items-center gap-0.5">
+          {/* Second entry point to the same insight panel the takes above open. */}
+          <Button variant="ghost" size="icon-sm" aria-label={`Ask Nanci about ${title}`} onClick={onAsk}>
+            <Sparkles className="size-4 text-primary" />
+          </Button>
+          <Button variant="ghost" size="icon-sm" aria-label={`More options for ${title}`}>
+            <MoreHorizontal className="size-4 text-muted-foreground" />
+          </Button>
         </div>
       </div>
-      {children}
+      {/* min-h-0 so a chart child can shrink to the card instead of forcing it taller.
+          recharts puts tabindex on its wrapper/surface — kill the focus ring it shows on click. */}
+      <div className="min-h-0 flex-1 [&_.recharts-wrapper]:outline-none [&_.recharts-surface]:outline-none">{children}</div>
     </div>
   )
 }
@@ -100,12 +107,12 @@ export function Dashboard() {
         {/* Chart grid — Figma layout */}
         <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
           {(["high-risk", "scatter", "param-heat", "alert-volume"] as DashChartId[]).map((id) => (
-            <ChartPanel key={id} id={id} title={CHART_TITLES[id]} active={isOn(id)} dim={anyActive && !isOn(id)}>
+            <ChartPanel key={id} id={id} title={CHART_TITLES[id]} active={isOn(id)} dim={anyActive && !isOn(id)} onAsk={() => toggleTake(CHART_TAKE[id])}>
               <DashChart id={id} />
             </ChartPanel>
           ))}
           <div className="lg:col-span-2">
-            <ChartPanel id="realert" title={CHART_TITLES.realert} active={isOn("realert")} dim={anyActive && !isOn("realert")}>
+            <ChartPanel id="realert" title={CHART_TITLES.realert} active={isOn("realert")} dim={anyActive && !isOn("realert")} onAsk={() => toggleTake(CHART_TAKE.realert)}>
               <DashChart id="realert" />
             </ChartPanel>
           </div>

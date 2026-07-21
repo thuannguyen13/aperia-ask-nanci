@@ -17,7 +17,7 @@ export const RISK_LANDING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> =
       role: "assistant",
       content:
         "**3 merchants are High risk today**, and risk lines up with exposure so working them top-down also works them by dollars:\n\n1. **Regency Furniture Manchester** — VW 89 / MC 940, $48,200 exposure. Your clear #1.\n2. **PBBILLER.COM** — VW 83 / MC 920, $31,500.\n3. **Ashley Homestore – Mechanicsbu** — VW 81 / MC 830, $27,800 (already Worked).\n\nEverything below is Medium and tapers off fast. Want me to open the Barometer Report so you can work them in order?",
-      source: "Detection Queue · Esquire - Phase 2",
+      source: "Detection Queue · MC - Phase 2",
       dashChart: "high-risk",
       suggestions: ["Show the 5 merchants that are both VW and MC critical", "Why is alert volume running hot today?"],
     },
