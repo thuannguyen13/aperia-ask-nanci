@@ -1,6 +1,6 @@
 "use client"
 
-import { SlidersHorizontal, RefreshCw, ArrowRight } from "lucide-react"
+import { SlidersHorizontal, RefreshCw } from "lucide-react"
 import { Button } from "aperia-ds5"
 import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
 import { QueueSummaryCard } from "./QueueSummaryCard"
@@ -26,9 +26,6 @@ export function DetectionQueue() {
 
       <div className="flex-1 overflow-y-auto p-4 md:p-6">
         <QueueSummaryCard onBarometer={openBarometer} />
-        <div className="mt-4 flex justify-end">
-          <Button variant="secondary" size="sm" onClick={openBarometer}>Next Queue <ArrowRight className="size-4" /></Button>
-        </div>
       </div>
     </PanelShell>
   )
