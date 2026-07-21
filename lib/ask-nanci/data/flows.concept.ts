@@ -40,6 +40,9 @@ export const CONCEPT_BUSINESS_LOAN_PROMPT = "Do I have enough money for payroll?
 export const CONCEPT_OFFER_YES = "Yes, show me";
 export const CONCEPT_OFFER_NO = "No, ignore for now";
 
+// Destination card id — an internal key, never sent as a prompt (see FlowDef.destination).
+export const CONCEPT_MARKETPLACE_KEY = "__marketplace__";
+
 // Declining an offer isn't a dead end: the flow that made the offer gets the last
 // word, restating the problem that is still there. Keyed by flow prompt because both
 // offer flows share the same "No, ignore for now" pill. A flow with no entry here
@@ -113,6 +116,9 @@ export interface FlowDef {
   followups?: string[]; // continuation keys kept in-session (derive CONCEPT_NO_RESET_PROMPTS)
   keepSession?: boolean; // this flow's own key is reachable mid-session — don't reset on it
   manual?: boolean; // step one turn per pill click instead of auto-playing the script
+  // A destination card opens a surface instead of playing a conversation. Its `key`
+  // is an internal id, not a prompt, so it stays out of the trigger-prompt lists.
+  destination?: "marketplace";
 }
 
 export const FLOW_DEFS: FlowDef[] = [
@@ -296,6 +302,15 @@ export const FLOW_DEFS: FlowDef[] = [
     slug: "21",
     description: "A projected payroll shortfall leads into a ranked lender list — tap any option to submit a pre-filled application, handed off to the account services team for review.",
   },
+  {
+    num: 22,
+    section: "merchant",
+    title: "Service Marketplace",
+    badge: "Destination",
+    key: CONCEPT_MARKETPLACE_KEY,
+    destination: "marketplace",
+    description: "Add-ons and integrations that extend Ask Nanci — browse, search and enable services. A destination, not a conversation: the card opens it directly.",
+  },
 ];
 
 // Derived — do not hand-maintain; add to FLOW_DEFS above instead.
@@ -318,16 +333,16 @@ export const CONCEPT_EMBED_FLOW_LAYOUTS: Record<string, ConceptEmbedLayout> = {
 };
 
 // Trigger prompts (routing guard + recycled as end-of-flow suggestion chips), in
-// ascending card number. Proactive flows have no prompt and are excluded.
+// ascending card number. Proactive and destination flows have no prompt — excluded.
 export const CONCEPT_ALL_PROMPTS = [...FLOW_DEFS]
-  .filter((f) => !f.proactive)
+  .filter((f) => !f.proactive && !f.destination)
   .sort((a, b) => a.num - b.num)
   .map((f) => f.key);
 
 // Merchant-money group prompts, ascending. End-of-flow chips suggest sibling flows
 // in the same group — otherMerchantPrompts(self) drops the flow that just finished.
 export const CONCEPT_MERCHANT_PROMPTS = [...FLOW_DEFS]
-  .filter((f) => f.section === "merchant" && !f.proactive)
+  .filter((f) => f.section === "merchant" && !f.proactive && !f.destination)
   .sort((a, b) => a.num - b.num)
   .map((f) => f.key);
 
@@ -341,7 +356,7 @@ export const CONCEPT_NO_RESET_PROMPTS = new Set<string>([...FLOW_DEFS.filter((f)
 // Defaults to the Merchant Money section; a flow's `manual` prop overrides it.
 // Includes each flow's followup/alt-entry keys so continuations step too.
 export const CONCEPT_MANUAL_PROMPTS = new Set<string>(
-  FLOW_DEFS.filter((f) => f.manual ?? f.section === "merchant").flatMap((f) => [f.key, ...(f.followups ?? []), ...(f.altEntries?.map((e) => e.key) ?? [])]),
+  FLOW_DEFS.filter((f) => !f.destination && (f.manual ?? f.section === "merchant")).flatMap((f) => [f.key, ...(f.followups ?? []), ...(f.altEntries?.map((e) => e.key) ?? [])]),
 );
 
 // ─── Sheet action data (populated at module load) ─────────────────────────────

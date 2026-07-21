@@ -119,6 +119,8 @@ export function ConceptWelcomeView() {
 }
 
 function FlowGrid({ flows, onTryIt, onSimulateLogin }: { flows: FlowDef[]; onTryIt: (prompt: string) => void; onSimulateLogin: () => void }) {
+  // A destination card opens a surface rather than playing a script.
+  const { setMarketplaceOpen } = useAskNanci()
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
       {flows.map((flow) => (
@@ -135,7 +137,14 @@ function FlowGrid({ flows, onTryIt, onSimulateLogin }: { flows: FlowDef[]; onTry
             </span>
           </div>
           <p className="text-sm text-muted-foreground leading-relaxed">{flow.description}</p>
-          {flow.proactive ? (
+          {flow.destination === "marketplace" ? (
+            <button
+              onClick={() => setMarketplaceOpen(true)}
+              className="rounded-lg border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
+            >
+              Open Marketplace
+            </button>
+          ) : flow.proactive ? (
             <button
               onClick={onSimulateLogin}
               className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors"
