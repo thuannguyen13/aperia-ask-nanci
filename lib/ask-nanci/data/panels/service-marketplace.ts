@@ -45,6 +45,7 @@ export const MARKETPLACE_DETAIL_LABELS = {
   enable: "Add",
   enabled: "Added",
   added: "Added",
+  remove: "Remove", // the toggle-off action on an already-added service
 };
 
 export const MARKETPLACE_SERVICES: MarketplaceService[] = [

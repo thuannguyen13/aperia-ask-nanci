@@ -62,7 +62,7 @@ export function MarketplaceDetailPanel({
             </div>
             {enabled ? (
               <Button variant="outline" size="sm" className="shrink-0" onClick={onToggle}>
-                <Check className="size-3.5 text-green-600 dark:text-green-400" /> {L.added}
+                {L.remove}
               </Button>
             ) : (
               <Button size="sm" className="shrink-0" onClick={onToggle}>
