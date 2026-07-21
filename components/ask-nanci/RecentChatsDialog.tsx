@@ -44,7 +44,8 @@ export function RecentChatsDialog({ open, onOpenChange, onResume }: {
           <InputGroupInput placeholder="Search" value={query} onChange={(e) => setQuery(e.target.value)} />
         </InputGroup>
 
-        <div className="flex max-h-[320px] flex-col overflow-y-auto rounded-xl">
+        {/* p-1 so the focus ring isn't clipped by the scroll container's overflow */}
+        <div className="flex max-h-[320px] flex-col overflow-y-auto p-1">
           {results.map((session) => (
             <button
               key={session.id}
