@@ -2,7 +2,6 @@
 // All content lives in data/flows.concept.ts.
 // This file re-exports everything so existing imports don't change.
 
-export type { ConceptScriptedTurn } from "./types"
 export type { FlowDef } from "./data/flows.concept"
 
 export {
@@ -24,4 +23,3 @@ export {
 } from "./data/flows.concept"
 
 export { MERCHANT_VOLUME_DATA } from "./data/merchants"
-export type { MerchantVolumeRow } from "./data/merchants"

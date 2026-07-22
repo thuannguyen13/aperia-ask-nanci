@@ -2,7 +2,7 @@
 
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { WEEK_COMPARE, DAILY_SALES, WEEKDAY_AVG_TRANSACTIONS, SATURDAY_DRILLDOWN, SLOWEST_DAY } from "@/lib/ask-nanci/data/panels/sales-snapshot"
-import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelTable, Th, Td, formatCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelFigureTable, Td, formatCurrency } from "@/components/ask-nanci/shared"
 
 export function SalesSnapshotPanel() {
   const { closeDynamicPanel } = useAskNanci()
@@ -26,50 +26,19 @@ export function SalesSnapshotPanel() {
         <div>
           <p className="text-base font-bold text-foreground">This Week vs Last Week Sales</p>
           <p className="mb-2 text-sm text-muted-foreground">Week of May 11–17 vs. Week of May 4–10</p>
-          <PanelTable className="table-fixed">
-            <colgroup>
-              <col className="w-[40%]" />
-              <col className="w-[20%]" />
-              <col className="w-[20%]" />
-              <col className="w-[20%]" />
-            </colgroup>
-            <thead>
-              <tr className="border-b bg-muted/40">
-                <Th></Th>
-                <Th align="right">Last Week</Th>
-                <Th align="right">This Week</Th>
-                <Th align="right">Change</Th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <Td></Td>
-                <Td align="right" mono>{formatCurrency(WEEK_COMPARE.lastWeek)}</Td>
-                <Td align="right" mono>{formatCurrency(WEEK_COMPARE.thisWeek)}</Td>
-                <Td align="right" mono className="text-green-600 dark:text-green-400">+{WEEK_COMPARE.changePct}%</Td>
-              </tr>
-            </tbody>
-          </PanelTable>
+          <PanelFigureTable headers={["", "Last Week", "This Week", "Change"]}>
+            <tr>
+              <Td></Td>
+              <Td align="right" mono>{formatCurrency(WEEK_COMPARE.lastWeek)}</Td>
+              <Td align="right" mono>{formatCurrency(WEEK_COMPARE.thisWeek)}</Td>
+              <Td align="right" mono className="text-green-600 dark:text-green-400">+{WEEK_COMPARE.changePct}%</Td>
+            </tr>
+          </PanelFigureTable>
         </div>
 
         <div>
           <p className="mb-2 text-base font-bold text-foreground">Daily Sales</p>
-          <PanelTable className="table-fixed">
-            <colgroup>
-              <col className="w-[40%]" />
-              <col className="w-[20%]" />
-              <col className="w-[20%]" />
-              <col className="w-[20%]" />
-            </colgroup>
-            <thead>
-              <tr className="border-b bg-muted/40">
-                <Th>Day</Th>
-                <Th align="right">Sales</Th>
-                <Th align="right">Transactions</Th>
-                <Th align="right">Avg Ticket</Th>
-              </tr>
-            </thead>
-            <tbody>
+          <PanelFigureTable headers={["Day", "Sales", "Transactions", "Avg Ticket"]}>
               {DAILY_SALES.map((d) => {
                 const isSlow = slowHighlighted && d.day === SLOWEST_DAY.day
                 return (
@@ -93,8 +62,7 @@ export function SalesSnapshotPanel() {
                   </tr>
                 )
               })}
-            </tbody>
-          </PanelTable>
+          </PanelFigureTable>
         </div>
       </div>
     </PanelShell>

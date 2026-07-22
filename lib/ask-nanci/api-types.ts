@@ -16,13 +16,16 @@ export type ChatStreamChunk =
 
 // ─── Sessions ─────────────────────────────────────────────────────────────────
 
+/** @expected-unused backend seam */
 export type SessionListResponse = Session[]
 
 
 // ─── Sources ──────────────────────────────────────────────────────────────────
 
+/** @expected-unused backend seam */
 export type SourceListResponse = Source[]
 
+/** @expected-unused backend seam */
 export interface SourceAddRequest {
   name: string
   kind: "file" | "bank"
@@ -32,6 +35,7 @@ export interface SourceAddRequest {
   initials?: string
 }
 
+/** @expected-unused backend seam */
 export interface SourceUpdateRequest {
   active?: boolean
 }

@@ -36,7 +36,7 @@ export function writeSources(sources: Source[]): void {
   } catch { /* ignore */ }
 }
 
-export function addFileSource(name: string, mimeType: string): Source {
+function addFileSource(name: string, mimeType: string): Source {
   const sources = readSources()
   const source: Source = { id: generateId(), name, kind: "file", mimeType, active: true, addedAt: Date.now() }
   writeSources([source, ...sources])

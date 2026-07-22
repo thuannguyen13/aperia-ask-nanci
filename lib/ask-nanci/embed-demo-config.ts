@@ -26,8 +26,6 @@ export function parseMode(mode: string | null): ParsedMode {
   }
 }
 
-export type { ScriptedTurn, PromptCategory } from "./types"
-
 import { SCRIPTED_CONVERSATIONS as BASE_SCRIPTED_CONVERSATIONS } from "./data/flows.clover"
 import { ISO_SCRIPTED_CONVERSATIONS } from "./data/flows.iso"
 

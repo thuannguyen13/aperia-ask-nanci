@@ -2,7 +2,7 @@
 
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { STATUS_ROWS, MERCHANT_ROWS } from "@/lib/ask-nanci/data/panels/barometer"
+import { ASSIGNMENT, STATUS_ROWS, MERCHANT_ROWS } from "@/lib/ask-nanci/data/panels/barometer"
 import { PanelShell, PanelHeader, ScoreBadge, PanelTable, Th, Td } from "@/components/ask-nanci/shared"
 
 export function BarometerReportPanel() {
@@ -25,8 +25,8 @@ export function BarometerReportPanel() {
         <div className="border-b px-4 py-3 space-y-3">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold text-foreground">High Velocity Watch</p>
-              <p className="text-xs text-muted-foreground">05/24/2026</p>
+              <p className="text-sm font-semibold text-foreground">{ASSIGNMENT.name}</p>
+              <p className="text-xs text-muted-foreground">{ASSIGNMENT.date}</p>
             </div>
             <button className="shrink-0 rounded-md border px-2.5 py-1 text-xs font-medium text-foreground hover:bg-muted">
               Assignment Details
@@ -36,12 +36,7 @@ export function BarometerReportPanel() {
           {/* General info */}
           <div className="rounded-lg border px-3 py-2 space-y-1.5">
             <p className="text-xs font-semibold text-foreground">General Information</p>
-            {[
-              { label: "Assignment Name",         value: "High Velocity Watch" },
-              { label: "Assignment Type",         value: "DQ" },
-              { label: "Eligible Merchant Count", value: "14" },
-              { label: "Percent Worked",          value: "0%" },
-            ].map(({ label, value }) => (
+            {ASSIGNMENT.generalInfo.map(({ label, value }) => (
               <div key={label} className="flex items-center justify-between text-xs">
                 <span className="text-muted-foreground">{label}</span>
                 <span className="text-foreground">{value}</span>

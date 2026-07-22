@@ -30,7 +30,7 @@ import {
   writeSources,
 } from "./sourceStore"
 import { findResponse, DEFAULT_RESPONSE, DEFAULT_SUGGESTIONS, PROMPT_CATEGORIES, ALL_QUESTIONS } from "./mock-data"
-export type { MockResponse, PromptCategory, CurrentUser } from "./types"
+export type { PromptCategory, CurrentUser } from "./types"
 import { VARIANT_CONTENT_OVERRIDES } from "./embed-demo-config"
 import type { EmbedVariant } from "./embed-demo-config"
 import { generateId } from "./utils"

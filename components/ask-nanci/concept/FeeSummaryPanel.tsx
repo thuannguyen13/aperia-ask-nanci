@@ -6,7 +6,7 @@ import { cn } from "aperia-ds5/utils"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { DRIVER_SUMMARY, EFFECTIVE_RATE, VOLUME, FEES, FEES_TOTAL } from "@/lib/ask-nanci/data/panels/fee-summary"
 import { CHARGEBACK } from "@/lib/ask-nanci/data/panels/chargeback-status"
-import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, Callout, PanelTable, Th, Td, formatCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, Callout, PanelFigureTable, Td, formatCurrency } from "@/components/ask-nanci/shared"
 
 // How long the volume row stays tinted before it fades on its own — the flow
 // reads it aloud, then it clears so the panel returns to a neutral state.
@@ -41,78 +41,31 @@ export function FeeSummaryPanel() {
 
           <div>
             <p className="mb-2 text-base font-bold text-foreground">Effective Rate</p>
-            <PanelTable className="table-fixed">
-              <colgroup>
-                <col className="w-[40%]" />
-                <col className="w-[20%]" />
-                <col className="w-[20%]" />
-                <col className="w-[20%]" />
-              </colgroup>
-              <thead>
-                <tr className="border-b bg-muted/40">
-                  <Th></Th>
-                  <Th align="right">April</Th>
-                  <Th align="right">May</Th>
-                  <Th align="right">Change</Th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <Td></Td>
-                  <Td align="right" mono>{EFFECTIVE_RATE.april}</Td>
-                  <Td align="right" mono>{EFFECTIVE_RATE.may}</Td>
-                  <Td align="right" mono className="text-amber-600 dark:text-amber-400">{EFFECTIVE_RATE.change}</Td>
-                </tr>
-              </tbody>
-            </PanelTable>
+            <PanelFigureTable headers={["", "April", "May", "Change"]}>
+              <tr>
+                <Td></Td>
+                <Td align="right" mono>{EFFECTIVE_RATE.april}</Td>
+                <Td align="right" mono>{EFFECTIVE_RATE.may}</Td>
+                <Td align="right" mono className="text-amber-600 dark:text-amber-400">{EFFECTIVE_RATE.change}</Td>
+              </tr>
+            </PanelFigureTable>
           </div>
 
           <div>
             <p className="mb-2 text-base font-bold text-foreground">Volume Processed</p>
-            <PanelTable className="table-fixed">
-              <colgroup>
-                <col className="w-[40%]" />
-                <col className="w-[20%]" />
-                <col className="w-[20%]" />
-                <col className="w-[20%]" />
-              </colgroup>
-              <thead>
-                <tr className="border-b bg-muted/40">
-                  <Th></Th>
-                  <Th align="right">April</Th>
-                  <Th align="right">May</Th>
-                  <Th align="right">Change</Th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className={cn("transition-colors duration-500", highlighted ? "bg-blue-50 dark:bg-blue-950/20" : "")}>
-                  <Td></Td>
-                  <Td align="right" mono>{formatCurrency(VOLUME.april)}</Td>
-                  <Td align="right" mono>{formatCurrency(VOLUME.may)}</Td>
-                  <Td align="right" mono className="text-amber-600 dark:text-amber-400">+{formatCurrency(VOLUME.changeAmount)} (+{VOLUME.changePct}%)</Td>
-                </tr>
-              </tbody>
-            </PanelTable>
+            <PanelFigureTable headers={["", "April", "May", "Change"]}>
+              <tr className={cn("transition-colors duration-500", highlighted ? "bg-blue-50 dark:bg-blue-950/20" : "")}>
+                <Td></Td>
+                <Td align="right" mono>{formatCurrency(VOLUME.april)}</Td>
+                <Td align="right" mono>{formatCurrency(VOLUME.may)}</Td>
+                <Td align="right" mono className="text-amber-600 dark:text-amber-400">+{formatCurrency(VOLUME.changeAmount)} (+{VOLUME.changePct}%)</Td>
+              </tr>
+            </PanelFigureTable>
           </div>
 
           <div>
             <p className="mb-2 text-base font-bold text-foreground">Fees</p>
-            <PanelTable className="table-fixed">
-              <colgroup>
-                <col className="w-[40%]" />
-                <col className="w-[20%]" />
-                <col className="w-[20%]" />
-                <col className="w-[20%]" />
-              </colgroup>
-              <thead>
-                <tr className="border-b bg-muted/40">
-                  <Th>Fee Type</Th>
-                  <Th align="right">April</Th>
-                  <Th align="right">May</Th>
-                  <Th align="right">Change</Th>
-                </tr>
-              </thead>
-              <tbody>
+            <PanelFigureTable headers={["Fee Type", "April", "May", "Change"]}>
                 {FEES.map((fee) => (
                   <tr key={fee.type}>
                     <Td>
@@ -132,8 +85,7 @@ export function FeeSummaryPanel() {
                   <Td align="right" mono className="font-semibold">{formatCurrency(FEES_TOTAL.may)}</Td>
                   <Td align="right" mono className="font-semibold text-amber-600 dark:text-amber-400">+{formatCurrency(FEES_TOTAL.change)}</Td>
                 </tr>
-              </tbody>
-            </PanelTable>
+            </PanelFigureTable>
           </div>
         {/* Chargeback detail — the answer to "show me that chargeback"; renders inline
             as the reason this view opened (green-tinted = resolved in the merchant's favor). */}

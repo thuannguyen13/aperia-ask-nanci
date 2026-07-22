@@ -19,6 +19,29 @@ export function PanelTable({ className, children }: { className?: string; childr
   )
 }
 
+// The "label column + right-aligned figure columns" table shape — a wide first
+// column, the rest equal-width and right-aligned. Pass the header labels ("" for
+// a blank first header) and the <tr> rows as children.
+// ponytail: only the first <col> is declared; under table-fixed the remaining
+// columns split the leftover width equally, which is what every call site wants.
+export function PanelFigureTable({ headers, children }: { headers: React.ReactNode[]; children: React.ReactNode }) {
+  return (
+    <PanelTable className="table-fixed">
+      <colgroup>
+        <col className="w-[40%]" />
+      </colgroup>
+      <thead>
+        <tr className="border-b bg-muted/40">
+          {headers.map((header, i) => (
+            <Th key={i} align={i === 0 ? "left" : "right"}>{header}</Th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>{children}</tbody>
+    </PanelTable>
+  )
+}
+
 // Column header cell — sentence-case, muted, medium weight (matches Figma).
 // Inherits font-size from the table. Wrap the header row in `<tr className="bg-muted/40">`.
 export function Th({ align = "left", className, children }: { align?: "left" | "right"; className?: string; children?: React.ReactNode }) {

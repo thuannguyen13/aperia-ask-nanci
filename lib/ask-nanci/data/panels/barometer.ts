@@ -1,3 +1,15 @@
+// The one assignment both the Detection Queue and its Barometer Report describe.
+export const ASSIGNMENT = {
+  name: "High Velocity Watch",
+  date: "05/24/2026",
+  generalInfo: [
+    { label: "Assignment Name",         value: "High Velocity Watch" },
+    { label: "Assignment Type",         value: "DQ" },
+    { label: "Eligible Merchant Count", value: "14" },
+    { label: "Percent Worked",          value: "0%" },
+  ],
+}
+
 export const STATUS_ROWS = [
   { label: "Alerted",          count: 14, amount: "$380,000.00" },
   { label: "Ready to Work",    count: 11, amount: "$290,000.00" },
