@@ -1,7 +1,6 @@
 export { PanelShell } from "./PanelShell"
 export { PanelHeader } from "./PanelHeader"
 export { PanelExportButton } from "./PanelExportButton"
-export { SidebarPanelShell } from "./SidebarPanelShell"
 export { ScoreBadge } from "./ScoreBadge"
 export { StatCard } from "./StatCard"
 export { Callout } from "./Callout"

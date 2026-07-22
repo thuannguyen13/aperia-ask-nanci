@@ -5,9 +5,8 @@
 import type { MockResponse } from "./types"
 import { MOCK_RESPONSES } from "./data/responses.clover"
 
-export { MOCK_RESPONSES, DEFAULT_RESPONSE, DEFAULT_SUGGESTIONS, WELCOME_SUGGESTIONS, ALL_QUESTIONS } from "./data/responses.clover"
+export { DEFAULT_RESPONSE, DEFAULT_SUGGESTIONS, ALL_QUESTIONS } from "./data/responses.clover"
 export { PROMPT_CATEGORIES } from "./data/prompts.clover"
-export { SCRIPTED_CONVERSATIONS } from "./data/flows.clover"
 export { MOCK_USAGE, DEFAULT_CURRENT_USER } from "./data/account"
 
 // Keyword-match lookup used by api.ts streamChat.

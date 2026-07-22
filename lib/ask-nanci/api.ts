@@ -18,7 +18,7 @@
  */
 
 import type { Message, Session, Source, PromptCategory } from "./types"
-import type { ChatStreamChunk, SourceAddRequest, SourceUpdateRequest } from "./api-types"
+import type { ChatStreamChunk } from "./api-types"
 import {
   readSessions,
   saveSession,
@@ -28,10 +28,6 @@ import {
   FOUNDATION_SOURCE,
   readSources,
   writeSources,
-  addFileSource,
-  addBankSource,
-  toggleSource,
-  removeSource,
 } from "./sourceStore"
 import { findResponse, DEFAULT_RESPONSE, DEFAULT_SUGGESTIONS, PROMPT_CATEGORIES, ALL_QUESTIONS } from "./mock-data"
 export type { MockResponse, PromptCategory, CurrentUser } from "./types"
@@ -128,26 +124,9 @@ export async function persistSources(sources: Source[]): Promise<void> {
   writeSources(sources)
 }
 
-export async function addSource(req: SourceAddRequest): Promise<Source> {
-  if (req.kind === "file") {
-    return addFileSource(req.name, req.mimeType ?? "")
-  }
-  return addBankSource(req.name, {
-    institution: req.institution,
-    color: req.color,
-    initials: req.initials,
-  })
-}
 
 // Stub only toggles active state; real endpoint should apply the full updates payload.
-export async function updateSource(id: string, updates: SourceUpdateRequest): Promise<void> {
-  void updates
-  toggleSource(id)
-}
 
-export async function deleteSourceById(id: string): Promise<void> {
-  removeSource(id)
-}
 
 // ─── Prompts ──────────────────────────────────────────────────────────────────
 

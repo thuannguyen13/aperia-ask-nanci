@@ -41,6 +41,3 @@ export function deleteSession(id: string): void {
   writeSessions(readSessions().filter((s) => s.id !== id))
 }
 
-export function newSessionId(): string {
-  return generateId()
-}

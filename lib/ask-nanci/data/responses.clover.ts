@@ -445,14 +445,6 @@ const QUESTION_TITLES: Record<string, string> = {
 
 export const ALL_QUESTIONS = MOCK_RESPONSES.map((r) => QUESTION_TITLES[r.id] ?? r.id)
 
-export const WELCOME_SUGGESTIONS = [
-  "Give me the full picture on yesterday.",
-  "How much is Sysco costing me?",
-  "Was Saturday worth it?",
-  "How much did I actually make last week?",
-  "Who's my best employee?",
-  "Can I afford to give my staff a raise?",
-]
 
 export const DEFAULT_RESPONSE =
   "That's a great question! I don't have specific data on that right now, but I'd suggest checking your reports dashboard or asking your account manager. Is there something else I can help you analyze?"

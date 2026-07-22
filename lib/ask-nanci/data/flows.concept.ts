@@ -7,31 +7,31 @@ import { RISK_LANDING_CONVERSATIONS } from "./risk-conversations";
 
 // ─── Flow-key constants ───────────────────────────────────────────────────────
 
-export const CONCEPT_FLOW2_PROMPT = "Show me merchant volume for this week";
-export const CONCEPT_FLOW2_FOLLOWUP = "Just the top 5";
+const CONCEPT_FLOW2_PROMPT = "Show me merchant volume for this week";
+const CONCEPT_FLOW2_FOLLOWUP = "Just the top 5";
 export const CONCEPT_FLOW6_KEY = "__proactive__";
-export const CONCEPT_DETECT_WELCOME_KEY = "__detect_welcome__";
+const CONCEPT_DETECT_WELCOME_KEY = "__detect_welcome__";
 
-export const CONCEPT_FLOW8_FOLLOWUP = "Filter to ones not contacted in the last 30 days";
+const CONCEPT_FLOW8_FOLLOWUP = "Filter to ones not contacted in the last 30 days";
 export const CONCEPT_FLOW8_FINAL = "Send them all";
-export const CONCEPT_FLOW10_FOLLOWUP = "Open the volume trend and the settlement change side by side";
-export const CONCEPT_FLOW10_FOLLOWUP2 = "Who else has approved account changes for this merchant historically?";
-export const CONCEPT_FLOW11_QUICKWINS = "Start with the quick wins";
-export const CONCEPT_FLOW11_APPROVE = "Approve all except the third one";
+const CONCEPT_FLOW10_FOLLOWUP = "Open the volume trend and the settlement change side by side";
+const CONCEPT_FLOW10_FOLLOWUP2 = "Who else has approved account changes for this merchant historically?";
+const CONCEPT_FLOW11_QUICKWINS = "Start with the quick wins";
+const CONCEPT_FLOW11_APPROVE = "Approve all except the third one";
 
-export const CONCEPT_FLOW12_PROMPT = "Show me the detection queue";
+const CONCEPT_FLOW12_PROMPT = "Show me the detection queue";
 export const CONCEPT_FLOW12_CONTINUE_KEY = "__dq_continue__";
 const CONCEPT_DQ_OPEN_KEY = "Yes, open it";
 const CONCEPT_DQ_COASTAL_KEY = "Pull up Coastal's risk report alongside";
 const CONCEPT_DQ_ESCALATE_KEY = "Escalate this one and open a risk case.";
 
-export const CONCEPT_FLOW13_PROMPT = "When's my money from the weekend hitting?";
-export const CONCEPT_FLOW14_PROMPT = "my fees went up this month, what happened?";
-export const CONCEPT_FLOW15_PROMPT = "how'd this week go vs last week?";
+const CONCEPT_FLOW13_PROMPT = "When's my money from the weekend hitting?";
+const CONCEPT_FLOW14_PROMPT = "my fees went up this month, what happened?";
+const CONCEPT_FLOW15_PROMPT = "how'd this week go vs last week?";
 export const CONCEPT_FLOW15_FOLLOWUP = "nice. was there a slow day?";
-export const CONCEPT_FLOW16_PROMPT = "I changed banks, send my deposits to the new account";
-export const CONCEPT_FLOW17_PROMPT = "none of this is right, my payout is short by like 600 bucks and I don't get why";
-export const CONCEPT_MENU_MARGIN_PROMPT = "how's the Italian combo doing this month?";
+const CONCEPT_FLOW16_PROMPT = "I changed banks, send my deposits to the new account";
+const CONCEPT_FLOW17_PROMPT = "none of this is right, my payout is short by like 600 bucks and I don't get why";
+const CONCEPT_MENU_MARGIN_PROMPT = "how's the Italian combo doing this month?";
 const CONCEPT_ADDRESS_PROMPT = "Change my business address";
 const CONCEPT_CREDIT_CARD_PROMPT = "Who am I paying the most on food cost?";
 const CONCEPT_BUSINESS_LOAN_PROMPT = "Do I have enough money for payroll?";
@@ -41,7 +41,7 @@ const CONCEPT_OFFER_YES = "Yes, show me";
 export const CONCEPT_OFFER_NO = "No, ignore for now";
 
 // Destination card id — an internal key, never sent as a prompt (see FlowDef.destination).
-export const CONCEPT_MARKETPLACE_KEY = "__marketplace__";
+const CONCEPT_MARKETPLACE_KEY = "__marketplace__";
 
 // Declining an offer isn't a dead end: the flow that made the offer gets the last
 // word, restating the problem that is still there. Keyed by flow prompt because both
