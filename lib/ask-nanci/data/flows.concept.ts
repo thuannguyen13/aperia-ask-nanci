@@ -30,7 +30,7 @@ export const CONCEPT_FLOW14_PROMPT = "my fees went up this month, what happened?
 export const CONCEPT_FLOW15_PROMPT = "how'd this week go vs last week?";
 export const CONCEPT_FLOW15_FOLLOWUP = "nice. was there a slow day?";
 export const CONCEPT_FLOW16_PROMPT = "I changed banks, send my deposits to the new account";
-export const CONCEPT_FLOW9_PROMPT = "none of this is right, my payout is short by like 600 bucks and I don't get why";
+export const CONCEPT_FLOW17_PROMPT = "none of this is right, my payout is short by like 600 bucks and I don't get why";
 export const CONCEPT_MENU_MARGIN_PROMPT = "how's the Italian combo doing this month?";
 export const CONCEPT_ADDRESS_PROMPT = "Change my business address";
 export const CONCEPT_CREDIT_CARD_PROMPT = "Who am I paying the most on food cost?";
@@ -261,8 +261,8 @@ export const FLOW_DEFS: FlowDef[] = [
     section: "merchant",
     title: "Escalation",
     badge: "Payouts",
-    key: CONCEPT_FLOW9_PROMPT,
-    slug: "9",
+    key: CONCEPT_FLOW17_PROMPT,
+    slug: "17",
     description: "AI can't resolve a payout shortfall — hands off to a human with the batch context already attached, never a dead end.",
   },
   {
@@ -830,8 +830,8 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   ],
 
   // ── Flow 9: Escalation ─────────────────────────────────────────────────────
-  [CONCEPT_FLOW9_PROMPT]: [
-    { role: "user", content: CONCEPT_FLOW9_PROMPT },
+  [CONCEPT_FLOW17_PROMPT]: [
+    { role: "user", content: CONCEPT_FLOW17_PROMPT },
     {
       role: "assistant",
       content:
@@ -852,7 +852,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       content: "Booked for 4:30 today. Reference SR-2205. The team will have the batch discrepancy in front of them, so you can pick up where we left off.",
       panel: "escalation",
       view: "booked",
-      suggestions: otherMerchantPrompts(CONCEPT_FLOW9_PROMPT),
+      suggestions: otherMerchantPrompts(CONCEPT_FLOW17_PROMPT),
     },
   ],
 
