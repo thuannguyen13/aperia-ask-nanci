@@ -10,7 +10,7 @@ import { AskNanciProvider, useAskNanci } from "@/contexts/AskNanciContext"
 import { ChatStreamProvider } from "@/contexts/ChatStreamContext"
 import { parseMode, CONCEPT_FLOW_SLUGS, CONCEPT_EMBED_FLOW_LAYOUTS, type EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
 import { AppFrame, useAppTheme } from "./AppFrame"
-import { themeLogos, type ThemeId } from "@/lib/ask-nanci/data/theme-logos"
+import { getThemeLogos, type ThemeId } from "@/lib/ask-nanci/data/theme-logos"
 import { Sidebar } from "./Sidebar"
 import { TeachNanciPanel } from "./TeachNanciPanel"
 import { ServiceMarketplacePanel } from "./ServiceMarketplacePanel"
@@ -140,7 +140,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, [isEmbed, setTheme])
 
   if (isEmbed) {
-    const logos = themeLogos(EMBED_THEME[embedVariant!])
+    const logos = getThemeLogos(EMBED_THEME[embedVariant!])
     const isConceptEmbed = embedVariant === "concept-embed"
     // Full-app embed flows (e.g. Service Marketplace) render the sidebar + standard
     // WelcomeView, so they behave like the default app (not the concept demo catalog).
@@ -199,7 +199,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="absolute left-0 flex items-center md:hidden">
               <MobileSidebarToggle />
             </div>
-            <Image data-logo="frame" {...themeLogos(CONCEPT_THEME).frame} className="h-6 w-auto" />
+            <Image data-logo="frame" {...getThemeLogos(CONCEPT_THEME).frame} className="h-6 w-auto" />
           </div>
         }
         sidebar={<Sidebar />}

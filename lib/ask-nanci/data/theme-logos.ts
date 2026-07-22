@@ -42,4 +42,4 @@ const THEME_LOGOS = {
 export type ThemeId = keyof typeof THEME_LOGOS
 
 /** Widen to `ThemeLogos` so optional slots (sidebar, sidebarCollapsed) are visible on every entry. */
-export const themeLogos = (id: ThemeId): ThemeLogos => THEME_LOGOS[id]
+export const getThemeLogos = (id: ThemeId): ThemeLogos => THEME_LOGOS[id]
