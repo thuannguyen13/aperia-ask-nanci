@@ -5,7 +5,7 @@ import { Badge } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { MERCHANT_VOLUME_DATA } from "@/lib/ask-nanci/concept-config"
-import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelTable, Th, Td, formatCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelTable, Th, Td, formatCurrency, formatWholeCurrency } from "@/components/ask-nanci/shared"
 
 type SortKey = "volume" | "txnCount" | "avgTicket"
 
@@ -40,8 +40,8 @@ export function MerchantVolumePanel() {
       <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
         <NanciInsight>
               {view === "top5"
-                ? <>Your top 5 by volume. <span className="font-bold">{leader.merchant}</span> still leads at ${leader.volume.toLocaleString()} across {leader.txnCount.toLocaleString()} transactions. Sort by any column to reorder.</>
-                : <><span className="font-bold">{leader.merchant}</span> leads the week at ${leader.volume.toLocaleString()} across {leader.txnCount.toLocaleString()} transactions — the highest average ticket earners rank lower on count. Sort by any column to reorder.</>}
+                ? <>Your top 5 by volume. <span className="font-bold">{leader.merchant}</span> still leads at {formatWholeCurrency(leader.volume)} across {leader.txnCount.toLocaleString()} transactions. Sort by any column to reorder.</>
+                : <><span className="font-bold">{leader.merchant}</span> leads the week at {formatWholeCurrency(leader.volume)} across {leader.txnCount.toLocaleString()} transactions — the highest average ticket earners rank lower on count. Sort by any column to reorder.</>}
         </NanciInsight>
 
         {/* Sort chips — the one Ranked-Report affordance; named dimensions, not raw arrows */}
@@ -83,7 +83,7 @@ export function MerchantVolumePanel() {
               >
                 <Td mono className="text-muted-foreground">{i + 1}</Td>
                 <Td>{row.merchant}</Td>
-                <Td align="right" mono>${row.volume.toLocaleString()}</Td>
+                <Td align="right" mono>{formatWholeCurrency(row.volume)}</Td>
                 <Td align="right" mono>{row.txnCount.toLocaleString()}</Td>
                 <Td align="right" mono>{formatCurrency(row.avgTicket)}</Td>
               </tr>

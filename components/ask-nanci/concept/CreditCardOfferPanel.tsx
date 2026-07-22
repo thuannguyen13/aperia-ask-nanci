@@ -8,7 +8,7 @@ import {
   CARD_INSIGHT_LEAD, CARD_INSIGHT_BODY, CARD_INSIGHT_OFFER_PRE, CARD_INSIGHT_OFFER_BOLD, CARD_INSIGHT_OFFER_POST,
   CARD_PREFILL_NOTE, CARD_CONSENT, CARD_REQUEST_REF, CARD_SENT_TO, CARD_SUCCESS_MESSAGE,
 } from "@/lib/ask-nanci/data/panels/credit-card-offer"
-import { PanelShell, PanelHeader, NanciInsight, Callout, formatCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, NanciInsight, Callout, formatWholeCurrency } from "@/components/ask-nanci/shared"
 import { ApplicantFields, BrandMonogram, OfferField, OfferLogo, OfferSelect, SectionLabel, StatStrip } from "./offer-shared"
 
 const PANEL_ID = "credit-card-offer"
@@ -27,7 +27,6 @@ const cardStats = [
 // can never disagree with each other.
 const monthlyBack = CARD_VALUE.monthlySpend * CARD_VALUE.rate
 const firstYearValue = monthlyBack * 12 + CARD_VALUE.introBonus
-const whole = (n: number) => formatCurrency(n).replace(/\.\d\d$/, "")
 
 function ValueRow({ label, value }: { label: string; value: string }) {
   return (
@@ -83,12 +82,12 @@ export function CreditCardOfferPanel() {
         {/* The reason to switch, in dollars — before the form, not after approval. */}
         <div className="rounded-xl border bg-muted/30 p-4">
           <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.07em] text-muted-foreground">{CARD_VALUE.title}</p>
-          <ValueRow label={`${CARD_VALUE.vendor} spend, monthly`} value={whole(CARD_VALUE.monthlySpend)} />
-          <ValueRow label={`Cash back at ${offer.rewardsRate}`} value={`${whole(monthlyBack)}/mo`} />
-          <ValueRow label={`Intro bonus (${CARD_VALUE.introThreshold})`} value={whole(CARD_VALUE.introBonus)} />
+          <ValueRow label={`${CARD_VALUE.vendor} spend, monthly`} value={formatWholeCurrency(CARD_VALUE.monthlySpend)} />
+          <ValueRow label={`Cash back at ${offer.rewardsRate}`} value={`${formatWholeCurrency(monthlyBack)}/mo`} />
+          <ValueRow label={`Intro bonus (${CARD_VALUE.introThreshold})`} value={formatWholeCurrency(CARD_VALUE.introBonus)} />
           <div className="mt-2 flex items-center justify-between gap-4 border-t pt-3">
             <span className="text-sm font-semibold text-foreground">Estimated first-year value</span>
-            <span className="text-sm font-semibold text-foreground">{whole(firstYearValue)}</span>
+            <span className="text-sm font-semibold text-foreground">{formatWholeCurrency(firstYearValue)}</span>
           </div>
           <p className="mt-3 text-xs leading-relaxed text-muted-foreground/70">{CARD_VALUE.caveat}</p>
         </div>

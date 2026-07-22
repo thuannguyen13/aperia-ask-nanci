@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { formatCurrency, formatPercent } from "./format"
+import { formatCurrency, formatPercent, formatWholeCurrency } from "./format"
 
 describe("formatCurrency", () => {
   it("always shows two fraction digits and a thousands separator", () => {
@@ -15,6 +15,23 @@ describe("formatCurrency", () => {
   })
   it("rounds to cents", () => {
     expect(formatCurrency(2.675)).toBe("$2.68")
+  })
+})
+
+describe("formatWholeCurrency", () => {
+  it("drops the cents and keeps the thousands separator", () => {
+    expect(formatWholeCurrency(18420)).toBe("$18,420")
+    expect(formatWholeCurrency(3241880)).toBe("$3,241,880")
+  })
+  it("truncates rather than rounds", () => {
+    // Intl with maximumFractionDigits: 0 would say "$4,621" for the first case —
+    // the demo's firstYearValue. Truncation is the behaviour that shipped.
+    expect(formatWholeCurrency(4620.8)).toBe("$4,620")
+    expect(formatWholeCurrency(368.99)).toBe("$368")
+  })
+  it("handles zero and negatives", () => {
+    expect(formatWholeCurrency(0)).toBe("$0")
+    expect(formatWholeCurrency(-1234.5)).toBe("-$1,234")
   })
 })
 
