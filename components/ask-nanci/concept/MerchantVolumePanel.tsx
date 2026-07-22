@@ -77,7 +77,10 @@ export function MerchantVolumePanel() {
                 key={row.merchant}
                 className={cn(
                   "border-b last:border-0",
-                  row.rank === 1 && "bg-amber-50 dark:bg-amber-950/20",
+                  // Tint the merchant the insight line names, by identity — not by
+                  // `rank`, which only means "volume rank" by convention and detaches
+                  // from the copy the moment the data is re-ordered or swapped for an API.
+                  row.merchant === leader.merchant && "bg-amber-50 dark:bg-amber-950/20",
                 )}
               >
                 <td className={cn(TD, "text-muted-foreground")}>{i + 1}</td>
