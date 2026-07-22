@@ -19,9 +19,11 @@ const mustResolve = (key: string, where: string) => {
   if (!convKeys.has(key)) errors.push(`${where}: "${key}" has no matching conversation`)
 }
 
-// Every key the registry can route to must have a conversation.
+// Every key the registry can route to must have a conversation. A destination flow is
+// the exception: it opens a surface instead of playing a script, so its `key` is an
+// internal id (see FlowDef.destination) with no conversation behind it.
 for (const f of FLOW_DEFS) {
-  mustResolve(f.key, `flow ${f.num} "${f.title}"`)
+  if (!f.destination) mustResolve(f.key, `flow ${f.num} "${f.title}"`)
   f.altEntries?.forEach((e) => mustResolve(e.key, `flow ${f.num} altEntry (slug ${e.slug})`))
   f.followups?.forEach((k) => mustResolve(k, `flow ${f.num} followup`))
 }
