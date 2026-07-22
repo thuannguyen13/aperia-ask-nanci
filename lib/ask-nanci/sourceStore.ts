@@ -62,13 +62,4 @@ export function removeSource(id: string): void {
   writeSources(readSources().filter((s) => s.id !== id))
 }
 
-export function getActiveSources(): Source[] {
-  return readSources().filter((s) => s.active)
-}
 
-export function sampleSources(sources: Source[], min = 1, max = 3): Source[] {
-  if (!sources.length) return []
-  const count = Math.min(sources.length, Math.floor(Math.random() * (max - min + 1)) + min)
-  const shuffled = [...sources].sort(() => Math.random() - 0.5)
-  return shuffled.slice(0, count)
-}
