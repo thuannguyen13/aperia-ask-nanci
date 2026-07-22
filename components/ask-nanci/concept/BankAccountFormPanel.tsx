@@ -1,10 +1,10 @@
 "use client"
 
 import { useState } from "react"
-import { X, CheckCircle2 } from "lucide-react"
+import { CheckCircle2 } from "lucide-react"
 import { Button, Input, Label, Separator } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { PanelShell } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
 
 export function BankAccountFormPanel() {
   const { closeDynamicPanel, submitFormPanel } = useAskNanci()
@@ -20,16 +20,11 @@ export function BankAccountFormPanel() {
 
   return (
     <PanelShell>
-      {/* Header */}
-      <div className="flex shrink-0 items-center justify-between gap-3 border-b px-4 py-3">
-        <div className="min-w-0">
-          <p className="text-sm font-semibold text-foreground">Deposit Account Update</p>
-          <p className="text-xs text-muted-foreground">Review and confirm to apply changes</p>
-        </div>
-        <Button variant="ghost" size="icon" onClick={() => closeDynamicPanel("bank-account-form")}>
-          <X className="size-4" />
-        </Button>
-      </div>
+      <PanelHeader
+        title="Deposit Account Update"
+        subtitle="Review and confirm to apply changes"
+        onClose={() => closeDynamicPanel("bank-account-form")}
+      />
 
       {submitted ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6">

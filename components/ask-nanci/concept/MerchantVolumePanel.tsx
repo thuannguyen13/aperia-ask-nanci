@@ -5,7 +5,7 @@ import { Badge } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { MERCHANT_VOLUME_DATA } from "@/lib/ask-nanci/concept-config"
-import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelTable, Th, formatCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelTable, Th, Td, formatCurrency } from "@/components/ask-nanci/shared"
 
 type SortKey = "volume" | "txnCount" | "avgTicket"
 
@@ -18,8 +18,6 @@ const SORT_LABELS: Record<SortKey, string> = {
 // The volume leader is the answer to "merchant volume this week" — stable
 // regardless of which column the user sorts by, so it anchors the insight line.
 const leader = [...MERCHANT_VOLUME_DATA].sort((a, b) => b.volume - a.volume)[0]
-
-const TD = "px-3 py-2 font-mono text-foreground"
 
 export function MerchantVolumePanel() {
   const { closeDynamicPanel } = useAskNanci()
@@ -83,11 +81,11 @@ export function MerchantVolumePanel() {
                   row.merchant === leader.merchant && "bg-amber-50 dark:bg-amber-950/20",
                 )}
               >
-                <td className={cn(TD, "text-muted-foreground")}>{i + 1}</td>
-                <td className="px-3 py-2 text-foreground">{row.merchant}</td>
-                <td className={cn(TD, "text-right")}>${row.volume.toLocaleString()}</td>
-                <td className={cn(TD, "text-right")}>{row.txnCount.toLocaleString()}</td>
-                <td className={cn(TD, "text-right")}>{formatCurrency(row.avgTicket)}</td>
+                <Td mono className="text-muted-foreground">{i + 1}</Td>
+                <Td>{row.merchant}</Td>
+                <Td align="right" mono>${row.volume.toLocaleString()}</Td>
+                <Td align="right" mono>{row.txnCount.toLocaleString()}</Td>
+                <Td align="right" mono>{formatCurrency(row.avgTicket)}</Td>
               </tr>
             ))}
           </tbody>

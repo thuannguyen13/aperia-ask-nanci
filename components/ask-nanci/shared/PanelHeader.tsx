@@ -16,9 +16,11 @@ interface PanelHeaderProps {
   badge?: { label: React.ReactNode; className: string }
   /** "lg" renders a bigger, bolder title — used by the new-flow panels (Pending Deposits, Fee Summary, etc). */
   size?: "default" | "lg"
+  /** Escape hatch for the outer row, e.g. an "lg" header that still wants a `border-b`. */
+  className?: string
 }
 
-export function PanelHeader({ title, subtitle, actions, onClose, dot, badge, size = "default" }: PanelHeaderProps) {
+export function PanelHeader({ title, subtitle, actions, onClose, dot, badge, size = "default", className }: PanelHeaderProps) {
   if (dot) {
     return (
       <div className="flex shrink-0 items-center justify-between border-b bg-muted/30 px-4 py-2.5">
@@ -46,7 +48,7 @@ export function PanelHeader({ title, subtitle, actions, onClose, dot, badge, siz
   }
 
   return (
-    <div className={cn("flex shrink-0 items-center justify-between px-4 py-3", size !== "lg" && "border-b")}>
+    <div className={cn("flex shrink-0 items-center justify-between px-4 py-3", size !== "lg" && "border-b", className)}>
       <div className="min-w-0">
         <p className={cn("truncate text-foreground", size === "lg" ? "text-base font-semibold" : "text-sm font-semibold")}>{title}</p>
         {subtitle && <p className="text-xs text-muted-foreground truncate">{subtitle}</p>}

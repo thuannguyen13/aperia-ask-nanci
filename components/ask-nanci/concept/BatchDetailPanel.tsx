@@ -1,10 +1,9 @@
 "use client"
 
-import { X } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { BATCH_TRANSACTIONS } from "@/lib/ask-nanci/data/panels/batch-detail"
-import { PanelShell, Callout, PanelTable, Th, Td, formatCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, Callout, PanelTable, Th, Td, formatCurrency } from "@/components/ask-nanci/shared"
 
 export function BatchDetailPanel() {
   const { closeDynamicPanel } = useAskNanci()
@@ -13,19 +12,13 @@ export function BatchDetailPanel() {
 
   return (
     <PanelShell>
-      <div className="flex shrink-0 items-center justify-between px-4 py-3 border-b">
-        <div>
-          <h2 className="text-base font-semibold text-foreground">Batch #4471</h2>
-          <p className="text-xs text-muted-foreground">May 20 · {BATCH_TRANSACTIONS.length} transactions · {formatCurrency(total)}</p>
-        </div>
-        <button
-          onClick={() => closeDynamicPanel("batch-detail")}
-          className="rounded-full p-1.5 text-muted-foreground hover:bg-muted"
-          aria-label="Close"
-        >
-          <X className="size-4" />
-        </button>
-      </div>
+      <PanelHeader
+        title="Batch #4471"
+        subtitle={`May 20 · ${BATCH_TRANSACTIONS.length} transactions · ${formatCurrency(total)}`}
+        size="lg"
+        className="border-b"
+        onClose={() => closeDynamicPanel("batch-detail")}
+      />
 
       <Callout variant="amber" className="mx-4 my-3 shrink-0">
         1 transaction held for review — exceeds your single-ticket limit of $2,500.

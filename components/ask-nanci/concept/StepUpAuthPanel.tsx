@@ -1,9 +1,9 @@
 "use client"
 
-import { X, Check } from "lucide-react"
+import { Check } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
-import { PanelShell, PanelTable, Th, Td } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, Callout, PanelTable, Th, Td } from "@/components/ask-nanci/shared"
 
 const STEPS = ["Verify Identity", "New Account", "Review & Confirm"] as const
 
@@ -56,9 +56,9 @@ function Step1() {
       <button className="text-xs text-primary hover:underline underline-offset-2 text-left">
         Resend code
       </button>
-      <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 dark:border-blue-800 dark:bg-blue-950/20 dark:text-blue-300">
+      <Callout variant="blue">
         Tell the AI "Done" once you've entered your code.
-      </div>
+      </Callout>
     </div>
   )
 }
@@ -94,9 +94,9 @@ function Step2() {
           </select>
         </div>
       </div>
-      <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 dark:border-blue-800 dark:bg-blue-950/20 dark:text-blue-300">
+      <Callout variant="blue">
         Tell the AI "Submitted" when you've entered your account details.
-      </div>
+      </Callout>
     </div>
   )
 }
@@ -133,9 +133,9 @@ function Step3({ onSubmit }: { onSubmit: () => void }) {
           </tr>
         </tbody>
       </PanelTable>
-      <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:border-amber-800 dark:bg-amber-950/20 dark:text-amber-300">
+      <Callout variant="amber">
         Two micro-deposits will be sent to verify the new account. Deposits continue to your current account until verification is complete.
-      </div>
+      </Callout>
       <button
         onClick={onSubmit}
         className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white hover:bg-primary/90 transition-colors"
@@ -152,16 +152,11 @@ export function StepUpAuthPanel() {
 
   return (
     <PanelShell>
-      <div className="flex shrink-0 items-center justify-between px-4 py-3">
-        <h2 className="text-base font-semibold text-foreground">Change Deposit Account</h2>
-        <button
-          onClick={() => closeDynamicPanel("step-up-auth")}
-          className="rounded-full p-1.5 text-muted-foreground hover:bg-muted"
-          aria-label="Close"
-        >
-          <X className="size-4" />
-        </button>
-      </div>
+      <PanelHeader
+        title="Change Deposit Account"
+        size="lg"
+        onClose={() => closeDynamicPanel("step-up-auth")}
+      />
       <StepIndicator current={step} />
       <div className="flex flex-col flex-1 overflow-auto">
         {step === 1 && <Step1 />}
