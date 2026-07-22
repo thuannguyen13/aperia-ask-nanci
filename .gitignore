@@ -13,3 +13,6 @@ test-results/
 playwright-report/
 /e2e/.cache
 .playwright/
+
+# Personal Claude Code notes (machine-local)
+CLAUDE.local.md
