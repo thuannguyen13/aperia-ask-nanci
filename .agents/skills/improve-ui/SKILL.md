@@ -9,7 +9,7 @@ Audit one coherent product surface against the system that actually governs it. 
 
 ## Boundaries
 
-- Never modify product source. Create or edit files only under `design-plans/`.
+- Never modify product source. Create or edit files only under `docs/plans/`.
 - Do not install dependencies, run formatters, commit, push, or otherwise mutate the working tree.
 - Do not update design documentation. Record accepted documentation changes in the plan for its executor.
 - Use rendered evidence only when the user provides it or explicitly requests visual inspection.

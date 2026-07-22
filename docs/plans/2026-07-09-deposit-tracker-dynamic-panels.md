@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Migrate the Deposit Tracker flow (Flow 13, prompt "When's my money from the weekend hitting?") to the new dynamic panel stack mechanism from `docs/superpowers/specs/2026-07-09-dynamic-panel-stack-design.md`, splitting its single hand-stacked two-card panel into two real independent panels that open incrementally and share space via the system's standard `ResizableHandle` divider.
+**Goal:** Migrate the Deposit Tracker flow (Flow 13, prompt "When's my money from the weekend hitting?") to the new dynamic panel stack mechanism from `docs/specs/2026-07-09-dynamic-panel-stack-design.md`, splitting its single hand-stacked two-card panel into two real independent panels that open incrementally and share space via the system's standard `ResizableHandle` divider.
 
 **Architecture:** A new `usePanelStack` hook (ordered array, FIFO cap of 3, insertion order = slot order) is wired into `AskNanciContext` alongside the existing legacy `openPanels` array, completely additively — the legacy `mapPanelsToSlots` switch in `ConceptPanelArea` is read first for any of the 11 live scripted flows; the new dynamic path is only reached for the two new panel ids this flow introduces (`pending-deposits`, `flagged-transaction`). No other flow's behavior changes.
 
@@ -540,7 +540,7 @@ Directly below the closing `}` of `mapPanelsToSlots`, add:
 
 ```ts
 // Slot geometry for the dynamic panel stack (new flows only — see
-// docs/superpowers/specs/2026-07-09-dynamic-panel-stack-design.md). Position
+// docs/specs/2026-07-09-dynamic-panel-stack-design.md). Position
 // in the stack array is the only input: 1st panel gets a full-height column,
 // a 2nd shares it 50/50, a 3rd stacks under the 2nd (55/45).
 function slotsFromDynamicPanels(stack: PanelId[]): Slots {

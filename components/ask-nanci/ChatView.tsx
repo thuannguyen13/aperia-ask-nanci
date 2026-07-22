@@ -9,7 +9,7 @@ import { UserMessage, BotMessage } from "./ChatMessage"
 import { ThinkingIndicator } from "./ThinkingIndicator"
 
 // Dormant: the scroll-to-bottom affordance is fully built below but shipped off.
-// Flip to `true` to activate it (see design-plans / useChatScroll JSDoc).
+// Flip to `true` to activate it (see docs/plans / useChatScroll JSDoc).
 const ENABLE_SCROLL_TO_BOTTOM_BUTTON = false
 
 export function ChatView() {

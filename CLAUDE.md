@@ -226,10 +226,5 @@ Imported from `aperia-ds5`.
 
 ## Knowledge Base
 
-A compiled wiki lives at `./wiki/` (relative to this file). Before answering questions about Ask Nanci's domain, personas, or workflows:
-
-1. Read `./wiki/index.md` to find relevant pages
-2. Read those pages directly — they are the compiled source of truth
-3. Raw sources are in `./demo-context/` and are never modified
-
-Start with `./wiki/overview.md` for a full orientation.
+Domain background (personas, merchant flows, demo questions) lives in `./docs/demo-context/`.
+Read the relevant file there before answering questions about Ask Nanci's domain or workflows.
