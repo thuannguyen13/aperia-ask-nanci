@@ -54,6 +54,24 @@ export const CONCEPT_DECLINE_REPLIES: Record<string, string> = {
     "Understood. Just so you're not caught out: you're still projected $4,230 short Friday. If something changes or you want to see options, ask me for financing anytime.",
 };
 
+// What Nanci says after a panel submit. The panel makes the state change; this is
+// the reply that lands in the chat about it. Keyed by the action rather than the
+// panel, because one panel can have more than one submit (see account-change).
+export const CONCEPT_PANEL_REPLIES = {
+  bankAccountUpdated:
+    "Done — your deposit bank account has been updated. Changes take effect within 1–2 business days.",
+  stepUpConfirmed:
+    "New account confirmed and submitted. Micro-deposits will arrive in 1–2 business days — I'll notify you when they're ready to verify. Deposits continue to your current account until then.",
+  disputeSubmitted:
+    "Submitted to the processor. Case status updated to Dispute Filed. Next deadline: processor response due May 28.",
+  depositNotifyOn:
+    "Done. You'll get a notification when Sunday's batch funds.",
+  accountChangeVerify:
+    "Routing number checks out to First National. This is a financial change, so I'll verify it's you first — I've sent a 6-digit code to your email teresawalker@example.com. Enter it to confirm.",
+  accountChangeSubmitted:
+    "Request submitted at 3:40 PM. A confirmation was sent to the email teresawalker@example.com. Deposits continue going to your current account until the new one is verified — typically within 1–2 business days. I'll notify you once it's active.",
+};
+
 // Curated conversation titles (chat-column header + sidebar item). Figma shows a
 // summarized title, not the raw first prompt. Keyed by the flow's opening prompt;
 // add entries here as each flow's Figma frame specifies a title.

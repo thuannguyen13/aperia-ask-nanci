@@ -21,7 +21,7 @@ import type { CurrentUser, PromptCategory } from "@/lib/ask-nanci/api"
 import { MOCK_USAGE, DEFAULT_CURRENT_USER } from "@/lib/ask-nanci/mock-data"
 import { EMBED_DEMO_SOURCES, EMBED_BUSINESS_OWNER_DEMO_SOURCES, EMBED_ISO_DEMO_SOURCES, EMBED_VW_DEMO_SOURCES, SCRIPTED_CONVERSATIONS } from "@/lib/ask-nanci/embed-demo-config"
 import type { EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
-import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_ALL_PROMPTS, CONCEPT_NO_RESET_PROMPTS, CONCEPT_MANUAL_PROMPTS, CONCEPT_FLOW16_FOLLOWUPS, CONCEPT_FAKE_FOLLOWUPS, CONCEPT_CHAT_TITLES, CONCEPT_DECLINE_REPLIES, CONCEPT_OFFER_NO } from "@/lib/ask-nanci/concept-config"
+import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_ALL_PROMPTS, CONCEPT_PANEL_REPLIES, CONCEPT_NO_RESET_PROMPTS, CONCEPT_MANUAL_PROMPTS, CONCEPT_FLOW16_FOLLOWUPS, CONCEPT_FAKE_FOLLOWUPS, CONCEPT_CHAT_TITLES, CONCEPT_DECLINE_REPLIES, CONCEPT_OFFER_NO } from "@/lib/ask-nanci/concept-config"
 import { ACCOUNT_CHANGE_SHEET } from "@/lib/ask-nanci/data/panels/account-change"
 import { FOUNDATION_SOURCE_ID, ONBOARDING_KEY } from "@/lib/ask-nanci/source-store"
 
@@ -304,6 +304,17 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     if (done) opts.onDone?.()
   }, [])
 
+  // Append one canned assistant message — the tail every panel-submit handler shares.
+  // Pills default to the full prompt set, which is what a completed panel action ends
+  // with; pass `suggestions: undefined` in `extra` to opt out (the offer flows do —
+  // their follow-ups live on the sheet instead).
+  const appendAssistant = useCallback((content: string, extra?: Partial<Message>) => {
+    setMessages((prev) => [
+      ...prev,
+      { id: newSessionId(), role: "assistant" as const, content, suggestions: CONCEPT_ALL_PROMPTS, ...extra },
+    ])
+  }, [])
+
   const playScripted = useCallback((prompt: string) => {
     const script = SCRIPTED_CONVERSATIONS[prompt]
     if (!script) return
@@ -510,30 +521,21 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
 
   const submitFormPanel = useCallback(() => {
     closeDynamicPanel("bank-account-form")
-    setMessages((prev) => [
-      ...prev,
-      { id: newSessionId(), role: "assistant" as const, content: "Done — your deposit bank account has been updated. Changes take effect within 1–2 business days.", suggestions: CONCEPT_ALL_PROMPTS },
-    ])
-  }, [closeDynamicPanel])
+    appendAssistant(CONCEPT_PANEL_REPLIES.bankAccountUpdated)
+  }, [closeDynamicPanel, appendAssistant])
 
   // Offer flows (credit-card-offer / business-loan-offer): the panel's form submit
   // closes the panel and drops the pending-review success message + audit card. The
   // message/sheetAction are built in the panel from the offer the merchant chose.
   const submitOfferApplication = useCallback((panelId: PanelId, message: string, sheetAction: SheetActionData) => {
     closeDynamicPanel(panelId)
-    setMessages((prev) => [
-      ...prev,
-      { id: newSessionId(), role: "assistant" as const, content: message, sheetAction },
-    ])
-  }, [closeDynamicPanel])
+    appendAssistant(message, { suggestions: undefined, sheetAction })
+  }, [closeDynamicPanel, appendAssistant])
 
   const submitStepUpPanel = useCallback(() => {
     closeDynamicPanel("step-up-auth")
-    setMessages((prev) => [
-      ...prev,
-      { id: newSessionId(), role: "assistant" as const, content: "New account confirmed and submitted. Micro-deposits will arrive in 1–2 business days — I'll notify you when they're ready to verify. Deposits continue to your current account until then.", suggestions: CONCEPT_ALL_PROMPTS },
-    ])
-  }, [closeDynamicPanel])
+    appendAssistant(CONCEPT_PANEL_REPLIES.stepUpConfirmed)
+  }, [closeDynamicPanel, appendAssistant])
 
   // Every panel is now on the dynamic stack; closePanel(id) just closes it there.
   const closePanel = useCallback((id: string) => {
@@ -548,11 +550,8 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
 
   const requestDepositNotify = useCallback(() => {
     setPanelView("pending-deposits", "notified")
-    setMessages((prev) => [
-      ...prev,
-      { id: newSessionId(), role: "assistant" as const, content: "Done. You'll get a notification when Sunday's batch funds.", suggestions: CONCEPT_ALL_PROMPTS },
-    ])
-  }, [])
+    appendAssistant(CONCEPT_PANEL_REPLIES.depositNotifyOn)
+  }, [appendAssistant])
 
   const streamAssistantReply = useCallback(
     (content: string, extra?: Partial<Message>) =>
@@ -560,14 +559,21 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     [streamWords],
   )
 
+  // The "merchant acts, Nanci answers" beat: their turn lands in the chat, Nanci
+  // thinks, then streams the reply. Used wherever a click reads as the merchant
+  // speaking — a panel button or a decline pill. Clearing the previous turn's pills
+  // is the same rule a typed message follows (see withClearedSuggestions).
+  const replyToUserAction = useCallback(async (userContent: string, reply: string, extra?: Partial<Message>) => {
+    setMessages((prev) => [...withClearedSuggestions(prev), { id: newSessionId(), role: "user" as const, content: userContent }])
+    setChatState("thinking")
+    await sleep(600)
+    await streamAssistantReply(reply, extra)
+  }, [streamAssistantReply])
+
   const submitAccountChangeDetails = useCallback(() => {
     setPanelView("account-change", "confirm")
-    setMessages((prev) => [...prev, { id: newSessionId(), role: "user" as const, content: "Request Changes" }])
-    setChatState("thinking")
-    sleep(600).then(() => streamAssistantReply(
-      "Routing number checks out to First National. This is a financial change, so I'll verify it's you first — I've sent a 6-digit code to your email teresawalker@example.com. Enter it to confirm."
-    ))
-  }, [streamAssistantReply])
+    replyToUserAction("Request Changes", CONCEPT_PANEL_REPLIES.accountChangeVerify)
+  }, [replyToUserAction])
 
   const goBackAccountChangeStep = useCallback(() => {
     setPanelView("account-change", "details")
@@ -576,21 +582,16 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const confirmAccountChange = useCallback(() => {
     // Confirmation is a drawer (ChangeAuditSheet), not a panel view — close the panel.
     closeDynamicPanel("account-change")
-    setMessages((prev) => [...prev, { id: newSessionId(), role: "user" as const, content: "Confirm" }])
-    setChatState("thinking")
-    sleep(600).then(() => streamAssistantReply(
-      "Request submitted at 3:40 PM. A confirmation was sent to the email teresawalker@example.com. Deposits continue going to your current account until the new one is verified — typically within 1–2 business days. I'll notify you once it's active.",
-      { sheetAction: ACCOUNT_CHANGE_SHEET, suggestions: CONCEPT_FLOW16_FOLLOWUPS }
-    ))
-  }, [streamAssistantReply, closeDynamicPanel])
+    replyToUserAction("Confirm", CONCEPT_PANEL_REPLIES.accountChangeSubmitted, {
+      sheetAction: ACCOUNT_CHANGE_SHEET,
+      suggestions: CONCEPT_FLOW16_FOLLOWUPS,
+    })
+  }, [replyToUserAction, closeDynamicPanel])
 
   const submitDisputeDraft = useCallback(() => {
     resetDynamic()
-    setMessages((prev) => [
-      ...prev,
-      { id: newSessionId(), role: "assistant" as const, content: "Submitted to the processor. Case status updated to Dispute Filed. Next deadline: processor response due May 28.", suggestions: CONCEPT_ALL_PROMPTS },
-    ])
-  }, [])
+    appendAssistant(CONCEPT_PANEL_REPLIES.disputeSubmitted)
+  }, [appendAssistant])
 
   const activateProactiveNotification = useCallback(() => {
     setProactiveNotificationActive(true)
@@ -607,10 +608,8 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       const declineReply = activeFlowRef.current && CONCEPT_DECLINE_REPLIES[activeFlowRef.current.key]
       if (prompt === CONCEPT_OFFER_NO && declineReply) {
         activeFlowRef.current = null
-        setMessages((prev) => [...withClearedSuggestions(prev), { id: newSessionId(), role: "user" as const, content: prompt }])
-        setChatState("thinking")
         // No pills: declining ends the thread, and the reply already says how to come back.
-        sleep(600).then(() => streamAssistantReply(declineReply))
+        replyToUserAction(prompt, declineReply)
         return
       }
       // Fake end-of-flow follow-ups are decorative only — no conversation behind them.
@@ -626,7 +625,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     }
     if (isEmbed && SCRIPTED_CONVERSATIONS[prompt]) { playScripted(prompt); return }
     sendMessage(prompt)
-  }, [isConceptVersion, isEmbed, sendMessage, playScripted, playConceptScripted, advanceConceptFlow, streamAssistantReply])
+  }, [isConceptVersion, isEmbed, sendMessage, playScripted, playConceptScripted, advanceConceptFlow, replyToUserAction])
 
   const startNewChat = useCallback(() => {
     stopRef.current = true
