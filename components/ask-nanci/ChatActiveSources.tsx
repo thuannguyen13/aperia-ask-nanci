@@ -7,7 +7,7 @@ import { Popover, PopoverTrigger, PopoverContent } from "aperia-ds5"
 import { SourceIcon, getSourceInitials } from "./SourceIcon"
 import { ConnectWizard } from "./ConnectWizard"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { addFileSources, readSources } from "@/lib/ask-nanci/sourceStore"
+import { addFileSources, readSources } from "@/lib/ask-nanci/source-store"
 import type { Source } from "@/lib/ask-nanci/types"
 
 interface Props {

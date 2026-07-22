@@ -2,11 +2,11 @@
 // Swap with real API data when wiring the backend.
 
 import type { Source } from "../types"
-import { FOUNDATION_SOURCE, FOUNDATION_SOURCE_ID } from "../sourceStore"
+import { FOUNDATION_SOURCE, FOUNDATION_SOURCE_ID } from "../source-store"
 
 // ─── Internal build blocks ────────────────────────────────────────────────────
 // Per-host foundation sources (all share FOUNDATION_SOURCE_ID so the "is built-in?"
-// checks stay theme-agnostic). FOUNDATION_SOURCE itself is VisionWeb (see sourceStore).
+// checks stay theme-agnostic). FOUNDATION_SOURCE itself is VisionWeb (see source-store).
 
 const CLOVER_SOURCE: Source = {
   id: FOUNDATION_SOURCE_ID,

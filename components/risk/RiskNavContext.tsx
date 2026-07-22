@@ -14,7 +14,7 @@ interface RiskNav {
   barometerFilter: "critical" | null
 }
 
-const RiskNavCtx = createContext<RiskNav>({
+const RiskNavContext = createContext<RiskNav>({
   go: () => {},
   openBarometer: () => {},
   openMerchant: () => {},
@@ -22,5 +22,5 @@ const RiskNavCtx = createContext<RiskNav>({
   barometerFilter: null,
 })
 
-export const RiskNavProvider = RiskNavCtx.Provider
-export const useRiskNav = () => useContext(RiskNavCtx)
+export const RiskNavProvider = RiskNavContext.Provider
+export const useRiskNav = () => useContext(RiskNavContext)

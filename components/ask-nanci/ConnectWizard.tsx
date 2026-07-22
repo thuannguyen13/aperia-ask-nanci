@@ -5,7 +5,7 @@ import { useState } from "react"
 import { ArrowLeft, CheckCircle2 } from "lucide-react"
 import { Button, Checkbox, Dialog, DialogContent, DialogTitle, Input, Label } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
-import { addBankSource } from "@/lib/ask-nanci/sourceStore"
+import { addBankSource } from "@/lib/ask-nanci/source-store"
 
 const INSTITUTION_GROUPS = [
   { key: "accounting", label: "Accounting" },

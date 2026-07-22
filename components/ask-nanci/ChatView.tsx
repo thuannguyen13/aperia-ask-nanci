@@ -3,7 +3,7 @@
 import { ArrowDown } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { usePendingBot } from "@/contexts/ChatStreamContext"
-import { useChatScroll } from "@/hooks/useChatScroll"
+import { useChatScroll } from "@/hooks/use-chat-scroll"
 import { PanelHeader } from "./shared"
 import { UserMessage, BotMessage } from "./ChatMessage"
 import { ThinkingIndicator } from "./ThinkingIndicator"

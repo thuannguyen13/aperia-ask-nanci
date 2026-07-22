@@ -7,7 +7,7 @@ import { Button, Switch, Separator, Card, CardContent, ScrollArea } from "aperia
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { FOUNDATION_SOURCE, addFileSources, toggleSource, removeSource, readSources } from "@/lib/ask-nanci/sourceStore"
+import { FOUNDATION_SOURCE, addFileSources, toggleSource, removeSource, readSources } from "@/lib/ask-nanci/source-store"
 import { SourceIcon } from "./SourceIcon"
 import type { Source } from "@/lib/ask-nanci/types"
 import { ConnectWizard } from "./ConnectWizard"

@@ -23,12 +23,12 @@ import {
   readSessions,
   saveSession,
   deleteSession,
-} from "./sessionStore"
+} from "./session-store"
 import {
   FOUNDATION_SOURCE,
   readSources,
   writeSources,
-} from "./sourceStore"
+} from "./source-store"
 import { findResponse, DEFAULT_RESPONSE, DEFAULT_SUGGESTIONS, PROMPT_CATEGORIES, ALL_QUESTIONS } from "./mock-data"
 export type { PromptCategory, CurrentUser } from "./types"
 import { VARIANT_CONTENT_OVERRIDES } from "./embed-demo-config"

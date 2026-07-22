@@ -23,7 +23,7 @@ import { EMBED_DEMO_SOURCES, EMBED_BUSINESS_OWNER_DEMO_SOURCES, EMBED_ISO_DEMO_S
 import type { EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
 import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_ALL_PROMPTS, CONCEPT_NO_RESET_PROMPTS, CONCEPT_MANUAL_PROMPTS, CONCEPT_FLOW16_FOLLOWUPS, CONCEPT_FAKE_FOLLOWUPS, CONCEPT_CHAT_TITLES, CONCEPT_DECLINE_REPLIES, CONCEPT_OFFER_NO } from "@/lib/ask-nanci/concept-config"
 import { ACCOUNT_CHANGE_SHEET } from "@/lib/ask-nanci/data/panels/account-change"
-import { FOUNDATION_SOURCE_ID, ONBOARDING_KEY } from "@/lib/ask-nanci/sourceStore"
+import { FOUNDATION_SOURCE_ID, ONBOARDING_KEY } from "@/lib/ask-nanci/source-store"
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
@@ -100,10 +100,10 @@ interface AskNanciCtx {
   clearPanelView: (id: PanelId) => void
 }
 
-const Ctx = createContext<AskNanciCtx | null>(null)
+const AskNanciContext = createContext<AskNanciCtx | null>(null)
 
 export function useAskNanci() {
-  const ctx = useContext(Ctx)
+  const ctx = useContext(AskNanciContext)
   if (!ctx) throw new Error("useAskNanci must be used inside AskNanciProvider")
   return ctx
 }
@@ -698,7 +698,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const chatTitle = isConceptVersion && firstUserContent ? (CONCEPT_CHAT_TITLES[firstUserContent] ?? null) : null
 
   return (
-    <Ctx.Provider value={{
+    <AskNanciContext.Provider value={{
       isEmbed, embedVariant,
       view, messages, chatState, chatTitle, sessions, activeSessionId,
       sendMessage, handlePrompt, stopAnimation, startNewChat, replayFlow, resumeSession,
@@ -723,6 +723,6 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       panelViews, clearPanelView,
     }}>
       {children}
-    </Ctx.Provider>
+    </AskNanciContext.Provider>
   )
 }

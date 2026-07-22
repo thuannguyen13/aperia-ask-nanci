@@ -6,7 +6,7 @@ import {
   shouldFollowToBottom,
   useChatScroll,
   type ChatScrollPhase,
-} from "./useChatScroll"
+} from "./use-chat-scroll"
 
 // ── Pure decisions — the load-bearing logic, no DOM needed ──────────────────
 
