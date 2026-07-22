@@ -5,7 +5,7 @@ import { BarChart, Bar, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveCo
 import { Settings } from "lucide-react"
 import { Badge, Button } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
-import { formatCurrency } from "@/components/ask-nanci/shared"
+import { formatCurrency, formatPercent } from "@/components/ask-nanci/shared"
 import { DETECTION_QUEUE, type QueueStatus, type DetectionQueueData } from "@/lib/ask-nanci/data/risk-detection-queue"
 
 // The assignment summary block (name + report switch + KPI row + chart + status grid),
@@ -115,7 +115,7 @@ export function QueueSummaryCard({ queue = DETECTION_QUEUE, onBarometer }: { que
         <Kpi label="Eligible Merchant Count" value={q.eligibleMerchants.toLocaleString()} sub="Merchants" />
         <Kpi label="Alerted" value={alerted.count.toLocaleString()} sub={formatCurrency(alerted.amount)} />
         <Kpi label="Re-queued" value={q.requeued.count.toLocaleString()} sub={formatCurrency(q.requeued.amount)} />
-        <Kpi label="% Worked" value={`${workedPct.toFixed(2)}%`} sub={`${worked.count} of ${q.workedOf.toLocaleString()}`} />
+        <Kpi label="% Worked" value={formatPercent(workedPct, 2)} sub={`${worked.count} of ${q.workedOf.toLocaleString()}`} />
       </div>
 
       {/* Chart + status grid — white shadowed card */}

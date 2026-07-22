@@ -2,6 +2,7 @@
 
 import { ChevronsUpDown } from "lucide-react"
 import { REALERT_ROWS } from "@/lib/ask-nanci/data/risk-dashboard"
+import { formatPercent } from "@/components/ask-nanci/shared"
 
 // ponytail: display-only sort affordance — the Figma is static, no sorting yet.
 function Th({ children, right }: { children: React.ReactNode; right?: boolean }) {
@@ -37,7 +38,7 @@ export function RealertTable() {
                   <div className="h-1.5 w-24 rounded-full bg-orange-100 dark:bg-orange-950/40">
                     <div className="h-full rounded-full bg-orange-500" style={{ width: `${Math.min(r.rate * 2, 100)}%` }} />
                   </div>
-                  <span className="tabular-nums text-foreground">{r.rate.toFixed(1)}%</span>
+                  <span className="tabular-nums text-foreground">{formatPercent(r.rate)}</span>
                 </div>
               </td>
               <td className="px-3 py-2 text-foreground">{r.action}</td>

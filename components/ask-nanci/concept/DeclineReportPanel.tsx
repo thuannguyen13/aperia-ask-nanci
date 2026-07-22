@@ -4,7 +4,7 @@ import { Download } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { ALL_MERCHANTS, FILTERED } from "@/lib/ask-nanci/data/panels/decline-report"
-import { PanelShell, PanelHeader, PanelTable, Th, Td } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelTable, Th, Td, formatPercent } from "@/components/ask-nanci/shared"
 
 function rateColor(r: number) {
   if (r >= 25) return "text-red-600 dark:text-red-400"
@@ -66,7 +66,7 @@ export function DeclineReportPanel() {
                   </Td>
                   <Td className="text-muted-foreground">{row.iso}</Td>
                   <Td align="right" mono className={cn("font-semibold", rateColor(row.rate))}>
-                    {row.rate.toFixed(1)}%
+                    {formatPercent(row.rate)}
                   </Td>
                   <Td align="right" mono className="text-muted-foreground">{row.contact}</Td>
                 </tr>
