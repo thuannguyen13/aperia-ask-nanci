@@ -29,7 +29,9 @@ const BASE = process.env.BASE ?? "http://localhost:3000"
  * data for the `aperia-ask-nanci-embed` project (Web Analytics → Referrers, or the
  * `Referer` header in runtime logs). Reconcile against that before trusting this list.
  */
-const EMBEDDED_IN: { query: string; where: string; note?: string }[] = [
+type Embed = { query: string; where: string; note?: string }
+
+const EXPLICIT_EMBEDS: Embed[] = [
   { query: "mode=business-owner", where: "production site (page unconfirmed)" },
   { query: "mode=clover", where: "production site (page unconfirmed)" },
   { query: "mode=vw", where: "production site (page unconfirmed)" },
@@ -41,6 +43,19 @@ const EMBEDDED_IN: { query: string; where: string; note?: string }[] = [
     note: "**broken** — `detect` is not a case in `parseMode`, so this falls through to the default app (sidebar + KB panel), not an embed",
   },
 ]
+
+// Every flow in the Merchant Money group (`section: "merchant"`) is live. Derived rather
+// than listed, so a new merchant flow is marked live the moment it gets a slug.
+const merchantEmbeds = (): Embed[] =>
+  FLOW_DEFS.filter((f) => f.section === "merchant")
+    .flatMap((f) => {
+      const slug = f.slug ?? (CONCEPT_EMBED_FLOW_LAYOUTS[String(f.num)] ? String(f.num) : null)
+      return slug ? [{ query: `mode=concept-embed&flow=${slug}`, where: `Merchant Money group — ${f.title}` }] : []
+    })
+    .sort((a, b) => a.query.localeCompare(b.query, undefined, { numeric: true }))
+
+const seen = new Set(EXPLICIT_EMBEDS.map((e) => e.query))
+const EMBEDDED_IN: Embed[] = [...EXPLICIT_EMBEDS, ...merchantEmbeds().filter((e) => !seen.has(e.query))]
 
 const url = (q: string) => (q ? `${BASE}/?${q}` : `${BASE}/`)
 const embeddedQueries = new Set(EMBEDDED_IN.map((e) => e.query))
@@ -115,7 +130,8 @@ if (layoutOnly.length) {
   p("|---|---|---|")
   for (const slug of layoutOnly) {
     const flow = FLOW_DEFS.find((f) => String(f.num) === slug)
-    p(`| \`${url(`mode=concept-embed&flow=${slug}`)}\` | ${flow?.num ?? "?"} | ${flow?.title ?? "unknown"} |`)
+    const q = `mode=concept-embed&flow=${slug}`
+    p(`| \`${url(q)}\`${liveMark(q)} | ${flow?.num ?? "?"} | ${flow?.title ?? "unknown"} |`)
   }
   p()
 }

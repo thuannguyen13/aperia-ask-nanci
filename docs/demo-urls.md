@@ -26,19 +26,19 @@ Any other `?mode=` value falls through to the default app.
 | URL | Card | Flow | Layout |
 |---|---|---|---|
 | `http://localhost:3000/?mode=concept-embed&flow=2` **live** | 2 | Data Lookup | compact widget |
-| `http://localhost:3000/?mode=concept-embed&flow=5` | 5 | Error Recovery | compact widget |
+| `http://localhost:3000/?mode=concept-embed&flow=5` **live** | 5 | Error Recovery | compact widget |
 | `http://localhost:3000/?mode=concept-embed&flow=6` | 6 | Proactive Surfacing | compact widget |
 | `http://localhost:3000/?mode=concept-embed&flow=11` **live** | 12 | Detection Queue — alt entry | compact widget |
 | `http://localhost:3000/?mode=concept-embed&flow=12` | 12 | Detection Queue | compact widget |
-| `http://localhost:3000/?mode=concept-embed&flow=13` | 13 | Deposit Tracker | compact widget |
-| `http://localhost:3000/?mode=concept-embed&flow=14` | 14 | Fee Change Explainer | compact widget |
-| `http://localhost:3000/?mode=concept-embed&flow=15` | 15 | Sales Snapshot | compact widget |
-| `http://localhost:3000/?mode=concept-embed&flow=16` | 16 | Account Change | compact widget |
-| `http://localhost:3000/?mode=concept-embed&flow=17` | 17 | Escalation | compact widget |
-| `http://localhost:3000/?mode=concept-embed&flow=18` | 18 | Menu Margin Truth | compact widget |
-| `http://localhost:3000/?mode=concept-embed&flow=19` | 19 | Address Change | compact widget |
-| `http://localhost:3000/?mode=concept-embed&flow=20` | 20 | Credit Card Offer | compact widget |
-| `http://localhost:3000/?mode=concept-embed&flow=21` | 21 | Business Loan Offer | compact widget |
+| `http://localhost:3000/?mode=concept-embed&flow=13` **live** | 13 | Deposit Tracker | compact widget |
+| `http://localhost:3000/?mode=concept-embed&flow=14` **live** | 14 | Fee Change Explainer | compact widget |
+| `http://localhost:3000/?mode=concept-embed&flow=15` **live** | 15 | Sales Snapshot | compact widget |
+| `http://localhost:3000/?mode=concept-embed&flow=16` **live** | 16 | Account Change | compact widget |
+| `http://localhost:3000/?mode=concept-embed&flow=17` **live** | 17 | Escalation | compact widget |
+| `http://localhost:3000/?mode=concept-embed&flow=18` **live** | 18 | Menu Margin Truth | compact widget |
+| `http://localhost:3000/?mode=concept-embed&flow=19` **live** | 19 | Address Change | compact widget |
+| `http://localhost:3000/?mode=concept-embed&flow=20` **live** | 20 | Credit Card Offer | compact widget |
+| `http://localhost:3000/?mode=concept-embed&flow=21` **live** | 21 | Business Loan Offer | compact widget |
 
 ### Layout-only entries (no autoplay)
 
@@ -46,7 +46,7 @@ These have a layout override but no slug — they open a destination surface ins
 
 | URL | Card | Flow |
 |---|---|---|
-| `http://localhost:3000/?mode=concept-embed&flow=22` | 22 | Service Marketplace |
+| `http://localhost:3000/?mode=concept-embed&flow=22` **live** | 22 | Service Marketplace |
 
 ## Flows with no embed URL
 
@@ -83,5 +83,16 @@ Referrers, or the `Referer` header in runtime logs).
 | `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=2` | production site (page unconfirmed) | ok |
 | `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=11` | production site (page unconfirmed) | ok |
 | `https://aperia-ask-nanci-embed.vercel.app/?mode=detect` | ../webflow/ask-nanci-v3-storybrand_6_dark.html:1561 | **broken** — `detect` is not a case in `parseMode`, so this falls through to the default app (sidebar + KB panel), not an embed |
+| `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=5` | Merchant Money group — Error Recovery | ok |
+| `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=13` | Merchant Money group — Deposit Tracker | ok |
+| `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=14` | Merchant Money group — Fee Change Explainer | ok |
+| `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=15` | Merchant Money group — Sales Snapshot | ok |
+| `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=16` | Merchant Money group — Account Change | ok |
+| `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=17` | Merchant Money group — Escalation | ok |
+| `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=18` | Merchant Money group — Menu Margin Truth | ok |
+| `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=19` | Merchant Money group — Address Change | ok |
+| `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=20` | Merchant Money group — Credit Card Offer | ok |
+| `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=21` | Merchant Money group — Business Loan Offer | ok |
+| `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=22` | Merchant Money group — Service Marketplace | ok |
 
 ⚠️ 1 embedded URL(s) above do not resolve to a valid mode — see the Modes table.
