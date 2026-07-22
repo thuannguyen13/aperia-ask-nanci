@@ -29,9 +29,13 @@ export function saveSession(messages: Message[], existingId?: string, titleOverr
   const title = titleOverride ?? (firstUser ? truncate(firstUser.content, 60) : "Untitled chat")
 
   const session: Session = { id, title, messages, updatedAt: Date.now() }
+  // Always float the saved session to the front: nothing downstream sorts by
+  // updatedAt (the recent lists just slice the array), so an in-place update
+  // would leave a chat you just used sitting below older ones — and let
+  // MAX_SESSIONS evict the active chat while keeping stale ones.
   const idx = sessions.findIndex((s) => s.id === id)
-  if (idx !== -1) sessions[idx] = session
-  else sessions.unshift(session)
+  if (idx !== -1) sessions.splice(idx, 1)
+  sessions.unshift(session)
 
   writeSessions(sessions.slice(0, MAX_SESSIONS))
   return session
