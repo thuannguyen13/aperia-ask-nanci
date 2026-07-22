@@ -1,12 +1,7 @@
-import type { Message, Session, Source, ChartWidget, MapWidget, PanelAction } from "./types"
+import type { Session, Source, ChartWidget, MapWidget, PanelAction } from "./types"
 
 // ─── Chat ─────────────────────────────────────────────────────────────────────
 
-export interface ChatRequest {
-  sessionId: string
-  messages: Pick<Message, "role" | "content">[]
-  sourceIds: string[]
-}
 
 export type ChatStreamChunk =
   | { type: "thinking"; source: Pick<Source, "id" | "name" | "kind" | "logo" | "color" | "initials" | "institution"> }
@@ -23,10 +18,6 @@ export type ChatStreamChunk =
 
 export type SessionListResponse = Session[]
 
-export interface SessionSaveRequest {
-  id: string
-  messages: Message[]
-}
 
 // ─── Sources ──────────────────────────────────────────────────────────────────
 

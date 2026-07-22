@@ -8,7 +8,7 @@
 export const EMBED_VARIANTS = ["clover", "business-owner", "iso", "concept-embed", "vw"] as const
 export type EmbedVariant = (typeof EMBED_VARIANTS)[number]
 
-export interface ParsedMode {
+interface ParsedMode {
   isEmbed: boolean
   embedVariant: EmbedVariant | null
   isConceptVersion: boolean

@@ -6,7 +6,7 @@ import { createContext, useContext } from "react"
 // selection state flows through this context instead of props.
 export type RiskDest = "ask-nanci" | "dashboard" | "detection-queue" | "barometer-report" | "risk-report" | "assignment"
 
-export interface RiskNav {
+interface RiskNav {
   go: (dest: RiskDest) => void
   openBarometer: (filter?: "critical" | null) => void
   openMerchant: (id: string) => void

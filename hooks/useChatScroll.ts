@@ -11,7 +11,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
  */
 export type ChatScrollPhase = "idle" | "awaiting" | "streaming"
 
-export interface UseChatScrollOptions {
+interface UseChatScrollOptions {
   /** Pixels of gap above the user message when it's pinned to the top. Default: 8 */
   scrollOffset?: number
   /**
@@ -42,12 +42,12 @@ export interface UseChatScrollOptions {
   waitForPostIdleRender?: boolean
 }
 
-export interface UseChatScrollParams extends UseChatScrollOptions {
+interface UseChatScrollParams extends UseChatScrollOptions {
   /** Current chat lifecycle phase. See {@link ChatScrollPhase}. */
   phase: ChatScrollPhase
 }
 
-export interface UseChatScrollResult {
+interface UseChatScrollResult {
   /** Attach to the scrollable overflow container. */
   containerRef: React.RefObject<HTMLDivElement | null>
   /** Attach to an empty element rendered as the LAST child of the message list. */

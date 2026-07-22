@@ -1,7 +1,7 @@
 // Flow 20: Credit Card Offer — single pre-filled card application.
 // ponytail: illustrative offer data only; not live issuer terms.
 
-export interface CardOffer {
+interface CardOffer {
   id: string;
   name: string;
   bestFor: string;

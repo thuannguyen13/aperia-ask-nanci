@@ -21,9 +21,9 @@ export const CONCEPT_FLOW11_APPROVE = "Approve all except the third one";
 
 export const CONCEPT_FLOW12_PROMPT = "Show me the detection queue";
 export const CONCEPT_FLOW12_CONTINUE_KEY = "__dq_continue__";
-export const CONCEPT_DQ_OPEN_KEY = "Yes, open it";
-export const CONCEPT_DQ_COASTAL_KEY = "Pull up Coastal's risk report alongside";
-export const CONCEPT_DQ_ESCALATE_KEY = "Escalate this one and open a risk case.";
+const CONCEPT_DQ_OPEN_KEY = "Yes, open it";
+const CONCEPT_DQ_COASTAL_KEY = "Pull up Coastal's risk report alongside";
+const CONCEPT_DQ_ESCALATE_KEY = "Escalate this one and open a risk case.";
 
 export const CONCEPT_FLOW13_PROMPT = "When's my money from the weekend hitting?";
 export const CONCEPT_FLOW14_PROMPT = "my fees went up this month, what happened?";
@@ -32,12 +32,12 @@ export const CONCEPT_FLOW15_FOLLOWUP = "nice. was there a slow day?";
 export const CONCEPT_FLOW16_PROMPT = "I changed banks, send my deposits to the new account";
 export const CONCEPT_FLOW17_PROMPT = "none of this is right, my payout is short by like 600 bucks and I don't get why";
 export const CONCEPT_MENU_MARGIN_PROMPT = "how's the Italian combo doing this month?";
-export const CONCEPT_ADDRESS_PROMPT = "Change my business address";
-export const CONCEPT_CREDIT_CARD_PROMPT = "Who am I paying the most on food cost?";
-export const CONCEPT_BUSINESS_LOAN_PROMPT = "Do I have enough money for payroll?";
+const CONCEPT_ADDRESS_PROMPT = "Change my business address";
+const CONCEPT_CREDIT_CARD_PROMPT = "Who am I paying the most on food cost?";
+const CONCEPT_BUSINESS_LOAN_PROMPT = "Do I have enough money for payroll?";
 // Both offer flows share the same accept/decline pills (matched per-active-flow, so
 // reuse is safe). "No, ignore for now" is decorative — registered as a fake follow-up.
-export const CONCEPT_OFFER_YES = "Yes, show me";
+const CONCEPT_OFFER_YES = "Yes, show me";
 export const CONCEPT_OFFER_NO = "No, ignore for now";
 
 // Destination card id — an internal key, never sent as a prompt (see FlowDef.destination).
@@ -64,19 +64,19 @@ export const CONCEPT_CHAT_TITLES: Record<string, string> = {
 
 // Fake end-of-flow follow-up questions — shown for realism only, with no scripted
 // conversation behind them. Clicking one is a no-op (see CONCEPT_FAKE_FOLLOWUPS).
-export const CONCEPT_FLOW5_FOLLOWUPS = ["Show yesterday's summary", "Break down my spending", "Check payroll affordability"];
+const CONCEPT_FLOW5_FOLLOWUPS = ["Show yesterday's summary", "Break down my spending", "Check payroll affordability"];
 
-export const CONCEPT_FLOW13_FOLLOWUPS = ["Investigate payout discrepancy", "Compare this week vs last week", "Review this month's fee changes", "Update deposit bank account"];
+const CONCEPT_FLOW13_FOLLOWUPS = ["Investigate payout discrepancy", "Compare this week vs last week", "Review this month's fee changes", "Update deposit bank account"];
 
-export const CONCEPT_FLOW14_FOLLOWUPS = ["Investigate payout discrepancy", "Compare this week vs last week", "Check weekend deposit timing"];
+const CONCEPT_FLOW14_FOLLOWUPS = ["Investigate payout discrepancy", "Compare this week vs last week", "Check weekend deposit timing"];
 
-export const CONCEPT_FLOW15_FOLLOWUPS_FAKE = ["Check weekend deposit timing", "Review this month's fee changes", "Investigate payout discrepancy"];
+const CONCEPT_FLOW15_FOLLOWUPS_FAKE = ["Check weekend deposit timing", "Review this month's fee changes", "Investigate payout discrepancy"];
 
 export const CONCEPT_FLOW16_FOLLOWUPS = ["Check weekend deposit timing", "Investigate payout discrepancy", "Update phone number", "Compare this week vs last week"];
 
-export const CONCEPT_FLOW18_FOLLOWUPS = ["Compare this week vs last week", "Review this month's fee changes"];
+const CONCEPT_FLOW18_FOLLOWUPS = ["Compare this week vs last week", "Review this month's fee changes"];
 
-export const CONCEPT_FLOW19_FOLLOWUPS = ["Update payment processor MID", "Update deposit bank account"];
+const CONCEPT_FLOW19_FOLLOWUPS = ["Update payment processor MID", "Update deposit bank account"];
 
 // Every fake follow-up across flows — handlePrompt treats these as no-op decoration.
 // Add each flow's follow-up array here as the treatment rolls out.
@@ -322,7 +322,7 @@ export const CONCEPT_FLOW_SLUGS: Record<string, string> = Object.fromEntries(
 // Per-flow embed layout overrides (?mode=concept-embed&flow=<slug>). Default
 // concept-embed is the sidebar-less compact chat widget; a flow listed here opts
 // into the full app shell (sidebar + standard welcome page) instead. Extend per flow.
-export interface ConceptEmbedLayout {
+interface ConceptEmbedLayout {
   fullApp: boolean; // render Sidebar + standard WelcomeView instead of the compact widget
   openMarketplace?: boolean; // auto-open the Service Marketplace panel on load
 }
@@ -339,7 +339,7 @@ export const CONCEPT_ALL_PROMPTS = [...FLOW_DEFS]
 
 // Merchant-money group prompts, ascending. End-of-flow chips suggest sibling flows
 // in the same group — otherMerchantPrompts(self) drops the flow that just finished.
-export const CONCEPT_MERCHANT_PROMPTS = [...FLOW_DEFS]
+const CONCEPT_MERCHANT_PROMPTS = [...FLOW_DEFS]
   .filter((f) => f.section === "merchant" && !f.proactive && !f.destination)
   .sort((a, b) => a.num - b.num)
   .map((f) => f.key);

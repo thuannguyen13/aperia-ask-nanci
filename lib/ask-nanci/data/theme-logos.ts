@@ -11,7 +11,7 @@
 // Omit `sidebar` / `sidebarCollapsed` to fall back to the Ask Nanci wordmark + logomark.
 // width/height are the asset's intrinsic size (a next/image ratio hint) — rendered
 // size is controlled by CSS at the usage site.
-export type LogoAsset = { src: string; alt: string; width: number; height: number }
+type LogoAsset = { src: string; alt: string; width: number; height: number }
 
 export type ThemeLogos = {
   frame: LogoAsset
@@ -19,7 +19,7 @@ export type ThemeLogos = {
   sidebarCollapsed?: LogoAsset
 }
 
-export const THEME_LOGOS = {
+const THEME_LOGOS = {
   clover: {
     frame: { src: "/logos/clover.svg", alt: "Clover", width: 80, height: 24 },
   },

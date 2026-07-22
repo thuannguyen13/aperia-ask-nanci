@@ -1,7 +1,7 @@
 // Aperia Risk — Barometer Report merchant list + Risk Report detail.
 // ponytail: illustrative demo data for the detection-queue narrative, not a live feed.
 
-export type RiskLevel = "High" | "Medium" | "Low"
+type RiskLevel = "High" | "Medium" | "Low"
 export type WorkStatus = "mark-work" | "wip" | "worked"
 
 export interface RiskMerchant {
@@ -32,7 +32,7 @@ export const findMerchant = (id: string) => RISK_MERCHANTS.find((m) => m.id === 
 
 // Risk Report detail. Fully specified for Regency (the drill-in from the Figma);
 // other merchants render from their list row + these shared defaults.
-export interface RiskReportDetail {
+interface RiskReportDetail {
   mid: string
   violations: number
   inQueues: number
@@ -119,7 +119,7 @@ export const MERCHANT_NOTES_SEED: NoteEntry[] = [
 ]
 
 // Cross-Queue Presence — opened from the "In N Queues" badge on the Risk Report.
-export interface QueueRow { name: string; status: string; alertedAt: string }
+interface QueueRow { name: string; status: string; alertedAt: string }
 export const CROSS_QUEUE_ROWS: QueueRow[] = [
   { name: "DQ-Cash Advance", status: "Ready to Work", alertedAt: "alerted 05/03/2026 06:14 AM" },
   { name: "Phase 2 Parameters", status: "Ready to Work", alertedAt: "alerted 05/03/2026 06:14 AM" },

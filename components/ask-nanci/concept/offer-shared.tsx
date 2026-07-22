@@ -85,7 +85,7 @@ export function StatStrip({ stats, className }: { stats: { label: string; value:
 
 // Business Info + Contact Info — identical across both offer forms. The trailing
 // details section (card limit vs loan terms) is rendered by each panel after this.
-export interface Applicant {
+interface Applicant {
   businessName: string
   ein: string
   industry: string

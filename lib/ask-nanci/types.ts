@@ -3,7 +3,7 @@ import type { PanelId } from "@/components/ask-nanci/concept/panel-registry"
 import type { DashChartId } from "./data/risk-dashboard"
 export type { PanelId }
 
-export type MessageRole = "user" | "assistant"
+type MessageRole = "user" | "assistant"
 
 // ─── Demo data types ───────────────────────────────────────────────────────────
 

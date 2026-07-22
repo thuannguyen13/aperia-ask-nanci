@@ -1,7 +1,7 @@
 // Flow 21: Business Loan Offer — single pre-filled loan application.
 // ponytail: illustrative offer data only; not live lender terms.
 
-export interface LoanOffer {
+interface LoanOffer {
   id: string;
   product: string; // what the merchant is offered, e.g. "Loan on Card"
   note: string; // what the product actually is, in the merchant's terms

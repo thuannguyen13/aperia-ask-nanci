@@ -36,7 +36,7 @@ import { AssignmentManagement as RiskAssignments } from "@/components/risk/Assig
 // The single registry of concept panels. Add a panel here (+ its component) and it
 // becomes renderable everywhere — `PanelId` is derived from these keys, so there is
 // no separate union to keep in sync.
-export interface PanelDef {
+interface PanelDef {
   component: ComponentType
 }
 

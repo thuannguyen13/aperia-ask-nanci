@@ -14,7 +14,7 @@ export function readSessions(): Session[] {
   }
 }
 
-export function writeSessions(sessions: Session[]): void {
+function writeSessions(sessions: Session[]): void {
   try {
     localStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions))
   } catch {
