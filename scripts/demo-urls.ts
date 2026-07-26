@@ -9,7 +9,7 @@
  * here for free. Validates data only (no React), so it runs in plain node via tsx.
  */
 import { writeFileSync } from "node:fs"
-import { FLOW_DEFS } from "../lib/ask-nanci/concept-config"
+import { FLOW_DEFS } from "../lib/ask-nanci/data/flows.concept"
 import {
   EMBED_VARIANTS,
   parseMode,

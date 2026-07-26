@@ -4,7 +4,7 @@ import { useState } from "react"
 import Image from "next/image"
 import { TriangleAlert } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { FLOW_DEFS, type FlowDef, CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY } from "@/lib/ask-nanci/concept-config"
+import { FLOW_DEFS, type FlowDef, CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY } from "@/lib/ask-nanci/data/flows.concept"
 import { ChatInput } from "@/components/ask-nanci/ChatInput"
 
 const PROACTIVE_CONTENT = CONCEPT_SCRIPTED_CONVERSATIONS[CONCEPT_FLOW6_KEY][0].content

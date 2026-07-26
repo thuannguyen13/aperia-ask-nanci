@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { memo, useEffect, useState } from "react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import type { PanelId } from "@/lib/ask-nanci/types"
@@ -8,7 +8,7 @@ import { PANELS } from "./panel-registry"
 
 // Every concept panel renders here as its own separate box, stacked vertically
 // with a gap — one layout for all flows. Order is the open order of the stack.
-function PanelBox({ id, closing }: { id: PanelId; closing: string[] }) {
+const PanelBox = memo(function PanelBox({ id, closing }: { id: PanelId; closing: string[] }) {
   const Panel = PANELS[id].component
   const isClosing = closing.includes(id)
   return (
@@ -18,7 +18,7 @@ function PanelBox({ id, closing }: { id: PanelId; closing: string[] }) {
       </div>
     </div>
   )
-}
+})
 
 export function ConceptPanelArea({ fillWidth = false, visible = true }: { fillWidth?: boolean; visible?: boolean }) {
   const { closingPanels, dynamicPanels } = useAskNanci()

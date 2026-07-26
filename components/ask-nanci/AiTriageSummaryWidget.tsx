@@ -3,7 +3,7 @@
 import { Clock, Layers, Zap, BarChart3, ShieldAlert } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { CONCEPT_FLOW12_CONTINUE_KEY } from "@/lib/ask-nanci/concept-config"
+import { CONCEPT_FLOW12_CONTINUE_KEY } from "@/lib/ask-nanci/data/flows.concept"
 
 const TRIAGE_GROUPS = [
   { label: "Time-critical",   count: 4,  note: "SLA breach within 2 hours",           color: "red",   icon: Clock     },

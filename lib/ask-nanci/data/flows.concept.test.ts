@@ -6,7 +6,7 @@ import {
   CONCEPT_FLOW_SLUGS,
   CONCEPT_ALL_PROMPTS,
   CONCEPT_MANUAL_PROMPTS,
-} from "../concept-config"
+} from "./flows.concept"
 import { RISK_QUICK_ACTIONS, RISK_NANCI_TAKES } from "./risk-landing"
 import type { ConceptScriptedTurn } from "../types"
 

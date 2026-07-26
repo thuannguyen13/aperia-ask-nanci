@@ -3,7 +3,7 @@
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { FLAT_BARS, MAX } from "@/lib/ask-nanci/data/panels/volume-settlement"
-import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, Callout } from "@/components/ask-nanci/shared"
 
 export function VolumeSettlementPanel() {
   const { closePanel } = useAskNanci()
@@ -45,10 +45,10 @@ export function VolumeSettlementPanel() {
             <span className="flex items-center gap-1"><span className="size-2 rounded-sm bg-muted-foreground/25 inline-block" />Normal</span>
             <span className="flex items-center gap-1"><span className="size-2 rounded-sm bg-red-400 inline-block" />Spike (Apr)</span>
           </div>
-          <div className="mt-3 rounded-md border border-red-200 bg-red-50 dark:border-red-800/60 dark:bg-red-950/20 px-3 py-2">
+          <Callout variant="red" className="mt-3 rounded-md px-3 py-2">
             <p className="text-[10px] font-semibold text-red-800 dark:text-red-300">+340% volume increase</p>
             <p className="text-[9px] text-red-600 dark:text-red-400">Apr W1–W4 vs Feb average</p>
-          </div>
+          </Callout>
         </div>
 
         {/* Settlement change */}
@@ -70,11 +70,11 @@ export function VolumeSettlementPanel() {
             </div>
             <div>
               <p className="text-[9px] text-muted-foreground mb-1.5">Current · <span className="text-red-600 dark:text-red-400 font-semibold">Apr 27</span></p>
-              <div className="rounded-md border border-red-200 bg-red-50 dark:border-red-800/60 dark:bg-red-950/20 px-2.5 py-2 space-y-1 font-mono">
+              <Callout variant="red" className="rounded-md px-2.5 py-2 space-y-1 font-mono">
                 <p className="text-foreground">Routing ••••3341</p>
                 <p className="text-foreground">Account ••••9104</p>
                 <p className="text-red-600 dark:text-red-400">Checking · 18 days ago</p>
-              </div>
+              </Callout>
             </div>
             <div className="border-t pt-2.5 space-y-1">
               <p className="text-[9px] text-muted-foreground">Changed by</p>

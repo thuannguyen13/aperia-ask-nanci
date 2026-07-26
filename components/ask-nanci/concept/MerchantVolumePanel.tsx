@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Badge } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
-import { MERCHANT_VOLUME_DATA } from "@/lib/ask-nanci/concept-config"
+import { MERCHANT_VOLUME_DATA } from "@/lib/ask-nanci/data/merchants"
 import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelTable, Th, Td, formatCurrency, formatWholeCurrency } from "@/components/ask-nanci/shared"
 
 type SortKey = "volume" | "txnCount" | "avgTicket"

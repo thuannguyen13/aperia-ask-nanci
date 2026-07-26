@@ -3,7 +3,7 @@
 
 import type { ScriptedTurn } from "../types"
 
-export const SCRIPTED_CONVERSATIONS: Record<string, ScriptedTurn[]> = {
+export const CLOVER_CONVERSATIONS: Record<string, ScriptedTurn[]> = {
   "Change my business address": [
     { role: "user", content: "Change my business address" },
     { role: "assistant", content: "Sure. Your current business address on file is:\n\n142 Oak Street, Austin, TX 78701\n\nWhat would you like to change it to? Please include street, city, state, and ZIP.", map: { address: "142 Oak Street, Austin, TX 78701", lat: 30.2645, lng: -97.7430 } },

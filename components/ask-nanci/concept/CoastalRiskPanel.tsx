@@ -4,7 +4,7 @@ import { TrendingUp } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { RISK_INFO, ACCOUNT_INFO, ACTIVITY_TABS, VOLUME_ROWS } from "@/lib/ask-nanci/data/panels/coastal-risk"
-import { PanelShell, PanelHeader, PanelTable, Th, Td } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelTable, Th, Td, Callout } from "@/components/ask-nanci/shared"
 
 function InfoRow({ label, value, badge, highlight, large }: { label: string; value: string; badge?: boolean; highlight?: string; large?: boolean }) {
   return (
@@ -43,7 +43,7 @@ export function CoastalRiskPanel() {
 
       <div className="flex-1 overflow-auto px-4 py-3 space-y-3">
         {/* Risk score callout */}
-        <div className="flex flex-col gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-3 dark:border-red-800/60 dark:bg-red-950/20">
+        <Callout variant="red" className="flex flex-col gap-2 rounded-lg px-3 py-3">
           <div className="flex items-center gap-2">
             <div className="flex size-7 shrink-0 items-center justify-center rounded bg-red-100 dark:bg-red-900/40">
               <TrendingUp className="size-3.5 text-red-600 dark:text-red-400" />
@@ -55,7 +55,7 @@ export function CoastalRiskPanel() {
             <p className="text-xs font-semibold text-red-800 dark:text-red-300">Score climbed 44 → 89 in 52 days</p>
             <p className="text-[10px] text-red-600 dark:text-red-400 mt-0.5">Settlement account + address changed in last 10 days</p>
           </div>
-        </div>
+        </Callout>
 
         {/* Merchant Identity */}
         <div className="rounded-lg border px-3 py-2.5 space-y-2">

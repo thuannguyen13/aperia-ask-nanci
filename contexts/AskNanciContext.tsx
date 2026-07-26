@@ -21,7 +21,7 @@ import type { CurrentUser, PromptCategory } from "@/lib/ask-nanci/api"
 import { MOCK_USAGE, DEFAULT_CURRENT_USER } from "@/lib/ask-nanci/mock-data"
 import { EMBED_DEMO_SOURCES, EMBED_BUSINESS_OWNER_DEMO_SOURCES, EMBED_ISO_DEMO_SOURCES, EMBED_VW_DEMO_SOURCES, SCRIPTED_CONVERSATIONS } from "@/lib/ask-nanci/embed-demo-config"
 import type { EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
-import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_ALL_PROMPTS, CONCEPT_PANEL_REPLIES, CONCEPT_NO_RESET_PROMPTS, CONCEPT_MANUAL_PROMPTS, CONCEPT_FLOW16_FOLLOWUPS, CONCEPT_FAKE_FOLLOWUPS, CONCEPT_CHAT_TITLES, CONCEPT_DECLINE_REPLIES, CONCEPT_OFFER_NO } from "@/lib/ask-nanci/concept-config"
+import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_ALL_PROMPTS, CONCEPT_PANEL_REPLIES, CONCEPT_NO_RESET_PROMPTS, CONCEPT_MANUAL_PROMPTS, CONCEPT_FLOW16_FOLLOWUPS, CONCEPT_FAKE_FOLLOWUPS, CONCEPT_CHAT_TITLES, CONCEPT_DECLINE_REPLIES, CONCEPT_OFFER_NO } from "@/lib/ask-nanci/data/flows.concept"
 import { ACCOUNT_CHANGE_SHEET } from "@/lib/ask-nanci/data/panels/account-change"
 import { FOUNDATION_SOURCE_ID, ONBOARDING_KEY } from "@/lib/ask-nanci/source-store"
 
@@ -146,8 +146,8 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   }, [])
   const [draft, setDraft] = useState("")
   const [error, setError] = useState<string | null>(null)
-  const [usage] = useState<UsageData>(MOCK_USAGE)
-  const [currentUser] = useState<CurrentUser | null>(DEFAULT_CURRENT_USER)
+  const usage: UsageData = MOCK_USAGE
+  const currentUser: CurrentUser | null = DEFAULT_CURRENT_USER
   const [promptCategories, setPromptCategories] = useState<PromptCategory[]>([])
   const [allQuestions, setAllQuestions] = useState<string[]>([])
   const [tokenLimitReached, setTokenLimitReached] = useState(false)

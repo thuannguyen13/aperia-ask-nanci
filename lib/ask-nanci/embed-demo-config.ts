@@ -26,11 +26,11 @@ export function parseMode(mode: string | null): ParsedMode {
   }
 }
 
-import { SCRIPTED_CONVERSATIONS as BASE_SCRIPTED_CONVERSATIONS } from "./data/flows.clover"
+import { CLOVER_CONVERSATIONS } from "./data/flows.clover"
 import { ISO_SCRIPTED_CONVERSATIONS } from "./data/flows.iso"
 
 // Merged conversation map used by the embed context (clover + ISO prompts in one Record).
-export const SCRIPTED_CONVERSATIONS = { ...BASE_SCRIPTED_CONVERSATIONS, ...ISO_SCRIPTED_CONVERSATIONS }
+export const SCRIPTED_CONVERSATIONS = { ...CLOVER_CONVERSATIONS, ...ISO_SCRIPTED_CONVERSATIONS }
 
 export { ISO_PROMPT_CATEGORIES } from "./data/prompts.iso"
 export { BUSINESS_OWNER_PROMPT_CATEGORIES } from "./data/prompts.clover"

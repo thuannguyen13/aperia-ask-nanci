@@ -1,5 +1,5 @@
 import type { Session, Message } from "./types"
-import { generateId, truncate } from "./utils"
+import { generateId } from "./utils"
 
 const SESSIONS_KEY = "asknanci_chats"
 const MAX_SESSIONS = 20
@@ -26,7 +26,7 @@ export function saveSession(messages: Message[], existingId?: string, titleOverr
   const sessions = readSessions()
   const id = existingId ?? generateId()
   const firstUser = messages.find((m) => m.role === "user")
-  const title = titleOverride ?? (firstUser ? truncate(firstUser.content, 60) : "Untitled chat")
+  const title = titleOverride ?? (firstUser ? (firstUser.content.length > 60 ? firstUser.content.slice(0, 60) + "…" : firstUser.content) : "Untitled chat")
 
   const session: Session = { id, title, messages, updatedAt: Date.now() }
   // Always float the saved session to the front: nothing downstream sorts by

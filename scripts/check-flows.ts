@@ -11,7 +11,7 @@ import {
   CONCEPT_FLOW_SLUGS,
   CONCEPT_ALL_PROMPTS,
   CONCEPT_NO_RESET_PROMPTS,
-} from "../lib/ask-nanci/concept-config"
+} from "../lib/ask-nanci/data/flows.concept"
 import { CONCEPT_EMBED_FLOW_LAYOUTS } from "../lib/ask-nanci/embed-demo-config"
 
 const errors: string[] = []

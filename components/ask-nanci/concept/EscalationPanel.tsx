@@ -4,7 +4,7 @@ import { Phone, Ticket, CheckCircle2 } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { PAYOUT_DISCREPANCY, ESCALATION_PATHS, ESCALATION_BOOKING } from "@/lib/ask-nanci/data/panels/escalation"
-import { PanelShell, PanelHeader, PanelExportButton, PanelTable, Th, formatCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelExportButton, PanelTable, Th, Callout, formatCurrency } from "@/components/ask-nanci/shared"
 
 const PATH_ICONS = { call: Phone, ticket: Ticket } as const
 
@@ -85,13 +85,13 @@ export function EscalationPanel() {
         )}
 
         {view === "booked" && (
-          <div className="flex flex-col items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-4 text-center dark:border-green-800 dark:bg-green-950/20">
+          <Callout variant="green" className="flex flex-col items-center gap-2 px-4 py-4 text-center">
             <div className="flex size-10 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/40">
               <CheckCircle2 className="size-5 text-green-600 dark:text-green-400" />
             </div>
             <p className="text-sm font-semibold text-foreground">Booked for {ESCALATION_BOOKING.bookedFor}</p>
             <p className="text-[10px] text-muted-foreground">Reference {ESCALATION_BOOKING.reference} · Batch details carried over</p>
-          </div>
+          </Callout>
         )}
       </div>
     </PanelShell>

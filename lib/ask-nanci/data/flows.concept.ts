@@ -1,6 +1,5 @@
 // Scripted conversation flows for the concept demo (?mode=concept and ?mode=detect).
 // All flow-key constants and the conversations record live here.
-// concept-config.ts re-exports everything so existing imports don't change.
 
 import type { ConceptScriptedTurn, SheetActionData } from "../types";
 import { RISK_LANDING_CONVERSATIONS } from "./risk-conversations";
