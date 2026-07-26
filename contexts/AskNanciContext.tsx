@@ -155,7 +155,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [onboardingOpen, setOnboardingOpen] = useState(false)
   const [closingPanels, setClosingPanels] = useState<string[]>([])
-  const { stack: dynamicPanels, openDynamic, closeDynamic: closeDynamicPanel, resetDynamic } = usePanelStack()
+  const { stack: dynamicPanels, stackRef: dynamicPanelsRef, openDynamic, closeDynamic: closeDynamicPanel, resetDynamic } = usePanelStack()
   const [declineReportFiltered, setDeclineReportFiltered] = useState(false)
   // Unified panel view state (concept-flow pipeline): one map replaces the per-flow
   // phase enums. A panel reads its view via usePanelView(id, fallback).
@@ -411,8 +411,11 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     applyTurnEffects(turn)
     if (turn.closeAllPanels) {
       await sleep(600)
-      // Stagger panels closed — right column first, then left.
-      const current = [...dynamicPanels]
+      // Stagger panels closed — right column first, then left. Read the stack from
+      // its ref, not from a closed-over `dynamicPanels`: the players call this from
+      // an async loop that captured one version of this callback when the flow
+      // started, so any panel opened since would be missing from a closure value.
+      const current = [...dynamicPanelsRef.current]
       const rightFirst = ["coastal-risk", "transaction-receipt", "email-draft", "change-log"]
       const first = current.find(p => rightFirst.includes(p))
       const rest = current.filter(p => p !== first)
@@ -423,7 +426,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       setDeclineReportFiltered(false)
       resetPanelViews()
     }
-  }, [streamWords, applyTurnEffects, dynamicPanels])
+  }, [streamWords, applyTurnEffects])
 
   // Play one manual step of the active flow: the pending user turn (if any) plus the
   // assistant turn(s) that follow, then stop and surface the next user question as a
