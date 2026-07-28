@@ -1,0 +1,2246 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Panel Model · Ask Nanci</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --aperia-blue: #002F67;
+      --dark-blue: #004785;
+      --sapphire: #0072BC;
+      --sky-blue: #7ED3F7;
+      --light-blue: #C8EAF5;
+      --black: #000000;
+      --white: #FFFFFF;
+      --dark-gray: #58595B;
+      --med-gray: #A7A9AC;
+      --light-gray: #F1F2F2;
+      --bg: #ffffff;
+      --fg: #1c1f24;
+      --muted: #F1F2F2;
+      --muted-fg: #58595B;
+      --border: #e3e6ea;
+      --card: #ffffff;
+      --primary: var(--aperia-blue);
+      --success: #16a34a;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --sans: 'Inter', sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --radius: 8px;
+      --shadow: 0 1px 3px rgba(0, 47, 103, .08), 0 1px 2px rgba(0, 47, 103, .05);
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html {
+      scroll-behavior: smooth
+    }
+
+    body {
+      font-family: var(--sans);
+      font-weight: 400;
+      background: var(--bg);
+      color: var(--fg);
+      font-size: 15px;
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased
+    }
+
+    .wrap {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 0 36px
+    }
+
+    section {
+      padding: 72px 0;
+      border-bottom: 1px solid var(--border);
+      position: relative
+    }
+
+    section:last-of-type {
+      border-bottom: none
+    }
+
+    h2 {
+      font-size: clamp(20px, 3vw, 28px);
+      font-weight: 600;
+      line-height: 1.2;
+      letter-spacing: -.015em;
+      margin-bottom: 10px
+    }
+
+    h3 {
+      font-size: 14px;
+      font-weight: 600
+    }
+
+    .sec-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--sapphire);
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .sec-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+      max-width: 52px
+    }
+
+    .sec-intro {
+      font-size: 15px;
+      color: var(--muted-fg);
+      max-width: 600px;
+      margin-bottom: 36px;
+      line-height: 1.7;
+      font-weight: 400
+    }
+
+    .big-idea {
+      font-size: clamp(24px, 3.6vw, 38px);
+      font-weight: 600;
+      line-height: 1.25;
+      letter-spacing: -.02em;
+      color: var(--aperia-blue);
+      max-width: 680px;
+      margin: 28px 0 20px;
+      padding-left: 20px;
+      border-left: 4px solid var(--sky-blue)
+    }
+
+    .g2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px
+    }
+
+    .g3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      box-shadow: var(--shadow)
+    }
+
+    .card h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px
+    }
+
+    .card p {
+      font-size: 13px;
+      color: var(--muted-fg);
+      line-height: 1.65
+    }
+
+    .mb-3 {
+      margin-bottom: 10px
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 11px;
+      font-family: var(--mono);
+      font-weight: 500;
+      padding: 3px 9px;
+      border-radius: 100px;
+      letter-spacing: .02em
+    }
+
+    .b-red {
+      background: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fecaca
+    }
+
+    .b-green {
+      background: #f0fdf4;
+      color: #15803d;
+      border: 1px solid #bbf7d0
+    }
+
+    .b-blue {
+      background: #eaf3fb;
+      color: var(--dark-blue);
+      border: 1px solid #bfdcf0
+    }
+
+    .b-amber {
+      background: #fffbeb;
+      color: #b45309;
+      border: 1px solid #fde68a
+    }
+
+    .b-gray {
+      background: var(--muted);
+      color: var(--muted-fg);
+      border: 1px solid var(--border)
+    }
+
+    .b-sky {
+      background: #eafaff;
+      color: var(--sapphire);
+      border: 1px solid var(--sky-blue)
+    }
+
+    .callout {
+      border-left: 3px solid var(--primary);
+      padding: 13px 16px;
+      background: #f4f8fc;
+      border-radius: 0 var(--radius) var(--radius) 0;
+      font-size: 13px;
+      line-height: 1.7;
+      margin: 20px 0;
+      color: var(--muted-fg)
+    }
+
+    .callout strong {
+      color: var(--primary)
+    }
+
+    .callout.amber {
+      border-left-color: var(--warning);
+      background: #fffbeb
+    }
+
+    .callout.amber strong {
+      color: var(--warning)
+    }
+
+    .cmp-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin: 26px 0
+    }
+
+    .cmp-table th {
+      text-align: left;
+      padding: 10px 14px;
+      font-weight: 600;
+      font-size: 11px;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      background: var(--muted);
+      border: 1px solid var(--border);
+      color: var(--muted-fg)
+    }
+
+    .cmp-table td {
+      padding: 11px 14px;
+      border: 1px solid var(--border);
+      vertical-align: top;
+      line-height: 1.5
+    }
+
+    .cmp-table tr:hover td {
+      background: var(--muted)
+    }
+
+    .stack-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin: 26px 0
+    }
+
+    .stack-table th {
+      text-align: left;
+      padding: 10px 14px;
+      font-weight: 600;
+      font-size: 11px;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      background: var(--muted);
+      border: 1px solid var(--border);
+      color: var(--muted-fg)
+    }
+
+    .stack-table td {
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      vertical-align: top;
+      line-height: 1.55
+    }
+
+    .stack-table tr:hover td {
+      background: var(--muted)
+    }
+
+    .layer-name {
+      font-weight: 600;
+      font-size: 13px;
+      margin-bottom: 3px
+    }
+
+    .layer-tool {
+      font-size: 12px;
+      color: var(--muted-fg);
+      font-family: var(--mono)
+    }
+
+    .concerns {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 24px 0
+    }
+
+    .concern {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden
+    }
+
+    .c-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 13px 16px;
+      cursor: pointer;
+      background: var(--card);
+      transition: background .15s
+    }
+
+    .c-hdr:hover {
+      background: var(--muted)
+    }
+
+    .c-left {
+      display: flex;
+      align-items: center;
+      gap: 10px
+    }
+
+    .c-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      background: #eaf3fb;
+      color: var(--dark-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      flex-shrink: 0;
+      font-family: var(--mono);
+      font-weight: 500
+    }
+
+    .c-title {
+      font-size: 13px;
+      font-weight: 500
+    }
+
+    .chevron {
+      font-size: 11px;
+      color: var(--muted-fg);
+      transition: transform .2s;
+      flex-shrink: 0;
+      margin-left: 8px
+    }
+
+    .concern.open .chevron {
+      transform: rotate(180deg)
+    }
+
+    .c-body {
+      display: none;
+      padding: 12px 16px 16px;
+      border-top: 1px solid var(--border);
+      background: #ffffff;
+      font-size: 13px;
+      color: var(--muted-fg);
+      line-height: 1.7
+    }
+
+    .concern.open .c-body {
+      display: block
+    }
+
+    .principles {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin: 24px 0
+    }
+
+    .principle {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card)
+    }
+
+    .principle .num {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--sapphire);
+      font-weight: 500;
+      flex-shrink: 0;
+      margin-top: 1px
+    }
+
+    .principle .ptext {
+      font-size: 13px;
+      font-weight: 500
+    }
+
+    .principle .pdesc {
+      font-size: 12px;
+      color: var(--muted-fg);
+      margin-top: 2px;
+      font-weight: 400
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .fu {
+      animation: fadeUp 0.5s ease both
+    }
+
+    .fu:nth-child(1) {
+      animation-delay: .05s
+    }
+
+    .fu:nth-child(2) {
+      animation-delay: .15s
+    }
+
+    .fu:nth-child(3) {
+      animation-delay: .25s
+    }
+
+    .fu:nth-child(4) {
+      animation-delay: .35s
+    }
+
+    .fu:nth-child(5) {
+      animation-delay: .45s
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, .95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border)
+    }
+
+    .nav-inner {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 0 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      height: 56px
+    }
+
+    .nav-brand {
+      display: inline-flex;
+      align-items: center;
+      line-height: 0;
+      flex-shrink: 0
+    }
+
+    .nav-brand svg {
+      display: block;
+      height: 28px;
+      width: auto
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2px;
+      list-style: none;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      min-width: 0;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      -webkit-overflow-scrolling: touch
+    }
+
+    .nav-links::-webkit-scrollbar {
+      display: none
+    }
+
+    .nav-links a {
+      font-size: 12px;
+      color: var(--muted-fg);
+      text-decoration: none;
+      padding: 5px 9px;
+      border-radius: 6px;
+      transition: all .15s;
+      white-space: nowrap
+    }
+
+    .nav-links a:hover {
+      color: var(--aperia-blue);
+      background: var(--muted)
+    }
+
+    .nav-burger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 6px;
+      border: none;
+      background: transparent;
+      flex-shrink: 0
+    }
+
+    .nav-burger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--aperia-blue);
+      border-radius: 2px;
+      transition: all .25s
+    }
+
+    .nav-burger.open span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg)
+    }
+
+    .nav-burger.open span:nth-child(2) {
+      opacity: 0
+    }
+
+    .nav-burger.open span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg)
+    }
+
+    .nav-drawer {
+      display: none;
+      position: fixed;
+      top: 56px;
+      left: 0;
+      right: 0;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      z-index: 99;
+      box-shadow: 0 8px 24px rgba(0, 47, 103, .1)
+    }
+
+    .nav-drawer.open {
+      display: block
+    }
+
+    .nav-drawer ul {
+      list-style: none;
+      padding: 12px 20px 16px
+    }
+
+    .nav-drawer ul li a {
+      display: block;
+      padding: 10px 12px;
+      font-size: 14px;
+      color: var(--fg);
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 500
+    }
+
+    .nav-drawer ul li a:hover {
+      background: var(--muted);
+      color: var(--aperia-blue)
+    }
+
+    .hero {
+      padding: 0;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(120deg, var(--aperia-blue) 0%, var(--dark-blue) 55%, var(--sapphire) 130%);
+      position: relative;
+      overflow: hidden
+    }
+
+    .hero-inner {
+      padding: 90px 0 80px;
+      position: relative;
+      z-index: 1
+    }
+
+    .hero .eyebrow {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--sky-blue);
+      margin-bottom: 20px
+    }
+
+    .hero h1 {
+      font-size: clamp(28px, 4.4vw, 46px);
+      font-weight: 700;
+      line-height: 1.12;
+      letter-spacing: -.02em;
+      max-width: 640px;
+      margin-bottom: 18px;
+      color: #fff
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      color: var(--sky-blue);
+      font-weight: 400
+    }
+
+    .hero-sub {
+      font-size: 15px;
+      color: #cfe0f0;
+      max-width: 540px;
+      line-height: 1.7;
+      font-weight: 300
+    }
+
+    .hero-shape {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+      width: auto;
+      z-index: 0;
+      opacity: 1
+    }
+
+    .hero-meta {
+      display: flex;
+      gap: 24px;
+      margin-top: 32px;
+      flex-wrap: wrap
+    }
+
+    .hero-meta div {
+      font-size: 12px;
+      color: #9fbedb
+    }
+
+    .hero-meta strong {
+      display: block;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 2px;
+      font-family: var(--mono)
+    }
+
+    footer {
+      padding: 44px 0;
+      text-align: center;
+      background: var(--aperia-blue)
+    }
+
+    footer .fbrand {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 12px;
+      line-height: 0
+    }
+
+    footer .fbrand svg {
+      display: block;
+      height: 32px;
+      width: auto
+    }
+
+    footer p {
+      font-size: 12px;
+      color: #9fbedb;
+      font-family: var(--mono)
+    }
+
+    /* ===== MINI DEMO COMPONENTS ===== */
+    .demo {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      padding: 18px 20px;
+      margin: 26px 0
+    }
+
+    .demo-title {
+      font-family: var(--mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--sapphire);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px
+    }
+
+    .demo-title::before {
+      content: '▸';
+      color: var(--sky-blue)
+    }
+
+    .demo-stage {
+      background: var(--light-gray);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      gap: 10px;
+      min-height: 200px;
+      align-items: stretch
+    }
+
+    .mini {
+      background: #fff;
+      border: 1.5px solid transparent;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex: 1;
+      min-width: 0;
+      box-shadow: 0 2px 10px rgba(0, 47, 103, .10)
+    }
+
+    @keyframes growPanel {
+      from {
+        flex-grow: .02;
+        opacity: 0
+      }
+    }
+
+    .p-new {
+      animation: growPanel .4s cubic-bezier(.2, .8, .3, 1) both
+    }
+
+    .col-new {
+      animation: growPanel .4s cubic-bezier(.2, .8, .3, 1) both
+    }
+
+    @keyframes swapPanel {
+      from {
+        opacity: 0;
+        transform: translateX(10px)
+      }
+    }
+
+    @keyframes focusPulse {
+      0% {
+        box-shadow: 0 0 0 3px var(--sky-blue)
+      }
+
+      100% {
+        box-shadow: 0 0 0 0 rgba(126, 211, 247, 0)
+      }
+    }
+
+    .p-focus {
+      animation: focusPulse .9s ease both
+    }
+
+    .p-swap {
+      animation: swapPanel .3s ease both
+    }
+
+    .mini-head {
+      font-family: var(--mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--muted-fg);
+      padding: 6px 9px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .mini-head .crumb {
+      color: var(--sapphire)
+    }
+
+    .mini-body {
+      padding: 8px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 11px;
+      overflow: hidden
+    }
+
+    .mini-nav {
+      background: #fff;
+      border: 1.5px solid transparent;
+      border-radius: 6px;
+      flex: 0 0 76px;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 6px;
+      font-family: var(--mono);
+      font-size: 9px;
+      box-shadow: 0 2px 10px rgba(0, 47, 103, .10)
+    }
+
+    .mini-nav .nv-title {
+      color: var(--med-gray);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      font-size: 8px;
+      padding: 2px 4px
+    }
+
+    .mini-nav .nv-item {
+      padding: 4px 6px;
+      border-radius: 4px;
+      color: var(--muted-fg);
+      cursor: default
+    }
+
+    .mini-nav .nv-item.active {
+      background: #eaf3fb;
+      color: var(--sapphire);
+      font-weight: 500
+    }
+
+    .slot {
+      flex: 1;
+      min-width: 0;
+      border: 1.5px dashed var(--med-gray);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--med-gray);
+      font-family: var(--mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      text-align: center;
+      padding: 8px
+    }
+
+    .bub {
+      border-radius: 10px;
+      padding: 6px 9px;
+      font-size: 11px;
+      max-width: 88%;
+      line-height: 1.45;
+      animation: popIn .3s ease both
+    }
+
+    .bub.user {
+      background: var(--aperia-blue);
+      color: #fff;
+      align-self: flex-end;
+      border-bottom-right-radius: 3px
+    }
+
+    .bub.bot {
+      background: var(--light-gray);
+      color: var(--fg);
+      align-self: flex-start;
+      border-bottom-left-radius: 3px
+    }
+
+    .mrow {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 10px;
+      background: #fff;
+      transition: all .35s ease;
+      overflow: hidden;
+      max-height: 32px
+    }
+
+    .mrow .amt {
+      font-family: var(--mono);
+      color: var(--aperia-blue);
+      font-weight: 600
+    }
+
+    .mrow.hot {
+      border-color: var(--sapphire);
+      background: #eafaff
+    }
+
+    .mrow.gone {
+      opacity: 0;
+      max-height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      border-width: 0;
+      margin: -3px 0
+    }
+
+    .mstat {
+      text-align: left;
+      padding: 4px 2px
+    }
+
+    .mstat .v {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--aperia-blue);
+      font-family: var(--mono);
+      line-height: 1.1
+    }
+
+    .mstat .l {
+      font-size: 9px;
+      color: var(--muted-fg);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      font-family: var(--mono)
+    }
+
+    .mbars {
+      display: flex;
+      align-items: flex-end;
+      gap: 3px;
+      height: 34px;
+      margin-top: auto
+    }
+
+    .mbars i {
+      flex: 1;
+      background: var(--sapphire);
+      border-radius: 2px 2px 0 0;
+      opacity: .85
+    }
+
+    .demo-btns {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 14px
+    }
+
+    .chip {
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 7px 14px;
+      border-radius: 100px;
+      border: 1px solid var(--sapphire);
+      color: var(--sapphire);
+      background: #fff;
+      cursor: pointer;
+      transition: all .15s
+    }
+
+    .chip:hover {
+      background: #eafaff
+    }
+
+    .chip:active {
+      transform: scale(.97)
+    }
+
+    .chip.reset {
+      border-color: var(--border);
+      color: var(--muted-fg)
+    }
+
+    .chip.reset:hover {
+      background: var(--muted)
+    }
+
+    .chip .n {
+      font-family: var(--mono);
+      font-size: 10px;
+      opacity: .7;
+      margin-right: 5px
+    }
+
+    .chip:disabled {
+      opacity: .35;
+      cursor: default;
+      border-color: var(--border);
+      color: var(--muted-fg);
+      background: #fff
+    }
+
+    .suggs {
+      margin-top: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+      padding-top: 4px
+    }
+
+    .sugg {
+      border: 1px solid #bbf7d0;
+      color: #15803d;
+      background: #f0fdf4;
+      border-radius: 100px;
+      padding: 3px 9px;
+      font-size: 10px;
+      cursor: pointer;
+      transition: background .15s;
+      line-height: 1.4
+    }
+
+    .sugg:hover {
+      background: #dcfce7
+    }
+
+    body.mode-manual .demo-stage .sugg {
+      border-color: var(--sky-blue);
+      color: var(--sapphire);
+      background: #eafaff
+    }
+
+    body.mode-manual .demo-stage .sugg:hover {
+      background: #d5f0fd
+    }
+
+    .mini-x-btn {
+      cursor: pointer
+    }
+
+    .mini-x-btn:hover {
+      color: var(--danger)
+    }
+
+    .mrow.clickable {
+      cursor: pointer
+    }
+
+    .mrow.clickable:hover {
+      border-color: var(--warning)
+    }
+
+    .mwidget.clickable:hover {
+      border-color: var(--warning)
+    }
+
+    .bub.user.linkable {
+      cursor: pointer
+    }
+
+    .bub.user.linkable:hover {
+      text-decoration: underline
+    }
+
+    .chip:disabled:hover {
+      background: #fff
+    }
+
+    .nv-click {
+      cursor: pointer;
+      transition: background .15s
+    }
+
+    .nv-click:hover {
+      background: var(--muted)
+    }
+
+    .ptabs {
+      display: inline-flex;
+      gap: 4px;
+      margin: 26px 0 14px;
+      padding: 4px;
+      background: var(--light-gray);
+      border: 1px solid var(--border);
+      border-radius: 12px
+    }
+
+    .ptab {
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 10px 26px;
+      border-radius: 9px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--muted-fg);
+      cursor: pointer;
+      transition: background .15s, color .15s
+    }
+
+    .ptab.active {
+      background: #fff;
+      border-color: var(--border);
+      color: var(--aperia-blue);
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgba(0, 47, 103, .12)
+    }
+
+    .chip.on {
+      background: var(--sapphire);
+      color: #fff;
+      border-color: var(--sapphire)
+    }
+
+    .tgl {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: var(--sans);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted-fg);
+      padding: 4px 0
+    }
+
+    .tgl-track {
+      width: 26px;
+      height: 14px;
+      border-radius: 100px;
+      background: var(--med-gray);
+      position: relative;
+      transition: background .2s;
+      flex-shrink: 0
+    }
+
+    .tgl-knob {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #fff;
+      transition: left .2s
+    }
+
+    .tgl.on .tgl-track {
+      background: var(--sapphire)
+    }
+
+    .tgl.on .tgl-knob {
+      left: 14px
+    }
+
+    .tgl-div {
+      color: var(--border);
+      font-weight: 400
+    }
+
+    .dot-ind {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted-fg)
+    }
+
+    .dot-ind::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--med-gray);
+      flex-shrink: 0;
+      transition: background .2s
+    }
+
+    .dot-ind.d-on {
+      color: var(--dark-blue)
+    }
+
+    .dot-ind.d-on::before {
+      background: var(--sapphire)
+    }
+
+    body.shift-held .demo-stage .sugg,
+    body.shift-held .demo-stage .mrow.clickable,
+    body.shift-held .demo-stage .mwidget.clickable {
+      outline: 2px dashed var(--sapphire);
+      outline-offset: 1px
+    }
+
+    #ptip {
+      position: fixed;
+      z-index: 999;
+      display: none;
+      transform: translate(-50%, -100%);
+      background: var(--aperia-blue);
+      color: #fff;
+      font-size: 11px;
+      font-family: var(--sans);
+      font-weight: 500;
+      padding: 5px 10px;
+      border-radius: 6px;
+      box-shadow: 0 4px 14px rgba(0, 47, 103, .3);
+      pointer-events: none;
+      white-space: nowrap;
+      line-height: 1.4
+    }
+
+    #ptip.on {
+      background: var(--sapphire)
+    }
+
+    #ptip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: var(--aperia-blue)
+    }
+
+    #ptip.on::after {
+      border-top-color: var(--sapphire)
+    }
+
+    .demo-note {
+      font-size: 12px;
+      color: var(--muted-fg);
+      margin-top: 12px;
+      min-height: 20px;
+      line-height: 1.5
+    }
+
+    .anat-col {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 0
+    }
+
+    .anat-label {
+      visibility: hidden;
+      opacity: 0;
+      font-family: var(--mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      color: var(--sapphire);
+      align-self: flex-start;
+      background: currentColor;
+      -webkit-text-fill-color: #fff;
+      border: 1.5px solid currentColor;
+      border-bottom: none;
+      border-radius: 7px 7px 0 0;
+      padding: 0 6px;
+      height: 17px;
+      display: flex;
+      align-items: center;
+      margin-bottom: -12px;
+      position: relative;
+      z-index: 2;
+      transition: opacity .2s ease
+    }
+
+    .anat-col .anat-label:not(:first-child) {
+      margin-top: -15px
+    }
+
+    body.labels-on .anat-label {
+      visibility: visible;
+      opacity: 1
+    }
+
+    body.labels-on .anat-label+.mini,
+    body.labels-on .anat-label+.mini-nav,
+    body.labels-on .anat-label+.slot {
+      border-top-left-radius: 0
+    }
+
+    .mini-input {
+      padding: 6px 9px;
+      border-top: 1px solid var(--border);
+      font-size: 10px;
+      color: var(--med-gray)
+    }
+
+    .mini-x {
+      float: right;
+      color: var(--med-gray);
+      font-size: 16px;
+      line-height: 1;
+      padding: 0 2px;
+      margin-top: -2px
+    }
+
+    .mwidget {
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 6px 8px;
+      background: #fff;
+      min-width: 0
+    }
+
+    .mwidget .mbars i {
+      background: var(--sapphire)
+    }
+
+    .mini-sub {
+      font-family: var(--mono);
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: var(--med-gray);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
+    }
+
+    .mv {
+      font-family: var(--mono);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--aperia-blue);
+      line-height: 1.2;
+      margin-top: 2px
+    }
+
+    body.labels-on .sec-nav {
+      border: 1.5px solid var(--med-gray)
+    }
+
+    body.labels-on .sec-pri {
+      border: 1.5px solid var(--aperia-blue)
+    }
+
+    body.labels-on .sec-sup {
+      border: 1.5px solid var(--success)
+    }
+
+    body.labels-on .sec-det {
+      border: 1.5px solid var(--warning)
+    }
+
+    .sec-dot {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 2px;
+      margin-right: 7px;
+      vertical-align: baseline
+    }
+
+    .demo-note strong {
+      color: var(--aperia-blue)
+    }
+
+    @keyframes popIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px) scale(.97)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1)
+      }
+    }
+
+    @media(max-width:700px) {
+      .wrap {
+        padding: 0 16px
+      }
+
+      .nav-inner {
+        padding: 0 16px
+      }
+
+      .nav-links {
+        display: none
+      }
+
+      .nav-burger {
+        display: flex
+      }
+
+      .g2,
+      .g3,
+      .principles {
+        grid-template-columns: 1fr
+      }
+
+      .hero-inner {
+        padding: 70px 0 60px
+      }
+
+      .demo-stage {
+        min-height: 170px
+      }
+
+      .mini-body {
+        padding: 6px;
+        gap: 4px
+      }
+
+      .bub {
+        font-size: 10px
+      }
+
+      .mini-nav {
+        flex: 0 0 58px
+      }
+
+      .anat-nav {
+        flex: 0 0 84px !important
+      }
+
+      .anat-label {
+        font-size: 8px
+      }
+    }
+
+    @media print {
+      nav {
+        display: none
+      }
+
+      section {
+        page-break-inside: avoid
+      }
+
+      .hero-shape {
+        display: none
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <a href="#" class="nav-brand" aria-label="Aperia home">
+        <svg width="108" height="32" viewBox="0 0 135 40" fill="none" xmlns="http://www.w3.org/2000/svg" role="img"
+          aria-label="Aperia">
+          <g clip-path="url(#clip0_nav)">
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M22.9449 25.9157L25.7618 32.8812H32.9321L19.6159 1.63916H13.3163L0 32.8812H7.01664L9.83355 25.9157H22.9449ZM12.292 19.9234L16.3893 9.83377L20.5378 19.9234H12.292Z"
+              fill="#002F67" />
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M41.4854 29.8082C43.1243 31.7032 45.3266 33.3421 48.9118 33.3421C54.5456 33.3421 59.7184 28.9887 59.7184 21.1014V20.999C59.7184 13.0604 54.4432 8.70703 48.9118 8.70703C45.3779 8.70703 43.1243 10.346 41.4854 12.5483V9.11676H34.7249V40.0002H41.4854V29.8082ZM47.2216 14.392C50.3458 14.392 53.0091 17.0041 53.0091 20.9477V21.0502C53.0091 25.045 50.3458 27.6059 47.2216 27.6059C44.0462 27.6059 41.4342 24.9938 41.4342 21.0502V20.9477C41.4342 17.0041 44.0974 14.392 47.2216 14.392Z"
+              fill="#002F67" />
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M68.0154 23.3549H84.5583C84.6096 22.7403 84.6096 22.3305 84.5583 21.6647V21.5623C84.5583 14.8017 80.922 8.65576 72.9834 8.65576C66.0692 8.65576 61.2549 14.2896 61.2549 21.0501V21.1526C61.2549 28.4253 66.5302 33.4445 73.6493 33.4445C77.9514 33.4445 81.1781 31.7544 83.3804 28.9887L79.5391 25.5572C77.6953 27.2985 76.0564 28.0156 73.8029 28.0156C70.8323 28.0156 68.6813 26.4278 68.0154 23.3549ZM67.9643 19.1551C68.4764 16.0821 70.269 14.0847 73.0859 14.0847C75.9028 14.0847 77.6954 16.1333 78.1051 19.1551H67.9643Z"
+              fill="#002F67" />
+            <path
+              d="M101.357 15.7234C96.9015 15.7234 94.1358 18.4379 94.1358 24.1229V32.8809H87.3752V9.1165H94.1358V13.8796C95.5186 10.6018 97.721 8.45069 101.716 8.65555V15.7234H101.357Z"
+              fill="#002F67" />
+            <path d="M104.021 32.8811V9.1167H110.781V32.8811H104.021Z" fill="#002F67" />
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M128.809 30.32V32.8808H135.314V19.1036C135.314 12.6504 132.087 8.86035 124.712 8.86035C120.666 8.86035 118.105 9.6286 115.493 10.7554L117.183 15.877C119.334 15.1088 121.178 14.5966 123.739 14.5966C127.119 14.5966 128.861 16.1331 128.861 18.95V19.3597C127.17 18.7963 125.48 18.3866 123.073 18.3866C117.439 18.3866 113.496 20.7938 113.496 25.9666V26.0691C113.496 30.781 117.183 33.3418 121.639 33.3418C124.917 33.3418 127.17 32.1126 128.809 30.32ZM124.661 22.4327C126.3 22.4327 127.785 22.7912 128.963 23.3034V24.5326C128.963 26.9398 126.812 28.6811 123.688 28.6811C121.485 28.6811 120 27.6056 120 25.813V25.7106C120 23.6107 121.793 22.4327 124.661 22.4327Z"
+              fill="#002F67" />
+            <ellipse cx="107.401" cy="3.53393" rx="3.53393" ry="3.53393" fill="#002F67" />
+          </g>
+          <defs>
+            <clipPath id="clip0_nav">
+              <rect width="135" height="40" fill="white" />
+            </clipPath>
+          </defs>
+        </svg>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#summary">Summary</a></li>
+        <li><a href="#layout">Anatomy</a></li>
+        <li><a href="#intents">Interactions</a></li>
+        <li><a href="#tests">Tests</a></li>
+        <li><a href="#open-questions">Open</a></li>
+      </ul>
+      <button class="nav-burger" id="burger" aria-label="Menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+  <div class="nav-drawer" id="drawer">
+    <ul>
+      <li><a href="#summary">01 · Summary</a></li>
+      <li><a href="#layout">02 · Anatomy</a></li>
+      <li><a href="#intents">03 · Interactions</a></li>
+      <li><a href="#tests">04 · Ship Tests</a></li>
+      <li><a href="#open-questions">05 · Open Questions</a></li>
+    </ul>
+  </div>
+
+  <header class="hero">
+    <svg class="hero-shape" viewBox="0 0 406.1 283.3" preserveAspectRatio="xMaxYMin meet" aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="heroPatA" x1="279.9" y1="319.7" x2="397.4" y2="-3.1" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#002f67" />
+          <stop offset="1" stop-color="#004583" />
+        </linearGradient>
+        <linearGradient id="heroPatB" x1="174.1" y1="306.1" x2="252.7" y2="90.3" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#002f67" />
+          <stop offset="1" stop-color="#0072bc" />
+        </linearGradient>
+      </defs>
+      <path fill="url(#heroPatA)" d="M406.6,283.3h-226.8l84.9-212.2C281.9,28.1,323.6-.2,369.9-.2L406.1,0l.5,283.3Z" />
+      <path fill="url(#heroPatB)" d="M247.4,283.3H111.3l50.9-127.3c10.3-25.8,35.3-42.8,63.2-42.8h90l-68,170.1Z" />
+    </svg>
+    <div class="wrap">
+      <div class="hero-inner">
+        <p class="eyebrow">Ask Nanci · Product Principles · July 2026</p>
+        <h1>The Panel Model<br><em style="font-size:clamp(18px,2.2vw,26px)">Four Parts, Three Triggers, One
+            Cascade</em></h1>
+        <p class="hero-sub">No panel appears that the user did not ask for, and how they asked never matters:
+          typing and clicking express the same intent, and the same intent always does the same thing. Click along with
+          the demos below.</p>
+        <div class="hero-meta">
+          <div>Scope<strong>Standalone + Embedded</strong></div>
+          <div>Status<strong>Production Vision</strong></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <section id="summary">
+    <div class="wrap">
+      <p class="sec-label">01 · Summary</p>
+      <h2>Two Pillars Carry The Whole Model</h2>
+      <p class="sec-intro">One says what a panel is, the other says why anything on screen ever changes. Everything else
+        in this report follows from them.</p>
+      <div class="g2">
+        <div class="card fu">
+          <div class="mb-3"><span class="badge b-blue">Definition</span></div>
+          <h3>A Panel Is A Surface The User Works On</h3>
+          <p>It opens beside what they are doing, never over it, so they can use both surfaces at once without leaving
+            either.</p>
+        </div>
+        <div class="card fu">
+          <div class="mb-3"><span class="badge b-amber">Intention</span></div>
+          <h3>Intent Decides What Happens Next</h3>
+          <p>Every change on screen is a user intent, and each intent has exactly one outcome, so nothing moves unless
+            the user meant it to.</p>
+        </div>
+      </div>
+      <h3 style="margin-top:26px">First Question: Page, Modal, or Panel?</h3>
+      <table class="stack-table">
+        <thead>
+          <tr>
+            <th style="width:55%">Do you still need what is on screen?</th>
+            <th>Use</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>No</td>
+            <td>A new page</td>
+          </tr>
+          <tr>
+            <td>Yes, but this must be handled first</td>
+            <td>A modal</td>
+          </tr>
+          <tr>
+            <td>Yes, and the user works between the two</td>
+            <td>A panel</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="demo-note">A panel opens beside its origin, never over it. The origin stays usable.</p>
+    </div>
+  </section>
+
+  <section id="layout">
+    <div class="wrap">
+      <p class="sec-label">02 · Anatomy</p>
+      <h2>Four Parts, One Layout</h2>
+      <p class="sec-intro">A navigation sidebar, then up to three panels in a row. Any page can sit in Primary, and each
+        panel is opened from the one before it.</p>
+
+      <div class="demo-btns" style="margin:26px 0 0">
+        <button class="tgl lbl-t" onclick="pLabels()"><span class="tgl-track"><span
+              class="tgl-knob"></span></span>Anatomy markers</button>
+      </div>
+      <div class="demo-stage" style="min-height:320px; margin:10px 0 0">
+        <div class="anat-col anat-nav" style="flex:0 0 108px">
+          <div class="anat-label" style="color:var(--dark-gray)">Navigation</div>
+          <div class="mini-nav sec-nav" style="flex:1">
+            <div class="nv-title">Menu</div>
+            <div class="nv-item active">Ask Nanci</div>
+            <div class="nv-item">Dashboard</div>
+            <div class="nv-item">Risk</div>
+          </div>
+        </div>
+        <div class="anat-col" style="flex:1.1">
+          <div class="anat-label" style="color:var(--aperia-blue)">Primary</div>
+          <div class="mini sec-pri" style="flex:1">
+            <div class="mini-head">Ask Nanci</div>
+            <div class="mini-body">
+              <div class="bub user">Show me held deposits</div>
+              <div class="bub bot">Here they are.</div>
+            </div>
+            <div class="mini-input">Ask anything…</div>
+          </div>
+        </div>
+        <div class="anat-col" style="flex:1.2">
+          <div class="anat-label" style="color:var(--success)">Secondary</div>
+          <div class="mini sec-sup" style="flex:1">
+            <div class="mini-head">Held Deposits · 3 <span class="mini-x">✕</span></div>
+            <div class="mini-body">
+              <div class="mrow hot"><span>Jul 14</span><span class="amt">$15,750</span></div>
+              <div class="mrow"><span>Jul 12</span><span class="amt">$12,400</span></div>
+              <div class="mrow"><span>Jul 09</span><span class="amt">$8,200</span></div>
+            </div>
+          </div>
+          <div class="anat-label" style="color:var(--warning)">Tertiary</div>
+          <div class="mini sec-det" style="flex:1">
+            <div class="mini-head"><span class="crumb">Jul 14 ▸</span> Batch #4417 <span class="mini-x">✕</span></div>
+            <div class="mini-body">
+              <div class="mstat">
+                <div class="v">$9,300</div>
+                <div class="l">14 transactions</div>
+              </div>
+              <div class="mrow"><span>Card present</span><span class="amt">11</span></div>
+              <div class="mrow"><span>Keyed</span><span class="amt">3</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="demo-note">Every panel has a header (title, breadcrumb, close) over a body. Secondary and Tertiary share
+        the right column, stacked; the parent sits above its child, and the parent-child order is what the model means
+        by left to right. When Ask Nanci is summoned onto a page instead, it sits in Secondary; the layout never
+        changes, only who sits where.</p>
+
+      <table class="stack-table">
+        <thead>
+          <tr>
+            <th style="width:120px">Part</th>
+            <th>What it holds</th>
+            <th style="width:180px">Opens by</th>
+            <th style="width:200px">Closes by</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="layer-name"><i class="sec-dot" style="background:var(--med-gray)"></i>Navigation</div>
+              <div class="layer-tool">not a panel</div>
+            </td>
+            <td>The product's pages, with Ask Nanci among them</td>
+            <td>Always there</td>
+            <td>Never</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="layer-name"><i class="sec-dot" style="background:var(--aperia-blue)"></i>Primary</div>
+            </td>
+            <td>The page picked from the menu: any page of the product, or Ask Nanci</td>
+            <td>A navigate: a menu click, or an ask that means take me somewhere. Pages load fresh; Ask Nanci resumes
+              its conversation</td>
+            <td>Never closes. Only a navigate replaces it, which also clears everything beside it</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="layer-name"><i class="sec-dot" style="background:var(--success)"></i>Secondary</div>
+            </td>
+            <td>Whatever is opened from Primary: a report the chat opened, a record clicked in a page's list, or Ask
+              Nanci itself when summoned onto a page</td>
+            <td>A click or an ask inside Primary</td>
+            <td>Its ✕, a menu click, or a new open from Primary replacing it. Takes Tertiary with it</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="layer-name"><i class="sec-dot" style="background:var(--warning)"></i>Tertiary</div>
+            </td>
+            <td>Whatever is opened from Secondary: a record's line items, an item's history. Going deeper replaces it
+              and grows the breadcrumb</td>
+            <td>A click or an ask inside Secondary</td>
+            <td>Its ✕, or anything that closes or replaces a panel to its left</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="intents">
+    <div class="wrap">
+      <p class="sec-label">03 · Interactions</p>
+      <h2>Play The Model, Then Read The Rules</h2>
+      <p class="sec-intro">Every way of opening something is one of three triggers: navigate, summon, or drill. The
+        behavior binds to the trigger, never to who fired it, so Ask Nanci and any product feature emitting the same
+        trigger behave identically, with no coordination between teams. Play first; the triggers and rules below cover
+        every case.</p>
+
+      <div class="ptabs">
+        <button class="ptab active" id="ptab-triggers" onclick="pMode('triggers')">Foundation</button>
+        <button class="ptab" id="ptab-manual" onclick="pMode('manual')">Experimental</button>
+      </div>
+      <div class="demo-stage" style="min-height:300px; margin:0">
+        <div class="anat-col anat-nav" style="flex:0 0 118px">
+          <div class="anat-label" style="color:var(--dark-gray)">Navigation</div>
+          <div class="mini-nav sec-nav" style="flex:1">
+            <div class="nv-title">Menu</div>
+            <div class="nv-item nv-click active" id="dB-nav-nanci" onclick="pNav(event,'chat')" data-tip>Ask Nanci</div>
+            <div class="nv-item nv-click" id="dB-nav-um" onclick="pNav(event,'um')" data-tip>User Mgmt</div>
+            <div class="nv-item nv-click" id="dB-nav-dash" onclick="pNav(event,'dash')" data-tip>Dashboard</div>
+          </div>
+        </div>
+        <div id="dB-chain" style="display:flex; gap:10px; flex:1; min-width:0"></div>
+      </div>
+      <div class="demo-btns" style="justify-content:space-between; align-items:flex-start">
+        <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-start">
+          <button class="tgl lbl-t" onclick="pLabels()"><span class="tgl-track"><span
+                class="tgl-knob"></span></span>Anatomy markers</button>
+          <button class="tgl" id="pshift" onclick="pLatch()" style="display:none"><span class="tgl-track"><span
+                class="tgl-knob"></span></span>Simulate holding Shift<span class="tgl-div">|</span><span class="dot-ind"
+              id="pshift-status">clicks load in place</span></button>
+        </div>
+        <button class="chip reset" onclick="pReset()">Reset Prototype</button>
+      </div>
+      <h3 id="pmode-heading" style="margin-top:26px">How This Mode Works</h3>
+      <p class="demo-note" id="dB-note">Three moves. Opening puts things in the next panel over, ✕ closes a panel and
+        everything after it, and the rest just updates in place. The breadcrumb shows the path that no longer fits;
+        click a step to go back.</p>
+
+      <div id="triggers-content">
+        <table class="stack-table" style="margin-top:12px">
+          <thead>
+            <tr>
+              <th style="width:110px">Trigger</th>
+              <th style="width:210px">Means</th>
+              <th>What happens</th>
+              <th style="width:210px">The way back</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge b-blue">Navigate</span></td>
+              <td>Take me somewhere</td>
+              <td>Replaces Primary and clears everything beside it. The only trigger that may touch Primary, which is
+                what protects the conversation while you work from it. High bar: it changes what the user is looking at
+              </td>
+              <td>The menu's own selected state</td>
+            </tr>
+            <tr>
+              <td><span class="badge b-green">Summon</span></td>
+              <td>Give me this alongside what I am doing</td>
+              <td>Opens a panel beside, additive. Never touches Primary</td>
+              <td>Triggered conversationally, it leaves a card in the thread; the thread is the trail back</td>
+            </tr>
+            <tr>
+              <td><span class="badge b-amber">Drill</span></td>
+              <td>Go deeper on this thing in front of me</td>
+              <td>Stacks a child below its parent, anchored to it, and closes with it. It stacks while there is room;
+                when full, the deepest panel refreshes in place and the breadcrumb extends</td>
+              <td>The parent it came from, or a breadcrumb step</td>
+            </tr>
+          </tbody>
+        </table>
+        <h3 style="margin-top:26px">The Four Rules Of Getting Around</h3>
+        <div class="principles">
+          <div class="principle"><span class="num">01</span>
+            <div>
+              <div class="ptext">Forward Only</div>
+              <div class="pdesc">A panel can change itself and the panels after it, never the panels before it. So
+                inside a panel you can only go deeper; new things open from the conversation or the menu. Navigate is
+                the only exception, because you asked to go somewhere else.</div>
+            </div>
+          </div>
+          <div class="principle"><span class="num">02</span>
+            <div>
+              <div class="ptext">Room Is Limited</div>
+              <div class="pdesc">Only a few panels fit on screen. When there is no room left, going deeper uses the last
+                panel again, and the breadcrumb remembers your path.</div>
+            </div>
+          </div>
+          <div class="principle"><span class="num">03</span>
+            <div>
+              <div class="ptext">Always A Way Back</div>
+              <div class="pdesc">You can always bring a view back: click your old message, or use the breadcrumb. It
+                comes back with live data, not an old copy.</div>
+            </div>
+          </div>
+          <div class="principle"><span class="num">04</span>
+            <div>
+              <div class="ptext">Never Opens By Itself</div>
+              <div class="pdesc">A panel never opens or closes by itself. Nanci can send a message with a button, but
+                only your click opens the panel.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="manual-content" style="display:none">
+        <table class="stack-table" style="margin-top:12px">
+          <thead>
+            <tr>
+              <th style="width:220px">You do</th>
+              <th>What happens</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Plain click</td>
+              <td>Loads in the panel you clicked, like a web page. The breadcrumb is that panel's history</td>
+            </tr>
+            <tr>
+              <td>Hold Shift and click, or the ⇧ toggle</td>
+              <td>Opens it as a panel beside or below instead. You decide the placement, never the system</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="callout amber"><strong>An experiment in user-controlled placement, not the model.</strong> The
+          system never guesses where things should open; the modifier decides. The open question is discoverability:
+          side-by-side work only happens when the user knows the key, which is why the tooltip, the ⇧ chip, and the
+          held-Shift highlight exist.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="tests">
+    <div class="wrap">
+      <p class="sec-label">04 · Ship Tests</p>
+      <h2>Check Every Panel Before It Ships</h2>
+      <p class="sec-intro">A panel that fails one of these should not exist as drawn.</p>
+      <table class="stack-table">
+        <thead>
+          <tr>
+            <th style="width:48%">Test</th>
+            <th>If It Fails</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="layer-name">Reachable from the product's own menu?</div>
+            </td>
+            <td>Open the real screen; do not rebuild it</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="layer-name">Question answerable in one plain sentence?</div>
+            </td>
+            <td>No panel. Answer in the conversation and offer the details. The words decide, never the answer size: a
+              "show me" still earns a panel, enriched past the bare number</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="layer-name">Did the user ask for what is on screen?</div>
+            </td>
+            <td>It should not be there. A panel never opens by itself</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="layer-name">Does a designed screen or panel already exist for it?</div>
+            </td>
+            <td>Nothing exists to open. Answer in conversation; take the gap to the design backlog</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="layer-name">Can the user bring it back through a message or a breadcrumb?</div>
+            </td>
+            <td>It breaks Always A Way Back. Give it a message card or a breadcrumb step before it ships</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="layer-name">Does anything inside it open a new topic?</div>
+            </td>
+            <td>Move that to the conversation or the menu. Inside a panel you can only go deeper (Forward Only)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="open-questions">
+    <div class="wrap">
+      <p class="sec-label">05 · Open Questions</p>
+      <h2>Not Decided Yet</h2>
+      <p class="sec-intro">Honest gaps, kept in the open so nobody mistakes an undecided area for a rule.</p>
+      <div class="concerns">
+        <div class="concern">
+          <div class="c-hdr">
+            <div class="c-left">
+              <div class="c-icon">?</div>
+              <div class="c-title">The designed panels at launch</div>
+            </div><span class="chevron">▼</span>
+          </div>
+          <div class="c-body">Every panel is designed by a person before it ships. Which ones exist on day one, and who approves adding a new one.</div>
+        </div>
+        <div class="concern">
+          <div class="c-hdr">
+            <div class="c-left">
+              <div class="c-icon">?</div>
+              <div class="c-title">The details-offer button's form</div>
+            </div><span class="chevron">▼</span>
+          </div>
+          <div class="c-body">It is a button on the message; its exact look is undecided.</div>
+        </div>
+        <div class="concern">
+          <div class="c-hdr">
+            <div class="c-left">
+              <div class="c-icon">?</div>
+              <div class="c-title">Closing Ask Nanci when it is Primary</div>
+            </div><span class="chevron">▼</span>
+          </div>
+          <div class="c-body">Whether the Ask Nanci panel can be closed at all when it holds the Primary Part.</div>
+        </div>
+        <div class="concern">
+          <div class="c-hdr">
+            <div class="c-left">
+              <div class="c-icon">?</div>
+              <div class="c-title">Liveness, and disappearing records</div>
+            </div><span class="chevron">▼</span>
+          </div>
+          <div class="c-body">How a panel shows it is live, and what it does when its record disappears. Until decided:
+            keep the last good state and say the problem in the conversation.</div>
+        </div>
+        <div class="concern">
+          <div class="c-hdr">
+            <div class="c-left">
+              <div class="c-icon">?</div>
+              <div class="c-title">Whether a reopened view replays later filters</div>
+            </div><span class="chevron">▼</span>
+          </div>
+          <div class="c-body">Bringing a view back re-runs the request live. Whether it also replays the narrowing the
+            user did afterwards is the open question; the conversation records it, so the information exists.</div>
+        </div>
+        <div class="concern">
+          <div class="c-hdr">
+            <div class="c-left">
+              <div class="c-icon">?</div>
+              <div class="c-title">The phone breakpoint</div>
+            </div><span class="chevron">▼</span>
+          </div>
+          <div class="c-body">The screen width where the layout switches to one Part at a time.</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <div class="fbrand">
+        <svg width="135" height="40" viewBox="0 0 135 40" fill="none" xmlns="http://www.w3.org/2000/svg" role="img"
+          aria-label="Aperia">
+          <g clip-path="url(#clip0_ftr)">
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M22.9449 25.9157L25.7618 32.8812H32.9321L19.6159 1.63916H13.3163L0 32.8812H7.01664L9.83355 25.9157H22.9449ZM12.292 19.9234L16.3893 9.83377L20.5378 19.9234H12.292Z"
+              fill="#FFFFFF" />
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M41.4854 29.8082C43.1243 31.7032 45.3266 33.3421 48.9118 33.3421C54.5456 33.3421 59.7184 28.9887 59.7184 21.1014V20.999C59.7184 13.0604 54.4432 8.70703 48.9118 8.70703C45.3779 8.70703 43.1243 10.346 41.4854 12.5483V9.11676H34.7249V40.0002H41.4854V29.8082ZM47.2216 14.392C50.3458 14.392 53.0091 17.0041 53.0091 20.9477V21.0502C53.0091 25.045 50.3458 27.6059 47.2216 27.6059C44.0462 27.6059 41.4342 24.9938 41.4342 21.0502V20.9477C41.4342 17.0041 44.0974 14.392 47.2216 14.392Z"
+              fill="#FFFFFF" />
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M68.0154 23.3549H84.5583C84.6096 22.7403 84.6096 22.3305 84.5583 21.6647V21.5623C84.5583 14.8017 80.922 8.65576 72.9834 8.65576C66.0692 8.65576 61.2549 14.2896 61.2549 21.0501V21.1526C61.2549 28.4253 66.5302 33.4445 73.6493 33.4445C77.9514 33.4445 81.1781 31.7544 83.3804 28.9887L79.5391 25.5572C77.6953 27.2985 76.0564 28.0156 73.8029 28.0156C70.8323 28.0156 68.6813 26.4278 68.0154 23.3549ZM67.9643 19.1551C68.4764 16.0821 70.269 14.0847 73.0859 14.0847C75.9028 14.0847 77.6954 16.1333 78.1051 19.1551H67.9643Z"
+              fill="#FFFFFF" />
+            <path
+              d="M101.357 15.7234C96.9015 15.7234 94.1358 18.4379 94.1358 24.1229V32.8809H87.3752V9.1165H94.1358V13.8796C95.5186 10.6018 97.721 8.45069 101.716 8.65555V15.7234H101.357Z"
+              fill="#FFFFFF" />
+            <path d="M104.021 32.8811V9.1167H110.781V32.8811H104.021Z" fill="#FFFFFF" />
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M128.809 30.32V32.8808H135.314V19.1036C135.314 12.6504 132.087 8.86035 124.712 8.86035C120.666 8.86035 118.105 9.6286 115.493 10.7554L117.183 15.877C119.334 15.1088 121.178 14.5966 123.739 14.5966C127.119 14.5966 128.861 16.1331 128.861 18.95V19.3597C127.17 18.7963 125.48 18.3866 123.073 18.3866C117.439 18.3866 113.496 20.7938 113.496 25.9666V26.0691C113.496 30.781 117.183 33.3418 121.639 33.3418C124.917 33.3418 127.17 32.1126 128.809 30.32ZM124.661 22.4327C126.3 22.4327 127.785 22.7912 128.963 23.3034V24.5326C128.963 26.9398 126.812 28.6811 123.688 28.6811C121.485 28.6811 120 27.6056 120 25.813V25.7106C120 23.6107 121.793 22.4327 124.661 22.4327Z"
+              fill="#FFFFFF" />
+            <ellipse cx="107.401" cy="3.53393" rx="3.53393" ry="3.53393" fill="#FFFFFF" />
+          </g>
+          <defs>
+            <clipPath id="clip0_ftr">
+              <rect width="135" height="40" fill="white" />
+            </clipPath>
+          </defs>
+        </svg>
+      </div>
+      <p>The Panel Model · Ask Nanci Product Principles · July 2026</p>
+    </div>
+  </footer>
+
+  <div id="ptip"></div>
+  <script>
+    // Accordion
+    document.querySelectorAll('.c-hdr').forEach(hdr => {
+      hdr.addEventListener('click', () => hdr.closest('.concern').classList.toggle('open'));
+    });
+
+    // Mobile nav drawer
+    const burger = document.getElementById('burger');
+    const drawer = document.getElementById('drawer');
+    burger.addEventListener('click', () => {
+      const open = drawer.classList.toggle('open');
+      burger.classList.toggle('open', open);
+      burger.setAttribute('aria-expanded', open);
+    });
+    drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      drawer.classList.remove('open');
+      burger.classList.remove('open');
+      burger.setAttribute('aria-expanded', false);
+    }));
+
+    function el(html) { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstChild; }
+
+    // ---- The Playground: root + chain + three primitives ----
+    const dBChain = document.getElementById('dB-chain');
+    const dBNote = document.getElementById('dB-note');
+    const NAVS = { chat: 'dB-nav-nanci', um: 'dB-nav-um', dash: 'dB-nav-dash' };
+    const DEFAULT_NOTE = 'Three moves. Opening puts things in the next panel over, ✕ closes a panel and everything after it, and the rest just updates in place. The breadcrumb shows the path that no longer fits; click a step to go back.';
+    const MANUAL_NOTE = 'You decide, and everything is a link. A plain click loads in place, and the breadcrumb is its history. Hold Shift while clicking (or toggle the ⇧ chip, for touch) to open it as a panel instead. The menu is no different.';
+    let chain;
+    function note(h) { dBNote.innerHTML = h; }
+    function hasChat() { return chain.some(e => e.id === 'chat'); }
+    function askChip(fromId) { return hasChat() ? '' : '<div class="suggs"><span class="sugg" onclick="pFrom(event,&quot;' + fromId + '&quot;,&quot;chat&quot;)">Ask Nanci</span></div>'; }
+    const DEFS = {
+      chat: {
+        title: 'Ask Nanci',
+        body: e => {
+          const ci = chain.findIndex(x => x.id === 'chat');
+          const child = chain[ci + 1];
+          const childId = child ? (child.trail && child.trail.length ? child.trail[0] : child.id) : null;
+          const pills = [
+            ['deposits', 'Show me held deposits'],
+            ['um', 'Open User Management'],
+            ['dash', 'Show my dashboard']
+          ].filter(p => p[0] !== childId)
+            .map(p => '<span class="sugg" onclick="pChat(event,&quot;' + p[0] + '&quot;)">' + p[1] + '</span>')
+            .join('');
+          return '<div class="bub bot">Hi! What do you want to look at?</div>' +
+            (childId ? '<div class="bub user">' + { deposits: 'Show me held deposits', um: 'Open User Management', dash: 'Show my dashboard' }[childId] + '</div>' : '') +
+            '<div class="suggs">' + pills + '</div>';
+        }
+      },
+      deposits: {
+        title: 'Held Deposits · 3',
+        body: e => '<div class="mrow clickable" onclick="pFrom(event,&quot;deposits&quot;,&quot;jul14&quot;)"><span>Jul 14</span><span class="amt">$15,750</span></div>' +
+          '<div class="mrow"><span>Jul 12</span><span class="amt">$12,400</span></div>' +
+          '<div class="mrow"><span>Jul 09</span><span class="amt">$8,200</span></div>'
+      },
+      jul14: {
+        title: 'Deposit · Jul 14',
+        body: e => '<div class="mstat"><div class="v">$15,750</div><div class="l">Held · 2 batches</div></div>' +
+          '<div class="mrow clickable" onclick="pFrom(event,&quot;jul14&quot;,&quot;batch&quot;)"><span>Batch #4417</span><span class="amt">$9,300</span></div>' +
+          '<div class="mrow"><span>Batch #4418</span><span class="amt">$6,450</span></div>'
+      },
+      batch: {
+        title: 'Batch #4417',
+        body: e => '<div class="mstat"><div class="v">$9,300</div><div class="l">14 transactions</div></div>' +
+          '<div class="mrow"><span>Card present</span><span class="amt">11</span></div>' +
+          '<div class="mrow"><span>Keyed</span><span class="amt">3</span></div>'
+      },
+      um: {
+        title: 'User Management',
+        body: e => '<div class="mrow clickable" onclick="pFrom(event,&quot;um&quot;,&quot;user&quot;)"><span>D. Alvarez</span><span class="amt" style="color:var(--danger)">Locked</span></div>' +
+          '<div class="mrow"><span>M. Chen</span><span class="amt">Active</span></div>' +
+          '<div class="mrow"><span>T. Okafor</span><span class="amt">Active</span></div>' + askChip('um')
+      },
+      user: {
+        title: 'D. Alvarez',
+        body: e => '<div class="mstat"><div class="v" style="font-size:14px">Locked · 3 failed attempts</div><div class="l">Admin · since 2023</div></div>' +
+          '<div class="mrow clickable" onclick="pFrom(event,&quot;user&quot;,&quot;activity&quot;)"><span>Login activity</span><span class="amt">→</span></div>' +
+          '<div class="mrow"><span>Permissions</span><span class="amt">7</span></div>'
+      },
+      activity: {
+        title: 'Activity · D. Alvarez',
+        body: e => '<div class="mrow"><span>Jul 27 · failed login</span><span class="amt" style="color:var(--danger)">✗</span></div>' +
+          '<div class="mrow"><span>Jul 27 · failed login</span><span class="amt" style="color:var(--danger)">✗</span></div>' +
+          '<div class="mrow"><span>Jul 26 · password reset</span><span class="amt">✓</span></div>'
+      },
+      dash: {
+        title: 'Dashboard',
+        body: e => '<div style="display:flex; gap:6px">' +
+          '<div class="mwidget" style="flex:1"><div class="mini-sub">Volume · Jul</div><div class="mv">$1.2M</div></div>' +
+          '<div class="mwidget" style="flex:1"><div class="mini-sub">Approval</div><div class="mv" style="color:var(--success)">96.4%</div></div>' +
+          '</div>' +
+          '<div class="mwidget clickable" onclick="pFrom(event,&quot;dash&quot;,&quot;deposits&quot;)" style="cursor:pointer"><div class="mini-sub">Held deposits · click to open</div><div class="mv">3</div></div>' + askChip('dash')
+      }
+    };
+    const SHORT = { chat: 'Ask Nanci', deposits: 'Deposits', jul14: 'Jul 14', batch: 'Batch #4417', um: 'User Mgmt', user: 'D. Alvarez', activity: 'Activity', dash: 'Dashboard' };
+    let prevKeys = [];
+    function keyOf(e) { return e.id + (e.trail ? '.' + e.trail.join('.') : ''); }
+    function panelHtml(i, anim) {
+      const e = chain[i];
+      const cls = ['sec-pri', 'sec-sup', 'sec-det'][i] + (anim ? ' ' + anim : '') + (i === focusIdx ? ' p-focus' : '');
+      let head = '';
+      (e.trail || []).forEach((t, k) => { head += '<span class="crumb" style="cursor:pointer" onclick="pTrail(' + i + ',' + k + ')">' + SHORT[t] + ' ▸</span> '; });
+      head += DEFS[e.id].title;
+      if (i > 0) head += '<span class="mini-x mini-x-btn" onclick="pClose(' + i + ')">✕</span>';
+      let out = '<div class="mini ' + cls + '" style="flex:1"><div class="mini-head">' + head + '</div><div class="mini-body">' + DEFS[e.id].body(e) + '</div></div>';
+      if (mode === 'manual') {
+        out = out.replace(/class="sugg"/g, 'class="sugg" data-tip')
+          .replace(/class="mrow clickable"/g, 'class="mrow clickable" data-tip')
+          .replace(/class="mwidget clickable"/g, 'class="mwidget clickable" data-tip');
+      }
+      return out;
+    }
+    function label(i) {
+      const c = ['var(--aperia-blue)', 'var(--success)', 'var(--warning)'][i];
+      const t = ['Primary', 'Secondary · opened from Primary', 'Tertiary · opened from Secondary'][i];
+      return '<div class="anat-label" style="color:' + c + '">' + t + '</div>';
+    }
+    function render() {
+      for (const k in NAVS) document.getElementById(NAVS[k]).classList.toggle('active', chain[0].id === k);
+      const keys = chain.map(keyOf);
+      const anim = i => (i >= prevKeys.length ? 'p-new' : (prevKeys[i] !== keys[i] ? 'p-swap' : ''));
+      const colNew = prevKeys.length <= 1 && chain.length > 1 ? ' col-new' : '';
+      let h = '<div class="anat-col" style="flex:1.1; min-width:0">' + label(0) + panelHtml(0, anim(0)) + '</div>';
+      if (chain.length > 1) h += '<div class="anat-col' + colNew + '" style="flex:1.2; min-width:0">' + label(1) + panelHtml(1, colNew ? '' : anim(1)) + (chain[2] ? label(2) + panelHtml(2, anim(2)) : '') + '</div>';
+      dBChain.innerHTML = h;
+      prevKeys = keys;
+    }
+    function push(from, id, kind) {
+      let crumbed = false;
+      chain = chain.slice(0, from + 1);
+      if (chain.length === 3) {
+        const old = chain[2];
+        chain = chain.slice(0, 2);
+        chain.push({ id: id, trail: (old.trail || []).concat([old.id]) });
+        crumbed = true;
+      } else {
+        chain.push({ id: id });
+      }
+      render();
+      if (kind === 'summon') {
+        note('<strong>Summon.</strong> ' + SHORT[id] + ' opened alongside what you are doing. Primary was not touched, and anything past the panel you acted in closed first.');
+      } else {
+        note('<strong>Drill.</strong> ' + SHORT[id] + ' opened below its parent, anchored to it.' + (crumbed ? ' No room left, so the deepest panel refreshed in place and the breadcrumb grew.' : ' Close the parent and it goes too.'));
+      }
+    }
+    let focusIdx = -1;
+    let mode = 'triggers', shiftLatch = false, shiftDown = false, labelsOn = false;
+    function pLabels() {
+      labelsOn = !labelsOn;
+      document.body.classList.toggle('labels-on', labelsOn);
+      document.querySelectorAll('.lbl-t').forEach(b => b.classList.toggle('on', labelsOn));
+    }
+    function updShiftUI() {
+      const on = mode === 'manual' && (shiftLatch || shiftDown);
+      document.getElementById('pshift').classList.toggle('on', mode === 'manual' && shiftLatch);
+      const st = document.getElementById('pshift-status');
+      st.textContent = on ? 'opens in new panel' : 'clicks load in place';
+      st.className = on ? 'dot-ind d-on' : 'dot-ind';
+      document.body.classList.toggle('shift-held', on);
+    }
+    const pTip = document.getElementById('ptip');
+    let tipTarget = null;
+    function tipText() { return (shiftLatch || shiftDown) ? '⇧ Opens in a new panel' : 'Click loads in place · hold ⇧ Shift to open in a new panel'; }
+    function refreshTip() {
+      if (!tipTarget) return;
+      const custom = tipTarget.getAttribute('data-tip');
+      pTip.textContent = custom || tipText();
+      pTip.classList.toggle('on', shiftLatch || shiftDown);
+      const r = tipTarget.getBoundingClientRect();
+      pTip.style.left = (r.left + r.width / 2) + 'px';
+      pTip.style.top = (r.top - 8) + 'px';
+    }
+    document.addEventListener('mouseover', e => {
+      if (mode !== 'manual') return;
+      const t = e.target.closest ? e.target.closest('[data-tip]') : null;
+      if (t) { tipTarget = t; pTip.style.display = 'block'; refreshTip(); }
+    });
+    document.addEventListener('mouseout', e => {
+      const t = e.target.closest ? e.target.closest('[data-tip]') : null;
+      if (t && t === tipTarget) { tipTarget = null; pTip.style.display = 'none'; }
+    });
+    document.addEventListener('click', () => { tipTarget = null; pTip.style.display = 'none'; });
+    document.addEventListener('keydown', e => { if (e.key === 'Shift') { shiftDown = true; updShiftUI(); refreshTip(); } });
+    document.addEventListener('keyup', e => { if (e.key === 'Shift') { shiftDown = false; updShiftUI(); refreshTip(); } });
+    window.addEventListener('blur', () => { shiftDown = false; updShiftUI(); });
+    function wantPanel(ev) { return mode === 'triggers' ? true : ((ev && (ev.shiftKey || ev.metaKey || ev.ctrlKey)) || shiftLatch || shiftDown); }
+    function pFrom(ev, fromId, id) {
+      const kind = (id === 'chat' || fromId === 'chat') ? 'summon' : 'drill';
+      const from = chain.findIndex(x => x.id === fromId);
+      if (mode === 'manual' && !wantPanel(ev)) {
+        const e = chain[from];
+        const trail = (e.trail || []).concat([e.id]);
+        chain = chain.slice(0, from);
+        chain.push({ id: id, trail: trail });
+        render();
+        note('<strong>In place.</strong> ' + SHORT[id] + ' loaded in the panel you clicked, like a web page; its breadcrumb is the history. Hold Shift while clicking to open it as a panel instead.');
+        return;
+      }
+      const ex = chain.findIndex(x => x.id === id);
+      if (mode === 'triggers' && ex !== -1 && ex <= from) {
+        focusIdx = ex; render(); focusIdx = -1;
+        note('<strong>Already open.</strong> ' + SHORT[id] + ' is on screen, so nothing new opens: you just go to it. One copy of a thing, ever.');
+        return;
+      }
+      push(from, id, kind);
+    }
+    function pChat(ev, id) { pFrom(ev, 'chat', id); }
+    function pMode(m) {
+      mode = m;
+      document.getElementById('ptab-triggers').classList.toggle('active', m === 'triggers');
+      document.getElementById('ptab-manual').classList.toggle('active', m === 'manual');
+      document.getElementById('pshift').style.display = m === 'manual' ? '' : 'none';
+      document.body.classList.toggle('mode-manual', m === 'manual');
+      document.getElementById('pmode-heading').textContent = 'How This Mode Works';
+      document.getElementById('triggers-content').style.display = m === 'manual' ? 'none' : '';
+      document.getElementById('manual-content').style.display = m === 'manual' ? '' : 'none';
+      tipTarget = null; pTip.style.display = 'none';
+      shiftLatch = false; updShiftUI();
+      pReset();
+    }
+    function pLatch() {
+      shiftLatch = !shiftLatch;
+      updShiftUI();
+    }
+    function pClose(i) { chain = chain.slice(0, i); render(); note('<strong>Close.</strong> That panel closed and took everything opened from it. The panels before it did not move.'); }
+    function pTrail(i, k) {
+      const e = chain[i];
+      const id = e.trail[k];
+      const trail = e.trail.slice(0, k);
+      chain = chain.slice(0, i);
+      chain.push(trail.length ? { id: id, trail: trail } : { id: id });
+      render();
+      note('<strong>Back.</strong> The breadcrumb reopened that view with today’s data. You are back at ' + SHORT[id] + '.');
+    }
+    function pNav(ev, pageId) {
+      if (mode === 'manual' && wantPanel(ev)) {
+        chain = [chain[0], { id: pageId }];
+        render();
+        note('<strong>Opened as a panel, straight from the menu.</strong> Shift makes any link open beside instead of loading. The menu is a link like any other.');
+        return;
+      }
+      chain = [{ id: pageId }];
+      render();
+      note(mode === 'manual'
+        ? '<strong>Loaded.</strong> A plain click loads the page; the menu is a link like any other.'
+        : '<strong>Navigate.</strong> Primary reloads and everything else closes. Pages reload fresh; Ask Nanci is the one exception: it always resumes.');
+    }
+    function pReset() { chain = [{ id: 'chat' }]; render(); note(mode === 'manual' ? MANUAL_NOTE : DEFAULT_NOTE); }
+    pReset();
+  </script>
+</body>
+
+</html>
