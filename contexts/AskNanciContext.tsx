@@ -166,6 +166,10 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   // Manual-stepping playback: the active scripted flow and the index of the next
   // turn to play. A flow advances one step per suggestion-pill click, never auto-runs.
   const activeFlowRef = useRef<{ key: string; script: ConceptScriptedTurn[]; cursor: number } | null>(null)
+  // Reentrancy guard for runConceptStep: a step reads activeFlowRef.cursor at the top and
+  // only writes it back at the end, so a second pill click mid-step would replay the same
+  // cursor and interleave two runs. While a step is in flight, further calls are no-ops.
+  const isAdvancingRef = useRef<boolean>(false)
   const sessionIdRef = useRef<string>(newSessionId())
 
   useEffect(() => {
@@ -318,28 +322,41 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const playScripted = useCallback((prompt: string) => {
     const script = SCRIPTED_CONVERSATIONS[prompt]
     if (!script) return
+    // Same reset the concept players do before a run: a previous startNewChat/stopAnimation
+    // left the stop refs raised, and this playback owns them from here.
+    scriptStopRef.current = false
+    stopRef.current = false
     setThinking((prev) => ({ ...prev, label: "Updating your account…" }))
     setView("chat")
     setMessages([])
     setChatState("idle")
     setPendingBot(null)
 
+    // startNewChat raises both refs; either one ends this playback.
+    const shouldStop = () => scriptStopRef.current || stopRef.current
+
     const streamText = (turn: typeof script[number], id: string) =>
-      streamWords(turn.content, { id, extra: turn.map ? { map: turn.map } : undefined })
+      streamWords(turn.content, { id, extra: turn.map ? { map: turn.map } : undefined, shouldStop })
 
     const run = async () => {
       for (let i = 0; i < script.length; i++) {
+        if (shouldStop()) break
         const turn = script[i]
         if (turn.role === "user") {
           await sleep(i === 0 ? 1000 : 1800)
+          if (shouldStop()) break
           setMessages((prev) => [...prev, { id: newSessionId(), role: "user" as const, content: turn.content }])
           setChatState("thinking")
         } else {
           await sleep(1800)
+          if (shouldStop()) break
           await streamText(turn, newSessionId())
           if (i === script.length - 1) { setChatState("idle"); setThinking({ source: null, label: "Thinking…" }) }
         }
       }
+      // Bail leaves the thinking indicator up and (mid-stream) a partial bubble —
+      // clear both, the same way sendMessage's run() bails.
+      if (shouldStop()) { setChatState("idle"); setPendingBot(null) }
     }
 
     run()
@@ -434,39 +451,47 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const runConceptStep = useCallback(async () => {
     const flow = activeFlowRef.current
     if (!flow) return
-    const { script } = flow
-    scriptStopRef.current = false
-    let i = flow.cursor
+    // A step is already in flight — the pill it started from is still on screen for the
+    // first 250ms, so a second click must not replay the same cursor.
+    if (isAdvancingRef.current) return
+    isAdvancingRef.current = true
+    try {
+      const { script } = flow
+      scriptStopRef.current = false
+      let i = flow.cursor
 
-    // Leading user turn — appears immediately, as if the merchant just sent it.
-    if (script[i]?.role === "user") {
-      const turn = script[i]
-      await sleep(250)
-      if (scriptStopRef.current) return
-      setMessages((prev) => [...withClearedSuggestions(prev), { id: newSessionId(), role: "user" as const, content: turn.content }])
-      applyTurnEffects(turn)
-      if (turn.pauseAfter) await sleep(turn.pauseAfter)
-      setChatState("thinking")
-      i++
+      // Leading user turn — appears immediately, as if the merchant just sent it.
+      if (script[i]?.role === "user") {
+        const turn = script[i]
+        await sleep(250)
+        if (scriptStopRef.current) return
+        setMessages((prev) => [...withClearedSuggestions(prev), { id: newSessionId(), role: "user" as const, content: turn.content }])
+        applyTurnEffects(turn)
+        if (turn.pauseAfter) await sleep(turn.pauseAfter)
+        setChatState("thinking")
+        i++
+      }
+
+      // Stream the assistant turn(s) up to the next user turn (or end of script).
+      while (i < script.length && script[i].role === "assistant") {
+        const turn = script[i]
+        await sleep(turn.widget ? 1200 : 1000)
+        if (scriptStopRef.current) return
+        const nextIsUser = script[i + 1]?.role === "user"
+        // The pill is the authored suggestions if present, else the next user question.
+        const suggestions = turn.suggestions ?? (nextIsUser ? [script[i + 1].content] : undefined)
+        await playAssistantTurn(turn, suggestions)
+        i++
+        // Stop unless the next turn is another consecutive assistant turn.
+        if (script[i]?.role !== "assistant") break
+      }
+
+      // Park at the next user turn (wait for the pill click) or end the flow.
+      activeFlowRef.current = script[i]?.role === "user" ? { key: flow.key, script, cursor: i } : null
+      setChatState("idle")
+    } finally {
+      isAdvancingRef.current = false
     }
-
-    // Stream the assistant turn(s) up to the next user turn (or end of script).
-    while (i < script.length && script[i].role === "assistant") {
-      const turn = script[i]
-      await sleep(turn.widget ? 1200 : 1000)
-      if (scriptStopRef.current) return
-      const nextIsUser = script[i + 1]?.role === "user"
-      // The pill is the authored suggestions if present, else the next user question.
-      const suggestions = turn.suggestions ?? (nextIsUser ? [script[i + 1].content] : undefined)
-      await playAssistantTurn(turn, suggestions)
-      i++
-      // Stop unless the next turn is another consecutive assistant turn.
-      if (script[i]?.role !== "assistant") break
-    }
-
-    // Park at the next user turn (wait for the pill click) or end the flow.
-    activeFlowRef.current = script[i]?.role === "user" ? { key: flow.key, script, cursor: i } : null
-    setChatState("idle")
   }, [playAssistantTurn, applyTurnEffects])
 
   // Auto-play (non-manual flows): run the whole script start to finish, advancing

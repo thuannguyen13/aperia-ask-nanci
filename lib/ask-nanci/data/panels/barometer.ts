@@ -1,15 +1,3 @@
-// The one assignment both the Detection Queue and its Barometer Report describe.
-export const ASSIGNMENT = {
-  name: "High Velocity Watch",
-  date: "05/24/2026",
-  generalInfo: [
-    { label: "Assignment Name",         value: "High Velocity Watch" },
-    { label: "Assignment Type",         value: "DQ" },
-    { label: "Eligible Merchant Count", value: "14" },
-    { label: "Percent Worked",          value: "0%" },
-  ],
-}
-
 export const STATUS_ROWS = [
   { label: "Alerted",          count: 14, amount: "$380,000.00" },
   { label: "Ready to Work",    count: 11, amount: "$290,000.00" },
@@ -17,6 +5,22 @@ export const STATUS_ROWS = [
   { label: "Worked",           count: 0,  amount: "$0.00"       },
   { label: "Requeue",          count: 2,  amount: "$52,000.00"  },
 ]
+
+// The status rows are the breakdown of the eligible population, so the total is the
+// eligible count — derived, because the two used to be edited apart and drifted (14 vs 30).
+export const eligibleMerchantCount = STATUS_ROWS.reduce((total, row) => total + row.count, 0)
+
+// The one assignment both the Detection Queue and its Barometer Report describe.
+export const ASSIGNMENT = {
+  name: "High Velocity Watch",
+  date: "05/24/2026",
+  generalInfo: [
+    { label: "Assignment Name",         value: "High Velocity Watch" },
+    { label: "Assignment Type",         value: "DQ" },
+    { label: "Eligible Merchant Count", value: String(eligibleMerchantCount) },
+    { label: "Percent Worked",          value: "0%" },
+  ],
+}
 
 export const MERCHANT_ROWS = [
   { id: "00078166655", name: "Coastal Merchant Solutions",  score: 89, status: "Alerted",          amount: "$42,000.00",  delta: "+45" },

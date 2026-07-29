@@ -2,7 +2,7 @@
 
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { FLAGS, criticalCount, mediumCount, FLAG_SEVERITY_CLS } from "@/lib/ask-nanci/data/panels/risk-flags"
+import { FLAGS, flagCount, criticalCount, mediumCount, FLAG_SEVERITY_CLS } from "@/lib/ask-nanci/data/panels/risk-flags"
 import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
 
 export function RiskFlagsPanel() {
@@ -21,7 +21,7 @@ export function RiskFlagsPanel() {
       {/* Score strip */}
       <div className="flex shrink-0 items-center gap-4 border-b bg-red-50/50 dark:bg-red-950/10 px-4 py-2">
         <div className="flex items-center gap-1.5">
-          <span className="font-mono text-lg font-bold text-red-600 dark:text-red-400">6</span>
+          <span className="font-mono text-lg font-bold text-red-600 dark:text-red-400">{flagCount}</span>
           <span className="text-[9px] text-muted-foreground uppercase tracking-wide">flags</span>
         </div>
         <div className="h-4 w-px bg-border" />

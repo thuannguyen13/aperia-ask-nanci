@@ -90,7 +90,7 @@ export function BusinessLoanOfferPanel() {
           <SectionLabel>Request Info</SectionLabel>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <OfferField label="Requested Amount" value={LOAN_APPLICANT.requestedAmount} />
-            <OfferSelect label="Repayment Term" value={LOAN_APPLICANT.repaymentTerm} options={["4 weekly payments", "8 weekly payments", "12 weekly payments"]} placeholder="Select term" />
+            <OfferSelect label="Repayment Term" value={LOAN_APPLICANT.repaymentTerm} options={["6 monthly payments", "12 monthly payments", "24 monthly payments"]} placeholder="Select term" />
             <OfferSelect label="Purpose" value={LOAN_APPLICANT.purpose} options={["Payroll", "Inventory", "Equipment", "Other"]} placeholder="Select purpose" />
             <OfferField label="Avg. Monthly Revenue" value={LOAN_APPLICANT.avgMonthlyRevenue} readOnly />
             <div className="sm:col-span-2">

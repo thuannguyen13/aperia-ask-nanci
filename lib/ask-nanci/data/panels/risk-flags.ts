@@ -9,6 +9,7 @@ export const FLAGS = [
   { icon: MapPin,       label: "Address updated",        detail: "12 days ago · 831 Harbor Blvd",          severity: "medium"   as const },
 ]
 
+export const flagCount     = FLAGS.length
 export const criticalCount = FLAGS.filter(f => f.severity === "critical").length
 export const mediumCount   = FLAGS.filter(f => f.severity === "medium").length
 

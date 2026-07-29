@@ -28,7 +28,7 @@ export const LOAN_OFFERS: LoanOffer[] = [
 export const LOAN_SUGGESTED = {
   eyebrow: "Suggested for you",
   amount: "$4,500",
-  cadence: "· 4 weekly payments",
+  cadence: "· 12 monthly payments",
   why: "Covers Friday's payroll with $270 left over. First payment due after your invoices clear.",
   range: "Program range: $2,500–$5,000,000, terms up to 25 years. Final rate and terms confirmed at approval.",
 };
@@ -58,7 +58,7 @@ export const LOAN_APPLICANT = {
   email: "teresawalker@example.com",
   phone: "(214) 555-0148",
   requestedAmount: "$4,500",
-  repaymentTerm: "4 weekly payments",
+  repaymentTerm: "12 monthly payments",
   purpose: "Payroll",
   avgMonthlyRevenue: "$32,500",
   fundingAccount: "Business Mastercard ···· 4821",

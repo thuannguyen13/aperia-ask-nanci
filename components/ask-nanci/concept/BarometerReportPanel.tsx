@@ -2,7 +2,7 @@
 
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { ASSIGNMENT, STATUS_ROWS, MERCHANT_ROWS } from "@/lib/ask-nanci/data/panels/barometer"
+import { ASSIGNMENT, STATUS_ROWS, MERCHANT_ROWS, eligibleMerchantCount } from "@/lib/ask-nanci/data/panels/barometer"
 import { PanelShell, PanelHeader, ScoreBadge, PanelTable, Th, Td } from "@/components/ask-nanci/shared"
 
 export function BarometerReportPanel() {
@@ -69,7 +69,7 @@ export function BarometerReportPanel() {
         <div className="px-4 py-3 space-y-2">
           <div className="flex items-center justify-between">
             <p className="text-xs font-semibold text-foreground">Merchant Activity</p>
-            <span className="text-[10px] text-muted-foreground">Sorted by risk score</span>
+            <span className="text-[10px] text-muted-foreground">Top {MERCHANT_ROWS.length} of {eligibleMerchantCount} by risk score</span>
           </div>
 
           <PanelTable>

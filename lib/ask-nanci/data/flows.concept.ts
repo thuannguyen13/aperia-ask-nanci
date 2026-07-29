@@ -536,7 +536,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   // ── Flow 8: Bulk Action ───────────────────────────────────────────────────
   "Show me merchants with decline rates above 15% last week": [
     { role: "user", content: "Show me merchants with decline rates above 15% last week" },
-    { role: "assistant", content: "Found 38 merchants across 7 ISOs sorted by decline rate. Panel open — you can sort by column.", panel: "decline-report", suggestions: [CONCEPT_FLOW8_FOLLOWUP] },
+    { role: "assistant", content: "Found 38 merchants across 5 ISOs sorted by decline rate. Panel open — you can sort by column.", panel: "decline-report", suggestions: [CONCEPT_FLOW8_FOLLOWUP] },
   ],
   [CONCEPT_FLOW8_FOLLOWUP]: [
     { role: "user", content: CONCEPT_FLOW8_FOLLOWUP },
