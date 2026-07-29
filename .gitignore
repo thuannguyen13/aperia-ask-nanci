@@ -16,3 +16,6 @@ playwright-report/
 
 # Personal Claude Code notes (machine-local)
 CLAUDE.local.md
+
+# Editor settings (machine-local: absolute paths)
+.vscode/
