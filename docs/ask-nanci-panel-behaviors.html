@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ask Nanci — Panel & Chat Behavior Across Two Contexts</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --aperia-blue:#002F67; --dark-blue:#004785; --sapphire:#0072BC;
+  --sky-blue:#7ED3F7; --light-blue:#C8EAF5;
+  --black:#000000; --white:#FFFFFF; --dark-gray:#58595B; --med-gray:#A7A9AC; --light-gray:#F1F2F2;
+  --bg:#ffffff; --fg:#1c1f24; --muted:#F1F2F2; --muted-fg:#58595B;
+  --border:#e3e6ea; --card:#ffffff; --primary:var(--aperia-blue);
+  --success:#16a34a; --warning:#d97706; --danger:#dc2626;
+  --sans:'Inter', sans-serif; --mono:'JetBrains Mono', monospace;
+  --radius:8px; --shadow:0 1px 3px rgba(0,47,103,.08),0 1px 2px rgba(0,47,103,.05);
+}
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0 }
+html { scroll-behavior:smooth }
+body { font-family:var(--sans); font-weight:400; background:var(--bg); color:var(--fg); font-size:15px; line-height:1.65; -webkit-font-smoothing:antialiased }
+.wrap { max-width:920px; margin:0 auto; padding:0 36px }
+section { padding:72px 0; border-bottom:1px solid var(--border); position:relative }
+section:last-of-type { border-bottom:none }
+h2 { font-size:clamp(20px,3vw,28px); font-weight:600; line-height:1.2; letter-spacing:-.015em; margin-bottom:10px }
+h3 { font-size:14px; font-weight:600 }
+.sec-label { font-family:var(--mono); font-size:11px; color:var(--sapphire); letter-spacing:.08em; text-transform:uppercase; margin-bottom:12px; display:flex; align-items:center; gap:10px }
+.sec-label::after { content:''; flex:1; height:1px; background:var(--border); max-width:52px }
+.sec-intro { font-size:15px; color:var(--muted-fg); max-width:620px; margin-bottom:36px; line-height:1.7; font-weight:400 }
+.g2 { display:grid; grid-template-columns:repeat(2,1fr); gap:14px }
+.card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px 22px; box-shadow:var(--shadow) }
+.card h3 { font-size:14px; font-weight:600; margin-bottom:6px }
+.card p { font-size:13px; color:var(--muted-fg); line-height:1.65 }
+.mb-3 { margin-bottom:10px }
+.badge { display:inline-flex; align-items:center; font-size:11px; font-family:var(--mono); font-weight:500; padding:3px 9px; border-radius:100px; letter-spacing:.02em }
+.b-red { background:#fef2f2; color:#dc2626; border:1px solid #fecaca }
+.b-green { background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0 }
+.b-blue { background:#eaf3fb; color:var(--dark-blue); border:1px solid #bfdcf0 }
+.b-amber { background:#fffbeb; color:#b45309; border:1px solid #fde68a }
+.b-gray { background:var(--muted); color:var(--muted-fg); border:1px solid var(--border) }
+.b-sky { background:#eafaff; color:var(--sapphire); border:1px solid var(--sky-blue) }
+.callout { border-left:3px solid var(--primary); padding:13px 16px; background:#f4f8fc; border-radius:0 var(--radius) var(--radius) 0; font-size:13px; line-height:1.7; margin:16px 0; color:var(--muted-fg) }
+.callout strong { color:var(--primary) }
+.callout.amber { border-left-color:var(--warning); background:#fffbeb }
+.callout.amber strong { color:var(--warning) }
+.cmp-table { width:100%; border-collapse:collapse; font-size:13px; margin:26px 0 }
+.cmp-table th { text-align:left; padding:10px 14px; font-weight:600; font-size:11px; letter-spacing:.05em; text-transform:uppercase; background:var(--muted); border:1px solid var(--border); color:var(--muted-fg) }
+.cmp-table th.hl { background:#eaf3fb; color:var(--dark-blue); border-color:#bfdcf0 }
+.cmp-table td { padding:11px 14px; border:1px solid var(--border); vertical-align:top; line-height:1.5 }
+.cmp-table td.hl { background:#f6fafe }
+.cmp-table tr:hover td { background:var(--muted) }
+.cmp-table tr:hover td.hl { background:#eef5fc }
+.stack-table { width:100%; border-collapse:collapse; font-size:13px; margin:26px 0 }
+.stack-table th { text-align:left; padding:10px 14px; font-weight:600; font-size:11px; letter-spacing:.05em; text-transform:uppercase; background:var(--muted); border:1px solid var(--border); color:var(--muted-fg) }
+.stack-table td { padding:14px 16px; border:1px solid var(--border); vertical-align:top; line-height:1.55 }
+.stack-table tr:hover td { background:var(--muted) }
+.layer-name { font-weight:600; font-size:13px; margin-bottom:3px }
+.layer-tool { font-size:12px; color:var(--muted-fg); font-family:var(--mono) }
+.principles { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin:24px 0 }
+.principle { display:flex; gap:12px; align-items:flex-start; padding:14px 16px; border:1px solid var(--border); border-radius:var(--radius); background:var(--card) }
+.principle .num { font-family:var(--mono); font-size:11px; color:var(--sapphire); font-weight:500; flex-shrink:0; margin-top:1px }
+.principle .ptext { font-size:13px; font-weight:500 }
+.principle .pdesc { font-size:12px; color:var(--muted-fg); margin-top:2px; font-weight:400 }
+.flow { margin:24px 0; display:flex; flex-direction:column; gap:0 }
+.flow-step { display:flex; gap:16px; position:relative }
+.flow-step:not(:last-child) { padding-bottom:22px }
+.flow-rail { flex:0 0 44px; display:flex; flex-direction:column; align-items:center }
+.flow-node { width:44px; height:40px; border-radius:10px; background:var(--aperia-blue); color:#fff; display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:13px; font-weight:700; flex-shrink:0; box-shadow:0 2px 6px rgba(0,47,103,.2) }
+.flow-step:nth-child(2) .flow-node { background:var(--dark-blue) }
+.flow-step:nth-child(3) .flow-node { background:var(--sapphire) }
+.flow-step:nth-child(4) .flow-node { background:var(--med-gray); box-shadow:none }
+.flow-line { width:2px; flex:1; background:var(--border); margin:4px 0; min-height:14px }
+.flow-step:last-child .flow-line { display:none }
+.flow-body { flex:1; padding-top:7px; min-width:0 }
+.flow-title { font-size:14px; font-weight:600; margin-bottom:3px; display:flex; align-items:center; gap:10px; flex-wrap:wrap }
+.flow-formula { font-family:var(--mono); font-size:11px; color:var(--sapphire); background:#eafaff; border:1px solid var(--sky-blue); padding:2px 8px; border-radius:5px; font-weight:500 }
+.flow-desc { font-size:13px; color:var(--muted-fg); line-height:1.6 }
+.dark-panel { background:var(--aperia-blue); border-radius:12px; padding:30px; margin:24px 0; position:relative; overflow:hidden }
+.dark-panel h3 { font-size:15px; font-weight:600; color:#fff; margin-bottom:8px; position:relative; z-index:1 }
+.dark-panel > p { font-size:13px; color:#b9cde2; line-height:1.7; position:relative; z-index:1; max-width:600px }
+.dp-cols { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:16px; position:relative; z-index:1 }
+.dp-col { border:1px solid rgba(255,255,255,.18); border-radius:8px; padding:14px }
+.dp-label { font-size:10px; font-family:var(--mono); color:var(--sky-blue); margin-bottom:5px; letter-spacing:.07em; text-transform:uppercase }
+.dp-col p { font-size:13px; color:#dce8f3 }
+.dp-shape { position:absolute; top:0; right:0; height:100%; width:auto; max-width:55%; z-index:0; opacity:1 }
+.cta-box { background:var(--aperia-blue); border-radius:12px; padding:40px; margin:24px 0; text-align:left; position:relative; overflow:hidden }
+.cta-box h2 { font-size:clamp(20px,3vw,26px); font-weight:600; color:#fff; margin-bottom:10px; position:relative; z-index:1; max-width:520px }
+.cta-box p { font-size:14px; color:#b9cde2; max-width:520px; margin:0 0 24px; line-height:1.7; position:relative; z-index:1 }
+.cta-btns { display:flex; gap:10px; flex-wrap:wrap; position:relative; z-index:1 }
+.btn-w { padding:10px 26px; border-radius:100px; font-size:13px; font-weight:600; background:#fff; color:var(--aperia-blue); cursor:pointer; border:none; font-family:var(--sans) }
+.btn-o { padding:10px 26px; border-radius:100px; font-size:13px; font-weight:500; background:transparent; color:#dce8f3; border:1px solid rgba(255,255,255,.4); cursor:pointer; font-family:var(--sans) }
+.cta-shape { position:absolute; top:0; right:0; height:100%; width:auto; max-width:55%; z-index:0; opacity:1 }
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:translateY(0) } }
+.fu { animation:fadeUp 0.5s ease both }
+.fu:nth-child(1) { animation-delay:.05s } .fu:nth-child(2) { animation-delay:.15s }
+.fu:nth-child(3) { animation-delay:.25s } .fu:nth-child(4) { animation-delay:.35s }
+nav { position:sticky; top:0; z-index:100; background:rgba(255,255,255,.95); backdrop-filter:blur(12px); border-bottom:1px solid var(--border) }
+.nav-inner { max-width:920px; margin:0 auto; padding:0 36px; display:flex; align-items:center; justify-content:space-between; gap:16px; height:56px }
+.nav-brand { display:inline-flex; align-items:center; line-height:0; flex-shrink:0 }
+.nav-brand svg { display:block; height:28px; width:auto }
+.nav-links { display:flex; gap:2px; list-style:none; flex-wrap:nowrap; overflow-x:auto; min-width:0; scrollbar-width:none; -ms-overflow-style:none; -webkit-overflow-scrolling:touch }
+.nav-links::-webkit-scrollbar { display:none }
+.nav-links a { font-size:12px; color:var(--muted-fg); text-decoration:none; padding:5px 9px; border-radius:6px; transition:all .15s; white-space:nowrap }
+.nav-links a:hover { color:var(--aperia-blue); background:var(--muted) }
+.nav-burger { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:6px; border:none; background:transparent; flex-shrink:0 }
+.nav-burger span { display:block; width:22px; height:2px; background:var(--aperia-blue); border-radius:2px; transition:all .25s }
+.nav-burger.open span:nth-child(1) { transform:translateY(7px) rotate(45deg) }
+.nav-burger.open span:nth-child(2) { opacity:0 }
+.nav-burger.open span:nth-child(3) { transform:translateY(-7px) rotate(-45deg) }
+.nav-drawer { display:none; position:fixed; top:56px; left:0; right:0; background:#fff; border-bottom:1px solid var(--border); z-index:99; box-shadow:0 8px 24px rgba(0,47,103,.1) }
+.nav-drawer.open { display:block }
+.nav-drawer ul { list-style:none; padding:12px 20px 16px }
+.nav-drawer ul li a { display:block; padding:10px 12px; font-size:14px; color:var(--fg); text-decoration:none; border-radius:6px; font-weight:500 }
+.nav-drawer ul li a:hover { background:var(--muted); color:var(--aperia-blue) }
+.hero { padding:0; border-bottom:1px solid var(--border); background:linear-gradient(120deg, var(--aperia-blue) 0%, var(--dark-blue) 55%, var(--sapphire) 130%); position:relative; overflow:hidden }
+.hero-inner { padding:90px 0 80px; position:relative; z-index:1 }
+.hero .eyebrow { font-family:var(--mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--sky-blue); margin-bottom:20px }
+.hero h1 { font-size:clamp(28px,4.4vw,46px); font-weight:700; line-height:1.12; letter-spacing:-.02em; max-width:640px; margin-bottom:18px; color:#fff }
+.hero h1 em { font-style:normal; color:var(--sky-blue); font-weight:400 }
+.hero-sub { font-size:15px; color:#cfe0f0; max-width:560px; line-height:1.7; font-weight:300 }
+.hero-shape { position:absolute; top:0; right:0; height:100%; width:auto; z-index:0; opacity:1 }
+.hero-meta { display:flex; gap:24px; margin-top:32px; flex-wrap:wrap }
+.hero-meta div { font-size:12px; color:#9fbedb }
+.hero-meta strong { display:block; color:#fff; font-size:13px; font-weight:600; margin-top:2px; font-family:var(--mono) }
+footer { padding:44px 0; text-align:center; background:var(--aperia-blue) }
+footer .fbrand { display:flex; justify-content:center; margin-bottom:12px; line-height:0 }
+footer .fbrand svg { display:block; height:32px; width:auto }
+footer p { font-size:12px; color:#9fbedb; font-family:var(--mono) }
+@media(max-width:700px) {
+  .wrap { padding:0 16px }
+  .nav-inner { padding:0 16px }
+  .nav-links { display:none }
+  .nav-burger { display:flex }
+  .g2,.dp-cols,.principles { grid-template-columns:1fr }
+  .hero-inner { padding:70px 0 60px }
+  .cta-box { padding:28px 20px }
+  .dark-panel { padding:24px 20px }
+}
+@media print { nav { display:none } section { page-break-inside:avoid } .hero-shape,.cta-shape,.dp-shape { display:none } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-brand" aria-label="Aperia home">
+      <svg width="108" height="32" viewBox="0 0 135 40" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Aperia">
+        <g clip-path="url(#clip0_nav)">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M22.9449 25.9157L25.7618 32.8812H32.9321L19.6159 1.63916H13.3163L0 32.8812H7.01664L9.83355 25.9157H22.9449ZM12.292 19.9234L16.3893 9.83377L20.5378 19.9234H12.292Z" fill="#002F67"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M41.4854 29.8082C43.1243 31.7032 45.3266 33.3421 48.9118 33.3421C54.5456 33.3421 59.7184 28.9887 59.7184 21.1014V20.999C59.7184 13.0604 54.4432 8.70703 48.9118 8.70703C45.3779 8.70703 43.1243 10.346 41.4854 12.5483V9.11676H34.7249V40.0002H41.4854V29.8082ZM47.2216 14.392C50.3458 14.392 53.0091 17.0041 53.0091 20.9477V21.0502C53.0091 25.045 50.3458 27.6059 47.2216 27.6059C44.0462 27.6059 41.4342 24.9938 41.4342 21.0502V20.9477C41.4342 17.0041 44.0974 14.392 47.2216 14.392Z" fill="#002F67"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M68.0154 23.3549H84.5583C84.6096 22.7403 84.6096 22.3305 84.5583 21.6647V21.5623C84.5583 14.8017 80.922 8.65576 72.9834 8.65576C66.0692 8.65576 61.2549 14.2896 61.2549 21.0501V21.1526C61.2549 28.4253 66.5302 33.4445 73.6493 33.4445C77.9514 33.4445 81.1781 31.7544 83.3804 28.9887L79.5391 25.5572C77.6953 27.2985 76.0564 28.0156 73.8029 28.0156C70.8323 28.0156 68.6813 26.4278 68.0154 23.3549ZM67.9643 19.1551C68.4764 16.0821 70.269 14.0847 73.0859 14.0847C75.9028 14.0847 77.6954 16.1333 78.1051 19.1551H67.9643Z" fill="#002F67"/>
+          <path d="M101.357 15.7234C96.9015 15.7234 94.1358 18.4379 94.1358 24.1229V32.8809H87.3752V9.1165H94.1358V13.8796C95.5186 10.6018 97.721 8.45069 101.716 8.65555V15.7234H101.357Z" fill="#002F67"/>
+          <path d="M104.021 32.8811V9.1167H110.781V32.8811H104.021Z" fill="#002F67"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M128.809 30.32V32.8808H135.314V19.1036C135.314 12.6504 132.087 8.86035 124.712 8.86035C120.666 8.86035 118.105 9.6286 115.493 10.7554L117.183 15.877C119.334 15.1088 121.178 14.5966 123.739 14.5966C127.119 14.5966 128.861 16.1331 128.861 18.95V19.3597C127.17 18.7963 125.48 18.3866 123.073 18.3866C117.439 18.3866 113.496 20.7938 113.496 25.9666V26.0691C113.496 30.781 117.183 33.3418 121.639 33.3418C124.917 33.3418 127.17 32.1126 128.809 30.32ZM124.661 22.4327C126.3 22.4327 127.785 22.7912 128.963 23.3034V24.5326C128.963 26.9398 126.812 28.6811 123.688 28.6811C121.485 28.6811 120 27.6056 120 25.813V25.7106C120 23.6107 121.793 22.4327 124.661 22.4327Z" fill="#002F67"/>
+          <ellipse cx="107.401" cy="3.53393" rx="3.53393" ry="3.53393" fill="#002F67"/>
+        </g>
+        <defs><clipPath id="clip0_nav"><rect width="135" height="40" fill="white"/></clipPath></defs>
+      </svg>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#summary">01 · Summary</a></li>
+      <li><a href="#contexts">02 · Two Contexts</a></li>
+      <li><a href="#gates">03 · Gate Test</a></li>
+      <li><a href="#rules">04 · Open Rules</a></li>
+      <li><a href="#scenarios">05 · Interaction Scenarios</a></li>
+      <li><a href="#lifecycle">06 · Lifecycle</a></li>
+      <li><a href="#decisions">07 · Open Decisions</a></li>
+      <li><a href="#recommendation">08 · Recommendation</a></li>
+    </ul>
+    <button class="nav-burger" id="burger" aria-label="Menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<div class="nav-drawer" id="drawer">
+  <ul>
+    <li><a href="#summary">01 · Summary</a></li>
+    <li><a href="#contexts">02 · Two Contexts</a></li>
+    <li><a href="#gates">03 · Gate Test</a></li>
+    <li><a href="#rules">04 · Open Rules</a></li>
+    <li><a href="#scenarios">05 · Interaction Scenarios</a></li>
+    <li><a href="#lifecycle">06 · Lifecycle</a></li>
+    <li><a href="#decisions">07 · Open Decisions</a></li>
+    <li><a href="#recommendation">08 · Recommendation</a></li>
+  </ul>
+</div>
+
+<header class="hero">
+  <svg class="hero-shape" viewBox="0 0 406.1 283.3" preserveAspectRatio="xMaxYMin meet" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="heroPatA" x1="279.9" y1="319.7" x2="397.4" y2="-3.1" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#002f67"/><stop offset="1" stop-color="#004583"/>
+      </linearGradient>
+      <linearGradient id="heroPatB" x1="174.1" y1="306.1" x2="252.7" y2="90.3" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#002f67"/><stop offset="1" stop-color="#0072bc"/>
+      </linearGradient>
+    </defs>
+    <path fill="url(#heroPatA)" d="M406.6,283.3h-226.8l84.9-212.2C281.9,28.1,323.6-.2,369.9-.2L406.1,0l.5,283.3Z"/>
+    <path fill="url(#heroPatB)" d="M247.4,283.3H111.3l50.9-127.3c10.3-25.8,35.3-42.8,63.2-42.8h90l-68,170.1Z"/>
+  </svg>
+  <div class="wrap">
+    <div class="hero-inner">
+      <p class="eyebrow">Ask Nanci · Interaction Model · Internal Briefing</p>
+      <h1>One Interaction Model.<br><em style="font-size:clamp(18px,2.2vw,26px)">Two Panels, Two Contexts.</em></h1>
+      <p class="hero-sub">Ask Nanci works from the same two-panel model everywhere: a main panel that's always present, and one second panel that opens and closes around it. What changes is what the second panel is — a Nanci-built artifact in the standalone app, or a running chat conversation in an integrated product, where generated content renders as generative UI inline in that same chat.</p>
+      <div class="hero-meta">
+        <div>Audience<strong>Design & Engineering</strong></div>
+        <div>Scope<strong>Panel & Chat Behavior</strong></div>
+        <div>Date<strong>July 2026</strong></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="summary">
+  <div class="wrap">
+    <p class="sec-label">01 · Summary</p>
+    <h2>The Same Two Panels, Applied To Two Different Home Screens</h2>
+    <p class="sec-intro">One main panel, one second panel, three gates that decide what happens in the second panel. What changes between contexts is what that second panel actually is.</p>
+    <div class="g2">
+      <div class="card fu"><div class="mb-3"><span class="badge b-blue">Direction</span></div><h3>Main Panel Never Closes</h3><p>Standalone: the main panel is the chat thread. Integrated: the main panel is whatever product screen is open. Either way, only the second panel can be opened or closed.</p></div>
+      <div class="card fu"><div class="mb-3"><span class="badge b-sky">Theme</span></div><h3>Three Gates, Both Contexts</h3><p>G1 (action needed), G2 (stays in view), G3 (too dense for chat) apply unchanged in both contexts. If none of the three fire, the response stays inline — no panel opens.</p></div>
+      <div class="card fu"><div class="mb-3"><span class="badge b-green">Positive</span></div><h3>Integrated Apps Reuse Real Screens</h3><p>Where a native screen already exists — a case, a queue, a form — Nanci navigates the main panel to it and pre-fills it. Anything without a native screen renders as generative UI inline in the chat instead.</p></div>
+      <div class="card fu"><div class="mb-3"><span class="badge b-blue">Decided</span></div><h3>The Second Panel Is Always Chat, Integrated</h3><p>In the integrated app, the second panel never switches away from the conversation. A table, a chart, a form — anything Nanci generates beyond the main page — renders as a generative UI card inline inside the chat itself.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="contexts">
+  <div class="wrap">
+    <p class="sec-label">02 · Two Contexts</p>
+    <h2>Ask Nanci AI vs. Ask Nanci Inside A Product</h2>
+    <p class="sec-intro">Same two-panel model, same three gates — but what the second panel is, and how generated content shows up inside it, diverges across every row below.</p>
+    <table class="cmp-table">
+      <thead><tr><th>Dimension</th><th>Ask Nanci AI (standalone)</th><th>Nanci inside a product</th></tr></thead>
+      <tbody>
+        <tr><td>Main panel</td><td>The chat conversation — permanent, never closes</td><td>The product's current screen — permanent, never closes, changes as the user navigates</td></tr>
+        <tr><td>Second panel</td><td>A Nanci-built artifact — chat lives in the main panel, so this panel is free for tables, forms, and reports</td><td>Always the chat conversation. Anything generated that isn't part of the main page renders as generative UI inline inside that chat — a table, a chart, a form — never a separate view replacing it</td></tr>
+        <tr><td>Opening the second panel</td><td>Automatic whenever a gate fires</td><td>Automatic when a gate fires, or manually — each page has an "Ask Nanci" button that opens the chat dock scoped to that page</td></tr>
+        <tr><td>Chat scope</td><td>One continuous thread; history lives in the left sidebar</td><td>Scoped per page — opening Ask Nanci on a page starts or resumes that page's thread</td></tr>
+        <tr><td>G1 · action needed</td><td>Second panel shows the form or confirmation</td><td>Main panel navigates to the real screen and pre-fills it when one exists; when it doesn't, a generative UI form renders inline in the chat instead</td></tr>
+        <tr><td>Comparisons</td><td>A single view inside the second panel — no floating multi-panel</td><td>A single generative UI card inline in the chat — no floating multi-panel</td></tr>
+        <tr><td>Closing the second panel</td><td>Returns to chat-only; the main panel is unaffected since it was never dependent on it</td><td>The chat dock collapses; the main panel is unaffected — it never depended on the dock being open</td></tr>
+        <tr><td>Mobile</td><td>The second panel becomes a full-height swipe-up sheet</td><td>Tapping Ask Nanci opens the chat dock as a full-screen modal over the current page</td></tr>
+      </tbody>
+    </table>
+    <div class="callout"><strong>Why it matters:</strong> the main panel being permanent is what keeps the model predictable in both contexts. In the integrated app it also means the chat is never displaced — a generated table doesn't take over the second panel, it just becomes part of the conversation the user is already having.</div>
+  </div>
+</section>
+
+<section id="gates">
+  <div class="wrap">
+    <p class="sec-label">03 · The Gate Test</p>
+    <h2>Three Gates Decide What Happens In The Second Panel</h2>
+    <p class="sec-intro">Evaluate top to bottom — first match wins, and a later gate is never checked once an earlier one fires. If none of the three fire, nothing opens or generates; the response stays inline.</p>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-rail"><div class="flow-node">G1</div><div class="flow-line"></div></div>
+        <div class="flow-body">
+          <div class="flow-title">Action needed <span class="flow-formula">auto-open</span></div>
+          <div class="flow-desc">Edit, approve, submit, sign, dispute, upload — something the user needs to do. Standalone: the second panel opens with the form or confirmation. Integrated: the main panel navigates to the real screen and pre-fills it when one exists; when it doesn't, Nanci renders a generative UI form inline in the chat instead.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-rail"><div class="flow-node">G2</div><div class="flow-line"></div></div>
+        <div class="flow-body">
+          <div class="flow-title">Stays in view across turns <span class="flow-formula">auto-open</span></div>
+          <div class="flow-desc">Content the user will keep referencing this turn and the next — a case, a merchant profile, a report they're asking follow-ups about. Standalone: the second panel opens and holds it as the one artifact view. Integrated: it renders as a generative UI card inline in the ongoing chat, staying in the scrollback to reference. A comparison is a single view — for example a two-column table — never two panels side by side; there's no multi-panel support.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-rail"><div class="flow-node">G3</div><div class="flow-line"></div></div>
+        <div class="flow-body">
+          <div class="flow-title">Too dense for chat <span class="flow-formula">offer</span></div>
+          <div class="flow-desc">More than a few items, a chart, more than about 80 words. Auto-opens only when the user used a display verb (show, open, pull up, list, compare); otherwise Nanci summarizes inline and offers it. Integrated: this means a generative UI table or chart card appended inline in the chat, unless a native report screen already exists, in which case the main panel navigates there instead.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-rail"><div class="flow-node">—</div></div>
+        <div class="flow-body">
+          <div class="flow-title">No gate fires <span class="flow-formula">stays inline</span></div>
+          <div class="flow-desc">Facts, statuses, confirmations, clarifying questions, short explanations, errors. Answered inline as plain chat text, wherever the user is already typing — the main chat panel in the standalone app, or the chat dock in the integrated one. No generative UI, nothing opens or closes.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="rules">
+  <div class="wrap">
+    <p class="sec-label">04 · Open Rules</p>
+    <h2>Auto-Open, Offer, Or Never</h2>
+    <p class="sec-intro">Auto-open is a small allowlist; everything ambiguous defaults to offering. These conditions are categorical, not numeric, so they're read as rules rather than charted as data.</p>
+    <table class="stack-table">
+      <thead>
+        <tr><th style="width:260px">Condition</th><th style="width:120px">Behavior</th><th>Why</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><div class="layer-name">Display verb used</div><div class="layer-tool">show, open, view, pull up, list, compare</div></td><td><span class="badge b-blue">Auto-open</span></td><td>Explicit request — asking again is friction.</td></tr>
+        <tr><td><div class="layer-name">Structured input required</div><div class="layer-tool">the task cannot proceed inline</div></td><td><span class="badge b-blue">Auto-open</span></td><td>Standalone builds the form in the second panel; integrated navigates the main panel to the real one, or renders a generative UI form inline in chat as a fallback.</td></tr>
+        <tr><td><div class="layer-name">Compound, multi-step intent</div><div class="layer-tool">investigation, bulk action, onboarding</div></td><td><span class="badge b-blue">Auto-open</span></td><td>The second panel — the artifact view in standalone, the chat feed in integrated — carries the whole sequence, updated turn by turn.</td></tr>
+        <tr><td><div class="layer-name">Resuming prior work</div><div class="layer-tool">the second panel already had context</div></td><td><span class="badge b-blue">Auto-open</span></td><td>Restores context the user already built.</td></tr>
+        <tr><td><div class="layer-name">Large unrequested result</div><div class="layer-tool">the user didn't ask to see it</div></td><td><span class="badge b-sky">Offer</span></td><td>Summarize the shape; let the user choose to go deep.</td></tr>
+        <tr><td><div class="layer-name">Nanci-initiated message</div><div class="layer-tool">alert, nudge, proactive insight</div></td><td><span class="badge b-sky">Offer</span></td><td>Never generate into the second panel for something the user didn't point at.</td></tr>
+        <tr><td><div class="layer-name">Single value, status, yes/no</div><div class="layer-tool">a fact that fits a sentence</div></td><td><span class="badge b-gray">Never</span></td><td>Faster to read as plain text than as a generated card.</td></tr>
+        <tr><td><div class="layer-name">Error, failure, or partial result</div><div class="layer-tool">any failure path, including timeouts</div></td><td><span class="badge b-gray">Never</span></td><td>Errors render where the eye already is — plain chat text, not a generated card.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="scenarios">
+  <div class="wrap">
+    <p class="sec-label">05 · Interaction Scenarios</p>
+    <h2>Worked Cases, Side By Side</h2>
+    <p class="sec-intro">The rules above, applied to the moments that actually come up — from first load to closing the second panel.</p>
+    <table class="cmp-table">
+      <thead><tr><th style="width:210px">Interaction</th><th>Ask Nanci AI (standalone)</th><th>Nanci inside a product</th></tr></thead>
+      <tbody>
+        <tr><td>Landing / first load</td><td>Chat opens empty in the main panel with starter prompts; the second panel stays closed until a gate fires.</td><td>The product's default page loads in the main panel; the chat dock starts collapsed until the user taps Ask Nanci or a proactive alert offers it.</td></tr>
+        <tr><td>Clicking a menu item</td><td>Not applicable — the sidebar only manages chat history, it never changes the main panel's content.</td><td>The main panel navigates to that page. The chat dock collapses back to closed, since chat is scoped to the page the user just left.</td></tr>
+        <tr><td>Asking a quick factual question</td><td>Chat is always open, so the answer appears inline in the main panel immediately.</td><td>The chat dock must already be open (via Ask Nanci) to ask anything; the answer appears inline as plain text there. The main panel doesn't change.</td></tr>
+        <tr><td>Requesting an action — "update my phone number"</td><td>The second panel opens with a pre-filled form or confirmation card.</td><td>The main panel navigates to the real settings screen, pre-filled for confirmation, when one exists; falls back to a generative UI form inline in the chat when it doesn't.</td></tr>
+        <tr><td>Asking to pull up something to reference</td><td>The second panel opens with that record and stays there across follow-ups.</td><td>Nanci renders that record as a generative UI card inline in the chat; the card stays in the scrollback to reference while the user keeps working in the main panel.</td></tr>
+        <tr><td>Asking to compare two things</td><td>Rendered as one view inside the second panel — for example a two-column table.</td><td>Rendered as a single generative UI card inline in the chat — for example a two-column table — never two panels.</td></tr>
+        <tr><td>Requesting something large, with a display verb</td><td>The second panel opens automatically with the full table or report.</td><td>The table or chart renders as a generative UI card inline in the chat automatically, unless a native report screen exists — in which case the main panel navigates there instead.</td></tr>
+        <tr><td>A follow-up that refines an open view — "filter to last 30 days"</td><td>Updates the open second panel in place; no new panel opens.</td><td>Updates that specific generative UI card in place within the chat, rather than appending a duplicate.</td></tr>
+        <tr><td>Dismissing the second panel</td><td>Closes back to chat-only; the main panel is unaffected, since it was always the constant.</td><td>The chat dock collapses entirely, cards and all; the main panel — the product screen — is completely unaffected.</td></tr>
+        <tr><td>On mobile</td><td>The second panel becomes a full-height swipe-up sheet over the chat.</td><td>Tapping Ask Nanci opens the chat dock as a full-screen modal over the current page; dismissing returns to the page exactly as it was.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="lifecycle">
+  <div class="wrap">
+    <p class="sec-label">06 · Lifecycle</p>
+    <h2>How The Second Panel Behaves Once It's Open</h2>
+    <p class="sec-intro">Opening is one decision. Replacing, keeping, and closing are the ones users actually notice — and the main panel is never part of this lifecycle, since it never closes.</p>
+    <div class="principles">
+      <div class="principle"><span class="num">01</span><div><div class="ptext">Every generated card is announced inline</div><div class="pdesc">The chat always carries a one-line lead-in for what a generative UI card is and why it appeared — it's never dropped in silently.</div></div></div>
+      <div class="principle"><span class="num">02</span><div><div class="ptext">Only the second panel opens or closes</div><div class="pdesc">The main panel is permanent. Standalone replaces the one open artifact with a new result. Integrated appends generated content as a card inside the ongoing chat instead of replacing anything.</div></div></div>
+      <div class="principle"><span class="num">03</span><div><div class="ptext">Unsaved input blocks replacement</div><div class="pdesc">If an open artifact or card holds user-entered data, confirm before replacing or navigating away from it. Never discard silently.</div></div></div>
+      <div class="principle"><span class="num">04</span><div><div class="ptext">Dismiss preserves state</div><div class="pdesc">Closing the second panel is a view change, not a reset. Reopening within the session restores scroll, filter, and form state.</div></div></div>
+      <div class="principle"><span class="num">05</span><div><div class="ptext">Nanci doesn't close the second panel</div><div class="pdesc">The only exception is a completed task, confirmed inline in the same turn.</div></div></div>
+      <div class="principle"><span class="num">06</span><div><div class="ptext">Follow-ups update in place</div><div class="pdesc">"Filter that to last 30 days" refreshes the current artifact (standalone) or the specific generative UI card (integrated) — it never opens a new panel or appends a duplicate.</div></div></div>
+      <div class="principle"><span class="num">07</span><div><div class="ptext">Mobile raises the bar</div><div class="pdesc">Only G1 and explicit display verbs auto-open the second panel on mobile. G3 always offers.</div></div></div>
+      <div class="principle"><span class="num">08</span><div><div class="ptext">The second panel never covers the answer</div><div class="pdesc">If layout forces overlap, the inline summary in the main panel has to stand alone without it.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="decisions">
+  <div class="wrap">
+    <p class="sec-label">07 · Open Decisions</p>
+    <h2>What Still Needs A Team Decision</h2>
+    <p class="sec-intro">The shared rules resolve most cases. These two don't have a documented answer yet and should be settled before scenarios are finalized.</p>
+    <div class="callout"><strong>Resolved:</strong> no multi-panel, for now. The model is a main panel plus a single second panel — G2 content and comparisons render as one view, never as parallel or tabbed panels.</div>
+    <div class="callout"><strong>Resolved:</strong> in the integrated app, the second panel is always the chat conversation. Anything Nanci generates that isn't part of the main page — a table, a chart, a form — renders as generative UI inline inside that chat, never as a separate panel replacing it.</div>
+    <div class="callout amber"><strong>Chat persistence across pages, integrated:</strong> if chat is scoped per page, does leaving a page discard that page's Nanci thread, or does it stay retrievable later — a per-page chat history, similar to the standalone app's sidebar?</div>
+    <div class="callout amber"><strong>Connected-account placement, integrated:</strong> Business Owner surfaces (VisionWeb, AccessOne) already show bank-linking even though the product owns the core data — should account linking live in Nanci's own settings, or the product's existing settings module?</div>
+  </div>
+</section>
+
+<section id="recommendation">
+  <div class="wrap">
+    <p class="sec-label">08 · Recommendation</p>
+    <h2>Document Once, Apply Twice</h2>
+    <p class="sec-intro">The two-panel model, the three gates, and the lifecycle rules are a single spec. Context only changes what the second panel is and how generated content shows up inside it.</p>
+    <div class="dark-panel">
+      <svg class="dp-shape" viewBox="0 0 127.6 85.1" preserveAspectRatio="xMaxYMin meet" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="dpPat" x1="61.7" y1="83.4" x2="91.5" y2="1.5" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#002f67"/><stop offset="1" stop-color="#004583"/>
+          </linearGradient>
+        </defs>
+        <path fill="url(#dpPat)" d="M93.6,85.1H25.5l25.5-63.7C56.2,8.5,68.7,0,82.6,0h45l-34,85.1Z"/>
+      </svg>
+      <h3>The Recommendation</h3>
+      <p>Write the two-panel model, the three gates, and the lifecycle rules as one shared spec. Layer a short "second panel resolution" appendix on top for each context — standalone resolves the second panel to a built artifact; integrated resolves G1 to the main panel's real screen first, and generative UI inline in the chat as the fallback everywhere else. That keeps the behavioral model single-sourced while letting each product read correctly.</p>
+      <div class="dp-cols">
+        <div class="dp-col"><div class="dp-label">Standalone default</div><p>Main panel is chat. Second panel is always a Nanci-built artifact.</p></div>
+        <div class="dp-col"><div class="dp-label">Integrated default</div><p>Main panel is the product screen. Second panel is always the chat conversation; anything generated beyond the page renders inline as generative UI within it.</p></div>
+      </div>
+    </div>
+    <div class="cta-box">
+      <svg class="cta-shape" viewBox="0 0 127.6 85.1" preserveAspectRatio="xMaxYMin meet" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="ctaPat" x1="61.7" y1="83.4" x2="91.5" y2="1.5" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#002f67"/><stop offset="1" stop-color="#004583"/>
+          </linearGradient>
+        </defs>
+        <path fill="url(#ctaPat)" d="M93.6,85.1H25.5l25.5-63.7C56.2,8.5,68.7,0,82.6,0h45l-34,85.1Z"/>
+      </svg>
+      <h2>The Ask</h2>
+      <p>Resolve the two open decisions in section 07 in a working session with Design and Engineering, then lock the second-panel-resolution appendix so scenario writing can proceed against a settled model rather than case-by-case judgment calls.</p>
+      <div class="cta-btns">
+        <button class="btn-w">Schedule working session</button>
+        <button class="btn-o">Review open decisions</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="fbrand">
+      <svg width="135" height="40" viewBox="0 0 135 40" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Aperia">
+        <g clip-path="url(#clip0_ftr)">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M22.9449 25.9157L25.7618 32.8812H32.9321L19.6159 1.63916H13.3163L0 32.8812H7.01664L9.83355 25.9157H22.9449ZM12.292 19.9234L16.3893 9.83377L20.5378 19.9234H12.292Z" fill="#FFFFFF"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M41.4854 29.8082C43.1243 31.7032 45.3266 33.3421 48.9118 33.3421C54.5456 33.3421 59.7184 28.9887 59.7184 21.1014V20.999C59.7184 13.0604 54.4432 8.70703 48.9118 8.70703C45.3779 8.70703 43.1243 10.346 41.4854 12.5483V9.11676H34.7249V40.0002H41.4854V29.8082ZM47.2216 14.392C50.3458 14.392 53.0091 17.0041 53.0091 20.9477V21.0502C53.0091 25.045 50.3458 27.6059 47.2216 27.6059C44.0462 27.6059 41.4342 24.9938 41.4342 21.0502V20.9477C41.4342 17.0041 44.0974 14.392 47.2216 14.392Z" fill="#FFFFFF"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M68.0154 23.3549H84.5583C84.6096 22.7403 84.6096 22.3305 84.5583 21.6647V21.5623C84.5583 14.8017 80.922 8.65576 72.9834 8.65576C66.0692 8.65576 61.2549 14.2896 61.2549 21.0501V21.1526C61.2549 28.4253 66.5302 33.4445 73.6493 33.4445C77.9514 33.4445 81.1781 31.7544 83.3804 28.9887L79.5391 25.5572C77.6953 27.2985 76.0564 28.0156 73.8029 28.0156C70.8323 28.0156 68.6813 26.4278 68.0154 23.3549ZM67.9643 19.1551C68.4764 16.0821 70.269 14.0847 73.0859 14.0847C75.9028 14.0847 77.6954 16.1333 78.1051 19.1551H67.9643Z" fill="#FFFFFF"/>
+          <path d="M101.357 15.7234C96.9015 15.7234 94.1358 18.4379 94.1358 24.1229V32.8809H87.3752V9.1165H94.1358V13.8796C95.5186 10.6018 97.721 8.45069 101.716 8.65555V15.7234H101.357Z" fill="#FFFFFF"/>
+          <path d="M104.021 32.8811V9.1167H110.781V32.8811H104.021Z" fill="#FFFFFF"/>
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M128.809 30.32V32.8808H135.314V19.1036C135.314 12.6504 132.087 8.86035 124.712 8.86035C120.666 8.86035 118.105 9.6286 115.493 10.7554L117.183 15.877C119.334 15.1088 121.178 14.5966 123.739 14.5966C127.119 14.5966 128.861 16.1331 128.861 18.95V19.3597C127.17 18.7963 125.48 18.3866 123.073 18.3866C117.439 18.3866 113.496 20.7938 113.496 25.9666V26.0691C113.496 30.781 117.183 33.3418 121.639 33.3418C124.917 33.3418 127.17 32.1126 128.809 30.32ZM124.661 22.4327C126.3 22.4327 127.785 22.7912 128.963 23.3034V24.5326C128.963 26.9398 126.812 28.6811 123.688 28.6811C121.485 28.6811 120 27.6056 120 25.813V25.7106C120 23.6107 121.793 22.4327 124.661 22.4327Z" fill="#FFFFFF"/>
+          <ellipse cx="107.401" cy="3.53393" rx="3.53393" ry="3.53393" fill="#FFFFFF"/>
+        </g>
+        <defs><clipPath id="clip0_ftr"><rect width="135" height="40" fill="white"/></clipPath></defs>
+      </svg>
+    </div>
+    <p>Ask Nanci Panel & Chat Behavior · Standalone vs. Integrated Contexts · July 2026</p>
+  </div>
+</footer>
+
+<script>
+  const burger = document.getElementById('burger');
+  const drawer = document.getElementById('drawer');
+  burger.addEventListener('click', () => {
+    const open = drawer.classList.toggle('open');
+    burger.classList.toggle('open', open);
+    burger.setAttribute('aria-expanded', open);
+  });
+  drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    drawer.classList.remove('open');
+    burger.classList.remove('open');
+    burger.setAttribute('aria-expanded', false);
+  }));
+</script>
+
+</body>
+</html>

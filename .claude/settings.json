@@ -2,10 +2,14 @@
   "permissions": {
     "allow": [
       "Skill(artifact-design)",
-      "Skill(artifact-design:*)"
+      "Skill(artifact-design:*)",
+      "Bash(find:*)"
     ],
     "additionalDirectories": [
       "/Users/thuannguyen/Desktop"
     ]
+  },
+  "enabledPlugins": {
+    "fallow@fallow-skills": true
   }
 }
