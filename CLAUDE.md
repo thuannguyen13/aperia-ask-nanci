@@ -84,7 +84,9 @@ first if you're deciding *whether* a panel is the right answer at all. It is the
 panel interaction principles (`panel-principles.md` was removed 2026-07-28).
 
 It moved out of `docs/` on 2026-07-29 so the same Next app serves it: **`/panels`** alongside the
-live console at **`/risk`**, with a link each way. It is still one self-contained file with no local
+live console. Its "See it running" link points at **`/risk-phase1`** (the assistant-free Phase 1
+console). The link is one-way: the console's top bar has no link back.
+It is still one self-contained file with no local
 asset dependencies (inline SVG, Google-hosted fonts), so it stays portable to the `../webflow`
 marketing repo. `/panels` needs the rewrite in `next.config.mjs` because Next's static handler
 serves exact paths only; `/panels/index.html` works without it.

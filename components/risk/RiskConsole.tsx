@@ -61,13 +61,6 @@ export function RiskConsole({ assistant = true }: { assistant?: boolean }) {
       topBar={
         <div className="relative z-10 flex h-10 shrink-0 items-center justify-center">
           <Image data-logo="frame" {...getThemeLogos(THEME).frame} className="h-6 w-auto" />
-          {/* The panel-principles report — a static page served from public/panels */}
-          <a
-            href="/panels"
-            className="absolute right-3 text-xs text-muted-foreground transition-colors hover:text-foreground"
-          >
-            Panel model
-          </a>
         </div>
       }
       sidebar={<Sidebar menu={nav} logos={getThemeLogos(THEME)} />}
