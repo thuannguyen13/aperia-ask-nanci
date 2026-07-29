@@ -98,7 +98,7 @@ export interface ViolationRow {
 
 export const RISK_VIOLATION_CYCLE = "06/25/2026"
 
-const ASSIGNMENT = "MC - Phase 2 Parameters - Auths - Detect Q"
+const ASSIGNMENT = "Esquire - Phase 2 Parameters - Auths - Detect Q"
 export const VIOLATION_ROWS: ViolationRow[] = [
   { pNum: "P-MC1", wk: "Ready to Work", alertOn: "05/03/2026 10:10:00 AM", assignment: ASSIGNMENT, parameter: "Score Threshold", reAlert: "No", paramIndicator: "2", actualIndicator: "2", paramThreshold: "N/A", actualThreshold: "N/A", disposition: "-", workedOn: "-", userName: "-", fileType: "Transaction" },
   { pNum: "P-MC2", wk: "Ready to Work", alertOn: "05/03/2026 06:25:30 AM", assignment: ASSIGNMENT, parameter: "Score Velocity", reAlert: "No", paramIndicator: "1", actualIndicator: "1", paramThreshold: "N/A", actualThreshold: "N/A", disposition: "-", workedOn: "-", userName: "-", fileType: "Transaction" },

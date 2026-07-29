@@ -10,6 +10,9 @@ const SIBLINGS = [
   "Why is alert volume running hot today?",
 ]
 
+// The opening question the Detection Queue's "Ask Nanci" button summons.
+export const DETECTION_QUEUE_PROMPT = "What stands out in the Detection Queue today?"
+
 export const RISK_LANDING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
   "Show me today's high risk merchants": [
     { role: "user", content: "Show me today's high risk merchants" },
@@ -17,7 +20,7 @@ export const RISK_LANDING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> =
       role: "assistant",
       content:
         "**3 merchants are High risk today**, and risk lines up with exposure so working them top-down also works them by dollars:\n\n1. **Regency Furniture Manchester** — VW 89 / MC 940, $48,200 exposure. Your clear #1.\n2. **PBBILLER.COM** — VW 83 / MC 920, $31,500.\n3. **Ashley Homestore – Mechanicsbu** — VW 81 / MC 830, $27,800 (already Worked).\n\nEverything below is Medium and tapers off fast. Want me to open the Barometer Report so you can work them in order?",
-      source: "Detection Queue · MC - Phase 2",
+      source: "Detection Queue · Esquire - Phase 2",
       dashChart: "high-risk",
       suggestions: ["Show the 5 merchants that are both VW and MC critical", "Why is alert volume running hot today?"],
     },
@@ -92,6 +95,52 @@ export const RISK_LANDING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> =
       source: "VisionWeb + MC critical overlap",
       dashChart: "scatter",
       suggestions: ["Show me today's high risk merchants", "Why is alert volume running hot today?"],
+    },
+  ],
+
+  // Summoned from the Detection Queue header (Figma 401:84863). Every number here
+  // is read off DETECTION_QUEUES[0] — keep the two in step if that data changes.
+  [DETECTION_QUEUE_PROMPT]: [
+    { role: "user", content: DETECTION_QUEUE_PROMPT },
+    {
+      role: "assistant",
+      content:
+        "Here are the key insights from **Esquire - Phase 2 Parameters - Auths - Detect Q**:\n\n- **Alert Volume**: 357 of 4,036 eligible merchants (8.8%) triggered alerts, representing a total exposure of $84,901.89.\n- **Operational Bottleneck**: the workflow is completely stalled. % Worked is 0.00%, with zero items in progress and zero items completed.\n- **Idle Financials**: the entire $84,901.89 is tied up in the 11 \"Ready to work\" / \"Re-queued\" items, but no action has been taken.",
+      source: "Detection Queue · Esquire - Phase 2",
+      suggestions: ["Analyze the Barometer Report", "Allocate 'Ready to Work' Items", "Unblock the Workflow"],
+    },
+  ],
+
+  "Analyze the Barometer Report": [
+    { role: "user", content: "Analyze the Barometer Report" },
+    {
+      role: "assistant",
+      content:
+        "The Barometer Report ranks the 357 alerted merchants by score, and the exposure is top-heavy: **3 merchants carry most of the $84,901.89**. Regency Furniture Manchester (VW 89 / MC 940) is your clear #1, then PBBILLER.COM (83 / 920) and Ashley Homestore – Mechanicsbu (81 / 830).\n\nWorking it top-down works it by dollars too, so the ranking is the queue order. Open it from the queue card when you want to start.",
+      source: "Detection Queue · Esquire - Phase 2",
+      suggestions: ["Allocate 'Ready to Work' Items", "Unblock the Workflow"],
+    },
+  ],
+
+  "Allocate 'Ready to Work' Items": [
+    { role: "user", content: "Allocate 'Ready to Work' Items" },
+    {
+      role: "assistant",
+      content:
+        "There are **11 items ready to work, worth $84,901.89**, and none are assigned to an analyst yet. That is the whole idle balance sitting in one bucket.\n\nAt your team's current throughput 11 items is well under a day's work for a single analyst, so this does not need to be split. Assign the batch from Assignment Management and the % Worked figure starts moving today.",
+      source: "Detection Queue · Esquire - Phase 2",
+      suggestions: ["Unblock the Workflow", "Analyze the Barometer Report"],
+    },
+  ],
+
+  "Unblock the Workflow": [
+    { role: "user", content: "Unblock the Workflow" },
+    {
+      role: "assistant",
+      content:
+        "The block is allocation, not capacity. **357 alerted, 11 re-queued, 0 in progress, 0 worked** is the signature of a queue nobody has been assigned to — if analysts were working it and stalling, you would see a work-in-progress count instead.\n\nSo the unblock is one step: put an owner on the 11 ready items. The 357 alerted merchants behind them are already prioritised by the Barometer Report, so nothing else needs re-tuning first.",
+      source: "Detection Queue · Esquire - Phase 2",
+      suggestions: ["Allocate 'Ready to Work' Items", "Show me today's high risk merchants"],
     },
   ],
 }

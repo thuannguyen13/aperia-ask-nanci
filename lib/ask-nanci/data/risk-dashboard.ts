@@ -39,7 +39,7 @@ export const SCATTER_COLORS: Record<ScatterCat, string> = {
 
 // ── Alert Volume by Assignment (horizontal bars) ─────────────────────────────
 export const ALERT_VOLUME: { name: string; count: number }[] = [
-  { name: "MC - Phase 2 Parameters - Auths…", count: 357 },
+  { name: "Esquire - Phase 2 Parameters - Auths…", count: 357 },
   { name: "Low Risk DQ - By MCC", count: 303 },
   { name: "MC Watchlist (system)", count: 52 },
   { name: "High Risk DQ - By MCC", count: 25 },
