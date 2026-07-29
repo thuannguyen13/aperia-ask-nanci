@@ -12,6 +12,19 @@ interface RiskNav {
   openMerchant: (id: string) => void
   merchantId: string | null
   barometerFilter: "critical" | null
+  /**
+   * Phase 1 of the Risk pitch is the same console with no AI in it. Screens read
+   * this instead of a build-time flag because both phases run side by side (the
+   * assistant-free console at /risk-phase1, the full one at /risk), so the same
+   * components have to render both ways in one build.
+   */
+  assistant: boolean
+  /**
+   * Where a screen's close button goes. Ask Nanci is home when the assistant is
+   * on; the Dashboard is home when it isn't. Screens close to `nav.home` rather
+   * than naming a destination, so neither phase can strand the user.
+   */
+  home: RiskDest
 }
 
 const RiskNavContext = createContext<RiskNav>({
@@ -20,6 +33,8 @@ const RiskNavContext = createContext<RiskNav>({
   openMerchant: () => {},
   merchantId: null,
   barometerFilter: null,
+  assistant: true,
+  home: "ask-nanci",
 })
 
 export const RiskNavProvider = RiskNavContext.Provider

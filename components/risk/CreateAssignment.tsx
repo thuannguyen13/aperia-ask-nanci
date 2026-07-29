@@ -14,6 +14,7 @@ import {
   NANCI_REVIEW, type McParameter,
 } from "@/lib/ask-nanci/data/risk-create-assignment"
 import { NanciReviewPanel } from "./NanciReviewPanel"
+import { useRiskNav } from "./RiskNavContext"
 
 // Create Assignment (Figma frames 219 → 225): a full-panel form that replaces the
 // assignment list. Selecting MC parameters expands a config card per parameter;
@@ -140,6 +141,7 @@ export function CreateAssignment({ onCancel, onSubmit }: { onCancel: () => void;
   const [groups, setGroups] = useState<string[]>([])
   const [review, setReview] = useState(false)
   const [tightened, setTightened] = useState(false)
+  const { assistant } = useRiskNav()
   const tunedRef = useRef<HTMLDivElement>(null)
 
   const selected = MC_PARAMETERS.filter((p) => params.includes(p.id))
@@ -295,10 +297,12 @@ export function CreateAssignment({ onCancel, onSubmit }: { onCancel: () => void;
 
         {/* Sticky footer */}
         <Separator />
-        <div className="flex shrink-0 items-center justify-between gap-2 px-4 py-3 md:px-6">
-          <Button variant="outline" size="sm" className="text-primary" onClick={() => setReview(true)}>
-            <Sparkles className="size-4" /> Review with Nanci
-          </Button>
+        <div className={cn("flex shrink-0 items-center gap-2 px-4 py-3 md:px-6", assistant ? "justify-between" : "justify-end")}>
+          {assistant && (
+            <Button variant="outline" size="sm" className="text-primary" onClick={() => setReview(true)}>
+              <Sparkles className="size-4" /> Review with Nanci
+            </Button>
+          )}
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" onClick={onCancel}>Cancel</Button>
             <Button size="sm" onClick={() => onSubmit(name)}>Submit</Button>
@@ -306,7 +310,7 @@ export function CreateAssignment({ onCancel, onSubmit }: { onCancel: () => void;
         </div>
       </div>
 
-      {review && (
+      {assistant && review && (
         <NanciReviewPanel
           name={name}
           tightened={tightened}

@@ -51,7 +51,7 @@ export function AssignmentManagement() {
             </Button>
           </>
         }
-        onClose={() => nav.go("ask-nanci")}
+        onClose={() => nav.go(nav.home)}
       />
 
       {/* Post-submit confirmation (Figma frame 207) */}

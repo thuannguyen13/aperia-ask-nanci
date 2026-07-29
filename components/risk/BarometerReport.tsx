@@ -54,7 +54,7 @@ export function BarometerReport() {
         subtitle="04/23/2026"
         size="lg"
         actions={<Button variant="secondary" size="sm"><RefreshCw className="size-4" /> Refresh</Button>}
-        onClose={() => nav.go("ask-nanci")}
+        onClose={() => nav.go(nav.home)}
       />
 
       <div className="flex-1 overflow-y-auto p-4 md:p-6">

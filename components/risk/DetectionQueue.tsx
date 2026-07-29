@@ -22,7 +22,7 @@ export function DetectionQueue() {
             <Button variant="secondary" size="sm"><RefreshCw className="size-4" /> Refresh</Button>
           </>
         }
-        onClose={() => nav.go("ask-nanci")}
+        onClose={() => nav.go(nav.home)}
       />
 
       <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 md:p-6">

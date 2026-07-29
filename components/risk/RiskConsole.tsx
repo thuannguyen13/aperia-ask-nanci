@@ -29,9 +29,12 @@ const DEST_PANEL: Record<Exclude<RiskDest, "ask-nanci">, PanelId> = {
   assignment: "risk-assignments",
 }
 
-export function RiskConsole() {
+// `assistant: false` is the Phase 1 console: no Ask Nanci nav item, no chat home,
+// no side panels. Everything else is the same screens.
+export function RiskConsole({ assistant = true }: { assistant?: boolean }) {
   const { view, startNewChat } = useAskNanci()
-  const [dest, setDest] = useState<RiskDest>("ask-nanci")
+  const home: RiskDest = assistant ? "ask-nanci" : "dashboard"
+  const [dest, setDest] = useState<RiskDest>(home)
   const [merchantId, setMerchantId] = useState<string | null>(null)
   const [barometerFilter, setBarometerFilter] = useState<"critical" | null>(null)
 
@@ -42,7 +45,9 @@ export function RiskConsole() {
   const inQueue = dest === "detection-queue" || dest === "barometer-report" || dest === "risk-report"
 
   const nav = [
-    { icon: MessageCircle, label: "Ask Nanci", active: dest === "ask-nanci", onClick: () => { setDest("ask-nanci"); startNewChat() } },
+    ...(assistant
+      ? [{ icon: MessageCircle, label: "Ask Nanci", active: dest === "ask-nanci", onClick: () => { setDest("ask-nanci"); startNewChat() } }]
+      : []),
     { icon: LayoutDashboard, label: "Dashboard", active: dest === "dashboard", onClick: () => setDest("dashboard") },
     { icon: ListChecks, label: "Detection Queue", active: inQueue, onClick: () => setDest("detection-queue") },
     { icon: ClipboardList, label: "Assignment Management", active: dest === "assignment", onClick: () => setDest("assignment") },
@@ -67,7 +72,7 @@ export function RiskConsole() {
       }
       sidebar={<Sidebar menu={nav} logos={getThemeLogos(THEME)} />}
     >
-      <RiskNavProvider value={{ go: setDest, openBarometer, openMerchant, merchantId, barometerFilter }}>
+      <RiskNavProvider value={{ go: setDest, openBarometer, openMerchant, merchantId, barometerFilter, assistant, home }}>
         <div className="flex min-w-0 flex-1 py-1 pr-1">
           {/* Primary box: the active destination panel (or the Ask Nanci home) */}
           <div className="flex min-w-0 flex-1 overflow-hidden rounded-xl border bg-background md:rounded-2xl">
@@ -87,7 +92,7 @@ export function RiskConsole() {
             )}
           </div>
           {/* Side panels (e.g. the Dashboard insight) — siblings, not nested */}
-          <ConceptPanelArea />
+          {assistant && <ConceptPanelArea />}
         </div>
       </RiskNavProvider>
     </AppFrame>

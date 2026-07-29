@@ -16,7 +16,7 @@ const PANEL_ID = "dashboard-insight"
 
 // A dashboard chart panel — title + AI/menu affordances + highlight ring when the
 // active insight points at it.
-function ChartPanel({ id, title, active, dim, onAsk, children }: { id: DashChartId; title: string; active: boolean; dim: boolean; onAsk: () => void; children: React.ReactNode }) {
+function ChartPanel({ id, title, active, dim, onAsk, children }: { id: DashChartId; title: string; active: boolean; dim: boolean; onAsk?: () => void; children: React.ReactNode }) {
   return (
     <div className={cn(
       "flex h-full flex-col rounded-xl border bg-card p-4 transition-all",
@@ -27,9 +27,11 @@ function ChartPanel({ id, title, active, dim, onAsk, children }: { id: DashChart
         <h3 className="truncate text-base font-semibold text-foreground">{title}</h3>
         <div className="flex shrink-0 items-center gap-0.5">
           {/* Second entry point to the same insight panel the takes above open. */}
-          <Button variant="ghost" size="icon-sm" aria-label={`Ask Nanci about ${title}`} onClick={onAsk}>
-            <Sparkles className="size-4 text-primary" />
-          </Button>
+          {onAsk && (
+            <Button variant="ghost" size="icon-sm" aria-label={`Ask Nanci about ${title}`} onClick={onAsk}>
+              <Sparkles className="size-4 text-primary" />
+            </Button>
+          )}
           <Button variant="ghost" size="icon-sm" aria-label={`More options for ${title}`}>
             <MoreHorizontal className="size-4 text-muted-foreground" />
           </Button>
@@ -44,6 +46,7 @@ function ChartPanel({ id, title, active, dim, onAsk, children }: { id: DashChart
 
 export function Dashboard() {
   const nav = useRiskNav()
+  const { assistant } = nav
   const { dynamicPanels, openDynamic, closeDynamicPanel, setPanelView } = useAskNanci()
   const panelOpen = dynamicPanels.includes(PANEL_ID)
   const activeKey = usePanelView(PANEL_ID, "")
@@ -70,26 +73,28 @@ export function Dashboard() {
         title="Dashboard"
         size="lg"
         actions={<Button variant="secondary" size="sm"><Download className="size-4" /> Export</Button>}
-        onClose={() => nav.go("ask-nanci")}
+        onClose={assistant ? () => nav.go(nav.home) : undefined}
       />
       <div className="flex-1 overflow-y-auto p-4 md:p-6">
         {/* Ask Nanci's take on today */}
-        <div className="rounded-xl border border-blue-200 bg-blue-50/60 p-4 dark:border-blue-900 dark:bg-blue-950/20">
-          <div className="mb-3 flex items-center gap-2">
-            <BarChartBig className="size-4 text-foreground" />
-            <p className="text-base font-semibold text-foreground">Ask Nanci&apos;s take on today</p>
+        {assistant && (
+          <div className="rounded-xl border border-blue-200 bg-blue-50/60 p-4 dark:border-blue-900 dark:bg-blue-950/20">
+            <div className="mb-3 flex items-center gap-2">
+              <BarChartBig className="size-4 text-foreground" />
+              <p className="text-base font-semibold text-foreground">Ask Nanci&apos;s take on today</p>
+            </div>
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+              {RISK_NANCI_TAKES.map((take) => (
+                // Same card as the landing — but here the answer lands in a sibling
+                // chat panel and the related charts light up behind it.
+                <NanciTakeCard key={take.title} take={take} active={active === take.title} onClick={() => toggleTake(take.title)} />
+              ))}
+            </div>
           </div>
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-            {RISK_NANCI_TAKES.map((take) => (
-              // Same card as the landing — but here the answer lands in a sibling
-              // chat panel and the related charts light up behind it.
-              <NanciTakeCard key={take.title} take={take} active={active === take.title} onClick={() => toggleTake(take.title)} />
-            ))}
-          </div>
-        </div>
+        )}
 
         {/* KPI row */}
-        <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
+        <div className={cn("grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5", assistant && "mt-4")}>
           {DASH_KPIS.map((k) => (
             <div key={k.label} className="rounded-xl border bg-card p-4">
               <div className="flex items-center justify-between">
@@ -107,12 +112,12 @@ export function Dashboard() {
         {/* Chart grid — Figma layout */}
         <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
           {(["high-risk", "scatter", "param-heat", "alert-volume"] as DashChartId[]).map((id) => (
-            <ChartPanel key={id} id={id} title={CHART_TITLES[id]} active={isOn(id)} dim={anyActive && !isOn(id)} onAsk={() => toggleTake(CHART_TAKE[id])}>
+            <ChartPanel key={id} id={id} title={CHART_TITLES[id]} active={isOn(id)} dim={anyActive && !isOn(id)} onAsk={assistant ? () => toggleTake(CHART_TAKE[id]) : undefined}>
               <DashChart id={id} />
             </ChartPanel>
           ))}
           <div className="lg:col-span-2">
-            <ChartPanel id="realert" title={CHART_TITLES.realert} active={isOn("realert")} dim={anyActive && !isOn("realert")} onAsk={() => toggleTake(CHART_TAKE.realert)}>
+            <ChartPanel id="realert" title={CHART_TITLES.realert} active={isOn("realert")} dim={anyActive && !isOn("realert")} onAsk={assistant ? () => toggleTake(CHART_TAKE.realert) : undefined}>
               <DashChart id="realert" />
             </ChartPanel>
           </div>
