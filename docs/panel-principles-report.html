@@ -803,6 +803,61 @@
       color: var(--sapphire)
     }
 
+    /* Deep paths collapse: only the level before the current one stays visible,
+       everything earlier folds into this trigger. */
+    .crumb-dots {
+      color: var(--sapphire);
+      cursor: pointer;
+      padding: 0 3px;
+      border-radius: 3px;
+      letter-spacing: .08em
+    }
+
+    .crumb-dots:hover,
+    .crumb-dots.on {
+      background: var(--sapphire);
+      color: #fff
+    }
+
+    /* Body-level so the two overflow:hidden ancestors (.mini-head, .mini) cannot clip it,
+       the same escape the anatomy tooltip uses. */
+    #crumb-menu {
+      display: none;
+      position: fixed;
+      z-index: 60;
+      min-width: 130px;
+      padding: 4px;
+      background: var(--card, #fff);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      box-shadow: 0 8px 22px rgba(16, 24, 40, .14);
+      text-transform: none;
+      letter-spacing: 0
+    }
+
+    #crumb-menu.on {
+      display: block
+    }
+
+    #crumb-menu button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      font-family: var(--mono);
+      font-size: 9px;
+      color: var(--sapphire);
+      background: none;
+      border: 0;
+      padding: 5px 7px;
+      border-radius: 5px;
+      cursor: pointer;
+      white-space: nowrap
+    }
+
+    #crumb-menu button:hover {
+      background: var(--soft-gray, rgba(16, 24, 40, .06))
+    }
+
     .mini-body {
       padding: 8px;
       flex: 1;
@@ -922,6 +977,44 @@
       margin: -3px 0
     }
 
+    .martifact {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: #fff;
+      padding: 5px 8px;
+      max-width: 88%;
+      align-self: flex-start;
+      box-shadow: 0 1px 2px rgba(0, 47, 103, .06)
+    }
+
+    .martifact-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 5px;
+      background: var(--light-gray);
+      color: var(--aperia-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0
+    }
+
+    .martifact-title {
+      font-size: 10px;
+      font-weight: 500;
+      line-height: 1.3;
+      color: var(--fg)
+    }
+
+    .martifact-sub {
+      font-size: 8px;
+      color: var(--muted-fg);
+      line-height: 1.3
+    }
+
     .mstat {
       text-align: left;
       padding: 4px 2px
@@ -1034,16 +1127,6 @@
       background: #dcfce7
     }
 
-    body.mode-manual .demo-stage .sugg {
-      border-color: var(--sky-blue);
-      color: var(--sapphire);
-      background: #eafaff
-    }
-
-    body.mode-manual .demo-stage .sugg:hover {
-      background: #d5f0fd
-    }
-
     .mini-x-btn {
       cursor: pointer
     }
@@ -1083,37 +1166,6 @@
 
     .nv-click:hover {
       background: var(--muted)
-    }
-
-    .ptabs {
-      display: inline-flex;
-      gap: 4px;
-      margin: 26px 0 14px;
-      padding: 4px;
-      background: var(--light-gray);
-      border: 1px solid var(--border);
-      border-radius: 12px
-    }
-
-    .ptab {
-      font-family: var(--sans);
-      font-size: 14px;
-      font-weight: 500;
-      padding: 10px 26px;
-      border-radius: 9px;
-      border: 1px solid transparent;
-      background: transparent;
-      color: var(--muted-fg);
-      cursor: pointer;
-      transition: background .15s, color .15s
-    }
-
-    .ptab.active {
-      background: #fff;
-      border-color: var(--border);
-      color: var(--aperia-blue);
-      font-weight: 600;
-      box-shadow: 0 1px 3px rgba(0, 47, 103, .12)
     }
 
     .chip.on {
@@ -1165,79 +1217,6 @@
       left: 14px
     }
 
-    .tgl-div {
-      color: var(--border);
-      font-weight: 400
-    }
-
-    .dot-ind {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      color: var(--muted-fg)
-    }
-
-    .dot-ind::before {
-      content: '';
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--med-gray);
-      flex-shrink: 0;
-      transition: background .2s
-    }
-
-    .dot-ind.d-on {
-      color: var(--dark-blue)
-    }
-
-    .dot-ind.d-on::before {
-      background: var(--sapphire)
-    }
-
-    body.shift-held .demo-stage .sugg,
-    body.shift-held .demo-stage .mrow.clickable,
-    body.shift-held .demo-stage .mwidget.clickable {
-      outline: 2px dashed var(--sapphire);
-      outline-offset: 1px
-    }
-
-    #ptip {
-      position: fixed;
-      z-index: 999;
-      display: none;
-      transform: translate(-50%, -100%);
-      background: var(--aperia-blue);
-      color: #fff;
-      font-size: 11px;
-      font-family: var(--sans);
-      font-weight: 500;
-      padding: 5px 10px;
-      border-radius: 6px;
-      box-shadow: 0 4px 14px rgba(0, 47, 103, .3);
-      pointer-events: none;
-      white-space: nowrap;
-      line-height: 1.4
-    }
-
-    #ptip.on {
-      background: var(--sapphire)
-    }
-
-    #ptip::after {
-      content: '';
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      border: 5px solid transparent;
-      border-top-color: var(--aperia-blue)
-    }
-
-    #ptip.on::after {
-      border-top-color: var(--sapphire)
-    }
-
     .demo-note {
       font-size: 12px;
       color: var(--muted-fg);
@@ -1281,14 +1260,18 @@
       margin-top: -15px
     }
 
-    body.labels-on .anat-label {
+    body.labels-on .anat-label,
+    .labels-static .anat-label {
       visibility: visible;
       opacity: 1
     }
 
     body.labels-on .anat-label+.mini,
     body.labels-on .anat-label+.mini-nav,
-    body.labels-on .anat-label+.slot {
+    body.labels-on .anat-label+.slot,
+    .labels-static .anat-label+.mini,
+    .labels-static .anat-label+.mini-nav,
+    .labels-static .anat-label+.slot {
       border-top-left-radius: 0
     }
 
@@ -1340,19 +1323,23 @@
       margin-top: 2px
     }
 
-    body.labels-on .sec-nav {
+    body.labels-on .sec-nav,
+    .labels-static .sec-nav {
       border: 1.5px solid var(--med-gray)
     }
 
-    body.labels-on .sec-pri {
+    body.labels-on .sec-pri,
+    .labels-static .sec-pri {
       border: 1.5px solid var(--aperia-blue)
     }
 
-    body.labels-on .sec-sup {
+    body.labels-on .sec-sup,
+    .labels-static .sec-sup {
       border: 1.5px solid var(--success)
     }
 
-    body.labels-on .sec-det {
+    body.labels-on .sec-det,
+    .labels-static .sec-det {
       border: 1.5px solid var(--warning)
     }
 
@@ -1367,6 +1354,76 @@
 
     .demo-note strong {
       color: var(--aperia-blue)
+    }
+
+    .demo-note a {
+      color: var(--sapphire);
+      text-decoration: underline;
+      text-underline-offset: 2px
+    }
+
+    /* Anatomy terms: interactive vocabulary inside the Part table */
+    .anatomy-term {
+      color: var(--sapphire);
+      font-weight: 500;
+      border-bottom: 1px dashed rgba(0, 114, 188, .5);
+      cursor: help
+    }
+
+    .anatomy-term:hover,
+    .anatomy-term.on {
+      background: #eafaff;
+      border-bottom-style: solid
+    }
+
+    #anatomy-stage .anat-hi {
+      outline: 2.5px solid var(--sapphire);
+      outline-offset: 2px;
+      border-radius: 4px;
+      animation: termPulse .45s ease
+    }
+
+    #anatomy-stage .anat-dim {
+      opacity: .35;
+      transition: opacity .2s
+    }
+
+    @keyframes termPulse {
+      from {
+        outline-color: var(--sky-blue);
+        outline-offset: 5px
+      }
+    }
+
+    #anat-tip {
+      position: fixed;
+      z-index: 999;
+      display: none;
+      transform: translate(-50%, -100%);
+      background: var(--aperia-blue);
+      color: #fff;
+      font-size: 11px;
+      font-family: var(--sans);
+      font-weight: 500;
+      padding: 5px 10px;
+      border-radius: 6px;
+      box-shadow: 0 4px 14px rgba(0, 47, 103, .3);
+      pointer-events: none;
+      white-space: normal;
+      width: max-content;
+      line-height: 1.4;
+      max-width: 260px;
+      text-align: center
+    }
+
+    #anat-tip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: var(--aperia-blue)
     }
 
     @keyframes popIn {
@@ -1557,30 +1614,6 @@
             the user meant it to.</p>
         </div>
       </div>
-      <h3 style="margin-top:26px">First Question: Page, Modal, or Panel?</h3>
-      <table class="stack-table">
-        <thead>
-          <tr>
-            <th style="width:55%">Do you still need what is on screen?</th>
-            <th>Use</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>No</td>
-            <td>A new page</td>
-          </tr>
-          <tr>
-            <td>Yes, but this must be handled first</td>
-            <td>A modal</td>
-          </tr>
-          <tr>
-            <td>Yes, and the user works between the two</td>
-            <td>A panel</td>
-          </tr>
-        </tbody>
-      </table>
-      <p class="demo-note">A panel opens beside its origin, never over it. The origin stays usable.</p>
     </div>
   </section>
 
@@ -1588,14 +1621,10 @@
     <div class="wrap">
       <p class="sec-label">02 · Anatomy</p>
       <h2>Four Parts, One Layout</h2>
-      <p class="sec-intro">A navigation sidebar, then up to three panels in a row. Any page can sit in Primary, and each
-        panel is opened from the one before it.</p>
+      <p class="sec-intro">A navigation sidebar, then up to three panels. The selected feature sits in Primary, one
+        screen at a time, and each panel is opened from the one before it.</p>
 
-      <div class="demo-btns" style="margin:26px 0 0">
-        <button class="tgl lbl-t" onclick="pLabels()"><span class="tgl-track"><span
-              class="tgl-knob"></span></span>Anatomy markers</button>
-      </div>
-      <div class="demo-stage" style="min-height:320px; margin:10px 0 0">
+      <div class="demo-stage labels-static" id="anatomy-stage" style="height:360px; margin:26px 0 0">
         <div class="anat-col anat-nav" style="flex:0 0 108px">
           <div class="anat-label" style="color:var(--dark-gray)">Navigation</div>
           <div class="mini-nav sec-nav" style="flex:1">
@@ -1612,6 +1641,19 @@
             <div class="mini-body">
               <div class="bub user">Show me held deposits</div>
               <div class="bub bot">Here they are.</div>
+              <div class="martifact">
+                <div class="martifact-icon">
+                  <svg width="10" height="12" viewBox="0 0 10 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M1 1.5C1 1.22 1.22 1 1.5 1H6l3 3v6.5c0 .28-.22.5-.5.5h-7a.5.5 0 0 1-.5-.5v-9Z"
+                      stroke="currentColor" stroke-width="1.1" stroke-linejoin="round" />
+                    <path d="M6 1v3h3" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="martifact-title">Held Deposits</div>
+                  <div class="martifact-sub">Click to open</div>
+                </div>
+              </div>
             </div>
             <div class="mini-input">Ask anything…</div>
           </div>
@@ -1640,10 +1682,8 @@
           </div>
         </div>
       </div>
-      <p class="demo-note">Every panel has a header (title, breadcrumb, close) over a body. Secondary and Tertiary share
-        the right column, stacked; the parent sits above its child, and the parent-child order is what the model means
-        by left to right. When Ask Nanci is summoned onto a page instead, it sits in Secondary; the layout never
-        changes, only who sits where.</p>
+      <p class="demo-note">Every panel has a header (title, breadcrumb, close) over a body. Secondary and Tertiary stack
+        in the right column: the parent above the child it opened.</p>
 
       <table class="stack-table">
         <thead>
@@ -1660,7 +1700,7 @@
               <div class="layer-name"><i class="sec-dot" style="background:var(--med-gray)"></i>Navigation</div>
               <div class="layer-tool">not a panel</div>
             </td>
-            <td>The product's pages, with Ask Nanci among them</td>
+            <td>The product's <span class="anatomy-term" data-term="feature">features</span></td>
             <td>Always there</td>
             <td>Never</td>
           </tr>
@@ -1668,28 +1708,27 @@
             <td>
               <div class="layer-name"><i class="sec-dot" style="background:var(--aperia-blue)"></i>Primary</div>
             </td>
-            <td>The page picked from the menu: any page of the product, or Ask Nanci</td>
-            <td>A navigate: a menu click, or an ask that means take me somewhere. Pages load fresh; Ask Nanci resumes
-              its conversation</td>
-            <td>Never closes. Only a navigate replaces it, which also clears everything beside it</td>
+            <td>The starting screen of the selected feature</td>
+            <td>Clicking a <span class="anatomy-term" data-term="feature">feature</span> in Navigation</td>
+            <td>Never</td>
           </tr>
           <tr>
             <td>
               <div class="layer-name"><i class="sec-dot" style="background:var(--success)"></i>Secondary</div>
             </td>
-            <td>Whatever is opened from Primary: a report the chat opened, a record clicked in a page's list, or Ask
-              Nanci itself when summoned onto a page</td>
-            <td>A click or an ask inside Primary</td>
-            <td>Its ✕, a menu click, or a new open from Primary replacing it. Takes Tertiary with it</td>
+            <td>The panel opened from <span class="anatomy-term" data-term="primary">Primary</span></td>
+            <td>An open request inside <span class="anatomy-term" data-term="primary">Primary</span></td>
+            <td>Its own <span class="anatomy-term" data-term="close-secondary">close button</span>, or <span class="anatomy-term"
+                data-term="primary">Primary</span> being refreshed</td>
           </tr>
           <tr>
             <td>
               <div class="layer-name"><i class="sec-dot" style="background:var(--warning)"></i>Tertiary</div>
             </td>
-            <td>Whatever is opened from Secondary: a record's line items, an item's history. Going deeper replaces it
-              and grows the breadcrumb</td>
-            <td>A click or an ask inside Secondary</td>
-            <td>Its ✕, or anything that closes or replaces a panel to its left</td>
+            <td>The panel opened from <span class="anatomy-term" data-term="secondary">Secondary</span></td>
+            <td>A drill request inside <span class="anatomy-term" data-term="secondary">Secondary</span></td>
+            <td>Its own <span class="anatomy-term" data-term="close-tertiary">close button</span>, or <span class="anatomy-term"
+                data-term="secondary">Secondary</span> closing or being refreshed</td>
           </tr>
         </tbody>
       </table>
@@ -1699,74 +1738,65 @@
   <section id="intents">
     <div class="wrap">
       <p class="sec-label">03 · Interactions</p>
-      <h2>Play The Model, Then Read The Rules</h2>
-      <p class="sec-intro">Every way of opening something is one of three triggers: navigate, summon, or drill. The
-        behavior binds to the trigger, never to who fired it, so Ask Nanci and any product feature emitting the same
-        trigger behave identically, with no coordination between teams. Play first; the triggers and rules below cover
-        every case.</p>
+      <h2>Triggers And Rules</h2>
+      <p class="sec-intro">Every way of opening something is one of three triggers: navigate, summon, or drill. What
+        happens depends on the trigger, not on what fired it, so a menu item and a row inside a panel that use the same
+        trigger behave the same way.</p>
 
-      <div class="ptabs">
-        <button class="ptab active" id="ptab-triggers" onclick="pMode('triggers')">Foundation</button>
-        <button class="ptab" id="ptab-manual" onclick="pMode('manual')">Experimental</button>
-      </div>
-      <div class="demo-stage" style="min-height:300px; margin:0">
+      <div class="demo-stage" style="height:360px; margin:26px 0 0">
         <div class="anat-col anat-nav" style="flex:0 0 118px">
           <div class="anat-label" style="color:var(--dark-gray)">Navigation</div>
           <div class="mini-nav sec-nav" style="flex:1">
             <div class="nv-title">Menu</div>
-            <div class="nv-item nv-click active" id="dB-nav-nanci" onclick="pNav(event,'chat')" data-tip>Ask Nanci</div>
-            <div class="nv-item nv-click" id="dB-nav-um" onclick="pNav(event,'um')" data-tip>User Mgmt</div>
-            <div class="nv-item nv-click" id="dB-nav-dash" onclick="pNav(event,'dash')" data-tip>Dashboard</div>
+            <div class="nv-item nv-click active" id="dB-nav-nanci" onclick="pNav(event,'chat')">Ask Nanci</div>
+            <div class="nv-item nv-click" id="dB-nav-um" onclick="pNav(event,'um')">User Mgmt</div>
+            <div class="nv-item nv-click" id="dB-nav-dash" onclick="pNav(event,'dash')">Dashboard</div>
           </div>
         </div>
         <div id="dB-chain" style="display:flex; gap:10px; flex:1; min-width:0"></div>
       </div>
       <div class="demo-btns" style="justify-content:space-between; align-items:flex-start">
-        <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-start">
-          <button class="tgl lbl-t" onclick="pLabels()"><span class="tgl-track"><span
-                class="tgl-knob"></span></span>Anatomy markers</button>
-          <button class="tgl" id="pshift" onclick="pLatch()" style="display:none"><span class="tgl-track"><span
-                class="tgl-knob"></span></span>Simulate holding Shift<span class="tgl-div">|</span><span class="dot-ind"
-              id="pshift-status">clicks load in place</span></button>
-        </div>
+        <button class="tgl lbl-t" onclick="pLabels()"><span class="tgl-track"><span
+              class="tgl-knob"></span></span>Anatomy markers</button>
         <button class="chip reset" onclick="pReset()">Reset Prototype</button>
       </div>
-      <h3 id="pmode-heading" style="margin-top:26px">How This Mode Works</h3>
-      <p class="demo-note" id="dB-note">Three moves. Opening puts things in the next panel over, ✕ closes a panel and
-        everything after it, and the rest just updates in place. The breadcrumb shows the path that no longer fits;
-        click a step to go back.</p>
+      <p class="demo-note" id="dB-note"></p>
 
       <div id="triggers-content">
+        <h3 style="margin-top:30px">The Three Triggers</h3>
+        <p class="demo-note">Each row is one trigger: what the user means by it, what it changes on screen, and how
+          they get back to what it replaced. Navigate is the only trigger allowed to touch Primary, so whatever the user
+          is working from stays put until they ask to leave. Summon and drill only ever add or replace panels beside it,
+          so nothing a user does inside a panel can disturb what opened it. The Parts named here (Primary, Secondary,
+          Tertiary) are the ones defined in <a href="#layout">Anatomy</a>.</p>
         <table class="stack-table" style="margin-top:12px">
           <thead>
             <tr>
               <th style="width:110px">Trigger</th>
               <th style="width:210px">Means</th>
               <th>What happens</th>
-              <th style="width:210px">The way back</th>
+              <th style="width:210px">How to get back</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td><span class="badge b-blue">Navigate</span></td>
-              <td>Take me somewhere</td>
-              <td>Replaces Primary and clears everything beside it. The only trigger that may touch Primary, which is
-                what protects the conversation while you work from it. High bar: it changes what the user is looking at
-              </td>
-              <td>The menu's own selected state</td>
+              <td>Take me to a feature</td>
+              <td>Replaces Primary and closes every panel beside it</td>
+              <td>Pick the feature again</td>
             </tr>
             <tr>
               <td><span class="badge b-green">Summon</span></td>
-              <td>Give me this alongside what I am doing</td>
+              <td>Show me this beside what I am currently viewing</td>
               <td>Opens a panel beside, additive. Never touches Primary</td>
-              <td>Triggered conversationally, it leaves a card in the thread; the thread is the trail back</td>
+              <td>Summon it again</td>
             </tr>
             <tr>
               <td><span class="badge b-amber">Drill</span></td>
-              <td>Go deeper on this thing in front of me</td>
-              <td>Stacks a child below its parent, anchored to it, and closes with it. It stacks while there is room;
-                when full, the deepest panel refreshes in place and the breadcrumb extends</td>
-              <td>The parent it came from, or a breadcrumb step</td>
+              <td>Show me more about this</td>
+              <td>Opens a child panel below its parent and closes with it. When there is no room left, the deepest
+                panel is reused and the breadcrumb grows</td>
+              <td>The parent panel, or a step in the breadcrumb</td>
             </tr>
           </tbody>
         </table>
@@ -1776,58 +1806,34 @@
             <div>
               <div class="ptext">Forward Only</div>
               <div class="pdesc">A panel can change itself and the panels after it, never the panels before it. So
-                inside a panel you can only go deeper; new things open from the conversation or the menu. Navigate is
-                the only exception, because you asked to go somewhere else.</div>
+                inside a panel you can only go deeper; anything new opens from outside it. What is true updates
+                everywhere.</div>
             </div>
           </div>
           <div class="principle"><span class="num">02</span>
             <div>
-              <div class="ptext">Room Is Limited</div>
-              <div class="pdesc">Only a few panels fit on screen. When there is no room left, going deeper uses the last
-                panel again, and the breadcrumb remembers your path.</div>
+              <div class="ptext">Newest Yields</div>
+              <div class="pdesc">When space runs short, the newest panel gives way. What you came through stays put,
+                so making room never costs you the way back.</div>
             </div>
           </div>
           <div class="principle"><span class="num">03</span>
             <div>
               <div class="ptext">Always A Way Back</div>
-              <div class="pdesc">You can always bring a view back: click your old message, or use the breadcrumb. It
-                comes back with live data, not an old copy.</div>
+              <div class="pdesc">Every panel you have opened can be opened again. Getting back should never depend on
+                remembering how you got there.</div>
             </div>
           </div>
           <div class="principle"><span class="num">04</span>
             <div>
               <div class="ptext">Never Opens By Itself</div>
-              <div class="pdesc">A panel never opens or closes by itself. Nanci can send a message with a button, but
-                only your click opens the panel.</div>
+              <div class="pdesc">Nothing opens unbidden. A panel is an answer to something you asked, not something
+                Ask Nanci decided you needed.</div>
             </div>
           </div>
         </div>
       </div>
 
-      <div id="manual-content" style="display:none">
-        <table class="stack-table" style="margin-top:12px">
-          <thead>
-            <tr>
-              <th style="width:220px">You do</th>
-              <th>What happens</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Plain click</td>
-              <td>Loads in the panel you clicked, like a web page. The breadcrumb is that panel's history</td>
-            </tr>
-            <tr>
-              <td>Hold Shift and click, or the ⇧ toggle</td>
-              <td>Opens it as a panel beside or below instead. You decide the placement, never the system</td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="callout amber"><strong>An experiment in user-controlled placement, not the model.</strong> The
-          system never guesses where things should open; the modifier decides. The open question is discoverability:
-          side-by-side work only happens when the user knows the key, which is why the tooltip, the ⇧ chip, and the
-          held-Shift highlight exist.</div>
-      </div>
     </div>
   </section>
 
@@ -1877,6 +1883,19 @@
           </tr>
           <tr>
             <td>
+              <div class="layer-name">Does bringing it back show today's answer?</div>
+            </td>
+            <td>It is a snapshot. Returning to a panel asks the question again; it never replays the answer you saw
+              before</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="layer-name">Does opening it again create a duplicate?</div>
+            </td>
+            <td>One copy of a thing, ever. Go to the one already on screen instead of opening a second</td>
+          </tr>
+          <tr>
+            <td>
               <div class="layer-name">Does anything inside it open a new topic?</div>
             </td>
             <td>Move that to the conversation or the menu. Inside a panel you can only go deeper (Forward Only)</td>
@@ -1923,6 +1942,18 @@
           <div class="c-hdr">
             <div class="c-left">
               <div class="c-icon">?</div>
+              <div class="c-title">The model on a narrow screen</div>
+            </div><span class="chevron">▼</span>
+          </div>
+          <div class="c-body">On a phone the panels cannot sit side by side, so the path stops being visible. Leading
+            proposal: treat how many panels fit as a setting rather than a second layout, so every rule still holds
+            and the breadcrumb carries the path. The cost is that drill and summon start to look alike when only one
+            panel shows. Until decided: the model assumes room for at least two panels.</div>
+        </div>
+        <div class="concern">
+          <div class="c-hdr">
+            <div class="c-left">
+              <div class="c-icon">?</div>
               <div class="c-title">Liveness, and disappearing records</div>
             </div><span class="chevron">▼</span>
           </div>
@@ -1933,10 +1964,10 @@
           <div class="c-hdr">
             <div class="c-left">
               <div class="c-icon">?</div>
-              <div class="c-title">Whether a reopened view replays later filters</div>
+              <div class="c-title">Whether a reopened panel replays later filters</div>
             </div><span class="chevron">▼</span>
           </div>
-          <div class="c-body">Bringing a view back re-runs the request live. Whether it also replays the narrowing the
+          <div class="c-body">Bringing a panel back re-runs the request live. Whether it also replays the narrowing the
             user did afterwards is the open question; the conversation records it, so the information exists.</div>
         </div>
         <div class="concern">
@@ -1988,7 +2019,6 @@
     </div>
   </footer>
 
-  <div id="ptip"></div>
   <script>
     // Accordion
     document.querySelectorAll('.c-hdr').forEach(hdr => {
@@ -2011,12 +2041,75 @@
 
     function el(html) { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstChild; }
 
+    // ---- Interactive anatomy: hovering a .term highlights it in the diagram ----
+    const TERMS = {
+      navigation: { sel: '.sec-nav', tip: 'Navigation: the menu of features. Not a panel.' },
+      feature: { sel: '.sec-nav .nv-item', tip: 'A feature: one destination in the menu. Picking one loads its starting screen into Primary.' },
+      panel: { sel: '.sec-pri, .sec-sup, .sec-det', tip: 'Every screen is a panel: a header over a body.' },
+      primary: { sel: '.sec-pri', tip: 'Primary: the starting screen of the selected feature.' },
+      landing: { sel: '.sec-pri', tip: 'The starting screen: what Primary shows after a navigate.' },
+      secondary: { sel: '.sec-sup', tip: 'Secondary: opened from Primary.' },
+      tertiary: { sel: '.sec-det', tip: 'Tertiary: opened from Secondary; the breadcrumb keeps its path.' },
+      header: { sel: '.sec-sup .mini-head, .sec-det .mini-head', tip: 'Every panel header: title, breadcrumb, close.' },
+      body: { sel: '.sec-sup .mini-body, .sec-det .mini-body', tip: 'The body: rows, charts, forms, or a real screen.' },
+      close: { sel: '.mini-x', tip: 'Close: this panel goes, and everything opened after it.' },
+      'close-secondary': { sel: '.sec-sup .mini-x', tip: 'Close Secondary: this panel goes, and Tertiary goes with it.' },
+      'close-tertiary': { sel: '.sec-det .mini-x', tip: 'Close Tertiary: only this panel goes. Secondary stays.' },
+      breadcrumb: { sel: '.crumb, .crumb-dots', tip: 'The breadcrumb: the path that no longer fits on screen. Click a step to go back; ••• holds the steps before it.' }
+    };
+    const anatStage = document.getElementById('anatomy-stage');
+    const anatTip = document.createElement('div');
+    anatTip.id = 'anat-tip';
+    document.body.appendChild(anatTip);
+    let termLock = null;
+    function termOff() {
+      anatStage.querySelectorAll('.anat-hi').forEach(x => x.classList.remove('anat-hi'));
+      anatStage.querySelectorAll('.anat-dim').forEach(x => x.classList.remove('anat-dim'));
+      document.querySelectorAll('.anatomy-term.on').forEach(x => x.classList.remove('on'));
+      anatTip.style.display = 'none';
+    }
+    function termOn(key, span) {
+      termOff();
+      const t = TERMS[key];
+      if (!t) return;
+      if (span) span.classList.add('on');
+      const hits = [...anatStage.querySelectorAll(t.sel)];
+      hits.forEach(x => x.classList.add('anat-hi'));
+      anatStage.querySelectorAll('.mini, .mini-nav').forEach(box => {
+        if (!hits.some(x => box === x || box.contains(x) || x.contains(box))) box.classList.add('anat-dim');
+      });
+      if (hits[0]) {
+        const r = hits[0].getBoundingClientRect();
+        anatTip.textContent = t.tip;
+        anatTip.style.display = 'block';
+        anatTip.style.left = (r.left + r.width / 2) + 'px';
+        anatTip.style.top = (r.top - 10) + 'px';
+      }
+    }
+    // Manual trigger: anatomyHighlight('close') from the console or other scripts; no argument clears.
+    window.anatomyHighlight = key => { termLock = key ? 'manual' : null; key ? termOn(key) : termOff(); };
+    document.addEventListener('mouseover', e => {
+      if (termLock) return;
+      const s = e.target.closest ? e.target.closest('.anatomy-term[data-term]') : null;
+      if (s) termOn(s.dataset.term, s);
+    });
+    document.addEventListener('mouseout', e => {
+      if (termLock) return;
+      const s = e.target.closest ? e.target.closest('.anatomy-term[data-term]') : null;
+      if (s) termOff();
+    });
+    document.addEventListener('click', e => {
+      const s = e.target.closest ? e.target.closest('.anatomy-term[data-term]') : null;
+      if (s) { termLock = termLock === s ? null : s; termLock ? termOn(s.dataset.term, s) : termOff(); }
+      else if (termLock) { termLock = null; termOff(); }
+    });
+    window.addEventListener('scroll', () => { if (!termLock) return; termLock = null; termOff(); }, { passive: true });
+
     // ---- The Playground: root + chain + three primitives ----
     const dBChain = document.getElementById('dB-chain');
     const dBNote = document.getElementById('dB-note');
     const NAVS = { chat: 'dB-nav-nanci', um: 'dB-nav-um', dash: 'dB-nav-dash' };
-    const DEFAULT_NOTE = 'Three moves. Opening puts things in the next panel over, ✕ closes a panel and everything after it, and the rest just updates in place. The breadcrumb shows the path that no longer fits; click a step to go back.';
-    const MANUAL_NOTE = 'You decide, and everything is a link. A plain click loads in place, and the breadcrumb is its history. Hold Shift while clicking (or toggle the ⇧ chip, for touch) to open it as a panel instead. The menu is no different.';
+    const DEFAULT_NOTE = '';
     let chain;
     function note(h) { dBNote.innerHTML = h; }
     function hasChat() { return chain.some(e => e.id === 'chat'); }
@@ -2092,16 +2185,19 @@
       const e = chain[i];
       const cls = ['sec-pri', 'sec-sup', 'sec-det'][i] + (anim ? ' ' + anim : '') + (i === focusIdx ? ' p-focus' : '');
       let head = '';
-      (e.trail || []).forEach((t, k) => { head += '<span class="crumb" style="cursor:pointer" onclick="pTrail(' + i + ',' + k + ')">' + SHORT[t] + ' ▸</span> '; });
+      const trail = e.trail || [];
+      const step = (t, k) => '<span class="crumb" style="cursor:pointer" onclick="pTrail(' + i + ',' + k + ')">' + SHORT[t] + ' ▸</span> ';
+      if (trail.length > 1) {
+        // Too deep to show in full: keep the level before the current one, fold the rest
+        // into the ••• menu. The path is never truncated, only collapsed.
+        head += '<span class="crumb-dots" onclick="pMore(event,this,' + i + ')">•••</span> <span class="crumb">▸</span> '
+          + step(trail[trail.length - 1], trail.length - 1);
+      } else {
+        trail.forEach(step);
+      }
       head += DEFS[e.id].title;
       if (i > 0) head += '<span class="mini-x mini-x-btn" onclick="pClose(' + i + ')">✕</span>';
-      let out = '<div class="mini ' + cls + '" style="flex:1"><div class="mini-head">' + head + '</div><div class="mini-body">' + DEFS[e.id].body(e) + '</div></div>';
-      if (mode === 'manual') {
-        out = out.replace(/class="sugg"/g, 'class="sugg" data-tip')
-          .replace(/class="mrow clickable"/g, 'class="mrow clickable" data-tip')
-          .replace(/class="mwidget clickable"/g, 'class="mwidget clickable" data-tip');
-      }
-      return out;
+      return '<div class="mini ' + cls + '" style="flex:1"><div class="mini-head">' + head + '</div><div class="mini-body">' + DEFS[e.id].body(e) + '</div></div>';
     }
     function label(i) {
       const c = ['var(--aperia-blue)', 'var(--success)', 'var(--warning)'][i];
@@ -2116,6 +2212,7 @@
       let h = '<div class="anat-col" style="flex:1.1; min-width:0">' + label(0) + panelHtml(0, anim(0)) + '</div>';
       if (chain.length > 1) h += '<div class="anat-col' + colNew + '" style="flex:1.2; min-width:0">' + label(1) + panelHtml(1, colNew ? '' : anim(1)) + (chain[2] ? label(2) + panelHtml(2, anim(2)) : '') + '</div>';
       dBChain.innerHTML = h;
+      crumbMenuOff();
       prevKeys = keys;
     }
     function push(from, id, kind) {
@@ -2137,60 +2234,17 @@
       }
     }
     let focusIdx = -1;
-    let mode = 'triggers', shiftLatch = false, shiftDown = false, labelsOn = false;
+    let labelsOn = false;
     function pLabels() {
       labelsOn = !labelsOn;
       document.body.classList.toggle('labels-on', labelsOn);
       document.querySelectorAll('.lbl-t').forEach(b => b.classList.toggle('on', labelsOn));
     }
-    function updShiftUI() {
-      const on = mode === 'manual' && (shiftLatch || shiftDown);
-      document.getElementById('pshift').classList.toggle('on', mode === 'manual' && shiftLatch);
-      const st = document.getElementById('pshift-status');
-      st.textContent = on ? 'opens in new panel' : 'clicks load in place';
-      st.className = on ? 'dot-ind d-on' : 'dot-ind';
-      document.body.classList.toggle('shift-held', on);
-    }
-    const pTip = document.getElementById('ptip');
-    let tipTarget = null;
-    function tipText() { return (shiftLatch || shiftDown) ? '⇧ Opens in a new panel' : 'Click loads in place · hold ⇧ Shift to open in a new panel'; }
-    function refreshTip() {
-      if (!tipTarget) return;
-      const custom = tipTarget.getAttribute('data-tip');
-      pTip.textContent = custom || tipText();
-      pTip.classList.toggle('on', shiftLatch || shiftDown);
-      const r = tipTarget.getBoundingClientRect();
-      pTip.style.left = (r.left + r.width / 2) + 'px';
-      pTip.style.top = (r.top - 8) + 'px';
-    }
-    document.addEventListener('mouseover', e => {
-      if (mode !== 'manual') return;
-      const t = e.target.closest ? e.target.closest('[data-tip]') : null;
-      if (t) { tipTarget = t; pTip.style.display = 'block'; refreshTip(); }
-    });
-    document.addEventListener('mouseout', e => {
-      const t = e.target.closest ? e.target.closest('[data-tip]') : null;
-      if (t && t === tipTarget) { tipTarget = null; pTip.style.display = 'none'; }
-    });
-    document.addEventListener('click', () => { tipTarget = null; pTip.style.display = 'none'; });
-    document.addEventListener('keydown', e => { if (e.key === 'Shift') { shiftDown = true; updShiftUI(); refreshTip(); } });
-    document.addEventListener('keyup', e => { if (e.key === 'Shift') { shiftDown = false; updShiftUI(); refreshTip(); } });
-    window.addEventListener('blur', () => { shiftDown = false; updShiftUI(); });
-    function wantPanel(ev) { return mode === 'triggers' ? true : ((ev && (ev.shiftKey || ev.metaKey || ev.ctrlKey)) || shiftLatch || shiftDown); }
     function pFrom(ev, fromId, id) {
       const kind = (id === 'chat' || fromId === 'chat') ? 'summon' : 'drill';
       const from = chain.findIndex(x => x.id === fromId);
-      if (mode === 'manual' && !wantPanel(ev)) {
-        const e = chain[from];
-        const trail = (e.trail || []).concat([e.id]);
-        chain = chain.slice(0, from);
-        chain.push({ id: id, trail: trail });
-        render();
-        note('<strong>In place.</strong> ' + SHORT[id] + ' loaded in the panel you clicked, like a web page; its breadcrumb is the history. Hold Shift while clicking to open it as a panel instead.');
-        return;
-      }
       const ex = chain.findIndex(x => x.id === id);
-      if (mode === 'triggers' && ex !== -1 && ex <= from) {
+      if (ex !== -1 && ex <= from) {
         focusIdx = ex; render(); focusIdx = -1;
         note('<strong>Already open.</strong> ' + SHORT[id] + ' is on screen, so nothing new opens: you just go to it. One copy of a thing, ever.');
         return;
@@ -2198,24 +2252,31 @@
       push(from, id, kind);
     }
     function pChat(ev, id) { pFrom(ev, 'chat', id); }
-    function pMode(m) {
-      mode = m;
-      document.getElementById('ptab-triggers').classList.toggle('active', m === 'triggers');
-      document.getElementById('ptab-manual').classList.toggle('active', m === 'manual');
-      document.getElementById('pshift').style.display = m === 'manual' ? '' : 'none';
-      document.body.classList.toggle('mode-manual', m === 'manual');
-      document.getElementById('pmode-heading').textContent = 'How This Mode Works';
-      document.getElementById('triggers-content').style.display = m === 'manual' ? 'none' : '';
-      document.getElementById('manual-content').style.display = m === 'manual' ? '' : 'none';
-      tipTarget = null; pTip.style.display = 'none';
-      shiftLatch = false; updShiftUI();
-      pReset();
-    }
-    function pLatch() {
-      shiftLatch = !shiftLatch;
-      updShiftUI();
-    }
     function pClose(i) { chain = chain.slice(0, i); render(); note('<strong>Close.</strong> That panel closed and took everything opened from it. The panels before it did not move.'); }
+    // The ••• menu of collapsed crumb steps. Steps are rebuilt from `chain` on open, so the
+    // markup never carries a stale copy of the path.
+    const crumbMenu = document.createElement('div');
+    crumbMenu.id = 'crumb-menu';
+    document.body.appendChild(crumbMenu);
+    function crumbMenuOff() {
+      crumbMenu.classList.remove('on');
+      document.querySelectorAll('.crumb-dots.on').forEach(x => x.classList.remove('on'));
+    }
+    function pMore(ev, dots, i) {
+      ev.stopPropagation();
+      const wasOpen = dots.classList.contains('on');
+      crumbMenuOff();
+      if (wasOpen) return;
+      crumbMenu.innerHTML = (chain[i].trail || []).slice(0, -1)
+        .map((t, k) => '<button onclick="crumbMenuOff();pTrail(' + i + ',' + k + ')">' + SHORT[t] + '</button>').join('');
+      const r = dots.getBoundingClientRect();
+      crumbMenu.style.left = r.left + 'px';
+      crumbMenu.style.top = (r.bottom + 4) + 'px';
+      crumbMenu.classList.add('on');
+      dots.classList.add('on');
+    }
+    document.addEventListener('click', e => { if (!e.target.closest || !e.target.closest('#crumb-menu')) crumbMenuOff(); });
+    window.addEventListener('scroll', crumbMenuOff, { passive: true });
     function pTrail(i, k) {
       const e = chain[i];
       const id = e.trail[k];
@@ -2226,19 +2287,11 @@
       note('<strong>Back.</strong> The breadcrumb reopened that view with today’s data. You are back at ' + SHORT[id] + '.');
     }
     function pNav(ev, pageId) {
-      if (mode === 'manual' && wantPanel(ev)) {
-        chain = [chain[0], { id: pageId }];
-        render();
-        note('<strong>Opened as a panel, straight from the menu.</strong> Shift makes any link open beside instead of loading. The menu is a link like any other.');
-        return;
-      }
       chain = [{ id: pageId }];
       render();
-      note(mode === 'manual'
-        ? '<strong>Loaded.</strong> A plain click loads the page; the menu is a link like any other.'
-        : '<strong>Navigate.</strong> Primary reloads and everything else closes. Pages reload fresh; Ask Nanci is the one exception: it always resumes.');
+      note('<strong>Navigate.</strong> Primary reloads and everything else closes. A feature opens at its starting screen, fresh; Ask Nanci is the one exception: it always resumes.');
     }
-    function pReset() { chain = [{ id: 'chat' }]; render(); note(mode === 'manual' ? MANUAL_NOTE : DEFAULT_NOTE); }
+    function pReset() { chain = [{ id: 'chat' }]; render(); note(DEFAULT_NOTE); }
     pReset();
   </script>
 </body>
