@@ -38,7 +38,7 @@ function Projection() {
       </ResponsiveContainer>
       <div className="flex items-center justify-center gap-4 text-[11px] text-muted-foreground">
         <span className="flex items-center gap-1.5"><span className="size-2 rounded-[2px] bg-muted-foreground/60" /> Current Setup</span>
-        <span className="flex items-center gap-1.5"><span className="size-2 rounded-[2px] bg-primary" /> Nanci Recommended</span>
+        <span className="flex items-center gap-1.5"><span className="size-2 rounded-[2px] bg-primary" /> Ask Nanci Recommended</span>
       </div>
     </div>
   )

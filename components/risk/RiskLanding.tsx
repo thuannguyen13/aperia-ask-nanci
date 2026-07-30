@@ -57,13 +57,13 @@ export function RiskLanding({ onOpenView }: { onOpenView?: (dest: RiskChipDest, 
           )})}
         </div>
 
-        {/* Nanci's take on today */}
+        {/* Ask Nanci's take on today */}
         <div className="flex flex-col gap-4">
           <div className="flex items-start gap-2">
             <BarChartBig className="mt-0.5 size-5 shrink-0 text-foreground" />
             <div>
-              <p className="text-base font-medium text-foreground">Nanci&apos;s take on today</p>
-              <p className="text-sm text-muted-foreground">What Nanci flagged across the alerted portfolio.</p>
+              <p className="text-base font-medium text-foreground">Ask Nanci&apos;s take on today</p>
+              <p className="text-sm text-muted-foreground">What Ask Nanci flagged across the alerted portfolio.</p>
             </div>
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">

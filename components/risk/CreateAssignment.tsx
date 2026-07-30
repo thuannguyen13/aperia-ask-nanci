@@ -18,7 +18,7 @@ import { useRiskNav } from "./RiskNavContext"
 
 // Create Assignment (Figma frames 219 → 225): a full-panel form that replaces the
 // assignment list. Selecting MC parameters expands a config card per parameter;
-// "Review with Nanci" opens the analysis column beside the form, and its
+// "Review with Ask Nanci" opens the analysis column beside the form, and its
 // "Modify the Threshold" chip writes back into the re-alert field.
 
 const LABEL = "text-sm font-medium text-foreground"
@@ -300,7 +300,7 @@ export function CreateAssignment({ onCancel, onSubmit }: { onCancel: () => void;
         <div className={cn("flex shrink-0 items-center gap-2 px-4 py-3 md:px-6", assistant ? "justify-between" : "justify-end")}>
           {assistant && (
             <Button variant="outline" size="sm" className="text-primary" onClick={() => setReview(true)}>
-              <Sparkles className="size-4" /> Review with Nanci
+              <Sparkles className="size-4" /> Review with Ask Nanci
             </Button>
           )}
           <div className="flex items-center gap-2">
