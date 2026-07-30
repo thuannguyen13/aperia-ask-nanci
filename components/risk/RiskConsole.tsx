@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useSearchParams } from "next/navigation"
 import { MessageCircle, LayoutDashboard, ListChecks, ClipboardList } from "lucide-react"
 import Image from "next/image"
 import { useAskNanci } from "@/contexts/AskNanciContext"
@@ -29,14 +30,44 @@ const DEST_PANEL: Record<Exclude<RiskDest, "ask-nanci">, PanelId> = {
   assignment: "risk-assignments",
 }
 
+// Destinations double as their own URL slugs, so `/risk?view=detection-queue` opens
+// straight into that screen and the address bar stays shareable as you navigate.
+// `ask-nanci` is the only dest with no panel, so DEST_PANEL is the runtime list.
+const isRiskDest = (value: string | null): value is RiskDest =>
+  value === "ask-nanci" || (!!value && value in DEST_PANEL)
+
 // `assistant: false` is the Phase 1 console: no Ask Nanci nav item, no chat home,
 // no side panels. Everything else is the same screens.
 export function RiskConsole({ assistant = true }: { assistant?: boolean }) {
   const { view, startNewChat } = useAskNanci()
+  const params = useSearchParams()
   const home: RiskDest = assistant ? "ask-nanci" : "dashboard"
-  const [dest, setDest] = useState<RiskDest>(home)
-  const [merchantId, setMerchantId] = useState<string | null>(null)
-  const [barometerFilter, setBarometerFilter] = useState<"critical" | null>(null)
+
+  // The URL seeds the opening screen; after mount, state is the source of truth and
+  // the effect below writes it back. `ask-nanci` falls back to home in Phase 1,
+  // where there is no assistant to land on.
+  const linked = params.get("view")
+  const [dest, setDest] = useState<RiskDest>(
+    isRiskDest(linked) && (linked !== "ask-nanci" || assistant) ? linked : home,
+  )
+  const [merchantId, setMerchantId] = useState<string | null>(params.get("merchant"))
+  const [barometerFilter, setBarometerFilter] = useState<"critical" | null>(
+    params.get("filter") === "critical" ? "critical" : null,
+  )
+
+  // replaceState, not a route change: the destination is client state, so pushing
+  // through the router would remount the console on every nav item click.
+  useEffect(() => {
+    const next = new URLSearchParams(window.location.search)
+    if (dest === home) next.delete("view")
+    else next.set("view", dest)
+    if (dest === "risk-report" && merchantId) next.set("merchant", merchantId)
+    else next.delete("merchant")
+    if (dest === "barometer-report" && barometerFilter) next.set("filter", barometerFilter)
+    else next.delete("filter")
+    const query = next.toString()
+    window.history.replaceState(null, "", query ? `${window.location.pathname}?${query}` : window.location.pathname)
+  }, [dest, merchantId, barometerFilter, home])
 
   const openBarometer = (filter: "critical" | null = null) => { setBarometerFilter(filter); setDest("barometer-report") }
   const openMerchant = (id: string) => { setMerchantId(id); setDest("risk-report") }
