@@ -1,16 +1,21 @@
 // Aperia Risk — Assignment Management destination (Figma "4. Assignment Management").
-// ponytail: illustrative demo data, not a live feed.
+// ponytail: the eligible count and the scored-transaction total are REAL portfolio
+// sizes summed across the four scored client portfolios (ESQR 4,681 / Maverick
+// 4,606 / Clearent 1,586 / Nuvei 1,251 chargeback merchants; 72,985 / 41,062 /
+// 53,156 / 53,771 MC-scored transactions, Sept–Dec 2025 — see
+// wiki/aperia-risk/demo-data-spec.md). The dollar amounts and the per-assignment
+// alert counts below are still illustrative; the source data carried no dollars.
 
 export const AM_INTEGRATION = {
   name: "Mastercard Brighterion",
   status: "Connected",
   lastSync: "Today 06:14 AM",
-  scored: "1,284,592 transactions scored in last 24h",
+  scored: "220,974 transactions scored across 4 portfolios (Sept–Dec 2025)",
 }
 
 // Distinct Merchant Summary — four stat cards (count + dollar amount).
 export const AM_SUMMARY: { label: string; count: string; amount: string }[] = [
-  { label: "Eligible",  count: "90,669", amount: "$107,912,116.30" },
+  { label: "Eligible",  count: "12,124", amount: "$107,912,116.30" },
   { label: "Alerted",   count: "364",    amount: "$18,082,415.58" },
   { label: "Worked",    count: "0",      amount: "$0.00" },
   { label: "Remaining", count: "364",    amount: "$18,082,415.58" },

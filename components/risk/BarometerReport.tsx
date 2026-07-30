@@ -7,13 +7,8 @@ import { cn } from "aperia-ds5/utils"
 import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
 import { QueueSummaryCard } from "./QueueSummaryCard"
 import { useRiskNav } from "./RiskNavContext"
-import { RISK_MERCHANTS, type RiskMerchant, type WorkStatus } from "@/lib/ask-nanci/data/risk-merchants"
-
-const RISK_PILL: Record<RiskMerchant["risk"], string> = {
-  High:   "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300",
-  Medium: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
-  Low:    "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",
-}
+import { RISK_MERCHANTS, type WorkStatus } from "@/lib/ask-nanci/data/risk-merchants"
+import { RISK_PILL } from "./risk-level"
 
 function TagBadges({ alert, list }: { alert: number; list: number }) {
   return (
@@ -89,6 +84,7 @@ export function BarometerReport() {
             <thead>
               <tr className="border-b bg-muted/40 text-left text-xs text-muted-foreground">
                 <th className="px-4 py-2.5 font-medium">Merchant Name</th>
+                <th className="px-4 py-2.5 font-medium">MCC</th>
                 <th className="px-4 py-2.5 font-medium">Tag</th>
                 <th className="px-4 py-2.5 font-medium">VW Score</th>
                 <th className="px-4 py-2.5 font-medium">MC Score</th>
@@ -100,7 +96,12 @@ export function BarometerReport() {
               {merchants.map((m) => (
                 <tr key={m.id} className="border-b last:border-0">
                   <td className="px-4 py-2.5">
-                    <button onClick={() => nav.openMerchant(m.id)} className="max-w-[220px] truncate font-medium text-primary hover:underline">{m.name}</button>
+                    <button onClick={() => nav.openMerchant(m.id)} className="block max-w-[220px] truncate font-medium text-primary hover:underline">{m.name}</button>
+                    <span className="text-xs tabular-nums text-muted-foreground">{m.mid}</span>
+                  </td>
+                  <td className="px-4 py-2.5">
+                    <span className="block tabular-nums text-foreground">{m.mcc}</span>
+                    <span className="block max-w-[160px] truncate text-xs text-muted-foreground">{m.mccDesc}</span>
                   </td>
                   <td className="px-4 py-2.5"><TagBadges alert={m.alertTag} list={m.listTag} /></td>
                   <td className="px-4 py-2.5 tabular-nums text-foreground">{m.vw}</td>

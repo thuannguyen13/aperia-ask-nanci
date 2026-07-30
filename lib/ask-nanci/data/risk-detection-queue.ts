@@ -1,6 +1,10 @@
 // Aperia Risk — Detection Queue destination (Figma: "3. Detection Queue", 401:84863).
 // Content only; layout lives in components/risk/DetectionQueue.tsx.
-// ponytail: illustrative queue data for the demo skin, not a live feed.
+// ponytail: eligible-merchant counts are REAL portfolio sizes (ESQR 4,681 and
+// Clearent 1,586 chargeback merchants, Sept–Dec 2025 — see
+// wiki/aperia-risk/demo-data-spec.md). The per-status counts and dollar amounts
+// are the Figma's illustrative values.
+// Numbers here are quoted verbatim in risk-conversations.ts — keep the two in step.
 
 export interface QueueStatus {
   key: "alerted" | "ready" | "wip" | "worked"
@@ -30,7 +34,7 @@ export const DETECTION_QUEUES: DetectionQueueData[] = [
     assignment: "Esquire - Phase 2 Parameters - Auths - Detect Q",
     code: "DQ",
     mastercard: true,
-    eligibleMerchants: 4036,
+    eligibleMerchants: 4681,
     requeued: { count: 11, amount: 84901.89 },
     workedOf: 11,
     statuses: [
@@ -43,7 +47,7 @@ export const DETECTION_QUEUES: DetectionQueueData[] = [
   {
     assignment: "Authorizations Assignment",
     code: "DQ",
-    eligibleMerchants: 1166,
+    eligibleMerchants: 1586,
     requeued: { count: 67, amount: 84664.75 },
     workedOf: 1022,
     statuses: [

@@ -13,7 +13,8 @@ import {
 import { cn } from "aperia-ds5/utils"
 import { PanelShell } from "@/components/ask-nanci/shared"
 import { useRiskNav } from "./RiskNavContext"
-import { findMerchant, RISK_REPORT_DETAILS, DEFAULT_RISK_DETAIL, TXN_VOLUME_ROWS, RISK_VIOLATION_CYCLE, VIOLATION_ROWS, CROSS_QUEUE_ROWS, MERCHANT_NOTES_SEED, type ViolationRow, type NoteEntry } from "@/lib/ask-nanci/data/risk-merchants"
+import { findMerchant, scoreLevel, RISK_REPORT_DETAILS, DEFAULT_RISK_DETAIL, TXN_VOLUME_ROWS, RISK_VIOLATION_CYCLE, VIOLATION_ROWS, CROSS_QUEUE_ROWS, MERCHANT_NOTES_SEED, DEFAULT_MERCHANT_NOTES, type ViolationRow, type NoteEntry, type RiskLevel } from "@/lib/ask-nanci/data/risk-merchants"
+import { getRiskLevelStyles } from "./risk-level"
 
 // Parameter Violation Details modal columns (Figma order + widths).
 const VIOLATION_COLS: { key: keyof ViolationRow; label: string; blue?: boolean; w: string }[] = [
@@ -107,8 +108,9 @@ function Row({ label, value, badgeClass }: { label: string; value: string; badge
 // oversized ellipses bleeding past the edges. Exact hexes from the design — they
 // are a fixed brand surface, not theme tokens, so they don't flip in dark mode.
 function ScoreCard({ brand, logo, score, max, level, deltas, params, extra, dark }: {
-  brand: string; logo?: React.ReactNode; score: number; max: number; level: string; deltas: React.ReactNode; params: string; extra?: { label: string; value: string }[]; dark?: boolean
+  brand: string; logo?: React.ReactNode; score: number; max: number; level: RiskLevel; deltas: React.ReactNode; params: string; extra?: { label: string; value: string }[]; dark?: boolean
 }) {
+  const style = getRiskLevelStyles(level, dark)
   return (
     <div className={cn(
       "relative flex h-full flex-col overflow-hidden rounded-xl border",
@@ -124,11 +126,11 @@ function ScoreCard({ brand, logo, score, max, level, deltas, params, extra, dark
         <div className="flex items-center gap-2">
           {logo}
           <p className={cn("text-base font-semibold", dark ? "text-white" : "text-foreground")}>{brand}</p>
-          {/* destructive is a 10%-opacity fill — it blends to pink on white but
-              goes maroon on the dark card, so pin the opaque equivalent there. */}
-          <Badge variant="destructive" className={cn(dark && "bg-red-100 text-red-600")}>{level}</Badge>
+          {/* Colour follows the level, not the brand — this card is where a High
+              VW score and a Low MC score on the same merchant have to read apart. */}
+          <Badge variant="destructive" className={cn("border-transparent", style.badge)}>{level}</Badge>
         </div>
-        <p className="mt-2 text-3xl font-bold tabular-nums text-rose-600 dark:text-rose-400">
+        <p className={cn("mt-2 text-3xl font-bold tabular-nums", style.score)}>
           {score}<span className={cn("text-lg font-medium", dark ? "text-[#a3a3a3]" : "text-muted-foreground")}> /{max}</span>
         </p>
         <p className={cn("mt-1 text-xs", dark ? "text-[#a3a3a3]" : "text-muted-foreground")}>{deltas}</p>
@@ -372,7 +374,7 @@ export function RiskReport() {
   const [disposition, setDisposition] = useState("")
   const workState: WorkState = !disposition ? "none" : disposition === "Work in Progress" ? "wip" : "worked"
   const [activeTab, setActiveTab] = useState("transactions")
-  const [notes, setNotes] = useState<NoteEntry[]>(MERCHANT_NOTES_SEED)
+  const [notes, setNotes] = useState<NoteEntry[]>(MERCHANT_NOTES_SEED[nav.merchantId ?? ""] ?? DEFAULT_MERCHANT_NOTES)
 
   // Add Notes → prepend to the merchant-notes feed and jump to the Notes tab.
   function addNote(body: string) {
@@ -421,7 +423,7 @@ export function RiskReport() {
             <ViolationsPill count={d.violations} />
             <QueuesPill count={d.inQueues} />
           </div>
-          <p className="mt-1 text-base font-medium text-primary">{d.mid}</p>
+          <p className="mt-1 text-base font-medium tabular-nums text-primary">{m.mid}</p>
         </div>
         <div className="flex items-center gap-2">
           <Button variant="secondary" size="icon-sm"><MoreHorizontal className="size-4" /></Button>
@@ -454,19 +456,19 @@ export function RiskReport() {
       {/* Score cards */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <ScoreCard
-          brand="VW Score" score={m.vw} max={100} level={m.risk}
+          brand="VW Score" score={m.vw} max={100} level={scoreLevel(m.vw, 100)}
           deltas={<><span className="font-medium text-rose-600 dark:text-rose-400">{d.vwDelta30}</span> last 30 days</>}
           params={`${d.vwParams} parameters`}
           extra={[{ label: "Last Update", value: d.lastUpdate }]}
         />
         <ScoreCard
           brand="MC Score" logo={<Image src="/logos/mastercard-logomark.svg" alt="Mastercard" width={34} height={20} className="h-5 w-auto" />}
-          score={m.mc} max={1000} level={m.risk} dark
+          score={m.mc} max={1000} level={scoreLevel(m.mc, 1000)} dark
           deltas={<><span className="font-medium text-rose-600 dark:text-rose-400">{d.mcDelta7}</span> last 7 days · <span className="font-medium text-rose-600 dark:text-rose-400">{d.mcDelta30}</span> last 30 days</>}
           params={`${d.mcParams} parameters`}
           extra={[
             { label: "Confidence", value: d.mcTxns },
-            { label: "Score Peer Percentile", value: d.mccPercentile },
+            { label: "Score Peer Percentile", value: `MCC ${m.mcc} · ${d.mccPercentile}` },
             { label: "Last Sync", value: d.lastUpdate },
           ]}
         />
@@ -495,7 +497,7 @@ export function RiskReport() {
           <Row label="First Batch Date" value="—" />
           <Row label="Last Batch" value={d.account.lastBatch} />
           <Row label="Last Statement" value={d.account.lastStatement} />
-          <Row label="SIC/MCC" value={d.account.sicMcc} />
+          <Row label="SIC/MCC" value={`${m.mcc} — ${m.mccDesc}`} />
           <Row label="Owner" value="—" />
           <Row label="Phone" value={d.account.phone} />
           <Row label="Address" value={d.account.address} />

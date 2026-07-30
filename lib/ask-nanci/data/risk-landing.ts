@@ -36,13 +36,22 @@ export interface RiskTake {
   prompt: string
 }
 
+// The first take is the standing insight: the premise of the whole product with a
+// real number attached. It does not change day to day the way the other two do.
 export const RISK_NANCI_TAKES: RiskTake[] = [
   {
     dot: "bg-red-500",
-    title: "Alert Volume requires attention",
-    body: "357 alerts today — 63 more than yesterday. 20.1% re-alert rate suggests thresholds may be too loose.",
-    badges: [{ label: "Alert Volume", icon: BarChartBig }, { label: "Re-Alert Rate", icon: Repeat2 }],
-    prompt: "Why is alert volume running hot today?",
+    title: "3,556 merchants scored above 700 with no alert",
+    body: "One client portfolio, Sept–Dec 2025. Mastercard called them high risk and VisionWeb raised nothing. 317 were later confirmed fraud.",
+    badges: [{ label: "High Risk Merchants", icon: TriangleAlert }, { label: "Alert Volume", icon: BarChartBig }],
+    prompt: "How many high-MC merchants never raised a VisionWeb alert?",
+  },
+  {
+    dot: "bg-violet-500",
+    title: "Together the two models cover 91% of chargeback merchants",
+    body: "Across 774 chargeback merchants: 210 caught early by both, against 178 for Mastercard alone and 93 for VisionWeb alone. 69 were missed by both.",
+    badges: [{ label: "VW vs. MC Scatter", icon: LineChart }, { label: "High Risk Merchants", icon: TriangleAlert }],
+    prompt: "Compare VW scores vs MC scores for the alerted portfolio",
   },
   {
     dot: "bg-amber-500",
@@ -50,12 +59,5 @@ export const RISK_NANCI_TAKES: RiskTake[] = [
     body: "Suggested action: raise velocity threshold 15 → 20 pts. Only 18 alerts but very noisy.",
     badges: [{ label: "Re-Alert Rate", icon: Repeat2 }],
     prompt: "Review MC Velocity re-alert rate",
-  },
-  {
-    dot: "bg-violet-500",
-    title: "5 merchants are both VW critical and MC critical",
-    body: "TX and OH merchants — 0553 OH Toledo and 8040 NY Rochester are highest priority with +180 and +140 score deltas.",
-    badges: [{ label: "VW vs. MC Scatter", icon: LineChart }, { label: "High Risk Merchants", icon: TriangleAlert }],
-    prompt: "Show the 5 merchants that are both VW and MC critical",
   },
 ]

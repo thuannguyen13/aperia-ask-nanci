@@ -22,7 +22,10 @@ export function ScatterQuadrant() {
     // Fills the card: chart takes the leftover height, the caption keeps its own.
     <div className="flex h-full min-h-[240px] flex-col gap-2">
       <div className="min-h-0 flex-1">
-        <ResponsiveContainer width="100%" height="100%" minHeight={0}>
+        {/* minHeight matches the card's own min-h: height="100%" resolves to 0 when
+            the parent has no fixed height (the chat's DashChartCard), and recharts
+            never re-measures, so the chart silently renders nothing there. */}
+        <ResponsiveContainer width="100%" height="100%" minHeight={240}>
           <ScatterChart margin={{ top: 10, right: 16, bottom: 20, left: 0 }}>
             {QUADRANTS.map((q) => (
               <ReferenceArea

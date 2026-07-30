@@ -51,8 +51,8 @@ export const EXAMPLE_ASSIGNMENT_NAME = "Esquire New Merchants - High MC Trans"
 // "Review with Nanci" — the analysis panel beside the form (frames 224/225).
 export const NANCI_REVIEW = {
   bullets: [
-    "P-MC1 ≥ 700 pts sets a fairly high bar — this should flag a small, high-confidence set rather than a broad sweep.",
-    "The +50 re-alert step is wide for this range, though: a merchant sitting at 710 won't re-alert until it climbs to 760, so moderate creep near the floor could go quiet for a while between alerts.",
+    "P-MC1 ≥ 700 pts is the right floor — in the Sept–Dec 2025 portfolio analysis, 3,556 merchants cleared it while raising no VisionWeb alert at all.",
+    "The +50 re-alert step is the problem: the highest Mastercard score observed in that data was 737.33, so a merchant that first alerts at 710 would have to reach 760 to re-alert — above anything the model actually produced. In practice it would alert once and then go silent.",
   ],
   suggestion: "Suggest tightening the re-alert step to 25–30 pts if you want closer tracking of merchants hovering just above 700, or keep it at 50 if you'd rather only hear about sharper jumps.",
   projectionLead: "Below is a projection with your re-alert indicator tightened to 20 pts:",

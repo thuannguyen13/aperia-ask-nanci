@@ -101,7 +101,10 @@ export function RiskConsole({ assistant = true }: { assistant?: boolean }) {
           {/* Primary box: the active destination panel (or the Ask Nanci home) */}
           <div className="flex min-w-0 flex-1 overflow-hidden rounded-xl border bg-background md:rounded-2xl">
             {ActivePanel ? (
-              <ActivePanel />
+              // The Risk Report is per-merchant, so keying it on the selection
+              // remounts it instead of leaking the previous merchant's notes and
+              // disposition into the next one.
+              <ActivePanel key={dest === "risk-report" ? `risk-report:${merchantId}` : dest} />
             ) : view === "chat" ? (
               <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
                 <ChatView />
