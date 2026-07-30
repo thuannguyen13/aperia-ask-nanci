@@ -13,7 +13,7 @@ import {
 import { cn } from "aperia-ds5/utils"
 import { PanelShell } from "@/components/ask-nanci/shared"
 import { useRiskNav } from "./RiskNavContext"
-import { findMerchant, scoreLevel, RISK_REPORT_DETAILS, DEFAULT_RISK_DETAIL, TXN_VOLUME_ROWS, RISK_VIOLATION_CYCLE, VIOLATION_ROWS, CROSS_QUEUE_ROWS, MERCHANT_NOTES_SEED, DEFAULT_MERCHANT_NOTES, type ViolationRow, type NoteEntry, type RiskLevel } from "@/lib/ask-nanci/data/risk-merchants"
+import { findMerchant, getVwLevel, getMcLevel, getRiskLevel, formatMcScore, RISK_REPORT_DETAILS, getDefaultRiskDetail, TXN_VOLUME_ROWS, RISK_VIOLATION_CYCLE, VIOLATION_ROWS, CROSS_QUEUE_ROWS, MERCHANT_NOTES_SEED, DEFAULT_MERCHANT_NOTES, type ViolationRow, type NoteEntry, type RiskLevel } from "@/lib/ask-nanci/data/risk-merchants"
 import { getRiskLevelStyles } from "./risk-level"
 
 // Parameter Violation Details modal columns (Figma order + widths).
@@ -108,7 +108,7 @@ function Row({ label, value, badgeClass }: { label: string; value: string; badge
 // oversized ellipses bleeding past the edges. Exact hexes from the design — they
 // are a fixed brand surface, not theme tokens, so they don't flip in dark mode.
 function ScoreCard({ brand, logo, score, max, level, deltas, params, extra, dark }: {
-  brand: string; logo?: React.ReactNode; score: number; max: number; level: RiskLevel; deltas: React.ReactNode; params: string; extra?: { label: string; value: string }[]; dark?: boolean
+  brand: string; logo?: React.ReactNode; score: string; max: number; level: RiskLevel; deltas: React.ReactNode; params: string; extra?: { label: string; value: string }[]; dark?: boolean
 }) {
   const style = getRiskLevelStyles(level, dark)
   return (
@@ -366,7 +366,7 @@ function MarkWorkPopover({ state, onSubmit }: { state: WorkState; onSubmit: (cho
 export function RiskReport() {
   const nav = useRiskNav()
   const m = findMerchant(nav.merchantId ?? "")
-  const d = RISK_REPORT_DETAILS[nav.merchantId ?? ""] ?? DEFAULT_RISK_DETAIL
+  const d = m ? (RISK_REPORT_DETAILS[m.id] ?? getDefaultRiskDetail(m)) : null
   const [noteOpen, setNoteOpen] = useState(false)
   const [note, setNote] = useState("")
   // The disposition is the single source of truth — "" means untouched, and
@@ -386,7 +386,7 @@ export function RiskReport() {
     setActiveTab("notes")
   }
 
-  if (!m) return null
+  if (!m || !d) return null
 
   return (
     <PanelShell className="min-w-0 flex-1">
@@ -456,14 +456,14 @@ export function RiskReport() {
       {/* Score cards */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <ScoreCard
-          brand="VW Score" score={m.vw} max={100} level={scoreLevel(m.vw, 100)}
+          brand="VW Score" score={String(m.vw)} max={100} level={getVwLevel(m.vw)}
           deltas={<><span className="font-medium text-rose-600 dark:text-rose-400">{d.vwDelta30}</span> last 30 days</>}
           params={`${d.vwParams} parameters`}
           extra={[{ label: "Last Update", value: d.lastUpdate }]}
         />
         <ScoreCard
           brand="MC Score" logo={<Image src="/logos/mastercard-logomark.svg" alt="Mastercard" width={34} height={20} className="h-5 w-auto" />}
-          score={m.mc} max={1000} level={scoreLevel(m.mc, 1000)} dark
+          score={formatMcScore(m.mc)} max={1000} level={getMcLevel(m.mc)} dark
           deltas={<><span className="font-medium text-rose-600 dark:text-rose-400">{d.mcDelta7}</span> last 7 days · <span className="font-medium text-rose-600 dark:text-rose-400">{d.mcDelta30}</span> last 30 days</>}
           params={`${d.mcParams} parameters`}
           extra={[
@@ -488,7 +488,7 @@ export function RiskReport() {
           <Row label="Worked in 30 Days" value="—" />
           <Row label="Classification" value={d.profile.classification} />
           <Row label="Multiplier" value="—" />
-          <Row label="Risk Level" value={m.risk} />
+          <Row label="Risk Level" value={getRiskLevel(m)} />
           <Row label="Risk Score" value={String(m.vw)} />
         </div>
         <div className="rounded-xl border bg-card p-4">

@@ -31,7 +31,7 @@ export const RISK_LANDING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> =
     {
       role: "assistant",
       content:
-        "**4 merchants are High risk today**, and they are High for two different reasons — which is the part worth reading:\n\n1. **Regency Furniture Manchester** — VW 89 / MC 737.33, $14,896.06. Both models agree. Your clear #1.\n2. **Cascade Auto Parts Warehouse** — VW 62 / MC 711.08, $9,812.00. **Mastercard only.** VisionWeb ranks it last on this list.\n3. **Ashley Homestore – Mechanicsbu** — VW 74 / MC 701.05, $3,318.14. Both models agree (already Worked).\n4. **Meridian Dental Group** — VW 87 / MC 95.99, $1,469.00. **VisionWeb only.** Mastercard has it near the bottom of its MCC.\n\nIf you worked this queue on VisionWeb score alone you would start with Meridian and never reach Cascade. Want me to open the Barometer Report?",
+        "**13 of the 30 merchants on page one are High risk** — but they are High for three different reasons, and that split is the part worth reading:\n\n- **5 are critical on both models.** Start here: Northgate Appliance Ctr (VW 91 / MC 731.44), Regency Furniture Manchester (89 / 737.33, $14,896.06), Coastal Wellness Partners (86 / 704.88), Brighton Medical Supply (84 / 712.40), Harbor Point Marine Svcs (81 / 726.05).\n- **4 are Mastercard only.** Goldleaf Jewelry Exchange (78 / 733.12), Ashley Homestore – Mechanicsbu (74 / 701.05), Apex Roofing Solutions (66 / 707.19) and **Cascade Auto Parts Warehouse (62 / 711.08)** — Cascade ranks 25th of 30 on VisionWeb.\n- **4 are VisionWeb only.** Summit Ridge Outfitters (94 / 688.21), Meridian Dental Group (87 / 95.99), Velocity Wireless Retail (83 / 358.19) and Elevate Fitness Club (80 / 612.77).\n\nWork the list top-down on VW score and you reach Cascade 25th. Sort by MC and it is 4th. Want me to open the Barometer Report?",
       source: "Barometer Report · Esquire - Phase 2",
       dashChart: "high-risk",
       suggestions: ["Which merchants are critical on both models?", "Why is alert volume running hot today?"],
@@ -80,7 +80,7 @@ export const RISK_LANDING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> =
     {
       role: "assistant",
       content:
-        "**357 alerts today — 63 more than yesterday.** The jump is concentrated, not broad: MC Velocity alone accounts for most of the delta, and its **45.6% re-alert rate** says a lot of that is the same merchants tripping the same threshold repeatedly.\n\nSo this reads as a **threshold-tuning issue, not a real risk spike**. Tightening MC Velocity (15 → 20 pts) would bring volume back in line. The genuine risk is still concentrated in the 4 High-risk accounts.",
+        "**357 alerts today — 63 more than yesterday.** The jump is concentrated, not broad: MC Velocity alone accounts for most of the delta, and its **45.6% re-alert rate** says a lot of that is the same merchants tripping the same threshold repeatedly.\n\nSo this reads as a **threshold-tuning issue, not a real risk spike**. Tightening MC Velocity (15 → 20 pts) would bring volume back in line. The genuine risk is still concentrated in the 13 High-risk accounts.",
       source: "Detection Queue · today vs. yesterday",
       dashChart: "alert-volume",
       suggestions: ["Review MC Velocity re-alert rate", "Show me today's high risk merchants"],
@@ -92,7 +92,7 @@ export const RISK_LANDING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> =
     {
       role: "assistant",
       content:
-        "**MC Velocity is your noisiest parameter: 45.6% re-alert rate, the highest today.** Only 18 alerts, but nearly half are repeats on merchants already surfaced — that's threshold noise, not new risk.\n\nSuggested action: **raise the velocity threshold from 15 → 20 points.** That trims the repeats without touching the merchants that matter (none of your 4 High-risk accounts depend on this parameter alone). It's a low-risk tuning change you can make from Assignment Management.",
+        "**MC Velocity is your noisiest parameter: 45.6% re-alert rate, the highest today.** Only 18 alerts, but nearly half are repeats on merchants already surfaced — that's threshold noise, not new risk.\n\nSuggested action: **raise the velocity threshold from 15 → 20 points.** That trims the repeats without touching the merchants that matter (none of your 13 High-risk accounts depend on this parameter alone). It's a low-risk tuning change you can make from Assignment Management.",
       source: "Parameter analytics · MC Velocity",
       dashChart: "realert",
       suggestions: ["What are the re-alert rates by assignment?", "Why is alert volume running hot today?"],
@@ -104,7 +104,7 @@ export const RISK_LANDING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> =
     {
       role: "assistant",
       content:
-        "Only **2 of today's 7** are critical on both — and that is the useful finding, not a disappointing one:\n\n1. **Regency Furniture Manchester** — VW 89 / MC 737.33. Top 2% for MCC 5712, +410 over 30 days.\n2. **Ashley Homestore – Mechanicsbu** — VW 74 / MC 701.05.\n\nThe other two High-risk merchants are single-model catches: **Cascade Auto Parts** (MC 711.08, VW only 62) and **Meridian Dental Group** (VW 87, MC only 95.99).\n\nWhen both models agree you can act with high confidence. When only one fires, that is the case worth reading before dispositioning — half your High-risk queue today is in that second category.",
+        "**5 of the 30 on page one** are critical on both — VW ≥ 80 and MC ≥ 700:\n\n1. **Northgate Appliance Ctr** — VW 91 / MC 731.44\n2. **Regency Furniture Manchester** — VW 89 / MC 737.33. Top 2% for MCC 5712, +410 over 30 days.\n3. **Coastal Wellness Partners** — VW 86 / MC 704.88\n4. **Brighton Medical Supply** — VW 84 / MC 712.40\n5. **Harbor Point Marine Svcs** — VW 81 / MC 726.05\n\nThose five are your high-confidence starts. The useful part is the other eight High-risk merchants: **4 fire on Mastercard only** and **4 on VisionWeb only**. So a majority of today's High queue would be invisible to whichever single model you picked — which is the case for reading both before dispositioning.",
       source: "VisionWeb + MC critical overlap",
       dashChart: "scatter",
       suggestions: ["Show me today's high risk merchants", "Compare VW scores vs MC scores for the alerted portfolio"],
@@ -129,7 +129,7 @@ export const RISK_LANDING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> =
     {
       role: "assistant",
       content:
-        "The Barometer Report ranks the 357 alerted merchants by VisionWeb score, and exposure is top-heavy: the **7 merchants on the first page carry $31,849.80 of the $84,901.89** — about 37%.\n\nBut ranking by VW score buries one of them. **Cascade Auto Parts Warehouse sits last on VW at 62 while Mastercard has it at 711.08** — second-highest MC score in the list, $9,812.00 of exposure. Working strictly top-down would reach it seventh.\n\nSort by MC score instead and the order changes materially. Open it from the queue card when you want to start.",
+        "The Barometer Report ranks all 357 alerted merchants by VisionWeb score, 30 to a page. On page one, **13 are High risk and 5 are critical on both models** — Regency Furniture Manchester alone carries $14,896.06.\n\nBut ranking by VW score buries the Mastercard-only cases. **Cascade Auto Parts Warehouse sits 25th of 30 on VisionWeb at 62, while Mastercard has it at 711.08** — top five on MC, $1,469.00 of exposure. Apex Roofing (66 / 707.19) has the same problem eight rows above it.\n\nSort by MC score instead and four merchants jump the queue. Open it from the queue card when you want to start.",
       source: "Barometer Report · Esquire - Phase 2",
       suggestions: ["Show me today's high risk merchants", "Allocate 'Ready to Work' Items", "Unblock the Workflow"],
     },

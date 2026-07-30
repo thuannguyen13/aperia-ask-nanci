@@ -1,13 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { RefreshCw, SlidersHorizontal, Download, Search, ChevronDown, AlertTriangle, ListChecks, Loader2, Check } from "lucide-react"
+import { RefreshCw, SlidersHorizontal, Download, Search, ChevronDown, ChevronLeft, ChevronRight, AlertTriangle, ListChecks, Loader2, Check } from "lucide-react"
 import { Button, Input } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
 import { QueueSummaryCard } from "./QueueSummaryCard"
 import { useRiskNav } from "./RiskNavContext"
-import { RISK_MERCHANTS, type WorkStatus } from "@/lib/ask-nanci/data/risk-merchants"
+import { RISK_MERCHANTS, RISK_MERCHANTS_TOTAL, getRiskLevel, formatMcScore, type WorkStatus } from "@/lib/ask-nanci/data/risk-merchants"
 import { RISK_PILL } from "./risk-level"
 
 function TagBadges({ alert, list }: { alert: number; list: number }) {
@@ -39,8 +39,10 @@ export function BarometerReport() {
     () => Object.fromEntries(RISK_MERCHANTS.map((m) => [m.id, m.status])),
   )
   const markWork = (id: string) => setStatuses((s) => ({ ...s, [id]: "worked" }))
-  // "critical" chip → only the High-risk merchants (both models critical).
-  const merchants = filter === "critical" ? RISK_MERCHANTS.filter((m) => m.risk === "High") : RISK_MERCHANTS
+  // "critical" chip → the High-risk merchants. That is "critical on either model",
+  // not both: 8 of the 13 fire on one model only, and dropping them would hide the
+  // exact cases the two-score view exists to surface.
+  const merchants = filter === "critical" ? RISK_MERCHANTS.filter((m) => getRiskLevel(m) === "High") : RISK_MERCHANTS
 
   return (
     <PanelShell className="min-w-0 flex-1">
@@ -105,9 +107,9 @@ export function BarometerReport() {
                   </td>
                   <td className="px-4 py-2.5"><TagBadges alert={m.alertTag} list={m.listTag} /></td>
                   <td className="px-4 py-2.5 tabular-nums text-foreground">{m.vw}</td>
-                  <td className="px-4 py-2.5 tabular-nums text-foreground">{m.mc}</td>
+                  <td className="px-4 py-2.5 tabular-nums text-foreground">{formatMcScore(m.mc)}</td>
                   <td className="px-4 py-2.5">
-                    <span className={cn("rounded px-2 py-0.5 text-xs font-medium", RISK_PILL[m.risk])}>{m.risk}</span>
+                    <span className={cn("rounded px-2 py-0.5 text-xs font-medium", RISK_PILL[getRiskLevel(m)])}>{getRiskLevel(m)}</span>
                   </td>
                   <td className="px-4 py-2.5 text-right">
                     <div className="flex justify-end"><ActionButton status={statuses[m.id]} onMarkWork={() => markWork(m.id)} /></div>
@@ -116,6 +118,24 @@ export function BarometerReport() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Pagination — same shape as Assignment Management. Display-only, like the
+            sort affordances: the list is page one of the assignment's alerted
+            merchants, and the count is what stops 30 rows reading as the whole queue. */}
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground">
+          <span>Showing {merchants.length} of {filter === "critical" ? merchants.length : RISK_MERCHANTS_TOTAL}</span>
+          <div className="flex items-center gap-2">
+            <button className="flex items-center gap-1 hover:text-foreground"><ChevronLeft className="size-4" /> Previous</button>
+            {[1, 2, 3].map((p) => (
+              <button key={p} className={cn("size-7 rounded", p === 1 ? "border bg-background text-foreground" : "hover:bg-muted")}>{p}</button>
+            ))}
+            <button className="flex items-center gap-1 hover:text-foreground">Next <ChevronRight className="size-4" /></button>
+          </div>
+          <div className="flex items-center gap-2">
+            Rows per page
+            <span className="flex items-center gap-1 rounded-md border bg-background px-2 py-1 text-foreground">30 <ChevronDown className="size-3.5" /></span>
+          </div>
         </div>
       </div>
       </div>

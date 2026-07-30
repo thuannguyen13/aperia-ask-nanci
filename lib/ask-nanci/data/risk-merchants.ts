@@ -20,42 +20,98 @@ export type RiskLevel = "High" | "Medium" | "Low"
 export type WorkStatus = "mark-work" | "wip" | "worked"
 
 /**
- * The band one model's score falls in, as a share of that model's own scale.
- * The Risk Report badges each score card with this rather than the merchant's
- * combined `risk`, so the two cards are free to disagree — which, in this data,
- * they routinely do (Meridian is VW High / MC Low, Cascade is the reverse).
+ * MC scores are 2dp in the source data, so they render 2dp — otherwise 712.40
+ * prints as "712.4" and sits in a column next to 737.33, which reads as sloppy
+ * rather than precise. VW scores are whole numbers and need no formatting.
  */
-export const scoreLevel = (score: number, scale: 100 | 1000): RiskLevel =>
-  score / scale >= 0.7 ? "High" : score / scale >= 0.4 ? "Medium" : "Low"
+export const formatMcScore = (mc: number) => mc.toFixed(2)
+
+// Each model gets its own bands rather than a shared percentage: 700 is the real
+// P-MC1 Score Threshold floor from the spec, 65 is the VW critical line the
+// dashboard scatter already draws its quadrants on.
+export const getVwLevel = (vw: number): RiskLevel => (vw >= 80 ? "High" : vw >= 65 ? "Medium" : "Low")
+export const getMcLevel = (mc: number): RiskLevel => (mc >= 700 ? "High" : mc >= 400 ? "Medium" : "Low")
+
+/**
+ * The merchant's combined level: the worse of the two models. Derived rather than
+ * stored, because with 30 rows a hand-kept `risk` column drifts from the scores
+ * beside it within one edit — and "High on one model only" is the whole point of
+ * this list, so the two must never disagree.
+ */
+export const getRiskLevel = (m: { vw: number; mc: number }): RiskLevel => {
+  const levels = [getVwLevel(m.vw), getMcLevel(m.mc)]
+  return levels.includes("High") ? "High" : levels.includes("Medium") ? "Medium" : "Low"
+}
 
 export interface RiskMerchant {
   id: string
   name: string
-  /** Real MID. 16-digit = Clearent/ESQR, 12-digit = Woodforest. */
+  /** 16-digit = Clearent/ESQR, 12-digit = Woodforest. `real` marks a live MID. */
   mid: string
+  /** True only for the seven MIDs that came out of the client data verbatim. */
+  real?: boolean
   mcc: string
   mccDesc: string
   alertTag: number // red triangle count
   listTag: number // yellow list count
   vw: number // VisionWeb score /100
   mc: number // MC/Brighterion score /1000
-  risk: RiskLevel
   status: WorkStatus
 }
 
-// Merchant List shown on the Barometer Report (Figma order = descending VW score).
-// The two models deliberately disagree down this list: Meridian is a VisionWeb-only
-// catch, Cascade is a Mastercard-only catch and ranks last on VW. That divergence is
-// the argument for showing both scores side by side, and it is what the real data says.
+/**
+ * Page one of the Barometer Report's merchant list, ranked by VW score like the
+ * Figma. 30 of the assignment's 357 alerted merchants — the queue card above the
+ * table says 357, so a list that ends after seven rows reads as a mock.
+ *
+ * Every row is `mark-work` on purpose. The queue card reports 0 work-in-progress,
+ * 0 worked and 0.00% worked, and the whole "unblock the workflow" story depends on
+ * that; rows badged WIP or Worked contradicted the card directly above them.
+ *
+ * Seven MIDs are real (`real: true`) and anchor the scores that came with them.
+ * The rest are generated in the same per-client formats — 6588…/9180… 16-digit,
+ * 4601… 12-digit — so the list reads as one portfolio without putting 30 live
+ * merchant numbers on a public URL.
+ *
+ * Scores are the point of the list, not decoration: 13 merchants are High, and
+ * they split 5 critical on both models, 4 on Mastercard only, 4 on VisionWeb only.
+ * Nothing exceeds MC 737.33, the highest score observed in the real data.
+ */
 export const RISK_MERCHANTS: RiskMerchant[] = [
-  { id: "regency",    name: "REGENCY FURNITURE MANCHESTER",   mid: "6588000002563435", mcc: "5712", mccDesc: "Furniture, Home Furnishings", alertTag: 3, listTag: 4, vw: 89, mc: 737.33, risk: "High",   status: "mark-work" },
-  { id: "meridian",   name: "MERIDIAN DENTAL GROUP",          mid: "6588000002811586", mcc: "8021", mccDesc: "Dentists, Orthodontists",     alertTag: 4, listTag: 2, vw: 87, mc: 95.99,  risk: "High",   status: "wip" },
-  { id: "pbbiller",   name: "PBBILLER.COM",                   mid: "6588000002907459", mcc: "5967", mccDesc: "Direct Marketing — Inbound",  alertTag: 3, listTag: 2, vw: 76, mc: 83.69,  risk: "Medium", status: "mark-work" },
-  { id: "ashley",     name: "ASHLEY HOMESTORE - MECHANICSBU", mid: "9180675172134302", mcc: "5712", mccDesc: "Furniture, Home Furnishings", alertTag: 4, listTag: 1, vw: 74, mc: 701.05, risk: "High",   status: "worked" },
-  { id: "jbhealth",   name: "JB HEALTH SHOP",                 mid: "460100000172",     mcc: "5912", mccDesc: "Drug Stores, Pharmacies",     alertTag: 3, listTag: 4, vw: 71, mc: 339.64, risk: "Medium", status: "wip" },
-  { id: "jbvitality", name: "JB VITALITY BEAUTY",             mid: "460100003142",     mcc: "5977", mccDesc: "Cosmetic Stores",             alertTag: 8, listTag: 3, vw: 68, mc: 329.52, risk: "Medium", status: "worked" },
-  { id: "cascade",    name: "CASCADE AUTO PARTS WAREHOUSE",   mid: "6588000002940328", mcc: "5533", mccDesc: "Automotive Parts, Accessories", alertTag: 2, listTag: 4, vw: 62, mc: 711.08, risk: "High",  status: "mark-work" },
+  { id: "summitridge",  name: "SUMMIT RIDGE OUTFITTERS",       mid: "6588000004182337",              mcc: "5941", mccDesc: "Sporting Goods Stores",         alertTag: 5, listTag: 2, vw: 94, mc: 688.21, status: "mark-work" },
+  { id: "northgate",    name: "NORTHGATE APPLIANCE CTR",       mid: "6588000003647120",              mcc: "5722", mccDesc: "Household Appliance Stores",    alertTag: 4, listTag: 3, vw: 91, mc: 731.44, status: "mark-work" },
+  { id: "regency",      name: "REGENCY FURNITURE MANCHESTER",  mid: "6588000002563435", real: true,  mcc: "5712", mccDesc: "Furniture, Home Furnishings",   alertTag: 3, listTag: 4, vw: 89, mc: 737.33, status: "mark-work" },
+  { id: "meridian",     name: "MERIDIAN DENTAL GROUP",         mid: "6588000002811586", real: true,  mcc: "8021", mccDesc: "Dentists, Orthodontists",       alertTag: 4, listTag: 2, vw: 87, mc: 95.99,  status: "mark-work" },
+  { id: "coastalwell",  name: "COASTAL WELLNESS PARTNERS",     mid: "9180675172408815",              mcc: "8099", mccDesc: "Health Services",               alertTag: 3, listTag: 1, vw: 86, mc: 704.88, status: "mark-work" },
+  { id: "brighton",     name: "BRIGHTON MEDICAL SUPPLY",       mid: "6588000004417209",              mcc: "5047", mccDesc: "Medical Equipment",             alertTag: 6, listTag: 2, vw: 84, mc: 712.40, status: "mark-work" },
+  { id: "velocitywls",  name: "VELOCITY WIRELESS RETAIL",      mid: "460100001884",                  mcc: "4812", mccDesc: "Telecom Equipment",             alertTag: 2, listTag: 5, vw: 83, mc: 358.19, status: "mark-work" },
+  { id: "harborpoint",  name: "HARBOR POINT MARINE SVCS",      mid: "6588000003925641",              mcc: "5551", mccDesc: "Boat Dealers",                  alertTag: 4, listTag: 2, vw: 81, mc: 726.05, status: "mark-work" },
+  { id: "elevatefit",   name: "ELEVATE FITNESS CLUB LLC",      mid: "9180675172661043",              mcc: "7997", mccDesc: "Membership Clubs",              alertTag: 3, listTag: 3, vw: 80, mc: 612.77, status: "mark-work" },
+  { id: "premiertitle", name: "PREMIER TITLE LOANS TX",        mid: "6588000004093778",              mcc: "6051", mccDesc: "Non-FI Money Orders",           alertTag: 7, listTag: 1, vw: 79, mc: 698.30, status: "mark-work" },
+  { id: "goldleaf",     name: "GOLDLEAF JEWELRY EXCHANGE",     mid: "6588000003318902",              mcc: "5944", mccDesc: "Jewelry Stores",                alertTag: 5, listTag: 4, vw: 78, mc: 733.12, status: "mark-work" },
+  { id: "pbbiller",     name: "PBBILLER.COM",                  mid: "6588000002907459", real: true,  mcc: "5967", mccDesc: "Direct Marketing — Inbound",    alertTag: 3, listTag: 2, vw: 76, mc: 83.69,  status: "mark-work" },
+  { id: "stonebridge",  name: "STONEBRIDGE HOME SVCS",         mid: "460100002935",                  mcc: "1731", mccDesc: "Electrical Contractors",        alertTag: 2, listTag: 2, vw: 75, mc: 421.66, status: "mark-work" },
+  { id: "ashley",       name: "ASHLEY HOMESTORE - MECHANICSBU", mid: "9180675172134302", real: true, mcc: "5712", mccDesc: "Furniture, Home Furnishings",   alertTag: 4, listTag: 1, vw: 74, mc: 701.05, status: "mark-work" },
+  { id: "atlasnutr",    name: "ATLAS NUTRITION DIRECT",        mid: "6588000004736155",              mcc: "5499", mccDesc: "Misc Food Stores",              alertTag: 3, listTag: 3, vw: 73, mc: 289.54, status: "mark-work" },
+  { id: "cedarwood",    name: "CEDARWOOD ANIMAL HOSPITAL",     mid: "460100004427",                  mcc: "0742", mccDesc: "Veterinary Services",           alertTag: 1, listTag: 2, vw: 72, mc: 176.28, status: "mark-work" },
+  { id: "jbhealth",     name: "JB HEALTH SHOP",                mid: "460100000172",     real: true,  mcc: "5912", mccDesc: "Drug Stores, Pharmacies",       alertTag: 3, listTag: 4, vw: 71, mc: 339.64, status: "mark-work" },
+  { id: "truenorth",    name: "TRUENORTH TRAVEL GROUP",        mid: "9180675172937268",              mcc: "4722", mccDesc: "Travel Agencies",               alertTag: 6, listTag: 1, vw: 70, mc: 655.91, status: "mark-work" },
+  { id: "silverline",   name: "SILVERLINE AUTO GLASS",         mid: "6588000003504816",              mcc: "7531", mccDesc: "Automotive Body Repair",        alertTag: 2, listTag: 3, vw: 69, mc: 244.07, status: "mark-work" },
+  { id: "jbvitality",   name: "JB VITALITY BEAUTY",            mid: "460100003142",     real: true,  mcc: "5977", mccDesc: "Cosmetic Stores",               alertTag: 8, listTag: 3, vw: 68, mc: 329.52, status: "mark-work" },
+  { id: "lakeshorepet", name: "LAKESHORE PET BOUTIQUE",        mid: "6588000004260934",              mcc: "5995", mccDesc: "Pet Shops",                     alertTag: 1, listTag: 1, vw: 67, mc: 118.63, status: "mark-work" },
+  { id: "apexroofing",  name: "APEX ROOFING SOLUTIONS",        mid: "6588000003871527",              mcc: "1761", mccDesc: "Roofing, Siding",               alertTag: 5, listTag: 2, vw: 66, mc: 707.19, status: "mark-work" },
+  { id: "oakfield",     name: "OAKFIELD PARK LIQUORS",         mid: "460100005619",                  mcc: "5921", mccDesc: "Package Stores",                alertTag: 2, listTag: 4, vw: 65, mc: 302.85, status: "mark-work" },
+  { id: "quantumpc",    name: "QUANTUM PC REPAIR LLC",         mid: "9180675172550471",              mcc: "7379", mccDesc: "Computer Maintenance",          alertTag: 1, listTag: 2, vw: 63, mc: 91.42,  status: "mark-work" },
+  { id: "cascade",      name: "CASCADE AUTO PARTS WAREHOUSE",  mid: "6588000002940328", real: true,  mcc: "5533", mccDesc: "Automotive Parts, Accessories", alertTag: 2, listTag: 4, vw: 62, mc: 711.08, status: "mark-work" },
+  { id: "blueheron",    name: "BLUE HERON LANDSCAPING",        mid: "6588000004605283",              mcc: "0780", mccDesc: "Landscaping Services",          alertTag: 1, listTag: 1, vw: 60, mc: 187.33, status: "mark-work" },
+  { id: "fairview",     name: "FAIRVIEW DRY CLEANERS",         mid: "460100006073",                  mcc: "7210", mccDesc: "Laundry, Cleaning",             alertTag: 1, listTag: 2, vw: 57, mc: 62.10,  status: "mark-work" },
+  { id: "tridentsec",   name: "TRIDENT SECURITY SYSTEMS",      mid: "9180675172284690",              mcc: "1731", mccDesc: "Electrical Contractors",        alertTag: 3, listTag: 1, vw: 54, mc: 448.92, status: "mark-work" },
+  { id: "maplewood",    name: "MAPLEWOOD FLORAL DESIGN",       mid: "6588000003146058",              mcc: "5992", mccDesc: "Florists",                      alertTag: 1, listTag: 1, vw: 49, mc: 33.75,  status: "mark-work" },
+  { id: "granitecity",  name: "GRANITE CITY HARDWARE",         mid: "460100007281",                  mcc: "5251", mccDesc: "Hardware Stores",               alertTag: 2, listTag: 3, vw: 41, mc: 205.60, status: "mark-work" },
 ]
+
+/** Alerted merchants in the assignment; the list above is page one of them. */
+export const RISK_MERCHANTS_TOTAL = 357
 
 export const findMerchant = (id: string) => RISK_MERCHANTS.find((m) => m.id === id)
 
@@ -124,20 +180,30 @@ export const RISK_REPORT_DETAILS: Record<string, RiskReportDetail> = {
   },
 }
 
-// Fallback detail so any merchant row drills into a plausible report.
-export const DEFAULT_RISK_DETAIL: RiskReportDetail = {
-  violations: 2,
-  inQueues: 2,
-  vwDelta30: "+12",
-  vwParams: 2,
-  mcDelta7: "+40",
-  mcDelta30: "+120",
-  mcParams: 4,
-  mcTxns: "820 Transactions last 30 Days",
-  mccPercentile: "Top 25% of peers",
-  lastUpdate: "05/03/2026 06:14 AM",
-  profile: { status: "In Review", profile: "No-Profile", multiWatch: "ISO", classification: "—" },
-  account: { lastBatch: "05/12/2026", lastStatement: "05/12/2026", phone: "(972) 000-0000", address: "PAPILLION, FL 010853016" },
+/**
+ * Fallback detail for the merchants without a hand-written entry above. The MC
+ * figures are derived from the merchant's own score rather than fixed, because a
+ * flat default put "+120 last 30 days" and "Top 25% of peers" on a merchant
+ * scoring 33.75 — a 30-day gain larger than the score itself, and a percentile
+ * that contradicts the number printed directly above it.
+ */
+export const getDefaultRiskDetail = (m: RiskMerchant): RiskReportDetail => {
+  const delta30 = Math.round(m.mc * 0.35)
+  const level = getMcLevel(m.mc)
+  return {
+    violations: 2,
+    inQueues: 2,
+    vwDelta30: "+12",
+    vwParams: 2,
+    mcDelta7: `+${Math.round(delta30 * 0.3)}`,
+    mcDelta30: `+${delta30}`,
+    mcParams: level === "High" ? 5 : level === "Medium" ? 3 : 1,
+    mcTxns: "820 Transactions last 30 Days",
+    mccPercentile: level === "High" ? "Top 5% of peers" : level === "Medium" ? "Top 30% of peers" : "Bottom 40% of peers",
+    lastUpdate: "05/03/2026 06:14 AM",
+    profile: { status: "In Review", profile: "No-Profile", multiWatch: "ISO", classification: "—" },
+    account: { lastBatch: "05/12/2026", lastStatement: "05/12/2026", phone: "(972) 000-0000", address: "PAPILLION, FL 010853016" },
+  }
 }
 
 // Transaction Volume Analysis rows (illustrative — mostly zero, matching the Figma).

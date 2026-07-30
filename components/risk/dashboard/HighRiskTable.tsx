@@ -2,6 +2,7 @@
 
 import { ChevronsUpDown } from "lucide-react"
 import { HIGH_RISK_MERCHANTS } from "@/lib/ask-nanci/data/risk-dashboard"
+import { formatMcScore } from "@/lib/ask-nanci/data/risk-merchants"
 
 // ponytail: display-only sort affordance — the Figma is static, no sorting yet.
 function Th({ children, right }: { children: React.ReactNode; right?: boolean }) {
@@ -28,7 +29,7 @@ export function HighRiskTable() {
           {HIGH_RISK_MERCHANTS.map((m) => (
             <tr key={m.name} className="border-b last:border-0">
               <td className="px-3 py-2 font-medium text-primary">{m.name}</td>
-              <td className="px-3 py-2 tabular-nums text-foreground">{m.from} → {m.to}</td>
+              <td className="px-3 py-2 tabular-nums text-foreground">{formatMcScore(m.from)} → {formatMcScore(m.to)}</td>
               <td className="px-3 py-2 text-right tabular-nums text-foreground">+{m.delta}</td>
             </tr>
           ))}

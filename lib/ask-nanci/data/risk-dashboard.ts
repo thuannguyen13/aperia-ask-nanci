@@ -66,17 +66,21 @@ export const ALERT_VOLUME: { name: string; count: number }[] = [
 ]
 
 // ── High Risk Merchants (MC score jumpers) ───────────────────────────────────
-// The same seven merchants the Barometer Report lists, so a name clicked here and
-// a name read there are the same account. `to` is each merchant's current MC score
-// on the 0–1000 scale; `from` is that score minus its 30-day delta.
+// The ten biggest 30-day MC movers, all drawn from the Barometer Report's merchant
+// list, so a name clicked here and a name read there are the same account. `to` is
+// each merchant's current MC score on the 0–1000 scale and matches its RISK_MERCHANTS
+// row exactly; `from` is that score minus its 30-day delta.
 export const HIGH_RISK_MERCHANTS: { name: string; from: number; to: number; delta: number }[] = [
   { name: "CASCADE AUTO PARTS WAREHOUSE",   from: 100.08, to: 711.08, delta: 611 },
   { name: "REGENCY FURNITURE MANCHESTER",   from: 327.33, to: 737.33, delta: 410 },
+  { name: "APEX ROOFING SOLUTIONS",         from: 318.19, to: 707.19, delta: 389 },
+  { name: "GOLDLEAF JEWELRY EXCHANGE",      from: 419.12, to: 733.12, delta: 314 },
+  { name: "BRIGHTON MEDICAL SUPPLY",        from: 448.40, to: 712.40, delta: 264 },
+  { name: "HARBOR POINT MARINE SVCS",       from: 502.05, to: 726.05, delta: 224 },
   { name: "ASHLEY HOMESTORE - MECHANICSBU", from: 513.05, to: 701.05, delta: 188 },
+  { name: "COASTAL WELLNESS PARTNERS",      from: 546.88, to: 704.88, delta: 158 },
+  { name: "NORTHGATE APPLIANCE CTR",        from: 604.44, to: 731.44, delta: 127 },
   { name: "MERIDIAN DENTAL GROUP",          from: 0,      to: 95.99,  delta: 96 },
-  { name: "JB HEALTH SHOP",                 from: 245.64, to: 339.64, delta: 94 },
-  { name: "JB VITALITY BEAUTY",             from: 268.52, to: 329.52, delta: 61 },
-  { name: "PBBILLER.COM",                   from: 71.69,  to: 83.69,  delta: 12 },
 ]
 
 // ── Top 10 Parameters Heat (bars = Fires count, line = Case Rate %) ───────────
