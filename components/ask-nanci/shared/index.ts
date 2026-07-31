@@ -1,5 +1,6 @@
 export { PanelShell } from "./PanelShell"
 export { PanelHeader } from "./PanelHeader"
+export { PanelBody } from "./PanelBody"
 export { PanelExportButton } from "./PanelExportButton"
 export { ScoreBadge } from "./ScoreBadge"
 export { StatCard } from "./StatCard"

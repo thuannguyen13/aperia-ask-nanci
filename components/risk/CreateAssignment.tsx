@@ -9,6 +9,7 @@ import {
   Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator,
 } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
+import { PanelHeader, PanelBody } from "@/components/ask-nanci/shared"
 import {
   MC_PARAMETERS, MC_PARAM_LABEL, ASSIGNED_GROUPS, DATE_WINDOWS, ASSIGNMENT_TYPES,
   NANCI_REVIEW, type McParameter,
@@ -164,9 +165,9 @@ export function CreateAssignment({ onCancel, onSubmit }: { onCancel: () => void;
   return (
     <div className="flex h-full min-w-0 flex-1">
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        {/* Breadcrumb + title */}
-        <div className="shrink-0 px-4 pt-3 md:px-6">
-          <div className="flex items-start justify-between gap-2">
+        <PanelHeader
+          size="page"
+          breadcrumb={
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem><BreadcrumbLink asChild><button onClick={onCancel}>Assignment Management</button></BreadcrumbLink></BreadcrumbItem>
@@ -174,12 +175,12 @@ export function CreateAssignment({ onCancel, onSubmit }: { onCancel: () => void;
                 <BreadcrumbItem><BreadcrumbPage>Create Assignment</BreadcrumbPage></BreadcrumbItem>
               </BreadcrumbList>
             </Breadcrumb>
-            <button onClick={onCancel} className="text-muted-foreground hover:text-foreground"><X className="size-5" /></button>
-          </div>
-          <h1 className="mt-1.5 text-xl font-semibold text-foreground">Create Assignment</h1>
-        </div>
+          }
+          title="Create Assignment"
+          onClose={onCancel}
+        />
 
-        <div className="flex-1 overflow-y-auto px-4 py-4 md:px-6">
+        <PanelBody>
           {/* General Information */}
           <h2 className={SECTION}>General Information</h2>
           <div className="mt-3 grid gap-4 md:grid-cols-2">
@@ -293,11 +294,11 @@ export function CreateAssignment({ onCancel, onSubmit }: { onCancel: () => void;
               ))}
             </PopoverContent>
           </Popover>
-        </div>
+        </PanelBody>
 
         {/* Sticky footer */}
         <Separator />
-        <div className={cn("flex shrink-0 items-center gap-2 px-4 py-3 md:px-6", assistant ? "justify-between" : "justify-end")}>
+        <div className={cn("flex shrink-0 items-center gap-2 px-4 py-3", assistant ? "justify-between" : "justify-end")}>
           {assistant && (
             <Button variant="outline" size="sm" className="text-primary" onClick={() => setReview(true)}>
               <Sparkles className="size-4" /> Review with Ask Nanci

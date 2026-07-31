@@ -4,8 +4,7 @@ import { useState } from "react"
 import { RefreshCw, SlidersHorizontal, Plus, ChevronDown, ChevronLeft, ChevronRight, ArrowUpDown, SlidersVertical, Pencil, Copy, Trash2, Download, CircleCheck } from "lucide-react"
 import { Button } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
-import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
-import { useRiskNav } from "./RiskNavContext"
+import { PanelShell, PanelHeader, PanelBody } from "@/components/ask-nanci/shared"
 import { CreateAssignment } from "./CreateAssignment"
 import { AM_INTEGRATION, AM_SUMMARY, ASSIGNMENTS, AM_TOTAL, type Assignment, type AssignmentStatus } from "@/lib/ask-nanci/data/risk-assignments"
 import { EXAMPLE_ASSIGNMENT_NAME } from "@/lib/ask-nanci/data/risk-create-assignment"
@@ -18,7 +17,6 @@ const STATUS_PILL: Record<AssignmentStatus, string> = {
 }
 
 export function AssignmentManagement() {
-  const nav = useRiskNav()
   const [tab, setTab] = useState<"All" | AssignmentStatus>("All")
   // Create Assignment replaces the list in place (Figma 219–225); a submitted
   // assignment lands at the top of the list with a confirmation toast (frame 207).
@@ -41,17 +39,16 @@ export function AssignmentManagement() {
     <PanelShell className="relative min-w-0 flex-1">
       <PanelHeader
         title="Assignment Management"
-        size="lg"
+        size="page"
         actions={
           <>
-            <Button variant="secondary" size="sm"><RefreshCw className="size-4" /> Refresh</Button>
-            <Button variant="secondary" size="sm"><SlidersHorizontal className="size-4" /> Advanced Filter</Button>
-            <Button size="sm" className="gap-1" onClick={() => { setToast(false); setCreating(true) }}>
+            <Button variant="outline"><RefreshCw className="size-4" /> Refresh</Button>
+            <Button variant="outline"><SlidersHorizontal className="size-4" /> Advanced Filter</Button>
+            <Button className="gap-1" onClick={() => { setToast(false); setCreating(true) }}>
               <Plus className="size-4" /> Create Assignment <ChevronDown className="size-3.5" />
             </Button>
           </>
         }
-        onClose={() => nav.go(nav.home)}
       />
 
       {/* Post-submit confirmation (Figma frame 207) */}
@@ -63,7 +60,7 @@ export function AssignmentManagement() {
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto p-4 md:p-6">
+      <PanelBody>
       {/* Integration card */}
       <div className="flex flex-wrap items-center gap-3 rounded-xl border bg-card px-4 py-3">
         <div className="flex size-7 items-center justify-center rounded-full bg-gradient-to-br from-red-500 to-orange-400 text-[10px] font-bold text-white">MC</div>
@@ -173,7 +170,7 @@ export function AssignmentManagement() {
           </div>
         </div>
       </div>
-      </div>
+      </PanelBody>
     </PanelShell>
   )
 }
