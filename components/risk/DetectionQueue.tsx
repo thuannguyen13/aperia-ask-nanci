@@ -1,11 +1,11 @@
 "use client"
 
 import { useEffect } from "react"
-import Image from "next/image"
 import { SlidersHorizontal, RefreshCw } from "lucide-react"
 import { Button } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelBody } from "@/components/ask-nanci/shared"
+import { AskNanciButton } from "./AskNanciButton"
 import { QueueSummaryCard } from "./QueueSummaryCard"
 import { DETECTION_QUEUES } from "@/lib/ask-nanci/data/risk-detection-queue"
 import { useRiskNav } from "./RiskNavContext"
@@ -30,31 +30,25 @@ export function DetectionQueue() {
     <PanelShell className="min-w-0 flex-1">
       <PanelHeader
         title="Detection Queue"
-        size="lg"
+        size="page"
         actions={
           <>
             {/* The queue is the one destination with no other way in to Nanci —
                 its nav item is a different destination and its cards drill down. */}
-            {nav.assistant && (
-              <Button variant="secondary" size="sm" onClick={toggleNanci} aria-pressed={panelOpen}>
-                <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={16} height={16} className="size-4" />
-                Ask Nanci
-              </Button>
-            )}
-            <Button variant="secondary" size="sm"><SlidersHorizontal className="size-4" /> Filter</Button>
-            <Button variant="secondary" size="sm"><RefreshCw className="size-4" /> Refresh</Button>
+            {nav.assistant && <AskNanciButton onClick={toggleNanci} pressed={panelOpen} />}
+            <Button variant="outline"><SlidersHorizontal className="size-4" /> Filter</Button>
+            <Button variant="outline"><RefreshCw className="size-4" /> Refresh</Button>
           </>
         }
-        onClose={() => nav.go(nav.home)}
       />
 
-      <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 md:p-6">
+      <PanelBody className="flex flex-col gap-4">
         {DETECTION_QUEUES.map((q, i) => (
           // Only the first (Mastercard) queue drills into the Barometer Report —
           // the second card's actions are inert.
-          <QueueSummaryCard key={q.assignment} queue={q} onBarometer={i === 0 ? openBarometer : undefined} />
+          <QueueSummaryCard key={q.assignment} queue={q} onBarometer={i === 0 ? openBarometer : undefined} live={i === 0} />
         ))}
-      </div>
+      </PanelBody>
     </PanelShell>
   )
 }

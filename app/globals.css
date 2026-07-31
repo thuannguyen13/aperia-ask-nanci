@@ -33,12 +33,23 @@
   --app-gradient: linear-gradient(180deg, #218800 0%, #BFCDC5 200px);
 }
 
-[data-theme="aperia"],
-[data-theme="aperia-risk"] {
+[data-theme="aperia"] {
   --primary: #002F67;
   --color-primary: #002F67;
   --ring: #002F67;
   --sidebar-primary: #002F67;
+  --app-gradient: linear-gradient(180deg, #002F67 0%, #c5d5ed 200px);
+}
+
+/* Aperia Risk runs a brighter primary than the concept app. Split from the shared
+   `aperia` block above rather than edited in place — that theme is on the live
+   embeds, and this is a Risk decision. The frame gradient stays the deep navy: it
+   is the Titan brand bar, not a primary-colored surface. */
+[data-theme="aperia-risk"] {
+  --primary: #0058CC;
+  --color-primary: #0058CC;
+  --ring: #0058CC;
+  --sidebar-primary: #0058CC;
   --app-gradient: linear-gradient(180deg, #002F67 0%, #c5d5ed 200px);
 }
 
@@ -64,6 +75,12 @@ html.dark [data-logo="sidebar-collapsed"] { filter: invert(1); }
 /* Aperia Risk's wordmark carries the Mastercard roundel — hue-rotate keeps it red
    rather than letting the invert turn it cyan. */
 html.dark[data-theme="aperia-risk"] [data-logo="sidebar"] { filter: invert(1) hue-rotate(180deg); }
+
+/* The Ask Nanci lockup ships with dark ink for light surfaces. Same invert +
+   hue-rotate as the sidebar wordmarks above: the invert lifts the wordmark off a
+   dark panel, the hue-rotate puts the logomark's blue gradient back to blue. */
+html.dark [data-logo="ask-nanci"] { filter: invert(1) hue-rotate(180deg); }
+
 
 
 @theme inline {

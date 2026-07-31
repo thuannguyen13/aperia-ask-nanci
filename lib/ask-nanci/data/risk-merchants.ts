@@ -20,6 +20,21 @@ export type RiskLevel = "High" | "Medium" | "Low"
 export type WorkStatus = "mark-work" | "wip" | "worked"
 
 /**
+ * The disposition choices in "Mark Work and Disposition". Mutually exclusive with
+ * each other and with "Work in Progress" — picking any of these ends the work,
+ * which is why the panel is one radio group rather than two.
+ */
+export const DISPOSITIONS = [
+  "Cleared — No Action", "Hold Funds",
+  "Escalated — Phase 2", "Termination Recommended",
+  "Contact Merchant", "Other (Specify)",
+]
+
+/** "Work in Progress" is the one choice that does not close the item out. */
+export const statusForDisposition = (choice: string): WorkStatus =>
+  choice === "Work in Progress" ? "wip" : "worked"
+
+/**
  * MC scores are 2dp in the source data, so they render 2dp — otherwise 712.40
  * prints as "712.4" and sits in a column next to 737.33, which reads as sloppy
  * rather than precise. VW scores are whole numbers and need no formatting.

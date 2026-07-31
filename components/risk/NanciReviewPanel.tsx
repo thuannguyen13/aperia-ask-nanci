@@ -55,12 +55,7 @@ export function NanciReviewPanel({
   return (
     <div className="hidden w-[386px] shrink-0 flex-col overflow-hidden border-l bg-background md:flex">
       <PanelHeader
-        title={
-          <span className="flex items-center gap-2">
-            <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={22} height={22} />
-            Ask Nanci
-          </span>
-        }
+        title={<Image data-logo="ask-nanci" src="/ask-nanci/ask-nanci-logo.svg" alt="Ask Nanci" width={113} height={24} />}
         size="lg"
         onClose={onClose}
       />

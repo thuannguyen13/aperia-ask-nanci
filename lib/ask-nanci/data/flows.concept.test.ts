@@ -8,6 +8,7 @@ import {
   CONCEPT_MANUAL_PROMPTS,
 } from "./flows.concept"
 import { RISK_QUICK_ACTIONS, RISK_NANCI_TAKES } from "./risk-landing"
+import { RISK_SUGGESTION_DESTS } from "./risk-conversations"
 import type { ConceptScriptedTurn } from "../types"
 
 const CONVERSATIONS = CONCEPT_SCRIPTED_CONVERSATIONS as Record<string, ConceptScriptedTurn[]>
@@ -15,12 +16,14 @@ const convKeys = new Set(Object.keys(CONVERSATIONS))
 
 /**
  * How a suggestion pill routes when clicked (mirrors handlePrompt in
- * AskNanciContext): it must be a real scripted conversation, a decorative
+ * AskNanciContext): it must be a real scripted conversation, a registered
+ * navigating pill (goes to a destination instead of answering), a decorative
  * fake follow-up (no-op by design), or the pending user turn of its own flow
  * (advances the active manual flow) — anything else is a dead pill.
  */
-function classify(sugg: string, flowKey: string): "scripted" | "fake" | "continuation" | "dead" {
+function classify(sugg: string, flowKey: string): "scripted" | "navigate" | "fake" | "continuation" | "dead" {
   if (convKeys.has(sugg)) return "scripted"
+  if (sugg in RISK_SUGGESTION_DESTS) return "navigate"
   if (CONCEPT_FAKE_FOLLOWUPS.has(sugg)) return "fake"
   const userTurns = new Set(CONVERSATIONS[flowKey].filter((t) => t.role === "user").map((t) => t.content))
   if (userTurns.has(sugg)) return "continuation"

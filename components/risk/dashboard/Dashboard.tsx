@@ -5,11 +5,12 @@ import { Download, Sparkles, MoreHorizontal, BarChartBig } from "lucide-react"
 import { Button } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
-import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelBody } from "@/components/ask-nanci/shared"
 import { useRiskNav } from "../RiskNavContext"
 import { RISK_NANCI_TAKES } from "@/lib/ask-nanci/data/risk-landing"
 import { DASH_KPIS, DASH_HIGHLIGHTS, CHART_TAKE, type DashChartId } from "@/lib/ask-nanci/data/risk-dashboard"
 import { DashChart, CHART_TITLES } from "./charts"
+import { AskNanciButton } from "../AskNanciButton"
 import { NanciTakeCard } from "../NanciTakeCard"
 
 const PANEL_ID = "dashboard-insight"
@@ -71,11 +72,22 @@ export function Dashboard() {
     <PanelShell className="min-w-0 flex-1">
       <PanelHeader
         title="Dashboard"
-        size="lg"
-        actions={<Button variant="secondary" size="sm"><Download className="size-4" /> Export</Button>}
-        onClose={assistant ? () => nav.go(nav.home) : undefined}
+        size="page"
+        actions={
+          <>
+            {/* Same summon as the Detection Queue header: it opens the insight panel
+                on whichever take is showing, or the first one from cold. */}
+            {assistant && (
+              <AskNanciButton
+                onClick={() => toggleTake(active ?? RISK_NANCI_TAKES[0].title)}
+                pressed={panelOpen}
+              />
+            )}
+            <Button variant="outline"><Download className="size-4" /> Export</Button>
+          </>
+        }
       />
-      <div className="flex-1 overflow-y-auto p-4 md:p-6">
+      <PanelBody>
         {/* Ask Nanci's take on today */}
         {assistant && (
           <div className="rounded-xl border border-blue-200 bg-blue-50/60 p-4 dark:border-blue-900 dark:bg-blue-950/20">
@@ -112,17 +124,21 @@ export function Dashboard() {
         {/* Chart grid — Figma layout */}
         <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
           {(["high-risk", "scatter", "param-heat", "alert-volume"] as DashChartId[]).map((id) => (
-            <ChartPanel key={id} id={id} title={CHART_TITLES[id]} active={isOn(id)} dim={anyActive && !isOn(id)} onAsk={assistant ? () => toggleTake(CHART_TAKE[id]) : undefined}>
+            // No sparkle where no take covers the chart — asking would open a take
+            // that dims the chart you asked from.
+            <ChartPanel key={id} id={id} title={CHART_TITLES[id]} active={isOn(id)} dim={anyActive && !isOn(id)}
+              onAsk={assistant && CHART_TAKE[id] ? () => toggleTake(CHART_TAKE[id]!) : undefined}>
               <DashChart id={id} />
             </ChartPanel>
           ))}
           <div className="lg:col-span-2">
-            <ChartPanel id="realert" title={CHART_TITLES.realert} active={isOn("realert")} dim={anyActive && !isOn("realert")} onAsk={assistant ? () => toggleTake(CHART_TAKE.realert) : undefined}>
+            <ChartPanel id="realert" title={CHART_TITLES.realert} active={isOn("realert")} dim={anyActive && !isOn("realert")}
+              onAsk={assistant && CHART_TAKE.realert ? () => toggleTake(CHART_TAKE.realert!) : undefined}>
               <DashChart id="realert" />
             </ChartPanel>
           </div>
         </div>
-      </div>
+      </PanelBody>
     </PanelShell>
   )
 }

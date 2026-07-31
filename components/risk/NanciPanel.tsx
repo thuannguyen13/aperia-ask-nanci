@@ -10,7 +10,8 @@ import { UserMessage, BotMessage } from "@/components/ask-nanci/ChatMessage"
 import { ChatActiveSources } from "@/components/ask-nanci/ChatActiveSources"
 import { ThinkingIndicator } from "@/components/ask-nanci/ThinkingIndicator"
 import { streamWords } from "@/lib/ask-nanci/stream-words"
-import { RISK_LANDING_CONVERSATIONS } from "@/lib/ask-nanci/data/risk-conversations"
+import { RISK_LANDING_CONVERSATIONS, RISK_SUGGESTION_DESTS } from "@/lib/ask-nanci/data/risk-conversations"
+import { useRiskNav } from "./RiskNavContext"
 import type { Message } from "@/lib/ask-nanci/types"
 import { DashChartCard } from "./dashboard/DashChartCard"
 
@@ -39,6 +40,7 @@ function answerTo(prompt: string, seq: number): Message[] {
 
 export function NanciPanel({ panelId, prompt }: { panelId: string; prompt: string }) {
   const { closePanel, sources } = useAskNanci()
+  const nav = useRiskNav()
   // Seeded with the question only — the answer streams in, same as the main chat.
   const [messages, setMessages] = useState<Message[]>(() => answerTo(prompt, 0).slice(0, 1))
   // Id of the message currently being typed out — it lives in `messages` and grows
@@ -94,14 +96,10 @@ export function NanciPanel({ panelId, prompt }: { panelId: string; prompt: strin
 
   return (
     <PanelShell>
-      {/* Logomark beside the title, same as the Create Assignment review panel. */}
+      {/* The lockup is the title — mark and wordmark are one asset, not an icon
+          with the name typeset beside it. Same in the Create Assignment panel. */}
       <PanelHeader
-        title={
-          <span className="flex items-center gap-2">
-            <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={22} height={22} />
-            Ask Nanci
-          </span>
-        }
+        title={<Image data-logo="ask-nanci" src="/ask-nanci/ask-nanci-logo.svg" alt="Ask Nanci" width={113} height={24} />}
         size="lg"
         onClose={() => closePanel(panelId)}
       />
@@ -124,7 +122,16 @@ export function NanciPanel({ panelId, prompt }: { panelId: string; prompt: strin
                   {m.suggestions.map((s) => (
                     <button
                       key={s}
-                      onClick={() => ask(s)}
+                      // A pill either asks or goes. Going closes this panel first:
+                      // Navigate replaces Primary and closes every panel beside it,
+                      // and leaving it open would strand an answer about a screen
+                      // the user just left.
+                      onClick={() => {
+                        const dest = RISK_SUGGESTION_DESTS[s]
+                        if (!dest) return ask(s)
+                        closePanel(panelId)
+                        nav.go(dest)
+                      }}
                       disabled={busy}
                       className="flex items-center gap-1.5 rounded-full border bg-background px-3 py-1.5 text-left text-sm text-foreground transition-colors hover:border-ring hover:bg-muted disabled:opacity-50"
                     >

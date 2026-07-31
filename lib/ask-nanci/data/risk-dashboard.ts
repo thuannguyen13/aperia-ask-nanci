@@ -53,16 +53,19 @@ export const SCATTER_COLORS: Record<ScatterCat, string> = {
 }
 
 // ── Alert Volume by Assignment (horizontal bars) ─────────────────────────────
-export const ALERT_VOLUME: { name: string; count: number }[] = [
-  { name: "Esquire - Phase 2 Parameters - Auths…", count: 357 },
-  { name: "Low Risk DQ - By MCC", count: 303 },
-  { name: "MC Watchlist (system)", count: 52 },
-  { name: "High Risk DQ - By MCC", count: 25 },
-  { name: "Moderate Risk DQ - By MCC", count: 19 },
-  { name: "MC Velocity (system)", count: 18 },
-  { name: "Unacceptable Risk DQ", count: 10 },
-  { name: "MC Divergence (system)", count: 9 },
-  { name: "Phase 2 - Auths Detect Q", count: 7 },
+// `prev` is yesterday's count for the same assignment. It is what lets the Alert
+// Volume take say "63 more than yesterday" instead of asserting a delta from
+// nowhere; the chart itself still plots `count`.
+export const ALERT_VOLUME: { name: string; count: number; prev: number }[] = [
+  { name: "Esquire - Phase 2 Parameters - Auths…", count: 357, prev: 294 },
+  { name: "Low Risk DQ - By MCC", count: 303, prev: 311 },
+  { name: "MC Watchlist (system)", count: 52, prev: 47 },
+  { name: "High Risk DQ - By MCC", count: 25, prev: 28 },
+  { name: "Moderate Risk DQ - By MCC", count: 19, prev: 21 },
+  { name: "MC Velocity (system)", count: 18, prev: 12 },
+  { name: "Unacceptable Risk DQ", count: 10, prev: 10 },
+  { name: "MC Divergence (system)", count: 9, prev: 11 },
+  { name: "Phase 2 - Auths Detect Q", count: 7, prev: 6 },
 ]
 
 // ── High Risk Merchants (MC score jumpers) ───────────────────────────────────
@@ -109,19 +112,22 @@ export const REALERT_ROWS: { assignment: string; worked: number; realerted: numb
 // ── Take → the charts its answer points at (keyed by RISK_NANCI_TAKES title) ──
 // Clicking a take opens the sibling chat panel; these charts get ringed and the
 // rest dim, so the answer and the dashboard behind it stay tied together.
+// Each list is exactly the charts named by that take's badges, so what the card
+// offers and what lights up behind it cannot drift apart.
 export const DASH_HIGHLIGHTS: Record<string, DashChartId[]> = {
-  "3,556 merchants scored above 700 with no alert": ["high-risk", "alert-volume"],
-  "Together the two models cover 91% of chargeback merchants": ["scatter", "high-risk"],
-  "MC Velocity re-alert rate is 45.6% — highest today": ["realert", "param-heat"],
+  "Alert Volume requires attention": ["alert-volume", "realert"],
+  "MC Velocity re-alert rate is 45.6% — highest today": ["realert"],
+  "5 merchants are both VW critical and MC critical": ["scatter", "high-risk"],
 }
 
 // Chart → the take its sparkle button asks Nanci about. The inverse of
-// DASH_HIGHLIGHTS, but hand-written because `high-risk` appears under two takes and
-// belongs to the more specific one (the take that is literally about high MC scores).
-export const CHART_TAKE: Record<DashChartId, string> = {
-  "alert-volume": "3,556 merchants scored above 700 with no alert",
-  "high-risk":    "3,556 merchants scored above 700 with no alert",
-  scatter:        "Together the two models cover 91% of chargeback merchants",
+// DASH_HIGHLIGHTS, but hand-written because `realert` appears under two takes and
+// belongs to the more specific one (the take that is only about re-alert rate).
+// Partial on purpose: no take covers parameter heat today, and pointing its button
+// at an unrelated take would dim the very chart the user asked from.
+export const CHART_TAKE: Partial<Record<DashChartId, string>> = {
+  "alert-volume": "Alert Volume requires attention",
   realert:        "MC Velocity re-alert rate is 45.6% — highest today",
-  "param-heat":   "MC Velocity re-alert rate is 45.6% — highest today",
+  scatter:        "5 merchants are both VW critical and MC critical",
+  "high-risk":    "5 merchants are both VW critical and MC critical",
 }

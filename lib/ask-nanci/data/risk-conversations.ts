@@ -8,9 +8,24 @@
 // wiki/aperia-risk/demo-data-spec.md (Sept–Dec 2025). Change a number there and
 // change it here; the demo falls apart the moment a card and its answer disagree.
 import type { ConceptScriptedTurn } from "../types"
+import type { RiskChipDest } from "./risk-landing"
 
 // The opening question the Detection Queue's "Ask Nanci" button summons.
 export const DETECTION_QUEUE_PROMPT = "What stands out in the Detection Queue today?"
+
+/**
+ * Suggestion pills that go somewhere instead of asking something. Clicking one is
+ * the Navigate trigger issued from the conversation — allowed, because chat sits
+ * outside the panel chain and is where the panel rules say a new topic may start
+ * ("Move that to the conversation or the menu"). Navigating closes the panel it was
+ * clicked in, since Navigate replaces Primary and closes every panel beside it.
+ *
+ * The label is a destination, never a question, so nobody loses their screen to a
+ * pill that read like something Nanci would answer in place.
+ */
+export const RISK_SUGGESTION_DESTS: Record<string, RiskChipDest> = {
+  "Open Detection Queue": "detection-queue",
+}
 
 export const RISK_LANDING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
   // The standing insight behind the landing's first take card.
@@ -83,7 +98,7 @@ export const RISK_LANDING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> =
         "**357 alerts today — 63 more than yesterday.** The jump is concentrated, not broad: MC Velocity alone accounts for most of the delta, and its **45.6% re-alert rate** says a lot of that is the same merchants tripping the same threshold repeatedly.\n\nSo this reads as a **threshold-tuning issue, not a real risk spike**. Tightening MC Velocity (15 → 20 pts) would bring volume back in line. The genuine risk is still concentrated in the 13 High-risk accounts.",
       source: "Detection Queue · today vs. yesterday",
       dashChart: "alert-volume",
-      suggestions: ["Review MC Velocity re-alert rate", "Show me today's high risk merchants"],
+      suggestions: ["Review MC Velocity re-alert rate", "Show me today's high risk merchants", "Open Detection Queue"],
     },
   ],
 
@@ -95,7 +110,7 @@ export const RISK_LANDING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> =
         "**MC Velocity is your noisiest parameter: 45.6% re-alert rate, the highest today.** Only 18 alerts, but nearly half are repeats on merchants already surfaced — that's threshold noise, not new risk.\n\nSuggested action: **raise the velocity threshold from 15 → 20 points.** That trims the repeats without touching the merchants that matter (none of your 13 High-risk accounts depend on this parameter alone). It's a low-risk tuning change you can make from Assignment Management.",
       source: "Parameter analytics · MC Velocity",
       dashChart: "realert",
-      suggestions: ["What are the re-alert rates by assignment?", "Why is alert volume running hot today?"],
+      suggestions: ["What are the re-alert rates by assignment?", "Why is alert volume running hot today?", "Open Detection Queue"],
     },
   ],
 
@@ -107,7 +122,7 @@ export const RISK_LANDING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> =
         "**5 of the 30 on page one** are critical on both — VW ≥ 80 and MC ≥ 700:\n\n1. **Northgate Appliance Ctr** — VW 91 / MC 731.44\n2. **Regency Furniture Manchester** — VW 89 / MC 737.33. Top 2% for MCC 5712, +410 over 30 days.\n3. **Coastal Wellness Partners** — VW 86 / MC 704.88\n4. **Brighton Medical Supply** — VW 84 / MC 712.40\n5. **Harbor Point Marine Svcs** — VW 81 / MC 726.05\n\nThose five are your high-confidence starts. The useful part is the other eight High-risk merchants: **4 fire on Mastercard only** and **4 on VisionWeb only**. So a majority of today's High queue would be invisible to whichever single model you picked — which is the case for reading both before dispositioning.",
       source: "VisionWeb + MC critical overlap",
       dashChart: "scatter",
-      suggestions: ["Show me today's high risk merchants", "Compare VW scores vs MC scores for the alerted portfolio"],
+      suggestions: ["Show me today's high risk merchants", "Compare VW scores vs MC scores for the alerted portfolio", "Open Detection Queue"],
     },
   ],
 
@@ -118,7 +133,7 @@ export const RISK_LANDING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> =
     {
       role: "assistant",
       content:
-        "Here are the key insights from **Esquire - Phase 2 Parameters - Auths - Detect Q**:\n\n- **Alert Volume**: 357 of 4,681 eligible merchants (7.6%) triggered alerts, representing a total exposure of $84,901.89.\n- **Operational Bottleneck**: the workflow is completely stalled. % Worked is 0.00%, with zero items in progress and zero items completed.\n- **Idle Financials**: the entire $84,901.89 is tied up in the 11 \"Ready to work\" / \"Re-queued\" items, but no action has been taken.",
+        "Here are the key insights from **Esquire - Phase 2 Parameters - Auths - Detect Q**:\n\n- **Alert Volume**: 357 of 1,240 eligible merchants (28.8%) triggered alerts, representing a total exposure of $84,901.89.\n- **Operational Bottleneck**: the workflow is completely stalled. % Worked is 0.00%, with zero items in progress and zero items completed.\n- **Idle Financials**: all 357 alerted merchants are sitting in \"Ready to work\", so the entire $84,901.89 is idle. Eleven of them have already been re-queued once.",
       source: "Detection Queue · Esquire - Phase 2",
       suggestions: ["Analyze the Barometer Report", "Allocate 'Ready to Work' Items", "Unblock the Workflow"],
     },
@@ -140,7 +155,7 @@ export const RISK_LANDING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> =
     {
       role: "assistant",
       content:
-        "There are **11 items ready to work, worth $84,901.89**, and none are assigned to an analyst yet. That is the whole idle balance sitting in one bucket.\n\nAt your team's current throughput 11 items is well under a day's work for a single analyst, so this does not need to be split. Assign the batch from Assignment Management and the % Worked figure starts moving today.",
+        "There are **357 items ready to work, worth $84,901.89**, and none are assigned to an analyst yet. That is the whole alerted volume sitting in one bucket, 11 of it already re-queued once.\n\nAt your team's current throughput 357 items is several days for a single analyst, so split it rather than handing it to one person. The Barometer Report has already ranked them, so allocating the top band first puts the largest exposure under an owner today.",
       source: "Detection Queue · Esquire - Phase 2",
       suggestions: ["Unblock the Workflow", "Analyze the Barometer Report"],
     },
@@ -151,7 +166,7 @@ export const RISK_LANDING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> =
     {
       role: "assistant",
       content:
-        "The block is allocation, not capacity. **357 alerted, 11 re-queued, 0 in progress, 0 worked** is the signature of a queue nobody has been assigned to — if analysts were working it and stalling, you would see a work-in-progress count instead.\n\nSo the unblock is one step: put an owner on the 11 ready items. The 357 alerted merchants behind them are already prioritised by the Barometer Report, so nothing else needs re-tuning first.",
+        "The block is allocation, not capacity. **357 alerted, 357 ready, 11 re-queued, 0 in progress, 0 worked** is the signature of a queue nobody has been assigned to — if analysts were working it and stalling, you would see a work-in-progress count instead.\n\nSo the unblock is one step: put owners on the ready items. The 357 are already prioritised by the Barometer Report, so nothing else needs re-tuning first.",
       source: "Detection Queue · Esquire - Phase 2",
       suggestions: ["Allocate 'Ready to Work' Items", "Show me today's high risk merchants"],
     },

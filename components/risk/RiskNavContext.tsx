@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, useContext } from "react"
+import type { WorkStatus } from "@/lib/ask-nanci/data/risk-merchants"
 
 // Every Risk destination is a registered, prop-less panel, so all navigation and
 // selection state flows through this context instead of props.
@@ -12,6 +13,13 @@ interface RiskNav {
   openMerchant: (id: string) => void
   merchantId: string | null
   barometerFilter: "critical" | null
+  /**
+   * Work state per merchant, shared rather than local to a screen: marking one in
+   * the Barometer list has to move the queue card above it and the same card back
+   * on the Detection Queue, and the merchant detail marks the same merchant.
+   */
+  workStatuses: Record<string, WorkStatus>
+  markWork: (id: string, status: WorkStatus) => void
   /**
    * Phase 1 of the Risk pitch is the same console with no AI in it. Screens read
    * this instead of a build-time flag because both phases run side by side (the
@@ -33,6 +41,8 @@ const RiskNavContext = createContext<RiskNav>({
   openMerchant: () => {},
   merchantId: null,
   barometerFilter: null,
+  workStatuses: {},
+  markWork: () => {},
   assistant: true,
   home: "ask-nanci",
 })

@@ -14,6 +14,7 @@ import { PANELS } from "@/components/ask-nanci/concept/panel-registry"
 import type { PanelId } from "@/lib/ask-nanci/types"
 import { RiskLanding } from "./RiskLanding"
 import { RiskNavProvider, type RiskDest } from "./RiskNavContext"
+import { RISK_MERCHANTS, type WorkStatus } from "@/lib/ask-nanci/data/risk-merchants"
 import { getThemeLogos, type ThemeId } from "@/lib/ask-nanci/data/theme-logos"
 
 const THEME: ThemeId = "aperia-risk"
@@ -72,6 +73,13 @@ export function RiskConsole({ assistant = true }: { assistant?: boolean }) {
   const openBarometer = (filter: "critical" | null = null) => { setBarometerFilter(filter); setDest("barometer-report") }
   const openMerchant = (id: string) => { setMerchantId(id); setDest("risk-report") }
 
+  // Seeded from the merchant rows, then owned here: the Barometer list, the merchant
+  // detail and the queue cards all read and write the same marks.
+  const [workStatuses, setWorkStatuses] = useState<Record<string, WorkStatus>>(
+    () => Object.fromEntries(RISK_MERCHANTS.map((m) => [m.id, m.status])),
+  )
+  const markWork = (id: string, status: WorkStatus) => setWorkStatuses((s) => ({ ...s, [id]: status }))
+
   // The Detection Queue nav item stays highlighted across its child reports.
   const inQueue = dest === "detection-queue" || dest === "barometer-report" || dest === "risk-report"
 
@@ -96,7 +104,7 @@ export function RiskConsole({ assistant = true }: { assistant?: boolean }) {
       }
       sidebar={<Sidebar menu={nav} logos={getThemeLogos(THEME)} />}
     >
-      <RiskNavProvider value={{ go: setDest, openBarometer, openMerchant, merchantId, barometerFilter, assistant, home }}>
+      <RiskNavProvider value={{ go: setDest, openBarometer, openMerchant, merchantId, barometerFilter, workStatuses, markWork, assistant, home }}>
         <div className="flex min-w-0 flex-1 py-1 pr-1">
           {/* Primary box: the active destination panel (or the Ask Nanci home) */}
           <div className="flex min-w-0 flex-1 overflow-hidden rounded-xl border bg-background md:rounded-2xl">

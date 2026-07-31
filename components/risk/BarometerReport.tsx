@@ -1,44 +1,34 @@
 "use client"
 
-import { useState } from "react"
-import { RefreshCw, SlidersHorizontal, Download, Search, ChevronDown, ChevronLeft, ChevronRight, AlertTriangle, ListChecks, Loader2, Check } from "lucide-react"
-import { Button, Input } from "aperia-ds5"
+import { RefreshCw, SlidersHorizontal, Download, Search, ChevronDown, ChevronLeft, ChevronRight, AlertTriangle, ListChecks } from "lucide-react"
+import {
+  Button, Input,
+  Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator,
+} from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
-import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelBody } from "@/components/ask-nanci/shared"
+import { MarkWorkPopover } from "./MarkWorkPopover"
 import { QueueSummaryCard } from "./QueueSummaryCard"
 import { useRiskNav } from "./RiskNavContext"
-import { RISK_MERCHANTS, RISK_MERCHANTS_TOTAL, getRiskLevel, formatMcScore, type WorkStatus } from "@/lib/ask-nanci/data/risk-merchants"
+import { RISK_MERCHANTS, RISK_MERCHANTS_TOTAL, getRiskLevel, formatMcScore, statusForDisposition } from "@/lib/ask-nanci/data/risk-merchants"
 import { RISK_PILL } from "./risk-level"
 
 function TagBadges({ alert, list }: { alert: number; list: number }) {
   return (
     <div className="flex items-center gap-1">
-      <span className="flex items-center gap-1 rounded bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
+      <span className="flex items-center gap-1 rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
         <AlertTriangle className="size-2.5" /> {alert}
       </span>
-      <span className="flex items-center gap-1 rounded bg-amber-400 px-1.5 py-0.5 text-[10px] font-bold text-amber-950">
+      <span className="flex items-center gap-1 rounded-full bg-amber-400 px-1.5 py-0.5 text-[10px] font-bold text-amber-950">
         <ListChecks className="size-2.5" /> {list}
       </span>
     </div>
   )
 }
 
-function ActionButton({ status, onMarkWork }: { status: WorkStatus; onMarkWork: () => void }) {
-  if (status === "worked")
-    return <Button size="sm" className="w-32 justify-between bg-green-600 text-white hover:bg-green-600/90"><span className="flex items-center gap-1"><Check className="size-3.5" /> Worked</span><ChevronDown className="size-3.5" /></Button>
-  if (status === "wip")
-    return <Button size="sm" className="w-32 justify-between bg-amber-500 text-white hover:bg-amber-500/90"><span className="flex items-center gap-1"><Loader2 className="size-3.5" /> WIP</span><ChevronDown className="size-3.5" /></Button>
-  return <Button size="sm" className="w-32 justify-between" onClick={onMarkWork}><span>Mark Work</span><ChevronDown className="size-3.5" /></Button>
-}
-
 export function BarometerReport() {
   const nav = useRiskNav()
   const filter = nav.barometerFilter
-  // Local work-status so the demo's Mark Work is clickable (happy path).
-  const [statuses, setStatuses] = useState<Record<string, WorkStatus>>(
-    () => Object.fromEntries(RISK_MERCHANTS.map((m) => [m.id, m.status])),
-  )
-  const markWork = (id: string) => setStatuses((s) => ({ ...s, [id]: "worked" }))
   // "critical" chip → the High-risk merchants. That is "critical on either model",
   // not both: 8 of the 13 fire on one model only, and dropping them would hide the
   // exact cases the two-score view exists to surface.
@@ -49,20 +39,24 @@ export function BarometerReport() {
       <PanelHeader
         title="Barometer Report"
         subtitle="04/23/2026"
-        size="lg"
-        actions={<Button variant="secondary" size="sm"><RefreshCw className="size-4" /> Refresh</Button>}
-        onClose={() => nav.go(nav.home)}
+        size="page"
+        breadcrumb={
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild><button onClick={() => nav.go("detection-queue")}>Detection Queue</button></BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem><BreadcrumbPage>Barometer Report</BreadcrumbPage></BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        }
+        actions={<Button variant="outline"><RefreshCw className="size-4" /> Refresh</Button>}
       />
 
-      <div className="flex-1 overflow-y-auto p-4 md:p-6">
-      {/* Breadcrumb */}
-      <div className="mb-4 flex items-center gap-1.5 text-sm text-muted-foreground">
-        <button onClick={() => nav.go("detection-queue")} className="hover:text-foreground hover:underline">Detection Queue</button>
-        <span>›</span>
-        <span className="font-medium text-foreground">Barometer Report</span>
-      </div>
-
-      <QueueSummaryCard />
+      <PanelBody>
+      {/* live: this list's Mark Work buttons feed the card directly above them. */}
+      <QueueSummaryCard live />
 
       {/* Merchant list */}
       <div className="mt-6">
@@ -112,7 +106,14 @@ export function BarometerReport() {
                     <span className={cn("rounded px-2 py-0.5 text-xs font-medium", RISK_PILL[getRiskLevel(m)])}>{getRiskLevel(m)}</span>
                   </td>
                   <td className="px-4 py-2.5 text-right">
-                    <div className="flex justify-end"><ActionButton status={statuses[m.id]} onMarkWork={() => markWork(m.id)} /></div>
+                    {/* Same control as the merchant detail: disposition first, then
+                        the mark — a row is never closed out without a reason. */}
+                    <div className="flex justify-end">
+                      <MarkWorkPopover
+                        status={nav.workStatuses[m.id]}
+                        onSubmit={(choice) => nav.markWork(m.id, statusForDisposition(choice))}
+                      />
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -138,7 +139,7 @@ export function BarometerReport() {
           </div>
         </div>
       </div>
-      </div>
+      </PanelBody>
     </PanelShell>
   )
 }

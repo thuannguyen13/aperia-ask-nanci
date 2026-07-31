@@ -2,18 +2,19 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import { MoreHorizontal, FileText, FolderPlus, ChevronDown, Check, Loader, CircleCheckBig, TriangleAlert, List, ArrowUpDown, Filter, Download, Settings, Pencil, Trash2 } from "lucide-react"
+import { MoreHorizontal, FileText, FolderPlus, Loader, CircleCheckBig, TriangleAlert, List, ArrowUpDown, Filter, Download, Settings, Pencil, Trash2 } from "lucide-react"
 import {
-  Badge, Button, Label, Textarea, RadioGroup, RadioGroupItem,
-  Popover, PopoverTrigger, PopoverContent,
+  Badge, Button,
   Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose,
   Alert, AlertTitle, AlertDescription,
   Tabs, TabsList, TabsTrigger, TabsContent, Avatar, AvatarFallback,
+  Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator,
 } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
-import { PanelShell } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelBody } from "@/components/ask-nanci/shared"
+import { MarkWorkPopover } from "./MarkWorkPopover"
 import { useRiskNav } from "./RiskNavContext"
-import { findMerchant, getVwLevel, getMcLevel, getRiskLevel, formatMcScore, RISK_REPORT_DETAILS, getDefaultRiskDetail, TXN_VOLUME_ROWS, RISK_VIOLATION_CYCLE, VIOLATION_ROWS, CROSS_QUEUE_ROWS, MERCHANT_NOTES_SEED, DEFAULT_MERCHANT_NOTES, type ViolationRow, type NoteEntry, type RiskLevel } from "@/lib/ask-nanci/data/risk-merchants"
+import { findMerchant, getVwLevel, getMcLevel, getRiskLevel, formatMcScore, RISK_REPORT_DETAILS, getDefaultRiskDetail, TXN_VOLUME_ROWS, RISK_VIOLATION_CYCLE, VIOLATION_ROWS, CROSS_QUEUE_ROWS, MERCHANT_NOTES_SEED, DEFAULT_MERCHANT_NOTES, statusForDisposition, type WorkStatus, type ViolationRow, type NoteEntry, type RiskLevel } from "@/lib/ask-nanci/data/risk-merchants"
 import { getRiskLevelStyles } from "./risk-level"
 
 // Parameter Violation Details modal columns (Figma order + widths).
@@ -276,93 +277,6 @@ function NotesTab({ notes, onDelete }: { notes: NoteEntry[]; onDelete: (i: numbe
 }
 
 // Row-major order → grid-cols-2 matches the Figma two-column layout.
-const DISPOSITIONS = [
-  "Cleared — No Action", "Hold Funds",
-  "Escalated — Phase 2", "Termination Recommended",
-  "Contact Merchant", "Other (Specify)",
-]
-
-// The three states of the split button. Hexes sampled from the design: WIP is
-// yellow-600 (#ca8a02), Worked is green-600 (#16a34a); the default keeps `primary`.
-// The spinner is a status glyph, not a loading affordance — it does not spin.
-type WorkState = "none" | "wip" | "worked"
-const WORK_STATES: Record<WorkState, { label: string; icon?: typeof Check; cls?: string }> = {
-  none:   { label: "Mark Work" },
-  wip:    { label: "WIP",    icon: Loader, cls: "bg-yellow-600 text-white hover:bg-yellow-600/90" },
-  worked: { label: "Worked", icon: Check,  cls: "bg-green-600 text-white hover:bg-green-600/90" },
-}
-
-// "Mark Work and Disposition" — opens from the Mark Work dropdown. One radio group
-// (Work in Progress + 6 dispositions are mutually exclusive) plus a note.
-function MarkWorkPopover({ state, onSubmit }: { state: WorkState; onSubmit: (choice: string, note: string) => void }) {
-  const [open, setOpen] = useState(false)
-  const [choice, setChoice] = useState("")
-  const [note, setNote] = useState("")
-  const { label, icon: Icon, cls } = WORK_STATES[state]
-
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      {/* Figma "ButtonGroup" (split button) — ds5 has no ButtonGroup, so compose two
-          Buttons + a divider: main action on the left, dropdown chevron on the right.
-          Both halves carry the state color so the group reads as one control. */}
-      <div className="inline-flex items-center">
-        <Button size="sm" className={cn("rounded-r-none", cls)} onClick={() => setOpen(true)}>
-          {Icon && <Icon className="size-3.5" />} {label}
-        </Button>
-        <PopoverTrigger asChild>
-          <Button size="sm" aria-label="Mark work options" className={cn("rounded-l-none border-l border-white/25 px-2", cls)}>
-            <ChevronDown className="size-3.5" />
-          </Button>
-        </PopoverTrigger>
-      </div>
-      <PopoverContent align="end" className="w-[440px] p-0">
-        <div className="border-b px-4 py-3">
-          <p className="text-sm font-semibold text-foreground">Mark Work and Disposition</p>
-        </div>
-
-        <RadioGroup value={choice} onValueChange={setChoice} className="space-y-4 px-4 py-3">
-          <div className="space-y-2">
-            <Label className="text-xs font-semibold text-muted-foreground">Mark Work</Label>
-            <div className="flex items-center gap-2">
-              <RadioGroupItem value="Work in Progress" id="mw-wip" />
-              <Label htmlFor="mw-wip" className="text-sm font-normal">Work in Progress</Label>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label className="text-xs font-semibold text-muted-foreground">Disposition</Label>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-              {DISPOSITIONS.map((d) => (
-                <div key={d} className="flex items-center gap-2">
-                  <RadioGroupItem value={d} id={`mw-${d}`} />
-                  <Label htmlFor={`mw-${d}`} className="text-sm font-normal">{d}</Label>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label className="text-xs font-semibold text-muted-foreground">Note</Label>
-            <Textarea
-              value={note}
-              onChange={(e) => setNote(e.target.value.slice(0, 7000))}
-              placeholder="Enter note..."
-              rows={note ? 5 : 1}
-              className="resize-none"
-            />
-            {note && <p className="text-xs text-muted-foreground">{note.length.toLocaleString()}/7,000 characters</p>}
-          </div>
-        </RadioGroup>
-
-        <div className="flex justify-end gap-2 px-4 pb-3">
-          <Button variant="secondary" size="sm" onClick={() => setOpen(false)}>Cancel</Button>
-          <Button size="sm" disabled={!choice} onClick={() => { onSubmit(choice, note); setOpen(false) }}>Submit</Button>
-        </div>
-      </PopoverContent>
-    </Popover>
-  )
-}
-
 export function RiskReport() {
   const nav = useRiskNav()
   const m = findMerchant(nav.merchantId ?? "")
@@ -372,7 +286,7 @@ export function RiskReport() {
   // The disposition is the single source of truth — "" means untouched, and
   // "Work in Progress" is the one choice that isn't a terminal disposition.
   const [disposition, setDisposition] = useState("")
-  const workState: WorkState = !disposition ? "none" : disposition === "Work in Progress" ? "wip" : "worked"
+  const workState: WorkStatus = !disposition ? "mark-work" : statusForDisposition(disposition)
   const [activeTab, setActiveTab] = useState("transactions")
   const [notes, setNotes] = useState<NoteEntry[]>(MERCHANT_NOTES_SEED[nav.merchantId ?? ""] ?? DEFAULT_MERCHANT_NOTES)
 
@@ -390,16 +304,71 @@ export function RiskReport() {
 
   return (
     <PanelShell className="min-w-0 flex-1">
-      <div className="flex-1 overflow-y-auto p-4 md:p-6">
-      {/* Breadcrumb */}
-      <div className="mb-3 flex items-center gap-1.5 text-sm text-muted-foreground">
-        <button onClick={() => nav.go("detection-queue")} className="hover:text-foreground hover:underline">Detection Queue</button>
-        <span>›</span>
-        <button onClick={() => nav.go("barometer-report")} className="hover:text-foreground hover:underline">Barometer Report</button>
-        <span>›</span>
-        <span className="font-medium text-foreground">Risk Report</span>
-      </div>
+      <PanelHeader
+        size="page"
+        breadcrumb={
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild><button onClick={() => nav.go("detection-queue")}>Detection Queue</button></BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild><button onClick={() => nav.go("barometer-report")}>Barometer Report</button></BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem><BreadcrumbPage>Risk Report</BreadcrumbPage></BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+        }
+        title={
+          <span className="flex items-center gap-2">
+            {m.name}
+            <ViolationsPill count={d.violations} />
+            <QueuesPill count={d.inQueues} />
+          </span>
+        }
+        subtitle={<span className="text-base font-medium tabular-nums text-primary">{m.mid}</span>}
+        actions={
+          <div className="relative flex items-center gap-2">
+            <Button variant="outline" size="icon"><MoreHorizontal className="size-4" /></Button>
+            <Button variant="outline" onClick={() => setNoteOpen((o) => !o)}><FileText className="size-4" /> Add Notes</Button>
+            <Button variant="outline"><FolderPlus className="size-4" /> Open New Case</Button>
+            {/* The disposition drives this screen; the same choice is published to
+                the shared marks so the queue cards move with it. */}
+            <MarkWorkPopover
+              status={workState}
+              size="default"
+              onSubmit={(choice) => {
+                setDisposition(choice)
+                if (m) nav.markWork(m.id, statusForDisposition(choice))
+              }}
+            />
 
+            {/* Add Notes popover */}
+            {noteOpen && (
+              <div className="absolute right-0 top-full z-20 mt-2 w-96 rounded-xl border bg-card p-3 text-left shadow-lg">
+                <p className="mb-2 text-sm font-semibold text-foreground">Note</p>
+                <textarea
+                  value={note}
+                  onChange={(e) => setNote(e.target.value.slice(0, 7000))}
+                  placeholder="Enter note..."
+                  className="h-24 w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+                />
+                <div className="mt-1 flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">{note.length}/7,000 characters</span>
+                </div>
+                <div className="mt-2 flex justify-end gap-2">
+                  <Button variant="secondary" size="sm" onClick={() => { setNote(""); setNoteOpen(false) }}>Cancel</Button>
+                  <Button size="sm" disabled={!note.trim()} onClick={() => { addNote(note.trim()); setNote(""); setNoteOpen(false) }}>Submit</Button>
+                </div>
+              </div>
+            )}
+          </div>
+        }
+      />
+
+      <PanelBody>
       {/* Mark-work payoff banner */}
       {disposition && (
         <div className={cn(
@@ -414,44 +383,6 @@ export function RiskReport() {
             : `Disposition set to ${disposition} — the updated status will reflect on VisionWeb.`}
         </div>
       )}
-
-      {/* Header */}
-      <div className="relative mb-5 flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="text-xl font-bold text-foreground">{m.name}</h1>
-            <ViolationsPill count={d.violations} />
-            <QueuesPill count={d.inQueues} />
-          </div>
-          <p className="mt-1 text-base font-medium tabular-nums text-primary">{m.mid}</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="secondary" size="icon-sm"><MoreHorizontal className="size-4" /></Button>
-          <Button variant="secondary" size="sm" onClick={() => setNoteOpen((o) => !o)}><FileText className="size-4" /> Add Notes</Button>
-          <Button variant="secondary" size="sm"><FolderPlus className="size-4" /> Open New Case</Button>
-          <MarkWorkPopover state={workState} onSubmit={(choice) => setDisposition(choice)} />
-        </div>
-
-        {/* Add Notes popover */}
-        {noteOpen && (
-          <div className="absolute right-0 top-11 z-20 w-96 rounded-xl border bg-card p-3 shadow-lg">
-            <p className="mb-2 text-sm font-semibold text-foreground">Note</p>
-            <textarea
-              value={note}
-              onChange={(e) => setNote(e.target.value.slice(0, 7000))}
-              placeholder="Enter note..."
-              className="h-24 w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-            />
-            <div className="mt-1 flex items-center justify-between">
-              <span className="text-xs text-muted-foreground">{note.length}/7,000 characters</span>
-            </div>
-            <div className="mt-2 flex justify-end gap-2">
-              <Button variant="secondary" size="sm" onClick={() => { setNote(""); setNoteOpen(false) }}>Cancel</Button>
-              <Button size="sm" disabled={!note.trim()} onClick={() => { addNote(note.trim()); setNote(""); setNoteOpen(false) }}>Submit</Button>
-            </div>
-          </div>
-        )}
-      </div>
 
       {/* Score cards */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -587,7 +518,7 @@ export function RiskReport() {
           </TabsContent>
         ))}
       </Tabs>
-      </div>
+      </PanelBody>
     </PanelShell>
   )
 }

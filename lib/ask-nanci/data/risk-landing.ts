@@ -14,7 +14,8 @@ export const RISK_HEADLINE_STATS = [
 
 // A landing chip either asks Nanci (`prompt` → chat answer) or jumps straight to a
 // risk destination (`dest`, optionally with a merchant `filter`). See RiskLanding.
-export type RiskChipDest = "barometer-report"
+// The same union types the navigating suggestion pills (RISK_SUGGESTION_DESTS).
+export type RiskChipDest = "barometer-report" | "detection-queue"
 export type RiskChipFilter = "critical"
 
 // Four quick-action chips below the chat input.
@@ -36,28 +37,36 @@ export interface RiskTake {
   prompt: string
 }
 
-// The first take is the standing insight: the premise of the whole product with a
-// real number attached. It does not change day to day the way the other two do.
+// Today-shaped takes: each one is read off the dashboard charts its badges name,
+// so a number here can be checked against the chart it points at. The badges and
+// DASH_HIGHLIGHTS are kept in step — the charts a take names are the charts that
+// ring when you open it.
 export const RISK_NANCI_TAKES: RiskTake[] = [
   {
     dot: "bg-red-500",
-    title: "3,556 merchants scored above 700 with no alert",
-    body: "One client portfolio, Sept–Dec 2025. Mastercard called them high risk and VisionWeb raised nothing. 317 were later confirmed fraud.",
-    badges: [{ label: "High Risk Merchants", icon: TriangleAlert }, { label: "Alert Volume", icon: BarChartBig }],
-    prompt: "How many high-MC merchants never raised a VisionWeb alert?",
-  },
-  {
-    dot: "bg-violet-500",
-    title: "Together the two models cover 91% of chargeback merchants",
-    body: "Across 774 chargeback merchants: 210 caught early by both, against 178 for Mastercard alone and 93 for VisionWeb alone. 69 were missed by both.",
-    badges: [{ label: "VW vs. MC Scatter", icon: LineChart }, { label: "High Risk Merchants", icon: TriangleAlert }],
-    prompt: "Compare VW scores vs MC scores for the alerted portfolio",
+    title: "Alert Volume requires attention",
+    // 357 and 294 are ALERT_VOLUME's Esquire row; 20.1% is REALERT_ROWS' rate for
+    // the same assignment.
+    body: "357 alerts today — 63 more than yesterday, and a 20.1% re-alert rate on the same queue suggests thresholds may be too loose.",
+    badges: [{ label: "Alert Volume", icon: BarChartBig }, { label: "Re-Alert Rate", icon: Repeat2 }],
+    prompt: "Why is alert volume running hot today?",
   },
   {
     dot: "bg-amber-500",
+    // 45.6%, the suggested action and the 18 alerts are all REALERT_ROWS /
+    // ALERT_VOLUME rows for MC Velocity (system).
     title: "MC Velocity re-alert rate is 45.6% — highest today",
     body: "Suggested action: raise velocity threshold 15 → 20 pts. Only 18 alerts but very noisy.",
     badges: [{ label: "Re-Alert Rate", icon: Repeat2 }],
     prompt: "Review MC Velocity re-alert rate",
+  },
+  {
+    dot: "bg-violet-500",
+    // Five of the 30 merchant rows are High on both models; the two named are the
+    // biggest 30-day MC movers among those five (HIGH_RISK_MERCHANTS).
+    title: "5 merchants are both VW critical and MC critical",
+    body: "Regency Furniture Manchester and Brighton Medical Supply are highest priority, at +410 and +264 on the 30-day MC delta.",
+    badges: [{ label: "VW vs. MC Scatter", icon: LineChart }, { label: "High Risk Merchants", icon: TriangleAlert }],
+    prompt: "Which merchants are critical on both models?",
   },
 ]
