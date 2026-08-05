@@ -67,7 +67,7 @@ const HOVER_OPEN_MS = 100
 const HOVER_CLOSE_MS = 250
 
 export function Sidebar({ menu, logos, hoverNav }: { menu?: SidebarNavItem[]; logos?: ThemeLogos; hoverNav?: boolean } = {}) {
-  const { view, startNewChat, setKbOpen, marketplaceOpen, setMarketplaceOpen, mobileSidebarOpen, setMobileSidebarOpen, currentUser } = useAskNanci()
+  const { view, messages, startNewChat, setKbOpen, marketplaceOpen, setMarketplaceOpen, mobileSidebarOpen, setMobileSidebarOpen, currentUser } = useAskNanci()
   const [collapsed, setCollapsed] = useState(false)
   const [wizardOpen, setWizardOpen] = useState(false)
   const { resolvedTheme, setTheme } = useTheme()
@@ -76,18 +76,21 @@ export function Sidebar({ menu, logos, hoverNav }: { menu?: SidebarNavItem[]; lo
   // ── Hover-rail nav (?mode=concept-nav) ──────────────────────────────────────
   // The pin is the only thing holding the sidebar open. It starts on, so the welcome
   // screen looks and behaves like the normal app (that's where the nav carries its
-  // context, and where the tour runs); asking the first question releases it and the
-  // sidebar becomes a rail that expands on hover.
+  // context, and where the tour runs), and every question asked releases it again —
+  // the sidebar falls back to a rail that expands on hover.
   //
-  // `null` means the user hasn't touched the pin yet, so the view still decides. The
-  // moment they click it, their choice sticks and the view stops mattering — including
-  // unpinning on the welcome screen, which collapses it to the rail there too.
+  // So the pin means "keep it open until I ask my next question", not "keep it open
+  // forever". A pin choice is stamped with the question count it was made at and
+  // expires when that count moves, which is cheaper than an effect watching for one.
+  // Until it's touched the view supplies the default, so unpinning on the welcome
+  // screen collapses it to the rail there too.
   //
   // ponytail: session state, deliberately not persisted. A pin clicked while rehearsing
   // would otherwise decide how the next demo opens.
-  const [pinned, setPinned] = useState<boolean | null>(null)
+  const [pinChoice, setPinChoice] = useState<{ at: number; on: boolean } | null>(null)
   const [hovering, setHovering] = useState(false)
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const askCount = messages.filter((m) => m.role === "user").length
 
   useEffect(() => () => { if (hoverTimer.current) clearTimeout(hoverTimer.current) }, [])
 
@@ -96,7 +99,8 @@ export function Sidebar({ menu, logos, hoverNav }: { menu?: SidebarNavItem[]; lo
     hoverTimer.current = setTimeout(() => setHovering(next), next ? HOVER_OPEN_MS : HOVER_CLOSE_MS)
   }
 
-  const isPinned = pinned ?? view === "welcome"
+  const isPinned = pinChoice?.at === askCount ? pinChoice.on : view === "welcome"
+  const setPinned = (on: boolean) => setPinChoice({ at: askCount, on })
   // The one value the rest of the component reads. Without hoverNav this is the manual
   // collapse toggle exactly as before.
   const isCollapsed = hoverNav ? !isPinned && !hovering : collapsed
