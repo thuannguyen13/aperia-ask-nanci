@@ -74,15 +74,18 @@ export function Sidebar({ menu, logos, hoverNav }: { menu?: SidebarNavItem[]; lo
   const isDark = resolvedTheme === "dark"
 
   // ── Hover-rail nav (?mode=concept-nav) ──────────────────────────────────────
-  // The welcome screen always shows the full sidebar — that's where the nav carries
-  // its context. From the first question on, it's a rail that expands on hover, unless
-  // the user pinned it open. Nothing the user did intentionally gets undone: the only
-  // sticky open state is the one they asked for.
+  // The pin is the only thing holding the sidebar open. It starts on, so the welcome
+  // screen looks and behaves like the normal app (that's where the nav carries its
+  // context, and where the tour runs); asking the first question releases it and the
+  // sidebar becomes a rail that expands on hover.
   //
-  // ponytail: the pin is session state, deliberately not persisted. A pin clicked while
-  // rehearsing would otherwise decide how the next demo opens, and on the welcome screen
-  // (sidebar open either way) that reads as the button lying about its state.
-  const [pinned, setPinned] = useState(false)
+  // `null` means the user hasn't touched the pin yet, so the view still decides. The
+  // moment they click it, their choice sticks and the view stops mattering — including
+  // unpinning on the welcome screen, which collapses it to the rail there too.
+  //
+  // ponytail: session state, deliberately not persisted. A pin clicked while rehearsing
+  // would otherwise decide how the next demo opens.
+  const [pinned, setPinned] = useState<boolean | null>(null)
   const [hovering, setHovering] = useState(false)
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -93,9 +96,10 @@ export function Sidebar({ menu, logos, hoverNav }: { menu?: SidebarNavItem[]; lo
     hoverTimer.current = setTimeout(() => setHovering(next), next ? HOVER_OPEN_MS : HOVER_CLOSE_MS)
   }
 
+  const isPinned = pinned ?? view === "welcome"
   // The one value the rest of the component reads. Without hoverNav this is the manual
   // collapse toggle exactly as before.
-  const isCollapsed = hoverNav ? view === "chat" && !pinned && !hovering : collapsed
+  const isCollapsed = hoverNav ? !isPinned && !hovering : collapsed
 
   const sidebarContent = (isMobile: boolean) => (
     <>
@@ -153,22 +157,22 @@ export function Sidebar({ menu, logos, hoverNav }: { menu?: SidebarNavItem[]; lo
           <Tooltip>
             <TooltipTrigger asChild>
               <button
-                onClick={() => (hoverNav ? setPinned(!pinned) : setCollapsed(true))}
+                onClick={() => (hoverNav ? setPinned(!isPinned) : setCollapsed(true))}
                 className={cn(
                   "flex size-6 items-center justify-center rounded text-foreground hover:bg-muted transition-colors",
                   isCollapsed && "pointer-events-none opacity-0",
-                  hoverNav && pinned && "text-primary",
+                  hoverNav && isPinned && "text-primary",
                 )}
               >
                 {hoverNav ? (
-                  pinned ? <PinOff className="size-4" /> : <Pin className="size-4" />
+                  isPinned ? <PinOff className="size-4" /> : <Pin className="size-4" />
                 ) : (
                   <PanelLeft className="size-4" />
                 )}
               </button>
             </TooltipTrigger>
             <TooltipContent side="bottom">
-              {hoverNav ? (pinned ? "Unpin sidebar" : "Pin sidebar open") : "Collapse sidebar"}
+              {hoverNav ? (isPinned ? "Unpin sidebar" : "Pin sidebar open") : "Collapse sidebar"}
             </TooltipContent>
           </Tooltip>
         )}
