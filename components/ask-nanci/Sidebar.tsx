@@ -53,39 +53,6 @@ function SidebarItem({
   )
 }
 
-// The small icon buttons in the sidebar header (pin, collapse). Same chrome as the
-// single close button that used to live inline here — extracted only because there are
-// now two of them side by side.
-function HeaderButton({
-  label,
-  active,
-  onClick,
-  children,
-}: {
-  label: string
-  active?: boolean
-  onClick: () => void
-  children: React.ReactNode
-}) {
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <button
-          onClick={onClick}
-          aria-label={label}
-          className={cn(
-            "flex size-6 items-center justify-center rounded text-foreground hover:bg-muted transition-colors",
-            active && "text-primary",
-          )}
-        >
-          {children}
-        </button>
-      </TooltipTrigger>
-      <TooltipContent side="bottom">{label}</TooltipContent>
-    </Tooltip>
-  )
-}
-
 // When `menu` is provided the rail renders a fixed nav list (e.g. the Aperia Risk
 // theme) instead of New Chat + Marketplace, and hides the Teach Nanci / Usage cards.
 // `logos` supplies the theme's rail branding (see data/theme-logos.ts); its `sidebar` and
@@ -103,29 +70,20 @@ const HOVER_OPEN_MS = 100
 const HOVER_CLOSE_MS = 250
 
 export function Sidebar({ menu, logos, hoverNav }: { menu?: SidebarNavItem[]; logos?: ThemeLogos; hoverNav?: boolean } = {}) {
-  const { view, messages, startNewChat, setKbOpen, marketplaceOpen, setMarketplaceOpen, mobileSidebarOpen, setMobileSidebarOpen, currentUser } = useAskNanci()
+  const { view, startNewChat, setKbOpen, marketplaceOpen, setMarketplaceOpen, mobileSidebarOpen, setMobileSidebarOpen, currentUser } = useAskNanci()
   const [collapsed, setCollapsed] = useState(false)
   const [wizardOpen, setWizardOpen] = useState(false)
   const { resolvedTheme, setTheme } = useTheme()
   const isDark = resolvedTheme === "dark"
 
   // ── Hover-rail nav (?mode=concept-nav) ──────────────────────────────────────
-  // Two independent controls, because they answer two different questions:
-  //
-  //   toggle — "open/close it right now". Lasts until the next question is asked,
-  //            then the sidebar goes back to the mode's default.
-  //   pin    — "stop doing that, keep it open". Survives every question, and reloads.
-  //
-  // The default itself: full sidebar on the welcome screen (that's where the nav
-  // carries its context, and where the tour runs), a hover rail once the user is
-  // actually chatting.
+  // The welcome screen always shows the full sidebar — that's where the nav carries
+  // its context. From the first question on, it's a rail that expands on hover, unless
+  // the user pinned it open. Nothing the user did intentionally gets undone: the only
+  // sticky open state is the one they asked for.
   const [pinned, setPinned] = useState(false)
   const [hovering, setHovering] = useState(false)
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  // A toggle choice is stamped with the question count it was made at, so it expires
-  // on the next question without an effect watching for it.
-  const [toggled, setToggled] = useState<{ at: number; open: boolean } | null>(null)
-  const askCount = messages.filter((m) => m.role === "user").length
 
   useEffect(() => {
     if (!hoverNav) return
@@ -139,16 +97,7 @@ export function Sidebar({ menu, logos, hoverNav }: { menu?: SidebarNavItem[]; lo
 
   const pin = (next: boolean) => {
     setPinned(next)
-    setToggled(null)
     localStorage.setItem(PIN_KEY, next ? "1" : "0")
-  }
-
-  // Closing by hand also unpins — otherwise the pin would silently reopen it and the
-  // toggle would look broken.
-  const toggle = (open: boolean) => {
-    if (!hoverNav) return setCollapsed(!open)
-    if (!open) pin(false)
-    setToggled({ at: askCount, open })
   }
 
   const hover = (next: boolean) => {
@@ -156,13 +105,9 @@ export function Sidebar({ menu, logos, hoverNav }: { menu?: SidebarNavItem[]; lo
     hoverTimer.current = setTimeout(() => setHovering(next), next ? HOVER_OPEN_MS : HOVER_CLOSE_MS)
   }
 
-  // The one value the rest of the component reads. Precedence: a hover peek, then the
-  // pin, then an unexpired toggle, then the default for the current view. Without
-  // hoverNav this is the manual collapse toggle exactly as before.
-  const activeToggle = toggled?.at === askCount ? toggled : null
-  const isCollapsed = hoverNav
-    ? !hovering && !pinned && (activeToggle ? !activeToggle.open : view === "chat")
-    : collapsed
+  // The one value the rest of the component reads. Without hoverNav this is the manual
+  // collapse toggle exactly as before.
+  const isCollapsed = hoverNav ? view === "chat" && !pinned && !hovering : collapsed
 
   const sidebarContent = (isMobile: boolean) => (
     <>
@@ -173,7 +118,7 @@ export function Sidebar({ menu, logos, hoverNav }: { menu?: SidebarNavItem[]; lo
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
-                  onClick={() => toggle(true)}
+                  onClick={() => (hoverNav ? pin(true) : setCollapsed(false))}
                   className="group relative flex size-6 items-center justify-center"
                 >
                   <Image
@@ -187,7 +132,7 @@ export function Sidebar({ menu, logos, hoverNav }: { menu?: SidebarNavItem[]; lo
                   <PanelLeft className="absolute size-4 rotate-180 text-foreground opacity-0 transition-opacity duration-150 group-hover:opacity-100" />
                 </button>
               </TooltipTrigger>
-              <TooltipContent side="right">Expand sidebar</TooltipContent>
+              <TooltipContent side="right">{hoverNav ? "Pin sidebar open" : "Expand sidebar"}</TooltipContent>
             </Tooltip>
           ) : logos?.sidebar ? (
             <Image
@@ -208,8 +153,7 @@ export function Sidebar({ menu, logos, hoverNav }: { menu?: SidebarNavItem[]; lo
           )}
         </div>
 
-        {/* Pin (hover-rail nav only) + close. Two separate controls: pin keeps the
-            sidebar open past the next question, close collapses it right now. */}
+        {/* Close button — the pin in hover-rail nav, the collapse toggle otherwise */}
         {isMobile ? (
           <button
             onClick={() => setMobileSidebarOpen(false)}
@@ -218,20 +162,27 @@ export function Sidebar({ menu, logos, hoverNav }: { menu?: SidebarNavItem[]; lo
             <PanelLeft className="size-4" />
           </button>
         ) : (
-          <div className={cn("flex items-center gap-0.5", isCollapsed && "pointer-events-none opacity-0")}>
-            {hoverNav && (
-              <HeaderButton
-                label={pinned ? "Unpin sidebar" : "Pin sidebar open"}
-                active={pinned}
-                onClick={() => pin(!pinned)}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                onClick={() => (hoverNav ? pin(!pinned) : setCollapsed(true))}
+                className={cn(
+                  "flex size-6 items-center justify-center rounded text-foreground hover:bg-muted transition-colors",
+                  isCollapsed && "pointer-events-none opacity-0",
+                  hoverNav && pinned && "text-primary",
+                )}
               >
-                {pinned ? <PinOff className="size-4" /> : <Pin className="size-4" />}
-              </HeaderButton>
-            )}
-            <HeaderButton label="Collapse sidebar" onClick={() => toggle(false)}>
-              <PanelLeft className="size-4" />
-            </HeaderButton>
-          </div>
+                {hoverNav ? (
+                  pinned ? <PinOff className="size-4" /> : <Pin className="size-4" />
+                ) : (
+                  <PanelLeft className="size-4" />
+                )}
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              {hoverNav ? (pinned ? "Unpin sidebar" : "Pin sidebar open") : "Collapse sidebar"}
+            </TooltipContent>
+          </Tooltip>
         )}
       </div>
 
