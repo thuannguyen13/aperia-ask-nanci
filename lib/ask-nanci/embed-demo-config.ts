@@ -12,17 +12,24 @@ interface ParsedMode {
   isEmbed: boolean
   embedVariant: EmbedVariant | null
   isConceptVersion: boolean
+  /**
+   * Sidebar behaves as a hover rail once the user asks a question, with a pin to keep
+   * it open (see Sidebar). `concept-nav` is `concept` plus this one behavior change, so
+   * the two URLs can be demoed side by side.
+   */
+  hoverNav: boolean
 }
 
 export function parseMode(mode: string | null): ParsedMode {
   switch (mode) {
-    case "clover":          return { isEmbed: true,  embedVariant: "clover",         isConceptVersion: false }
-    case "business-owner":  return { isEmbed: true,  embedVariant: "business-owner", isConceptVersion: false }
-    case "iso":             return { isEmbed: true,  embedVariant: "iso",            isConceptVersion: false }
-    case "concept-embed":   return { isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true  }
-    case "vw":              return { isEmbed: true,  embedVariant: "vw",             isConceptVersion: false }
-    case "concept":         return { isEmbed: false, embedVariant: null,             isConceptVersion: true  }
-    default:                return { isEmbed: false, embedVariant: null,             isConceptVersion: false }
+    case "clover":          return { isEmbed: true,  embedVariant: "clover",         isConceptVersion: false, hoverNav: false }
+    case "business-owner":  return { isEmbed: true,  embedVariant: "business-owner", isConceptVersion: false, hoverNav: false }
+    case "iso":             return { isEmbed: true,  embedVariant: "iso",            isConceptVersion: false, hoverNav: false }
+    case "concept-embed":   return { isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true,  hoverNav: false }
+    case "vw":              return { isEmbed: true,  embedVariant: "vw",             isConceptVersion: false, hoverNav: false }
+    case "concept":         return { isEmbed: false, embedVariant: null,             isConceptVersion: true,  hoverNav: false }
+    case "concept-nav":     return { isEmbed: false, embedVariant: null,             isConceptVersion: true,  hoverNav: true  }
+    default:                return { isEmbed: false, embedVariant: null,             isConceptVersion: false, hoverNav: false }
   }
 }
 

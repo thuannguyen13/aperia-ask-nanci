@@ -117,7 +117,7 @@ const EMBED_THEME: Record<EmbedVariant, ThemeId> = {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams()
-  const { isEmbed, embedVariant, isConceptVersion } = parseMode(searchParams.get("mode"))
+  const { isEmbed, embedVariant, isConceptVersion, hoverNav } = parseMode(searchParams.get("mode"))
   const rawFlow = searchParams.get("flow")
   const autoPlayFlow = (rawFlow && CONCEPT_FLOW_SLUGS[rawFlow]) ?? null
   // Per-flow embed layout: some flows (e.g. 22, Service Marketplace) render the full
@@ -202,7 +202,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Image data-logo="frame" {...getThemeLogos(CONCEPT_THEME).frame} className="h-6 w-auto" />
           </div>
         }
-        sidebar={<Sidebar />}
+        sidebar={<Sidebar hoverNav={hoverNav} />}
       >
         {isConceptVersion ? (
           <ConceptContentArea>{children}</ConceptContentArea>

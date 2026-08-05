@@ -80,8 +80,9 @@ p("|---|---|---|---|")
 const MODE_NOTES: Record<string, string> = {
   "": "Default app — sidebar, KB panel, sessions",
   concept: "Panel demo with the welcome card catalog",
+  "concept-nav": "`concept` + hover-rail sidebar (open on welcome, rail after the first question, pin to keep)",
 }
-for (const mode of ["", ...EMBED_VARIANTS, "concept"]) {
+for (const mode of ["", ...EMBED_VARIANTS, "concept", "concept-nav"]) {
   const q = mode ? `mode=${mode}` : ""
   const { isEmbed, isConceptVersion } = parseMode(mode || null)
   const note = MODE_NOTES[mode] ?? (isConceptVersion ? "Panel demo, embeddable" : "Chat-only embed")

@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { Blocks, MessageCirclePlus, PanelLeft, Settings, Moon } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
+import { Blocks, MessageCirclePlus, PanelLeft, Pin, PinOff, Settings, Moon } from "lucide-react"
 import Image from "next/image"
 import { useTheme } from "next-themes"
 import {
@@ -53,6 +53,39 @@ function SidebarItem({
   )
 }
 
+// The small icon buttons in the sidebar header (pin, collapse). Same chrome as the
+// single close button that used to live inline here — extracted only because there are
+// now two of them side by side.
+function HeaderButton({
+  label,
+  active,
+  onClick,
+  children,
+}: {
+  label: string
+  active?: boolean
+  onClick: () => void
+  children: React.ReactNode
+}) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          onClick={onClick}
+          aria-label={label}
+          className={cn(
+            "flex size-6 items-center justify-center rounded text-foreground hover:bg-muted transition-colors",
+            active && "text-primary",
+          )}
+        >
+          {children}
+        </button>
+      </TooltipTrigger>
+      <TooltipContent side="bottom">{label}</TooltipContent>
+    </Tooltip>
+  )
+}
+
 // When `menu` is provided the rail renders a fixed nav list (e.g. the Aperia Risk
 // theme) instead of New Chat + Marketplace, and hides the Teach Nanci / Usage cards.
 // `logos` supplies the theme's rail branding (see data/theme-logos.ts); its `sidebar` and
@@ -61,23 +94,86 @@ function SidebarItem({
 // of these logos is CSS, keyed off the `data-logo` attributes (globals.css).
 type SidebarNavItem = { icon: React.ElementType; label: string; active?: boolean; onClick?: () => void }
 
-export function Sidebar({ menu, logos }: { menu?: SidebarNavItem[]; logos?: ThemeLogos } = {}) {
-  const { startNewChat, setKbOpen, marketplaceOpen, setMarketplaceOpen, mobileSidebarOpen, setMobileSidebarOpen, currentUser } = useAskNanci()
+// Pin state outlives the tab (`?mode=concept-nav` only) — an intentional pin should not
+// be forgotten by a reload.
+const PIN_KEY = "asknanci_nav_pinned"
+// Opening is near-instant so the rail feels responsive; closing lags so a cursor that
+// clips the rail on its way elsewhere doesn't reflow the content.
+const HOVER_OPEN_MS = 100
+const HOVER_CLOSE_MS = 250
+
+export function Sidebar({ menu, logos, hoverNav }: { menu?: SidebarNavItem[]; logos?: ThemeLogos; hoverNav?: boolean } = {}) {
+  const { view, messages, startNewChat, setKbOpen, marketplaceOpen, setMarketplaceOpen, mobileSidebarOpen, setMobileSidebarOpen, currentUser } = useAskNanci()
   const [collapsed, setCollapsed] = useState(false)
   const [wizardOpen, setWizardOpen] = useState(false)
   const { resolvedTheme, setTheme } = useTheme()
   const isDark = resolvedTheme === "dark"
+
+  // ── Hover-rail nav (?mode=concept-nav) ──────────────────────────────────────
+  // Two independent controls, because they answer two different questions:
+  //
+  //   toggle — "open/close it right now". Lasts until the next question is asked,
+  //            then the sidebar goes back to the mode's default.
+  //   pin    — "stop doing that, keep it open". Survives every question, and reloads.
+  //
+  // The default itself: full sidebar on the welcome screen (that's where the nav
+  // carries its context, and where the tour runs), a hover rail once the user is
+  // actually chatting.
+  const [pinned, setPinned] = useState(false)
+  const [hovering, setHovering] = useState(false)
+  const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // A toggle choice is stamped with the question count it was made at, so it expires
+  // on the next question without an effect watching for it.
+  const [toggled, setToggled] = useState<{ at: number; open: boolean } | null>(null)
+  const askCount = messages.filter((m) => m.role === "user").length
+
+  useEffect(() => {
+    if (!hoverNav) return
+    // ponytail: must stay in the effect — a lazy useState initializer would read
+    // localStorage on the client but not the server, mismatching the width on hydrate.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPinned(localStorage.getItem(PIN_KEY) === "1")
+  }, [hoverNav])
+
+  useEffect(() => () => { if (hoverTimer.current) clearTimeout(hoverTimer.current) }, [])
+
+  const pin = (next: boolean) => {
+    setPinned(next)
+    setToggled(null)
+    localStorage.setItem(PIN_KEY, next ? "1" : "0")
+  }
+
+  // Closing by hand also unpins — otherwise the pin would silently reopen it and the
+  // toggle would look broken.
+  const toggle = (open: boolean) => {
+    if (!hoverNav) return setCollapsed(!open)
+    if (!open) pin(false)
+    setToggled({ at: askCount, open })
+  }
+
+  const hover = (next: boolean) => {
+    if (hoverTimer.current) clearTimeout(hoverTimer.current)
+    hoverTimer.current = setTimeout(() => setHovering(next), next ? HOVER_OPEN_MS : HOVER_CLOSE_MS)
+  }
+
+  // The one value the rest of the component reads. Precedence: a hover peek, then the
+  // pin, then an unexpired toggle, then the default for the current view. Without
+  // hoverNav this is the manual collapse toggle exactly as before.
+  const activeToggle = toggled?.at === askCount ? toggled : null
+  const isCollapsed = hoverNav
+    ? !hovering && !pinned && (activeToggle ? !activeToggle.open : view === "chat")
+    : collapsed
 
   const sidebarContent = (isMobile: boolean) => (
     <>
       {/* Header */}
       <div className="flex items-center justify-between p-2 pl-1 min-w-[256px]">
         <div className="flex h-9 shrink-0 items-center gap-2 px-2">
-          {!isMobile && collapsed ? (
+          {!isMobile && isCollapsed ? (
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
-                  onClick={() => setCollapsed(false)}
+                  onClick={() => toggle(true)}
                   className="group relative flex size-6 items-center justify-center"
                 >
                   <Image
@@ -112,7 +208,8 @@ export function Sidebar({ menu, logos }: { menu?: SidebarNavItem[]; logos?: Them
           )}
         </div>
 
-        {/* Close button */}
+        {/* Pin (hover-rail nav only) + close. Two separate controls: pin keeps the
+            sidebar open past the next question, close collapses it right now. */}
         {isMobile ? (
           <button
             onClick={() => setMobileSidebarOpen(false)}
@@ -121,32 +218,32 @@ export function Sidebar({ menu, logos }: { menu?: SidebarNavItem[]; logos?: Them
             <PanelLeft className="size-4" />
           </button>
         ) : (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <button
-                onClick={() => setCollapsed(true)}
-                className={cn(
-                  "flex size-6 items-center justify-center rounded text-foreground hover:bg-muted transition-colors",
-                  collapsed && "pointer-events-none opacity-0",
-                )}
+          <div className={cn("flex items-center gap-0.5", isCollapsed && "pointer-events-none opacity-0")}>
+            {hoverNav && (
+              <HeaderButton
+                label={pinned ? "Unpin sidebar" : "Pin sidebar open"}
+                active={pinned}
+                onClick={() => pin(!pinned)}
               >
-                <PanelLeft className="size-4" />
-              </button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom">Collapse sidebar</TooltipContent>
-          </Tooltip>
+                {pinned ? <PinOff className="size-4" /> : <Pin className="size-4" />}
+              </HeaderButton>
+            )}
+            <HeaderButton label="Collapse sidebar" onClick={() => toggle(false)}>
+              <PanelLeft className="size-4" />
+            </HeaderButton>
+          </div>
         )}
       </div>
 
       {/* Nav list (menu mode) or New Chat — stays onscreen above the scroll area */}
-      <div className={cn("shrink-0 min-w-12 p-2", !isMobile && collapsed && "px-1")}>
+      <div className={cn("shrink-0 min-w-12 p-2", !isMobile && isCollapsed && "px-1")}>
         {menu ? (
           menu.map((item) => (
             <SidebarItem
               key={item.label}
               icon={item.icon}
               label={item.label}
-              collapsed={!isMobile && collapsed}
+              collapsed={!isMobile && isCollapsed}
               onClick={item.onClick}
               className={item.active ? "bg-muted font-medium" : undefined}
             />
@@ -156,14 +253,14 @@ export function Sidebar({ menu, logos }: { menu?: SidebarNavItem[]; logos?: Them
             <SidebarItem
               icon={MessageCirclePlus}
               label="New Chat"
-              collapsed={!isMobile && collapsed}
+              collapsed={!isMobile && isCollapsed}
               onClick={() => { setMarketplaceOpen(false); startNewChat() }}
             />
             {/* Marketplace (Flow 22) — a nav destination that takes over the content area */}
             <SidebarItem
               icon={Blocks}
               label={MARKETPLACE_TITLE}
-              collapsed={!isMobile && collapsed}
+              collapsed={!isMobile && isCollapsed}
               onClick={() => { setMarketplaceOpen(!marketplaceOpen); if (isMobile) setMobileSidebarOpen(false) }}
               className={marketplaceOpen ? "bg-muted font-medium" : undefined}
             />
@@ -176,7 +273,7 @@ export function Sidebar({ menu, logos }: { menu?: SidebarNavItem[]; logos?: Them
       {/* Footer — in-flow, sits below the scroll area (no overlap, no reserved padding) */}
       <div className="shrink-0 bg-sidebar p-2 pb-3 min-w-[256px]">
         {/* Cards — hidden when collapsed or in menu mode */}
-        {!menu && (isMobile || !collapsed) && (
+        {!menu && (isMobile || !isCollapsed) && (
           <div className="flex flex-col gap-2 mb-4">
             
               <div className="relative bg-card rounded-[10px] border p-4 shadow-sm overflow-hidden">
@@ -207,7 +304,7 @@ export function Sidebar({ menu, logos }: { menu?: SidebarNavItem[]; logos?: Them
 
         {/* User row with dropdown */}
         <DropdownMenu>
-          {!isMobile && collapsed ? (
+          {!isMobile && isCollapsed ? (
             <Tooltip>
               <TooltipTrigger asChild>
                 <DropdownMenuTrigger asChild>
@@ -257,9 +354,11 @@ export function Sidebar({ menu, logos }: { menu?: SidebarNavItem[]; logos?: Them
 
       {/* Desktop sidebar */}
       <aside
+        onMouseEnter={hoverNav ? () => hover(true) : undefined}
+        onMouseLeave={hoverNav ? () => hover(false) : undefined}
         className={cn(
           "relative hidden md:flex h-full shrink-0 flex-col bg-sidebar overflow-hidden transition-[width] duration-200 ease-in-out",
-          collapsed ? "w-12" : "w-64",
+          isCollapsed ? "w-12" : "w-64",
         )}
       >
         {sidebarContent(false)}
