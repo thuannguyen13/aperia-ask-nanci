@@ -61,9 +61,6 @@ function SidebarItem({
 // of these logos is CSS, keyed off the `data-logo` attributes (globals.css).
 type SidebarNavItem = { icon: React.ElementType; label: string; active?: boolean; onClick?: () => void }
 
-// Pin state outlives the tab (`?mode=concept-nav` only) — an intentional pin should not
-// be forgotten by a reload.
-const PIN_KEY = "asknanci_nav_pinned"
 // Opening is near-instant so the rail feels responsive; closing lags so a cursor that
 // clips the rail on its way elsewhere doesn't reflow the content.
 const HOVER_OPEN_MS = 100
@@ -81,24 +78,15 @@ export function Sidebar({ menu, logos, hoverNav }: { menu?: SidebarNavItem[]; lo
   // its context. From the first question on, it's a rail that expands on hover, unless
   // the user pinned it open. Nothing the user did intentionally gets undone: the only
   // sticky open state is the one they asked for.
+  //
+  // ponytail: the pin is session state, deliberately not persisted. A pin clicked while
+  // rehearsing would otherwise decide how the next demo opens, and on the welcome screen
+  // (sidebar open either way) that reads as the button lying about its state.
   const [pinned, setPinned] = useState(false)
   const [hovering, setHovering] = useState(false)
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  useEffect(() => {
-    if (!hoverNav) return
-    // ponytail: must stay in the effect — a lazy useState initializer would read
-    // localStorage on the client but not the server, mismatching the width on hydrate.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPinned(localStorage.getItem(PIN_KEY) === "1")
-  }, [hoverNav])
-
   useEffect(() => () => { if (hoverTimer.current) clearTimeout(hoverTimer.current) }, [])
-
-  const pin = (next: boolean) => {
-    setPinned(next)
-    localStorage.setItem(PIN_KEY, next ? "1" : "0")
-  }
 
   const hover = (next: boolean) => {
     if (hoverTimer.current) clearTimeout(hoverTimer.current)
@@ -118,7 +106,7 @@ export function Sidebar({ menu, logos, hoverNav }: { menu?: SidebarNavItem[]; lo
             <Tooltip>
               <TooltipTrigger asChild>
                 <button
-                  onClick={() => (hoverNav ? pin(true) : setCollapsed(false))}
+                  onClick={() => (hoverNav ? setPinned(true) : setCollapsed(false))}
                   className="group relative flex size-6 items-center justify-center"
                 >
                   <Image
@@ -165,7 +153,7 @@ export function Sidebar({ menu, logos, hoverNav }: { menu?: SidebarNavItem[]; lo
           <Tooltip>
             <TooltipTrigger asChild>
               <button
-                onClick={() => (hoverNav ? pin(!pinned) : setCollapsed(true))}
+                onClick={() => (hoverNav ? setPinned(!pinned) : setCollapsed(true))}
                 className={cn(
                   "flex size-6 items-center justify-center rounded text-foreground hover:bg-muted transition-colors",
                   isCollapsed && "pointer-events-none opacity-0",
