@@ -53,6 +53,17 @@
   --app-gradient: linear-gradient(180deg, #002F67 0%, #c5d5ed 200px);
 }
 
+/* TIB currently runs Titan's palette. Written out in full rather than sharing the
+   `aperia` block on purpose: TIB is its own brand, so when its real colors land this
+   is the one place that changes, and nothing on the live Titan embeds moves with it. */
+[data-theme="tib"] {
+  --primary: #002F67;
+  --color-primary: #002F67;
+  --ring: #002F67;
+  --sidebar-primary: #002F67;
+  --app-gradient: linear-gradient(180deg, #002F67 0%, #c5d5ed 200px);
+}
+
 [data-theme="access-one"] {
   --color-primary: #FC6A25;
   --ring: #FC6A25;

@@ -37,6 +37,11 @@ const THEME_LOGOS = {
   "vision-web": {
     frame: { src: "/logos/vision-web-logo.svg", alt: "VisionWeb", width: 80, height: 24 },
   },
+  // White wordmark, so it only works on the dark frame bar. No sidebar slots: those
+  // fall back to the Ask Nanci lockup, which the light sidebar can actually show.
+  tib: {
+    frame: { src: "/logos/tib.png", alt: "TIB", width: 134, height: 48 },
+  },
 } satisfies Record<string, ThemeLogos>
 
 export type ThemeId = keyof typeof THEME_LOGOS

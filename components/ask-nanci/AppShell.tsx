@@ -8,9 +8,9 @@ import { useTheme } from "next-themes"
 import { Button } from "aperia-ds5"
 import { AskNanciProvider, useAskNanci } from "@/contexts/AskNanciContext"
 import { ChatStreamProvider } from "@/contexts/ChatStreamContext"
-import { parseMode, CONCEPT_FLOW_SLUGS, CONCEPT_EMBED_FLOW_LAYOUTS, type EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
+import { parseMode, CONCEPT_FLOW_SLUGS, CONCEPT_EMBED_FLOW_LAYOUTS } from "@/lib/ask-nanci/embed-demo-config"
 import { AppFrame, useAppTheme } from "./AppFrame"
-import { getThemeLogos, type ThemeId } from "@/lib/ask-nanci/data/theme-logos"
+import { getThemeLogos } from "@/lib/ask-nanci/data/theme-logos"
 import { Sidebar } from "./Sidebar"
 import { TeachNanciPanel } from "./TeachNanciPanel"
 import { ServiceMarketplacePanel } from "./ServiceMarketplacePanel"
@@ -103,21 +103,12 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
   )
 }
 
-// Which theme each surface wears: colors live in globals.css under [data-theme],
-// logos in data/theme-logos.ts.
-const CONCEPT_THEME: ThemeId = "aperia"
-
-const EMBED_THEME: Record<EmbedVariant, ThemeId> = {
-  clover:           "clover",
-  "business-owner": "access-one",
-  iso:              "aperia",
-  "concept-embed":  "aperia",
-  vw:               "vision-web",
-}
+// Which theme each surface wears is declared per mode in parseMode — colors live in
+// globals.css under [data-theme], logos in data/theme-logos.ts.
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams()
-  const { isEmbed, embedVariant, isConceptVersion, hoverNav } = parseMode(searchParams.get("mode"))
+  const { isEmbed, embedVariant, isConceptVersion, hoverNav, theme } = parseMode(searchParams.get("mode"))
   const rawFlow = searchParams.get("flow")
   const autoPlayFlow = (rawFlow && CONCEPT_FLOW_SLUGS[rawFlow]) ?? null
   // Per-flow embed layout: some flows (e.g. 22, Service Marketplace) render the full
@@ -126,7 +117,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { setTheme } = useTheme()
 
   // The theme goes on <html> so portaled surfaces inherit it (see useAppTheme).
-  useAppTheme(isEmbed && embedVariant ? EMBED_THEME[embedVariant] : CONCEPT_THEME)
+  useAppTheme(theme)
 
   useEffect(() => {
     if (!isEmbed) return
@@ -140,7 +131,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, [isEmbed, setTheme])
 
   if (isEmbed) {
-    const logos = getThemeLogos(EMBED_THEME[embedVariant!])
+    const logos = getThemeLogos(theme)
     const isConceptEmbed = embedVariant === "concept-embed"
     // Full-app embed flows (e.g. Service Marketplace) render the sidebar + standard
     // WelcomeView, so they behave like the default app (not the concept demo catalog).
@@ -193,13 +184,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <ChatStreamProvider>
     <AskNanciProvider isConceptVersion={isConceptVersion}>
       <AppFrame
-        theme={CONCEPT_THEME}
+        theme={theme}
         topBar={
           <div className="relative z-10 flex h-10 shrink-0 items-center justify-center">
             <div className="absolute left-0 flex items-center md:hidden">
               <MobileSidebarToggle />
             </div>
-            <Image data-logo="frame" {...getThemeLogos(CONCEPT_THEME).frame} className="h-6 w-auto" />
+            <Image data-logo="frame" {...getThemeLogos(theme).frame} className="h-6 w-auto" />
           </div>
         }
         sidebar={<Sidebar hoverNav={hoverNav} />}
