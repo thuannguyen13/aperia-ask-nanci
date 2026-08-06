@@ -9,6 +9,7 @@ import { SlashCommandPopover, type SlashAction } from "./SlashCommandPopover"
 import { ChatActiveSources } from "./ChatActiveSources"
 import { ExplorePrompts } from "./ExplorePrompts"
 import { RecentChatsDialog } from "./RecentChatsDialog"
+import { ContextUsageBanner } from "./ContextUsageBanner"
 
 const PROACTIVE_CONTENT = CONCEPT_SCRIPTED_CONVERSATIONS[CONCEPT_FLOW6_KEY][0].content
 
@@ -75,7 +76,10 @@ export function ChatInput() {
 
       <RecentChatsDialog open={recentOpen} onOpenChange={setRecentOpen} />
 
-      <div className="flex flex-col rounded-xl border bg-background dark:bg-input/30 shadow-sm transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50">
+      <ContextUsageBanner />
+
+      {/* relative z-10 keeps the input painted over the banner tucked behind its top edge */}
+      <div className="relative z-10 flex flex-col rounded-xl border bg-background dark:bg-input/30 shadow-sm transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50">
         <Textarea
           ref={textareaRef}
           placeholder="Ask anything"
