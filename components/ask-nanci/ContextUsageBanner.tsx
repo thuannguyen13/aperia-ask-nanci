@@ -77,10 +77,10 @@ export function ContextUsageBanner({ demo }: { demo?: ContextUsageDemo }) {
   if (usage.state === "ok" || isDismissed) return null
 
   return (
-    // h-12 is the design's full height; translate-y-5 hides the bottom 20px behind the
-    // input, and the matching pb-5 shrinks the content box to just the visible band so
-    // items-center centers against what you can actually see.
-    <div className="absolute inset-x-0 bottom-full z-0 flex h-12 translate-y-5 items-center justify-between gap-2 overflow-clip rounded-t-[10px] border border-orange-200 bg-orange-50 px-2 pb-5 dark:border-orange-900/50 dark:bg-orange-950/40">
+    // translate-y-5 hides the bottom 20px behind the input and the matching pb-5 shrinks
+    // the content box to just the visible band, so items-center centers against what you
+    // can actually see. h-14 sizes that band to 36px: 8px, the 20px line, 8px.
+    <div className="absolute inset-x-0 bottom-full z-0 flex h-14 translate-y-5 items-center justify-between gap-2 overflow-clip rounded-t-[10px] border border-orange-200 bg-orange-50 px-2 pb-5 dark:border-orange-900/50 dark:bg-orange-950/40">
       <p className="text-sm leading-5 text-orange-800 dark:text-orange-300">
         {BANNER_COPY[usage.state]}
         <ContextUsageDialog usage={usage} />
