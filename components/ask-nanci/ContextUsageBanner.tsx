@@ -80,7 +80,9 @@ export function ContextUsageBanner({ demo }: { demo?: ContextUsageDemo }) {
     // translate-y-5 hides the bottom 20px behind the input and the matching pb-5 shrinks
     // the content box to just the visible band, so items-center centers against what you
     // can actually see. h-14 sizes that band to 36px: 8px, the 20px line, 8px.
-    <div className="absolute inset-x-0 bottom-full z-0 flex h-14 translate-y-5 items-center justify-between gap-2 overflow-clip rounded-t-[10px] border border-orange-200 bg-orange-50 px-2 pb-5 dark:border-orange-900/50 dark:bg-orange-950/40">
+    // animate-panel-in rises 6px and fades; it animates `transform`, while the tuck uses
+    // Tailwind's `translate` property, so the two compose instead of fighting.
+    <div className="absolute inset-x-0 bottom-full z-0 flex h-14 translate-y-5 animate-panel-in items-center justify-between gap-2 overflow-clip rounded-t-[10px] border border-orange-200 bg-orange-50 px-2 pb-5 dark:border-orange-900/50 dark:bg-orange-950/40">
       <p className="text-sm leading-5 text-orange-800 dark:text-orange-300">
         {BANNER_COPY[usage.state]}
         <ContextUsageDialog usage={usage} />
