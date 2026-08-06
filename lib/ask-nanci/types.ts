@@ -136,4 +136,8 @@ export interface UsageData {
   tokens: { used: number; limit: number }
   chats: { used: number; limit: number }
   files: { used: number; limit: number }
+  /** When the daily budget refills. The Plan Usage popover shows the relative form
+   *  ("2h"), the limit-reached alert the absolute one ("6:00PM today"). */
+  resetsIn: string
+  resetsAt: string
 }

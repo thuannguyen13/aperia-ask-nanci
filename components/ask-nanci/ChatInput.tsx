@@ -10,11 +10,13 @@ import { ChatActiveSources } from "./ChatActiveSources"
 import { ExplorePrompts } from "./ExplorePrompts"
 import { RecentChatsDialog } from "./RecentChatsDialog"
 import { ContextUsageBanner, type ContextUsageDemo } from "./ContextUsageBanner"
+import { PlanUsageChip, type PlanUsageDemo } from "./PlanUsageChip"
+import { getPlanUsage } from "@/lib/ask-nanci/plan-usage"
 
 const PROACTIVE_CONTENT = CONCEPT_SCRIPTED_CONVERSATIONS[CONCEPT_FLOW6_KEY][0].content
 
 export function ChatInput() {
-  const { handlePrompt, startNewChat, chatState, stopAnimation, sources, draft, setDraft, setTokenLimitReached, setOnboardingOpen, isEmbed, embedVariant, isConceptVersion, triggerProactiveFlow, proactiveNotificationActive } = useAskNanci()
+  const { handlePrompt, startNewChat, chatState, stopAnimation, sources, draft, setDraft, usage, setTokenLimitReached, setOnboardingOpen, isEmbed, embedVariant, isConceptVersion, triggerProactiveFlow, proactiveNotificationActive } = useAskNanci()
   const isDetect = embedVariant === "concept-embed"
   const activeSources = sources.filter((s) => s.active)
 
@@ -25,6 +27,9 @@ export function ChatInput() {
   const [notifRead, setNotifRead] = useState(false)
   // Pinned by the /context-* commands; null follows the real conversation length.
   const [contextDemo, setContextDemo] = useState<ContextUsageDemo>({ state: null, n: 0 })
+  // Pinned by the /plan-* commands; null follows the real account data.
+  const [planDemo, setPlanDemo] = useState<PlanUsageDemo>({ state: null, n: 0 })
+  const planSpent = getPlanUsage(usage, planDemo.state).state === "full"
 
   function handleNotifOpen(open: boolean) {
     setNotifOpen(open)
@@ -66,6 +71,9 @@ export function ChatInput() {
       if (action.id === "context-warning") setContextDemo((d) => ({ state: "approaching", n: d.n + 1 }))
       if (action.id === "context-full") setContextDemo((d) => ({ state: "full", n: d.n + 1 }))
       if (action.id === "context-clear") setContextDemo((d) => ({ state: null, n: d.n + 1 }))
+      if (action.id === "plan-warning") setPlanDemo((d) => ({ state: "approaching", n: d.n + 1 }))
+      if (action.id === "plan-full") setPlanDemo((d) => ({ state: "full", n: d.n + 1 }))
+      if (action.id === "plan-clear") setPlanDemo((d) => ({ state: null, n: d.n + 1 }))
       setValue("")
     } else {
       setValue("")
@@ -91,6 +99,9 @@ export function ChatInput() {
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
+          // Per the design note, the spent-budget warning fires when they go to type,
+          // not on arrival — it lands at the moment it actually blocks them.
+          onFocus={() => { if (planSpent) setTokenLimitReached(true) }}
           className="min-h-[72px] resize-none border-0 shadow-none focus-visible:ring-0 focus-visible:border-0 text-sm bg-transparent dark:bg-transparent"
         />
 
@@ -150,15 +161,19 @@ export function ChatInput() {
             )}
           </div>
 
-          {isBusy ? (
-            <Button size="icon-sm" variant="secondary" onClick={stopAnimation}>
-              <Square className="size-3.5 fill-current" />
-            </Button>
-          ) : (
-            <Button size="icon-sm" variant="default" onClick={submit} disabled={(isEmbed && !isDetect) || !value.trim()}>
-              <ArrowUp />
-            </Button>
-          )}
+          {/* Grouped so the toolbar's justify-between still has exactly two sides */}
+          <div className="flex items-center gap-1">
+            <PlanUsageChip demo={planDemo} />
+            {isBusy ? (
+              <Button size="icon-sm" variant="secondary" onClick={stopAnimation}>
+                <Square className="size-3.5 fill-current" />
+              </Button>
+            ) : (
+              <Button size="icon-sm" variant="default" onClick={submit} disabled={(isEmbed && !isDetect) || !value.trim()}>
+                <ArrowUp />
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 

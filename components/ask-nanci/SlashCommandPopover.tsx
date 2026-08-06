@@ -40,6 +40,21 @@ const COMMANDS = [
     label: "/context-clear",
     description: "Stop simulating and follow the real conversation",
   },
+  {
+    id: "plan-warning",
+    label: "/plan-warning",
+    description: "Simulate the plan budget nearly spent (90%)",
+  },
+  {
+    id: "plan-full",
+    label: "/plan-full",
+    description: "Simulate the plan budget spent (100%)",
+  },
+  {
+    id: "plan-clear",
+    label: "/plan-clear",
+    description: "Stop simulating and follow the real plan usage",
+  },
 ]
 
 export type SlashAction =

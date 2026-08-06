@@ -8,6 +8,8 @@ export const MOCK_USAGE: UsageData = {
   tokens: { used: 11200, limit: 15000 },
   chats: { used: 4, limit: 10 },
   files: { used: 2, limit: 5 },
+  resetsIn: "2h",
+  resetsAt: "6:00PM today",
 }
 
 export const DEFAULT_CURRENT_USER: CurrentUser = {
