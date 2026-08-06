@@ -17,7 +17,11 @@ export function TokenLimitDialog() {
   return (
     <AlertDialog open={tokenLimitReached} onOpenChange={(open) => { if (!open) setTokenLimitReached(false) }}>
       <AlertDialogContent>
-        <AlertDialogHeader>
+        {/* AlertDialogHeader sets grid rows but no columns, so both tracks are `auto` and
+            stretch to fill — inflating the icon's column from 40px to 73px and opening a
+            phantom gap before the title. Pin the first track to the media's width; only
+            from sm up, where the DS switches to the icon-beside-text layout. */}
+        <AlertDialogHeader className="sm:grid-cols-[auto_1fr]">
           <AlertDialogMedia>
             <TriangleAlert />
           </AlertDialogMedia>
