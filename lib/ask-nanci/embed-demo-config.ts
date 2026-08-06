@@ -15,12 +15,6 @@ interface ParsedMode {
   embedVariant: EmbedVariant | null
   isConceptVersion: boolean
   /**
-   * Sidebar behaves as a hover rail once the user asks a question, with a pin to keep
-   * it open (see Sidebar). `concept-nav` is `concept` plus this one behavior change, so
-   * the two URLs can be demoed side by side.
-   */
-  hoverNav: boolean
-  /**
    * Which brand the mode wears — colors in globals.css under `[data-theme="<id>"]`,
    * logos in data/theme-logos.ts. Declared per mode rather than derived from the embed
    * variant so a non-embed mode (`tib`) can carry a brand too.
@@ -30,16 +24,18 @@ interface ParsedMode {
 
 export function parseMode(mode: string | null): ParsedMode {
   switch (mode) {
-    case "clover":          return { isEmbed: true,  embedVariant: "clover",         isConceptVersion: false, hoverNav: false, theme: "clover"      }
-    case "business-owner":  return { isEmbed: true,  embedVariant: "business-owner", isConceptVersion: false, hoverNav: false, theme: "access-one"  }
-    case "iso":             return { isEmbed: true,  embedVariant: "iso",            isConceptVersion: false, hoverNav: false, theme: "aperia"      }
-    case "concept-embed":   return { isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true,  hoverNav: false, theme: "aperia"      }
-    case "vw":              return { isEmbed: true,  embedVariant: "vw",             isConceptVersion: false, hoverNav: false, theme: "vision-web"  }
-    case "concept":         return { isEmbed: false, embedVariant: null,             isConceptVersion: true,  hoverNav: false, theme: "aperia"      }
-    case "concept-nav":     return { isEmbed: false, embedVariant: null,             isConceptVersion: true,  hoverNav: true,  theme: "aperia"      }
-    case "tib":             return { isEmbed: false, embedVariant: null,             isConceptVersion: false, hoverNav: false, theme: "tib"         }
-    case "woodforest":      return { isEmbed: false, embedVariant: null,             isConceptVersion: false, hoverNav: false, theme: "woodforest"  }
-    default:                return { isEmbed: false, embedVariant: null,             isConceptVersion: false, hoverNav: false, theme: "aperia"      }
+    case "clover":          return { isEmbed: true,  embedVariant: "clover",         isConceptVersion: false, theme: "clover"      }
+    case "business-owner":  return { isEmbed: true,  embedVariant: "business-owner", isConceptVersion: false, theme: "access-one"  }
+    case "iso":             return { isEmbed: true,  embedVariant: "iso",            isConceptVersion: false, theme: "aperia"      }
+    case "concept-embed":   return { isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true,  theme: "aperia"      }
+    case "vw":              return { isEmbed: true,  embedVariant: "vw",             isConceptVersion: false, theme: "vision-web"  }
+    case "concept":         return { isEmbed: false, embedVariant: null,             isConceptVersion: true,  theme: "aperia"      }
+    // Alias of `concept`, kept because the URL is already out with reviewers — the
+    // hover rail it used to opt into is now how every Ask Nanci sidebar behaves.
+    case "concept-nav":     return { isEmbed: false, embedVariant: null,             isConceptVersion: true,  theme: "aperia"      }
+    case "tib":             return { isEmbed: false, embedVariant: null,             isConceptVersion: false, theme: "tib"         }
+    case "woodforest":      return { isEmbed: false, embedVariant: null,             isConceptVersion: false, theme: "woodforest"  }
+    default:                return { isEmbed: false, embedVariant: null,             isConceptVersion: false, theme: "aperia"      }
   }
 }
 

@@ -108,7 +108,7 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams()
-  const { isEmbed, embedVariant, isConceptVersion, hoverNav, theme } = parseMode(searchParams.get("mode"))
+  const { isEmbed, embedVariant, isConceptVersion, theme } = parseMode(searchParams.get("mode"))
   const rawFlow = searchParams.get("flow")
   const autoPlayFlow = (rawFlow && CONCEPT_FLOW_SLUGS[rawFlow]) ?? null
   // Per-flow embed layout: some flows (e.g. 22, Service Marketplace) render the full
@@ -193,7 +193,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Image data-logo="frame" {...getThemeLogos(theme).frame} className="h-6 w-auto" />
           </div>
         }
-        sidebar={<Sidebar hoverNav={hoverNav} />}
+        sidebar={<Sidebar />}
       >
         {isConceptVersion ? (
           <ConceptContentArea>{children}</ConceptContentArea>

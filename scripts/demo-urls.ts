@@ -80,7 +80,7 @@ p("|---|---|---|---|")
 const MODE_NOTES: Record<string, string> = {
   "": "Default app — sidebar, KB panel, sessions",
   concept: "Panel demo with the welcome card catalog",
-  "concept-nav": "`concept` + hover-rail sidebar (open on welcome, rail after the first question, pin to keep)",
+  "concept-nav": "Alias of `concept` — the hover-rail sidebar it trialled is now app-wide; kept so shared links keep working",
   tib: "Full app (sidebar, sessions, KB panel) wearing the TIB brand",
   woodforest: "Full app (sidebar, sessions, KB panel) wearing the Woodforest brand",
 }

@@ -102,7 +102,7 @@ export function RiskConsole({ assistant = true }: { assistant?: boolean }) {
           <Image data-logo="frame" {...getThemeLogos(THEME).frame} className="h-6 w-auto" />
         </div>
       }
-      sidebar={<Sidebar menu={nav} logos={getThemeLogos(THEME)} />}
+      sidebar={<Sidebar menu={nav} logos={getThemeLogos(THEME)} hoverNav={false} />}
     >
       <RiskNavProvider value={{ go: setDest, openBarometer, openMerchant, merchantId, barometerFilter, workStatuses, markWork, assistant, home }}>
         <div className="flex min-w-0 flex-1 py-1 pr-1">

@@ -65,7 +65,10 @@ type SidebarNavItem = { icon: React.ElementType; label: string; active?: boolean
 const HOVER_OPEN_MS = 100
 const HOVER_CLOSE_MS = 250
 
-export function Sidebar({ menu, logos, hoverNav }: { menu?: SidebarNavItem[]; logos?: ThemeLogos; hoverNav?: boolean } = {}) {
+// `hoverNav` is the Ask Nanci default: rail + hover peek + pin. Aperia Risk opts out
+// (`hoverNav={false}`) — its rail is a fixed destination menu for a different product,
+// so it keeps the plain collapse toggle.
+export function Sidebar({ menu, logos, hoverNav = true }: { menu?: SidebarNavItem[]; logos?: ThemeLogos; hoverNav?: boolean } = {}) {
   const { startNewChat, setKbOpen, marketplaceOpen, setMarketplaceOpen, mobileSidebarOpen, setMobileSidebarOpen, currentUser } = useAskNanci()
   const [collapsed, setCollapsed] = useState(false)
   const [wizardOpen, setWizardOpen] = useState(false)
