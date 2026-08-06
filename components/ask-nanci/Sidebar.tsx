@@ -13,7 +13,6 @@ import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { MARKETPLACE_TITLE } from "@/lib/ask-nanci/data/panels/service-marketplace"
 import type { ThemeLogos } from "@/lib/ask-nanci/data/theme-logos"
-import { UsageCard } from "./UsageCard"
 import { ConnectWizard } from "./ConnectWizard"
 
 function SidebarItem({
@@ -235,8 +234,6 @@ export function Sidebar({ menu, logos, hoverNav }: { menu?: SidebarNavItem[]; lo
 
 
               </div>
-
-            <UsageCard />
           </div>
         )}
 
