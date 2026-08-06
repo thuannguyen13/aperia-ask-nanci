@@ -43,7 +43,7 @@ function WelcomeView() {
               </span>
             </div>
             <p className="text-xs text-muted-foreground">
-              Your Clover data is already connected. Add your financial and bookkeeping accounts to give Nanci a complete picture of your business.
+              Your payment data is already connected. Add your financial and bookkeeping accounts to give Nanci a complete picture of your business.
             </p>
           </div>
           <Button size="sm" className="shrink-0" onClick={() => setKbOpen(true)}>
