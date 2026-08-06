@@ -18,6 +18,7 @@ Base: `http://localhost:3000` (override with `BASE=https://... npm run demo:urls
 | `http://localhost:3000/?mode=concept` | no | yes | Panel demo with the welcome card catalog |
 | `http://localhost:3000/?mode=concept-nav` | no | yes | `concept` + hover-rail sidebar (open on welcome, rail after the first question, pin to keep) |
 | `http://localhost:3000/?mode=tib` | no | no | Full app (sidebar, sessions, KB panel) wearing the TIB brand |
+| `http://localhost:3000/?mode=woodforest` | no | no | Full app (sidebar, sessions, KB panel) wearing the Woodforest brand |
 
 Any other `?mode=` value falls through to the default app.
 

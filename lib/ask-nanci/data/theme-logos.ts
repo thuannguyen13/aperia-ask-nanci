@@ -42,6 +42,9 @@ const THEME_LOGOS = {
   tib: {
     frame: { src: "/logos/tib.png", alt: "TIB", width: 134, height: 48 },
   },
+  woodforest: {
+    frame: { src: "/logos/logo-woodforest.png", alt: "Woodforest National Bank", width: 278, height: 48 },
+  },
 } satisfies Record<string, ThemeLogos>
 
 export type ThemeId = keyof typeof THEME_LOGOS

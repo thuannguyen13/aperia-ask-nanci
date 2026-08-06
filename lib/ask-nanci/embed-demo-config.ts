@@ -38,6 +38,7 @@ export function parseMode(mode: string | null): ParsedMode {
     case "concept":         return { isEmbed: false, embedVariant: null,             isConceptVersion: true,  hoverNav: false, theme: "aperia"      }
     case "concept-nav":     return { isEmbed: false, embedVariant: null,             isConceptVersion: true,  hoverNav: true,  theme: "aperia"      }
     case "tib":             return { isEmbed: false, embedVariant: null,             isConceptVersion: false, hoverNav: false, theme: "tib"         }
+    case "woodforest":      return { isEmbed: false, embedVariant: null,             isConceptVersion: false, hoverNav: false, theme: "woodforest"  }
     default:                return { isEmbed: false, embedVariant: null,             isConceptVersion: false, hoverNav: false, theme: "aperia"      }
   }
 }

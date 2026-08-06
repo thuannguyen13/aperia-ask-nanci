@@ -53,6 +53,21 @@
   --app-gradient: linear-gradient(180deg, #002F67 0%, #c5d5ed 200px);
 }
 
+/* Woodforest. The brand green is light, so two things differ from the other themes:
+   the frame gradient starts on a dark green from the same family (the wordmark is white
+   artwork and would vanish on #AED581), and --primary-foreground flips to dark ink so
+   button labels stay readable on a light primary — the DS default is near-white. */
+[data-theme="woodforest"] {
+  --primary: #AED581;
+  --color-primary: #AED581;
+  --primary-foreground: #1B3409;
+  --color-primary-foreground: #1B3409;
+  --ring: #AED581;
+  --sidebar-primary: #AED581;
+  --sidebar-primary-foreground: #1B3409;
+  --app-gradient: linear-gradient(180deg, #33691E 0%, #dcedc8 200px);
+}
+
 /* TIB currently runs Titan's palette. Written out in full rather than sharing the
    `aperia` block on purpose: TIB is its own brand, so when its real colors land this
    is the one place that changes, and nothing on the live Titan embeds moves with it. */
