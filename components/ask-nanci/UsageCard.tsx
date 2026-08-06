@@ -14,6 +14,13 @@ function getTimeUntilMidnight(): string {
   return `${mins} min`
 }
 
+/**
+ * @expected-unused awaiting redesign
+ *
+ * Unmounted, not dead. Pulled out of the sidebar footer on 2026-08-06; usage is
+ * being redesigned and will get its own place to view. Kept so that work starts
+ * from the existing card instead of a blank file.
+ */
 export function UsageCard() {
   const { usage } = useAskNanci()
   const tokenPct = Math.round((usage.tokens.used / usage.tokens.limit) * 100)
