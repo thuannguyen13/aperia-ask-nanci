@@ -9,7 +9,7 @@ import { SlashCommandPopover, type SlashAction } from "./SlashCommandPopover"
 import { ChatActiveSources } from "./ChatActiveSources"
 import { ExplorePrompts } from "./ExplorePrompts"
 import { RecentChatsDialog } from "./RecentChatsDialog"
-import { ContextUsageBanner } from "./ContextUsageBanner"
+import { ContextUsageBanner, type ContextUsageDemo } from "./ContextUsageBanner"
 
 const PROACTIVE_CONTENT = CONCEPT_SCRIPTED_CONVERSATIONS[CONCEPT_FLOW6_KEY][0].content
 
@@ -23,6 +23,8 @@ export function ChatInput() {
   const [recentOpen, setRecentOpen] = useState(false)
   const [notifOpen, setNotifOpen] = useState(false)
   const [notifRead, setNotifRead] = useState(false)
+  // Pinned by the /context-* commands; null follows the real conversation length.
+  const [contextDemo, setContextDemo] = useState<ContextUsageDemo>({ state: null, n: 0 })
 
   function handleNotifOpen(open: boolean) {
     setNotifOpen(open)
@@ -61,6 +63,9 @@ export function ChatInput() {
     } else if (action.type === "command") {
       if (action.id === "usage") setTokenLimitReached(true)
       if (action.id === "onboarding") setOnboardingOpen(true)
+      if (action.id === "context-warning") setContextDemo((d) => ({ state: "approaching", n: d.n + 1 }))
+      if (action.id === "context-full") setContextDemo((d) => ({ state: "full", n: d.n + 1 }))
+      if (action.id === "context-clear") setContextDemo((d) => ({ state: null, n: d.n + 1 }))
       setValue("")
     } else {
       setValue("")
@@ -76,7 +81,7 @@ export function ChatInput() {
 
       <RecentChatsDialog open={recentOpen} onOpenChange={setRecentOpen} />
 
-      <ContextUsageBanner />
+      <ContextUsageBanner demo={contextDemo} />
 
       {/* relative z-10 keeps the input painted over the banner tucked behind its top edge */}
       <div className="relative z-10 flex flex-col rounded-xl border bg-background dark:bg-input/30 shadow-sm transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50">

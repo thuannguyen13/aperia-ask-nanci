@@ -11,16 +11,24 @@ export interface ContextUsage {
   state: ContextUsageState
 }
 
+/** What the /context-* slash commands pin the meter to, for demoing either state. */
+export type ContextUsageOverride = Exclude<ContextUsageState, "ok">
+
 /**
  * How full this conversation's context window is. Derived from the messages rather
  * than stored, so it can never drift from what's onscreen and resets with a new chat.
+ *
+ * `override` pins it to a state on demand — the demo can't always spare the five
+ * exchanges it takes to fill the window naturally.
  */
-export function getContextUsage(messages: Message[]): ContextUsage {
+export function getContextUsage(messages: Message[], override?: ContextUsageOverride | null): ContextUsage {
   const { limit, base, perUserMessage, perAssistantMessage, approachingAt } = CONTEXT_WINDOW
-  const spent = messages.reduce(
-    (sum, m) => sum + (m.role === "user" ? perUserMessage : perAssistantMessage),
-    base,
-  )
+  const spent = override
+    ? (override === "full" ? limit : limit * approachingAt)
+    : messages.reduce(
+        (sum, m) => sum + (m.role === "user" ? perUserMessage : perAssistantMessage),
+        base,
+      )
   const used = Math.min(spent, limit)
   const ratio = used / limit
   return {

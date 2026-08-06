@@ -25,6 +25,21 @@ const COMMANDS = [
     label: "/onboarding",
     description: "Re-open the onboarding dialog",
   },
+  {
+    id: "context-warning",
+    label: "/context-warning",
+    description: "Simulate approaching the context limit (90%)",
+  },
+  {
+    id: "context-full",
+    label: "/context-full",
+    description: "Simulate reaching the context limit (100%)",
+  },
+  {
+    id: "context-clear",
+    label: "/context-clear",
+    description: "Stop simulating and follow the real conversation",
+  },
 ]
 
 export type SlashAction =
