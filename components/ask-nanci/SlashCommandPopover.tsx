@@ -106,7 +106,9 @@ export function SlashCommandPopover({ query, onAction }: Props) {
                 }}
                 className="flex-col items-start gap-0"
               >
-                <span className="font-medium text-primary">{cmd.label}</span>
+                {/* foreground, not primary: a light brand color (Woodforest's green)
+                    left these unreadable on the white menu */}
+                <span className="font-medium text-foreground">{cmd.label}</span>
                 <span className="text-xs text-muted-foreground">{cmd.description}</span>
               </DropdownMenuItem>
             ))}
