@@ -48,14 +48,16 @@ export function PlanUsageChip({ demo }: { demo?: PlanUsageDemo }) {
         </button>
       </PopoverTrigger>
 
-      <PopoverContent side="top" align="end" className="w-[300px]">
+      {/* gap-4 overrides PopoverContent's own 10px gap so the header-to-meter spacing is
+          declared in one place rather than being a margin tuned against a hidden default */}
+      <PopoverContent side="top" align="end" className="w-[300px] gap-4">
         <PopoverHeader>
           <PopoverTitle className="text-base">Plan Usage</PopoverTitle>
           <PopoverDescription>
             {"Track how much of your AI usage you've consumed."}
           </PopoverDescription>
         </PopoverHeader>
-        <div className="mt-3 flex flex-col gap-1">
+        <div className="flex flex-col gap-1">
           <div className="flex items-center justify-between text-xs font-medium leading-none text-muted-foreground">
             <span>{plan.percent}% used</span>
             <span>resets {usage.resetsIn}</span>
