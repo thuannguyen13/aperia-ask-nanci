@@ -1,11 +1,10 @@
 "use client"
 
-import { CheckCircle2, Clock, MapPin, Landmark, Store, Phone, ArrowRight } from "lucide-react"
+import { Check, Clock, MapPin, Landmark, Store, Phone, ArrowRight } from "lucide-react"
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter,
   Button, Separator,
 } from "aperia-ds5"
-import { Callout } from "@/components/ask-nanci/shared"
 import type { SheetActionData } from "@/lib/ask-nanci/types"
 
 interface Props {
@@ -57,37 +56,41 @@ export function ChangeAuditSheet({ open, onOpenChange, data }: Props) {
   // The Current → New cards are the Merchant Money format. Any change with a from→to
   // earns them now, completed or submitted — only the request variant has none to show.
   const showChangeCards = !isRequest
+  // Both statuses share one hero so they stay visually identical: same circle, same
+  // title scale, same muted line. Only the icon, colour and wording differ.
+  const hero = submitted
+    ? {
+        Icon: Clock, swatch: "bg-amber-400", ink: "text-amber-950",
+        title: data.submittedTitle ?? "Request Submitted",
+        sub: `Submitted ${data.timestamp}${data.reference ? ` · Reference ${data.reference}` : ""}`,
+      }
+    : {
+        Icon: Check, swatch: "bg-green-400", ink: "text-green-950",
+        title: "Update Applied",
+        sub: `Applied ${data.timestamp}`,
+      }
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="right" showCloseButton className={`flex flex-col ${submitted || showChangeCards ? "w-[92vw] sm:w-[680px] sm:!max-w-[680px]" : "w-[400px] sm:w-[480px]"}`}>
         <SheetHeader>
           <SheetTitle>{isRequest ? (data.submittedTitle ?? "Request Submitted") : submitted ? "Change Request Submitted" : "Change Confirmation"}</SheetTitle>
-          {/* Kept sr-only on the submitted variant for a11y (Radix needs a description). */}
-          <SheetDescription className={submitted ? "sr-only" : undefined}>
+          {/* sr-only, not removed: Radix needs a description, but the hero below already
+              says what this is, so showing it twice is just noise. */}
+          <SheetDescription className="sr-only">
             {submitted ? "Record of this change request." : "Audit record for this account update."}
           </SheetDescription>
         </SheetHeader>
 
         <div className="flex flex-col gap-4 px-6 py-4 flex-1">
-          {submitted ? (
-            <div className="flex flex-col items-center gap-3 py-2">
-              <div className="flex size-14 items-center justify-center rounded-full bg-amber-400">
-                <Clock className="size-7 text-amber-950" />
-              </div>
-              <div className="text-center">
-                <p className="text-xl font-bold text-foreground">{data.submittedTitle ?? "Request Submitted"}</p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Submitted {data.timestamp}{data.reference ? ` · Reference ${data.reference}` : ""}
-                </p>
-              </div>
+          <div className="flex flex-col items-center gap-3 py-2">
+            <div className={`flex size-14 items-center justify-center rounded-full ${hero.swatch}`}>
+              <hero.Icon className={`size-7 ${hero.ink}`} />
             </div>
-          ) : (
-            <Callout variant="green" className="flex items-center gap-2 rounded-lg px-3 py-2.5">
-              <CheckCircle2 className="size-4 shrink-0 text-green-600" />
-              <span className="text-sm font-medium text-green-800">Update Applied</span>
-              <span className="ml-auto text-xs text-green-600">{data.timestamp}</span>
-            </Callout>
-          )}
+            <div className="text-center">
+              <p className="text-xl font-bold text-foreground">{hero.title}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{hero.sub}</p>
+            </div>
+          </div>
 
           {showChangeCards && (
             <div className="w-full space-y-2">
