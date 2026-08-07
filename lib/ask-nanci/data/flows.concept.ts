@@ -140,7 +140,7 @@ export interface FlowDef {
 
 export const FLOW_DEFS: FlowDef[] = [
   // ── Interaction patterns ──
-  { num: 1, section: "pattern", title: "Simple Update", badge: "Chat only", key: "Update my phone number", description: "Update a phone number — AI confirms and shows an audit record." },
+  { num: 1, section: "pattern", title: "Simple Update", badge: "Chat only", key: "Update my phone number", slug: "1", description: "Update a phone number — AI confirms and shows an audit record." },
   {
     num: 2,
     section: "pattern",

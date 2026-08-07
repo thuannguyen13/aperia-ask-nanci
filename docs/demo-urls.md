@@ -34,6 +34,7 @@ behaves exactly as it does today until the param is added, and it is mode-agnost
 
 | URL | Card | Flow | Layout |
 |---|---|---|---|
+| `http://localhost:3000/?mode=concept-embed&flow=1` | 1 | Simple Update | compact widget |
 | `http://localhost:3000/?mode=concept-embed&flow=2` **live** | 2 | Data Lookup | compact widget |
 | `http://localhost:3000/?mode=concept-embed&flow=5` **live** | 5 | Error Recovery | compact widget |
 | `http://localhost:3000/?mode=concept-embed&flow=6` | 6 | Proactive Surfacing | compact widget |
@@ -59,9 +60,8 @@ These have a layout override but no slug — they open a destination surface ins
 
 ## Flows with no embed URL
 
-7 of 21 flows have no slug — reachable only via the `?mode=concept` welcome cards.
+6 of 21 flows have no slug — reachable only via the `?mode=concept` welcome cards.
 
-- 1. Simple Update — Chat only
 - 3. Panel as Form — Chat + form
 - 4. Step-up Auth — Multi-step
 - 7. Case Management — ISO · Multi-panel
