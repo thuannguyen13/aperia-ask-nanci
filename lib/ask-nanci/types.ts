@@ -99,7 +99,7 @@ export interface SheetActionData {
   status: "completed" | "submitted"
   reference?: string // request reference shown in the submitted-variant hero
   sentTo?: string // submitted-variant only: the team/queue the request was routed to
-  iconKind?: "address" | "bank" | "name" // icon used in the submitted-variant value cards
+  iconKind?: "address" | "bank" | "name" | "phone" // icon used in the value cards
   // Offer-request variant (credit-card/loan flows): when set, the drawer drops the
   // from→to value cards and relabels "Field" → "File"; `product` is the offer shown
   // in the chat card subtitle. See credit-card-offer / business-loan-offer flows.

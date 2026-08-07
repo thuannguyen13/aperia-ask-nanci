@@ -1,6 +1,6 @@
 "use client"
 
-import { CheckCircle2, Clock, MapPin, Landmark, Store, ArrowRight } from "lucide-react"
+import { CheckCircle2, Clock, MapPin, Landmark, Store, Phone, ArrowRight } from "lucide-react"
 import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter,
   Button, Separator,
@@ -27,8 +27,8 @@ function Row({ label, value, muted, highlight, amber }: { label: string; value: 
 
 // Flow-16-style value card (icon swatch + value + sublabel).
 // `highlight` tints it blue (design system: blue = informational) to hint it's the new value.
-function ValueCard({ value, sublabel, iconKind, highlight }: { value: string; sublabel: string; iconKind?: "address" | "bank" | "name"; highlight?: boolean }) {
-  const Icon = iconKind === "bank" ? Landmark : iconKind === "name" ? Store : MapPin
+function ValueCard({ value, sublabel, iconKind, highlight }: { value: string; sublabel: string; iconKind?: SheetActionData["iconKind"]; highlight?: boolean }) {
+  const Icon = iconKind === "bank" ? Landmark : iconKind === "name" ? Store : iconKind === "phone" ? Phone : MapPin
   // US-style two-line address: street on line 1 (keeps trailing comma), city/state/zip on line 2.
   // Split on the first comma only; gated to addresses so "Company, LLC" name cards stay one line.
   const comma = value.indexOf(",")
@@ -54,9 +54,12 @@ export function ChangeAuditSheet({ open, onOpenChange, data }: Props) {
   const submitted = data.status === "submitted"
   // Offer-request variant: no from→to change to show, "Field" reads as "File".
   const isRequest = !!data.requestLabel
+  // The Current → New cards are the Merchant Money format. Any change with a from→to
+  // earns them now, completed or submitted — only the request variant has none to show.
+  const showChangeCards = !isRequest
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" showCloseButton className={`flex flex-col ${submitted ? "w-[92vw] sm:w-[680px] sm:!max-w-[680px]" : "w-[400px] sm:w-[480px]"}`}>
+      <SheetContent side="right" showCloseButton className={`flex flex-col ${submitted || showChangeCards ? "w-[92vw] sm:w-[680px] sm:!max-w-[680px]" : "w-[400px] sm:w-[480px]"}`}>
         <SheetHeader>
           <SheetTitle>{isRequest ? (data.submittedTitle ?? "Request Submitted") : submitted ? "Change Request Submitted" : "Change Confirmation"}</SheetTitle>
           {/* Kept sr-only on the submitted variant for a11y (Radix needs a description). */}
@@ -86,7 +89,7 @@ export function ChangeAuditSheet({ open, onOpenChange, data }: Props) {
             </Callout>
           )}
 
-          {submitted && !isRequest && (
+          {showChangeCards && (
             <div className="w-full space-y-2">
               <div className="flex items-center gap-3">
                 <p className="flex-1 text-base font-medium text-foreground">Current</p>
@@ -106,7 +109,8 @@ export function ChangeAuditSheet({ open, onOpenChange, data }: Props) {
           <div className="flex flex-col">
             <Row label={isRequest ? "File" : "Field"} value={isRequest ? data.requestLabel! : data.field} />
             <Separator />
-            {!submitted && (
+            {/* The cards already carry from→to; these rows would just repeat them. */}
+            {!submitted && !showChangeCards && (
               <>
                 <Row label="Previous Value" value={data.fromValue ?? ""} muted />
                 <Separator />

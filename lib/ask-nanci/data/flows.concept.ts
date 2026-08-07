@@ -382,6 +382,7 @@ const FLOW1_SHEET: SheetActionData = {
   toValue: "(415) 867-5309",
   timestamp: new Date().toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" }),
   status: "completed",
+  iconKind: "phone",
 };
 
 const FLOW5_SHEET: SheetActionData = {
