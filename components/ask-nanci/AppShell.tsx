@@ -158,7 +158,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         >
           <div className="relative z-10 flex h-10 shrink-0 items-center justify-center">
             <Image data-logo="frame" src={logos.frame.src} alt={logos.frame.alt} width={logos.frame.width} height={logos.frame.height} className="h-6 w-auto" />
-            {isConceptEmbed && !fullApp && <ReplayButton />}
+            {/* Hidden under ?autoplay — the flow starts itself, so the button has
+                nothing to offer on arrival and only reads as a stray control. */}
+            {isConceptEmbed && !fullApp && !autoPlay && <ReplayButton />}
           </div>
           <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden md:rounded-2xl bg-sidebar shadow-sm">
             {fullApp ? (
