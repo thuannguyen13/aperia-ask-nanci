@@ -74,10 +74,11 @@ export const CONCEPT_PANEL_REPLIES = {
 // Curated conversation titles (chat-column header + sidebar item). Figma shows a
 // summarized title, not the raw first prompt. Keyed by the flow's opening prompt;
 // add entries here as each flow's Figma frame specifies a title.
-export const CONCEPT_CHAT_TITLES: Record<string, string> = {
-  [CONCEPT_CREDIT_CARD_PROMPT]: "Top Food Cost Vendor",
-  [CONCEPT_BUSINESS_LOAN_PROMPT]: "Payroll Funds Check",
-};
+//
+// Deliberately empty: flows 20 and 21 were the only two with titles, which made them
+// the odd ones out against every other flow. The mechanism stays for when a Figma
+// frame calls for one — an entry here is all it takes.
+export const CONCEPT_CHAT_TITLES: Record<string, string> = {};
 
 // Fake end-of-flow follow-up questions — shown for realism only, with no scripted
 // conversation behind them. Clicking one is a no-op (see CONCEPT_FAKE_FOLLOWUPS).
