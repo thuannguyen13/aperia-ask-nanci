@@ -103,7 +103,12 @@ const entries: Entry[] = FLOW_DEFS.flatMap((flow) => [
 
 p("## Embeddable concept flows")
 p()
-p("`?mode=concept-embed&flow=<slug>` autoplays the flow in the compact widget.")
+p("`?mode=concept-embed&flow=<slug>` loads the flow in the compact widget. It does **not**")
+p("play on load — the **Ask** button in the top bar starts it.")
+p()
+p("Add `&autoplay` to play it on load instead. The param is opt-in, so every URL below")
+p("behaves exactly as it does today until the param is added, and it is mode-agnostic:")
+p("`?mode=tib&flow=2&autoplay` works the same way. `&autoplay=0` explicitly turns it off.")
 p()
 p("| URL | Card | Flow | Layout |")
 p("|---|---|---|---|")

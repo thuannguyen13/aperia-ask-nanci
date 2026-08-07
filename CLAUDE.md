@@ -43,8 +43,12 @@ De-prioritize refactors that don't reduce flow-adding friction, however tempting
 - **Five URL modes are embedded on a live production site.** Anything touching their code paths is
   production-facing — verify in a browser, not just `next build`:
   `?mode=business-owner`, `?mode=clover`, `?mode=vw` (the three non-concept embeds, real chat app
-  via the legacy `playScripted`/`sendMessage` path), `?mode=concept-embed&flow=2` (autoplays to
+  via the legacy `playScripted`/`sendMessage` path), `?mode=concept-embed&flow=2` (opens
   **MerchantVolumePanel**), and `?mode=concept-embed&flow=11`.
+  - **A `?flow=` embed does not play on load.** It sits idle until the **Ask** button in the top
+    bar is clicked. Add `&autoplay` to play on mount instead — opt-in and mode-agnostic
+    (`?mode=tib&flow=2&autoplay` works), so no existing embed URL changes behavior. This doc
+    claimed flow=2 "autoplays" until 2026-08-06; it hadn't for some time.
   - **`flow=11` is NOT the Work Queue panel.** `CONCEPT_FLOW_SLUGS["11"]` maps to
     `CONCEPT_DETECT_WELCOME_KEY` — the Detection Queue greeting path. The welcome-grid "Work Queue"
     card (`num: 11`) and the embed slug `11` are different things.

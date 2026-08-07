@@ -24,7 +24,12 @@ Any other `?mode=` value falls through to the default app.
 
 ## Embeddable concept flows
 
-`?mode=concept-embed&flow=<slug>` autoplays the flow in the compact widget.
+`?mode=concept-embed&flow=<slug>` loads the flow in the compact widget. It does **not**
+play on load — the **Ask** button in the top bar starts it.
+
+Add `&autoplay` to play it on load instead. The param is opt-in, so every URL below
+behaves exactly as it does today until the param is added, and it is mode-agnostic:
+`?mode=tib&flow=2&autoplay` works the same way. `&autoplay=0` explicitly turns it off.
 
 | URL | Card | Flow | Layout |
 |---|---|---|---|

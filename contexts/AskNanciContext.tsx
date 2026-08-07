@@ -114,7 +114,7 @@ export function usePanelView(id: PanelId, fallback: string): string {
   return useAskNanci().panelViews[id] ?? fallback
 }
 
-export function AskNanciProvider({ children, isEmbed = false, embedVariant = null, isConceptVersion = false, autoPlayFlow = null, initialView, initialMarketplaceOpen = false }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null; isConceptVersion?: boolean; autoPlayFlow?: string | null; initialView?: ChatView; initialMarketplaceOpen?: boolean }) {
+export function AskNanciProvider({ children, isEmbed = false, embedVariant = null, isConceptVersion = false, autoPlayFlow = null, autoPlay = false, initialView, initialMarketplaceOpen = false }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null; isConceptVersion?: boolean; autoPlayFlow?: string | null; autoPlay?: boolean; initialView?: ChatView; initialMarketplaceOpen?: boolean }) {
   const [view, setView] = useState<ChatView>(initialView ?? (embedVariant === "concept-embed" ? "chat" : "welcome"))
   const [messages, setMessages] = useState<Message[]>([])
   const [chatState, setChatState] = useState<ChatState>("idle")
@@ -689,6 +689,16 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setTimeout(() => playConceptScripted(autoPlayFlow), 300)
   }, [autoPlayFlow])
   const replayFlow: (() => void) | null = autoPlayFlow ? doReplayFlow : null
+
+  // `?autoplay` plays the flow on load instead of waiting for the Ask button. Opt-in:
+  // without the param an embed sits idle exactly as before. Reuses doReplayFlow so
+  // there is one definition of "play this flow from the top".
+  const autoPlayedRef = useRef(false)
+  useEffect(() => {
+    if (!autoPlay || !autoPlayFlow || autoPlayedRef.current) return
+    autoPlayedRef.current = true
+    doReplayFlow()
+  }, [autoPlay, autoPlayFlow, doReplayFlow])
 
   const resumeSession = useCallback(async (id: string) => {
     const all = await fetchSessions()

@@ -111,6 +111,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { isEmbed, embedVariant, isConceptVersion, theme } = parseMode(searchParams.get("mode"))
   const rawFlow = searchParams.get("flow")
   const autoPlayFlow = (rawFlow && CONCEPT_FLOW_SLUGS[rawFlow]) ?? null
+  // `?autoplay` plays ?flow= on load rather than waiting for the Ask button. Opt-in and
+  // mode-agnostic, so no existing URL changes and a variant like this never needs its
+  // own mode again. Bare `?autoplay` counts; `=0` / `=false` turn it off.
+  const rawAutoPlay = searchParams.get("autoplay")
+  const autoPlay = rawAutoPlay !== null && rawAutoPlay !== "0" && rawAutoPlay !== "false"
   // Per-flow embed layout: some flows (e.g. 22, Service Marketplace) render the full
   // app shell (sidebar + standard welcome) instead of the compact concept-embed widget.
   const embedLayout = (rawFlow && CONCEPT_EMBED_FLOW_LAYOUTS[rawFlow]) || null
@@ -143,6 +148,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         embedVariant={embedVariant}
         isConceptVersion={fullApp ? false : isConceptVersion}
         autoPlayFlow={autoPlayFlow}
+        autoPlay={autoPlay}
         initialView={fullApp ? "welcome" : undefined}
         initialMarketplaceOpen={embedLayout?.openMarketplace}
       >
@@ -182,7 +188,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <ChatStreamProvider>
-    <AskNanciProvider isConceptVersion={isConceptVersion}>
+    {/* autoPlayFlow reaches the non-embed modes too, so ?autoplay composes with
+        concept / tib / woodforest, not just the embed */}
+    <AskNanciProvider isConceptVersion={isConceptVersion} autoPlayFlow={autoPlayFlow} autoPlay={autoPlay}>
       <AppFrame
         theme={theme}
         topBar={
