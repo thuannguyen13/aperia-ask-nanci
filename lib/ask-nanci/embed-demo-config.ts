@@ -35,6 +35,7 @@ export function parseMode(mode: string | null): ParsedMode {
     case "concept-nav":     return { isEmbed: false, embedVariant: null,             isConceptVersion: true,  theme: "aperia"      }
     case "tib":             return { isEmbed: false, embedVariant: null,             isConceptVersion: false, theme: "tib"         }
     case "woodforest":      return { isEmbed: false, embedVariant: null,             isConceptVersion: false, theme: "woodforest"  }
+    case "placeholder":     return { isEmbed: false, embedVariant: null,             isConceptVersion: false, theme: "placeholder" }
     default:                return { isEmbed: false, embedVariant: null,             isConceptVersion: false, theme: "aperia"      }
   }
 }

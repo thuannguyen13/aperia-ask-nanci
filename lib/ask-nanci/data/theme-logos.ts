@@ -45,6 +45,11 @@ const THEME_LOGOS = {
   woodforest: {
     frame: { src: "/logos/logo-woodforest.png", alt: "Woodforest National Bank", width: 278, height: 48 },
   },
+  // White-label placeholder — swap the asset and the [data-theme="placeholder"] block
+  // to stand up a new brand without touching anything else.
+  placeholder: {
+    frame: { src: "/logos/img-logo-placeholder.png", alt: "Brand logo", width: 262, height: 64 },
+  },
 } satisfies Record<string, ThemeLogos>
 
 export type ThemeId = keyof typeof THEME_LOGOS

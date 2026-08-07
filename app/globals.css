@@ -53,6 +53,21 @@
   --app-gradient: linear-gradient(180deg, #002F67 0%, #c5d5ed 200px);
 }
 
+/* White-label placeholder. Same shape as Woodforest, and for the same reason: the brand
+   color is light, so the frame gradient starts on a dark shade of it (the placeholder
+   wordmark is white artwork) and --primary-foreground carries dark ink. To stand up a new
+   brand, replace these five values and the logo in theme-logos.ts. */
+[data-theme="placeholder"] {
+  --primary: #FFD8A8;
+  --color-primary: #FFD8A8;
+  --primary-foreground: #4A2B00;
+  --color-primary-foreground: #4A2B00;
+  --ring: #FFD8A8;
+  --sidebar-primary: #FFD8A8;
+  --sidebar-primary-foreground: #4A2B00;
+  --app-gradient: linear-gradient(180deg, #8A4300 0%, #ffead5 200px);
+}
+
 /* Woodforest. The brand green is light, so two things differ from the other themes:
    the frame gradient starts on a dark green from the same family (the wordmark is white
    artwork and would vanish on #AED581), and --primary-foreground flips to dark ink so

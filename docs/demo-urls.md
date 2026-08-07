@@ -19,6 +19,7 @@ Base: `http://localhost:3000` (override with `BASE=https://... npm run demo:urls
 | `http://localhost:3000/?mode=concept-nav` | no | yes | Alias of `concept` — the hover-rail sidebar it trialled is now app-wide; kept so shared links keep working |
 | `http://localhost:3000/?mode=tib` | no | no | Full app (sidebar, sessions, KB panel) wearing the TIB brand |
 | `http://localhost:3000/?mode=woodforest` | no | no | Full app (sidebar, sessions, KB panel) wearing the Woodforest brand |
+| `http://localhost:3000/?mode=placeholder` | no | no | Full app wearing the white-label placeholder brand — swap the logo + theme block to stand up a new one |
 
 Any other `?mode=` value falls through to the default app.
 

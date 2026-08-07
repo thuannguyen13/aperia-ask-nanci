@@ -83,8 +83,9 @@ const MODE_NOTES: Record<string, string> = {
   "concept-nav": "Alias of `concept` — the hover-rail sidebar it trialled is now app-wide; kept so shared links keep working",
   tib: "Full app (sidebar, sessions, KB panel) wearing the TIB brand",
   woodforest: "Full app (sidebar, sessions, KB panel) wearing the Woodforest brand",
+  placeholder: "Full app wearing the white-label placeholder brand — swap the logo + theme block to stand up a new one",
 }
-for (const mode of ["", ...EMBED_VARIANTS, "concept", "concept-nav", "tib", "woodforest"]) {
+for (const mode of ["", ...EMBED_VARIANTS, "concept", "concept-nav", "tib", "woodforest", "placeholder"]) {
   const q = mode ? `mode=${mode}` : ""
   const { isEmbed, isConceptVersion } = parseMode(mode || null)
   const note = MODE_NOTES[mode] ?? (isConceptVersion ? "Panel demo, embeddable" : "Chat-only embed")
