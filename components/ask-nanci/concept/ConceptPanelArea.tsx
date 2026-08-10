@@ -46,7 +46,12 @@ export function ConceptPanelArea({ fillWidth = false, visible = true }: { fillWi
         "relative h-full shrink-0 flex-col overflow-hidden",
         "transition-[width,opacity,margin] duration-500 ease-out",
         fillWidth
-          ? cn("flex flex-1 min-w-0 transition-opacity duration-500 ease-out", visible ? "opacity-100" : "opacity-0")
+          ? cn(
+              // Below md there is no room beside the chat — MobilePanelSwitcher shows
+              // these panels instead.
+              "hidden md:flex flex-1 min-w-0 transition-opacity duration-500 ease-out",
+              visible ? "opacity-100" : "opacity-0",
+            )
           : cn(
               "hidden md:flex",
               isOpen ? "w-[50%] opacity-100 ml-2" : "w-0 opacity-0 border-0 pointer-events-none",
