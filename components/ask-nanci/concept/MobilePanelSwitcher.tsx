@@ -67,9 +67,8 @@ function PanelThumbnail({ id, onOpen, onClose }: { id: PanelId; onOpen: () => vo
 }
 
 export function MobilePanelSwitcher() {
-  const { dynamicPanels, closePanel } = useAskNanci()
+  const { dynamicPanels, closePanel, panelSwitcherOpen, setPanelSwitcherOpen } = useAskNanci()
   const isMobile = useIsMobile()
-  const [overviewOpen, setOverviewOpen] = useState(false)
   const [openId, setOpenId] = useState<PanelId | null>(null)
   const prevCount = useRef(dynamicPanels.length)
 
@@ -80,15 +79,21 @@ export function MobilePanelSwitcher() {
     if (dynamicPanels.length > prevCount.current) {
       const newest = dynamicPanels[dynamicPanels.length - 1]
       setOpenId(newest)
-      setOverviewOpen(false)
+      setPanelSwitcherOpen(false)
     }
     prevCount.current = dynamicPanels.length
-  }, [dynamicPanels])
+  }, [dynamicPanels, setPanelSwitcherOpen])
+
+  const multiple = dynamicPanels.length > 1
 
   // Derived, not synced: a panel closed from anywhere (its own X, a turn's
   // closePanel, closeAllPanels) leaves the drawer closed on the very next render,
-  // with no effect to fall out of step with the stack.
-  const activeId = openId && dynamicPanels.includes(openId) ? openId : null
+  // with no effect to fall out of step with the stack. The toggle only sets one flag,
+  // so with a single panel open it lands straight on that panel and skips the
+  // overview — an overview of one thumbnail is pure friction.
+  const activeId =
+    (openId && dynamicPanels.includes(openId) ? openId : null) ??
+    (panelSwitcherOpen && !multiple ? dynamicPanels[0] : null)
 
   // Not `md:hidden`: Sheet and Drawer portal onto <body>, so CSS on this wrapper
   // would never reach them and a drawer opened on a phone would stay open when the
@@ -96,24 +101,11 @@ export function MobilePanelSwitcher() {
   if (!isMobile || dynamicPanels.length === 0) return null
 
   const openPanel = PANELS[activeId ?? dynamicPanels[0]]
-  const multiple = dynamicPanels.length > 1
 
   return (
     <>
-      {/* Trigger — one tap straight to the panel when there is only one. */}
-      <button
-        onClick={() => (multiple ? setOverviewOpen(true) : setOpenId(dynamicPanels[0]))}
-        aria-label={multiple ? `Show ${dynamicPanels.length} panels` : `Open ${openPanel.label}`}
-        // Sits clear of the chat input rather than over it — the composer stays fully
-        // tappable while a panel is parked behind the trigger.
-        className="fixed bottom-40 right-4 z-30 flex h-10 max-w-[60%] items-center gap-1.5 truncate rounded-full border bg-background px-3.5 text-sm font-medium text-foreground shadow-lg active:scale-95"
-      >
-        <LayoutGrid className="size-4" />
-        {multiple ? dynamicPanels.length : openPanel.label}
-      </button>
-
-      {/* Overview — the thumbnail container. */}
-      <Sheet open={overviewOpen} onOpenChange={setOverviewOpen}>
+      {/* Overview — the thumbnail container. Opened by MobilePanelToggle in the top bar. */}
+      <Sheet open={panelSwitcherOpen && multiple} onOpenChange={setPanelSwitcherOpen}>
         <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-2xl">
           <SheetTitle className="px-4 pt-4 text-base">Panels</SheetTitle>
           <SheetDescription className="sr-only">
@@ -126,7 +118,7 @@ export function MobilePanelSwitcher() {
                 id={id}
                 onOpen={() => {
                   setOpenId(id)
-                  setOverviewOpen(false)
+                  setPanelSwitcherOpen(false)
                 }}
                 onClose={() => closePanel(id)}
               />
@@ -136,7 +128,15 @@ export function MobilePanelSwitcher() {
       </Sheet>
 
       {/* The opened panel. Near-full height so the panel gets the viewport. */}
-      <Drawer open={activeId !== null} onOpenChange={(o) => !o && setOpenId(null)}>
+      <Drawer
+        open={activeId !== null}
+        onOpenChange={(o) => {
+          if (o) return
+          setOpenId(null)
+          // Also clears the toggle's flag, which is what put a lone panel on screen.
+          setPanelSwitcherOpen(false)
+        }}
+      >
         <DrawerContent className="h-[92vh] !max-h-[92vh]">
           <DrawerTitle className="sr-only">{openPanel.label}</DrawerTitle>
           <DrawerDescription className="sr-only">Panel detail</DrawerDescription>
@@ -144,7 +144,7 @@ export function MobilePanelSwitcher() {
             <button
               onClick={() => {
                 setOpenId(null)
-                setOverviewOpen(true)
+                setPanelSwitcherOpen(true)
               }}
               className="mx-auto mb-1 flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium text-muted-foreground"
             >

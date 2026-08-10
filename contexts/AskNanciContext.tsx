@@ -74,6 +74,10 @@ interface AskNanciCtx {
   setSettingsOpen: (open: boolean) => void
   mobileSidebarOpen: boolean
   setMobileSidebarOpen: (open: boolean) => void
+  // Mirror of the sidebar toggle for the other end of the mobile top bar: the panel
+  // switcher, which is how open panels are reached below md.
+  panelSwitcherOpen: boolean
+  setPanelSwitcherOpen: (open: boolean) => void
   onboardingOpen: boolean
   setOnboardingOpen: (open: boolean) => void
   isConceptVersion: boolean
@@ -153,6 +157,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [tokenLimitReached, setTokenLimitReached] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+  const [panelSwitcherOpen, setPanelSwitcherOpen] = useState(false)
   const [onboardingOpen, setOnboardingOpen] = useState(false)
   const [closingPanels, setClosingPanels] = useState<string[]>([])
   const { stack: dynamicPanels, stackRef: dynamicPanelsRef, openDynamic, closeDynamic: closeDynamicPanel, resetDynamic } = usePanelStack()
@@ -749,6 +754,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       tokenLimitReached, setTokenLimitReached,
       settingsOpen, openSettings, setSettingsOpen,
       mobileSidebarOpen, setMobileSidebarOpen,
+      panelSwitcherOpen, setPanelSwitcherOpen,
       onboardingOpen, setOnboardingOpen,
       isConceptVersion,
       submitFormPanel, submitOfferApplication, submitStepUpPanel,

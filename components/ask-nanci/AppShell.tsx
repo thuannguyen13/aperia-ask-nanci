@@ -21,6 +21,7 @@ import { OnboardingDialog } from "./OnboardingDialog"
 import { SettingsDialog } from "./SettingsDialog"
 import { DarkModeToggle } from "./DarkModeToggle"
 import { MobileSidebarToggle } from "./MobileSidebarToggle"
+import { MobilePanelToggle } from "./MobilePanelToggle"
 
 const DQ_PANELS = new Set(["detection-queue", "barometer-report", "coastal-risk"])
 
@@ -30,7 +31,9 @@ function ReplayButton() {
   // stays hidden while the script is thinking/streaming.
   if (!replayFlow || chatState !== "idle") return null
   return (
-    <Button variant="secondary" size="xs" onClick={replayFlow} className="absolute right-3 gap-1.5">
+    // Sits left of MobilePanelToggle on mobile so the two never overlap once a flow
+    // has finished with panels still open.
+    <Button variant="secondary" size="xs" onClick={replayFlow} className="absolute right-12 gap-1.5 md:right-3">
       <RotateCcw className="size-3" />
       Ask
     </Button>
@@ -165,6 +168,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             {/* Hidden under ?autoplay — the flow starts itself, so the button has
                 nothing to offer on arrival and only reads as a stray control. */}
             {isConceptEmbed && !fullApp && !autoPlay && <ReplayButton />}
+            <div className="absolute right-0 flex items-center md:hidden">
+              <MobilePanelToggle />
+            </div>
           </div>
           <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden md:rounded-2xl bg-sidebar shadow-sm">
             {fullApp ? (
@@ -205,6 +211,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <MobileSidebarToggle />
             </div>
             <Image data-logo="frame" {...getThemeLogos(theme).frame} className="h-6 w-auto" />
+            <div className="absolute right-0 flex items-center md:hidden">
+              <MobilePanelToggle />
+            </div>
           </div>
         }
         sidebar={<Sidebar />}
