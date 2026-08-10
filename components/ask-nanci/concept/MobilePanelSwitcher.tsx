@@ -84,46 +84,58 @@ export function MobilePanelSwitcher() {
     prevCount.current = dynamicPanels.length
   }, [dynamicPanels, setPanelSwitcherOpen])
 
-  const multiple = dynamicPanels.length > 1
-
   // Derived, not synced: a panel closed from anywhere (its own X, a turn's
   // closePanel, closeAllPanels) leaves the drawer closed on the very next render,
   // with no effect to fall out of step with the stack. The toggle only sets one flag,
-  // so with a single panel open it lands straight on that panel and skips the
+  // so with exactly one panel open it lands straight on that panel and skips the
   // overview — an overview of one thumbnail is pure friction.
+  const single = dynamicPanels.length === 1
   const activeId =
     (openId && dynamicPanels.includes(openId) ? openId : null) ??
-    (panelSwitcherOpen && !multiple ? dynamicPanels[0] : null)
+    (panelSwitcherOpen && single ? dynamicPanels[0] : null)
 
   // Not `md:hidden`: Sheet and Drawer portal onto <body>, so CSS on this wrapper
   // would never reach them and a drawer opened on a phone would stay open when the
   // viewport grows. Skipping the render entirely is what actually keeps desktop clean.
-  if (!isMobile || dynamicPanels.length === 0) return null
+  if (!isMobile) return null
 
-  const openPanel = PANELS[activeId ?? dynamicPanels[0]]
+  const openPanel = activeId ? PANELS[activeId] : null
 
   return (
     <>
       {/* Overview — the thumbnail container. Opened by MobilePanelToggle in the top bar. */}
-      <Sheet open={panelSwitcherOpen && multiple} onOpenChange={setPanelSwitcherOpen}>
+      <Sheet open={panelSwitcherOpen && !single} onOpenChange={setPanelSwitcherOpen}>
         <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-2xl">
           <SheetTitle className="px-4 pt-4 text-base">Panels</SheetTitle>
           <SheetDescription className="sr-only">
             Open panels. Select one to view it full screen.
           </SheetDescription>
-          <div className="grid grid-cols-2 gap-3 p-4">
-            {dynamicPanels.map((id) => (
-              <PanelThumbnail
-                key={id}
-                id={id}
-                onOpen={() => {
-                  setOpenId(id)
-                  setPanelSwitcherOpen(false)
-                }}
-                onClose={() => closePanel(id)}
-              />
-            ))}
-          </div>
+          {dynamicPanels.length === 0 ? (
+            // The toggle is always in the bar, so this is a real destination rather
+            // than a dead end. Panels are answers to questions — say so, instead of
+            // showing an empty grid that reads as something failing to load.
+            <div className="flex flex-col items-center gap-2 px-6 py-12 text-center">
+              <LayoutGrid className="size-6 text-muted-foreground" />
+              <p className="text-sm font-medium text-foreground">No panels open</p>
+              <p className="text-xs text-muted-foreground">
+                Ask a question and Nanci opens the answer here.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 gap-3 p-4">
+              {dynamicPanels.map((id) => (
+                <PanelThumbnail
+                  key={id}
+                  id={id}
+                  onOpen={() => {
+                    setOpenId(id)
+                    setPanelSwitcherOpen(false)
+                  }}
+                  onClose={() => closePanel(id)}
+                />
+              ))}
+            </div>
+          )}
         </SheetContent>
       </Sheet>
 
@@ -138,9 +150,9 @@ export function MobilePanelSwitcher() {
         }}
       >
         <DrawerContent className="h-[92vh] !max-h-[92vh]">
-          <DrawerTitle className="sr-only">{openPanel.label}</DrawerTitle>
+          <DrawerTitle className="sr-only">{openPanel?.label ?? "Panel"}</DrawerTitle>
           <DrawerDescription className="sr-only">Panel detail</DrawerDescription>
-          {multiple && (
+          {dynamicPanels.length > 1 && (
             <button
               onClick={() => {
                 setOpenId(null)
@@ -153,7 +165,7 @@ export function MobilePanelSwitcher() {
             </button>
           )}
           <div className="min-h-0 flex-1 overflow-hidden">
-            {activeId && <openPanel.component />}
+            {openPanel && <openPanel.component />}
           </div>
         </DrawerContent>
       </Drawer>
