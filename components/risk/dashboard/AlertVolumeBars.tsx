@@ -1,23 +1,39 @@
 "use client"
 
 import { ALERT_VOLUME } from "@/lib/ask-nanci/data/risk-dashboard"
+import { findAssignment } from "@/lib/ask-nanci/data/risk-assignments"
+import { useRiskNav } from "../RiskNavContext"
 
 // Horizontal bar list (assignment → alert count), per the Figma card (734:28526):
 // the top row is emphasized; the rest sit at 40% opacity. Bars are orange #ea580c,
 // length proportional to count, with the value at the end.
+//
+// Each label drills into that assignment in Assignment Management. The label text is
+// the registry's `short` name rather than a string stored on the chart row, so the
+// bar and the queue card can no longer disagree about what an assignment is called.
 export function AlertVolumeBars() {
+  const nav = useRiskNav()
   const max = Math.max(...ALERT_VOLUME.map((a) => a.count))
   return (
     <div className="flex flex-col gap-2">
-      {ALERT_VOLUME.map((a) => (
-        <div key={a.name} className="flex items-center gap-2 text-xs">
-          <span className="w-52 shrink-0 truncate text-right font-medium text-primary">{a.name}</span>
-          <div className="flex min-w-0 flex-1 items-center gap-2">
-            <div className="h-4 rounded-[2px] bg-[#ea580c]" style={{ width: `${Math.max((a.count / max) * 100, 2)}%` }} />
-            <span className="shrink-0 text-sm tabular-nums text-foreground">{a.count}</span>
+      {ALERT_VOLUME.map((a) => {
+        const assignment = findAssignment(a.assignmentId)
+        return (
+          <div key={a.assignmentId} className="flex items-center gap-2 text-xs">
+            <button
+              onClick={() => nav.openAssignment(a.assignmentId)}
+              title={assignment?.name}
+              className="w-52 shrink-0 truncate text-right font-medium text-primary hover:underline"
+            >
+              {assignment?.short ?? a.assignmentId}
+            </button>
+            <div className="flex min-w-0 flex-1 items-center gap-2">
+              <div className="h-4 rounded-[2px] bg-[#ea580c]" style={{ width: `${Math.max((a.count / max) * 100, 2)}%` }} />
+              <span className="shrink-0 text-sm tabular-nums text-foreground">{a.count}</span>
+            </div>
           </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }

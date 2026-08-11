@@ -8,16 +8,20 @@
 import {
   AlertTriangle, Inbox, BarChart3, Briefcase, Timer, type LucideIcon,
 } from "lucide-react"
+import type { RiskDest } from "@/components/risk/RiskNavContext"
 
 // Chart ids used by the insight → highlight mapping.
 export type DashChartId = "scatter" | "alert-volume" | "high-risk" | "param-heat" | "realert"
 
 // ── Top KPI row ────────────────────────────────────────────────────────────
-export const DASH_KPIS: { label: string; value: string; delta: string; deltaCls: string; sub: string; icon: LucideIcon }[] = [
-  { label: "Alerted Today",     value: "364", delta: "+12%", deltaCls: "text-rose-600 dark:text-rose-400",    sub: "across 23 assignments",     icon: AlertTriangle },
-  { label: "Ready to Work",     value: "298", delta: "+8%",  deltaCls: "text-rose-600 dark:text-rose-400",    sub: "66 oldest > 24h",           icon: Inbox },
+// `dest` is where the card drills to. Partial on purpose: a card only carries one
+// when a screen exists behind it, so nothing on the dashboard offers a click that
+// lands nowhere. `barometer-report` opens filtered to the critical merchants.
+export const DASH_KPIS: { label: string; value: string; delta: string; deltaCls: string; sub: string; icon: LucideIcon; dest?: RiskDest }[] = [
+  { label: "Alerted Today",     value: "364", delta: "+12%", deltaCls: "text-rose-600 dark:text-rose-400",    sub: "across 23 assignments",     icon: AlertTriangle, dest: "detection-queue" },
+  { label: "Ready to Work",     value: "298", delta: "+8%",  deltaCls: "text-rose-600 dark:text-rose-400",    sub: "66 oldest > 24h",           icon: Inbox,         dest: "detection-queue" },
   // The standing finding, not a today number — hence the explicit period in `sub`.
-  { label: "MC >700, No Alert", value: "3,556", delta: "", deltaCls: "text-muted-foreground",                sub: "Sept–Dec 2025 · 317 confirmed fraud", icon: BarChart3 },
+  { label: "MC >700, No Alert", value: "3,556", delta: "", deltaCls: "text-muted-foreground",                sub: "Sept–Dec 2025 · 317 confirmed fraud", icon: BarChart3, dest: "barometer-report" },
   { label: "Case Opened (Week)",value: "42",  delta: "-18m", deltaCls: "text-emerald-600 dark:text-emerald-400", sub: "avg time to case: 3h12m",   icon: Briefcase },
   { label: "% Worked in SLA",   value: "87%", delta: "-3%",  deltaCls: "text-rose-600 dark:text-rose-400",    sub: "target 90%",                icon: Timer },
 ]
@@ -53,37 +57,50 @@ export const SCATTER_COLORS: Record<ScatterCat, string> = {
 }
 
 // ── Alert Volume by Assignment (horizontal bars) ─────────────────────────────
+// Today's new alerts per assignment. Keyed by assignment id, not by a display name:
+// the label the bar renders comes from ASSIGNMENTS, so the chart and the queue card
+// can no longer call the same assignment two different things.
+//
 // `prev` is yesterday's count for the same assignment. It is what lets the Alert
 // Volume take say "63 more than yesterday" instead of asserting a delta from
 // nowhere; the chart itself still plots `count`.
-export const ALERT_VOLUME: { name: string; count: number; prev: number }[] = [
-  { name: "Esquire - Phase 2 Parameters - Auths…", count: 357, prev: 294 },
-  { name: "Low Risk DQ - By MCC", count: 303, prev: 311 },
-  { name: "MC Watchlist (system)", count: 52, prev: 47 },
-  { name: "High Risk DQ - By MCC", count: 25, prev: 28 },
-  { name: "Moderate Risk DQ - By MCC", count: 19, prev: 21 },
-  { name: "MC Velocity (system)", count: 18, prev: 12 },
-  { name: "Unacceptable Risk DQ", count: 10, prev: 10 },
-  { name: "MC Divergence (system)", count: 9, prev: 11 },
-  { name: "Phase 2 - Auths Detect Q", count: 7, prev: 6 },
+//
+// Note this measures *alerts raised today*, which is a different quantity from the
+// standing queue depth in DETECTION_QUEUES — a queue can hold 1,022 unworked items
+// and still raise none today. Both are real; neither derives from the other.
+export const ALERT_VOLUME: { assignmentId: string; count: number; prev: number }[] = [
+  { assignmentId: "esqr-phase2-auths", count: 357, prev: 294 },
+  { assignmentId: "low-risk-mcc",      count: 303, prev: 311 },
+  { assignmentId: "mc-watch",          count: 52,  prev: 47 },
+  { assignmentId: "high-risk-mcc",     count: 25,  prev: 28 },
+  { assignmentId: "moderate-risk-mcc", count: 19,  prev: 21 },
+  { assignmentId: "mc-velocity",       count: 18,  prev: 12 },
+  { assignmentId: "unacceptable-risk", count: 10,  prev: 10 },
+  { assignmentId: "mc-divergence",     count: 9,   prev: 11 },
+  { assignmentId: "esqr-phase2",       count: 7,   prev: 6 },
 ]
+
+/** Today's alert count for an assignment — 0 for one that did not fire. */
+export const alertsToday = (assignmentId: string) =>
+  ALERT_VOLUME.find((a) => a.assignmentId === assignmentId)?.count ?? 0
 
 // ── High Risk Merchants (MC score jumpers) ───────────────────────────────────
 // The ten biggest 30-day MC movers, all drawn from the Barometer Report's merchant
-// list, so a name clicked here and a name read there are the same account. `to` is
-// each merchant's current MC score on the 0–1000 scale and matches its RISK_MERCHANTS
-// row exactly; `from` is that score minus its 30-day delta.
-export const HIGH_RISK_MERCHANTS: { name: string; from: number; to: number; delta: number }[] = [
-  { name: "CASCADE AUTO PARTS WAREHOUSE",   from: 100.08, to: 711.08, delta: 611 },
-  { name: "REGENCY FURNITURE MANCHESTER",   from: 327.33, to: 737.33, delta: 410 },
-  { name: "APEX ROOFING SOLUTIONS",         from: 318.19, to: 707.19, delta: 389 },
-  { name: "GOLDLEAF JEWELRY EXCHANGE",      from: 419.12, to: 733.12, delta: 314 },
-  { name: "BRIGHTON MEDICAL SUPPLY",        from: 448.40, to: 712.40, delta: 264 },
-  { name: "HARBOR POINT MARINE SVCS",       from: 502.05, to: 726.05, delta: 224 },
-  { name: "ASHLEY HOMESTORE - MECHANICSBU", from: 513.05, to: 701.05, delta: 188 },
-  { name: "COASTAL WELLNESS PARTNERS",      from: 546.88, to: 704.88, delta: 158 },
-  { name: "NORTHGATE APPLIANCE CTR",        from: 604.44, to: 731.44, delta: 127 },
-  { name: "MERIDIAN DENTAL GROUP",          from: 0,      to: 95.99,  delta: 96 },
+// list, so a name clicked here and a name read there are the same account. `id` is
+// the RISK_MERCHANTS key, which is what makes the row a link into that merchant's
+// Risk Report. `to` is each merchant's current MC score on the 0–1000 scale and
+// matches its RISK_MERCHANTS row exactly; `from` is that score minus its 30-day delta.
+export const HIGH_RISK_MERCHANTS: { id: string; name: string; from: number; to: number; delta: number }[] = [
+  { id: "cascade",     name: "CASCADE AUTO PARTS WAREHOUSE",   from: 100.08, to: 711.08, delta: 611 },
+  { id: "regency",     name: "REGENCY FURNITURE MANCHESTER",   from: 327.33, to: 737.33, delta: 410 },
+  { id: "apexroofing", name: "APEX ROOFING SOLUTIONS",         from: 318.19, to: 707.19, delta: 389 },
+  { id: "goldleaf",    name: "GOLDLEAF JEWELRY EXCHANGE",      from: 419.12, to: 733.12, delta: 314 },
+  { id: "brighton",    name: "BRIGHTON MEDICAL SUPPLY",        from: 448.40, to: 712.40, delta: 264 },
+  { id: "harborpoint", name: "HARBOR POINT MARINE SVCS",       from: 502.05, to: 726.05, delta: 224 },
+  { id: "ashley",      name: "ASHLEY HOMESTORE - MECHANICSBU", from: 513.05, to: 701.05, delta: 188 },
+  { id: "coastalwell", name: "COASTAL WELLNESS PARTNERS",      from: 546.88, to: 704.88, delta: 158 },
+  { id: "northgate",   name: "NORTHGATE APPLIANCE CTR",        from: 604.44, to: 731.44, delta: 127 },
+  { id: "meridian",    name: "MERIDIAN DENTAL GROUP",          from: 0,      to: 95.99,  delta: 96 },
 ]
 
 // ── Top 10 Parameters Heat (bars = Fires count, line = Case Rate %) ───────────
@@ -101,12 +118,16 @@ export const PARAM_HEAT: { param: string; fires: number; caseRate: number }[] = 
 ]
 
 // ── Re-alert Rate by Assignment ──────────────────────────────────────────────
-export const REALERT_ROWS: { assignment: string; worked: number; realerted: number; rate: number; action: string }[] = [
-  { assignment: "Phase 2 Parameters - Detect Q", worked: 2184, realerted: 438, rate: 20.1, action: "+180" },
-  { assignment: "Low Risk DQ - By MCC",          worked: 1724, realerted: 512, rate: 29.7, action: "Tighten re-alert delta on P11/P12" },
-  { assignment: "High Risk DQ - By MCC",         worked: 182,  realerted: 22,  rate: 12.1, action: "+120" },
-  { assignment: "MC Watchlist (system)",         worked: 312,  realerted: 28,  rate: 9.0,  action: "+90" },
-  { assignment: "MC Velocity (system)",          worked: 68,   realerted: 31,  rate: 45.6, action: "Raise velocity threshold from 15 → 20 pts" },
+// A period metric, not a today metric: `worked` counts everything worked on the
+// assignment over the reporting window, and `realerted` how much of it came back.
+// Keyed by assignment id like ALERT_VOLUME, so a row here and a bar there resolve to
+// the same assignment.
+export const REALERT_ROWS: { assignmentId: string; worked: number; realerted: number; rate: number; action: string }[] = [
+  { assignmentId: "esqr-phase2-auths", worked: 2184, realerted: 438, rate: 20.1, action: "+180" },
+  { assignmentId: "low-risk-mcc",      worked: 1724, realerted: 512, rate: 29.7, action: "Tighten re-alert delta on P11/P12" },
+  { assignmentId: "high-risk-mcc",     worked: 182,  realerted: 22,  rate: 12.1, action: "+120" },
+  { assignmentId: "mc-watch",          worked: 312,  realerted: 28,  rate: 9.0,  action: "+90" },
+  { assignmentId: "mc-velocity",       worked: 68,   realerted: 31,  rate: 45.6, action: "Raise velocity threshold from 15 → 20 pts" },
 ]
 
 // ── Take → the charts its answer points at (keyed by RISK_NANCI_TAKES title) ──

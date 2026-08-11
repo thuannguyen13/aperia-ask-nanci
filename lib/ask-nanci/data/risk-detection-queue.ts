@@ -20,7 +20,8 @@ export interface QueueStatus {
 }
 
 export interface DetectionQueueData {
-  assignment: string
+  /** The ASSIGNMENTS row this queue belongs to; the card renders that row's name. */
+  assignmentId: string
   code: string // short pill next to the assignment name
   /** Mastercard-sourced queue — shows the network mark beside the name. */
   mastercard?: boolean
@@ -45,7 +46,7 @@ export interface DetectionQueueData {
 // the second is the non-Mastercard Authorizations assignment.
 export const DETECTION_QUEUES: DetectionQueueData[] = [
   {
-    assignment: "Esquire - Phase 2 Parameters - Auths - Detect Q",
+    assignmentId: "esqr-phase2-auths",
     code: "DQ",
     mastercard: true,
     eligibleMerchants: 1240,
@@ -59,7 +60,7 @@ export const DETECTION_QUEUES: DetectionQueueData[] = [
     ],
   },
   {
-    assignment: "Authorizations Assignment",
+    assignmentId: "authorizations",
     code: "DQ",
     eligibleMerchants: 1586,
     requeued: { count: 67, amount: 84664.75 },

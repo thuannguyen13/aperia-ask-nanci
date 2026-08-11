@@ -6,6 +6,7 @@ import { Badge, Button } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { formatCurrency, formatPercent } from "@/components/ask-nanci/shared"
 import { applyWorkMarks, DETECTION_QUEUE, type QueueStatus, type DetectionQueueData } from "@/lib/ask-nanci/data/risk-detection-queue"
+import { findAssignment } from "@/lib/ask-nanci/data/risk-assignments"
 import { useRiskNav } from "./RiskNavContext"
 
 // The assignment summary block (name + report switch + KPI row + progress trail),
@@ -88,7 +89,7 @@ export function QueueSummaryCard({ queue = DETECTION_QUEUE, onBarometer, live = 
         {/* Tags belong to the title, so they travel with it rather than drifting
             over to the buttons: the name takes the slack, the tags never do. */}
         <div className="flex min-w-0 flex-1 items-center gap-2">
-          <p className="truncate text-base font-semibold text-foreground">{q.assignment}</p>
+          <p className="truncate text-base font-semibold text-foreground">{findAssignment(q.assignmentId)?.name ?? q.assignmentId}</p>
           {/* Same outline badge as the code pill — the network mark is a tag too.
               Both take an explicit background: the outline variant is transparent,
               which would let the gray card show through a tag meant to read white. */}
