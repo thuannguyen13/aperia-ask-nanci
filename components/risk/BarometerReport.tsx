@@ -1,12 +1,14 @@
 "use client"
 
+import { useState } from "react"
 import { RefreshCw, SlidersHorizontal, Download, Search, ChevronDown, ChevronLeft, ChevronRight, AlertTriangle, ListChecks } from "lucide-react"
 import {
   Button, Input,
   Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator,
+  TableBody, TableRow,
 } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
-import { PanelShell, PanelHeader, PanelBody } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelBody, PanelTable, Thead, Th, Td } from "@/components/ask-nanci/shared"
 import { MarkWorkPopover } from "./MarkWorkPopover"
 import { QueueSummaryCard } from "./QueueSummaryCard"
 import { useRiskNav } from "./RiskNavContext"
@@ -29,10 +31,22 @@ function TagBadges({ alert, list }: { alert: number; list: number }) {
 export function BarometerReport() {
   const nav = useRiskNav()
   const filter = nav.barometerFilter
+  const [query, setQuery] = useState("")
+  const q = query.trim().toLowerCase()
+
   // "critical" chip → the High-risk merchants. That is "critical on either model",
   // not both: 8 of the 13 fire on one model only, and dropping them would hide the
   // exact cases the two-score view exists to surface.
-  const merchants = filter === "critical" ? RISK_MERCHANTS.filter((m) => getRiskLevel(m) === "High") : RISK_MERCHANTS
+  // The search box narrows whatever that left, matching name or MID — the field says
+  // "merchant id" but an analyst reading the list has the name in front of them.
+  const merchants = RISK_MERCHANTS
+    .filter((m) => filter !== "critical" || getRiskLevel(m) === "High")
+    .filter((m) => !q || m.name.toLowerCase().includes(q) || m.mid.includes(q))
+
+  // The 357 total belongs to the unfiltered assignment. Once anything narrows the
+  // list, the count on screen is the whole result, so quoting 357 beside it would
+  // claim there are pages of matches that do not exist.
+  const narrowed = filter === "critical" || !!q
 
   return (
     <PanelShell className="min-w-0 flex-1">
@@ -70,62 +84,70 @@ export function BarometerReport() {
             <Button variant="secondary" size="sm"><Download className="size-4" /> Export</Button>
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input placeholder="Search merchant id..." className="w-56 pl-8" />
+              <Input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search merchant or MID..."
+                className="w-56 pl-8"
+              />
             </div>
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-xl border">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b bg-muted/40 text-left text-xs text-muted-foreground">
-                <th className="px-4 py-2.5 font-medium">Merchant Name</th>
-                <th className="px-4 py-2.5 font-medium">MCC</th>
-                <th className="px-4 py-2.5 font-medium">Tag</th>
-                <th className="px-4 py-2.5 font-medium">VW Score</th>
-                <th className="px-4 py-2.5 font-medium">MC Score</th>
-                <th className="px-4 py-2.5 font-medium">Risk Level</th>
-                <th className="px-4 py-2.5 text-right font-medium">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {merchants.map((m) => (
-                <tr key={m.id} className="border-b last:border-0">
-                  <td className="px-4 py-2.5">
-                    <button onClick={() => nav.openMerchant(m.id)} className="block max-w-[220px] truncate font-medium text-primary hover:underline">{m.name}</button>
-                    <span className="text-xs tabular-nums text-muted-foreground">{m.mid}</span>
-                  </td>
-                  <td className="px-4 py-2.5">
-                    <span className="block tabular-nums text-foreground">{m.mcc}</span>
-                    <span className="block max-w-[160px] truncate text-xs text-muted-foreground">{m.mccDesc}</span>
-                  </td>
-                  <td className="px-4 py-2.5"><TagBadges alert={m.alertTag} list={m.listTag} /></td>
-                  <td className="px-4 py-2.5 tabular-nums text-foreground">{m.vw}</td>
-                  <td className="px-4 py-2.5 tabular-nums text-foreground">{formatMcScore(m.mc)}</td>
-                  <td className="px-4 py-2.5">
-                    <span className={cn("rounded px-2 py-0.5 text-xs font-medium", RISK_PILL[getRiskLevel(m)])}>{getRiskLevel(m)}</span>
-                  </td>
-                  <td className="px-4 py-2.5 text-right">
-                    {/* Same control as the merchant detail: disposition first, then
-                        the mark — a row is never closed out without a reason. */}
-                    <div className="flex justify-end">
-                      <MarkWorkPopover
-                        status={nav.workStatuses[m.id]}
-                        onSubmit={(choice) => nav.markWork(m.id, statusForDisposition(choice))}
-                      />
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <PanelTable density="comfortable">
+          <Thead>
+            <Th sortable>Merchant name</Th>
+            <Th sortable>MCC</Th>
+            <Th>Tag</Th>
+            <Th sortable>VW score</Th>
+            <Th sortable>MC score</Th>
+            <Th sortable>Risk level</Th>
+            <Th align="right">Action</Th>
+          </Thead>
+          <TableBody>
+            {merchants.length === 0 && (
+              <TableRow>
+                <Td colSpan={7} className="py-10 text-center text-muted-foreground">
+                  No merchant matches <span className="font-medium text-foreground">{query}</span> in this assignment.
+                </Td>
+              </TableRow>
+            )}
+            {merchants.map((m) => (
+              <TableRow key={m.id}>
+                <Td>
+                  <button onClick={() => nav.openMerchant(m.id)} className="block max-w-[220px] truncate font-medium text-primary hover:underline">{m.name}</button>
+                  <span className="font-mono text-xs text-muted-foreground">{m.mid}</span>
+                </Td>
+                <Td>
+                  <span className="block font-mono">{m.mcc}</span>
+                  <span className="block max-w-[160px] truncate text-xs text-muted-foreground">{m.mccDesc}</span>
+                </Td>
+                <Td><TagBadges alert={m.alertTag} list={m.listTag} /></Td>
+                <Td mono>{m.vw}</Td>
+                <Td mono>{formatMcScore(m.mc)}</Td>
+                <Td>
+                  <span className={cn("rounded px-2 py-0.5 text-xs font-medium", RISK_PILL[getRiskLevel(m)])}>{getRiskLevel(m)}</span>
+                </Td>
+                <Td align="right">
+                  {/* Same control as the merchant detail: disposition first, then
+                      the mark — a row is never closed out without a reason. */}
+                  <div className="flex justify-end">
+                    <MarkWorkPopover
+                      status={nav.workStatuses[m.id]}
+                      onSubmit={(choice) => nav.markWork(m.id, statusForDisposition(choice))}
+                    />
+                  </div>
+                </Td>
+              </TableRow>
+            ))}
+          </TableBody>
+        </PanelTable>
 
         {/* Pagination — same shape as Assignment Management. Display-only, like the
             sort affordances: the list is page one of the assignment's alerted
             merchants, and the count is what stops 30 rows reading as the whole queue. */}
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground">
-          <span>Showing {merchants.length} of {filter === "critical" ? merchants.length : RISK_MERCHANTS_TOTAL}</span>
+          <span>Showing {merchants.length} of {narrowed ? merchants.length : RISK_MERCHANTS_TOTAL}</span>
           <div className="flex items-center gap-2">
             <button className="flex items-center gap-1 hover:text-foreground"><ChevronLeft className="size-4" /> Previous</button>
             {[1, 2, 3].map((p) => (

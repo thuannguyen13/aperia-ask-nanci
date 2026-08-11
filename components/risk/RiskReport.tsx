@@ -2,16 +2,17 @@
 
 import { useState } from "react"
 import Image from "next/image"
-import { MoreHorizontal, FileText, FolderPlus, Loader, CircleCheckBig, TriangleAlert, List, ArrowUpDown, Filter, Download, Settings, Pencil, Trash2 } from "lucide-react"
+import { MoreHorizontal, FileText, FolderPlus, Loader, CircleCheckBig, TriangleAlert, List, Filter, Download, Settings, Pencil, Trash2 } from "lucide-react"
 import {
   Badge, Button,
   Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose,
   Alert, AlertTitle, AlertDescription,
   Tabs, TabsList, TabsTrigger, TabsContent, Avatar, AvatarFallback,
   Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator,
+  TableBody, TableRow,
 } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
-import { PanelShell, PanelHeader, PanelBody } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelBody, PanelTable, Thead, Th, Td } from "@/components/ask-nanci/shared"
 import { MarkWorkPopover } from "./MarkWorkPopover"
 import { useRiskNav } from "./RiskNavContext"
 import { findMerchant, getVwLevel, getMcLevel, getRiskLevel, formatMcScore, RISK_REPORT_DETAILS, getDefaultRiskDetail, TXN_VOLUME_ROWS, RISK_VIOLATION_CYCLE, VIOLATION_ROWS, CROSS_QUEUE_ROWS, MERCHANT_NOTES_SEED, DEFAULT_MERCHANT_NOTES, statusForDisposition, type WorkStatus, type ViolationRow, type NoteEntry, type RiskLevel } from "@/lib/ask-nanci/data/risk-merchants"
@@ -59,25 +60,25 @@ function ViolationsPill({ count }: { count: number }) {
             <Button variant="outline" size="sm"><Download className="size-4" /> Export</Button>
           </div>
 
-          <div className="min-w-0 overflow-x-auto rounded-md border">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b bg-muted/50 text-left text-muted-foreground">
-                  {VIOLATION_COLS.map((c) => (
-                    <th key={c.key} className={cn("whitespace-nowrap px-3 py-2.5 font-medium", c.w)}>{c.label}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {VIOLATION_ROWS.slice(0, count).map((r, i) => (
-                  <tr key={i} className="border-b last:border-0">
-                    {VIOLATION_COLS.map((c) => (
-                      <td key={c.key} className={cn("whitespace-nowrap px-3 py-3", c.blue ? "font-medium text-blue-500" : "text-foreground")}>{r[c.key]}</td>
-                    ))}
-                  </tr>
+          <div className="min-w-0 overflow-x-auto">
+            <PanelTable density="comfortable">
+              <Thead>
+                {VIOLATION_COLS.map((c) => (
+                  <Th key={c.key} className={cn("whitespace-nowrap", c.w)}>{c.label}</Th>
                 ))}
-              </tbody>
-            </table>
+              </Thead>
+              <TableBody>
+                {VIOLATION_ROWS.slice(0, count).map((r, i) => (
+                  <TableRow key={i}>
+                    {VIOLATION_COLS.map((c) => (
+                      // explicit blue: this Dialog portals outside the risk theme, so
+                      // text-primary would resolve to the wrong brand color
+                      <Td key={c.key} className={cn("whitespace-nowrap", c.blue && "font-medium text-blue-500")}>{r[c.key]}</Td>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </PanelTable>
           </div>
         </div>
 
@@ -180,20 +181,20 @@ function QueuesPill({ count }: { count: number }) {
             Marking Worked will mark this merchant as Worked in {count} queues simultaneously and remove it from Ready to Work counts everywhere:
           </p>
 
-          <div className="overflow-hidden rounded-md border">
-            <table className="w-full text-sm">
-              <tbody>
-                {CROSS_QUEUE_ROWS.slice(0, count).map((r, i) => (
-                  <tr key={i} className="border-b last:border-0">
-                    {/* explicit blue: Dialog portals outside the risk theme, so text-primary would resolve wrong */}
-                    <td className="p-2 text-blue-600">{r.name}</td>
-                    <td className="w-[140px] p-2 text-foreground">{r.status}</td>
-                    <td className="p-2 text-right text-foreground">{r.alertedAt}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          {/* Headerless on purpose — three self-evident columns inside a confirm
+              dialog, where a header row would read as a second table to parse. */}
+          <PanelTable density="comfortable">
+            <TableBody>
+              {CROSS_QUEUE_ROWS.slice(0, count).map((r, i) => (
+                <TableRow key={i}>
+                  {/* explicit blue: Dialog portals outside the risk theme, so text-primary would resolve wrong */}
+                  <Td className="text-blue-600">{r.name}</Td>
+                  <Td className="w-[140px]">{r.status}</Td>
+                  <Td align="right">{r.alertedAt}</Td>
+                </TableRow>
+              ))}
+            </TableBody>
+          </PanelTable>
         </div>
 
         <DialogFooter className="m-0 border-t bg-muted/40 px-6 py-4">
@@ -464,47 +465,38 @@ export function RiskReport() {
             </div>
           </div>
 
-          <div className="mt-3 overflow-hidden rounded-xl border">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b bg-muted/40 text-left text-xs text-muted-foreground">
-                  <th className="px-4 py-2.5 font-medium">
-                    <span className="inline-flex items-center gap-1">Time <ArrowUpDown className="size-3 text-muted-foreground/60" /></span>
-                  </th>
-                  {TXN_COLS.map((c) => (
-                    <th key={c} className="px-4 py-2.5 text-right font-medium">
-                      <span className="inline-flex items-center justify-end gap-1">{c} <ArrowUpDown className="size-3 text-muted-foreground/60" /></span>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
+          <div className="mt-3">
+            <PanelTable density="comfortable">
+              <Thead>
+                <Th sortable>Time</Th>
+                {TXN_COLS.map((c) => (
+                  <Th key={c} sortable align="right">{c}</Th>
+                ))}
+              </Thead>
+              <TableBody>
                 {TXN_VOLUME_ROWS.map((t) => {
                   const na = t === "Contract Expected"
+                  const cells = na
+                    ? ["N/A", "N/A", "N/A", "N/A", "N/A", "N/A"]
+                    : ["0", "0.00%", "$0.00", "0.00%", "0", "$0.00"]
                   return (
-                    <tr key={t} className={cn("border-b", na && "bg-muted/40")}>
-                      <td className="px-4 py-2.5 font-medium text-foreground">{t}</td>
-                      <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">{na ? "N/A" : "0"}</td>
-                      <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">{na ? "N/A" : "0.00%"}</td>
-                      <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">{na ? "N/A" : "$0.00"}</td>
-                      <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">{na ? "N/A" : "0.00%"}</td>
-                      <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">{na ? "N/A" : "0"}</td>
-                      <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">{na ? "N/A" : "$0.00"}</td>
-                    </tr>
+                    <TableRow key={t} className={cn(na && "bg-muted/40")}>
+                      <Td className="font-medium">{t}</Td>
+                      {cells.map((v, i) => (
+                        <Td key={i} mono align="right" className="text-muted-foreground">{v}</Td>
+                      ))}
+                    </TableRow>
                   )
                 })}
                 {/* Total */}
-                <tr className="border-t bg-muted/40 font-semibold text-foreground">
-                  <td className="px-4 py-2.5">Total</td>
-                  <td className="px-4 py-2.5 text-right tabular-nums">0</td>
-                  <td className="px-4 py-2.5 text-right tabular-nums">N/A</td>
-                  <td className="px-4 py-2.5 text-right tabular-nums">$0.00</td>
-                  <td className="px-4 py-2.5 text-right tabular-nums">N/A</td>
-                  <td className="px-4 py-2.5 text-right tabular-nums">0</td>
-                  <td className="px-4 py-2.5 text-right tabular-nums">$0.00</td>
-                </tr>
-              </tbody>
-            </table>
+                <TableRow className="bg-muted/40 font-semibold text-foreground">
+                  <Td>Total</Td>
+                  {["0", "N/A", "$0.00", "N/A", "0", "$0.00"].map((v, i) => (
+                    <Td key={i} mono align="right">{v}</Td>
+                  ))}
+                </TableRow>
+              </TableBody>
+            </PanelTable>
           </div>
         </TabsContent>
 
