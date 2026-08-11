@@ -11,7 +11,7 @@ import { useAskNanci } from "@/contexts/AskNanciContext"
 import { ConceptWelcomeView } from "@/components/ask-nanci/concept/ConceptWelcomeView"
 
 function WelcomeView() {
-  const { sessions, resumeSession, setKbOpen, sources, isEmbed, currentUser } = useAskNanci()
+  const { sessions, resumeSession, setKbOpen, sources, isEmbed } = useAskNanci()
   const recentSessions = sessions.slice(0, 3)
 
   return (
@@ -23,7 +23,7 @@ function WelcomeView() {
           <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={40} height={40} />
           <div className="text-center">
             <p className="text-2xl font-medium text-foreground">Welcome to Ask Nanci</p>
-            <p className="text-2xl font-medium text-foreground">Ready when you are{currentUser ? `, ${currentUser.name.split(" ")[0]}` : ""}.</p>
+            <p className="text-2xl font-medium text-foreground">Ready when you are.</p>
           </div>
         </div>
 
