@@ -20,6 +20,7 @@ Base: `http://localhost:3000` (override with `BASE=https://... npm run demo:urls
 | `http://localhost:3000/?mode=tib` | no | no | Full app (sidebar, sessions, KB panel) wearing the TIB brand |
 | `http://localhost:3000/?mode=woodforest` | no | no | Full app (sidebar, sessions, KB panel) wearing the Woodforest brand |
 | `http://localhost:3000/?mode=placeholder` | no | no | Full app wearing the white-label placeholder brand — swap the logo + theme block to stand up a new one |
+| `http://localhost:3000/?mode=onboarding` | no | no | Default app, but the onboarding dialog opens on every load and finishing it records nothing — so it can be demoed repeatedly without clearing localStorage |
 
 Any other `?mode=` value falls through to the default app.
 

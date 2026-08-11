@@ -76,6 +76,8 @@ interface AskNanciCtx {
   setMobileSidebarOpen: (open: boolean) => void
   onboardingOpen: boolean
   setOnboardingOpen: (open: boolean) => void
+  /** `?mode=onboarding` — replay onboarding on every load and never record that it ran. */
+  forceOnboarding: boolean
   isConceptVersion: boolean
   submitFormPanel: () => void
   submitOfferApplication: (panelId: PanelId, message: string, sheetAction: SheetActionData) => void
@@ -114,7 +116,7 @@ export function usePanelView(id: PanelId, fallback: string): string {
   return useAskNanci().panelViews[id] ?? fallback
 }
 
-export function AskNanciProvider({ children, isEmbed = false, embedVariant = null, isConceptVersion = false, autoPlayFlow = null, autoPlay = false, initialView, initialMarketplaceOpen = false }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null; isConceptVersion?: boolean; autoPlayFlow?: string | null; autoPlay?: boolean; initialView?: ChatView; initialMarketplaceOpen?: boolean }) {
+export function AskNanciProvider({ children, isEmbed = false, embedVariant = null, isConceptVersion = false, autoPlayFlow = null, autoPlay = false, initialView, initialMarketplaceOpen = false, forceOnboarding = false }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null; isConceptVersion?: boolean; autoPlayFlow?: string | null; autoPlay?: boolean; initialView?: ChatView; initialMarketplaceOpen?: boolean; forceOnboarding?: boolean }) {
   const [view, setView] = useState<ChatView>(initialView ?? (embedVariant === "concept-embed" ? "chat" : "welcome"))
   const [messages, setMessages] = useState<Message[]>([])
   const [chatState, setChatState] = useState<ChatState>("idle")
@@ -180,8 +182,8 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     // ponytail: must stay in the effect — a lazy useState initializer would read
     // localStorage on the client but not the server, mismatching Dialog's `open` on hydrate.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (!localStorage.getItem(ONBOARDING_KEY)) setOnboardingOpen(true)
-  }, [isEmbed])
+    if (forceOnboarding || !localStorage.getItem(ONBOARDING_KEY)) setOnboardingOpen(true)
+  }, [isEmbed, forceOnboarding])
 
 
   const persistAndReload = useCallback(async (msgs: Message[]) => {
@@ -749,7 +751,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       tokenLimitReached, setTokenLimitReached,
       settingsOpen, openSettings, setSettingsOpen,
       mobileSidebarOpen, setMobileSidebarOpen,
-      onboardingOpen, setOnboardingOpen,
+      onboardingOpen, setOnboardingOpen, forceOnboarding,
       isConceptVersion,
       submitFormPanel, submitOfferApplication, submitStepUpPanel,
       triggerProactiveFlow, proactiveNotificationActive, activateProactiveNotification,

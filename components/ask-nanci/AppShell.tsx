@@ -108,7 +108,7 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams()
-  const { isEmbed, embedVariant, isConceptVersion, theme } = parseMode(searchParams.get("mode"))
+  const { isEmbed, embedVariant, isConceptVersion, theme, forceOnboarding } = parseMode(searchParams.get("mode"))
   const rawFlow = searchParams.get("flow")
   const autoPlayFlow = (rawFlow && CONCEPT_FLOW_SLUGS[rawFlow]) ?? null
   // `?autoplay` plays ?flow= on load rather than waiting for the Ask button. Opt-in and
@@ -192,7 +192,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <ChatStreamProvider>
     {/* autoPlayFlow reaches the non-embed modes too, so ?autoplay composes with
         concept / tib / woodforest, not just the embed */}
-    <AskNanciProvider isConceptVersion={isConceptVersion} autoPlayFlow={autoPlayFlow} autoPlay={autoPlay}>
+    <AskNanciProvider isConceptVersion={isConceptVersion} autoPlayFlow={autoPlayFlow} autoPlay={autoPlay} forceOnboarding={forceOnboarding}>
       <AppFrame
         theme={theme}
         topBar={

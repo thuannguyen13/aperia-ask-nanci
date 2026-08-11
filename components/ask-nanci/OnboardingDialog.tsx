@@ -51,7 +51,7 @@ function MarqueeRow({ logos, direction }: { logos: typeof ROW1; direction: "left
 type OnboardingStep = 1 | 2  // 1 = welcome, 2 = link accounts
 
 export function OnboardingDialog() {
-  const { onboardingOpen, setOnboardingOpen, setSources } = useAskNanci()
+  const { onboardingOpen, setOnboardingOpen, setSources, forceOnboarding } = useAskNanci()
   const [step, setStep] = useState<OnboardingStep>(1)
   const [wizardOpen, setWizardOpen] = useState(false)
 
@@ -63,7 +63,10 @@ export function OnboardingDialog() {
     setSources([FOUNDATION_SOURCE, ...readSources()])
     setWizardOpen(false)
     setOnboardingOpen(false)
-    localStorage.setItem(ONBOARDING_KEY, "1")
+    // ?mode=onboarding leaves no trace: recording the run here would mark the browser
+    // onboarded for every other mode too, and the point of that URL is that it can be
+    // demoed again on the next load without clearing localStorage first.
+    if (!forceOnboarding) localStorage.setItem(ONBOARDING_KEY, "1")
   }
 
   return (
