@@ -57,16 +57,15 @@ npm run lint        # no new errors
 
 ---
 
-## Mode: detect (`?mode=detect`)
+## Mode: concept-embed (`?mode=concept-embed&flow=<slug>`)
 
-- [ ] Embed frame renders (Aperia logo, blue gradient)
-- [ ] Auto-play starts within ~1s: welcome message streams in
-- [ ] DQ flow plays: Detection Queue panel opens, barometer + coastal risk populate
-- [ ] Loop: after DQ flow completes, waits ~3s then loops back to welcome
-- [ ] Chat messages persist across loop cycles (no blank reset)
-- [ ] Input enabled: type a question, ArrowUp button active, pressing Enter or clicking sends it
+- [ ] Embed frame renders (theme logo, blue gradient)
+- [ ] Flow sits idle on load; the top-bar **Ask** button starts it
+- [ ] `&autoplay` plays it on load instead, and hides the Ask button
+- [ ] Panels open as the script reaches them, and close with animation at the end
+- [ ] A finished flow offers **Restart demo** at the bottom of the conversation
+- [ ] No chip offers to jump to a different flow (the URL pins this one)
 - [ ] Add New Source popover opens, shows source list
-- [ ] Panels close with animation before each new loop cycle
 
 ---
 

@@ -92,7 +92,6 @@ Referrers, or the `Referer` header in runtime logs).
 | `https://aperia-ask-nanci-embed.vercel.app/?mode=vw` | production site (page unconfirmed) | ok |
 | `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=2` | production site (page unconfirmed) | ok |
 | `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=11` | production site (page unconfirmed) | ok |
-| `https://aperia-ask-nanci-embed.vercel.app/?mode=detect` | ../webflow/ask-nanci-v3-storybrand_6_dark.html:1561 | **broken** — `detect` is not a case in `parseMode`, so this falls through to the default app (sidebar + KB panel), not an embed |
 | `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=5` | Merchant Money group — Error Recovery | ok |
 | `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=13` | Merchant Money group — Deposit Tracker | ok |
 | `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=14` | Merchant Money group — Fee Change Explainer | ok |
@@ -104,5 +103,3 @@ Referrers, or the `Referer` header in runtime logs).
 | `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=20` | Merchant Money group — Credit Card Offer | ok |
 | `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=21` | Merchant Money group — Business Loan Offer | ok |
 | `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=22` | Merchant Money group — Service Marketplace | ok |
-
-⚠️ 1 embedded URL(s) above do not resolve to a valid mode — see the Modes table.

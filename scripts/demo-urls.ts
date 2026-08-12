@@ -37,11 +37,11 @@ const EXPLICIT_EMBEDS: Embed[] = [
   { query: "mode=vw", where: "production site (page unconfirmed)" },
   { query: "mode=concept-embed&flow=2", where: "production site (page unconfirmed)" },
   { query: "mode=concept-embed&flow=11", where: "production site (page unconfirmed)" },
-  {
-    query: "mode=detect",
-    where: "../webflow/ask-nanci-v3-storybrand_6_dark.html:1561",
-    note: "**broken** — `detect` is not a case in `parseMode`, so this falls through to the default app (sidebar + KB panel), not an embed",
-  },
+  // `mode=detect` used to be listed here, embedded at
+  // ../webflow/ask-nanci-v3-storybrand_6_dark.html:1561 and flagged broken: it was never
+  // a case in parseMode, so it fell through to the default app instead of an embed.
+  // Removed 2026-08-12 — the reference is gone from ../webflow entirely. Do not re-add
+  // the mode; nothing points at it.
 ]
 
 // Every flow in the Merchant Money group (`section: "merchant"`) is live. Derived rather
