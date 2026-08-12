@@ -78,6 +78,18 @@ interface AskNanciCtx {
   setOnboardingOpen: (open: boolean) => void
   /** `?mode=onboarding` — replay onboarding on every load and never record that it ran. */
   forceOnboarding: boolean
+  /**
+   * True once a concept flow has played its last turn. `chatState === "idle"` cannot
+   * stand in for this: a manual (Merchant Money) flow goes idle between every step
+   * while it waits for the next pill click, so it would read as finished mid-demo.
+   */
+  flowFinished: boolean
+  /**
+   * Would clicking this suggestion abandon the demo the URL pinned? Only ever true
+   * in a `?flow=` embed, where the flow is the whole point of the page — elsewhere a
+   * chip that starts another conversation is exactly what the user wants.
+   */
+  leavesCurrentFlow: (prompt: string) => boolean
   isConceptVersion: boolean
   submitFormPanel: () => void
   submitOfferApplication: (panelId: PanelId, message: string, sheetAction: SheetActionData) => void
@@ -156,6 +168,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [onboardingOpen, setOnboardingOpen] = useState(false)
+  const [flowFinished, setFlowFinished] = useState(false)
   const [closingPanels, setClosingPanels] = useState<string[]>([])
   const { stack: dynamicPanels, stackRef: dynamicPanelsRef, openDynamic, closeDynamic: closeDynamicPanel, resetDynamic } = usePanelStack()
   const [declineReportFiltered, setDeclineReportFiltered] = useState(false)
@@ -491,6 +504,8 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       // Park at the next user turn (wait for the pill click) or end the flow.
       activeFlowRef.current = script[i]?.role === "user" ? { key: flow.key, script, cursor: i } : null
       setChatState("idle")
+      // Parked mid-flow is not finished — only a script with nothing left to play is.
+      if (!activeFlowRef.current) setFlowFinished(true)
     } finally {
       isAdvancingRef.current = false
     }
@@ -514,7 +529,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
         await sleep(1800)
         if (scriptStopRef.current) break
         await playAssistantTurn(turn, turn.suggestions)
-        if (i === script.length - 1) setChatState("idle")
+        if (i === script.length - 1) { setChatState("idle"); setFlowFinished(true) }
       }
     }
   }, [playAssistantTurn, applyTurnEffects])
@@ -523,6 +538,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     const script = CONCEPT_SCRIPTED_CONVERSATIONS[prompt]
     if (!script) return
     scriptStopRef.current = false
+    setFlowFinished(false)
     setThinking((prev) => ({ ...prev, label: "Thinking…" }))
     setView("chat")
     if (!CONCEPT_NO_RESET_PROMPTS.has(prompt)) {
@@ -631,6 +647,26 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     playConceptScripted(CONCEPT_FLOW6_KEY)
   }, [playConceptScripted])
 
+  /**
+   * Mirrors handlePrompt's routing below, in the same order, and answers the one
+   * question a `?flow=` embed cares about: does this chip leave the pinned demo?
+   *
+   * The pending-user-turn check has to come first for the same reason it does there —
+   * a manual flow surfaces its next user turn as a pill, and that text can itself be a
+   * conversation key. Testing the key first would hide the pill that advances the demo.
+   */
+  const leavesCurrentFlow = useCallback((prompt: string) => {
+    if (!autoPlayFlow) return false
+    const flow = activeFlowRef.current
+    if (flow && flow.script[flow.cursor]?.role === "user" && flow.script[flow.cursor].content === prompt) return false
+    // A follow-up continues the thread it is already in — it is a conversation key
+    // like any other, but CONCEPT_NO_RESET_PROMPTS is exactly the set that does not
+    // start over. Without this, every follow-up chip in flows 2, 12, 15 and friends
+    // would be filtered away and those demos would dead-end after one turn.
+    if (CONCEPT_NO_RESET_PROMPTS.has(prompt)) return false
+    return prompt !== autoPlayFlow && !!CONCEPT_SCRIPTED_CONVERSATIONS[prompt]
+  }, [autoPlayFlow])
+
   const handlePrompt = useCallback((prompt: string) => {
     if (isConceptVersion) {
       // Declining an offer gets a real reply when the active flow has one authored —
@@ -661,6 +697,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     stopRef.current = true
     scriptStopRef.current = true
     activeFlowRef.current = null
+    setFlowFinished(false)
     setView("welcome")
     setMessages([])
     setChatState("idle")
@@ -679,6 +716,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     scriptStopRef.current = true
     stopRef.current = true
     activeFlowRef.current = null
+    setFlowFinished(false)
     setMessages([])
     setChatState("idle")
     setPendingBot(null)
@@ -751,7 +789,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       tokenLimitReached, setTokenLimitReached,
       settingsOpen, openSettings, setSettingsOpen,
       mobileSidebarOpen, setMobileSidebarOpen,
-      onboardingOpen, setOnboardingOpen, forceOnboarding,
+      onboardingOpen, setOnboardingOpen, forceOnboarding, flowFinished, leavesCurrentFlow,
       isConceptVersion,
       submitFormPanel, submitOfferApplication, submitStepUpPanel,
       triggerProactiveFlow, proactiveNotificationActive, activateProactiveNotification,

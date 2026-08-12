@@ -16,7 +16,7 @@ import { getPlanUsage } from "@/lib/ask-nanci/plan-usage"
 const PROACTIVE_CONTENT = CONCEPT_SCRIPTED_CONVERSATIONS[CONCEPT_FLOW6_KEY][0].content
 
 export function ChatInput() {
-  const { handlePrompt, startNewChat, chatState, stopAnimation, sources, draft, setDraft, usage, setTokenLimitReached, setOnboardingOpen, isEmbed, embedVariant, isConceptVersion, triggerProactiveFlow, proactiveNotificationActive } = useAskNanci()
+  const { handlePrompt, startNewChat, chatState, stopAnimation, sources, draft, setDraft, usage, setTokenLimitReached, setOnboardingOpen, isEmbed, embedVariant, isConceptVersion, triggerProactiveFlow, proactiveNotificationActive, replayFlow } = useAskNanci()
   const isDetect = embedVariant === "concept-embed"
   const activeSources = sources.filter((s) => s.active)
 
@@ -109,6 +109,12 @@ export function ChatInput() {
           <div className="flex items-center gap-2">
             <ChatActiveSources sources={activeSources} />
 
+            {/* Both of these leave the pinned demo — Common Questions replays another
+                persona's scripted conversation over it, Recent Chats resumes a stored
+                session. A `?flow=` embed exists to show one flow, so neither is
+                offered there. Same reasoning as the top-bar Ask button under
+                ?autoplay: an affordance with nothing useful behind it. */}
+            {!replayFlow && (
             <TooltipProvider delayDuration={400}>
               <div className="flex overflow-hidden rounded-lg">
                 <Tooltip>
@@ -129,6 +135,7 @@ export function ChatInput() {
                 </Tooltip>
               </div>
             </TooltipProvider>
+            )}
 
             {isConceptVersion && proactiveNotificationActive && (
               <Popover open={notifOpen} onOpenChange={handleNotifOpen}>

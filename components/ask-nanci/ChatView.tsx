@@ -1,12 +1,33 @@
 "use client"
 
-import { ArrowDown } from "lucide-react"
+import { ArrowDown, RotateCcw } from "lucide-react"
+import { Button } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { usePendingBot } from "@/contexts/ChatStreamContext"
 import { useChatScroll } from "@/hooks/use-chat-scroll"
 import { PanelHeader } from "./shared"
 import { UserMessage, BotMessage } from "./ChatMessage"
 import { ThinkingIndicator } from "./ThinkingIndicator"
+
+// End of a `?flow=` demo: offer to play it again from the top. `replayFlow` is only
+// non-null when a flow was routed by URL, so this never appears in a normal chat —
+// and `flowFinished` (not `chatState`) is what keeps it off screen mid-demo.
+//
+// It sits below the last message rather than in the top bar because under `?autoplay`
+// the top-bar Ask button is hidden, which left a finished demo with no way to restart
+// short of reloading the page.
+function RestartDemoButton() {
+  const { replayFlow, flowFinished } = useAskNanci()
+  if (!replayFlow || !flowFinished) return null
+  return (
+    <div className="mt-6 flex justify-center">
+      <Button variant="secondary" size="sm" onClick={replayFlow} className="gap-1.5">
+        <RotateCcw className="size-3.5" />
+        Restart demo
+      </Button>
+    </div>
+  )
+}
 
 // Dormant: the scroll-to-bottom affordance is fully built below but shipped off.
 // Flip to `true` to activate it (see docs/plans / useChatScroll JSDoc).
@@ -59,6 +80,8 @@ export function ChatView() {
             />
           </div>
         )}
+
+        <RestartDemoButton />
 
         <div ref={spacerRef} className="shrink-0" />
       </div>
