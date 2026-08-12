@@ -410,7 +410,7 @@ export const MOCK_RESPONSES: MockResponse[] = [
   {
     id: "business-address",
     keywords: ["business address", "change my address", "update my address"],
-    content: "Done! Your business address has been updated to 456 Market St, San Francisco, CA 94105. The change will be reflected on your account within 1–2 business days. You'll receive a confirmation email at your primary address shortly.",
+    content: "Done! Your business address has been updated to 1100 S Congress Ave, Austin, TX 78704. The change will be reflected on your account within 1–2 business days. You'll receive a confirmation email at your primary address shortly.",
     suggestions: ["Update my primary email", "Update my phone number", "Change my statement descriptor"],
   },
 ]

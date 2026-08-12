@@ -1,4 +1,4 @@
-// Scripted conversation flows for the concept demo (?mode=concept and ?mode=detect).
+// Scripted conversation flows for the concept demo (?mode=concept and ?mode=concept-embed).
 // All flow-key constants and the conversations record live here.
 
 import type { ConceptScriptedTurn, SheetActionData } from "../types";
@@ -30,7 +30,7 @@ const CONCEPT_FLOW15_PROMPT = "how'd this week go vs last week?";
 export const CONCEPT_FLOW15_FOLLOWUP = "nice. was there a slow day?";
 const CONCEPT_FLOW16_PROMPT = "I changed banks, send my deposits to the new account";
 const CONCEPT_FLOW17_PROMPT = "none of this is right, my payout is short by like 600 bucks and I don't get why";
-const CONCEPT_MENU_MARGIN_PROMPT = "how's the Italian combo doing this month?";
+const CONCEPT_INVENTORY_PROMPT = "What am I about to run out of?";
 const CONCEPT_ADDRESS_PROMPT = "Change my business address";
 const CONCEPT_CREDIT_CARD_PROMPT = "Who am I paying the most on food cost?";
 const CONCEPT_BUSINESS_LOAN_PROMPT = "Do I have enough money for payroll?";
@@ -286,11 +286,11 @@ export const FLOW_DEFS: FlowDef[] = [
   {
     num: 18,
     section: "merchant",
-    title: "Menu Margin Truth",
+    title: "Running Low",
     badge: "Inventory",
-    key: CONCEPT_MENU_MARGIN_PROMPT,
+    key: CONCEPT_INVENTORY_PROMPT,
     slug: "18",
-    description: "Best-seller by volume isn't the best earner — Nanci joins sales and ingredient cost to rank the menu by profit, insight only she can surface.",
+    description: "Raw count is the wrong sort — Nanci divides stock by how fast it sells, so 8 lb of mozzarella outranks 40 ciabatta rolls.",
   },
   {
     num: 5,
@@ -400,7 +400,7 @@ const FLOW5_SHEET: SheetActionData = {
 const FLOW19_SHEET: SheetActionData = {
   field: "Business Address",
   fromValue: "142 Oak Street, Austin, TX 78701",
-  toValue: "456 Market St, San Francisco, CA 94105",
+  toValue: "1100 S Congress Ave, Austin, TX 78704",
   timestamp: "Today, 2:14 PM",
   status: "submitted",
   reference: "AD-3307",
@@ -831,18 +831,20 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       content: "Sure. Your current business address on file is:\n\n142 Oak Street, Austin, TX 78701\n\nWhat would you like to change it to? Please include street, city, state, and ZIP.",
       map: { address: "142 Oak Street, Austin, TX 78701", lat: 30.2645, lng: -97.743 },
     },
-    { role: "user", content: "456 Market St, San Francisco, CA 94105" },
+    { role: "user", content: "1100 S Congress Ave, Austin, TX 78704" },
     {
       role: "assistant",
       content:
-        "Got it — just to confirm, you'd like to update your business address from 142 Oak Street, Austin, TX 78701 to:\n\n456 Market St, San Francisco, CA 94105\n\nIs that correct?\n\n{{MAP}}",
-      map: { address: "456 Market St, San Francisco, CA 94105", lat: 37.7915, lng: -122.3972 },
+        "Got it — just to confirm, you'd like to update your business address from 142 Oak Street, Austin, TX 78701 to:\n\n1100 S Congress Ave, Austin, TX 78704\n\nIs that correct?\n\n{{MAP}}",
+      // South Congress, ~1.5 miles south of the current downtown address — a real
+      // relocation the map can show, without leaving the city the merchant trades in.
+      map: { address: "1100 S Congress Ave, Austin, TX 78704", lat: 30.2515, lng: -97.7494 },
     },
     { role: "user", content: "Yes, that's correct." },
     {
       role: "assistant",
       content:
-        "Your change request has been submitted for review — I can't update account details like your business address directly, so this goes to the team that can. Once it's approved, the change to 456 Market St, San Francisco, CA 94105 will be reflected on your account, typically within 1–2 business days. You'll get a confirmation email at your primary address.",
+        "Your change request has been submitted for review — I can't update account details like your business address directly, so this goes to the team that can. Once it's approved, the change to 1100 S Congress Ave, Austin, TX 78704 will be reflected on your account, typically within 1–2 business days. You'll get a confirmation email at your primary address.",
       sheetAction: FLOW19_SHEET,
       suggestions: CONCEPT_FLOW19_FOLLOWUPS,
     },
@@ -876,31 +878,22 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   ],
 
   // ── Menu Margin Truth (Merchant, Read-Only) ───────────────────────────────
-  [CONCEPT_MENU_MARGIN_PROMPT]: [
-    { role: "user", content: CONCEPT_MENU_MARGIN_PROMPT },
-    { role: "assistant", content: "It is your volume leader. 840 sold, $7,140 in sales. It is the sandwich the shop runs on.", panel: "menu-performance" },
-    { role: "user", content: "figured. that's our star" },
+  [CONCEPT_INVENTORY_PROMPT]: [
+    { role: "user", content: CONCEPT_INVENTORY_PROMPT },
     {
       role: "assistant",
       content:
-        "By volume, yes. By margin per sandwich, it ranks fourth. Its ingredient cost runs high, mostly the imported meats, so each one nets about $2.90. The chicken pesto nets $4.60 on far fewer sales.",
-      panel: "menu-performance",
-      view: "margin",
+        "Six items are running low, based on how fast they are selling, not just what is left. Fresh mozzarella is the tightest. You have 8 pounds and you are moving about 5 a day, so you run out Wednesday.",
+      panel: "running-low",
     },
-    { role: "user", content: "wait, the pesto makes more per sandwich than the combo?" },
+    { role: "user", content: "wait, I have way fewer ciabatta rolls than mozzarella though" },
     {
       role: "assistant",
       content:
-        "Yes. Here is every sandwich ranked two ways, volume on the left, profit-per-sandwich on the right. The two lists do not match. Your highest-margin items sit in the middle of your sales, and your top seller sits near the bottom on margin.",
-      panel: "menu-performance",
-      view: "compare",
-    },
-    { role: "user", content: "why's the combo's cost so high" },
-    {
-      role: "assistant",
-      content:
-        "Three imported meats carry it. Prosciutto and mortadella together are 60% of the ingredient cost. The provolone and bread are minor. Nothing here is wrong, it is just an expensive sandwich to make.",
-      panel: "menu-cost-detail",
+        "You do, 40 rolls against 8 pounds of mozzarella. But the rolls move slower relative to stock, about 2.9 days of cover. The mozzarella has 1.6. Days of cover is what matters here, not the raw count.",
+      // Opens beside Running Low rather than replacing it — the pushback is about two
+      // items, so the list has to stay on screen while the tightest one is singled out.
+      panel: "runs-out-first",
       suggestions: CONCEPT_FLOW18_FOLLOWUPS,
     },
   ],

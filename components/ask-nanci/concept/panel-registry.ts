@@ -18,6 +18,8 @@ import { SalesSnapshotPanel } from "./SalesSnapshotPanel"
 import { SalesDrilldownPanel } from "./SalesDrilldownPanel"
 import { AccountChangePanel } from "./AccountChangePanel"
 import { EscalationPanel } from "./EscalationPanel"
+import { RunningLowPanel } from "./RunningLowPanel"
+import { RunsOutFirstPanel } from "./RunsOutFirstPanel"
 import { MenuPerformancePanel } from "./MenuPerformancePanel"
 import { CostDetailPanel } from "./CostDetailPanel"
 import { MerchantVolumePanel } from "./MerchantVolumePanel"
@@ -60,6 +62,8 @@ export const PANELS = {
   "sales-drilldown":     { component: SalesDrilldownPanel },
   "account-change":      { component: AccountChangePanel },
   "escalation":          { component: EscalationPanel },
+  "running-low":         { component: RunningLowPanel },
+  "runs-out-first":      { component: RunsOutFirstPanel },
   "menu-performance":    { component: MenuPerformancePanel },
   "menu-cost-detail":    { component: CostDetailPanel },
   "merchant-volume":     { component: MerchantVolumePanel },
