@@ -5,10 +5,37 @@
 // helpers, and the muted stat strip used on both the list rows and the form summary.
 
 import { useState } from "react"
+import { ShieldCheck } from "lucide-react"
 import {
-  Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
+import { VerificationCode } from "@/components/ask-nanci/shared"
+
+// Step-up gate both offer panels open on, before any terms are shown. The offer is
+// derived from the merchant's own financial data, so the panel establishes who is
+// asking before it reveals what they qualify for — the same reasoning as the
+// deposit-account change, and the same passcode control.
+//
+// There is no Back button on purpose: this is the first view, so back is nowhere.
+// Closing the panel is the way out, and PanelHeader already carries that.
+export function OfferVerifyStep({ body, email, onConfirm }: { body: string; email: string; onConfirm: () => void }) {
+  return (
+    <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-4 py-3">
+      <div className="flex items-start gap-2.5 rounded-xl border border-blue-200 bg-blue-50/60 p-3 dark:border-blue-900 dark:bg-blue-950/20">
+        <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
+        <p className="text-sm leading-relaxed text-foreground">{body}</p>
+      </div>
+
+      <div>
+        <p className="mb-2 text-base font-bold text-foreground">Verification</p>
+        <VerificationCode email={email} />
+      </div>
+
+      <Button className="w-full" onClick={onConfirm}>Confirm</Button>
+    </div>
+  )
+}
 
 // Brand logo with an icon fallback: shows the offer's `logo` image if it loads,
 // otherwise the provided monogram. Images are optional — the panels look complete

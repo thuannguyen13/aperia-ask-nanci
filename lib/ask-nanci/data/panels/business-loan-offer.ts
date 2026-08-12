@@ -77,6 +77,12 @@ export const LOAN_PREFILL_NOTE = {
 
 export const LOAN_CONSENT = "I authorize the participating lending partner to review my business information for pre-qualification and financing eligibility.";
 
+// Step-up gate shown before the offer itself — see CARD_VERIFY for the reasoning.
+export const LOAN_VERIFY = {
+  title: "Verify it's you",
+  body: "Your pre-qualified amount is based on your processing history. Confirm it's you and I'll show the terms.",
+};
+
 export const LOAN_REQUEST_REF = "AD-3307";
 export const LOAN_SENT_TO = "Mastercard Loan Team";
 export const LOAN_SUBMITTED_TITLE = "Loan Application Submitted";

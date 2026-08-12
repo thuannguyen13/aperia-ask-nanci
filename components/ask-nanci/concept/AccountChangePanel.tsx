@@ -1,10 +1,10 @@
 "use client"
 
 import { Landmark, ArrowRight, CheckCircle2, Lock } from "lucide-react"
-import { Button, Input, InputOTP, InputOTPGroup, InputOTPSlot, Label, Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "aperia-ds5"
+import { Button, Input, Label, Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "aperia-ds5"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { CURRENT_ACCOUNT, NEW_ACCOUNT, CONFIRMATION_EMAIL } from "@/lib/ask-nanci/data/panels/account-change"
-import { PanelShell, PanelHeader, Callout } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, Callout, VerificationCode } from "@/components/ask-nanci/shared"
 
 function AccountRow({ last4, className }: { last4: string; className?: string }) {
   return (
@@ -89,19 +89,9 @@ function Step2({ onBack, onConfirm }: { onBack: () => void; onConfirm: () => voi
 
       <div>
         <p className="mb-2 text-base font-bold text-foreground">Verification</p>
-        <div className="flex flex-col items-center gap-2">
-          <Label className="text-xs">Verification Code</Label>
-          <InputOTP maxLength={6}>
-            <InputOTPGroup className="gap-2">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <InputOTPSlot key={i} index={i} className="rounded-lg border-l" />
-              ))}
-            </InputOTPGroup>
-          </InputOTP>
-          <p className="text-center text-xs text-muted-foreground">
-            Enter the passcode sent to {CONFIRMATION_EMAIL} to confirm.
-          </p>
-        </div>
+        {/* Left unseeded: this step confirms a money-movement change, so the code is
+            typed rather than arriving pre-filled the way the offer gate does. */}
+        <VerificationCode email={CONFIRMATION_EMAIL} />
       </div>
 
       <div className="flex gap-2">

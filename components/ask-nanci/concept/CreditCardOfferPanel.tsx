@@ -2,14 +2,14 @@
 
 import { CheckCheck } from "lucide-react"
 import { Button, Checkbox, Label } from "aperia-ds5"
-import { useAskNanci } from "@/contexts/AskNanciContext"
+import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import {
   CREDIT_CARD_OFFERS, CARD_APPLICANT, CARD_EMPLOYEE_CARD_OPTIONS, CARD_VALUE, CARD_FEES, CARD_FEES_TITLE,
   CARD_INSIGHT_LEAD, CARD_INSIGHT_BODY, CARD_INSIGHT_OFFER_PRE, CARD_INSIGHT_OFFER_BOLD, CARD_INSIGHT_OFFER_POST,
-  CARD_PREFILL_NOTE, CARD_CONSENT, CARD_REQUEST_REF, CARD_SENT_TO, CARD_SUCCESS_MESSAGE,
+  CARD_PREFILL_NOTE, CARD_CONSENT, CARD_REQUEST_REF, CARD_SENT_TO, CARD_SUCCESS_MESSAGE, CARD_VERIFY,
 } from "@/lib/ask-nanci/data/panels/credit-card-offer"
 import { PanelShell, PanelHeader, NanciInsight, Callout, formatWholeCurrency } from "@/components/ask-nanci/shared"
-import { ApplicantFields, BrandMonogram, OfferField, OfferLogo, OfferSelect, SectionLabel, StatStrip } from "./offer-shared"
+import { ApplicantFields, BrandMonogram, OfferField, OfferLogo, OfferSelect, OfferVerifyStep, SectionLabel, StatStrip } from "./offer-shared"
 
 const PANEL_ID = "credit-card-offer"
 
@@ -38,7 +38,11 @@ function ValueRow({ label, value }: { label: string; value: string }) {
 }
 
 export function CreditCardOfferPanel() {
-  const { closeDynamicPanel, submitOfferApplication } = useAskNanci()
+  const { closeDynamicPanel, submitOfferApplication, setPanelView } = useAskNanci()
+  // Opens on the step-up gate; Confirm swaps to the offer itself. Default view rather
+  // than a `view` field on the turn, so every entry point to this panel is gated, not
+  // just the one the flow happens to use.
+  const view = usePanelView(PANEL_ID, "verify")
 
   const submit = () => {
     submitOfferApplication(PANEL_ID, CARD_SUCCESS_MESSAGE, {
@@ -51,6 +55,19 @@ export function CreditCardOfferPanel() {
       timestamp: "Today, 2:14 PM",
       status: "submitted",
     })
+  }
+
+  if (view === "verify") {
+    return (
+      <PanelShell>
+        <PanelHeader title={CARD_VERIFY.title} size="lg" onClose={() => closeDynamicPanel(PANEL_ID)} />
+        <OfferVerifyStep
+          body={CARD_VERIFY.body}
+          email={CARD_APPLICANT.email}
+          onConfirm={() => setPanelView(PANEL_ID, "offer")}
+        />
+      </PanelShell>
+    )
   }
 
   return (

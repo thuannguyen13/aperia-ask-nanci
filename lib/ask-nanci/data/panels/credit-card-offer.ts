@@ -88,6 +88,14 @@ export const CARD_PREFILL_NOTE = {
 
 export const CARD_CONSENT = "I authorize a credit check. I understand this is an application, not a guaranteed approval, and that it may result in a hard inquiry on my personal and business credit.";
 
+// Step-up gate shown before the offer itself. Pre-qualified terms are derived from
+// the merchant's own financial data, so the panel confirms who is asking before it
+// shows them — the same reason the deposit-account change is gated.
+export const CARD_VERIFY = {
+  title: "Verify it's you",
+  body: "Your pre-qualified terms are based on your connected account data. Confirm it's you and I'll show the offer.",
+};
+
 export const CARD_REQUEST_REF = "AD-3308";
 export const CARD_SENT_TO = "Citi";
 export const CARD_SUCCESS_MESSAGE =

@@ -2,13 +2,13 @@
 
 import { CheckCheck } from "lucide-react"
 import { Button, Checkbox, Label } from "aperia-ds5"
-import { useAskNanci } from "@/contexts/AskNanciContext"
+import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import {
   LOAN_OFFERS, LOAN_APPLICANT, LOAN_SUGGESTED, LOAN_COST, LOAN_CONSENT, LOAN_INSIGHT_PRE, LOAN_INSIGHT_BOLD, LOAN_INSIGHT_POST, LOAN_PREFILL_NOTE,
-  LOAN_REQUEST_REF, LOAN_SENT_TO, LOAN_SUBMITTED_TITLE, LOAN_SUCCESS_MESSAGE,
+  LOAN_REQUEST_REF, LOAN_SENT_TO, LOAN_SUBMITTED_TITLE, LOAN_SUCCESS_MESSAGE, LOAN_VERIFY,
 } from "@/lib/ask-nanci/data/panels/business-loan-offer"
 import { PanelShell, PanelHeader, NanciInsight, Callout, formatCurrency } from "@/components/ask-nanci/shared"
-import { ApplicantFields, BrandMonogram, OfferField, OfferLogo, OfferSelect, SectionLabel } from "./offer-shared"
+import { ApplicantFields, BrandMonogram, OfferField, OfferLogo, OfferSelect, OfferVerifyStep, SectionLabel } from "./offer-shared"
 
 const PANEL_ID = "business-loan-offer"
 
@@ -30,7 +30,9 @@ function CostRow({ label, value }: { label: string; value: string }) {
 
 
 export function BusinessLoanOfferPanel() {
-  const { closeDynamicPanel, submitOfferApplication } = useAskNanci()
+  const { closeDynamicPanel, submitOfferApplication, setPanelView } = useAskNanci()
+  // Opens on the step-up gate; Confirm swaps to the offer itself. See CreditCardOfferPanel.
+  const view = usePanelView(PANEL_ID, "verify")
 
   const submit = () => {
     submitOfferApplication(PANEL_ID, LOAN_SUCCESS_MESSAGE, {
@@ -43,6 +45,19 @@ export function BusinessLoanOfferPanel() {
       timestamp: "Today, 2:14 PM",
       status: "submitted",
     })
+  }
+
+  if (view === "verify") {
+    return (
+      <PanelShell>
+        <PanelHeader title={LOAN_VERIFY.title} size="lg" onClose={() => closeDynamicPanel(PANEL_ID)} />
+        <OfferVerifyStep
+          body={LOAN_VERIFY.body}
+          email={LOAN_APPLICANT.email}
+          onConfirm={() => setPanelView(PANEL_ID, "offer")}
+        />
+      </PanelShell>
+    )
   }
 
   return (
