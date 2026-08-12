@@ -116,6 +116,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // own mode again. Bare `?autoplay` counts; `=0` / `=false` turn it off.
   const rawAutoPlay = searchParams.get("autoplay")
   const autoPlay = rawAutoPlay !== null && rawAutoPlay !== "0" && rawAutoPlay !== "false"
+  // `?brand=generic` strips partner branding from the offer flows. A param rather than
+  // a mode for the same reason autoplay is one: branding varies independently of which
+  // surface you are on, so every existing embed URL keeps working untouched and a sales
+  // site adds one param instead of being reissued a whole new set of links.
+  const genericBrand = searchParams.get("brand") === "generic"
   // Per-flow embed layout: some flows (e.g. 22, Service Marketplace) render the full
   // app shell (sidebar + standard welcome) instead of the compact concept-embed widget.
   const embedLayout = (rawFlow && CONCEPT_EMBED_FLOW_LAYOUTS[rawFlow]) || null
@@ -148,7 +153,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         embedVariant={embedVariant}
         isConceptVersion={fullApp ? false : isConceptVersion}
         autoPlayFlow={autoPlayFlow}
-        autoPlay={autoPlay}
+        autoPlay={autoPlay} genericBrand={genericBrand}
         initialView={fullApp ? "welcome" : undefined}
         initialMarketplaceOpen={embedLayout?.openMarketplace}
       >
@@ -192,7 +197,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <ChatStreamProvider>
     {/* autoPlayFlow reaches the non-embed modes too, so ?autoplay composes with
         concept / tib / woodforest, not just the embed */}
-    <AskNanciProvider isConceptVersion={isConceptVersion} autoPlayFlow={autoPlayFlow} autoPlay={autoPlay} forceOnboarding={forceOnboarding}>
+    <AskNanciProvider isConceptVersion={isConceptVersion} autoPlayFlow={autoPlayFlow} autoPlay={autoPlay} genericBrand={genericBrand} forceOnboarding={forceOnboarding}>
       <AppFrame
         theme={theme}
         topBar={

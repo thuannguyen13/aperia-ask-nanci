@@ -4,16 +4,16 @@ import { CheckCheck } from "lucide-react"
 import { Button, Checkbox, Label } from "aperia-ds5"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import {
-  LOAN_OFFERS, LOAN_APPLICANT, LOAN_SUGGESTED, LOAN_COST, LOAN_CONSENT, LOAN_INSIGHT_PRE, LOAN_INSIGHT_BOLD, LOAN_INSIGHT_POST, LOAN_PREFILL_NOTE,
-  LOAN_REQUEST_REF, LOAN_SENT_TO, LOAN_SUBMITTED_TITLE, LOAN_SUCCESS_MESSAGE, LOAN_VERIFY,
+  getLoanBrand, LOAN_APPLICANT, LOAN_SUGGESTED, LOAN_COST, LOAN_CONSENT, LOAN_INSIGHT_PRE, LOAN_INSIGHT_BOLD, LOAN_INSIGHT_POST, LOAN_PREFILL_NOTE,
+  LOAN_REQUEST_REF, LOAN_SUBMITTED_TITLE, LOAN_SUCCESS_MESSAGE, LOAN_VERIFY,
 } from "@/lib/ask-nanci/data/panels/business-loan-offer"
 import { PanelShell, PanelHeader, NanciInsight, Callout, formatCurrency } from "@/components/ask-nanci/shared"
 import { ApplicantFields, BrandMonogram, OfferField, OfferLogo, OfferSelect, OfferVerifyStep, SectionLabel } from "./offer-shared"
 
 const PANEL_ID = "business-loan-offer"
 
-// ponytail: one offer, so no list step and no selection state — the panel opens on the form.
-const offer = LOAN_OFFERS[0]
+// ponytail: one offer, so no list step and no selection state. The amounts and terms
+// are fixed; only the lender identity varies, and that comes from getLoanBrand.
 
 // Derived from the payment, so the schedule, charge and total can never disagree.
 const totalRepaid = LOAN_COST.payments * LOAN_COST.perPayment
@@ -30,7 +30,8 @@ function CostRow({ label, value }: { label: string; value: string }) {
 
 
 export function BusinessLoanOfferPanel() {
-  const { closeDynamicPanel, submitOfferApplication, setPanelView } = useAskNanci()
+  const { closeDynamicPanel, submitOfferApplication, setPanelView, genericBrand } = useAskNanci()
+  const brand = getLoanBrand(genericBrand)
   // Opens on the step-up gate; Confirm swaps to the offer itself. See CreditCardOfferPanel.
   const view = usePanelView(PANEL_ID, "verify")
 
@@ -39,8 +40,8 @@ export function BusinessLoanOfferPanel() {
       field: "Loan application",
       requestLabel: "Loan application",
       submittedTitle: LOAN_SUBMITTED_TITLE,
-      product: offer.product,
-      sentTo: LOAN_SENT_TO,
+      product: brand.product,
+      sentTo: brand.sentTo,
       reference: LOAN_REQUEST_REF,
       timestamp: "Today, 2:14 PM",
       status: "submitted",
@@ -68,14 +69,15 @@ export function BusinessLoanOfferPanel() {
         <NanciInsight>{LOAN_INSIGHT_PRE}<strong className="font-semibold">{LOAN_INSIGHT_BOLD}</strong>{LOAN_INSIGHT_POST}</NanciInsight>
 
         {/* The offer is why the panel opened: what it is (tinted) over what Nanci sized
-            for this merchant (plain). Mastercard runs the rails but doesn't underwrite,
-            so it sits in a "powered by" line rather than the title slot. */}
+            for this merchant (plain). The network runs the rails but doesn't underwrite,
+            so it sits in the product note rather than the title slot — which is also why
+            the generic variant can drop the name without rewriting the sentence. */}
         <div className="overflow-hidden rounded-xl border border-blue-500 dark:border-blue-700">
           <div className="flex items-start gap-3 bg-blue-50 p-4 dark:bg-blue-950/20">
-            <OfferLogo src={offer.logo} alt={offer.product} className="size-14" fallback={<BrandMonogram label={offer.mark} color={offer.color} />} />
+            <OfferLogo src={brand.logo} alt={brand.product} className="size-14" fallback={<BrandMonogram label={brand.mark} color={brand.color} />} />
             <div className="min-w-0 space-y-1">
-              <p className="text-base font-semibold text-foreground">{offer.product}</p>
-              <p className="text-sm text-muted-foreground">{offer.note}</p>
+              <p className="text-base font-semibold text-foreground">{brand.product}</p>
+              <p className="text-sm text-muted-foreground">{brand.note}</p>
             </div>
           </div>
 
@@ -109,7 +111,7 @@ export function BusinessLoanOfferPanel() {
             <OfferSelect label="Purpose" value={LOAN_APPLICANT.purpose} options={["Payroll", "Inventory", "Equipment", "Other"]} placeholder="Select purpose" />
             <OfferField label="Avg. Monthly Revenue" value={LOAN_APPLICANT.avgMonthlyRevenue} readOnly />
             <div className="sm:col-span-2">
-              <OfferSelect label="Funding Account" value={LOAN_APPLICANT.fundingAccount} options={[LOAN_APPLICANT.fundingAccount, "Business checking ···· 1190"]} />
+              <OfferSelect label="Funding Account" value={brand.fundingAccount} options={[brand.fundingAccount, "Business checking ···· 1190"]} />
             </div>
           </div>
         </div>

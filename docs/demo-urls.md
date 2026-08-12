@@ -33,6 +33,13 @@ Add `&autoplay` to play it on load instead. The param is opt-in, so every URL be
 behaves exactly as it does today until the param is added, and it is mode-agnostic:
 `?mode=tib&flow=2&autoplay` works the same way. `&autoplay=0` explicitly turns it off.
 
+Add `&brand=generic` to drop partner branding from the two financing flows (20 and
+21): the product is renamed, the logo, monogram and colour go neutral, and the audit
+record reads "the issuer" / "the lending partner". Rates, amounts and terms are
+identical either way — the brand changes, the offer does not. Opt-in and mode-agnostic
+like `autoplay`, so a partner-facing site and a sales site can share one set of URLs
+with one param between them. Flows other than 20 and 21 ignore it.
+
 | URL | Card | Flow | Layout |
 |---|---|---|---|
 | `http://localhost:3000/?mode=concept-embed&flow=1` | 1 | Simple Update | compact widget |
@@ -46,7 +53,7 @@ behaves exactly as it does today until the param is added, and it is mode-agnost
 | `http://localhost:3000/?mode=concept-embed&flow=15` **live** | 15 | Sales Snapshot | compact widget |
 | `http://localhost:3000/?mode=concept-embed&flow=16` **live** | 16 | Account Change | compact widget |
 | `http://localhost:3000/?mode=concept-embed&flow=17` **live** | 17 | Escalation | compact widget |
-| `http://localhost:3000/?mode=concept-embed&flow=18` **live** | 18 | Menu Margin Truth | compact widget |
+| `http://localhost:3000/?mode=concept-embed&flow=18` **live** | 18 | Running Low | compact widget |
 | `http://localhost:3000/?mode=concept-embed&flow=19` **live** | 19 | Address Change | compact widget |
 | `http://localhost:3000/?mode=concept-embed&flow=20` **live** | 20 | Credit Card Offer | compact widget |
 | `http://localhost:3000/?mode=concept-embed&flow=21` **live** | 21 | Business Loan Offer | compact widget |
@@ -98,7 +105,7 @@ Referrers, or the `Referer` header in runtime logs).
 | `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=15` | Merchant Money group — Sales Snapshot | ok |
 | `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=16` | Merchant Money group — Account Change | ok |
 | `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=17` | Merchant Money group — Escalation | ok |
-| `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=18` | Merchant Money group — Menu Margin Truth | ok |
+| `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=18` | Merchant Money group — Running Low | ok |
 | `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=19` | Merchant Money group — Address Change | ok |
 | `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=20` | Merchant Money group — Credit Card Offer | ok |
 | `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=21` | Merchant Money group — Business Loan Offer | ok |

@@ -112,6 +112,13 @@ p("Add `&autoplay` to play it on load instead. The param is opt-in, so every URL
 p("behaves exactly as it does today until the param is added, and it is mode-agnostic:")
 p("`?mode=tib&flow=2&autoplay` works the same way. `&autoplay=0` explicitly turns it off.")
 p()
+p("Add `&brand=generic` to drop partner branding from the two financing flows (20 and")
+p("21): the product is renamed, the logo, monogram and colour go neutral, and the audit")
+p("record reads \"the issuer\" / \"the lending partner\". Rates, amounts and terms are")
+p("identical either way — the brand changes, the offer does not. Opt-in and mode-agnostic")
+p("like `autoplay`, so a partner-facing site and a sales site can share one set of URLs")
+p("with one param between them. Flows other than 20 and 21 ignore it.")
+p()
 p("| URL | Card | Flow | Layout |")
 p("|---|---|---|---|")
 for (const { slug, flow, alt } of entries) {

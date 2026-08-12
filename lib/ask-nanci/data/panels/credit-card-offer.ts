@@ -3,31 +3,59 @@
 
 interface CardOffer {
   id: string;
-  name: string;
   bestFor: string;
   annualFee: string;
   rewardsRate: string;
   introOffer: string;
   purchaseApr: string;
-  logo: string; // /credit-card-offer/<file>.png — optional at runtime (monogram fallback if missing)
-  mark: string; // brand monogram label shown until the logo image loads
-  color: string; // brand color behind the monogram
 }
+
+/**
+ * Everything that names the issuer, in one object per variant. `?brand=generic`
+ * swaps the whole object, so an unbranded demo cannot half-rebrand — the logo,
+ * the monogram, the colour and the "sent to" line move together or not at all.
+ *
+ * The terms below are unchanged either way: rates and fees are the product, not
+ * the brand, and a demo that quietly altered them would be lying about the offer.
+ */
+interface CardBrand {
+  name: string;
+  logo: string; // optional at runtime — OfferLogo falls back to the monogram
+  mark: string; // monogram label shown until the logo image loads
+  color: string; // colour behind the monogram
+  sentTo: string; // who the application goes to, on the audit record
+}
+
+const CARD_BRANDED: CardBrand = {
+  name: "Citi Double Cash® Card",
+  logo: "/credit-card-offer/citi-double-cash.png",
+  mark: "CITI",
+  color: "#056DAE",
+  sentTo: "Citi",
+};
+
+// Named for what it is rather than who issues it, so nothing reads as a partner
+// the audience does not have. Slate, because a brand colour would invent one.
+const CARD_GENERIC: CardBrand = {
+  name: "Business Rewards Card",
+  logo: "/credit-card-offer/generic-credit-card.png",
+  mark: "CARD",
+  color: "#64748B",
+  sentTo: "the issuer",
+};
+
+export const getCardBrand = (generic: boolean): CardBrand => (generic ? CARD_GENERIC : CARD_BRANDED);
 
 // Single offer — the demo targets one card, not a ranked list. Terms are the real
 // published Citi Double Cash terms (citi.com, July 2026).
 export const CREDIT_CARD_OFFERS: CardOffer[] = [
   {
     id: "citi-double-cash",
-    name: "Citi Double Cash® Card",
     bestFor: "Flat 2% back on every purchase — 1% when you buy, 1% as you pay. No category caps or enrollment.",
     annualFee: "$0",
     rewardsRate: "2%",
     introOffer: "$200",
     purchaseApr: "18.24%–26.99%",
-    logo: "/credit-card-offer/citi-double-cash.png",
-    mark: "CITI",
-    color: "#056DAE",
   },
 ];
 
@@ -97,6 +125,5 @@ export const CARD_VERIFY = {
 };
 
 export const CARD_REQUEST_REF = "AD-3308";
-export const CARD_SENT_TO = "Citi";
 export const CARD_SUCCESS_MESSAGE =
   "Your credit card application has been submitted for review. Once it's approved, you'll get a confirmation email and your new card will arrive in the mail within 7–10 business days.";

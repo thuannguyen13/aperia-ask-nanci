@@ -4,16 +4,17 @@ import { CheckCheck } from "lucide-react"
 import { Button, Checkbox, Label } from "aperia-ds5"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import {
-  CREDIT_CARD_OFFERS, CARD_APPLICANT, CARD_EMPLOYEE_CARD_OPTIONS, CARD_VALUE, CARD_FEES, CARD_FEES_TITLE,
+  CREDIT_CARD_OFFERS, getCardBrand, CARD_APPLICANT, CARD_EMPLOYEE_CARD_OPTIONS, CARD_VALUE, CARD_FEES, CARD_FEES_TITLE,
   CARD_INSIGHT_LEAD, CARD_INSIGHT_BODY, CARD_INSIGHT_OFFER_PRE, CARD_INSIGHT_OFFER_BOLD, CARD_INSIGHT_OFFER_POST,
-  CARD_PREFILL_NOTE, CARD_CONSENT, CARD_REQUEST_REF, CARD_SENT_TO, CARD_SUCCESS_MESSAGE, CARD_VERIFY,
+  CARD_PREFILL_NOTE, CARD_CONSENT, CARD_REQUEST_REF, CARD_SUCCESS_MESSAGE, CARD_VERIFY,
 } from "@/lib/ask-nanci/data/panels/credit-card-offer"
 import { PanelShell, PanelHeader, NanciInsight, Callout, formatWholeCurrency } from "@/components/ask-nanci/shared"
 import { ApplicantFields, BrandMonogram, OfferField, OfferLogo, OfferSelect, OfferVerifyStep, SectionLabel, StatStrip } from "./offer-shared"
 
 const PANEL_ID = "credit-card-offer"
 
-// ponytail: one offer, so no list step and no selection state — the panel opens on the form.
+// ponytail: one offer, so no list step and no selection state. The terms are fixed;
+// only the issuer identity varies, and that comes from getCardBrand at render.
 const offer = CREDIT_CARD_OFFERS[0]
 
 const cardStats = [
@@ -38,7 +39,8 @@ function ValueRow({ label, value }: { label: string; value: string }) {
 }
 
 export function CreditCardOfferPanel() {
-  const { closeDynamicPanel, submitOfferApplication, setPanelView } = useAskNanci()
+  const { closeDynamicPanel, submitOfferApplication, setPanelView, genericBrand } = useAskNanci()
+  const brand = getCardBrand(genericBrand)
   // Opens on the step-up gate; Confirm swaps to the offer itself. Default view rather
   // than a `view` field on the turn, so every entry point to this panel is gated, not
   // just the one the flow happens to use.
@@ -49,8 +51,8 @@ export function CreditCardOfferPanel() {
       field: "Credit card application",
       requestLabel: "Credit card application",
       submittedTitle: "Credit Card Application Submitted",
-      product: offer.name,
-      sentTo: CARD_SENT_TO,
+      product: brand.name,
+      sentTo: brand.sentTo,
       reference: CARD_REQUEST_REF,
       timestamp: "Today, 2:14 PM",
       status: "submitted",
@@ -87,9 +89,9 @@ export function CreditCardOfferPanel() {
         {/* The offer being applied for is the reason the panel opened — tinted, not a plain row. */}
         <div className="space-y-2 rounded-xl border border-blue-300 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-950/20">
           <div className="flex items-start gap-3">
-            <OfferLogo src={offer.logo} alt={offer.name} className="h-14 w-24" fallback={<BrandMonogram label={offer.mark} color={offer.color} />} />
+            <OfferLogo src={brand.logo} alt={brand.name} className="h-14 w-24" fallback={<BrandMonogram label={brand.mark} color={brand.color} />} />
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-foreground">{offer.name}</p>
+              <p className="text-sm font-semibold text-foreground">{brand.name}</p>
               <p className="text-xs text-muted-foreground">{offer.bestFor}</p>
             </div>
           </div>

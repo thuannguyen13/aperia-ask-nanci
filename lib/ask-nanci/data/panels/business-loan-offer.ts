@@ -1,27 +1,45 @@
 // Flow 21: Business Loan Offer — single pre-filled loan application.
 // ponytail: illustrative offer data only; not live lender terms.
 
-interface LoanOffer {
-  id: string;
+/**
+ * Everything that names the network, in one object per variant — see CardBrand in
+ * credit-card-offer.ts for the reasoning. Note the product `note` and the funding
+ * account both name the card the money lands on, so both belong here: rebranding one
+ * and not the other is how a demo ends up half-generic.
+ *
+ * The amounts, term and APR are identical in both variants. Those are the offer.
+ */
+interface LoanBrand {
   product: string; // what the merchant is offered, e.g. "Loan on Card"
   note: string; // what the product actually is, in the merchant's terms
-  logo: string; // /business-loan-offer/<file>.png — optional at runtime (monogram fallback if missing)
-  mark: string; // brand monogram label shown until the logo image loads
-  color: string; // brand color behind the monogram
+  logo: string; // optional at runtime — OfferLogo falls back to the monogram
+  mark: string; // monogram label shown until the logo image loads
+  color: string; // colour behind the monogram
+  fundingAccount: string; // where the funds land, on the application form
+  sentTo: string; // who the request goes to, on the audit record
 }
 
-// Single offer — the demo targets one product, not a ranked list.
-// Drop the card art at public/business-loan-offer/mastercard-installments.png (monogram fallback until then).
-export const LOAN_OFFERS: LoanOffer[] = [
-  {
-    id: "mastercard-installments",
-    product: "Loan on Card",
-    note: "Financing provided by a participating lending partner. Funds delivered to your Business Mastercard, usable the moment they land. Fixed installments, no revolving balance.",
-    logo: "/business-loan-offer/mastercard-installments.png",
-    mark: "MC",
-    color: "#EB001B",
-  },
-];
+const LOAN_BRANDED: LoanBrand = {
+  product: "Loan on Card",
+  note: "Financing provided by a participating lending partner. Funds delivered to your Business Mastercard, usable the moment they land. Fixed installments, no revolving balance.",
+  logo: "/business-loan-offer/mastercard-installments.png",
+  mark: "MC",
+  color: "#EB001B",
+  fundingAccount: "Business Mastercard ···· 4821",
+  sentTo: "Mastercard Loan Team",
+};
+
+const LOAN_GENERIC: LoanBrand = {
+  product: "Business Installment Loan",
+  note: "Financing provided by a participating lending partner. Funds delivered to your business card, usable the moment they land. Fixed installments, no revolving balance.",
+  logo: "/business-loan-offer/generic-installments.png",
+  mark: "LOAN",
+  color: "#64748B",
+  fundingAccount: "Business card ···· 4821",
+  sentTo: "the lending partner",
+};
+
+export const getLoanBrand = (generic: boolean): LoanBrand => (generic ? LOAN_GENERIC : LOAN_BRANDED);
 
 // The offer sized to THIS shortfall. The program maximums stay in `range` fine print —
 // leading with $5M would make a $4,230 need look like a rounding error.
@@ -61,7 +79,7 @@ export const LOAN_APPLICANT = {
   repaymentTerm: "12 monthly payments",
   purpose: "Payroll",
   avgMonthlyRevenue: "$32,500",
-  fundingAccount: "Business Mastercard ···· 4821",
+  // fundingAccount lives on the brand object — it names the card the money lands on.
 };
 
 // The shortfall renders bold mid-sentence (see BusinessLoanOfferPanel).
@@ -84,6 +102,5 @@ export const LOAN_VERIFY = {
 };
 
 export const LOAN_REQUEST_REF = "AD-3307";
-export const LOAN_SENT_TO = "Mastercard Loan Team";
 export const LOAN_SUBMITTED_TITLE = "Loan Application Submitted";
 export const LOAN_SUCCESS_MESSAGE = "Your loan request has been submitted for review. Once it's approved, you'll get a confirmation email at your primary address.";
