@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { formatCurrency, formatPercent, formatWholeCurrency } from "./format"
+import { formatCurrency, formatPercent, formatWholeCurrency, maskDigits } from "./format"
 
 describe("formatCurrency", () => {
   it("always shows two fraction digits and a thousands separator", () => {
@@ -43,5 +43,26 @@ describe("formatPercent", () => {
   it("honours a custom precision", () => {
     expect(formatPercent(2.666, 2)).toBe("2.67%")
     expect(formatPercent(50, 0)).toBe("50%")
+  })
+})
+
+describe("maskDigits", () => {
+  it("keeps the last four digits and the punctuation between them", () => {
+    expect(maskDigits("84-1029384")).toBe("••-•••9384")
+    expect(maskDigits("4111 1111 1111 1234")).toBe("•••• •••• •••• 1234")
+  })
+  it("works without separators", () => {
+    expect(maskDigits("841029384")).toBe("•••••9384")
+  })
+  it("leaves a value with four or fewer digits alone", () => {
+    expect(maskDigits("1234")).toBe("1234")
+    expect(maskDigits("123")).toBe("123")
+  })
+  it("takes the visible count as an argument", () => {
+    expect(maskDigits("841029384", 2)).toBe("•••••••84")
+    expect(maskDigits("841029384", 0)).toBe("•••••••••")
+  })
+  it("does not mask non-digits that look like padding", () => {
+    expect(maskDigits("Business card ···· 4821")).toBe("Business card ···· 4821")
   })
 })

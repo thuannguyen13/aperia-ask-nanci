@@ -10,7 +10,7 @@ import {
   Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
-import { VerificationCode } from "@/components/ask-nanci/shared"
+import { VerificationCode, maskDigits } from "@/components/ask-nanci/shared"
 
 // Step-up gate both offer panels open on, before any terms are shown. The offer is
 // derived from the merchant's own financial data, so the panel establishes who is
@@ -133,7 +133,7 @@ export function ApplicantFields({ applicant }: { applicant: Applicant }) {
         <SectionLabel>Business Info</SectionLabel>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <OfferField label="Business Name" value={applicant.businessName} readOnly />
-          <OfferField label="EIN (Tax ID)" value={applicant.ein} readOnly />
+          <OfferField label="EIN (Tax ID)" value={maskDigits(applicant.ein)} readOnly />
           <OfferSelect label="Industry" value={applicant.industry} options={INDUSTRIES} readOnly />
           <OfferSelect label="Business Type" value={applicant.businessType} options={BUSINESS_TYPES} readOnly />
         </div>
