@@ -524,7 +524,13 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       activeFlowRef.current = script[i]?.role === "user" ? { key: flow.key, script, cursor: i } : null
       setChatState("idle")
       // Parked mid-flow is not finished — only a script with nothing left to play is.
-      if (!activeFlowRef.current) setFlowFinished(true)
+      //
+      // Running out on a *user* turn is not the end either: that turn opened a panel and
+      // handed the demo to it, so the steps still ahead (verify, review, submit) are panel
+      // buttons rather than script turns. The offer flows are the only two scripts shaped
+      // that way, and their real ending is submitOfferApplication. Every other script
+      // closes on an assistant turn, which is what finished actually looks like.
+      if (!activeFlowRef.current && script[script.length - 1]?.role === "assistant") setFlowFinished(true)
     } finally {
       isAdvancingRef.current = false
     }
@@ -595,6 +601,9 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const submitOfferApplication = useCallback((panelId: PanelId, message: string, sheetAction: SheetActionData) => {
     closeDynamicPanel(panelId)
     appendAssistant(message, { suggestions: undefined, sheetAction })
+    // The script handed these flows to the panel and stopped; this submit is where they
+    // actually end, so it is what earns the Restart button (see runConceptStep).
+    setFlowFinished(true)
   }, [closeDynamicPanel, appendAssistant])
 
   const submitStepUpPanel = useCallback(() => {
@@ -694,7 +703,9 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       if (prompt === CONCEPT_OFFER_NO && declineReply) {
         activeFlowRef.current = null
         // No pills: declining ends the thread, and the reply already says how to come back.
+        // It is the offer flows' other ending, so it earns the Restart button too.
         replyToUserAction(prompt, declineReply)
+        setFlowFinished(true)
         return
       }
       // Fake end-of-flow follow-ups are decorative only — no conversation behind them.
