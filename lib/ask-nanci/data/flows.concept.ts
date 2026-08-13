@@ -345,7 +345,10 @@ interface ConceptEmbedLayout {
   openMarketplace?: boolean; // auto-open the Service Marketplace panel on load
 }
 export const CONCEPT_EMBED_FLOW_LAYOUTS: Record<string, ConceptEmbedLayout> = {
-  "22": { fullApp: true }, // Merchant Service Marketplace — panel opens from the sidebar banner
+  // Merchant Service Marketplace. Under ?autoplay the panel opens on load — autoplay
+  // means nobody is driving, so waiting for a click on the sidebar banner would leave
+  // the embed sitting on the welcome screen showing none of what the flow is about.
+  "22": { fullApp: true, openMarketplace: true },
 };
 
 // Trigger prompts (routing guard + recycled as end-of-flow suggestion chips), in

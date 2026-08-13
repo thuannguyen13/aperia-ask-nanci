@@ -156,7 +156,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         autoPlayFlow={autoPlayFlow}
         autoPlay={autoPlay} genericBrand={genericBrand}
         initialView={fullApp ? "welcome" : undefined}
-        initialMarketplaceOpen={embedLayout?.openMarketplace}
+        initialMarketplaceOpen={autoPlay && !!embedLayout?.openMarketplace}
       >
         <div
           data-embed={embedVariant}
