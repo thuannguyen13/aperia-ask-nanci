@@ -68,7 +68,7 @@ const HOVER_CLOSE_MS = 250
 // `hoverNav` is the Ask Nanci default: rail + hover peek + pin. Aperia Risk opts out
 // (`hoverNav={false}`) — its rail is a fixed destination menu for a different product,
 // so it keeps the plain collapse toggle.
-export function Sidebar({ menu, logos, hoverNav = true }: { menu?: SidebarNavItem[]; logos?: ThemeLogos; hoverNav?: boolean } = {}) {
+export function Sidebar({ menu, logos, hoverNav = true, initialPinned = false }: { menu?: SidebarNavItem[]; logos?: ThemeLogos; hoverNav?: boolean; initialPinned?: boolean } = {}) {
   const { startNewChat, setKbOpen, marketplaceOpen, setMarketplaceOpen, mobileSidebarOpen, setMobileSidebarOpen, currentUser, tourActive } = useAskNanci()
   const [collapsed, setCollapsed] = useState(false)
   const [wizardOpen, setWizardOpen] = useState(false)
@@ -83,7 +83,10 @@ export function Sidebar({ menu, logos, hoverNav = true }: { menu?: SidebarNavIte
   //
   // ponytail: session state, deliberately not persisted. A pin clicked while rehearsing
   // would otherwise decide how the next demo opens.
-  const [pinned, setPinned] = useState(false)
+  // `initialPinned` seeds it open — an autoplaying full-app embed has no one to hover
+  // the rail, and its story starts in the sidebar. Still just the starting value: the
+  // pin button unpins it like any other session.
+  const [pinned, setPinned] = useState(initialPinned)
   const [hovering, setHovering] = useState(false)
   const hoverTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 

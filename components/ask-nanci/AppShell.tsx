@@ -171,7 +171,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden md:rounded-2xl bg-sidebar shadow-sm">
             {fullApp ? (
               <>
-                <Sidebar />
+                {/* Autoplay means nobody is driving — the rail starts pinned so the
+                    marketplace story is visible instead of collapsed to icons. */}
+                <Sidebar initialPinned={autoPlay} />
                 <div className="flex min-w-0 flex-1 py-1 pr-1 pl-1">
                   <TeachNanciPanel />
                   <ChatArea>{children}</ChatArea>
