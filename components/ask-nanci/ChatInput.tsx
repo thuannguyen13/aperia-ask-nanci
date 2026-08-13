@@ -16,7 +16,7 @@ import { getPlanUsage } from "@/lib/ask-nanci/plan-usage"
 const PROACTIVE_CONTENT = CONCEPT_SCRIPTED_CONVERSATIONS[CONCEPT_FLOW6_KEY][0].content
 
 export function ChatInput() {
-  const { handlePrompt, startNewChat, chatState, stopAnimation, sources, draft, setDraft, usage, setTokenLimitReached, setOnboardingOpen, isEmbed, embedVariant, isConceptVersion, triggerProactiveFlow, proactiveNotificationActive, replayFlow } = useAskNanci()
+  const { handlePrompt, startNewChat, chatState, stopAnimation, sources, draft, setDraft, usage, setTokenLimitReached, setOnboardingOpen, isEmbed, embedVariant, isConceptVersion, triggerProactiveFlow, proactiveNotificationActive, replayFlow, requestTour } = useAskNanci()
   const isDetect = embedVariant === "concept-embed"
   const activeSources = sources.filter((s) => s.active)
 
@@ -68,6 +68,7 @@ export function ChatInput() {
     } else if (action.type === "command") {
       if (action.id === "usage") setTokenLimitReached(true)
       if (action.id === "onboarding") setOnboardingOpen(true)
+      if (action.id === "tour") requestTour()
       if (action.id === "context-warning") setContextDemo((d) => ({ state: "approaching", n: d.n + 1 }))
       if (action.id === "context-full") setContextDemo((d) => ({ state: "full", n: d.n + 1 }))
       if (action.id === "context-clear") setContextDemo((d) => ({ state: null, n: d.n + 1 }))
@@ -92,7 +93,7 @@ export function ChatInput() {
       <ContextUsageBanner demo={contextDemo} />
 
       {/* relative z-10 keeps the input painted over the banner tucked behind its top edge */}
-      <div className="relative z-10 flex flex-col rounded-xl border bg-background dark:bg-input/30 shadow-sm transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50">
+      <div data-tour="chat-input" className="relative z-10 flex flex-col rounded-xl border bg-background dark:bg-input/30 shadow-sm transition-colors focus-within:border-ring focus-within:ring-3 focus-within:ring-ring/50">
         <Textarea
           ref={textareaRef}
           placeholder="Ask anything"
@@ -107,7 +108,7 @@ export function ChatInput() {
 
         <div className="flex items-center justify-between px-2 pb-2">
           <div className="flex items-center gap-2">
-            <ChatActiveSources sources={activeSources} />
+            <div data-tour="active-sources"><ChatActiveSources sources={activeSources} /></div>
 
             {/* Both of these leave the pinned demo — Common Questions replays another
                 persona's scripted conversation over it, Recent Chats resumes a stored
@@ -119,7 +120,7 @@ export function ChatInput() {
               <div className="flex overflow-hidden rounded-lg">
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <button onClick={() => setCommonQOpen(true)} className="flex h-7 w-7 items-center justify-center bg-secondary text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground">
+                    <button data-tour="common-questions" onClick={() => setCommonQOpen(true)} className="flex h-7 w-7 items-center justify-center bg-secondary text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground">
                       <MessageCircleQuestion className="size-3.5" />
                     </button>
                   </TooltipTrigger>
@@ -127,7 +128,7 @@ export function ChatInput() {
                 </Tooltip>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <button onClick={() => setRecentOpen(true)} className="flex h-7 w-7 items-center justify-center bg-secondary text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground">
+                    <button data-tour="recent-chats" onClick={() => setRecentOpen(true)} className="flex h-7 w-7 items-center justify-center bg-secondary text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground">
                       <Clock5 className="size-3.5" />
                     </button>
                   </TooltipTrigger>

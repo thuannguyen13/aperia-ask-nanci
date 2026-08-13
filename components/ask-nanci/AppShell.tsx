@@ -17,6 +17,7 @@ import { ServiceMarketplacePanel } from "./ServiceMarketplacePanel"
 import { ConceptPanelArea } from "./concept/ConceptPanelArea"
 import { TokenLimitDialog } from "./TokenLimitDialog"
 import { OnboardingDialog } from "./OnboardingDialog"
+import { Onboarding } from "@/components/onboarding/Onboarding"
 import { SettingsDialog } from "./SettingsDialog"
 import { DarkModeToggle } from "./DarkModeToggle"
 import { MobileSidebarToggle } from "./MobileSidebarToggle"
@@ -222,6 +223,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <TokenLimitDialog />
       <OnboardingDialog />
+      {/* Product tour. Non-embed only — embeds render children with no sidebar, and
+          five of the eight steps point at sidebar or chat-input chrome. */}
+      <Onboarding />
       <SettingsDialog />
       <DarkModeToggle />
     </AskNanciProvider>

@@ -69,7 +69,7 @@ const HOVER_CLOSE_MS = 250
 // (`hoverNav={false}`) — its rail is a fixed destination menu for a different product,
 // so it keeps the plain collapse toggle.
 export function Sidebar({ menu, logos, hoverNav = true }: { menu?: SidebarNavItem[]; logos?: ThemeLogos; hoverNav?: boolean } = {}) {
-  const { startNewChat, setKbOpen, marketplaceOpen, setMarketplaceOpen, mobileSidebarOpen, setMobileSidebarOpen, currentUser } = useAskNanci()
+  const { startNewChat, setKbOpen, marketplaceOpen, setMarketplaceOpen, mobileSidebarOpen, setMobileSidebarOpen, currentUser, tourActive } = useAskNanci()
   const [collapsed, setCollapsed] = useState(false)
   const [wizardOpen, setWizardOpen] = useState(false)
   const { resolvedTheme, setTheme } = useTheme()
@@ -96,7 +96,9 @@ export function Sidebar({ menu, logos, hoverNav = true }: { menu?: SidebarNavIte
 
   // The one value the rest of the component reads. Without hoverNav this is the manual
   // collapse toggle exactly as before.
-  const isCollapsed = hoverNav ? !pinned && !hovering : collapsed
+  // The product tour holds the rail open: three of its steps point at things only the
+  // expanded sidebar renders, and the Link Accounts card is not in the DOM when collapsed.
+  const isCollapsed = tourActive ? false : hoverNav ? !pinned && !hovering : collapsed
 
   const sidebarContent = (isMobile: boolean) => (
     <>
@@ -154,6 +156,7 @@ export function Sidebar({ menu, logos, hoverNav = true }: { menu?: SidebarNavIte
           <Tooltip>
             <TooltipTrigger asChild>
               <button
+                data-tour="sidebar-toggle"
                 onClick={() => (hoverNav ? setPinned(!pinned) : setCollapsed(true))}
                 className={cn(
                   "flex size-6 items-center justify-center rounded text-foreground hover:bg-muted transition-colors",
@@ -190,12 +193,16 @@ export function Sidebar({ menu, logos, hoverNav = true }: { menu?: SidebarNavIte
           ))
         ) : (
           <>
-            <SidebarItem
-              icon={MessageCirclePlus}
-              label="New Chat"
-              collapsed={!isMobile && isCollapsed}
-              onClick={() => { setMarketplaceOpen(false); startNewChat() }}
-            />
+            {/* Wrapped so the tour has an element to spotlight — SidebarItem takes no
+                arbitrary props, and only New Chat is the target. */}
+            <div data-tour="new-chat">
+              <SidebarItem
+                icon={MessageCirclePlus}
+                label="New Chat"
+                collapsed={!isMobile && isCollapsed}
+                onClick={() => { setMarketplaceOpen(false); startNewChat() }}
+              />
+            </div>
             {/* Marketplace (Flow 22) — a nav destination that takes over the content area */}
             <SidebarItem
               icon={Blocks}
@@ -227,7 +234,7 @@ export function Sidebar({ menu, logos, hoverNav = true }: { menu?: SidebarNavIte
                   </p>
                 </div>
                 <div className="flex gap-1">
-                  <Button className="flex-1 mt-3" size="sm" onClick={() => setWizardOpen(true)}>
+                  <Button data-tour="link-accounts" className="flex-1 mt-3" size="sm" onClick={() => setWizardOpen(true)}>
                   Link Accounts
                 </Button>
                 <Button className=" mt-3" variant="secondary" size="icon-sm" onClick={() => setKbOpen(true)}>

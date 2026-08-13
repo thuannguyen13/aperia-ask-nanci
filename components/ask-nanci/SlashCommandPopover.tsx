@@ -26,6 +26,11 @@ const COMMANDS = [
     description: "Re-open the onboarding dialog",
   },
   {
+    id: "tour",
+    label: "/tour",
+    description: "Replay the product tour from the first step",
+  },
+  {
     id: "context-warning",
     label: "/context-warning",
     description: "Simulate approaching the context limit (90%)",

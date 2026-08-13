@@ -81,6 +81,20 @@ interface AskNanciCtx {
   /** `?brand=generic` — the offer flows drop partner branding for neutral descriptors. */
   genericBrand: boolean
   /**
+   * The product tour is running. The sidebar reads this to stay expanded: it is a
+   * hover rail by default, and three tour steps point at things only the open rail
+   * renders (the Link Accounts card is not in the DOM when collapsed).
+   */
+  tourActive: boolean
+  setTourActive: (active: boolean) => void
+  /**
+   * Bumped by `/tour` to replay the walkthrough on demand. A counter rather than a
+   * boolean so asking twice in one session starts it twice — a flag would already be
+   * true the second time and do nothing.
+   */
+  tourRequest: number
+  requestTour: () => void
+  /**
    * True once a concept flow has played its last turn. `chatState === "idle"` cannot
    * stand in for this: a manual (Merchant Money) flow goes idle between every step
    * while it waits for the next pill click, so it would read as finished mid-demo.
@@ -171,6 +185,9 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [onboardingOpen, setOnboardingOpen] = useState(false)
   const [flowFinished, setFlowFinished] = useState(false)
+  const [tourActive, setTourActive] = useState(false)
+  const [tourRequest, setTourRequest] = useState(0)
+  const requestTour = useCallback(() => setTourRequest((n) => n + 1), [])
   const [closingPanels, setClosingPanels] = useState<string[]>([])
   const { stack: dynamicPanels, stackRef: dynamicPanelsRef, openDynamic, closeDynamic: closeDynamicPanel, resetDynamic } = usePanelStack()
   const [declineReportFiltered, setDeclineReportFiltered] = useState(false)
@@ -791,7 +808,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       tokenLimitReached, setTokenLimitReached,
       settingsOpen, openSettings, setSettingsOpen,
       mobileSidebarOpen, setMobileSidebarOpen,
-      onboardingOpen, setOnboardingOpen, forceOnboarding, genericBrand, flowFinished, leavesCurrentFlow,
+      onboardingOpen, setOnboardingOpen, forceOnboarding, genericBrand, tourActive, setTourActive, tourRequest, requestTour, flowFinished, leavesCurrentFlow,
       isConceptVersion,
       submitFormPanel, submitOfferApplication, submitStepUpPanel,
       triggerProactiveFlow, proactiveNotificationActive, activateProactiveNotification,

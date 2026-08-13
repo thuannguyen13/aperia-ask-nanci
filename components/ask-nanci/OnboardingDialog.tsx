@@ -59,14 +59,24 @@ export function OnboardingDialog() {
     if (onboardingOpen) setStep(1)
   }, [onboardingOpen])
 
+  /**
+   * The welcome sequence is done. ONBOARDING_KEY means "has seen the welcome", not
+   * "has linked an account" — linking is optional, and the product tour that follows
+   * is what points the merchant at the sidebar to do it.
+   *
+   * ?mode=onboarding leaves no trace: recording the run here would mark the browser
+   * onboarded for every other mode too, and the point of that URL is that it can be
+   * demoed again on the next load without clearing localStorage first.
+   */
+  function completeWelcome() {
+    setOnboardingOpen(false)
+    if (!forceOnboarding) localStorage.setItem(ONBOARDING_KEY, "1")
+  }
+
   function handleLinked() {
     setSources([FOUNDATION_SOURCE, ...readSources()])
     setWizardOpen(false)
-    setOnboardingOpen(false)
-    // ?mode=onboarding leaves no trace: recording the run here would mark the browser
-    // onboarded for every other mode too, and the point of that URL is that it can be
-    // demoed again on the next load without clearing localStorage first.
-    if (!forceOnboarding) localStorage.setItem(ONBOARDING_KEY, "1")
+    completeWelcome()
   }
 
   return (
@@ -142,8 +152,14 @@ export function OnboardingDialog() {
                     <Link2 className="size-4" />
                     Link Accounts
                   </Button>
+                  {/* The way out of the welcome without the four-step wizard. The tour
+                      starts straight after and its third step points back at Link
+                      Accounts in the sidebar, so nothing is lost by deferring. */}
+                  <Button variant="ghost" className="w-full" onClick={completeWelcome}>
+                    Maybe later
+                  </Button>
                   <p className="text-center text-xs text-muted-foreground">
-                    You must link your accounts to get started.
+                    You can add accounts any time from the sidebar.
                   </p>
                 </div>
               </div>
