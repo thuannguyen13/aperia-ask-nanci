@@ -889,7 +889,10 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
         "Six items are running low, based on how fast they are selling, not just what is left. Fresh mozzarella is the tightest. You have 8 pounds and you are moving about 5 a day, so you run out Wednesday.",
       panel: "running-low",
     },
-    { role: "user", content: "wait, I have way fewer ciabatta rolls than mozzarella though" },
+    // "more", not "fewer": 40 rolls against 8 lb is the merchant reading raw count and
+    // expecting the rolls to be the safe one. The reply only lands as a lesson about days
+    // of cover if the bigger number is the one they are pointing at.
+    { role: "user", content: "wait, I have way more ciabatta rolls than mozzarella though" },
     {
       role: "assistant",
       content:
