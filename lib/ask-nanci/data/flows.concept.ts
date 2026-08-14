@@ -3,6 +3,10 @@
 
 import type { ConceptScriptedTurn, SheetActionData } from "../types";
 import { RISK_LANDING_CONVERSATIONS } from "./risk-conversations";
+// Flow 20 quotes the same spend, share and cash-back figures the offer panel does.
+// Read them from the panel's data rather than retyping, so the answer and the panel
+// the merchant opens seconds later can never disagree.
+import { CARD_FIGURES } from "./panels/credit-card-offer";
 
 // ─── Flow-key constants ───────────────────────────────────────────────────────
 
@@ -912,7 +916,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     {
       role: "assistant",
       content:
-        "Your largest food-cost vendor over the last 30 days is **Sysco Foodservice** — $18,420, about 34% of total food spend, up 6% from last month.\n\nYou're paying that by ACH, so it isn't earning anything back. A business card could help you manage this spend and return about $368/mo on Sysco alone.\n\nI've pre-filled an application from your connected accounts, you'd just confirm your credit limit. Want me to open it?",
+        `Your largest food-cost vendor over the last 30 days is **Sysco Foodservice** — ${CARD_FIGURES.monthlySpend}, about ${CARD_FIGURES.foodSpendShare} of total food spend, up 6% from last month.\n\nYou're paying that by ACH, so it isn't earning anything back. A business card could help you manage this spend and return about ${CARD_FIGURES.monthlyReturn}/mo on Sysco alone.\n\nI've pre-filled an application from your connected accounts, you'd just confirm your credit limit. Want me to open it?`,
       source: "Vendor Spend Breakdown",
       suggestions: [CONCEPT_OFFER_YES, CONCEPT_OFFER_NO],
     },

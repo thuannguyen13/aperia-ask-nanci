@@ -61,10 +61,19 @@ export const CREDIT_CARD_OFFERS: CardOffer[] = [
 
 // "What this is worth to you" — the reason to switch, in dollars. Stored as numbers
 // so the monthly return, annual total and first-year value are derived, not retyped.
+//
+// Scale check, because these figures sit next to the sales flows: the demo merchant
+// turns over $18,240/wk (WEEK_COMPARE in panels/sales-snapshot), so ~$79k/mo. Sysco at
+// `monthlySpend` and `foodSpendShare` implies a total food spend of ~$23.7k, or ~30% of
+// revenue — where a restaurant should sit (28–35% is the normal band). It used to read
+// $18,420 at 34%, which implied ~$54k of food on $79k of sales: a 69% food-cost ratio no
+// operator would survive, and obvious to anyone in the room who does the division.
 export const CARD_VALUE = {
   title: "What this is worth to you",
   vendor: "Sysco",
-  monthlySpend: 18420,
+  monthlySpend: 8050,
+  /** Sysco's share of total food spend — a broadline distributor being the top third is normal. */
+  foodSpendShare: 0.34,
   rate: 0.02,
   introBonus: 200,
   introThreshold: "$1,500 spend in 6 mo.",
@@ -102,11 +111,26 @@ export const CARD_APPLICANT = {
 
 export const CARD_EMPLOYEE_CARD_OPTIONS = ["3 cards (kitchen, FOH, admin)", "1 card", "None for now"];
 
+/**
+ * The three figures the merchant hears twice: once in the chat answer, once in the
+ * panel that opens after it. Formatted here so both read from the same arithmetic —
+ * they were typed out separately before, which is how a $368/mo return ended up
+ * quoted beside an $18,420 spend at a 2% rate.
+ */
+const money = (value: number) => `$${Math.round(value).toLocaleString("en-US")}`;
+
+export const CARD_FIGURES = {
+  monthlySpend: money(CARD_VALUE.monthlySpend),
+  foodSpendShare: `${Math.round(CARD_VALUE.foodSpendShare * 100)}%`,
+  rewardsRate: `${Math.round(CARD_VALUE.rate * 100)}%`,
+  monthlyReturn: money(CARD_VALUE.monthlySpend * CARD_VALUE.rate),
+};
+
 // Two paragraphs: the finding, then the offer. Lead sentence of each renders bold.
-export const CARD_INSIGHT_LEAD = "Sysco is your top food-cost vendor at $18,420/mo";
-export const CARD_INSIGHT_BODY = " — 34% of food spend, up 6% from last month. You're currently paying that by ACH, so it isn't earning anything.";
-export const CARD_INSIGHT_OFFER_PRE = "A business card with 2% cash back would return about ";
-export const CARD_INSIGHT_OFFER_BOLD = "$368/mo";
+export const CARD_INSIGHT_LEAD = `Sysco is your top food-cost vendor at ${CARD_FIGURES.monthlySpend}/mo`;
+export const CARD_INSIGHT_BODY = ` — ${CARD_FIGURES.foodSpendShare} of food spend, up 6% from last month. You're currently paying that by ACH, so it isn't earning anything.`;
+export const CARD_INSIGHT_OFFER_PRE = `A business card with ${CARD_FIGURES.rewardsRate} cash back would return about `;
+export const CARD_INSIGHT_OFFER_BOLD = `${CARD_FIGURES.monthlyReturn}/mo`;
 export const CARD_INSIGHT_OFFER_POST = " on Sysco alone. Here's an offer you're pre-qualified for.";
 
 export const CARD_PREFILL_NOTE = {
