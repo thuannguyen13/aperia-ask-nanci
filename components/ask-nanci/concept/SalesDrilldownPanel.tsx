@@ -9,8 +9,14 @@ import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, StatCard, for
 export function SalesDrilldownPanel() {
   const { closeDynamicPanel, handlePrompt } = useAskNanci()
 
-  const txnChangePct = Math.round(((SATURDAY_DRILLDOWN.transactions - WEEKDAY_AVG_TRANSACTIONS) / WEEKDAY_AVG_TRANSACTIONS) * 100)
-  const ticketChangePct = Math.round(((SATURDAY_DRILLDOWN.avgTicket - WEEKDAY_AVG_TICKET) / WEEKDAY_AVG_TICKET) * 100)
+  // Signed, because ticket can land either side of the weekday average — the sublabels
+  // used to hardcode a leading "+", which reads as "+-1%" the moment it goes negative.
+  const signedPct = (value: number, baseline: number) => {
+    const pct = Math.round(((value - baseline) / baseline) * 100)
+    return `${pct >= 0 ? "+" : ""}${pct}%`
+  }
+  const txnChangePct = signedPct(SATURDAY_DRILLDOWN.transactions, WEEKDAY_AVG_TRANSACTIONS)
+  const ticketChangePct = signedPct(SATURDAY_DRILLDOWN.avgTicket, WEEKDAY_AVG_TICKET)
 
   return (
     <PanelShell>
@@ -32,12 +38,12 @@ export function SalesDrilldownPanel() {
             <StatCard
               label="Transactions"
               value={SATURDAY_DRILLDOWN.transactions}
-              sublabel={`vs ${WEEKDAY_AVG_TRANSACTIONS} avg · +${txnChangePct}%`}
+              sublabel={`vs ${WEEKDAY_AVG_TRANSACTIONS} avg · ${txnChangePct}`}
             />
             <StatCard
               label="Avg. ticket"
               value={formatCurrency(SATURDAY_DRILLDOWN.avgTicket)}
-              sublabel={`vs ${formatCurrency(WEEKDAY_AVG_TICKET)} avg · +${ticketChangePct}%`}
+              sublabel={`vs ${formatCurrency(WEEKDAY_AVG_TICKET)} avg · ${ticketChangePct}`}
             />
           </div>
         </div>

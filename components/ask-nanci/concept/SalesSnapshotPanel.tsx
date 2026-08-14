@@ -1,7 +1,7 @@
 "use client"
 
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
-import { WEEK_COMPARE, DAILY_SALES, WEEKDAY_AVG_TRANSACTIONS, SATURDAY_DRILLDOWN, SLOWEST_DAY } from "@/lib/ask-nanci/data/panels/sales-snapshot"
+import { WEEK_COMPARE, DAILY_SALES, WEEKDAY_AVG_TRANSACTIONS, WEEKDAY_AVG_TICKET, SATURDAY_DRILLDOWN, SLOWEST_DAY } from "@/lib/ask-nanci/data/panels/sales-snapshot"
 import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelFigureTable, Td, formatCurrency } from "@/components/ask-nanci/shared"
 
 export function SalesSnapshotPanel() {
@@ -20,7 +20,7 @@ export function SalesSnapshotPanel() {
 
       <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
         <NanciInsight>
-              <span className="font-bold">+{WEEK_COMPARE.changePct}% vs last week</span> — you brought in {formatCurrency(WEEK_COMPARE.thisWeek)} against {formatCurrency(WEEK_COMPARE.lastWeek)}. Saturday led at {formatCurrency(SATURDAY_DRILLDOWN.sales)}: you ran {SATURDAY_DRILLDOWN.transactions} transactions versus a weekday average of {WEEKDAY_AVG_TRANSACTIONS}, while your average ticket held steady around $43. A busier week, not bigger baskets. {SLOWEST_DAY.day} was your softest day at {formatCurrency(SLOWEST_DAY.sales)}.
+              <span className="font-bold">+{WEEK_COMPARE.changePct}% vs last week</span> — you brought in {formatCurrency(WEEK_COMPARE.thisWeek)} against {formatCurrency(WEEK_COMPARE.lastWeek)}. Saturday led at {formatCurrency(SATURDAY_DRILLDOWN.sales)}: you ran {SATURDAY_DRILLDOWN.transactions} transactions versus a weekday average of {WEEKDAY_AVG_TRANSACTIONS}, while your average ticket held steady around ${Math.round(WEEKDAY_AVG_TICKET)}. A busier week, not bigger baskets. {SLOWEST_DAY.day} was your softest day at {formatCurrency(SLOWEST_DAY.sales)}.
         </NanciInsight>
 
         <div>
