@@ -297,9 +297,9 @@ export const FLOW_DEFS: FlowDef[] = [
     section: "merchant",
     title: "Error Recovery",
     badge: "Escalation",
-    key: "Change my MID to a new one",
+    key: "Can I get a new merchant ID?",
     slug: "5",
-    followups: ["Update my DBA name"],
+    followups: ["Update my business name"],
     description: "AI can't change a MID — diagnoses intent, offers alternatives via chips.",
   },
   {
@@ -390,12 +390,12 @@ const FLOW1_SHEET: SheetActionData = {
 };
 
 const FLOW5_SHEET: SheetActionData = {
-  field: "DBA Name",
+  field: "Business Name",
   fromValue: "Walker's Books",
   toValue: "Walker Bistro",
   timestamp: "Today, 11:20 AM",
   status: "submitted",
-  reference: "DBA-4416",
+  reference: "NAME-4416",
   sentTo: "Merchant Support team",
   iconKind: "name",
 };
@@ -484,26 +484,26 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   ],
 
   // ── Flow 5: Error Recovery ────────────────────────────────────────────────
-  "Change my MID to a new one": [
-    { role: "user", content: "Update payment processor MID" },
+  "Can I get a new merchant ID?": [
+    { role: "user", content: "Can I get a new merchant ID?" },
     {
       role: "assistant",
       content:
-        "I can't change the MID itself — that's assigned by the processor and requires a new application. But if the goal is a different business name on receipts, that's a DBA update I can do.",
-      suggestions: ["Update my DBA name"],
+        "That's one thing I can't change — your merchant ID is assigned by your payment processor when the account is set up, so a new one would mean a whole new application. But if what you're really after is a different business name on your receipts and statements, that I can update for you right now.",
+      suggestions: ["Update my business name"],
     },
   ],
 
-  "Update my DBA name": [
-    { role: "user", content: "Update my DBA name" },
-    { role: "assistant", content: 'Your current DBA name on file is "Walker\'s Books". What would you like to change it to?' },
+  "Update my business name": [
+    { role: "user", content: "Update my business name" },
+    { role: "assistant", content: 'Your business name on file is "Walker\'s Books". What would you like customers to see instead?' },
     { role: "user", content: "Walker Bistro" },
-    { role: "assistant", content: 'To confirm — submit a request to change your DBA name from "Walker\'s Books" to "Walker Bistro"? This is what appears on receipts and cardholder statements.' },
+    { role: "assistant", content: 'To confirm — submit a request to change the name on your receipts and cardholder statements from "Walker\'s Books" to "Walker Bistro"?' },
     { role: "user", content: "Yes, go ahead." },
     {
       role: "assistant",
       content:
-        "Your DBA name change has been submitted for review — I can't update what appears on receipts directly, so this goes to the team that can. Once it's approved, \"Walker Bistro\" will show on receipts and statements, typically within 1–2 business days.",
+        'Your name change request has been submitted. Once it\'s processed, "Walker Bistro" will appear on your receipts and statements — this usually takes about a week. You\'ll get an email confirmation when it\'s done.',
       sheetAction: FLOW5_SHEET,
       suggestions: CONCEPT_FLOW5_FOLLOWUPS,
     },
