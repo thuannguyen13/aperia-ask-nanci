@@ -57,6 +57,7 @@ with one param between them. Flows other than 20 and 21 ignore it.
 | `http://localhost:3000/?mode=concept-embed&flow=19` **live** | 19 | Address Change | compact widget |
 | `http://localhost:3000/?mode=concept-embed&flow=20` **live** | 20 | Credit Card Offer | compact widget |
 | `http://localhost:3000/?mode=concept-embed&flow=21` **live** | 21 | Business Loan Offer | compact widget |
+| `http://localhost:3000/?mode=concept-embed&flow=23` **live** | 23 | Busiest Times | compact widget |
 
 ### Layout-only entries (no autoplay)
 
@@ -68,7 +69,7 @@ These have a layout override but no slug — they open a destination surface ins
 
 ## Flows with no embed URL
 
-6 of 21 flows have no slug — reachable only via the `?mode=concept` welcome cards.
+6 of 22 flows have no slug — reachable only via the `?mode=concept` welcome cards.
 
 - 3. Panel as Form — Chat + form
 - 4. Step-up Auth — Multi-step
@@ -110,3 +111,4 @@ Referrers, or the `Referer` header in runtime logs).
 | `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=20` | Merchant Money group — Credit Card Offer | ok |
 | `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=21` | Merchant Money group — Business Loan Offer | ok |
 | `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=22` | Merchant Money group — Service Marketplace | ok |
+| `https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&flow=23` | Merchant Money group — Busiest Times | ok |

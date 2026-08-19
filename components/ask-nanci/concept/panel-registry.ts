@@ -28,6 +28,8 @@ import { StepUpAuthPanel } from "./StepUpAuthPanel"
 import { BatchDetailPanel } from "./BatchDetailPanel"
 import { CreditCardOfferPanel } from "./CreditCardOfferPanel"
 import { BusinessLoanOfferPanel } from "./BusinessLoanOfferPanel"
+import { BusiestTimesPanel } from "./BusiestTimesPanel"
+import { TopWindowsPanel } from "./TopWindowsPanel"
 import { DashboardInsightPanel } from "@/components/risk/dashboard/DashboardInsightPanel"
 import { Dashboard as RiskDashboard } from "@/components/risk/dashboard/Dashboard"
 import { DetectionQueue as RiskDetectionQueue } from "@/components/risk/DetectionQueue"
@@ -72,6 +74,8 @@ export const PANELS = {
   "batch-detail":        { component: BatchDetailPanel },
   "credit-card-offer":   { component: CreditCardOfferPanel },
   "business-loan-offer": { component: BusinessLoanOfferPanel },
+  "busiest-times":       { component: BusiestTimesPanel },
+  "top-windows":         { component: TopWindowsPanel },
   "dashboard-insight":   { component: DashboardInsightPanel },
   "detection-queue-insight": { component: DetectionQueueInsightPanel },
   // Aperia Risk destinations — every risk UI is a registered panel.

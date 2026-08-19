@@ -38,6 +38,8 @@ const CONCEPT_INVENTORY_PROMPT = "What am I about to run out of?";
 const CONCEPT_ADDRESS_PROMPT = "Change my business address";
 const CONCEPT_CREDIT_CARD_PROMPT = "Who am I paying the most on food cost?";
 const CONCEPT_BUSINESS_LOAN_PROMPT = "Do I have enough money for payroll?";
+const CONCEPT_FLOW23_PROMPT = "When am I busiest?";
+export const CONCEPT_FLOW23_FOLLOWUP = "and when's it dead? I want to cut a shift";
 // Both offer flows share the same accept/decline pills (matched per-active-flow, so
 // reuse is safe). "No, ignore for now" is decorative — registered as a fake follow-up.
 const CONCEPT_OFFER_YES = "Yes, show me";
@@ -100,6 +102,8 @@ const CONCEPT_FLOW18_FOLLOWUPS = ["Compare this week vs last week", "Review this
 
 const CONCEPT_FLOW19_FOLLOWUPS = ["Update payment processor MID", "Update deposit bank account"];
 
+const CONCEPT_FLOW23_FOLLOWUPS_FAKE = ["Check weekend deposit timing", "Compare this week vs last week", "Check what's running low", "how's the Italian combo doing this month?"];
+
 // Every fake follow-up across flows — handlePrompt treats these as no-op decoration.
 // Add each flow's follow-up array here as the treatment rolls out.
 // Flow 6 (proactive auto-play): decorative "road not taken" pills on non-final turns.
@@ -117,6 +121,7 @@ export const CONCEPT_FAKE_FOLLOWUPS = new Set<string>([
   ...CONCEPT_FLOW16_FOLLOWUPS,
   ...CONCEPT_FLOW18_FOLLOWUPS,
   ...CONCEPT_FLOW19_FOLLOWUPS,
+  ...CONCEPT_FLOW23_FOLLOWUPS_FAKE,
 ]);
 
 // ─── Flow registry — single source of truth for showcased flows ──────────────
@@ -332,6 +337,16 @@ export const FLOW_DEFS: FlowDef[] = [
     key: CONCEPT_MARKETPLACE_KEY,
     destination: "marketplace",
     description: "Add-ons and integrations that extend Ask Nanci — browse, search and enable services. A destination, not a conversation: the card opens it directly.",
+  },
+  {
+    num: 23,
+    section: "merchant",
+    title: "Busiest Times",
+    badge: "Staffing",
+    key: CONCEPT_FLOW23_PROMPT,
+    slug: "23",
+    followups: [CONCEPT_FLOW23_FOLLOWUP],
+    description: "A day-by-hour sales heatmap finds the peaks — the follow-up ranks the quietest window, the safe place to cut a shift.",
   },
 ];
 
@@ -937,5 +952,27 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     },
     // "Yes, show me" opens the panel directly — no assistant bubble (per Figma).
     { role: "user", content: CONCEPT_OFFER_YES, panel: "business-loan-offer" },
+  ],
+
+  // ── Flow 23: Busiest Times ────────────────────────────────────────────────
+  [CONCEPT_FLOW23_PROMPT]: [
+    { role: "user", content: CONCEPT_FLOW23_PROMPT },
+    {
+      role: "assistant",
+      content:
+        "Your busiest stretch is Friday and Saturday, around midday and again from 6 to 8. Weekday lunch, noon to 1, runs hot every day of the week. Saturday 12 to 1 is your single busiest hour.",
+      panel: "busiest-times",
+      suggestions: [CONCEPT_FLOW23_FOLLOWUP],
+    },
+  ],
+  [CONCEPT_FLOW23_FOLLOWUP]: [
+    { role: "user", content: CONCEPT_FLOW23_FOLLOWUP },
+    {
+      role: "assistant",
+      content:
+        "Tuesday and Wednesday, 2 to 4 in the afternoon, are your quietest windows all week. Sales there run about a third of your lunch peak, so that is the safest place to trim hours.",
+      panel: "top-windows",
+      suggestions: CONCEPT_FLOW23_FOLLOWUPS_FAKE,
+    },
   ],
 };
