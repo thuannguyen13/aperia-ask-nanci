@@ -971,7 +971,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       role: "assistant",
       content:
         "Tuesday and Wednesday, 2 to 4 in the afternoon, are your quietest windows all week. Sales there run about a third of your lunch peak, so that is the safest place to trim hours.",
-      panel: "top-windows",
+      panel: "slowest-windows",
       suggestions: CONCEPT_FLOW23_FOLLOWUPS_FAKE,
     },
   ],

@@ -1,4 +1,4 @@
-// Data for Flow 23 — Busiest Times: sales-by-hour heatmap + top volume windows.
+// Data for Flow 23 — Busiest Times: sales-by-hour heatmap + slowest windows follow-up.
 // Saturday's $4,110 matches the sales-snapshot figure (data/panels/sales-snapshot.ts,
 // SATURDAY_DRILLDOWN) — same mock business, same week, so the two flows never disagree.
 
@@ -22,12 +22,13 @@ export const BUSIEST_TIMES_TILES = [
   { label: "Quietest window", value: "Tue–Wed 2–4", sublabel: "~⅓ of lunch peak" },
 ]
 
-export const TOP_WINDOWS = [
-  { name: "Saturday 12–1 PM", sub: "busiest single hour", pct: 100 },
-  { name: "Friday 6–8 PM", sub: "dinner rush", pct: 88 },
-  { name: "Saturday 6–8 PM", sub: "dinner rush", pct: 84 },
-  { name: "Weekday 12–1 PM", sub: "daily lunch peak", pct: 72 },
+export const SLOWEST_WINDOWS = [
+  { name: "Tuesday 2–4 PM", sub: "quietest all week", sales: 185, orders: 8, pct: 28 },
+  { name: "Wednesday 2–4 PM", sub: "second quietest", sales: 210, orders: 9, pct: 32 },
+  { name: "Monday 2–4 PM", sub: "weekday lull", sales: 240, orders: 10, pct: 37 },
+  { name: "Thursday 2–4 PM", sub: "afternoon lull", sales: 265, orders: 11, pct: 41 },
 ]
 
-export const TOP_WINDOWS_CALLOUT =
-  "Four windows carry most of your week. Two are lunch, two are weekend dinner — worth your strongest staff and a prep push just ahead of each."
+// The callout's "under $210 across 8-9 orders" quotes the two quietest rows above —
+// read from them rather than retyped, so the copy can't drift from the table.
+export const SLOWEST_WINDOWS_HIGH = SLOWEST_WINDOWS[1]
