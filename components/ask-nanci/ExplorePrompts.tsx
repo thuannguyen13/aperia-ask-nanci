@@ -28,7 +28,7 @@ export function ExplorePrompts({ title, description, onPromptClick }: ExplorePro
           <Compass className="mt-0.5 size-5 shrink-0 text-foreground" />
           <div>
             <p className="text-base font-medium text-foreground">{title || "How can I help?"}</p>
-            <p className="text-sm text-muted-foreground">{description || "Frequently asked questions by business like yours."}</p>
+            <p className="text-sm text-muted-foreground">{description || "Frequently asked questions by businesses like yours."}</p>
           </div>
         </div>
       </div>
