@@ -34,11 +34,11 @@
 }
 
 [data-theme="aperia"] {
-  --primary: #4F46E5;
-  --color-primary: #4F46E5;
-  --ring: #4F46E5;
-  --sidebar-primary: #4F46E5;
-  --app-gradient: linear-gradient(180deg, #4F46E5 0%, #c7d2fe 200px);
+  --primary: #280086;
+  --color-primary: #280086;
+  --ring: #280086;
+  --sidebar-primary: #280086;
+  --app-gradient: linear-gradient(180deg, #280086 0%, #ddd6fe 200px);
 }
 
 /* Aperia Risk runs a brighter primary than the concept app. Split from the shared

@@ -24,7 +24,7 @@ const THEME_LOGOS = {
     frame: { src: "/logos/clover.svg", alt: "Clover", width: 80, height: 24 },
   },
   aperia: {
-    frame: { src: "/logos/abc-bank.svg", alt: "ABC Bank", width: 152, height: 24 },
+    frame: { src: "/logos/abc-bank.svg", alt: "ABC Bank", width: 128, height: 24 },
   },
   "aperia-risk": {
     frame: { src: "/logos/titan.svg", alt: "Titan", width: 120, height: 24 },
