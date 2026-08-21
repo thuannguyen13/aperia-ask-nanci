@@ -157,7 +157,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     isEmbed ? (
       embedVariant === "business-owner" ? EMBED_BUSINESS_OWNER_DEMO_SOURCES :
       embedVariant === "iso" ? EMBED_ISO_DEMO_SOURCES :
-      embedVariant === "vw" || embedVariant === "concept-embed" ? EMBED_VW_DEMO_SOURCES :
+      embedVariant === "vw" || embedVariant === "abc" || embedVariant === "concept-embed" ? EMBED_VW_DEMO_SOURCES :
       EMBED_DEMO_SOURCES) : []
   )
   const [thinking, setThinking] = useState<{ source: Source | null; label: string }>({ source: null, label: "Thinking…" })

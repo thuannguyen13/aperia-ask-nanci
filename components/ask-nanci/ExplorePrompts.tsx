@@ -27,8 +27,8 @@ export function ExplorePrompts({ title, description, onPromptClick }: ExplorePro
         <div className="flex items-start gap-2">
           <Compass className="mt-0.5 size-5 shrink-0 text-foreground" />
           <div>
-            <p className="text-base font-medium text-foreground">{title || "Common Questions"}</p>
-            <p className="text-sm text-muted-foreground">{description || "Jumpstart your analysis with curated questions."}</p>
+            <p className="text-base font-medium text-foreground">{title || "How can I help?"}</p>
+            <p className="text-sm text-muted-foreground">{description || "Frequently asked questions by business like yours."}</p>
           </div>
         </div>
       </div>

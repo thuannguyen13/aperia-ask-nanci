@@ -1,7 +1,7 @@
 // Content overrides for embed variants. Keys match MockResponse.id.
 // Only responses listed here get alternate text; all others fall through to the
-// default Clover content. business-owner and vw are Clover re-skins that only
-// differ by brand name in the bank-match reconciliation answer.
+// default Clover content. business-owner, vw, and abc are Clover re-skins that
+// only differ by brand name in the bank-match reconciliation answer.
 
 const bankMatch = (brand: string): Record<string, string> => ({
   "bank-match":
@@ -11,4 +11,5 @@ const bankMatch = (brand: string): Record<string, string> => ({
 export const VARIANT_CONTENT_OVERRIDES: Record<string, Record<string, string>> = {
   "business-owner": bankMatch("AccessOne"),
   "vw": bankMatch("VisionWeb"),
+  "abc": bankMatch("ABC Bank"),
 }

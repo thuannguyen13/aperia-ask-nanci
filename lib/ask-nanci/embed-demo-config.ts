@@ -7,7 +7,7 @@
 
 import type { ThemeId } from "./data/theme-logos"
 
-export const EMBED_VARIANTS = ["clover", "business-owner", "iso", "concept-embed", "vw"] as const
+export const EMBED_VARIANTS = ["clover", "business-owner", "iso", "concept-embed", "vw", "abc"] as const
 export type EmbedVariant = (typeof EMBED_VARIANTS)[number]
 
 interface ParsedMode {
@@ -40,6 +40,9 @@ export function parseMode(mode: string | null): ParsedMode {
     case "iso":             return { ...base, isEmbed: true,  embedVariant: "iso"                                  }
     case "concept-embed":   return { ...base, isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true }
     case "vw":              return { ...base, isEmbed: true,  embedVariant: "vw",             theme: "vision-web"  }
+    // Same shape as vw — chat-only embed, Clover content underneath — but keeps the
+    // default aperia (ABC Bank) theme instead of switching brand.
+    case "abc":             return { ...base, isEmbed: true,  embedVariant: "abc"                                  }
     case "concept":         return { ...base, isConceptVersion: true }
     // Alias of `concept`, kept because the URL is already out with reviewers — the
     // hover rail it used to opt into is now how every Ask Nanci sidebar behaves.
