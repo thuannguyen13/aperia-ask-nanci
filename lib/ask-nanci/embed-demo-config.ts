@@ -50,6 +50,10 @@ export function parseMode(mode: string | null): ParsedMode {
     // Duplicate of concept — same welcome card catalog, panel demo, everything —
     // wearing the Titan brand instead of the default aperia (ABC Bank) theme.
     case "titan":           return { ...base, isConceptVersion: true, theme: "titan" }
+    // Embeddable counterpart to `titan`, same as concept-embed is to concept — same
+    // embedVariant so &flow=<slug>&autoplay behaves identically, compact widget layout
+    // included. Only the theme differs.
+    case "titan-embed":     return { ...base, isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true, theme: "titan" }
     case "tib":             return { ...base, theme: "tib"         }
     case "woodforest":      return { ...base, theme: "woodforest"  }
     case "placeholder":     return { ...base, theme: "placeholder" }
