@@ -31,7 +31,7 @@ const LOAN_BRANDED: LoanBrand = {
 
 const LOAN_GENERIC: LoanBrand = {
   product: "Cash Advance",
-  note: "Financing provided by a participating lending partner. Funds delivered to your business card, usable the moment they land. Fixed installments, no revolving balance.",
+  note: "An advance against your future card sales, provided by a participating lending partner. Funds land on your business card, usable the moment they arrive. Repaid in fixed monthly payments, no revolving balance.",
   logo: "/business-loan-offer/generic-cash-advance.png",
   mark: "CA",
   color: "#64748B",

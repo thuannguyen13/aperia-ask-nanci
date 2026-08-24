@@ -89,7 +89,7 @@ export function CreditCardOfferPanel() {
         {/* The offer being applied for is the reason the panel opened — tinted, not a plain row. */}
         <div className="space-y-2 rounded-xl border border-blue-300 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-950/20">
           <div className="flex items-start gap-3">
-            <OfferLogo src={brand.logo} alt={brand.name} className="h-14 w-24" fallback={<BrandMonogram label={brand.mark} color={brand.color} />} />
+            <OfferLogo src={brand.logo} alt={brand.name} className="h-18 w-30" fallback={<BrandMonogram label={brand.mark} color={brand.color} />} />
             <div className="min-w-0">
               <p className="text-sm font-semibold text-foreground">{brand.name}</p>
               <p className="text-xs text-muted-foreground">{offer.bestFor}</p>
