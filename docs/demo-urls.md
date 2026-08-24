@@ -18,6 +18,7 @@ Base: `http://localhost:3000` (override with `BASE=https://... npm run demo:urls
 | `http://localhost:3000/?mode=abc` | yes | no | Chat-only embed |
 | `http://localhost:3000/?mode=concept` | no | yes | Panel demo with the welcome card catalog |
 | `http://localhost:3000/?mode=concept-nav` | no | yes | Alias of `concept` — the hover-rail sidebar it trialled is now app-wide; kept so shared links keep working |
+| `http://localhost:3000/?mode=titan` | no | yes | Duplicate of `concept` — same welcome card catalog and panel demo — wearing the Titan brand |
 | `http://localhost:3000/?mode=tib` | no | no | Full app (sidebar, sessions, KB panel) wearing the TIB brand |
 | `http://localhost:3000/?mode=woodforest` | no | no | Full app (sidebar, sessions, KB panel) wearing the Woodforest brand |
 | `http://localhost:3000/?mode=placeholder` | no | no | Full app wearing the white-label placeholder brand — swap the logo + theme block to stand up a new one |

@@ -26,6 +26,9 @@ const THEME_LOGOS = {
   aperia: {
     frame: { src: "/logos/abc-bank.svg", alt: "ABC Bank", width: 128, height: 24 },
   },
+  titan: {
+    frame: { src: "/logos/titan.svg", alt: "Titan", width: 120, height: 24 },
+  },
   "aperia-risk": {
     frame: { src: "/logos/titan.svg", alt: "Titan", width: 120, height: 24 },
     sidebar: { src: "/logos/logo-aperia-risk.svg", alt: "Aperia Risk", width: 146, height: 33 },

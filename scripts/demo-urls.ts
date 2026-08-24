@@ -81,12 +81,13 @@ const MODE_NOTES: Record<string, string> = {
   "": "Default app — sidebar, KB panel, sessions",
   concept: "Panel demo with the welcome card catalog",
   "concept-nav": "Alias of `concept` — the hover-rail sidebar it trialled is now app-wide; kept so shared links keep working",
+  titan: "Duplicate of `concept` — same welcome card catalog and panel demo — wearing the Titan brand",
   tib: "Full app (sidebar, sessions, KB panel) wearing the TIB brand",
   woodforest: "Full app (sidebar, sessions, KB panel) wearing the Woodforest brand",
   placeholder: "Full app wearing the white-label placeholder brand — swap the logo + theme block to stand up a new one",
   onboarding: "Default app, but the onboarding dialog opens on every load and finishing it records nothing — so it can be demoed repeatedly without clearing localStorage",
 }
-for (const mode of ["", ...EMBED_VARIANTS, "concept", "concept-nav", "tib", "woodforest", "placeholder", "onboarding"]) {
+for (const mode of ["", ...EMBED_VARIANTS, "concept", "concept-nav", "titan", "tib", "woodforest", "placeholder", "onboarding"]) {
   const q = mode ? `mode=${mode}` : ""
   const { isEmbed, isConceptVersion } = parseMode(mode || null)
   const note = MODE_NOTES[mode] ?? (isConceptVersion ? "Panel demo, embeddable" : "Chat-only embed")

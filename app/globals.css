@@ -41,6 +41,16 @@
   --app-gradient: linear-gradient(180deg, #280086 0%, #ddd6fe 200px);
 }
 
+/* Titan — the aperia theme's original navy branding, kept as its own theme for the
+   `?mode=titan` embed after `aperia` was rebranded to ABC Bank. */
+[data-theme="titan"] {
+  --primary: #002F67;
+  --color-primary: #002F67;
+  --ring: #002F67;
+  --sidebar-primary: #002F67;
+  --app-gradient: linear-gradient(180deg, #002F67 0%, #c5d5ed 200px);
+}
+
 /* Aperia Risk runs a brighter primary than the concept app. Split from the shared
    `aperia` block above rather than edited in place — that theme is on the live
    embeds, and this is a Risk decision. The frame gradient stays the deep navy: it

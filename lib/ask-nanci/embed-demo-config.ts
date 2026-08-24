@@ -47,6 +47,9 @@ export function parseMode(mode: string | null): ParsedMode {
     // Alias of `concept`, kept because the URL is already out with reviewers — the
     // hover rail it used to opt into is now how every Ask Nanci sidebar behaves.
     case "concept-nav":     return { ...base, isConceptVersion: true }
+    // Duplicate of concept — same welcome card catalog, panel demo, everything —
+    // wearing the Titan brand instead of the default aperia (ABC Bank) theme.
+    case "titan":           return { ...base, isConceptVersion: true, theme: "titan" }
     case "tib":             return { ...base, theme: "tib"         }
     case "woodforest":      return { ...base, theme: "woodforest"  }
     case "placeholder":     return { ...base, theme: "placeholder" }
