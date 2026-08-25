@@ -74,6 +74,16 @@ export const GALLERY_MONTHLY = [
   { month: "Dec", volume: 7.12, declines: 7.8, chargebacks: 0.55 },
 ]
 
+/** Channel split, for the grouped and stacked specimens. Sums to the month's volume. */
+export const GALLERY_CHANNEL_MIX = [
+  { month: "Jul", cardPresent: 3.21, keyed: 0.94, ecom: 1.48 },
+  { month: "Aug", cardPresent: 3.30, keyed: 0.91, ecom: 1.60 },
+  { month: "Sep", cardPresent: 2.98, keyed: 0.88, ecom: 1.56 },
+  { month: "Oct", cardPresent: 3.24, keyed: 0.95, ecom: 1.78 },
+  { month: "Nov", cardPresent: 3.47, keyed: 1.02, ecom: 1.95 },
+  { month: "Dec", cardPresent: 3.86, keyed: 1.09, ecom: 2.17 },
+]
+
 /** Top merchants by volume, in millions, for the bar and horizontal-bar specimens. */
 export const GALLERY_TOP_MERCHANTS = MERCHANT_VOLUME_DATA.slice(0, 6).map((m) => ({
   merchant: m.merchant.replace(/ (Group|Chain|Co\.)$/, ""),
@@ -117,6 +127,12 @@ export const GALLERY_SLA = [
   { key: "tier2", team: "Tier 2", attainment: 81 },
   { key: "escalations", team: "Escalations", attainment: 67 },
 ]
+
+/** Twenty-four intraday points, for the sparkline specimen. No axes, no labels. */
+export const GALLERY_INTRADAY = [
+  18, 16, 14, 11, 9, 8, 12, 21, 34, 47, 58, 71,
+  84, 79, 66, 61, 68, 77, 88, 82, 64, 47, 33, 24,
+].map((v, i) => ({ hour: i, txns: v }))
 
 /** Assignment alert counts, for the CSS-bar specimen, matching AlertVolumeBars. */
 export const GALLERY_ALERT_VOLUME = [

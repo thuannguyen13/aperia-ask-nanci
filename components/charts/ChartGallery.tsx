@@ -121,7 +121,7 @@ export function ChartGallery() {
           <Badge variant="secondary" className="mb-3">Reference</Badge>
           <h1 className="text-3xl font-semibold tracking-tight text-foreground">Charts</h1>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            The chart forms this stack renders, two per family, and every knob that themes one. Charting is{" "}
+            Every chart form this stack can render, and every knob that themes one. Charting is{" "}
             <span className="font-medium text-foreground">Recharts 3.8</span> throughout. The wrapper is{" "}
             <span className="font-medium text-foreground">shadcn&rsquo;s chart component</span>, which the design
             system re-exports from <span className="font-mono text-xs">aperia-ds5</span> as{" "}
@@ -226,7 +226,10 @@ export function ChartGallery() {
 
         {SPECIMEN_GROUPS.map((group) => (
           <section key={group.title} className="mt-12">
-            <h2 className="text-lg font-semibold tracking-tight text-foreground">{group.title}</h2>
+            <div className="flex items-baseline gap-3">
+              <h2 className="text-lg font-semibold tracking-tight text-foreground">{group.title}</h2>
+              <span className="text-xs text-muted-foreground">{group.specimens.length} forms</span>
+            </div>
             <p className="mt-1.5 max-w-3xl text-sm leading-relaxed text-muted-foreground">{group.blurb}</p>
             <Separator className="mt-4" />
             <div className="mt-5 grid gap-5 md:grid-cols-2">
