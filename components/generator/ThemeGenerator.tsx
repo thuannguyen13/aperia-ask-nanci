@@ -39,6 +39,20 @@ const TOKEN_ROWS: { key: keyof BrandTokens; label: string; hint: string }[] = [
   { key: "gradientEnd", label: "Frame gradient end", hint: "Where the backdrop fades to" },
 ]
 
+/**
+ * The design system's own stock tokens, from aperia-ds5/styles/base.css :root. They
+ * cannot be read off a probe — app/globals.css re-declares :root after the DS import,
+ * so the cascade always answers with the app's values. Kept verbatim as authored;
+ * the seeding resolver converts them to hex.
+ */
+const DS5_DEFAULTS = {
+  primary: "oklch(0.21 0.006 285.885)",
+  primaryForeground: "oklch(0.985 0 0)",
+  ring: "oklch(0.705 0.015 286.067)",
+  sidebarPrimary: "oklch(0.21 0.006 285.885)",
+}
+const DS5_PRESET = "ds5-default"
+
 /** Every current gradient in globals.css follows this exact shape. */
 const GRADIENT_RE = /linear-gradient\(180deg,\s*(.+?)\s+0%,\s*(.+?)\s+200px\)/
 
@@ -391,36 +405,49 @@ function Wall() {
 // ── The generator ──────────────────────────────────────────────────────────────
 
 export function ThemeGenerator() {
-  const [seedBrand, setSeedBrand] = useState<ThemeId>("aperia")
+  const [preset, setPreset] = useState<ThemeId | typeof DS5_PRESET>("aperia")
   const [themeName, setThemeName] = useState("new-brand")
   const [tokens, setTokens] = useState<BrandTokens | null>(null)
   const [copied, setCopied] = useState(false)
 
-  // Seed the tokens from an existing brand: a probe div carrying data-theme picks up
-  // that brand's [data-theme] block through the normal cascade, with :root and the DS
-  // defaults filling whatever the brand does not set — exactly what the app resolves.
+  // Seed the tokens from the chosen preset. A brand seeds off a probe div carrying
+  // data-theme, which picks up that brand's [data-theme] block through the normal
+  // cascade — with :root filling whatever the brand does not set, exactly what the
+  // app resolves. The DS5 default seeds from the design system's stock values.
   useEffect(() => {
     const probe = document.createElement("div")
-    probe.dataset.theme = seedBrand
+    if (preset !== DS5_PRESET) probe.dataset.theme = preset
     document.body.appendChild(probe)
     const resolver = createColorResolver(probe)
-    const cs = getComputedStyle(probe)
-    const raw = (name: string) => cs.getPropertyValue(name).trim()
-    const hex = (value: string, fallback: string) => (value ? resolver.toHex(value) : fallback)
 
-    const primary = hex(raw("--color-primary") || raw("--primary"), "#280086")
-    const gradient = raw("--app-gradient").match(GRADIENT_RE)
-    setTokens({
-      primary,
-      primaryForeground: hex(raw("--color-primary-foreground") || raw("--primary-foreground"), "#fafafa"),
-      ring: hex(raw("--ring"), primary),
-      sidebarPrimary: hex(raw("--sidebar-primary"), primary),
-      gradientStart: gradient ? resolver.toHex(gradient[1]) : primary,
-      gradientEnd: gradient ? resolver.toHex(gradient[2]) : "#ffffff",
-    })
+    if (preset === DS5_PRESET) {
+      const primary = resolver.toHex(DS5_DEFAULTS.primary)
+      setTokens({
+        primary,
+        primaryForeground: resolver.toHex(DS5_DEFAULTS.primaryForeground),
+        ring: resolver.toHex(DS5_DEFAULTS.ring),
+        sidebarPrimary: resolver.toHex(DS5_DEFAULTS.sidebarPrimary),
+        gradientStart: primary,
+        gradientEnd: resolver.toHex(`color-mix(in oklab, ${DS5_DEFAULTS.primary} 12%, white)`),
+      })
+    } else {
+      const cs = getComputedStyle(probe)
+      const raw = (name: string) => cs.getPropertyValue(name).trim()
+      const hex = (value: string, fallback: string) => (value ? resolver.toHex(value) : fallback)
+      const primary = hex(raw("--color-primary") || raw("--primary"), "#280086")
+      const gradient = raw("--app-gradient").match(GRADIENT_RE)
+      setTokens({
+        primary,
+        primaryForeground: hex(raw("--color-primary-foreground") || raw("--primary-foreground"), "#fafafa"),
+        ring: hex(raw("--ring"), primary),
+        sidebarPrimary: hex(raw("--sidebar-primary"), primary),
+        gradientStart: gradient ? resolver.toHex(gradient[1]) : primary,
+        gradientEnd: gradient ? resolver.toHex(gradient[2]) : "#ffffff",
+      })
+    }
     resolver.dispose()
     probe.remove()
-  }, [seedBrand])
+  }, [preset])
 
   if (!tokens) return <div className="min-h-screen bg-background" />
 
@@ -462,10 +489,11 @@ export function ThemeGenerator() {
 
         <div className="sticky top-0 z-20 -mx-6 mt-8 border-y bg-background/85 px-6 py-4 backdrop-blur">
           <div className="flex flex-wrap items-end gap-x-8 gap-y-4">
-            <Control label="Start from">
-              <Select value={seedBrand} onValueChange={(v) => setSeedBrand(v as ThemeId)}>
+            <Control label="Preset" note="Loads that theme's colors as your starting point.">
+              <Select value={preset} onValueChange={(v) => setPreset(v as ThemeId | typeof DS5_PRESET)}>
                 <SelectTrigger className="w-44 bg-background focus-visible:border-foreground focus-visible:ring-foreground/20"><SelectValue /></SelectTrigger>
                 <SelectContent position="popper" align="start">
+                  <SelectItem value={DS5_PRESET}>DS5 default</SelectItem>
                   {THEME_IDS.map((id) => <SelectItem key={id} value={id}>{id}</SelectItem>)}
                 </SelectContent>
               </Select>
