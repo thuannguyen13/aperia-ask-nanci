@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react"
 import { useTheme } from "next-themes"
 import {
-  Card, CardContent, CardHeader, CardTitle, Label, Select, SelectContent, SelectItem,
-  SelectTrigger, SelectValue, Separator, Switch,
+  Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Separator, Switch,
 } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { useAppTheme } from "@/components/ask-nanci/AppFrame"
@@ -66,14 +65,17 @@ function SegmentedGroup<T extends string>({
   )
 }
 
+// The exact chrome MessageChart.tsx puts around a chart in a chat answer, so a
+// specimen here looks the way it will look in the app — not a DS Card approximation.
+// (The risk dashboard's DashChartCard is the one variation: no border-b on the title.)
 function SpecimenCard({ specimen, opts }: { specimen: Specimen; opts: GalleryOptions }) {
   return (
-    <Card id={specimen.id} className="scroll-mt-32 gap-0 overflow-hidden py-0">
-      <CardHeader className="border-b px-4 py-3">
-        <CardTitle className="text-sm font-semibold">{specimen.name}</CardTitle>
-      </CardHeader>
-      <CardContent className="px-4 py-4">{specimen.render(opts)}</CardContent>
-    </Card>
+    <div id={specimen.id} className="scroll-mt-32 overflow-hidden rounded-xl border bg-background">
+      <div className="flex items-center border-b px-3 py-2">
+        <span className="text-xs font-semibold text-foreground">{specimen.name}</span>
+      </div>
+      <div className="px-3 py-4">{specimen.render(opts)}</div>
+    </div>
   )
 }
 
