@@ -414,18 +414,18 @@ function Slices({ opts, donut }: { opts: GalleryOptions; donut?: boolean }) {
 }
 
 const SLA_SERIES = GALLERY_SLA.map((s) => ({ key: s.key, label: s.team }))
+// fill on the data rows (the shadcn radial pattern): RadialBar reads it for the ring
+// AND puts it on the legend payload — Cells color the rings but leave the legend
+// dots invisible, and Recharts 3 accepts no external legend payload.
+const SLA_DATA = GALLERY_SLA.map((s) => ({ ...s, fill: `var(--color-${s.key})` }))
 
 function Radial({ opts }: { opts: GalleryOptions }) {
   return (
     <ChartContainer config={buildChartConfig(SLA_SERIES, opts.swatches)} className={BOX}>
-      <RadialBarChart data={GALLERY_SLA} innerRadius="30%" outerRadius="98%" startAngle={90} endAngle={-270}>
+      <RadialBarChart data={SLA_DATA} innerRadius="30%" outerRadius="98%" startAngle={90} endAngle={-270}>
         <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
         <ChartTooltip content={<ChartTooltipContent nameKey="key" hideLabel className={TOOLTIP_SPACING} />} />
-        <RadialBar dataKey="attainment" background cornerRadius={6}>
-          {GALLERY_SLA.map((s) => (
-            <Cell key={s.key} fill={`var(--color-${s.key})`} />
-          ))}
-        </RadialBar>
+        <RadialBar dataKey="attainment" background cornerRadius={6} />
         {opts.legend && <ChartLegend content={<ChartLegendContent nameKey="key" />} />}
       </RadialBarChart>
     </ChartContainer>
