@@ -10,7 +10,7 @@ import {
   CommandItem, CommandList, Input, Label, Pagination, PaginationContent, PaginationItem,
   PaginationLink, PaginationNext, PaginationPrevious, Progress, RadioGroup, RadioGroupItem,
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
-  DialogTrigger, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Separator, Skeleton,
+  DialogTrigger, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Skeleton,
   Slider, Switch, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Tabs,
   TabsList, TabsTrigger, Textarea, Toggle, ToggleGroup, ToggleGroupItem,
 } from "aperia-ds5"
@@ -488,7 +488,7 @@ export function ThemeGenerator() {
           </p>
         </header>
 
-        <div className="sticky top-0 z-20 -mx-6 mt-8 border-y bg-background/85 px-6 py-4 backdrop-blur">
+        <div className="sticky top-0 z-20 -mx-6 mt-8 border-b bg-background/85 px-6 py-4 backdrop-blur">
           <div className="flex flex-wrap items-end gap-x-8 gap-y-5 pb-5">
             <Control label="Preset" note="Seeds all six tokens below.">
               <Select value={preset} onValueChange={(v) => setPreset(v as ThemeId | typeof DS5_PRESET)}>
@@ -543,8 +543,7 @@ export function ThemeGenerator() {
           <div className="flex flex-col gap-6 lg:sticky lg:top-32 lg:self-start">
             <section>
               <h2 className="text-sm font-semibold text-foreground">Brand tokens</h2>
-              <Separator className="mt-2" />
-              <div className="mt-2 flex flex-col">
+              <div className="mt-3 flex flex-col">
                 {TOKEN_ROWS.map((row) => (
                   <TokenRow
                     key={row.key}

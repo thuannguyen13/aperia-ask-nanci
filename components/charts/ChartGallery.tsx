@@ -3,7 +3,7 @@
 import { memo, useEffect, useMemo, useState } from "react"
 import { useTheme } from "next-themes"
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Separator, Switch,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Switch,
 } from "aperia-ds5"
 import { useAppTheme } from "@/components/ask-nanci/AppFrame"
 import { THEME_IDS, type ThemeId } from "@/lib/ask-nanci/data/theme-logos"
@@ -99,7 +99,7 @@ export function ChartGallery() {
 
         {/* Controls. Sticky because the point of the page is watching a change ripple
             across every specimen at once, which means the knobs have to stay reachable. */}
-        <div className="sticky top-0 z-20 -mx-6 mt-8 border-y bg-background/85 px-6 py-4 backdrop-blur">
+        <div className="sticky top-0 z-20 -mx-6 mt-8 border-b bg-background/85 px-6 py-4 backdrop-blur">
           <div className="flex flex-wrap items-end gap-x-8 gap-y-5 pb-5">
             <Control label="Palette">
               <SegmentedGroup
@@ -187,7 +187,6 @@ export function ChartGallery() {
         {SPECIMEN_GROUPS.map((group) => (
           <section key={group.title} className="mt-12">
             <h2 className="text-lg font-semibold tracking-tight text-foreground">{group.title}</h2>
-            <Separator className="mt-3" />
             <div className="mt-5 grid gap-5 md:grid-cols-2">
               {group.specimens.map((s) => <SpecimenCard key={s.id} specimen={s} opts={opts} />)}
             </div>
