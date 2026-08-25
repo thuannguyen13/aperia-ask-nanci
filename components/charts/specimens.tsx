@@ -94,6 +94,7 @@ const pct = (v: number) => `${v}%`
 
 const MERCHANT_SERIES = [{ key: "volume", label: "Volume" }]
 
+// One measure, one color: the bars are all the same series, so they share a swatch.
 function VerticalBar({ opts }: { opts: GalleryOptions }) {
   return (
     <ChartContainer config={buildChartConfig(MERCHANT_SERIES, opts.swatches)} className={BOX}>
@@ -110,14 +111,20 @@ function VerticalBar({ opts }: { opts: GalleryOptions }) {
 
 const CHANNEL_SERIES = [
   { key: "cardPresent", label: "Card present" },
-  { key: "keyed", label: "Keyed" },
   { key: "ecom", label: "E-commerce" },
+  { key: "keyed", label: "Keyed" },
+  { key: "wallet", label: "Mobile wallet" },
+  { key: "ach", label: "ACH" },
 ]
+
+// Five series over twelve months is legible stacked but not grouped — the grouped
+// specimen shows the year's second half so its bars stay wide enough to read.
+const CHANNEL_MIX_H2 = GALLERY_CHANNEL_MIX.slice(6)
 
 function GroupedBar({ opts }: { opts: GalleryOptions }) {
   return (
     <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX}>
-      <BarChart data={GALLERY_CHANNEL_MIX} margin={MARGIN}>
+      <BarChart data={CHANNEL_MIX_H2} margin={MARGIN}>
         <Grid opts={opts} />
         <XAxis dataKey="month" {...AXIS} />
         <YAxis {...AXIS} tickFormatter={money} width={MONEY_AXIS_WIDTH} />
@@ -304,7 +311,16 @@ function Combo({ opts }: { opts: GalleryOptions }) {
 
 // ── Relationship ───────────────────────────────────────────────────────────────
 
-const SCORE_SERIES = [{ key: "merchants", label: "Merchants" }]
+// One series per quadrant category, so the scatter carries four ramp colors.
+const SCORE_SERIES = [
+  { key: "both", label: "Both flag" },
+  { key: "mc", label: "Mastercard only" },
+  { key: "vw", label: "VisionWeb only" },
+  { key: "none", label: "Neither" },
+] as const
+const SCATTER_BY_CAT = SCORE_SERIES.map((s) => ({
+  ...s, points: GALLERY_SCATTER.filter((p) => p.cat === s.key),
+}))
 
 function Points({ opts }: { opts: GalleryOptions }) {
   return (
@@ -314,7 +330,10 @@ function Points({ opts }: { opts: GalleryOptions }) {
         <XAxis type="number" dataKey="vw" name="VisionWeb" domain={[0, 100]} {...AXIS} />
         <YAxis type="number" dataKey="mc" name="Mastercard" domain={[0, 100]} {...AXIS} width={40} />
         <Tip opts={opts} />
-        <Scatter name="merchants" data={GALLERY_SCATTER} fill="var(--color-merchants)" fillOpacity={0.7} />
+        <Key opts={opts} />
+        {SCATTER_BY_CAT.map((s) => (
+          <Scatter key={s.key} name={s.key} data={s.points} fill={`var(--color-${s.key})`} fillOpacity={0.75} />
+        ))}
       </ScatterChart>
     </ChartContainer>
   )
@@ -327,11 +346,14 @@ function Quadrant({ opts }: { opts: GalleryOptions }) {
         <XAxis type="number" dataKey="vw" domain={[0, 100]} {...AXIS} />
         <YAxis type="number" dataKey="mc" domain={[0, 100]} {...AXIS} width={40} />
         <ZAxis type="number" dataKey="mc" range={[24, 260]} />
-        <ReferenceArea x1={0} x2={65} y1={65} y2={100} fill="var(--color-merchants)" fillOpacity={0.07} />
+        <ReferenceArea x1={0} x2={65} y1={65} y2={100} fill="var(--color-mc)" fillOpacity={0.07} />
         <ReferenceLine x={65} strokeDasharray="4 4" />
         <ReferenceLine y={65} strokeDasharray="4 4" />
         <Tip opts={opts} />
-        <Scatter data={GALLERY_SCATTER} fill="var(--color-merchants)" fillOpacity={0.55} />
+        <Key opts={opts} />
+        {SCATTER_BY_CAT.map((s) => (
+          <Scatter key={s.key} name={s.key} data={s.points} fill={`var(--color-${s.key})`} fillOpacity={0.6} />
+        ))}
       </ScatterChart>
     </ChartContainer>
   )
@@ -466,6 +488,7 @@ function Blocks({ opts }: { opts: GalleryOptions }) {
 const PROFILE_SERIES = [
   { key: "portfolio", label: "Portfolio avg" },
   { key: "merchant", label: "This merchant" },
+  { key: "topQuartile", label: "Top quartile" },
 ]
 
 function Profile({ opts }: { opts: GalleryOptions }) {

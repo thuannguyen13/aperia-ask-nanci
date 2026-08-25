@@ -74,14 +74,23 @@ export const GALLERY_MONTHLY = [
   { month: "Dec", volume: 7.12, declines: 7.8, chargebacks: 0.55 },
 ]
 
-/** Channel split, for the grouped and stacked specimens. Sums to the month's volume. */
+/**
+ * Channel split, for the grouped and stacked specimens: a full year across five
+ * channels, so multi-series charts exercise five ramp colors, not three.
+ */
 export const GALLERY_CHANNEL_MIX = [
-  { month: "Jul", cardPresent: 3.21, keyed: 0.94, ecom: 1.48 },
-  { month: "Aug", cardPresent: 3.30, keyed: 0.91, ecom: 1.60 },
-  { month: "Sep", cardPresent: 2.98, keyed: 0.88, ecom: 1.56 },
-  { month: "Oct", cardPresent: 3.24, keyed: 0.95, ecom: 1.78 },
-  { month: "Nov", cardPresent: 3.47, keyed: 1.02, ecom: 1.95 },
-  { month: "Dec", cardPresent: 3.86, keyed: 1.09, ecom: 2.17 },
+  { month: "Jan", cardPresent: 2.31, ecom: 0.86, keyed: 0.48, wallet: 0.29, ach: 0.18 },
+  { month: "Feb", cardPresent: 2.18, ecom: 0.91, keyed: 0.45, wallet: 0.24, ach: 0.16 },
+  { month: "Mar", cardPresent: 2.60, ecom: 1.06, keyed: 0.52, wallet: 0.29, ach: 0.21 },
+  { month: "Apr", cardPresent: 2.71, ecom: 1.12, keyed: 0.54, wallet: 0.32, ach: 0.22 },
+  { month: "May", cardPresent: 2.86, ecom: 1.24, keyed: 0.57, wallet: 0.34, ach: 0.23 },
+  { month: "Jun", cardPresent: 2.74, ecom: 1.23, keyed: 0.55, wallet: 0.33, ach: 0.23 },
+  { month: "Jul", cardPresent: 3.02, ecom: 1.35, keyed: 0.60, wallet: 0.41, ach: 0.25 },
+  { month: "Aug", cardPresent: 3.09, ecom: 1.43, keyed: 0.61, wallet: 0.42, ach: 0.26 },
+  { month: "Sep", cardPresent: 2.84, ecom: 1.38, keyed: 0.58, wallet: 0.38, ach: 0.24 },
+  { month: "Oct", cardPresent: 3.11, ecom: 1.54, keyed: 0.63, wallet: 0.43, ach: 0.26 },
+  { month: "Nov", cardPresent: 3.34, ecom: 1.69, keyed: 0.67, wallet: 0.46, ach: 0.28 },
+  { month: "Dec", cardPresent: 3.71, ecom: 1.91, keyed: 0.73, wallet: 0.48, ach: 0.29 },
 ]
 
 /** Top merchants by volume, in millions, for the bar and horizontal-bar specimens. */
@@ -102,14 +111,14 @@ export const GALLERY_DECLINE_REASONS = [
 /** VW vs Mastercard scores, for the scatter and bubble specimens. Real client proportions. */
 export const GALLERY_SCATTER = SCATTER_POINTS
 
-/** Merchant health profile across six axes, for the radar specimen. */
+/** Merchant health profile across six axes, for the radar specimen. Three overlays. */
 export const GALLERY_HEALTH_PROFILE = [
-  { axis: "Approval", portfolio: 92, merchant: 78 },
-  { axis: "Retention", portfolio: 74, merchant: 81 },
-  { axis: "Ticket size", portfolio: 61, merchant: 88 },
-  { axis: "Dispute rate", portfolio: 83, merchant: 52 },
-  { axis: "Settlement", portfolio: 88, merchant: 90 },
-  { axis: "Growth", portfolio: 69, merchant: 84 },
+  { axis: "Approval", portfolio: 92, merchant: 78, topQuartile: 96 },
+  { axis: "Retention", portfolio: 74, merchant: 81, topQuartile: 90 },
+  { axis: "Ticket size", portfolio: 61, merchant: 88, topQuartile: 79 },
+  { axis: "Dispute rate", portfolio: 83, merchant: 52, topQuartile: 94 },
+  { axis: "Settlement", portfolio: 88, merchant: 90, topQuartile: 97 },
+  { axis: "Growth", portfolio: 69, merchant: 84, topQuartile: 88 },
 ]
 
 /** Authorization drop-off, for the funnel specimen. Each stage is a subset of the one above. */
@@ -126,6 +135,8 @@ export const GALLERY_SLA = [
   { key: "tier1", team: "Tier 1", attainment: 94 },
   { key: "tier2", team: "Tier 2", attainment: 81 },
   { key: "escalations", team: "Escalations", attainment: 67 },
+  { key: "chargebacks", team: "Chargebacks", attainment: 58 },
+  { key: "onboarding", team: "Onboarding", attainment: 88 },
 ]
 
 /** Twenty-four intraday points, for the sparkline specimen. No axes, no labels. */
