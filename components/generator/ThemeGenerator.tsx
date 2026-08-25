@@ -101,15 +101,15 @@ const ESSENTIAL_KEYS = new Set([
   "primary", "primary-foreground", "ring", "gradient-start", "gradient-end",
 ])
 
-const DS5_PRESET = "ds5-default"
+const SHADCN_PRESET = "shadcn"
 
 /**
  * The values app/globals.css :root overrides, restored verbatim from
- * aperia-ds5/styles/base.css for the DS5-default preset — the cascade cannot answer
+ * aperia-ds5/styles/base.css for the Shadcn preset — the cascade cannot answer
  * with them because globals re-declares :root after the DS import. Every token not
  * listed here resolves correctly off the probe even for this preset.
  */
-const DS5_OVERRIDES: Record<string, string> = {
+const SHADCN_OVERRIDES: Record<string, string> = {
   primary: "oklch(0.21 0.006 285.885)",
   "primary-foreground": "oklch(0.985 0 0)",
   ring: "oklch(0.705 0.015 286.067)",
@@ -521,7 +521,7 @@ function Wall() {
 // ── The generator ──────────────────────────────────────────────────────────────
 
 export function ThemeGenerator() {
-  const [preset, setPreset] = useState<ThemeId | typeof DS5_PRESET>(DS5_PRESET)
+  const [preset, setPreset] = useState<ThemeId | typeof SHADCN_PRESET>(SHADCN_PRESET)
   const [themeName, setThemeName] = useState("new-brand")
   const [scope, setScope] = useState<TokenScope>("essential")
   const [tokens, setTokens] = useState<Tokens | null>(null)
@@ -530,10 +530,10 @@ export function ThemeGenerator() {
   // Seed every token from the chosen preset. A brand seeds off a probe div carrying
   // data-theme, which picks up that brand's [data-theme] block through the normal
   // cascade — with :root filling whatever the brand does not set, exactly what the
-  // app resolves. The DS5 default swaps in the stock values globals.css shadows.
+  // app resolves. The Shadcn preset swaps in the stock values globals.css shadows.
   useEffect(() => {
     const probe = document.createElement("div")
-    if (preset !== DS5_PRESET) probe.dataset.theme = preset
+    if (preset !== SHADCN_PRESET) probe.dataset.theme = preset
     document.body.appendChild(probe)
     const resolver = createColorResolver(probe)
     const cs = getComputedStyle(probe)
@@ -542,12 +542,12 @@ export function ThemeGenerator() {
     const next: Tokens = {}
     for (const key of ALL_TOKENS) {
       if (key.startsWith("gradient-")) continue
-      const stock = preset === DS5_PRESET ? DS5_OVERRIDES[key] : undefined
+      const stock = preset === SHADCN_PRESET ? SHADCN_OVERRIDES[key] : undefined
       // --color-primary first: two brand blocks set only that form of primary.
       const value = stock ?? (key === "primary" ? raw("--color-primary") || raw("--primary") : raw(`--${key}`))
       next[key] = value ? resolver.toHex(value) : "#888888"
     }
-    const gradient = preset === DS5_PRESET ? null : raw("--app-gradient").match(GRADIENT_RE)
+    const gradient = preset === SHADCN_PRESET ? null : raw("--app-gradient").match(GRADIENT_RE)
     next["gradient-start"] = gradient ? resolver.toHex(gradient[1]) : next.primary
     next["gradient-end"] = gradient
       ? resolver.toHex(gradient[2])
@@ -594,10 +594,10 @@ export function ThemeGenerator() {
         <div className="sticky top-0 z-20 -mx-6 mt-8 border-b bg-background/85 px-6 py-4 backdrop-blur">
           <div className="flex flex-wrap items-end gap-x-8 gap-y-5 pb-5">
             <Control label="Preset">
-              <Select value={preset} onValueChange={(v) => setPreset(v as ThemeId | typeof DS5_PRESET)}>
+              <Select value={preset} onValueChange={(v) => setPreset(v as ThemeId | typeof SHADCN_PRESET)}>
                 <SelectTrigger className="w-44 bg-background focus-visible:border-foreground focus-visible:ring-foreground/20"><SelectValue /></SelectTrigger>
                 <SelectContent position="popper" align="start">
-                  <SelectItem value={DS5_PRESET}>DS5 default</SelectItem>
+                  <SelectItem value={SHADCN_PRESET}>Shadcn Default</SelectItem>
                   {THEME_IDS.map((id) => <SelectItem key={id} value={id}>{id}</SelectItem>)}
                 </SelectContent>
               </Select>
