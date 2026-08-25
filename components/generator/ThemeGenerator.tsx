@@ -405,7 +405,7 @@ function Wall() {
 // ── The generator ──────────────────────────────────────────────────────────────
 
 export function ThemeGenerator() {
-  const [preset, setPreset] = useState<ThemeId | typeof DS5_PRESET>("aperia")
+  const [preset, setPreset] = useState<ThemeId | typeof DS5_PRESET>(DS5_PRESET)
   const [themeName, setThemeName] = useState("new-brand")
   const [tokens, setTokens] = useState<BrandTokens | null>(null)
   const [copied, setCopied] = useState(false)
