@@ -13,12 +13,6 @@ import { resolveSwatch, SPECIMEN_GROUPS, type GalleryOptions, type Specimen } fr
 
 const PALETTE_IDS = Object.keys(PALETTES) as PaletteId[]
 
-/** What the brand-theme picker actually does to the charts under each palette. */
-const BRAND_REACH: Record<PaletteId, string> = {
-  shadcn: "No effect: the shadcn ramp is scheme-only.",
-  ds5: "No effect: --chart-* is :root only.",
-  primary: "Charts follow this brand's --primary.",
-}
 const INDICATORS = ["dot", "line", "dashed"] as const
 
 function Control({ label, note, children }: { label: string; note?: string; children: React.ReactNode }) {
@@ -167,14 +161,18 @@ export function ChartGallery() {
               />
             </Control>
 
-            <Control label="Brand theme" note={BRAND_REACH[palette]}>
-              <Select value={brand} onValueChange={(v) => setBrand(v as ThemeId)}>
-                <SelectTrigger className="w-48 bg-background focus-visible:border-foreground focus-visible:ring-foreground/20"><SelectValue /></SelectTrigger>
-                <SelectContent position="popper" align="start">
-                  {THEME_IDS.map((id) => <SelectItem key={id} value={id}>{id}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </Control>
+            {/* Only the Primary Ramp is mixed from --primary, so only there does the
+                brand picker reach the charts — the other two ramps are fixed colors. */}
+            {palette === "primary" && (
+              <Control label="Brand theme" note="Charts follow this brand's --primary.">
+                <Select value={brand} onValueChange={(v) => setBrand(v as ThemeId)}>
+                  <SelectTrigger className="w-48 bg-background focus-visible:border-foreground focus-visible:ring-foreground/20"><SelectValue /></SelectTrigger>
+                  <SelectContent position="popper" align="start">
+                    {THEME_IDS.map((id) => <SelectItem key={id} value={id}>{id}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </Control>
+            )}
 
             <Control label="Scheme">
               <SegmentedGroup
