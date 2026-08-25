@@ -146,7 +146,7 @@ function TokenRow({
   label, hint, value, onChange,
 }: { label: string; hint?: string; value: string; onChange: (hex: string) => void }) {
   return (
-    <label className="flex cursor-pointer items-center gap-3 rounded-md px-2 py-1.5 hover:bg-muted/50">
+    <label className="-mx-2 flex cursor-pointer items-center gap-3 rounded-md px-2 py-1.5 hover:bg-muted/50">
       <span
         className="relative size-6 shrink-0 rounded-md ring-1 ring-inset ring-black/10"
         style={{ background: value }}
