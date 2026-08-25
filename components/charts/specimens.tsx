@@ -441,21 +441,27 @@ function truncateToWidth(text: string, px: number) {
   return text.length <= max ? text : `${text.slice(0, Math.max(max - 1, 0)).trimEnd()}\u2026`
 }
 
+const TREEMAP_MAX = Math.max(...TREEMAP_DATA.map((d) => d.size))
+
 /**
  * Recharts' default treemap block drops the label on all but the largest few. This one
- * paints every block from the same swatch — size already encodes the value, so color per
- * block would encode nothing — and keeps the label wherever it fits, outlined so it stays
- * legible on a light fill as well as a dark one.
+ * paints every block from the same swatch — same category, same color — with intensity
+ * scaled to the block's value, so color redundantly encodes what area already shows
+ * (the standard treemap treatment) instead of a meaningless color per block. Labels
+ * stay wherever they fit, outlined so they read on the lighter fills too.
  */
 function TreemapBlock(props: unknown) {
   const { x = 0, y = 0, width = 0, height = 0, name = "", size = 0 } =
     props as { x?: number; y?: number; width?: number; height?: number; name?: string; size?: number }
   const fits = width > 76 && height > 40
+  // 45%..100% of the swatch toward the background: the smallest block stays clearly
+  // in the hue family, the largest is the full swatch.
+  const strength = Math.round(45 + (size / TREEMAP_MAX) * 55)
   return (
     <g>
       <rect
         x={x} y={y} width={width} height={height}
-        fill="var(--color-blocks)"
+        fill={`color-mix(in oklab, var(--color-blocks) ${strength}%, var(--background))`}
         stroke="var(--background)"
         strokeWidth={2}
       />
