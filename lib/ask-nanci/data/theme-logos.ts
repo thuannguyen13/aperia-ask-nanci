@@ -57,5 +57,8 @@ const THEME_LOGOS = {
 
 export type ThemeId = keyof typeof THEME_LOGOS
 
+/** Every brand theme, in declaration order, for pickers that let you try all of them. */
+export const THEME_IDS = Object.keys(THEME_LOGOS) as ThemeId[]
+
 /** Widen to `ThemeLogos` so optional slots (sidebar, sidebarCollapsed) are visible on every entry. */
 export const getThemeLogos = (id: ThemeId): ThemeLogos => THEME_LOGOS[id]
