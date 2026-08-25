@@ -15,8 +15,8 @@ const PALETTE_IDS = Object.keys(PALETTES) as PaletteId[]
 
 /** What the brand-theme picker actually does to the charts under each palette. */
 const BRAND_REACH: Record<PaletteId, string> = {
-  brand: "No effect: --chart-* is :root only.",
-  ds5: "No effect: the DS ramp is scheme-only.",
+  shadcn: "No effect: the shadcn ramp is scheme-only.",
+  ds5: "No effect: --chart-* is :root only.",
   primary: "Charts follow this brand's --primary.",
 }
 const INDICATORS = ["dot", "line", "dashed"] as const
@@ -82,7 +82,7 @@ function SpecimenCard({ specimen, opts }: { specimen: Specimen; opts: GalleryOpt
 
 export function ChartGallery() {
   const [brand, setBrand] = useState<ThemeId>("aperia")
-  const [palette, setPalette] = useState<PaletteId>("brand")
+  const [palette, setPalette] = useState<PaletteId>("ds5")
   const [indicator, setIndicator] = useState<GalleryOptions["indicator"]>("dot")
   const [grid, setGrid] = useState(true)
   const [legend, setLegend] = useState(true)

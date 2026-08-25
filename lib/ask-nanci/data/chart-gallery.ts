@@ -21,17 +21,9 @@ export interface GalleryPalette {
 }
 
 export const PALETTES = {
-  brand: {
-    label: "Brand tokens",
-    note: "The --chart-1..6 hexes in app/globals.css. What the app renders today. One ramp for both schemes, and it does not move when the brand theme changes.",
-    swatches: [
-      "var(--chart-1)", "var(--chart-2)", "var(--chart-3)",
-      "var(--chart-4)", "var(--chart-5)", "var(--chart-6)",
-    ],
-  },
-  ds5: {
-    label: "Design-system default",
-    note: "The ramp aperia-ds5 ships in styles/base.css. It has separate :root and .dark values, so it is the only one of the three that was built to re-tune for dark mode.",
+  shadcn: {
+    label: "Shadcn Default",
+    note: "The stock shadcn chart ramp, shipped by aperia-ds5 in styles/base.css. It has separate :root and .dark values, so it is the only one of the three that was built to re-tune for dark mode.",
     swatches: [
       { light: "oklch(0.646 0.222 41.116)", dark: "oklch(0.488 0.243 264.376)" },
       { light: "oklch(0.600 0.118 184.704)", dark: "oklch(0.696 0.170 162.480)" },
@@ -40,8 +32,16 @@ export const PALETTES = {
       { light: "oklch(0.769 0.188 70.080)", dark: "oklch(0.645 0.246 16.439)" },
     ],
   },
+  ds5: {
+    label: "DS5 Colors",
+    note: "The --chart-1..6 hexes in app/globals.css. What the app renders today. One ramp for both schemes, fixed regardless of brand theme.",
+    swatches: [
+      "var(--chart-1)", "var(--chart-2)", "var(--chart-3)",
+      "var(--chart-4)", "var(--chart-5)", "var(--chart-6)",
+    ],
+  },
   primary: {
-    label: "Primary ramp",
+    label: "Primary Ramp",
     note: "Mixed from the active brand's --primary toward --background, so it follows the theme picker and re-tunes for dark mode on its own. Sequential: correct for one ordered measure, wrong for unrelated categories.",
     swatches: [
       "var(--primary)",
