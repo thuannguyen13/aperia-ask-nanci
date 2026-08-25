@@ -446,11 +446,11 @@ function Wall() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm">Data</CardTitle>
-            <CardDescription className="text-xs">Charts color from the chart ramp — a single series takes chart-1.</CardDescription>
+                        <CardTitle className="text-sm">Charts</CardTitle>
+            <CardDescription className="text-xs">Series map to the chart ramp in order; a single series takes chart-1.</CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col justify-center gap-2.5">
-            <div className="mb-1 flex items-center gap-1.5">
+          <CardContent className="flex flex-col gap-5">
+            <div className="flex items-center gap-1.5">
               {[1, 2, 3, 4, 5, 6].map((n) => (
                 <span
                   key={n}
@@ -461,22 +461,56 @@ function Wall() {
               ))}
               <span className="ml-1 text-[10px] text-muted-foreground">chart-1..6</span>
             </div>
-            {[
-              { name: "Card present", v: 100 },
-              { name: "E-commerce", v: 62 },
-              { name: "Keyed", v: 31 },
-              { name: "Mobile wallet", v: 18 },
-            ].map((r) => (
-              <div key={r.name} className="flex items-center gap-3 text-xs">
-                <span className="w-24 shrink-0 truncate text-right text-muted-foreground">{r.name}</span>
-                <div className="min-w-0 flex-1">
-                  <div
-                    className="h-3.5 rounded-[2px]"
-                    style={{ width: `${r.v}%`, background: "var(--chart-1)" }}
-                  />
-                </div>
+
+            {/* Five series stacked — one ramp slot each, like a stacked bar chart. */}
+            <div className="flex h-3.5 overflow-hidden rounded-[3px]">
+              {[
+                { n: 1, w: 35 }, { n: 2, w: 25 }, { n: 3, w: 18 }, { n: 4, w: 12 }, { n: 5, w: 10 },
+              ].map((seg) => (
+                <div key={seg.n} style={{ width: `${seg.w}%`, background: `var(--chart-${seg.n})` }} />
+              ))}
+            </div>
+
+            {/* Part-to-whole: the same five series as a donut, with a legend. */}
+            <div className="flex items-center gap-5">
+              <div
+                className="relative size-24 shrink-0 rounded-full"
+                style={{
+                  background:
+                    "conic-gradient(var(--chart-1) 0 35%, var(--chart-2) 35% 60%, var(--chart-3) 60% 78%, var(--chart-4) 78% 90%, var(--chart-5) 90% 100%)",
+                }}
+              >
+                <div className="absolute inset-5 rounded-full bg-card" />
               </div>
-            ))}
+              <div className="flex flex-col gap-1">
+                {["In-person", "Online", "Keyed", "Wallet", "ACH"].map((name, i) => (
+                  <div key={name} className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                    <span className="size-2 rounded-[2px]" style={{ background: `var(--chart-${i + 1})` }} />
+                    {name}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* One measure, one color: single-series bars all take chart-1. */}
+            <div className="flex flex-col gap-2.5">
+              {[
+                { name: "Card present", v: 100 },
+                { name: "E-commerce", v: 62 },
+                { name: "Keyed", v: 31 },
+                { name: "Mobile wallet", v: 18 },
+              ].map((r) => (
+                <div key={r.name} className="flex items-center gap-3 text-xs">
+                  <span className="w-24 shrink-0 truncate text-right text-muted-foreground">{r.name}</span>
+                  <div className="min-w-0 flex-1">
+                    <div
+                      className="h-3.5 rounded-[2px]"
+                      style={{ width: `${r.v}%`, background: "var(--chart-1)" }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>
