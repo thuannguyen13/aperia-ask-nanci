@@ -595,201 +595,141 @@ function Heat({ opts }: { opts: GalleryOptions }) {
 export interface Specimen {
   id: string
   name: string
-  /** The question this form answers well. */
-  use: string
-  /** The Recharts pieces it is built from, or "no library". */
-  parts: string
-  /** Where this shape already appears in the product, if it does. */
-  inUse?: string
   render: (opts: GalleryOptions) => React.ReactNode
 }
 
 export interface SpecimenGroup {
   title: string
-  blurb: string
   specimens: Specimen[]
 }
 
 export const SPECIMEN_GROUPS: SpecimenGroup[] = [
   {
     title: "Comparison",
-    blurb: "Ranking discrete things against each other. Bars, because length off a shared baseline is the most accurately read encoding there is.",
     specimens: [
       {
         id: "bar",
         name: "Bar",
-        use: "One measure across a handful of named categories.",
-        parts: "BarChart · Bar",
-        inUse: "MessageChart.tsx, the chat-message bar widget",
         render: (o) => <VerticalBar opts={o} />,
       },
       {
         id: "bar-grouped",
         name: "Grouped bar",
-        use: "Two or three series compared within each category. Past four, the eye gives up.",
-        parts: "BarChart · Bar ×n",
         render: (o) => <GroupedBar opts={o} />,
       },
       {
         id: "bar-stacked",
         name: "Stacked bar",
-        use: "Composition and total at once. Only the bottom segment is accurately comparable.",
-        parts: "BarChart · Bar stackId",
         render: (o) => <StackedBar opts={o} />,
       },
       {
         id: "bar-horizontal",
         name: "Horizontal bar",
-        use: "Long category labels, or more than about eight rows. The default for a leaderboard.",
-        parts: "BarChart layout=vertical · LabelList",
-        inUse: "AlertVolumeBars.tsx renders this shape without Recharts",
         render: (o) => <HorizontalBar opts={o} />,
       },
     ],
   },
   {
     title: "Trend",
-    blurb: "Change over an ordered axis. Lines for rate, area when the magnitude under the line is the point.",
     specimens: [
       {
         id: "line",
         name: "Line",
-        use: "One measure over time. The workhorse.",
-        parts: "LineChart · Line",
-        inUse: "MessageChart.tsx · NanciReviewPanel.tsx",
         render: (o) => <SingleLine opts={o} />,
       },
       {
         id: "line-multi",
         name: "Multi-line",
-        use: "Several series on one scale, when the comparison between them matters more than any one.",
-        parts: "LineChart · Line ×n",
         render: (o) => <MultiLine opts={o} />,
       },
       {
         id: "area",
         name: "Area",
-        use: "A single trend where the volume beneath it reads as accumulation.",
-        parts: "AreaChart · Area · linearGradient",
         render: (o) => <SingleArea opts={o} />,
       },
       {
         id: "area-stacked",
         name: "Stacked area",
-        use: "How a total splits over time. Same caveat as the stacked bar.",
-        parts: "AreaChart · Area stackId",
         render: (o) => <StackedArea opts={o} />,
       },
       {
         id: "combo",
         name: "Combo, dual axis",
-        use: "A count and a rate together. Two axes need two visibly different marks, or it misleads.",
-        parts: "ComposedChart · Bar + Line · YAxis ×2",
-        inUse: "ParamHeatChart.tsx",
         render: (o) => <Combo opts={o} />,
       },
     ],
   },
   {
     title: "Relationship",
-    blurb: "Whether two measures move together, and which records sit in the corner you care about.",
     specimens: [
       {
         id: "scatter",
         name: "Scatter",
-        use: "Correlation across many records. Density is the message, not any one point.",
-        parts: "ScatterChart · Scatter",
         render: (o) => <Points opts={o} />,
       },
       {
         id: "quadrant",
         name: "Bubble quadrant",
-        use: "Scatter plus a third measure as size, split into named quadrants by threshold.",
-        parts: "ScatterChart · ZAxis · ReferenceLine · ReferenceArea",
-        inUse: "ScatterQuadrant.tsx, VW vs Mastercard scores",
         render: (o) => <Quadrant opts={o} />,
       },
     ],
   },
   {
     title: "Part to whole",
-    blurb: "Shares of a total. Worth it only at five or six slices, and only when the shares are far apart.",
     specimens: [
       {
         id: "pie",
         name: "Pie",
-        use: "A handful of shares where the ordering is obvious. A sorted bar chart usually beats it.",
-        parts: "PieChart · Pie · Cell",
         render: (o) => <Slices opts={o} />,
       },
       {
         id: "donut",
         name: "Donut",
-        use: "Same as the pie, with the headline figure parked in the hole. Usually the better trade.",
-        parts: "PieChart · Pie innerRadius · Label",
         render: (o) => <Slices opts={o} donut />,
       },
       {
         id: "radial",
         name: "Radial gauge",
-        use: "A few values against a fixed ceiling, like SLA attainment. Decorative more than precise.",
-        parts: "RadialBarChart · RadialBar background",
         render: (o) => <Radial opts={o} />,
       },
       {
         id: "treemap",
         name: "Treemap",
-        use: "Shares when there are too many categories for a pie and the long tail still matters.",
-        parts: "Treemap",
         render: (o) => <Blocks opts={o} />,
       },
     ],
   },
   {
     title: "Profile and process",
-    blurb: "Two narrower forms: one record's shape across fixed axes, and drop-off through ordered stages.",
     specimens: [
       {
         id: "radar",
         name: "Radar",
-        use: "One subject against a benchmark on 5 to 8 fixed axes. Reads as a silhouette, not as numbers.",
-        parts: "RadarChart · PolarGrid · Radar ×n",
         render: (o) => <Profile opts={o} />,
       },
       {
         id: "funnel",
         name: "Funnel",
-        use: "Sequential drop-off where every stage is a strict subset of the one above it.",
-        parts: "FunnelChart · Funnel · LabelList",
         render: (o) => <Drop opts={o} />,
       },
     ],
   },
   {
     title: "Micro and no-library",
-    blurb: "Shapes small enough that chart chrome costs more than it gives. Two of the three below ship no Recharts at all.",
     specimens: [
       {
         id: "spark",
         name: "Sparkline",
-        use: "Shape of a series beside the figure it belongs to. No axes, no grid, no tooltip.",
-        parts: "AreaChart, stripped",
         render: (o) => <Spark opts={o} />,
       },
       {
         id: "css-bars",
         name: "Proportional bars",
-        use: "A ranked list where the bar is one column of a text row. Cheaper and aligns with the type.",
-        parts: "No library: width percentage on a div",
-        inUse: "AlertVolumeBars.tsx · DeclineReportPanel.tsx · SlowestWindowsPanel.tsx",
         render: (o) => <CssBars opts={o} />,
       },
       {
         id: "heatmap",
         name: "Heatmap",
-        use: "Two categorical axes and one intensity. Recharts has no heatmap, so this is a CSS grid.",
-        parts: "No library: CSS grid + color-mix",
-        inUse: "The Busiest Times panel (flow 23)",
         render: (o) => <Heat opts={o} />,
       },
     ],
