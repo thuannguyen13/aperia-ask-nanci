@@ -3,9 +3,15 @@
 import { useEffect, useState } from "react"
 import { Check, Copy } from "lucide-react"
 import {
-  Badge, Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Checkbox,
-  Input, Label, Progress, Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-  Separator, Switch,
+  Accordion, AccordionContent, AccordionItem, AccordionTrigger, Alert, AlertDescription,
+  AlertTitle, Avatar, AvatarFallback, Badge, Breadcrumb, BreadcrumbItem, BreadcrumbLink,
+  BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, Button, Calendar, Card, CardContent,
+  CardDescription, CardHeader, CardTitle, Checkbox, Command, CommandGroup, CommandInput,
+  CommandItem, CommandList, Input, Label, Pagination, PaginationContent, PaginationItem,
+  PaginationLink, PaginationNext, PaginationPrevious, Progress, RadioGroup, RadioGroupItem,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Separator, Skeleton,
+  Slider, Switch, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Tabs,
+  TabsList, TabsTrigger, Textarea, Toggle, ToggleGroup, ToggleGroupItem,
 } from "aperia-ds5"
 import { Control } from "@/components/charts/controls"
 import { createColorResolver } from "@/lib/ask-nanci/resolve-color"
@@ -131,6 +137,10 @@ function Wall() {
               <Input placeholder="Harbor View Hotel" />
             </div>
             <div className="flex flex-col gap-1.5">
+              <Label className="text-xs">Notes</Label>
+              <Textarea placeholder="Anything the processor should know…" className="min-h-14 text-xs" />
+            </div>
+            <div className="flex flex-col gap-1.5">
               <Label className="text-xs">Focused</Label>
               {/* A held focus state, so the ring is visible without interacting. */}
               <div className="flex h-8 items-center rounded-lg border border-ring px-2.5 text-sm ring-3 ring-ring/50">
@@ -138,6 +148,157 @@ function Wall() {
               </div>
             </div>
             <Button className="mt-1 w-full">Continue</Button>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Selection</CardTitle>
+            <CardDescription className="text-xs">Checked and dragged states take primary.</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-5">
+            <RadioGroup defaultValue="monthly" className="flex gap-5">
+              {["monthly", "quarterly", "annual"].map((v) => (
+                <label key={v} className="flex items-center gap-2 text-xs capitalize text-foreground">
+                  <RadioGroupItem value={v} /> {v}
+                </label>
+              ))}
+            </RadioGroup>
+            <Slider defaultValue={[64]} aria-label="Sample slider" />
+            <div className="flex items-center gap-2">
+              <Toggle defaultPressed aria-label="Bold sample">Pressed</Toggle>
+              <Toggle aria-label="Off sample">Off</Toggle>
+              <ToggleGroup type="single" defaultValue="week" variant="outline" spacing={0}>
+                {["day", "week", "month"].map((v) => (
+                  <ToggleGroupItem key={v} value={v} className="px-3 text-xs capitalize">{v}</ToggleGroupItem>
+                ))}
+              </ToggleGroup>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Calendar</CardTitle>
+            <CardDescription className="text-xs">The selected day takes primary.</CardDescription>
+          </CardHeader>
+          <CardContent className="flex justify-center">
+            {/* Fixed date: today's date would differ between server and client render. */}
+            <Calendar mode="single" selected={new Date(2026, 7, 25)} defaultMonth={new Date(2026, 7, 1)} />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Navigation</CardTitle>
+            <CardDescription className="text-xs">Links and the active page take primary; tabs stay neutral.</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            <Breadcrumb>
+              <BreadcrumbList className="text-xs">
+                <BreadcrumbItem><BreadcrumbLink href="#">Merchants</BreadcrumbLink></BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem><BreadcrumbLink href="#">Harbor View Hotel</BreadcrumbLink></BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem><BreadcrumbPage>Deposits</BreadcrumbPage></BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+            <Tabs defaultValue="overview">
+              <TabsList>
+                {["overview", "activity", "settings"].map((v) => (
+                  <TabsTrigger key={v} value={v} className="px-3 capitalize">{v}</TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem><PaginationPrevious href="#" /></PaginationItem>
+                <PaginationItem><PaginationLink href="#">1</PaginationLink></PaginationItem>
+                <PaginationItem><PaginationLink href="#" isActive>2</PaginationLink></PaginationItem>
+                <PaginationItem><PaginationLink href="#">3</PaginationLink></PaginationItem>
+                <PaginationItem><PaginationNext href="#" /></PaginationItem>
+              </PaginationContent>
+            </Pagination>
+            <div className="flex items-center gap-4 text-xs">
+              <Button variant="link" className="h-auto p-0 text-xs">Link button</Button>
+              <a href="#" className="font-medium text-primary underline underline-offset-2">Text link</a>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Command</CardTitle>
+            <CardDescription className="text-xs">The highlighted row takes the accent tint.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Command className="rounded-lg border">
+              <CommandInput placeholder="Search merchants…" />
+              <CommandList>
+                <CommandGroup heading="Merchants">
+                  <CommandItem>Harbor View Hotel</CommandItem>
+                  <CommandItem>Summit Auto Group</CommandItem>
+                  <CommandItem>Coastal Fresh Market</CommandItem>
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Content</CardTitle>
+            <CardDescription className="text-xs">Tables and accordions stay on the neutral tokens.</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-xs">Merchant</TableHead>
+                  <TableHead className="text-right text-xs">Volume</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableRow><TableCell className="text-xs">Harbor View Hotel</TableCell><TableCell className="text-right text-xs tabular-nums">$3.2M</TableCell></TableRow>
+                <TableRow><TableCell className="text-xs">Summit Auto</TableCell><TableCell className="text-right text-xs tabular-nums">$2.9M</TableCell></TableRow>
+              </TableBody>
+            </Table>
+            <Accordion type="single" collapsible defaultValue="a">
+              <AccordionItem value="a">
+                <AccordionTrigger className="text-xs">What moves with the theme?</AccordionTrigger>
+                <AccordionContent className="text-xs text-muted-foreground">
+                  Primary surfaces, the focus ring, the sidebar active item and the frame gradient.
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="b">
+                <AccordionTrigger className="text-xs">What stays neutral?</AccordionTrigger>
+                <AccordionContent className="text-xs text-muted-foreground">
+                  Borders, muted fills and body text.
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm">Feedback</CardTitle>
+            <CardDescription className="text-xs">Alerts, avatars and loading stay on the neutral tokens.</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            <Alert>
+              <AlertTitle className="text-xs">Deposit on the way</AlertTitle>
+              <AlertDescription className="text-xs">$4,620 arrives tomorrow morning.</AlertDescription>
+            </Alert>
+            <div className="flex items-center gap-3">
+              <Avatar><AvatarFallback>HV</AvatarFallback></Avatar>
+              <Avatar><AvatarFallback>SA</AvatarFallback></Avatar>
+              <Badge variant="outline">Outline badge</Badge>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Skeleton className="h-4 w-2/3" />
+              <Skeleton className="h-4 w-1/2" />
+            </div>
           </CardContent>
         </Card>
 
