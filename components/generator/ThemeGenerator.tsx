@@ -22,10 +22,13 @@ import { THEME_IDS, type ThemeId } from "@/lib/ask-nanci/data/theme-logos"
 // Every color token the design system themes, grouped the way a brand thinks about
 // them. Keys are the CSS custom-property names (minus the --); the two gradient
 // stops are pseudo-tokens composed into --app-gradient. Non-color knobs (radius,
-// fonts) are deliberately out of scope. Two defined-but-dead vars are also left out
-// rather than shown doing nothing: popover (portals out of the preview scope) and
-// destructive-foreground (zero consumers — the DS renders destructive as a tint,
-// bg-destructive/10 with text-destructive, never as ink on a solid surface).
+// fonts) are deliberately out of scope. Defined-but-dead vars are also left out
+// rather than shown doing nothing — audited 2026-08-25 against the ds5 dist and the
+// app source: popover (portals out of the preview scope), destructive-foreground
+// (the DS renders destructive as a tint, bg-destructive/10 with text-destructive),
+// and sidebar-primary(+foreground) (this DS build ships no sidebar-primary classes,
+// and the app's active nav item is bg-muted — the existing brand blocks set the var
+// without a single reader). Every exposed token below has real consumers.
 
 interface TokenDef { key: string; label: string; hint?: string }
 
@@ -66,10 +69,8 @@ const TOKEN_GROUPS: { title: string; tokens: TokenDef[] }[] = [
     tokens: [
       { key: "sidebar", label: "Surface" },
       { key: "sidebar-foreground", label: "Text" },
-      { key: "sidebar-primary", label: "Active item" },
-      { key: "sidebar-primary-foreground", label: "Active item text" },
-      { key: "sidebar-accent", label: "Hover" },
-      { key: "sidebar-accent-foreground", label: "Hover text" },
+      { key: "sidebar-accent", label: "Hover and active" },
+      { key: "sidebar-accent-foreground", label: "Hover and active text" },
       { key: "sidebar-border", label: "Border" },
     ],
   },
@@ -98,7 +99,6 @@ type TokenScope = "essential" | "all"
  */
 const ESSENTIAL_KEYS = new Set([
   "primary", "primary-foreground", "ring", "gradient-start", "gradient-end",
-  "sidebar-primary", "sidebar-primary-foreground",
 ])
 
 const DS5_PRESET = "ds5-default"
@@ -200,10 +200,9 @@ function Wall() {
             <Button size="sm" className="justify-start text-xs">New chat</Button>
             <div className="mt-4 flex flex-col gap-1">
               <Skeleton className="mb-1 h-2.5 w-14" />
-              <div
-                className="rounded-md px-2 py-1.5 text-xs font-medium"
-                style={{ background: "var(--sidebar-primary)", color: "var(--sidebar-primary-foreground, #fff)" }}
-              >
+              {/* The app's real active treatment: bg-muted, not a sidebar-primary var
+                  (that token has no consumers — see the model comment). */}
+              <div className="rounded-md bg-muted px-2 py-1.5 text-xs font-medium text-foreground">
                 Saturday sales spike
               </div>
               {[20, 24, 16].map((w, i) => (
