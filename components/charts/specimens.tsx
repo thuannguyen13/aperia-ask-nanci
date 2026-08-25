@@ -79,8 +79,12 @@ function Grid({ opts, vertical = false }: { opts: GalleryOptions; vertical?: boo
   return opts.grid ? <CartesianGrid vertical={vertical} horizontal={!vertical} strokeDasharray="3 3" /> : null
 }
 
+// min-w widens the card and the row is justify-between, so the label and its value
+// get real air between them instead of nearly touching at the DS min-w-32.
+const TOOLTIP_SPACING = "min-w-44 [&_.justify-between]:gap-6"
+
 function Tip({ opts }: { opts: GalleryOptions }) {
-  return <ChartTooltip content={<ChartTooltipContent indicator={opts.indicator} />} />
+  return <ChartTooltip content={<ChartTooltipContent indicator={opts.indicator} className={TOOLTIP_SPACING} />} />
 }
 
 function Key({ opts }: { opts: GalleryOptions }) {
@@ -313,27 +317,26 @@ function Combo({ opts }: { opts: GalleryOptions }) {
 
 // One series per quadrant category, so the scatter carries four ramp colors.
 const SCORE_SERIES = [
-  { key: "both", label: "Both flag" },
+  { key: "both", label: "Flagged by both" },
   { key: "mc", label: "Mastercard only" },
   { key: "vw", label: "VisionWeb only" },
-  { key: "none", label: "Neither" },
+  { key: "none", label: "Not flagged" },
 ] as const
 const SCATTER_BY_CAT = SCORE_SERIES.map((s) => ({
   ...s, points: GALLERY_SCATTER.filter((p) => p.cat === s.key),
 }))
 
+const MERCHANTS_SERIES = [{ key: "merchants", label: "Merchants" }]
+
 function Points({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(SCORE_SERIES, opts.swatches)} className={BOX}>
+    <ChartContainer config={buildChartConfig(MERCHANTS_SERIES, opts.swatches)} className={BOX}>
       <ScatterChart margin={MARGIN}>
         {opts.grid && <CartesianGrid strokeDasharray="3 3" />}
-        <XAxis type="number" dataKey="vw" name="VisionWeb" domain={[0, 100]} {...AXIS} />
-        <YAxis type="number" dataKey="mc" name="Mastercard" domain={[0, 100]} {...AXIS} width={40} />
+        <XAxis type="number" dataKey="vw" name="VisionWeb score" domain={[0, 100]} {...AXIS} />
+        <YAxis type="number" dataKey="mc" name="Mastercard score" domain={[0, 100]} {...AXIS} width={40} />
         <Tip opts={opts} />
-        <Key opts={opts} />
-        {SCATTER_BY_CAT.map((s) => (
-          <Scatter key={s.key} name={s.key} data={s.points} fill={`var(--color-${s.key})`} fillOpacity={0.75} />
-        ))}
+        <Scatter name="merchants" data={GALLERY_SCATTER} fill="var(--color-merchants)" fillOpacity={0.7} />
       </ScatterChart>
     </ChartContainer>
   )
@@ -342,9 +345,15 @@ function Points({ opts }: { opts: GalleryOptions }) {
 function Quadrant({ opts }: { opts: GalleryOptions }) {
   return (
     <ChartContainer config={buildChartConfig(SCORE_SERIES, opts.swatches)} className={BOX}>
-      <ScatterChart margin={MARGIN}>
-        <XAxis type="number" dataKey="vw" domain={[0, 100]} {...AXIS} />
-        <YAxis type="number" dataKey="mc" domain={[0, 100]} {...AXIS} width={40} />
+      <ScatterChart margin={{ ...MARGIN, bottom: 16 }}>
+        <XAxis
+          type="number" dataKey="vw" domain={[0, 100]} {...AXIS}
+          label={{ value: "VisionWeb score", position: "insideBottom", offset: -12, fontSize: 10, style: { textAnchor: "middle" } }}
+        />
+        <YAxis
+          type="number" dataKey="mc" domain={[0, 100]} {...AXIS} width={56}
+          label={{ value: "Mastercard score", angle: -90, position: "insideLeft", offset: 6, fontSize: 10, style: { textAnchor: "middle" } }}
+        />
         <ZAxis type="number" dataKey="mc" range={[24, 260]} />
         <ReferenceArea x1={0} x2={65} y1={65} y2={100} fill="var(--color-mc)" fillOpacity={0.07} />
         <ReferenceLine x={65} strokeDasharray="4 4" />
@@ -368,7 +377,7 @@ function Slices({ opts, donut }: { opts: GalleryOptions; donut?: boolean }) {
   return (
     <ChartContainer config={config} className={BOX}>
       <PieChart>
-        <ChartTooltip content={<ChartTooltipContent nameKey="key" hideLabel />} />
+        <ChartTooltip content={<ChartTooltipContent nameKey="key" hideLabel className={TOOLTIP_SPACING} />} />
         <Pie
           data={GALLERY_DECLINE_REASONS}
           dataKey="share"
@@ -411,7 +420,7 @@ function Radial({ opts }: { opts: GalleryOptions }) {
     <ChartContainer config={buildChartConfig(SLA_SERIES, opts.swatches)} className={BOX}>
       <RadialBarChart data={GALLERY_SLA} innerRadius="30%" outerRadius="98%" startAngle={90} endAngle={-270}>
         <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
-        <ChartTooltip content={<ChartTooltipContent nameKey="key" hideLabel />} />
+        <ChartTooltip content={<ChartTooltipContent nameKey="key" hideLabel className={TOOLTIP_SPACING} />} />
         <RadialBar dataKey="attainment" background cornerRadius={6}>
           {GALLERY_SLA.map((s) => (
             <Cell key={s.key} fill={`var(--color-${s.key})`} />
@@ -423,10 +432,8 @@ function Radial({ opts }: { opts: GalleryOptions }) {
   )
 }
 
-const TREEMAP_SERIES = GALLERY_TOP_MERCHANTS.map((m, i) => ({ key: `block${i}`, label: m.merchant }))
-const TREEMAP_DATA = GALLERY_TOP_MERCHANTS.map((m, i) => ({
-  name: m.merchant, size: m.volume, key: `block${i}`,
-}))
+const TREEMAP_SERIES = [{ key: "blocks", label: "Volume" }]
+const TREEMAP_DATA = GALLERY_TOP_MERCHANTS.map((m) => ({ name: m.merchant, size: m.volume }))
 
 /** Blocks are laid out at render time, so the label has to be clipped to the box it landed in. */
 function truncateToWidth(text: string, px: number) {
@@ -435,19 +442,20 @@ function truncateToWidth(text: string, px: number) {
 }
 
 /**
- * Recharts' default treemap block paints one shared fill and drops the label on all but
- * the largest few. This draws the palette color per block and keeps the label wherever it
- * fits, outlined so it stays legible on a light fill as well as a dark one.
+ * Recharts' default treemap block drops the label on all but the largest few. This one
+ * paints every block from the same swatch — size already encodes the value, so color per
+ * block would encode nothing — and keeps the label wherever it fits, outlined so it stays
+ * legible on a light fill as well as a dark one.
  */
 function TreemapBlock(props: unknown) {
-  const { x = 0, y = 0, width = 0, height = 0, index = 0, name = "", size = 0 } =
-    props as { x?: number; y?: number; width?: number; height?: number; index?: number; name?: string; size?: number }
-  const fits = width > 76 && height > 36
+  const { x = 0, y = 0, width = 0, height = 0, name = "", size = 0 } =
+    props as { x?: number; y?: number; width?: number; height?: number; name?: string; size?: number }
+  const fits = width > 76 && height > 40
   return (
     <g>
       <rect
         x={x} y={y} width={width} height={height}
-        fill={`var(--color-block${index})`}
+        fill="var(--color-blocks)"
         stroke="var(--background)"
         strokeWidth={2}
       />
@@ -477,7 +485,7 @@ function Blocks({ opts }: { opts: GalleryOptions }) {
         content={<TreemapBlock />}
         isAnimationActive={false}
       >
-        <ChartTooltip content={<ChartTooltipContent nameKey="key" hideLabel />} />
+        <ChartTooltip content={<ChartTooltipContent nameKey="name" hideLabel className={TOOLTIP_SPACING} />} />
       </Treemap>
     </ChartContainer>
   )
@@ -521,7 +529,7 @@ function Drop({ opts }: { opts: GalleryOptions }) {
   return (
     <ChartContainer config={buildChartConfig(FUNNEL_SERIES, opts.swatches)} className={BOX}>
       <FunnelChart margin={{ top: 4, right: 96, left: 4, bottom: 4 }}>
-        <ChartTooltip content={<ChartTooltipContent nameKey="key" hideLabel />} />
+        <ChartTooltip content={<ChartTooltipContent nameKey="key" hideLabel className={TOOLTIP_SPACING} />} />
         <Funnel dataKey="count" nameKey="key" data={FUNNEL_DATA} isAnimationActive={false}>
           {FUNNEL_DATA.map((f) => (
             <Cell key={f.key} fill={`var(--color-${f.key})`} />
