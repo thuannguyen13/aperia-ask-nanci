@@ -22,7 +22,7 @@ export interface GalleryPalette {
 
 export const PALETTES = {
   shadcn: {
-    label: "Shadcn",
+    label: "shadcn",
     note: "The stock shadcn chart ramp, shipped by aperia-ds5 in styles/base.css. It has separate :root and .dark values, so it is the only one of the three that was built to re-tune for dark mode.",
     swatches: [
       { light: "oklch(0.646 0.222 41.116)", dark: "oklch(0.488 0.243 264.376)" },

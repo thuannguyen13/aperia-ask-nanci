@@ -522,6 +522,8 @@ export function ThemeGenerator() {
   const [tokens, setTokens] = useState<Tokens | null>(null)
   // The values as seeded, so the export can tell an edit from an untouched default.
   const [seeded, setSeeded] = useState<Tokens | null>(null)
+  // Bumped by the Reset button to re-run the seeding effect on the same preset.
+  const [seedNonce, setSeedNonce] = useState(0)
   const [copied, setCopied] = useState(false)
 
   // Seed every token from the chosen preset. A brand seeds off a probe div carrying
@@ -554,7 +556,7 @@ export function ThemeGenerator() {
     setSeeded(next)
     resolver.dispose()
     probe.remove()
-  }, [preset])
+  }, [preset, seedNonce])
 
   if (!tokens || !seeded) return <div className="min-h-screen bg-background" />
 
@@ -574,6 +576,8 @@ export function ThemeGenerator() {
     setTimeout(() => setCopied(false), 1500)
   }
 
+  const dirty = ALL_TOKENS.some((k) => tokens[k] !== seeded[k])
+
   const edit = (key: string) => (hexValue: string) =>
     setTokens((prev) => (prev ? { ...prev, [key]: hexValue } : prev))
 
@@ -592,13 +596,26 @@ export function ThemeGenerator() {
         <div className="sticky top-0 z-20 -mx-6 mt-8 border-b bg-background/85 px-6 py-4 backdrop-blur">
           <div className="flex flex-wrap items-end gap-x-8 gap-y-5 pb-5">
             <Control label="Preset">
-              <Select value={preset} onValueChange={(v) => setPreset(v as ThemeId | typeof SHADCN_PRESET)}>
-                <SelectTrigger className="w-44 bg-background focus-visible:border-foreground focus-visible:ring-foreground/20"><SelectValue /></SelectTrigger>
-                <SelectContent position="popper" align="start" className="p-1">
-                  <SelectItem value={SHADCN_PRESET} className="py-1.5 pl-2">Shadcn</SelectItem>
-                  {THEME_IDS.map((id) => <SelectItem key={id} value={id} className="py-1.5 pl-2">{id}</SelectItem>)}
-                </SelectContent>
-              </Select>
+              <div className="flex items-center gap-2">
+                <Select value={preset} onValueChange={(v) => setPreset(v as ThemeId | typeof SHADCN_PRESET)}>
+                  <SelectTrigger className="w-44 bg-background focus-visible:border-foreground focus-visible:ring-foreground/20"><SelectValue /></SelectTrigger>
+                  <SelectContent position="popper" align="start" className="p-1">
+                    <SelectItem value={SHADCN_PRESET} className="py-1.5 pl-2">shadcn</SelectItem>
+                    {THEME_IDS.map((id) => <SelectItem key={id} value={id} className="py-1.5 pl-2">{id}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                {/* Discards every edit by re-seeding the same preset. Only shown dirty. */}
+                {dirty && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setSeedNonce((n) => n + 1)}
+                    className="focus-visible:border-foreground focus-visible:ring-foreground/20"
+                  >
+                    Reset
+                  </Button>
+                )}
+              </div>
             </Control>
             <Control label="Theme name">
               <Input
