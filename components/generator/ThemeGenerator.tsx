@@ -488,8 +488,8 @@ export function ThemeGenerator() {
         </header>
 
         <div className="sticky top-0 z-20 -mx-6 mt-8 border-y bg-background/85 px-6 py-4 backdrop-blur">
-          <div className="flex flex-wrap items-end gap-x-8 gap-y-4">
-            <Control label="Preset" note="Loads that theme's colors as your starting point.">
+          <div className="flex flex-wrap items-end gap-x-8 gap-y-5 pb-5">
+            <Control label="Preset" note="Seeds all six tokens below.">
               <Select value={preset} onValueChange={(v) => setPreset(v as ThemeId | typeof DS5_PRESET)}>
                 <SelectTrigger className="w-44 bg-background focus-visible:border-foreground focus-visible:ring-foreground/20"><SelectValue /></SelectTrigger>
                 <SelectContent position="popper" align="start">
