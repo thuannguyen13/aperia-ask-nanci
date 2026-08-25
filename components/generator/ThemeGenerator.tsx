@@ -94,12 +94,69 @@ function TokenRow({
 function Wall() {
   return (
     <div className="flex flex-col gap-5">
-      {/* The app frame: the gradient bar every brand theme paints behind the app. */}
-      <div
-        className="flex h-16 items-center rounded-xl px-5"
-        style={{ background: "var(--app-gradient)" }}
-      >
-        <span className="text-lg font-semibold tracking-tight text-white">Your Brand</span>
+      {/* The app itself, skeletonized: the same .app-frame gradient rule and nested
+          bg-sidebar card as the real shell, laid out like the concept welcome screen.
+          Themed surfaces (gradient, primary, sidebar active, ring) paint for real;
+          everything that would be content is a placeholder block. */}
+      <div className="app-frame flex h-[420px] flex-col overflow-hidden rounded-xl px-2 pb-2 ring-1 ring-inset ring-black/5">
+        <div className="relative flex h-12 shrink-0 items-center justify-between px-3">
+          <div className="h-6 w-16 rounded-md bg-white/20" />
+          <span className="absolute left-1/2 -translate-x-1/2 text-sm font-semibold tracking-tight text-white">
+            Your Brand
+          </span>
+          <div className="size-6 rounded-full bg-white/25" />
+        </div>
+        <div className="flex min-h-0 flex-1 overflow-hidden rounded-2xl bg-sidebar shadow-sm">
+          <div className="flex w-48 shrink-0 flex-col p-3">
+            <div className="flex items-center gap-2 px-1 pb-3">
+              <div className="size-5 rounded-md" style={{ background: "var(--primary)" }} />
+              <span className="text-xs font-semibold text-foreground">Ask Nanci</span>
+            </div>
+            <Button size="sm" className="justify-start text-xs">New chat</Button>
+            <div className="mt-4 flex flex-col gap-1">
+              <Skeleton className="mb-1 h-2.5 w-14" />
+              <div
+                className="rounded-md px-2 py-1.5 text-xs font-medium"
+                style={{ background: "var(--sidebar-primary)", color: "var(--sidebar-primary-foreground, #fff)" }}
+              >
+                Saturday sales spike
+              </div>
+              {[20, 24, 16].map((w, i) => (
+                <div key={i} className="px-2 py-1.5"><Skeleton className="h-2.5" style={{ width: w * 4 }} /></div>
+              ))}
+            </div>
+            <div className="mt-auto rounded-lg border p-2.5">
+              <Skeleton className="h-2.5 w-16" />
+              <Skeleton className="mt-1.5 h-2.5 w-24" />
+              <Progress value={62} className="mt-2 h-1.5" />
+            </div>
+          </div>
+          <div className="m-2 ml-0 flex min-w-0 flex-1 flex-col rounded-xl bg-background p-5">
+            <div className="flex flex-1 flex-col items-center justify-center gap-4">
+              <div className="flex flex-col items-center gap-2">
+                <Skeleton className="h-4 w-56" />
+                <Skeleton className="h-2.5 w-40" />
+              </div>
+              <div className="grid w-full max-w-md grid-cols-2 gap-2.5">
+                {[0, 1, 2, 3].map((i) => (
+                  <div key={i} className="rounded-lg border p-3">
+                    <Skeleton className="h-2.5 w-3/4" />
+                    <Skeleton className="mt-1.5 h-2.5 w-1/2" />
+                    <span className="mt-2 block text-[10px] font-medium" style={{ color: "var(--primary)" }}>
+                      Try it →
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="mx-auto flex w-full max-w-md shrink-0 items-center gap-2">
+              <div className="flex h-8 flex-1 items-center rounded-lg border px-2.5">
+                <span className="text-xs text-muted-foreground">Ask anything…</span>
+              </div>
+              <Button size="sm">Ask</Button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="grid gap-5 lg:grid-cols-2">
@@ -299,28 +356,6 @@ function Wall() {
               <Skeleton className="h-4 w-2/3" />
               <Skeleton className="h-4 w-1/2" />
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">Sidebar</CardTitle>
-            <CardDescription className="text-xs">The active item takes sidebar-primary.</CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-1">
-            {["Dashboard", "Transactions", "Reports"].map((item, i) => (
-              <div
-                key={item}
-                className="rounded-md px-3 py-2 text-xs font-medium"
-                style={
-                  i === 0
-                    ? { background: "var(--sidebar-primary)", color: "var(--sidebar-primary-foreground, #fff)" }
-                    : undefined
-                }
-              >
-                {item}
-              </div>
-            ))}
           </CardContent>
         </Card>
 
