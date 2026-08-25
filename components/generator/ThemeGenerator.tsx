@@ -19,66 +19,127 @@ import { createColorResolver } from "@/lib/ask-nanci/resolve-color"
 import { THEME_IDS, type ThemeId } from "@/lib/ask-nanci/data/theme-logos"
 
 // ── Token model ────────────────────────────────────────────────────────────────
-// The six knobs a brand block in app/globals.css actually sets. The export below
-// emits exactly that block shape, so the output is paste-ready white-labeling.
+// Every color token the design system themes, grouped the way a brand thinks about
+// them. Keys are the CSS custom-property names (minus the --); the two gradient
+// stops are pseudo-tokens composed into --app-gradient. Non-color knobs (radius,
+// fonts) are deliberately out of scope. Popover is themeable too but portals out of
+// the preview scope, so it is left unexposed rather than shown doing nothing.
 
-interface BrandTokens {
-  primary: string
-  primaryForeground: string
-  ring: string
-  sidebarPrimary: string
-  gradientStart: string
-  gradientEnd: string
-}
+interface TokenDef { key: string; label: string; hint?: string }
 
-const TOKEN_ROWS: { key: keyof BrandTokens; label: string; hint: string }[] = [
-  { key: "primary", label: "Primary", hint: "Buttons, badges, switches, progress" },
-  { key: "primaryForeground", label: "Primary foreground", hint: "Ink on primary surfaces" },
-  { key: "ring", label: "Focus ring", hint: "Focused inputs and controls" },
-  { key: "sidebarPrimary", label: "Sidebar active", hint: "The active nav item" },
-  { key: "gradientStart", label: "Frame gradient start", hint: "Top of the page backdrop" },
-  { key: "gradientEnd", label: "Frame gradient end", hint: "Where the backdrop fades to" },
+const TOKEN_GROUPS: { title: string; tokens: TokenDef[] }[] = [
+  {
+    title: "Brand",
+    tokens: [
+      { key: "primary", label: "Primary", hint: "Buttons, badges, switches, progress" },
+      { key: "primary-foreground", label: "Primary foreground", hint: "Ink on primary surfaces" },
+      { key: "ring", label: "Focus ring", hint: "Focused inputs and controls" },
+      { key: "gradient-start", label: "Frame gradient start", hint: "Top of the page backdrop" },
+      { key: "gradient-end", label: "Frame gradient end", hint: "Where the backdrop fades to" },
+    ],
+  },
+  {
+    title: "Neutrals",
+    tokens: [
+      { key: "background", label: "Background" },
+      { key: "foreground", label: "Foreground" },
+      { key: "card", label: "Card" },
+      { key: "card-foreground", label: "Card foreground" },
+      { key: "secondary", label: "Secondary" },
+      { key: "secondary-foreground", label: "Secondary foreground" },
+      { key: "muted", label: "Muted" },
+      { key: "muted-foreground", label: "Muted foreground" },
+      { key: "accent", label: "Accent" },
+      { key: "accent-foreground", label: "Accent foreground" },
+      { key: "border", label: "Border" },
+      { key: "input", label: "Input border" },
+    ],
+  },
+  {
+    title: "Semantic",
+    tokens: [
+      { key: "destructive", label: "Destructive" },
+      { key: "destructive-foreground", label: "Destructive foreground" },
+    ],
+  },
+  {
+    title: "Sidebar",
+    tokens: [
+      { key: "sidebar", label: "Surface" },
+      { key: "sidebar-foreground", label: "Text" },
+      { key: "sidebar-primary", label: "Active item" },
+      { key: "sidebar-primary-foreground", label: "Active item text" },
+      { key: "sidebar-accent", label: "Hover" },
+      { key: "sidebar-accent-foreground", label: "Hover text" },
+      { key: "sidebar-border", label: "Border" },
+    ],
+  },
+  {
+    title: "Charts",
+    tokens: [
+      { key: "chart-1", label: "Chart 1" },
+      { key: "chart-2", label: "Chart 2" },
+      { key: "chart-3", label: "Chart 3" },
+      { key: "chart-4", label: "Chart 4" },
+      { key: "chart-5", label: "Chart 5" },
+      { key: "chart-6", label: "Chart 6" },
+    ],
+  },
 ]
 
-/**
- * The design system's own stock tokens, from aperia-ds5/styles/base.css :root. They
- * cannot be read off a probe — app/globals.css re-declares :root after the DS import,
- * so the cascade always answers with the app's values. Kept verbatim as authored;
- * the seeding resolver converts them to hex.
- */
-const DS5_DEFAULTS = {
-  primary: "oklch(0.21 0.006 285.885)",
-  primaryForeground: "oklch(0.985 0 0)",
-  ring: "oklch(0.705 0.015 286.067)",
-  sidebarPrimary: "oklch(0.21 0.006 285.885)",
-}
+const ALL_TOKENS = TOKEN_GROUPS.flatMap((g) => g.tokens.map((t) => t.key))
+type Tokens = Record<string, string>
+
 const DS5_PRESET = "ds5-default"
+
+/**
+ * The values app/globals.css :root overrides, restored verbatim from
+ * aperia-ds5/styles/base.css for the DS5-default preset — the cascade cannot answer
+ * with them because globals re-declares :root after the DS import. Every token not
+ * listed here resolves correctly off the probe even for this preset.
+ */
+const DS5_OVERRIDES: Record<string, string> = {
+  primary: "oklch(0.21 0.006 285.885)",
+  "primary-foreground": "oklch(0.985 0 0)",
+  ring: "oklch(0.705 0.015 286.067)",
+  "chart-1": "oklch(0.646 0.222 41.116)",
+  "chart-2": "oklch(0.6 0.118 184.704)",
+  "chart-3": "oklch(0.398 0.07 227.392)",
+  "chart-4": "oklch(0.828 0.189 84.429)",
+  "chart-5": "oklch(0.769 0.188 70.08)",
+}
 
 /** Every current gradient in globals.css follows this exact shape. */
 const GRADIENT_RE = /linear-gradient\(180deg,\s*(.+?)\s+0%,\s*(.+?)\s+200px\)/
 
-function buildGradient(t: BrandTokens) {
-  return `linear-gradient(180deg, ${t.gradientStart} 0%, ${t.gradientEnd} 200px)`
+function buildGradient(t: Tokens) {
+  return `linear-gradient(180deg, ${t["gradient-start"]} 0%, ${t["gradient-end"]} 200px)`
 }
 
-function buildCss(name: string, t: BrandTokens) {
-  return `[data-theme="${name}"] {
-  --primary: ${t.primary};
-  --color-primary: ${t.primary};
-  --primary-foreground: ${t.primaryForeground};
-  --color-primary-foreground: ${t.primaryForeground};
-  --ring: ${t.ring};
-  --sidebar-primary: ${t.sidebarPrimary};
-  --sidebar-primary-foreground: ${t.primaryForeground};
-  --app-gradient: linear-gradient(180deg, ${t.gradientStart} 0%, ${t.gradientEnd} 200px);
-}`
+/**
+ * The paste-ready block. The Brand group and the sidebar active pair are always
+ * emitted — the shape every existing brand block uses — and every other token is
+ * included only when it was edited away from its seeded value, so untouched
+ * neutrals never bloat the theme.
+ */
+function buildCss(name: string, t: Tokens, seeded: Tokens) {
+  const always = new Set(["primary", "primary-foreground", "ring", "sidebar-primary", "sidebar-primary-foreground"])
+  const lines: string[] = []
+  for (const key of ALL_TOKENS) {
+    if (key.startsWith("gradient-")) continue
+    if (!always.has(key) && t[key] === seeded[key]) continue
+    lines.push(`  --${key}: ${t[key]};`)
+    lines.push(`  --color-${key}: ${t[key]};`)
+  }
+  lines.push(`  --app-gradient: ${buildGradient(t)};`)
+  return `[data-theme="${name}"] {\n${lines.join("\n")}\n}`
 }
 
 // ── Token editor row ───────────────────────────────────────────────────────────
 
 function TokenRow({
   label, hint, value, onChange,
-}: { label: string; hint: string; value: string; onChange: (hex: string) => void }) {
+}: { label: string; hint?: string; value: string; onChange: (hex: string) => void }) {
   return (
     <label className="flex cursor-pointer items-center gap-3 rounded-md px-2 py-1.5 hover:bg-muted/50">
       <span
@@ -94,7 +155,7 @@ function TokenRow({
       </span>
       <span className="min-w-0 flex-1">
         <span className="block text-xs font-medium text-foreground">{label}</span>
-        <span className="block truncate text-[10px] text-muted-foreground">{hint}</span>
+        {hint && <span className="block truncate text-[10px] text-muted-foreground">{hint}</span>}
       </span>
       <span className="font-mono text-[10px] text-muted-foreground">{value}</span>
     </label>
@@ -186,6 +247,7 @@ function Wall() {
               <Button size="sm" variant="secondary">Secondary</Button>
               <Button size="sm" variant="outline">Outline</Button>
               <Button size="sm" disabled>Disabled</Button>
+              <Button size="sm" variant="destructive">Delete</Button>
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <Badge>Badge</Badge>
@@ -380,6 +442,17 @@ function Wall() {
             <CardDescription className="text-xs">Single-measure bars take primary.</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col justify-center gap-2.5">
+            <div className="mb-1 flex items-center gap-1.5">
+              {[1, 2, 3, 4, 5, 6].map((n) => (
+                <span
+                  key={n}
+                  title={`chart-${n}`}
+                  className="size-4 rounded-[3px] ring-1 ring-inset ring-black/10"
+                  style={{ background: `var(--chart-${n})` }}
+                />
+              ))}
+              <span className="ml-1 text-[10px] text-muted-foreground">chart-1..6</span>
+            </div>
             {[
               { name: "Card present", v: 100 },
               { name: "E-commerce", v: 62 },
@@ -408,64 +481,54 @@ function Wall() {
 export function ThemeGenerator() {
   const [preset, setPreset] = useState<ThemeId | typeof DS5_PRESET>(DS5_PRESET)
   const [themeName, setThemeName] = useState("new-brand")
-  const [tokens, setTokens] = useState<BrandTokens | null>(null)
+  const [tokens, setTokens] = useState<Tokens | null>(null)
+  // The values as seeded, so the export can tell an edit from an untouched default.
+  const [seeded, setSeeded] = useState<Tokens | null>(null)
   const [copied, setCopied] = useState(false)
 
-  // Seed the tokens from the chosen preset. A brand seeds off a probe div carrying
+  // Seed every token from the chosen preset. A brand seeds off a probe div carrying
   // data-theme, which picks up that brand's [data-theme] block through the normal
   // cascade — with :root filling whatever the brand does not set, exactly what the
-  // app resolves. The DS5 default seeds from the design system's stock values.
+  // app resolves. The DS5 default swaps in the stock values globals.css shadows.
   useEffect(() => {
     const probe = document.createElement("div")
     if (preset !== DS5_PRESET) probe.dataset.theme = preset
     document.body.appendChild(probe)
     const resolver = createColorResolver(probe)
+    const cs = getComputedStyle(probe)
+    const raw = (n: string) => cs.getPropertyValue(n).trim()
 
-    if (preset === DS5_PRESET) {
-      const primary = resolver.toHex(DS5_DEFAULTS.primary)
-      setTokens({
-        primary,
-        primaryForeground: resolver.toHex(DS5_DEFAULTS.primaryForeground),
-        ring: resolver.toHex(DS5_DEFAULTS.ring),
-        sidebarPrimary: resolver.toHex(DS5_DEFAULTS.sidebarPrimary),
-        gradientStart: primary,
-        gradientEnd: resolver.toHex(`color-mix(in oklab, ${DS5_DEFAULTS.primary} 12%, white)`),
-      })
-    } else {
-      const cs = getComputedStyle(probe)
-      const raw = (name: string) => cs.getPropertyValue(name).trim()
-      const hex = (value: string, fallback: string) => (value ? resolver.toHex(value) : fallback)
-      const primary = hex(raw("--color-primary") || raw("--primary"), "#280086")
-      const gradient = raw("--app-gradient").match(GRADIENT_RE)
-      setTokens({
-        primary,
-        primaryForeground: hex(raw("--color-primary-foreground") || raw("--primary-foreground"), "#fafafa"),
-        ring: hex(raw("--ring"), primary),
-        sidebarPrimary: hex(raw("--sidebar-primary"), primary),
-        gradientStart: gradient ? resolver.toHex(gradient[1]) : primary,
-        gradientEnd: gradient ? resolver.toHex(gradient[2]) : "#ffffff",
-      })
+    const next: Tokens = {}
+    for (const key of ALL_TOKENS) {
+      if (key.startsWith("gradient-")) continue
+      const stock = preset === DS5_PRESET ? DS5_OVERRIDES[key] : undefined
+      // --color-primary first: two brand blocks set only that form of primary.
+      const value = stock ?? (key === "primary" ? raw("--color-primary") || raw("--primary") : raw(`--${key}`))
+      next[key] = value ? resolver.toHex(value) : "#888888"
     }
+    const gradient = preset === DS5_PRESET ? null : raw("--app-gradient").match(GRADIENT_RE)
+    next["gradient-start"] = gradient ? resolver.toHex(gradient[1]) : next.primary
+    next["gradient-end"] = gradient
+      ? resolver.toHex(gradient[2])
+      : resolver.toHex(`color-mix(in oklab, ${next.primary} 12%, white)`)
+
+    setTokens(next)
+    setSeeded(next)
     resolver.dispose()
     probe.remove()
   }, [preset])
 
-  if (!tokens) return <div className="min-h-screen bg-background" />
+  if (!tokens || !seeded) return <div className="min-h-screen bg-background" />
 
-  const previewVars = {
-    "--primary": tokens.primary,
-    "--color-primary": tokens.primary,
-    "--primary-foreground": tokens.primaryForeground,
-    "--color-primary-foreground": tokens.primaryForeground,
-    "--ring": tokens.ring,
-    "--color-ring": tokens.ring,
-    "--sidebar-primary": tokens.sidebarPrimary,
-    "--color-sidebar-primary": tokens.sidebarPrimary,
-    "--sidebar-primary-foreground": tokens.primaryForeground,
-    "--app-gradient": buildGradient(tokens),
-  } as React.CSSProperties
+  const previewVars = Object.fromEntries([
+    ...ALL_TOKENS.filter((k) => !k.startsWith("gradient-")).flatMap((k) => [
+      [`--${k}`, tokens[k]],
+      [`--color-${k}`, tokens[k]],
+    ]),
+    ["--app-gradient", buildGradient(tokens)],
+  ]) as React.CSSProperties
 
-  const css = buildCss(themeName, tokens)
+  const css = buildCss(themeName, tokens, seeded)
 
   const copy = async () => {
     await navigator.clipboard.writeText(css)
@@ -473,7 +536,7 @@ export function ThemeGenerator() {
     setTimeout(() => setCopied(false), 1500)
   }
 
-  const edit = (key: keyof BrandTokens) => (hexValue: string) =>
+  const edit = (key: string) => (hexValue: string) =>
     setTokens((prev) => (prev ? { ...prev, [key]: hexValue } : prev))
 
   return (
@@ -540,21 +603,23 @@ export function ThemeGenerator() {
         </div>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[320px_minmax(0,1fr)]">
-          <div className="flex flex-col gap-6 lg:sticky lg:top-32 lg:self-start">
-            <section>
-              <h2 className="text-sm font-semibold text-foreground">Brand tokens</h2>
-              <div className="mt-3 flex flex-col">
-                {TOKEN_ROWS.map((row) => (
-                  <TokenRow
-                    key={row.key}
-                    label={row.label}
-                    hint={row.hint}
-                    value={tokens[row.key]}
-                    onChange={edit(row.key)}
-                  />
-                ))}
-              </div>
-            </section>
+          <div className="flex flex-col gap-5 lg:sticky lg:top-32 lg:max-h-[calc(100vh-10rem)] lg:self-start lg:overflow-y-auto lg:pr-2">
+            {TOKEN_GROUPS.map((group) => (
+              <section key={group.title}>
+                <h2 className="text-sm font-semibold text-foreground">{group.title}</h2>
+                <div className="mt-2 flex flex-col">
+                  {group.tokens.map((row) => (
+                    <TokenRow
+                      key={row.key}
+                      label={row.label}
+                      hint={row.hint}
+                      value={tokens[row.key]}
+                      onChange={edit(row.key)}
+                    />
+                  ))}
+                </div>
+              </section>
+            ))}
           </div>
 
           <div style={previewVars}>
