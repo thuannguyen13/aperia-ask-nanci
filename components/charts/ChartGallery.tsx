@@ -3,62 +3,18 @@
 import { memo, useEffect, useMemo, useState } from "react"
 import { useTheme } from "next-themes"
 import {
-  Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Separator, Switch,
-  Tabs, TabsList, TabsTrigger,
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Separator, Switch,
 } from "aperia-ds5"
 import { useAppTheme } from "@/components/ask-nanci/AppFrame"
 import { THEME_IDS, type ThemeId } from "@/lib/ask-nanci/data/theme-logos"
 import { PALETTES, type ChartSwatch, type PaletteId } from "@/lib/ask-nanci/data/chart-gallery"
+import { createColorResolver } from "@/lib/ask-nanci/resolve-color"
+import { Control, SegmentedGroup } from "./controls"
 import { resolveSwatch, SPECIMEN_GROUPS, type GalleryOptions, type Specimen } from "./specimens"
 
 const PALETTE_IDS = Object.keys(PALETTES) as PaletteId[]
 
 const INDICATORS = ["dot", "line", "dashed"] as const
-
-function Control({ label, note, children }: { label: string; note?: string; children: React.ReactNode }) {
-  return (
-    <div className="relative flex flex-col gap-1.5">
-      <Label className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">{label}</Label>
-      {children}
-      {/* Out of the flex flow: in it, the one control carrying a note was taller than the
-          rest and knocked its own label off the row's baseline. The row reserves the space. */}
-      {note && (
-        <span className="absolute left-0 top-full mt-1.5 whitespace-nowrap text-[10px] leading-none text-muted-foreground/80">
-          {note}
-        </span>
-      )}
-    </div>
-  )
-}
-
-// The DS's segmented control: the default TabsList variant is the muted track with a
-// raised bg-background active pill (there is no separate SegmentedControl export in
-// aperia-ds5). Tabs never deselects on re-click, so no empty-value guard is needed.
-// Only the focus ring is overridden — foreground/20 instead of --ring, matching the
-// rest of this bar's brand-independent chrome.
-function SegmentedGroup<T extends string>({
-  options, value, onChange,
-}: {
-  options: readonly { value: T; label: string }[]
-  value: T
-  onChange: (v: T) => void
-}) {
-  return (
-    <Tabs value={value} onValueChange={(v) => onChange(v as T)}>
-      <TabsList>
-        {options.map((o) => (
-          <TabsTrigger
-            key={o.value}
-            value={o.value}
-            className="px-3 focus-visible:outline-none focus-visible:ring-foreground/20"
-          >
-            {o.label}
-          </TabsTrigger>
-        ))}
-      </TabsList>
-    </Tabs>
-  )
-}
 
 // The exact chrome MessageChart.tsx puts around a chart in a chat answer, so a
 // specimen here looks the way it will look in the app — not a DS Card approximation.
@@ -122,27 +78,9 @@ export function ChartGallery() {
   // live theme context — a probe on <body> sees data-theme, .dark and the CSS vars.
   const swatchKey = effective.map((s) => (typeof s === "string" ? s : s.light + s.dark)).join("|")
   useEffect(() => {
-    const probe = document.createElement("span")
-    document.body.appendChild(probe)
-    // The computed color keeps its authored syntax (oklch(...), oklab(...) from
-    // color-mix) — regex-reading rgb() numbers out of it silently produced garbage
-    // like #010029 for the shadcn orange. A 1px canvas parses any color syntax and
-    // hands back actual bytes.
-    const canvas = document.createElement("canvas")
-    canvas.width = canvas.height = 1
-    const ctx = canvas.getContext("2d", { willReadFrequently: true })
-    const toHex = (color: string) => {
-      if (!ctx) return "#888888"
-      probe.style.color = ""
-      probe.style.color = color
-      ctx.fillStyle = "#888888"
-      ctx.fillStyle = getComputedStyle(probe).color
-      ctx.fillRect(0, 0, 1, 1)
-      const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data
-      return "#" + [r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("")
-    }
-    setResolvedHex(effective.map((s) => toHex(resolveSwatch(s, dark))))
-    probe.remove()
+    const resolver = createColorResolver(document.body)
+    setResolvedHex(effective.map((s) => resolver.toHex(resolveSwatch(s, dark))))
+    resolver.dispose()
     // swatchKey covers the swatches array; brand re-resolves the CSS vars.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [swatchKey, brand, dark, mounted])
