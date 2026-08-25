@@ -433,7 +433,15 @@ function Radial({ opts }: { opts: GalleryOptions }) {
 }
 
 const TREEMAP_SERIES = [{ key: "blocks", label: "Volume" }]
-const TREEMAP_DATA = GALLERY_TOP_MERCHANTS.map((m) => ({ name: m.merchant, size: m.volume }))
+const TREEMAP_PEAK = Math.max(...GALLERY_TOP_MERCHANTS.map((m) => m.volume))
+// One hue, intensity scaled to value (45%..100% of the swatch toward the background).
+// The shade lives on the data rows so the block rect AND the tooltip dot read the same
+// fill — computed inside the block, the tooltip had no color at all.
+const TREEMAP_DATA = GALLERY_TOP_MERCHANTS.map((m) => ({
+  name: m.merchant,
+  size: m.volume,
+  fill: `color-mix(in oklab, var(--color-blocks) ${Math.round(45 + (m.volume / TREEMAP_PEAK) * 55)}%, var(--background))`,
+}))
 
 /** Blocks are laid out at render time, so the label has to be clipped to the box it landed in. */
 function truncateToWidth(text: string, px: number) {
@@ -441,27 +449,20 @@ function truncateToWidth(text: string, px: number) {
   return text.length <= max ? text : `${text.slice(0, Math.max(max - 1, 0)).trimEnd()}\u2026`
 }
 
-const TREEMAP_MAX = Math.max(...TREEMAP_DATA.map((d) => d.size))
-
 /**
  * Recharts' default treemap block drops the label on all but the largest few. This one
- * paints every block from the same swatch — same category, same color — with intensity
- * scaled to the block's value, so color redundantly encodes what area already shows
- * (the standard treemap treatment) instead of a meaningless color per block. Labels
- * stay wherever they fit, outlined so they read on the lighter fills too.
+ * paints the row's fill (the value-scaled shade above) and keeps the label wherever it
+ * fits, outlined so it reads on the lighter fills too.
  */
 function TreemapBlock(props: unknown) {
-  const { x = 0, y = 0, width = 0, height = 0, name = "", size = 0 } =
-    props as { x?: number; y?: number; width?: number; height?: number; name?: string; size?: number }
+  const { x = 0, y = 0, width = 0, height = 0, name = "", size = 0, fill = "var(--color-blocks)" } =
+    props as { x?: number; y?: number; width?: number; height?: number; name?: string; size?: number; fill?: string }
   const fits = width > 76 && height > 40
-  // 45%..100% of the swatch toward the background: the smallest block stays clearly
-  // in the hue family, the largest is the full swatch.
-  const strength = Math.round(45 + (size / TREEMAP_MAX) * 55)
   return (
     <g>
       <rect
         x={x} y={y} width={width} height={height}
-        fill={`color-mix(in oklab, var(--color-blocks) ${strength}%, var(--background))`}
+        fill={fill}
         stroke="var(--background)"
         strokeWidth={2}
       />
@@ -529,7 +530,11 @@ function Profile({ opts }: { opts: GalleryOptions }) {
 }
 
 const FUNNEL_SERIES = GALLERY_AUTH_FUNNEL.map((f, i) => ({ key: `stage${i}`, label: f.stage }))
-const FUNNEL_DATA = GALLERY_AUTH_FUNNEL.map((f, i) => ({ ...f, key: `stage${i}` }))
+// fill on the data rows, not Cells: the tooltip dot resolves payload.fill, which a
+// Cell never reaches — same fix as the radial gauge's legend.
+const FUNNEL_DATA = GALLERY_AUTH_FUNNEL.map((f, i) => ({
+  ...f, key: `stage${i}`, fill: `var(--color-stage${i})`,
+}))
 
 function Drop({ opts }: { opts: GalleryOptions }) {
   return (
@@ -537,9 +542,6 @@ function Drop({ opts }: { opts: GalleryOptions }) {
       <FunnelChart margin={{ top: 4, right: 96, left: 4, bottom: 4 }}>
         <ChartTooltip content={<ChartTooltipContent nameKey="key" hideLabel className={TOOLTIP_SPACING} />} />
         <Funnel dataKey="count" nameKey="key" data={FUNNEL_DATA} isAnimationActive={false}>
-          {FUNNEL_DATA.map((f) => (
-            <Cell key={f.key} fill={`var(--color-${f.key})`} />
-          ))}
           <LabelList
             dataKey="stage"
             position="right"
