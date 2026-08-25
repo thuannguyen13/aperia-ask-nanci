@@ -14,7 +14,7 @@ import {
   Slider, Switch, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Tabs,
   TabsList, TabsTrigger, Textarea, Toggle, ToggleGroup, ToggleGroupItem,
 } from "aperia-ds5"
-import { Control, SegmentedGroup } from "@/components/charts/controls"
+import { Control } from "@/components/charts/controls"
 import { createColorResolver } from "@/lib/ask-nanci/resolve-color"
 import { THEME_IDS, type ThemeId } from "@/lib/ask-nanci/data/theme-logos"
 
@@ -90,12 +90,9 @@ const TOKEN_GROUPS: { title: string; tokens: TokenDef[] }[] = [
 const ALL_TOKENS = TOKEN_GROUPS.flatMap((g) => g.tokens.map((t) => t.key))
 type Tokens = Record<string, string>
 
-type TokenScope = "essential" | "all"
-
 /**
- * The white-label set every existing brand block ships — what "Essential" shows and
- * exports. "All" opens the full inventory and exports every token, making the theme
- * self-contained instead of leaning on the :root defaults.
+ * The white-label core every existing brand block ships. Always exported; every
+ * other token joins the block only when edited away from its seeded value.
  */
 const ESSENTIAL_KEYS = new Set([
   "primary", "primary-foreground", "ring", "gradient-start", "gradient-end",
@@ -128,15 +125,14 @@ function buildGradient(t: Tokens) {
 }
 
 /**
- * The paste-ready block. Essential emits the white-label set — the shape every
- * existing brand block uses. All emits every token, so the theme carries its whole
- * palette explicitly.
+ * The paste-ready block: the white-label core always, plus any token edited away
+ * from its seeded value — so untouched defaults never bloat the theme.
  */
-function buildCss(name: string, t: Tokens, scope: TokenScope) {
-  const keys = scope === "essential" ? ALL_TOKENS.filter((k) => ESSENTIAL_KEYS.has(k)) : ALL_TOKENS
+function buildCss(name: string, t: Tokens, seeded: Tokens) {
   const lines: string[] = []
-  for (const key of keys) {
+  for (const key of ALL_TOKENS) {
     if (key.startsWith("gradient-")) continue
+    if (!ESSENTIAL_KEYS.has(key) && t[key] === seeded[key]) continue
     lines.push(`  --${key}: ${t[key]};`)
     lines.push(`  --color-${key}: ${t[key]};`)
   }
@@ -523,8 +519,9 @@ function Wall() {
 export function ThemeGenerator() {
   const [preset, setPreset] = useState<ThemeId | typeof SHADCN_PRESET>(SHADCN_PRESET)
   const [themeName, setThemeName] = useState("new-brand")
-  const [scope, setScope] = useState<TokenScope>("essential")
   const [tokens, setTokens] = useState<Tokens | null>(null)
+  // The values as seeded, so the export can tell an edit from an untouched default.
+  const [seeded, setSeeded] = useState<Tokens | null>(null)
   const [copied, setCopied] = useState(false)
 
   // Seed every token from the chosen preset. A brand seeds off a probe div carrying
@@ -554,11 +551,12 @@ export function ThemeGenerator() {
       : resolver.toHex(`color-mix(in oklab, ${next.primary} 12%, white)`)
 
     setTokens(next)
+    setSeeded(next)
     resolver.dispose()
     probe.remove()
   }, [preset])
 
-  if (!tokens) return <div className="min-h-screen bg-background" />
+  if (!tokens || !seeded) return <div className="min-h-screen bg-background" />
 
   const previewVars = Object.fromEntries([
     ...ALL_TOKENS.filter((k) => !k.startsWith("gradient-")).flatMap((k) => [
@@ -568,7 +566,7 @@ export function ThemeGenerator() {
     ["--app-gradient", buildGradient(tokens)],
   ]) as React.CSSProperties
 
-  const css = buildCss(themeName, tokens, scope)
+  const css = buildCss(themeName, tokens, seeded)
 
   const copy = async () => {
     await navigator.clipboard.writeText(css)
@@ -597,17 +595,10 @@ export function ThemeGenerator() {
               <Select value={preset} onValueChange={(v) => setPreset(v as ThemeId | typeof SHADCN_PRESET)}>
                 <SelectTrigger className="w-44 bg-background focus-visible:border-foreground focus-visible:ring-foreground/20"><SelectValue /></SelectTrigger>
                 <SelectContent position="popper" align="start" className="p-1">
-                  <SelectItem value={SHADCN_PRESET} className="py-1.5 pl-2">Shadcn Default</SelectItem>
+                  <SelectItem value={SHADCN_PRESET} className="py-1.5 pl-2">Shadcn</SelectItem>
                   {THEME_IDS.map((id) => <SelectItem key={id} value={id} className="py-1.5 pl-2">{id}</SelectItem>)}
                 </SelectContent>
               </Select>
-            </Control>
-            <Control label="Tokens" note={scope === "essential" ? "The set every brand ships." : "The full themeable inventory."}>
-              <SegmentedGroup
-                value={scope}
-                onChange={setScope}
-                options={[{ value: "essential", label: "Essential" }, { value: "all", label: "All tokens" }]}
-              />
             </Control>
             <Control label="Theme name">
               <Input
@@ -651,13 +642,17 @@ export function ThemeGenerator() {
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[320px_minmax(0,1fr)]">
           <div className="flex flex-col gap-5 lg:sticky lg:top-32 lg:max-h-[calc(100vh-10rem)] lg:self-start lg:overflow-y-auto lg:pr-2">
-            {TOKEN_GROUPS.map((group) => {
-              const rows = scope === "essential" ? group.tokens.filter((t) => ESSENTIAL_KEYS.has(t.key)) : group.tokens
-              return rows.length === 0 ? null : (
+            {TOKEN_GROUPS.map((group) => (
               <section key={group.title}>
                 <h2 className="text-sm font-semibold text-foreground">{group.title}</h2>
+                {group.title === "Brand" && (
+                  <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
+                    The main tokens for a brand theme: start here. The groups below
+                    fine-tune, and only join the CSS once you change them.
+                  </p>
+                )}
                 <div className="mt-2 flex flex-col">
-                  {rows.map((row) => (
+                  {group.tokens.map((row) => (
                     <TokenRow
                       key={row.key}
                       label={row.label}
@@ -668,8 +663,7 @@ export function ThemeGenerator() {
                   ))}
                 </div>
               </section>
-              )
-            })}
+            ))}
           </div>
 
           <div style={previewVars}>
