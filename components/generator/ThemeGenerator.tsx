@@ -447,7 +447,7 @@ function Wall() {
         <Card>
           <CardHeader>
             <CardTitle className="text-sm">Data</CardTitle>
-            <CardDescription className="text-xs">Single-measure bars take primary.</CardDescription>
+            <CardDescription className="text-xs">Charts color from the chart ramp — a single series takes chart-1.</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col justify-center gap-2.5">
             <div className="mb-1 flex items-center gap-1.5">
@@ -472,7 +472,7 @@ function Wall() {
                 <div className="min-w-0 flex-1">
                   <div
                     className="h-3.5 rounded-[2px]"
-                    style={{ width: `${r.v}%`, background: "var(--primary)" }}
+                    style={{ width: `${r.v}%`, background: "var(--chart-1)" }}
                   />
                 </div>
               </div>
