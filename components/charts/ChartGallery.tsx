@@ -4,8 +4,8 @@ import { useEffect, useState } from "react"
 import { useTheme } from "next-themes"
 import {
   Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Separator, Switch,
+  ToggleGroup, ToggleGroupItem,
 } from "aperia-ds5"
-import { cn } from "aperia-ds5/utils"
 import { useAppTheme } from "@/components/ask-nanci/AppFrame"
 import { THEME_IDS, type ThemeId } from "@/lib/ask-nanci/data/theme-logos"
 import { PALETTES, type PaletteId } from "@/lib/ask-nanci/data/chart-gallery"
@@ -37,6 +37,11 @@ function Control({ label, note, children }: { label: string; note?: string; chil
   )
 }
 
+// DS5's own segmented control: ToggleGroup at spacing 0 with the outline variant
+// renders joined segments with shared borders. Only the on-state is overridden — the
+// DS default is bg-muted, and this bar's chrome is deliberately black-on-white so the
+// brand-theme picker re-skins the specimens, never the controls (same reason the
+// focus ring is foreground/20 instead of --ring).
 function SegmentedGroup<T extends string>({
   options, value, onChange,
 }: {
@@ -45,23 +50,23 @@ function SegmentedGroup<T extends string>({
   onChange: (v: T) => void
 }) {
   return (
-    <div className="inline-flex h-8 items-center rounded-lg border border-input bg-background p-0.5">
+    <ToggleGroup
+      type="single"
+      variant="outline"
+      spacing={0}
+      value={value}
+      onValueChange={(v) => { if (v) onChange(v as T) }}
+    >
       {options.map((o) => (
-        <button
+        <ToggleGroupItem
           key={o.value}
-          type="button"
-          onClick={() => onChange(o.value)}
-          className={cn(
-            "h-7 rounded-md px-3 text-xs font-medium transition-colors",
-            value === o.value
-              ? "bg-foreground text-background"
-              : "text-muted-foreground hover:text-foreground",
-          )}
+          value={o.value}
+          className="px-3 text-xs focus-visible:border-foreground focus-visible:ring-foreground/20 data-[state=on]:bg-foreground data-[state=on]:text-background"
         >
           {o.label}
-        </button>
+        </ToggleGroupItem>
       ))}
-    </div>
+    </ToggleGroup>
   )
 }
 
