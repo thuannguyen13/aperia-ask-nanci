@@ -596,9 +596,9 @@ export function ThemeGenerator() {
             <Control label="Preset">
               <Select value={preset} onValueChange={(v) => setPreset(v as ThemeId | typeof SHADCN_PRESET)}>
                 <SelectTrigger className="w-44 bg-background focus-visible:border-foreground focus-visible:ring-foreground/20"><SelectValue /></SelectTrigger>
-                <SelectContent position="popper" align="start">
-                  <SelectItem value={SHADCN_PRESET}>Shadcn Default</SelectItem>
-                  {THEME_IDS.map((id) => <SelectItem key={id} value={id}>{id}</SelectItem>)}
+                <SelectContent position="popper" align="start" className="p-1">
+                  <SelectItem value={SHADCN_PRESET} className="py-1.5 pl-2">Shadcn Default</SelectItem>
+                  {THEME_IDS.map((id) => <SelectItem key={id} value={id} className="py-1.5 pl-2">{id}</SelectItem>)}
                 </SelectContent>
               </Select>
             </Control>
