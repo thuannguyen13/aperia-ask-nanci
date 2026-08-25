@@ -14,13 +14,12 @@ import { HEATMAP_HOURS, HEATMAP_ROWS } from "@/lib/ask-nanci/data/panels/busiest
 import {
   GALLERY_ALERT_VOLUME, GALLERY_AUTH_FUNNEL, GALLERY_CHANNEL_MIX, GALLERY_DECLINE_REASONS,
   GALLERY_HEALTH_PROFILE, GALLERY_INTRADAY, GALLERY_MONTHLY, GALLERY_SCATTER, GALLERY_SLA,
-  GALLERY_TOP_MERCHANTS, PALETTES, type ChartSwatch, type PaletteId,
+  GALLERY_TOP_MERCHANTS, type ChartSwatch,
 } from "@/lib/ask-nanci/data/chart-gallery"
 
 // ── Options the gallery controls drive ─────────────────────────────────────────
 
 export interface GalleryOptions {
-  palette: PaletteId
   grid: boolean
   legend: boolean
   indicator: "dot" | "line" | "dashed"
@@ -30,6 +29,12 @@ export interface GalleryOptions {
    * them, so they need the scheme handed to them to resolve a light/dark pair themselves.
    */
   dark: boolean
+  /**
+   * The effective ramp: the selected palette's swatches with any per-dot edits from the
+   * gallery's swatch strip applied. Specimens never look a palette up themselves — this
+   * is the one seam the strip's color pickers write through.
+   */
+  swatches: readonly ChartSwatch[]
 }
 
 /** Picks the half of a light/dark pair the current scheme should show. */
@@ -44,9 +49,8 @@ export function resolveSwatch(swatch: ChartSwatch, dark: boolean) {
  */
 export function buildChartConfig(
   series: readonly { key: string; label: string }[],
-  palette: PaletteId,
+  swatches: readonly ChartSwatch[],
 ): ChartConfig {
-  const { swatches } = PALETTES[palette]
   return Object.fromEntries(
     series.map((s, i) => {
       const swatch = swatches[i % swatches.length]
@@ -92,7 +96,7 @@ const MERCHANT_SERIES = [{ key: "volume", label: "Volume" }]
 
 function VerticalBar({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(MERCHANT_SERIES, opts.palette)} className={BOX}>
+    <ChartContainer config={buildChartConfig(MERCHANT_SERIES, opts.swatches)} className={BOX}>
       <BarChart data={GALLERY_TOP_MERCHANTS} margin={MARGIN}>
         <Grid opts={opts} />
         <XAxis dataKey="merchant" {...AXIS} interval={0} tickFormatter={(v: string) => v.split(" ")[0]} />
@@ -112,7 +116,7 @@ const CHANNEL_SERIES = [
 
 function GroupedBar({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.palette)} className={BOX}>
+    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX}>
       <BarChart data={GALLERY_CHANNEL_MIX} margin={MARGIN}>
         <Grid opts={opts} />
         <XAxis dataKey="month" {...AXIS} />
@@ -129,7 +133,7 @@ function GroupedBar({ opts }: { opts: GalleryOptions }) {
 
 function StackedBar({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.palette)} className={BOX}>
+    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX}>
       <BarChart data={GALLERY_CHANNEL_MIX} margin={MARGIN}>
         <Grid opts={opts} />
         <XAxis dataKey="month" {...AXIS} />
@@ -152,7 +156,7 @@ function StackedBar({ opts }: { opts: GalleryOptions }) {
 
 function HorizontalBar({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(MERCHANT_SERIES, opts.palette)} className={BOX}>
+    <ChartContainer config={buildChartConfig(MERCHANT_SERIES, opts.swatches)} className={BOX}>
       <BarChart
         layout="vertical"
         data={GALLERY_TOP_MERCHANTS}
@@ -181,7 +185,7 @@ const VOLUME_SERIES = [{ key: "volume", label: "Volume" }]
 
 function SingleLine({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(VOLUME_SERIES, opts.palette)} className={BOX}>
+    <ChartContainer config={buildChartConfig(VOLUME_SERIES, opts.swatches)} className={BOX}>
       <LineChart data={GALLERY_MONTHLY} margin={MARGIN}>
         <Grid opts={opts} />
         <XAxis dataKey="month" {...AXIS} />
@@ -195,7 +199,7 @@ function SingleLine({ opts }: { opts: GalleryOptions }) {
 
 function MultiLine({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.palette)} className={BOX}>
+    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX}>
       <LineChart data={GALLERY_CHANNEL_MIX} margin={MARGIN}>
         <Grid opts={opts} />
         <XAxis dataKey="month" {...AXIS} />
@@ -219,7 +223,7 @@ function MultiLine({ opts }: { opts: GalleryOptions }) {
 
 function SingleArea({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(VOLUME_SERIES, opts.palette)} className={BOX}>
+    <ChartContainer config={buildChartConfig(VOLUME_SERIES, opts.swatches)} className={BOX}>
       <AreaChart data={GALLERY_MONTHLY} margin={MARGIN}>
         <defs>
           <linearGradient id="gallery-area-fill" x1="0" y1="0" x2="0" y2="1">
@@ -245,7 +249,7 @@ function SingleArea({ opts }: { opts: GalleryOptions }) {
 
 function StackedArea({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.palette)} className={BOX}>
+    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX}>
       <AreaChart data={GALLERY_CHANNEL_MIX} margin={MARGIN}>
         <Grid opts={opts} />
         <XAxis dataKey="month" {...AXIS} />
@@ -276,7 +280,7 @@ const COMBO_SERIES = [
 
 function Combo({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(COMBO_SERIES, opts.palette)} className={BOX}>
+    <ChartContainer config={buildChartConfig(COMBO_SERIES, opts.swatches)} className={BOX}>
       <ComposedChart data={GALLERY_MONTHLY} margin={{ ...MARGIN, right: 0 }}>
         <Grid opts={opts} />
         <XAxis dataKey="month" {...AXIS} />
@@ -304,7 +308,7 @@ const SCORE_SERIES = [{ key: "merchants", label: "Merchants" }]
 
 function Points({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(SCORE_SERIES, opts.palette)} className={BOX}>
+    <ChartContainer config={buildChartConfig(SCORE_SERIES, opts.swatches)} className={BOX}>
       <ScatterChart margin={MARGIN}>
         {opts.grid && <CartesianGrid strokeDasharray="3 3" />}
         <XAxis type="number" dataKey="vw" name="VisionWeb" domain={[0, 100]} {...AXIS} />
@@ -318,7 +322,7 @@ function Points({ opts }: { opts: GalleryOptions }) {
 
 function Quadrant({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(SCORE_SERIES, opts.palette)} className={BOX}>
+    <ChartContainer config={buildChartConfig(SCORE_SERIES, opts.swatches)} className={BOX}>
       <ScatterChart margin={MARGIN}>
         <XAxis type="number" dataKey="vw" domain={[0, 100]} {...AXIS} />
         <YAxis type="number" dataKey="mc" domain={[0, 100]} {...AXIS} width={40} />
@@ -338,7 +342,7 @@ function Quadrant({ opts }: { opts: GalleryOptions }) {
 const DECLINE_SERIES = GALLERY_DECLINE_REASONS.map((d) => ({ key: d.key, label: d.reason }))
 
 function Slices({ opts, donut }: { opts: GalleryOptions; donut?: boolean }) {
-  const config = buildChartConfig(DECLINE_SERIES, opts.palette)
+  const config = buildChartConfig(DECLINE_SERIES, opts.swatches)
   return (
     <ChartContainer config={config} className={BOX}>
       <PieChart>
@@ -382,7 +386,7 @@ const SLA_SERIES = GALLERY_SLA.map((s) => ({ key: s.key, label: s.team }))
 
 function Radial({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(SLA_SERIES, opts.palette)} className={BOX}>
+    <ChartContainer config={buildChartConfig(SLA_SERIES, opts.swatches)} className={BOX}>
       <RadialBarChart data={GALLERY_SLA} innerRadius="30%" outerRadius="98%" startAngle={90} endAngle={-270}>
         <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
         <ChartTooltip content={<ChartTooltipContent nameKey="key" hideLabel />} />
@@ -443,7 +447,7 @@ function TreemapBlock(props: unknown) {
 
 function Blocks({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(TREEMAP_SERIES, opts.palette)} className={BOX}>
+    <ChartContainer config={buildChartConfig(TREEMAP_SERIES, opts.swatches)} className={BOX}>
       <Treemap
         data={TREEMAP_DATA}
         dataKey="size"
@@ -466,7 +470,7 @@ const PROFILE_SERIES = [
 
 function Profile({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(PROFILE_SERIES, opts.palette)} className={BOX}>
+    <ChartContainer config={buildChartConfig(PROFILE_SERIES, opts.swatches)} className={BOX}>
       <RadarChart data={GALLERY_HEALTH_PROFILE} outerRadius="72%">
         <PolarGrid strokeDasharray="3 3" />
         <PolarAngleAxis dataKey="axis" tick={{ fontSize: 10 }} />
@@ -492,7 +496,7 @@ const FUNNEL_DATA = GALLERY_AUTH_FUNNEL.map((f, i) => ({ ...f, key: `stage${i}` 
 
 function Drop({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(FUNNEL_SERIES, opts.palette)} className={BOX}>
+    <ChartContainer config={buildChartConfig(FUNNEL_SERIES, opts.swatches)} className={BOX}>
       <FunnelChart margin={{ top: 4, right: 96, left: 4, bottom: 4 }}>
         <ChartTooltip content={<ChartTooltipContent nameKey="key" hideLabel />} />
         <Funnel dataKey="count" nameKey="key" data={FUNNEL_DATA} isAnimationActive={false}>
@@ -521,7 +525,7 @@ function Spark({ opts }: { opts: GalleryOptions }) {
         <div className="text-[11px] text-muted-foreground">transactions today</div>
       </div>
       <ChartContainer
-        config={buildChartConfig(VOLUME_SERIES, opts.palette)}
+        config={buildChartConfig(VOLUME_SERIES, opts.swatches)}
         className="aspect-auto h-14 flex-1"
       >
         <AreaChart data={GALLERY_INTRADAY} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
@@ -543,7 +547,7 @@ function Spark({ opts }: { opts: GalleryOptions }) {
 // The one shape in the app that deliberately does not use Recharts: a proportional
 // div is cheaper than a chart and lines up with the text column beside it.
 function CssBars({ opts }: { opts: GalleryOptions }) {
-  const color = resolveSwatch(PALETTES[opts.palette].swatches[0], opts.dark)
+  const color = resolveSwatch(opts.swatches[0], opts.dark)
   const max = Math.max(...GALLERY_ALERT_VOLUME.map((a) => a.count))
   return (
     <div className="flex h-[220px] flex-col justify-center gap-2.5">
@@ -566,7 +570,7 @@ function CssBars({ opts }: { opts: GalleryOptions }) {
 const HEAT_STEPS = [0.08, 0.24, 0.44, 0.68, 1]
 
 function Heat({ opts }: { opts: GalleryOptions }) {
-  const color = resolveSwatch(PALETTES[opts.palette].swatches[0], opts.dark)
+  const color = resolveSwatch(opts.swatches[0], opts.dark)
   return (
     <div className="flex h-[220px] flex-col justify-center gap-1">
       <div className="flex gap-1 pl-8">

@@ -8,7 +8,7 @@ import {
 } from "aperia-ds5"
 import { useAppTheme } from "@/components/ask-nanci/AppFrame"
 import { THEME_IDS, type ThemeId } from "@/lib/ask-nanci/data/theme-logos"
-import { PALETTES, type PaletteId } from "@/lib/ask-nanci/data/chart-gallery"
+import { PALETTES, type ChartSwatch, type PaletteId } from "@/lib/ask-nanci/data/chart-gallery"
 import { resolveSwatch, SPECIMEN_GROUPS, type GalleryOptions, type Specimen } from "./specimens"
 
 const PALETTE_IDS = Object.keys(PALETTES) as PaletteId[]
@@ -87,14 +87,47 @@ export function ChartGallery() {
   const [grid, setGrid] = useState(true)
   const [legend, setLegend] = useState(true)
   const [mounted, setMounted] = useState(false)
+  // Per-dot edits from the swatch strip, kept per palette so switching palettes
+  // switches edits with them. An edited dot is a plain hex for both schemes.
+  const [overrides, setOverrides] = useState<Partial<Record<PaletteId, Record<number, string>>>>({})
+  // The strip's native color inputs need concrete #rrggbb seeds, so the effective
+  // swatches (vars, oklch, color-mix) are resolved through a probe element below.
+  const [resolvedHex, setResolvedHex] = useState<string[]>([])
 
   const { resolvedTheme, setTheme } = useTheme()
   useAppTheme(brand)
   useEffect(() => setMounted(true), [])
 
   const dark = mounted && resolvedTheme === "dark"
-  const opts: GalleryOptions = { palette, grid, legend, indicator, dark }
-  const active = PALETTES[palette]
+  const paletteOverrides = overrides[palette]
+  const swatches: ChartSwatch[] = PALETTES[palette].swatches.map(
+    (s, i) => paletteOverrides?.[i] ?? s,
+  )
+  const opts: GalleryOptions = { grid, legend, indicator, dark, swatches }
+
+  // Resolve each effective swatch to hex by letting the browser compute it in the
+  // live theme context — a probe on <body> sees data-theme, .dark and the CSS vars.
+  const swatchKey = swatches.map((s) => (typeof s === "string" ? s : s.light + s.dark)).join("|")
+  useEffect(() => {
+    const probe = document.createElement("span")
+    document.body.appendChild(probe)
+    const toHex = (color: string) => {
+      probe.style.color = ""
+      probe.style.color = color
+      const m = getComputedStyle(probe).color.match(/\d+(\.\d+)?/g)
+      if (!m) return "#888888"
+      return "#" + m.slice(0, 3).map((v) => Math.round(Number(v)).toString(16).padStart(2, "0")).join("")
+    }
+    setResolvedHex(swatches.map((s) => toHex(resolveSwatch(s, dark))))
+    probe.remove()
+    // swatchKey covers the swatches array; brand re-resolves the CSS vars.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [swatchKey, brand, dark, mounted])
+
+  const editSwatch = (i: number, hex: string) =>
+    setOverrides((prev) => ({ ...prev, [palette]: { ...prev[palette], [i]: hex } }))
+  const resetSwatches = () =>
+    setOverrides((prev) => ({ ...prev, [palette]: undefined }))
 
   return (
     <div className="min-h-screen bg-background">
@@ -154,17 +187,35 @@ export function ChartGallery() {
             </Control>
           </div>
 
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+            {/* Each dot is a live color input: edit one and every chart re-renders with
+                the edited ramp. Edits are per palette; Reset clears the active one. */}
             <div className="flex gap-1">
-              {active.swatches.map((s, i) => (
-                <span
+              {swatches.map((s, i) => (
+                <label
                   key={i}
-                  title={resolveSwatch(s, dark)}
-                  className="size-5 rounded-[3px] ring-1 ring-inset ring-black/10"
+                  title={`chart-${i + 1} — click to edit`}
+                  className="relative size-5 cursor-pointer rounded-[3px] ring-1 ring-inset ring-black/10 transition-transform hover:scale-110"
                   style={{ background: resolveSwatch(s, dark) }}
-                />
+                >
+                  <input
+                    type="color"
+                    value={resolvedHex[i] ?? "#888888"}
+                    onChange={(e) => editSwatch(i, e.target.value)}
+                    className="absolute inset-0 size-full cursor-pointer opacity-0"
+                  />
+                </label>
               ))}
             </div>
+            {paletteOverrides && (
+              <button
+                type="button"
+                onClick={resetSwatches}
+                className="text-[11px] font-medium text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+              >
+                Reset
+              </button>
+            )}
           </div>
         </div>
 
