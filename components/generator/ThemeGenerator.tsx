@@ -22,8 +22,10 @@ import { THEME_IDS, type ThemeId } from "@/lib/ask-nanci/data/theme-logos"
 // Every color token the design system themes, grouped the way a brand thinks about
 // them. Keys are the CSS custom-property names (minus the --); the two gradient
 // stops are pseudo-tokens composed into --app-gradient. Non-color knobs (radius,
-// fonts) are deliberately out of scope. Popover is themeable too but portals out of
-// the preview scope, so it is left unexposed rather than shown doing nothing.
+// fonts) are deliberately out of scope. Two defined-but-dead vars are also left out
+// rather than shown doing nothing: popover (portals out of the preview scope) and
+// destructive-foreground (zero consumers — the DS renders destructive as a tint,
+// bg-destructive/10 with text-destructive, never as ink on a solid surface).
 
 interface TokenDef { key: string; label: string; hint?: string }
 
@@ -57,10 +59,7 @@ const TOKEN_GROUPS: { title: string; tokens: TokenDef[] }[] = [
   },
   {
     title: "Semantic",
-    tokens: [
-      { key: "destructive", label: "Destructive" },
-      { key: "destructive-foreground", label: "Destructive foreground" },
-    ],
+    tokens: [{ key: "destructive", label: "Destructive", hint: "Delete actions and error text" }],
   },
   {
     title: "Sidebar",
