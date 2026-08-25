@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { memo, useEffect, useMemo, useState } from "react"
 import { useTheme } from "next-themes"
 import {
   Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Separator, Switch,
@@ -69,7 +69,9 @@ function SegmentedGroup<T extends string>({
 // The exact chrome MessageChart.tsx puts around a chart in a chat answer, so a
 // specimen here looks the way it will look in the app — not a DS Card approximation.
 // (The risk dashboard's DashChartCard is the one variation: no border-b on the title.)
-function SpecimenCard({ specimen, opts }: { specimen: Specimen; opts: GalleryOptions }) {
+const SpecimenCard = memo(function SpecimenCard({
+  specimen, opts,
+}: { specimen: Specimen; opts: GalleryOptions }) {
   return (
     <div id={specimen.id} className="scroll-mt-32 overflow-hidden rounded-xl border bg-background">
       <div className="flex items-center border-b px-3 py-2">
@@ -78,7 +80,7 @@ function SpecimenCard({ specimen, opts }: { specimen: Specimen; opts: GalleryOpt
       <div className="px-3 py-4">{specimen.render(opts)}</div>
     </div>
   )
-}
+})
 
 export function ChartGallery() {
   const [brand, setBrand] = useState<ThemeId>("aperia")
@@ -100,14 +102,31 @@ export function ChartGallery() {
 
   const dark = mounted && resolvedTheme === "dark"
   const paletteOverrides = overrides[palette]
-  const swatches: ChartSwatch[] = PALETTES[palette].swatches.map(
+  // The effective ramp: palette swatches with per-dot edits applied. Only the strip,
+  // the probe and the page-root CSS vars read this — the charts never see it directly.
+  const effective: ChartSwatch[] = PALETTES[palette].swatches.map(
     (s, i) => paletteOverrides?.[i] ?? s,
   )
-  const opts: GalleryOptions = { grid, legend, indicator, dark, swatches }
+
+  // Charts are colored through --gallery-cN vars set on the page root, and opts is
+  // memoized on everything except the colors themselves. Dragging in a color picker
+  // therefore edits one style attribute and the browser repaints the SVGs — no chart
+  // re-renders per tick, which is what made the picker lag.
+  const swatches = useMemo<ChartSwatch[]>(
+    () => PALETTES[palette].swatches.map((_, i) => `var(--gallery-c${i + 1})`),
+    [palette],
+  )
+  const opts: GalleryOptions = useMemo(
+    () => ({ grid, legend, indicator, dark, swatches }),
+    [grid, legend, indicator, dark, swatches],
+  )
+  const rootVars = Object.fromEntries(
+    effective.map((s, i) => [`--gallery-c${i + 1}`, resolveSwatch(s, dark)]),
+  ) as React.CSSProperties
 
   // Resolve each effective swatch to hex by letting the browser compute it in the
   // live theme context — a probe on <body> sees data-theme, .dark and the CSS vars.
-  const swatchKey = swatches.map((s) => (typeof s === "string" ? s : s.light + s.dark)).join("|")
+  const swatchKey = effective.map((s) => (typeof s === "string" ? s : s.light + s.dark)).join("|")
   useEffect(() => {
     const probe = document.createElement("span")
     document.body.appendChild(probe)
@@ -118,7 +137,7 @@ export function ChartGallery() {
       if (!m) return "#888888"
       return "#" + m.slice(0, 3).map((v) => Math.round(Number(v)).toString(16).padStart(2, "0")).join("")
     }
-    setResolvedHex(swatches.map((s) => toHex(resolveSwatch(s, dark))))
+    setResolvedHex(effective.map((s) => toHex(resolveSwatch(s, dark))))
     probe.remove()
     // swatchKey covers the swatches array; brand re-resolves the CSS vars.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -130,7 +149,7 @@ export function ChartGallery() {
     setOverrides((prev) => ({ ...prev, [palette]: undefined }))
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" style={rootVars}>
       <div className="mx-auto max-w-[1400px] px-6 py-10">
         <header>
           <h1 className="text-3xl font-semibold tracking-tight text-foreground">Charts</h1>
@@ -191,7 +210,7 @@ export function ChartGallery() {
             {/* Each dot is a live color input: edit one and every chart re-renders with
                 the edited ramp. Edits are per palette; Reset clears the active one. */}
             <div className="flex gap-1">
-              {swatches.map((s, i) => (
+              {effective.map((s, i) => (
                 <label
                   key={i}
                   title={`chart-${i + 1} — click to edit`}
