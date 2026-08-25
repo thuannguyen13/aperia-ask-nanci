@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Moon, Sun } from "lucide-react"
 import { useTheme } from "next-themes"
 import {
   Badge, Card, CardContent, CardHeader, CardTitle, Label, Select, SelectContent, SelectItem,
@@ -17,20 +16,24 @@ const PALETTE_IDS = Object.keys(PALETTES) as PaletteId[]
 
 /** What the brand-theme picker actually does to the charts under each palette. */
 const BRAND_REACH: Record<PaletteId, string> = {
-  brand: "No effect on charts: --chart-1..6 are declared once in :root.",
-  ds5: "No effect on charts: the DS ramp is scheme-aware, not brand-aware.",
-  primary: "Charts follow this: the ramp is mixed from --primary.",
+  brand: "No effect: --chart-* is :root only.",
+  ds5: "No effect: the DS ramp is scheme-only.",
+  primary: "Charts follow this brand's --primary.",
 }
 const INDICATORS = ["dot", "line", "dashed"] as const
 
 function Control({ label, note, children }: { label: string; note?: string; children: React.ReactNode }) {
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="relative flex flex-col gap-1.5">
       <Label className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">{label}</Label>
       {children}
-      {/* Always rendered, so one control carrying a note does not push its label out of
-          line with the rest of the row. */}
-      <span className="min-h-4 text-[10px] leading-tight text-muted-foreground/80">{note}</span>
+      {/* Out of the flex flow: in it, the one control carrying a note was taller than the
+          rest and knocked its own label off the row's baseline. The row reserves the space. */}
+      {note && (
+        <span className="absolute left-0 top-full mt-1.5 whitespace-nowrap text-[10px] leading-none text-muted-foreground/80">
+          {note}
+        </span>
+      )}
     </div>
   )
 }
@@ -43,14 +46,14 @@ function SegmentedGroup<T extends string>({
   onChange: (v: T) => void
 }) {
   return (
-    <div className="inline-flex h-9 items-center rounded-md border bg-background p-0.5">
+    <div className="inline-flex h-8 items-center rounded-lg border border-input bg-background p-0.5">
       {options.map((o) => (
         <button
           key={o.value}
           type="button"
           onClick={() => onChange(o.value)}
           className={cn(
-            "h-8 rounded-[5px] px-3 text-xs font-medium transition-colors",
+            "h-7 rounded-md px-3 text-xs font-medium transition-colors",
             value === o.value
               ? "bg-primary text-primary-foreground"
               : "text-muted-foreground hover:text-foreground",
@@ -130,7 +133,7 @@ export function ChartGallery() {
         {/* Controls. Sticky because the point of the page is watching a change ripple
             across every specimen at once, which means the knobs have to stay reachable. */}
         <div className="sticky top-0 z-20 -mx-6 mt-8 border-y bg-background/85 px-6 py-4 backdrop-blur">
-          <div className="flex flex-wrap items-end gap-x-8 gap-y-4">
+          <div className="flex flex-wrap items-end gap-x-8 gap-y-5 pb-5">
             <Control label="Palette">
               <SegmentedGroup
                 value={palette}
@@ -141,7 +144,7 @@ export function ChartGallery() {
 
             <Control label="Brand theme" note={BRAND_REACH[palette]}>
               <Select value={brand} onValueChange={(v) => setBrand(v as ThemeId)}>
-                <SelectTrigger className="h-9 w-48 bg-background"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="w-48 bg-background"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {THEME_IDS.map((id) => <SelectItem key={id} value={id}>{id}</SelectItem>)}
                 </SelectContent>
@@ -164,20 +167,18 @@ export function ChartGallery() {
               />
             </Control>
 
-            <div className="flex items-center gap-5 pb-1.5">
-              <label className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Switch checked={grid} onCheckedChange={setGrid} />
-                Grid
-              </label>
-              <label className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Switch checked={legend} onCheckedChange={setLegend} />
-                Legend
-              </label>
-            </div>
-
-            <div className="ml-auto flex items-center gap-2 pb-2 text-muted-foreground">
-              {dark ? <Moon className="size-4" /> : <Sun className="size-4" />}
-            </div>
+            <Control label="Show">
+              <div className="flex h-8 items-center gap-5">
+                <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Switch checked={grid} onCheckedChange={setGrid} />
+                  Grid
+                </label>
+                <label className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <Switch checked={legend} onCheckedChange={setLegend} />
+                  Legend
+                </label>
+              </div>
+            </Control>
           </div>
 
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
