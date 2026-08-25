@@ -1,10 +1,9 @@
 "use client"
 
 import {
-  Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, ComposedChart, Funnel, FunnelChart,
-  Label, LabelList, Line, LineChart, Pie, PieChart, PolarAngleAxis, PolarGrid, Radar,
-  RadarChart, RadialBar, RadialBarChart, ReferenceArea, ReferenceLine, Scatter, ScatterChart,
-  Treemap, XAxis, YAxis, ZAxis,
+  Bar, BarChart, CartesianGrid, Cell, ComposedChart, Funnel, FunnelChart, Label, LabelList,
+  Line, LineChart, Pie, PieChart, PolarAngleAxis, PolarGrid, Radar, RadarChart, RadialBar,
+  RadialBarChart, ReferenceArea, ReferenceLine, Scatter, ScatterChart, XAxis, YAxis, ZAxis,
 } from "recharts"
 import {
   ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent,
@@ -12,9 +11,9 @@ import {
 } from "aperia-ds5"
 import { HEATMAP_HOURS, HEATMAP_ROWS } from "@/lib/ask-nanci/data/panels/busiest-times"
 import {
-  GALLERY_ALERT_VOLUME, GALLERY_AUTH_FUNNEL, GALLERY_CHANNEL_MIX, GALLERY_DECLINE_REASONS,
-  GALLERY_HEALTH_PROFILE, GALLERY_INTRADAY, GALLERY_MONTHLY, GALLERY_SCATTER, GALLERY_SLA,
-  GALLERY_TOP_MERCHANTS, PALETTES, type ChartSwatch, type PaletteId,
+  GALLERY_ALERT_VOLUME, GALLERY_AUTH_FUNNEL, GALLERY_DECLINE_REASONS, GALLERY_HEALTH_PROFILE,
+  GALLERY_MONTHLY, GALLERY_SCATTER, GALLERY_SLA, GALLERY_TOP_MERCHANTS, PALETTES,
+  type ChartSwatch, type PaletteId,
 } from "@/lib/ask-nanci/data/chart-gallery"
 
 // ── Options the gallery controls drive ─────────────────────────────────────────
@@ -104,52 +103,6 @@ function VerticalBar({ opts }: { opts: GalleryOptions }) {
   )
 }
 
-const CHANNEL_SERIES = [
-  { key: "cardPresent", label: "Card present" },
-  { key: "keyed", label: "Keyed" },
-  { key: "ecom", label: "E-commerce" },
-]
-
-function GroupedBar({ opts }: { opts: GalleryOptions }) {
-  return (
-    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.palette)} className={BOX}>
-      <BarChart data={GALLERY_CHANNEL_MIX} margin={MARGIN}>
-        <Grid opts={opts} />
-        <XAxis dataKey="month" {...AXIS} />
-        <YAxis {...AXIS} tickFormatter={money} width={MONEY_AXIS_WIDTH} />
-        <Tip opts={opts} />
-        <Key opts={opts} />
-        {CHANNEL_SERIES.map((s) => (
-          <Bar key={s.key} dataKey={s.key} fill={`var(--color-${s.key})`} radius={[3, 3, 0, 0]} />
-        ))}
-      </BarChart>
-    </ChartContainer>
-  )
-}
-
-function StackedBar({ opts }: { opts: GalleryOptions }) {
-  return (
-    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.palette)} className={BOX}>
-      <BarChart data={GALLERY_CHANNEL_MIX} margin={MARGIN}>
-        <Grid opts={opts} />
-        <XAxis dataKey="month" {...AXIS} />
-        <YAxis {...AXIS} tickFormatter={money} width={MONEY_AXIS_WIDTH} />
-        <Tip opts={opts} />
-        <Key opts={opts} />
-        {CHANNEL_SERIES.map((s, i) => (
-          <Bar
-            key={s.key}
-            dataKey={s.key}
-            stackId="mix"
-            fill={`var(--color-${s.key})`}
-            radius={i === CHANNEL_SERIES.length - 1 ? [4, 4, 0, 0] : 0}
-          />
-        ))}
-      </BarChart>
-    </ChartContainer>
-  )
-}
-
 function HorizontalBar({ opts }: { opts: GalleryOptions }) {
   return (
     <ChartContainer config={buildChartConfig(MERCHANT_SERIES, opts.palette)} className={BOX}>
@@ -189,82 +142,6 @@ function SingleLine({ opts }: { opts: GalleryOptions }) {
         <Tip opts={opts} />
         <Line dataKey="volume" type="monotone" stroke="var(--color-volume)" strokeWidth={2} dot={false} />
       </LineChart>
-    </ChartContainer>
-  )
-}
-
-function MultiLine({ opts }: { opts: GalleryOptions }) {
-  return (
-    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.palette)} className={BOX}>
-      <LineChart data={GALLERY_CHANNEL_MIX} margin={MARGIN}>
-        <Grid opts={opts} />
-        <XAxis dataKey="month" {...AXIS} />
-        <YAxis {...AXIS} tickFormatter={money} width={MONEY_AXIS_WIDTH} />
-        <Tip opts={opts} />
-        <Key opts={opts} />
-        {CHANNEL_SERIES.map((s) => (
-          <Line
-            key={s.key}
-            dataKey={s.key}
-            type="monotone"
-            stroke={`var(--color-${s.key})`}
-            strokeWidth={2}
-            dot={false}
-          />
-        ))}
-      </LineChart>
-    </ChartContainer>
-  )
-}
-
-function SingleArea({ opts }: { opts: GalleryOptions }) {
-  return (
-    <ChartContainer config={buildChartConfig(VOLUME_SERIES, opts.palette)} className={BOX}>
-      <AreaChart data={GALLERY_MONTHLY} margin={MARGIN}>
-        <defs>
-          <linearGradient id="gallery-area-fill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="var(--color-volume)" stopOpacity={0.35} />
-            <stop offset="100%" stopColor="var(--color-volume)" stopOpacity={0.02} />
-          </linearGradient>
-        </defs>
-        <Grid opts={opts} />
-        <XAxis dataKey="month" {...AXIS} />
-        <YAxis {...AXIS} tickFormatter={money} width={MONEY_AXIS_WIDTH} />
-        <Tip opts={opts} />
-        <Area
-          dataKey="volume"
-          type="monotone"
-          stroke="var(--color-volume)"
-          strokeWidth={2}
-          fill="url(#gallery-area-fill)"
-        />
-      </AreaChart>
-    </ChartContainer>
-  )
-}
-
-function StackedArea({ opts }: { opts: GalleryOptions }) {
-  return (
-    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.palette)} className={BOX}>
-      <AreaChart data={GALLERY_CHANNEL_MIX} margin={MARGIN}>
-        <Grid opts={opts} />
-        <XAxis dataKey="month" {...AXIS} />
-        <YAxis {...AXIS} tickFormatter={money} width={MONEY_AXIS_WIDTH} />
-        <Tip opts={opts} />
-        <Key opts={opts} />
-        {CHANNEL_SERIES.map((s) => (
-          <Area
-            key={s.key}
-            dataKey={s.key}
-            type="monotone"
-            stackId="mix"
-            stroke={`var(--color-${s.key})`}
-            fill={`var(--color-${s.key})`}
-            fillOpacity={0.25}
-            strokeWidth={2}
-          />
-        ))}
-      </AreaChart>
     </ChartContainer>
   )
 }
@@ -337,7 +214,7 @@ function Quadrant({ opts }: { opts: GalleryOptions }) {
 
 const DECLINE_SERIES = GALLERY_DECLINE_REASONS.map((d) => ({ key: d.key, label: d.reason }))
 
-function Slices({ opts, donut }: { opts: GalleryOptions; donut?: boolean }) {
+function Donut({ opts }: { opts: GalleryOptions }) {
   const config = buildChartConfig(DECLINE_SERIES, opts.palette)
   return (
     <ChartContainer config={config} className={BOX}>
@@ -347,15 +224,14 @@ function Slices({ opts, donut }: { opts: GalleryOptions; donut?: boolean }) {
           data={GALLERY_DECLINE_REASONS}
           dataKey="share"
           nameKey="key"
-          innerRadius={donut ? 52 : 0}
+          innerRadius={52}
           outerRadius={82}
-          strokeWidth={donut ? 3 : 1}
+          strokeWidth={3}
         >
           {GALLERY_DECLINE_REASONS.map((d) => (
             <Cell key={d.key} fill={`var(--color-${d.key})`} />
           ))}
-          {donut && (
-            <Label
+          <Label
               position="center"
               content={({ viewBox }) =>
                 viewBox && "cx" in viewBox ? (
@@ -369,8 +245,7 @@ function Slices({ opts, donut }: { opts: GalleryOptions; donut?: boolean }) {
                   </text>
                 ) : null
               }
-            />
-          )}
+          />
         </Pie>
         {opts.legend && <ChartLegend content={<ChartLegendContent nameKey="key" />} />}
       </PieChart>
@@ -397,65 +272,6 @@ function Radial({ opts }: { opts: GalleryOptions }) {
   )
 }
 
-const TREEMAP_SERIES = GALLERY_TOP_MERCHANTS.map((m, i) => ({ key: `block${i}`, label: m.merchant }))
-const TREEMAP_DATA = GALLERY_TOP_MERCHANTS.map((m, i) => ({
-  name: m.merchant, size: m.volume, key: `block${i}`,
-}))
-
-/** Blocks are laid out at render time, so the label has to be clipped to the box it landed in. */
-function truncateToWidth(text: string, px: number) {
-  const max = Math.floor(px / 5.6) // 10px medium Inter averages a shade under 6px per glyph
-  return text.length <= max ? text : `${text.slice(0, Math.max(max - 1, 0)).trimEnd()}\u2026`
-}
-
-/**
- * Recharts' default treemap block paints one shared fill and drops the label on all but
- * the largest few. This draws the palette color per block and keeps the label wherever it
- * fits, outlined so it stays legible on a light fill as well as a dark one.
- */
-function TreemapBlock(props: unknown) {
-  const { x = 0, y = 0, width = 0, height = 0, index = 0, name = "", size = 0 } =
-    props as { x?: number; y?: number; width?: number; height?: number; index?: number; name?: string; size?: number }
-  const fits = width > 76 && height > 36
-  return (
-    <g>
-      <rect
-        x={x} y={y} width={width} height={height}
-        fill={`var(--color-block${index})`}
-        stroke="var(--background)"
-        strokeWidth={2}
-      />
-      {fits && (
-        <text
-          x={x + 8} y={y + 20}
-          paintOrder="stroke"
-          stroke="rgba(0,0,0,0.45)"
-          strokeWidth={2.5}
-          className="fill-white text-[10px] font-medium"
-        >
-          <tspan>{truncateToWidth(name, width - 16)}</tspan>
-          <tspan x={x + 8} dy="14" className="tabular-nums">{money(size)}</tspan>
-        </text>
-      )}
-    </g>
-  )
-}
-
-function Blocks({ opts }: { opts: GalleryOptions }) {
-  return (
-    <ChartContainer config={buildChartConfig(TREEMAP_SERIES, opts.palette)} className={BOX}>
-      <Treemap
-        data={TREEMAP_DATA}
-        dataKey="size"
-        nameKey="name"
-        content={<TreemapBlock />}
-        isAnimationActive={false}
-      >
-        <ChartTooltip content={<ChartTooltipContent nameKey="key" hideLabel />} />
-      </Treemap>
-    </ChartContainer>
-  )
-}
 
 // ── Profile and process ────────────────────────────────────────────────────────
 
@@ -512,33 +328,6 @@ function Drop({ opts }: { opts: GalleryOptions }) {
 }
 
 // ── Micro ──────────────────────────────────────────────────────────────────────
-
-function Spark({ opts }: { opts: GalleryOptions }) {
-  return (
-    <div className="flex items-end gap-4">
-      <div>
-        <div className="text-2xl font-semibold tabular-nums text-foreground">1,284</div>
-        <div className="text-[11px] text-muted-foreground">transactions today</div>
-      </div>
-      <ChartContainer
-        config={buildChartConfig(VOLUME_SERIES, opts.palette)}
-        className="aspect-auto h-14 flex-1"
-      >
-        <AreaChart data={GALLERY_INTRADAY} margin={{ top: 2, right: 0, left: 0, bottom: 0 }}>
-          <Area
-            dataKey="txns"
-            type="monotone"
-            stroke="var(--color-volume)"
-            strokeWidth={1.5}
-            fill="var(--color-volume)"
-            fillOpacity={0.15}
-            dot={false}
-          />
-        </AreaChart>
-      </ChartContainer>
-    </div>
-  )
-}
 
 // The one shape in the app that deliberately does not use Recharts: a proportional
 // div is cheaper than a chart and lines up with the text column beside it.
@@ -613,7 +402,7 @@ export interface SpecimenGroup {
 export const SPECIMEN_GROUPS: SpecimenGroup[] = [
   {
     title: "Comparison",
-    blurb: "Ranking discrete things against each other. Bars, because length off a shared baseline is the most accurately read encoding there is.",
+    blurb: "Ranking discrete things against each other. Bars, because length off a shared baseline is the most accurately read encoding there is. Grouped and stacked variants are one more <Bar> (with a stackId) on the same chart.",
     specimens: [
       {
         id: "bar",
@@ -622,20 +411,6 @@ export const SPECIMEN_GROUPS: SpecimenGroup[] = [
         parts: "BarChart · Bar",
         inUse: "MessageChart.tsx, the chat-message bar widget",
         render: (o) => <VerticalBar opts={o} />,
-      },
-      {
-        id: "bar-grouped",
-        name: "Grouped bar",
-        use: "Two or three series compared within each category. Past four, the eye gives up.",
-        parts: "BarChart · Bar ×n",
-        render: (o) => <GroupedBar opts={o} />,
-      },
-      {
-        id: "bar-stacked",
-        name: "Stacked bar",
-        use: "Composition and total at once. Only the bottom segment is accurately comparable.",
-        parts: "BarChart · Bar stackId",
-        render: (o) => <StackedBar opts={o} />,
       },
       {
         id: "bar-horizontal",
@@ -649,7 +424,7 @@ export const SPECIMEN_GROUPS: SpecimenGroup[] = [
   },
   {
     title: "Trend",
-    blurb: "Change over an ordered axis. Lines for rate, area when the magnitude under the line is the point.",
+    blurb: "Change over an ordered axis. Multi-series, area and stacked-area variants are the same charts with more <Line>/<Area> children.",
     specimens: [
       {
         id: "line",
@@ -658,27 +433,6 @@ export const SPECIMEN_GROUPS: SpecimenGroup[] = [
         parts: "LineChart · Line",
         inUse: "MessageChart.tsx · NanciReviewPanel.tsx",
         render: (o) => <SingleLine opts={o} />,
-      },
-      {
-        id: "line-multi",
-        name: "Multi-line",
-        use: "Several series on one scale, when the comparison between them matters more than any one.",
-        parts: "LineChart · Line ×n",
-        render: (o) => <MultiLine opts={o} />,
-      },
-      {
-        id: "area",
-        name: "Area",
-        use: "A single trend where the volume beneath it reads as accumulation.",
-        parts: "AreaChart · Area · linearGradient",
-        render: (o) => <SingleArea opts={o} />,
-      },
-      {
-        id: "area-stacked",
-        name: "Stacked area",
-        use: "How a total splits over time. Same caveat as the stacked bar.",
-        parts: "AreaChart · Area stackId",
-        render: (o) => <StackedArea opts={o} />,
       },
       {
         id: "combo",
@@ -713,21 +467,14 @@ export const SPECIMEN_GROUPS: SpecimenGroup[] = [
   },
   {
     title: "Part to whole",
-    blurb: "Shares of a total. Worth it only at five or six slices, and only when the shares are far apart.",
+    blurb: "Shares of a total. Worth it only at five or six slices, and only when the shares are far apart. A plain pie is the donut with innerRadius 0, and usually loses to a sorted bar anyway.",
     specimens: [
-      {
-        id: "pie",
-        name: "Pie",
-        use: "A handful of shares where the ordering is obvious. A sorted bar chart usually beats it.",
-        parts: "PieChart · Pie · Cell",
-        render: (o) => <Slices opts={o} />,
-      },
       {
         id: "donut",
         name: "Donut",
-        use: "Same as the pie, with the headline figure parked in the hole. Usually the better trade.",
+        use: "A handful of shares with the headline figure parked in the hole.",
         parts: "PieChart · Pie innerRadius · Label",
-        render: (o) => <Slices opts={o} donut />,
+        render: (o) => <Donut opts={o} />,
       },
       {
         id: "radial",
@@ -735,13 +482,6 @@ export const SPECIMEN_GROUPS: SpecimenGroup[] = [
         use: "A few values against a fixed ceiling, like SLA attainment. Decorative more than precise.",
         parts: "RadialBarChart · RadialBar background",
         render: (o) => <Radial opts={o} />,
-      },
-      {
-        id: "treemap",
-        name: "Treemap",
-        use: "Shares when there are too many categories for a pie and the long tail still matters.",
-        parts: "Treemap",
-        render: (o) => <Blocks opts={o} />,
       },
     ],
   },
@@ -766,16 +506,9 @@ export const SPECIMEN_GROUPS: SpecimenGroup[] = [
     ],
   },
   {
-    title: "Micro and no-library",
-    blurb: "Shapes small enough that chart chrome costs more than it gives. Two of the three below ship no Recharts at all.",
+    title: "No library",
+    blurb: "Shapes small enough that chart chrome costs more than it gives. Neither of these ships any Recharts.",
     specimens: [
-      {
-        id: "spark",
-        name: "Sparkline",
-        use: "Shape of a series beside the figure it belongs to. No axes, no grid, no tooltip.",
-        parts: "AreaChart, stripped",
-        render: (o) => <Spark opts={o} />,
-      },
       {
         id: "css-bars",
         name: "Proportional bars",

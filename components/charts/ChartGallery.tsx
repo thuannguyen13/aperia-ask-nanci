@@ -55,7 +55,7 @@ function SegmentedGroup<T extends string>({
           className={cn(
             "h-7 rounded-md px-3 text-xs font-medium transition-colors",
             value === o.value
-              ? "bg-primary text-primary-foreground"
+              ? "bg-foreground text-background"
               : "text-muted-foreground hover:text-foreground",
           )}
         >
@@ -121,7 +121,7 @@ export function ChartGallery() {
           <Badge variant="secondary" className="mb-3">Reference</Badge>
           <h1 className="text-3xl font-semibold tracking-tight text-foreground">Charts</h1>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            Every chart form this stack can render, and every knob that themes one. Charting is{" "}
+            The chart forms this stack renders, two per family, and every knob that themes one. Charting is{" "}
             <span className="font-medium text-foreground">Recharts 3.8</span> throughout. The wrapper is{" "}
             <span className="font-medium text-foreground">shadcn&rsquo;s chart component</span>, which the design
             system re-exports from <span className="font-mono text-xs">aperia-ds5</span> as{" "}
@@ -144,7 +144,7 @@ export function ChartGallery() {
 
             <Control label="Brand theme" note={BRAND_REACH[palette]}>
               <Select value={brand} onValueChange={(v) => setBrand(v as ThemeId)}>
-                <SelectTrigger className="w-48 bg-background"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="w-48 bg-background focus-visible:border-foreground focus-visible:ring-foreground/20"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {THEME_IDS.map((id) => <SelectItem key={id} value={id}>{id}</SelectItem>)}
                 </SelectContent>
@@ -170,11 +170,11 @@ export function ChartGallery() {
             <Control label="Show">
               <div className="flex h-8 items-center gap-5">
                 <label className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Switch checked={grid} onCheckedChange={setGrid} />
+                  <Switch checked={grid} onCheckedChange={setGrid} className="data-checked:bg-foreground focus-visible:ring-foreground/20" />
                   Grid
                 </label>
                 <label className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Switch checked={legend} onCheckedChange={setLegend} />
+                  <Switch checked={legend} onCheckedChange={setLegend} className="data-checked:bg-foreground focus-visible:ring-foreground/20" />
                   Legend
                 </label>
               </div>
@@ -226,13 +226,10 @@ export function ChartGallery() {
 
         {SPECIMEN_GROUPS.map((group) => (
           <section key={group.title} className="mt-12">
-            <div className="flex items-baseline gap-3">
-              <h2 className="text-lg font-semibold tracking-tight text-foreground">{group.title}</h2>
-              <span className="text-xs text-muted-foreground">{group.specimens.length} forms</span>
-            </div>
+            <h2 className="text-lg font-semibold tracking-tight text-foreground">{group.title}</h2>
             <p className="mt-1.5 max-w-3xl text-sm leading-relaxed text-muted-foreground">{group.blurb}</p>
             <Separator className="mt-4" />
-            <div className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            <div className="mt-5 grid gap-5 md:grid-cols-2">
               {group.specimens.map((s) => <SpecimenCard key={s.id} specimen={s} opts={opts} />)}
             </div>
           </section>
