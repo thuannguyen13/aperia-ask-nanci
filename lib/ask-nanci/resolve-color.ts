@@ -14,11 +14,18 @@ export function createColorResolver(scope: HTMLElement) {
   const canvas = document.createElement("canvas")
   canvas.width = canvas.height = 1
   const ctx = canvas.getContext("2d", { willReadFrequently: true })
-  const toHex = (color: string): string => {
+  /**
+   * `base` is what a semi-transparent color is composited against before reading —
+   * the DS dark scheme uses alpha borders (oklch(1 0 0 / 10%)), which would
+   * otherwise flatten to solid white. Pass the scheme's background for those.
+   */
+  const toHex = (color: string, base = "#ffffff"): string => {
     if (!ctx) return "#888888"
     probe.style.color = ""
     probe.style.color = color
-    ctx.fillStyle = "#888888"
+    ctx.clearRect(0, 0, 1, 1)
+    ctx.fillStyle = base
+    ctx.fillRect(0, 0, 1, 1)
     ctx.fillStyle = getComputedStyle(probe).color
     ctx.fillRect(0, 0, 1, 1)
     const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data
