@@ -124,12 +124,22 @@ export function ChartGallery() {
   useEffect(() => {
     const probe = document.createElement("span")
     document.body.appendChild(probe)
+    // The computed color keeps its authored syntax (oklch(...), oklab(...) from
+    // color-mix) — regex-reading rgb() numbers out of it silently produced garbage
+    // like #010029 for the shadcn orange. A 1px canvas parses any color syntax and
+    // hands back actual bytes.
+    const canvas = document.createElement("canvas")
+    canvas.width = canvas.height = 1
+    const ctx = canvas.getContext("2d", { willReadFrequently: true })
     const toHex = (color: string) => {
+      if (!ctx) return "#888888"
       probe.style.color = ""
       probe.style.color = color
-      const m = getComputedStyle(probe).color.match(/\d+(\.\d+)?/g)
-      if (!m) return "#888888"
-      return "#" + m.slice(0, 3).map((v) => Math.round(Number(v)).toString(16).padStart(2, "0")).join("")
+      ctx.fillStyle = "#888888"
+      ctx.fillStyle = getComputedStyle(probe).color
+      ctx.fillRect(0, 0, 1, 1)
+      const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data
+      return "#" + [r, g, b].map((v) => v.toString(16).padStart(2, "0")).join("")
     }
     setResolvedHex(effective.map((s) => toHex(resolveSwatch(s, dark))))
     probe.remove()
