@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { useTheme } from "next-themes"
 import {
   Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Separator, Switch,
-  ToggleGroup, ToggleGroupItem,
+  Tabs, TabsList, TabsTrigger,
 } from "aperia-ds5"
 import { useAppTheme } from "@/components/ask-nanci/AppFrame"
 import { THEME_IDS, type ThemeId } from "@/lib/ask-nanci/data/theme-logos"
@@ -37,11 +37,11 @@ function Control({ label, note, children }: { label: string; note?: string; chil
   )
 }
 
-// DS5's own segmented control: ToggleGroup at spacing 0 with the outline variant
-// renders joined segments with shared borders. Only the on-state is overridden — the
-// DS default is bg-muted, and this bar's chrome is deliberately black-on-white so the
-// brand-theme picker re-skins the specimens, never the controls (same reason the
-// focus ring is foreground/20 instead of --ring).
+// The DS's segmented control: the default TabsList variant is the muted track with a
+// raised bg-background active pill (there is no separate SegmentedControl export in
+// aperia-ds5). Tabs never deselects on re-click, so no empty-value guard is needed.
+// Only the focus ring is overridden — foreground/20 instead of --ring, matching the
+// rest of this bar's brand-independent chrome.
 function SegmentedGroup<T extends string>({
   options, value, onChange,
 }: {
@@ -50,23 +50,19 @@ function SegmentedGroup<T extends string>({
   onChange: (v: T) => void
 }) {
   return (
-    <ToggleGroup
-      type="single"
-      variant="outline"
-      spacing={0}
-      value={value}
-      onValueChange={(v) => { if (v) onChange(v as T) }}
-    >
-      {options.map((o) => (
-        <ToggleGroupItem
-          key={o.value}
-          value={o.value}
-          className="px-3 text-xs focus-visible:border-foreground focus-visible:ring-foreground/20 data-[state=on]:bg-foreground data-[state=on]:text-background"
-        >
-          {o.label}
-        </ToggleGroupItem>
-      ))}
-    </ToggleGroup>
+    <Tabs value={value} onValueChange={(v) => onChange(v as T)}>
+      <TabsList>
+        {options.map((o) => (
+          <TabsTrigger
+            key={o.value}
+            value={o.value}
+            className="px-3 focus-visible:outline-none focus-visible:ring-foreground/20"
+          >
+            {o.label}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+    </Tabs>
   )
 }
 
@@ -122,7 +118,7 @@ export function ChartGallery() {
             <Control label="Brand theme" note={BRAND_REACH[palette]}>
               <Select value={brand} onValueChange={(v) => setBrand(v as ThemeId)}>
                 <SelectTrigger className="w-48 bg-background focus-visible:border-foreground focus-visible:ring-foreground/20"><SelectValue /></SelectTrigger>
-                <SelectContent>
+                <SelectContent position="popper" align="start">
                   {THEME_IDS.map((id) => <SelectItem key={id} value={id}>{id}</SelectItem>)}
                 </SelectContent>
               </Select>
