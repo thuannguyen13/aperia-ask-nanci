@@ -9,7 +9,8 @@ import {
   CardDescription, CardHeader, CardTitle, Checkbox, Command, CommandGroup, CommandInput,
   CommandItem, CommandList, Input, Label, Pagination, PaginationContent, PaginationItem,
   PaginationLink, PaginationNext, PaginationPrevious, Progress, RadioGroup, RadioGroupItem,
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Separator, Skeleton,
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+  DialogTrigger, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Separator, Skeleton,
   Slider, Switch, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Tabs,
   TabsList, TabsTrigger, Textarea, Toggle, ToggleGroup, ToggleGroupItem,
 } from "aperia-ds5"
@@ -505,7 +506,31 @@ export function ThemeGenerator() {
                 className="h-8 w-44 font-mono text-xs focus-visible:border-foreground focus-visible:ring-foreground/20"
               />
             </Control>
-            <div className="ml-auto">
+            <div className="ml-auto flex items-center gap-2">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button size="sm" variant="outline" className="focus-visible:border-foreground focus-visible:ring-foreground/20">
+                    View CSS
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle>Theme CSS</DialogTitle>
+                    <DialogDescription>
+                      Paste into app/globals.css, then add the logo in theme-logos.ts.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <pre className="overflow-x-auto rounded-lg border bg-muted/40 p-3 font-mono text-[11px] leading-relaxed text-foreground">
+                    {css}
+                  </pre>
+                  <DialogFooter>
+                    <Button size="sm" onClick={copy} className="bg-foreground text-background hover:bg-foreground/90">
+                      {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+                      {copied ? "Copied" : "Copy CSS"}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
               <Button size="sm" onClick={copy} className="bg-foreground text-background hover:bg-foreground/90">
                 {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
                 {copied ? "Copied" : "Copy CSS"}
@@ -515,7 +540,7 @@ export function ThemeGenerator() {
         </div>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[320px_minmax(0,1fr)]">
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-6 lg:sticky lg:top-32 lg:self-start">
             <section>
               <h2 className="text-sm font-semibold text-foreground">Brand tokens</h2>
               <Separator className="mt-2" />
@@ -530,13 +555,6 @@ export function ThemeGenerator() {
                   />
                 ))}
               </div>
-            </section>
-            <section>
-              <h2 className="text-sm font-semibold text-foreground">CSS</h2>
-              <Separator className="mt-2" />
-              <pre className="mt-3 overflow-x-auto rounded-lg border bg-muted/40 p-3 font-mono text-[10px] leading-relaxed text-foreground">
-                {css}
-              </pre>
             </section>
           </div>
 
