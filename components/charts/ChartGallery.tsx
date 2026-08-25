@@ -92,7 +92,7 @@ export function ChartGallery() {
 
   return (
     <div className="min-h-screen bg-background" style={rootVars}>
-      <div className="mx-auto max-w-[1400px] px-6 py-10">
+      <div className="mx-auto min-h-screen max-w-[1400px] border-x px-6 py-10">
         <header>
           <h1 className="text-3xl font-semibold tracking-tight text-foreground">Charts</h1>
         </header>
