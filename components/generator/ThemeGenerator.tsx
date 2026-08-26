@@ -674,14 +674,14 @@ export function ThemeGenerator() {
                     View CSS
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-lg">
+                <DialogContent className="sm:max-w-2xl">
                   <DialogHeader>
                     <DialogTitle>Theme CSS</DialogTitle>
                     <DialogDescription>
                       Paste into app/globals.css, then add the logo in theme-logos.ts.
                     </DialogDescription>
                   </DialogHeader>
-                  <pre className="overflow-x-auto rounded-lg border bg-muted/40 p-3 font-mono text-[11px] leading-relaxed text-foreground">
+                  <pre className="max-h-[60vh] overflow-auto rounded-lg border bg-muted/40 p-4 font-mono text-[11px] leading-relaxed text-foreground">
                     {css}
                   </pre>
                   <DialogFooter>
