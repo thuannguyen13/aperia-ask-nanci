@@ -621,7 +621,7 @@ export function ThemeGenerator() {
               <Input
                 value={themeName}
                 onChange={(e) => setThemeName(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-"))}
-                className="h-8 w-44 font-mono text-xs focus-visible:border-foreground focus-visible:ring-foreground/20"
+                className="h-8 w-72 font-mono text-xs focus-visible:border-foreground focus-visible:ring-foreground/20"
               />
             </Control>
             <div className="ml-auto flex items-center gap-2">
