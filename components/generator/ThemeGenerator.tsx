@@ -639,9 +639,9 @@ export function ThemeGenerator() {
               <div className="flex items-center gap-2">
                 <Select value={preset} onValueChange={(v) => setPreset(v as ThemeId | typeof SHADCN_PRESET)}>
                   <SelectTrigger className="w-44 bg-background focus-visible:border-foreground focus-visible:ring-foreground/20"><SelectValue /></SelectTrigger>
-                  <SelectContent position="popper" align="start" className="p-1">
+                  <SelectContent position="popper" align="start">
                     <SelectItem value={SHADCN_PRESET} className="py-1.5 pl-2">shadcn</SelectItem>
-                    {THEME_IDS.map((id) => <SelectItem key={id} value={id} className="py-1.5 pl-2">{id}</SelectItem>)}
+                    {THEME_IDS.map((id) => <SelectItem key={id} value={id}>{id}</SelectItem>)}
                   </SelectContent>
                 </Select>
                 {/* Discards every edit by re-seeding the same preset; inert while clean. */}

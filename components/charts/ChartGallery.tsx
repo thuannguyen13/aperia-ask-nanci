@@ -115,8 +115,8 @@ export function ChartGallery() {
               <Control label="Brand theme" note="Charts follow this brand's --primary.">
                 <Select value={brand} onValueChange={(v) => setBrand(v as ThemeId)}>
                   <SelectTrigger className="w-48 bg-background focus-visible:border-foreground focus-visible:ring-foreground/20"><SelectValue /></SelectTrigger>
-                  <SelectContent position="popper" align="start" className="p-1">
-                    {THEME_IDS.map((id) => <SelectItem key={id} value={id} className="py-1.5 pl-2">{id}</SelectItem>)}
+                  <SelectContent position="popper" align="start">
+                    {THEME_IDS.map((id) => <SelectItem key={id} value={id}>{id}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </Control>
