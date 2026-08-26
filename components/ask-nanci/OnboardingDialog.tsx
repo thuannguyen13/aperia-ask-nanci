@@ -31,9 +31,9 @@ const ROW3 = [
   { src: "/fi/usbank.png",     alt: "US Bank" },
 ]
 
-function MarqueeRow({ logos, direction }: { logos: typeof ROW1; direction: "left" | "right" }) {
+function MarqueeRow({ logos, direction, className = "" }: { logos: typeof ROW1; direction: "left" | "right"; className?: string }) {
   return (
-    <div className="w-full">
+    <div className={`w-full ${className}`}>
       <div className={`flex w-max ${direction === "left" ? "animate-marquee-left" : "animate-marquee-right"}`}>
         {[...logos, ...logos].map((logo, i) => (
           <div
@@ -84,7 +84,7 @@ export function OnboardingDialog() {
       <Dialog open={onboardingOpen} onOpenChange={() => {}}>
         <DialogContent
           showCloseButton={false}
-          className="overflow-hidden p-0 sm:max-w-[720px] gap-0"
+          className="overflow-hidden p-0 sm:max-w-[720px] gap-0 max-sm:inset-0 max-sm:top-0 max-sm:left-0 max-sm:h-screen max-sm:w-screen max-sm:max-w-full max-sm:translate-x-0 max-sm:translate-y-0 max-sm:flex max-sm:flex-col max-sm:rounded-none"
           onEscapeKeyDown={(e) => e.preventDefault()}
           onPointerDownOutside={(e) => e.preventDefault()}
           onInteractOutside={(e) => e.preventDefault()}
@@ -92,9 +92,9 @@ export function OnboardingDialog() {
           <DialogTitle className="sr-only">Welcome to Ask Nanci</DialogTitle>
 
           {step === 1 ? (
-            <div className="flex h-[22.75rem] overflow-hidden">
+            <div className="flex overflow-hidden max-sm:min-h-0 max-sm:flex-1 max-sm:flex-col-reverse sm:h-[22.75rem]">
               {/* Left panel */}
-              <div className="flex w-1/2 flex-col justify-between p-6">
+              <div className="flex w-1/2 flex-col justify-between p-6 max-sm:min-h-0 max-sm:w-full max-sm:flex-1 max-sm:overflow-y-auto">
                 <div className="flex flex-col gap-6">
                   {/* Logo */}
                   <div className="flex items-center gap-2">
@@ -120,14 +120,14 @@ export function OnboardingDialog() {
               </div>
 
               {/* Right panel — illustration */}
-              <div className="flex-1 overflow-hidden relative rounded-xl border-l border-y">
-                <Image src="/onboarding/onboarding-thumbnail.png" alt="" fill className="object-cover object-left-top" />
+              <div className="flex-1 overflow-hidden relative rounded-xl border-l border-y max-sm:h-40 max-sm:flex-none max-sm:rounded-none max-sm:border-x-0 max-sm:border-t-0">
+                <Image src="/onboarding/onboarding-thumbnail.png" alt="" fill className="object-cover object-center sm:object-left-top" />
               </div>
             </div>
           ) : (
-            <div className="flex h-[22.75rem] overflow-hidden">
+            <div className="flex overflow-hidden max-sm:min-h-0 max-sm:flex-1 max-sm:flex-col-reverse sm:h-[22.75rem]">
               {/* Left panel — 360px, 24px padding all sides */}
-              <div className="flex w-1/2 flex-col justify-between p-6">
+              <div className="flex w-1/2 flex-col justify-between p-6 max-sm:min-h-0 max-sm:w-full max-sm:flex-1 max-sm:overflow-y-auto">
                 <div className="flex flex-col gap-6">
                   {/* Logo */}
                   <div className="flex items-center gap-2">
@@ -165,10 +165,10 @@ export function OnboardingDialog() {
               </div>
 
               {/* Right panel — marquee rows, full height, muted bg */}
-              <div className="flex flex-1 flex-col justify-center gap-3 overflow-hidden bg-slate-100 dark:bg-card py-5 rounded-xl border-l border-y">
+              <div className="flex flex-1 flex-col justify-center gap-3 overflow-hidden bg-slate-100 dark:bg-card py-5 rounded-xl border-l border-y max-sm:h-40 max-sm:flex-none max-sm:rounded-none max-sm:border-x-0 max-sm:border-t-0">
                 <MarqueeRow logos={ROW1} direction="left" />
-                <MarqueeRow logos={ROW2} direction="right" />
-                <MarqueeRow logos={ROW3} direction="left" />
+                <MarqueeRow logos={ROW2} direction="right" className="max-sm:hidden" />
+                <MarqueeRow logos={ROW3} direction="left" className="max-sm:hidden" />
               </div>
             </div>
           )}
