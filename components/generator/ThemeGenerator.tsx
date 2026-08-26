@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Check, Copy, RotateCcw } from "lucide-react"
+import { Check, Copy, RotateCcw, SquarePen } from "lucide-react"
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger, Alert, AlertDescription,
   AlertTitle, Avatar, AvatarFallback, Badge, Breadcrumb, BreadcrumbItem, BreadcrumbLink,
@@ -193,14 +193,15 @@ function Wall() {
               The accent seeds to the muted-family value, so this matches the app's
               real look until the token is edited. */}
           <div className="flex w-48 shrink-0 flex-col p-3" style={{ color: "var(--sidebar-foreground)" }}>
-            <div
-              className="mb-3 flex items-center gap-2 border-b px-1 pb-3"
-              style={{ borderColor: "var(--sidebar-border)" }}
-            >
+            <div className="mb-2 flex items-center gap-2 px-1 pb-1">
               <div className="size-5 rounded-md" style={{ background: "var(--primary)" }} />
               <span className="text-xs font-semibold">Ask Nanci</span>
             </div>
-            <Button size="sm" className="justify-start text-xs">New chat</Button>
+            {/* A list item like the rest of the nav, not a filled button. */}
+            <div className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium">
+              <SquarePen className="size-3.5" />
+              New chat
+            </div>
             <div className="mt-4 flex flex-col gap-1">
               <Skeleton className="mb-1 h-2.5 w-14" />
               <div
