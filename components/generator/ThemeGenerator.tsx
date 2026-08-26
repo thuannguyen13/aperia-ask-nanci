@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Check, Copy, RotateCcw, SquarePen } from "lucide-react"
+import { Check, Copy, MessageSquare, RotateCcw, SquarePen } from "lucide-react"
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger, Alert, AlertDescription,
   AlertTitle, Avatar, AvatarFallback, Badge, Breadcrumb, BreadcrumbItem, BreadcrumbLink,
@@ -205,15 +205,19 @@ function Wall() {
             <div className="mt-4 flex flex-col gap-1">
               <Skeleton className="mb-1 h-2.5 w-14" />
               <div
-                className="rounded-md px-2 py-1.5 text-xs font-medium"
+                className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium"
                 style={{ background: "var(--sidebar-accent)", color: "var(--sidebar-accent-foreground)" }}
               >
-                Saturday sales spike
+                <MessageSquare className="size-3.5 shrink-0" />
+                <span className="truncate">Saturday sales spike</span>
               </div>
               {/* Real text, not skeleton bars: these rows are what sidebar-foreground
                   paints when nothing is hovered. */}
               {["Refund policy question", "Weekend staffing", "Deposit timing"].map((t) => (
-                <div key={t} className="truncate rounded-md px-2 py-1.5 text-xs opacity-80">{t}</div>
+                <div key={t} className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs opacity-80">
+                  <MessageSquare className="size-3.5 shrink-0" />
+                  <span className="truncate">{t}</span>
+                </div>
               ))}
             </div>
             <div className="mt-auto rounded-lg border p-2.5" style={{ borderColor: "var(--sidebar-border)" }}>
