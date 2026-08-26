@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Check, Copy } from "lucide-react"
+import { Check, Copy, RotateCcw } from "lucide-react"
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger, Alert, AlertDescription,
   AlertTitle, Avatar, AvatarFallback, Badge, Breadcrumb, BreadcrumbItem, BreadcrumbLink,
@@ -604,17 +604,18 @@ export function ThemeGenerator() {
                     {THEME_IDS.map((id) => <SelectItem key={id} value={id} className="py-1.5 pl-2">{id}</SelectItem>)}
                   </SelectContent>
                 </Select>
-                {/* Discards every edit by re-seeding the same preset. Only shown dirty. */}
-                {dirty && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setSeedNonce((n) => n + 1)}
-                    className="focus-visible:border-foreground focus-visible:ring-foreground/20"
-                  >
-                    Reset
-                  </Button>
-                )}
+                {/* Discards every edit by re-seeding the same preset; inert while clean. */}
+                <Button
+                  size="icon"
+                  variant="outline"
+                  aria-label="Reset edits"
+                  title="Reset edits"
+                  disabled={!dirty}
+                  onClick={() => setSeedNonce((n) => n + 1)}
+                  className="focus-visible:border-foreground focus-visible:ring-foreground/20"
+                >
+                  <RotateCcw />
+                </Button>
               </div>
             </Control>
             <Control label="Theme name">
