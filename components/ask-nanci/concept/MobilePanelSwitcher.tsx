@@ -1,75 +1,199 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { LayoutGrid, X } from "lucide-react"
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerTitle,
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetTitle,
-} from "aperia-ds5"
+import { ChevronRight } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { useIsMobile } from "@/hooks/use-is-mobile"
 import type { PanelId } from "@/lib/ask-nanci/types"
 import { PANELS } from "./panel-registry"
+import { usePanelUi } from "./use-panel-ui"
+import { useSheetDismissal } from "./use-sheet-dismissal"
+import { useSheetFocus } from "./use-sheet-focus"
+import { useKeyboardInset } from "../use-keyboard-inset"
+import { useSheetGesture } from "./use-sheet-gesture"
+import type { PanelSheetConfig } from "@/lib/ask-nanci/data/panel-ui"
 
-// Below `md` the chat and the panel column cannot sit side by side, so panels move
-// behind this switcher: a thumbnail overview (Sheet) that opens one panel at a time
-// (Drawer). Two taps at most — trigger, then thumbnail — and one tap whenever there
-// is only a single panel open, since an overview of one card is pure friction.
-// Desktop is untouched: ConceptPanelArea still renders the real stack at `md:` and up.
+// Below `md` the chat and the panel column cannot sit side by side, so the panel moves
+// into this sheet. One panel at a time: a phone shows the newest one, with no overview
+// to pick from — a chooser for a single card is pure friction, and only a couple of
+// flows ever open a second. Desktop is untouched: ConceptPanelArea still renders the
+// real stack at `md:` and up.
 
-// Thumbnails render the live panel scaled down, Safari-tab-manager style, rather than
-// an icon standing in for it. The source box is a phone-width slice of the panel; the
-// crop is deliberate — a thumbnail is a glance, not a readable copy.
-const THUMB_SRC_WIDTH = 390
-const THUMB_SRC_HEIGHT = 520
-const THUMB_SCALE = 0.45
+/**
+ * A sheet is a card floating on the dimmed page: inset by the same 12px the composer
+ * uses, so the two line up, stopping a gap above it and below the brand bar — the
+ * panel toggle lives up there and has to stay reachable while a panel is open. The
+ * composer publishes its own height (use-composer-height.ts); the fallback covers the
+ * first paint before the observer has run.
+ */
+const SHEET_FRAME =
+  "fixed inset-x-0 top-9 bottom-[calc(var(--composer-h,0px)+var(--keyboard-h,0px))] z-20 overflow-hidden"
+const SHEET_CARD = "absolute inset-3 rounded-2xl border"
 
-function PanelThumbnail({ id, onOpen, onClose }: { id: PanelId; onOpen: () => void; onClose: () => void }) {
-  const { component: Panel, label } = PANELS[id]
+/** The card's inset inside the clipping frame — its gap to the composer when open. */
+const CARD_INSET = 12
+/** How far past its own edge a non-peeking sheet goes, so its shadow clears too. */
+const OFF_SCREEN = 48
+
+function PanelSheet({ config, present, open, label, pager, onOpen, onClose, children }: {
+  /** Which presentation to draw. See lib/ask-nanci/data/panel-ui.ts. */
+  config: PanelSheetConfig
+  /** Whether a panel exists at all: without one there is nothing to rest as a lip. */
+  present: boolean
+  open: boolean
+  label?: string
+  /** Shown in the grab strip while open: the way to the panels this one is hiding. */
+  pager?: React.ReactNode
+  onOpen: () => void
+  onClose: () => void
+  children: React.ReactNode
+}) {
+  const vertical = config.axis === "y"
+  // A lip only exists while a panel does, so the two conditions travel together.
+  const peek = present && config.lip > 0
+  const { setPanelSheetOpen } = useAskNanci()
+
+  // How far the sheet travels between resting and open. Measured into state rather
+  // than assumed: the sheet's height depends on the composer, which changes with its
+  // own content, and a ref cannot be read during render.
+  const [span, setSpan] = useState(600)
+  // Measured from the clip line, not the card's own edge: the frame ends at the
+  // composer, so a card dragged past it is cut there rather than sliding behind it.
+  const travel = peek ? span + CARD_INSET - config.lip : span + CARD_INSET + OFF_SCREEN
+
+  const { cardRef, dragHandlers, bodyHandlers, consumeClick } = useSheetGesture({
+    axis: config.axis,
+    open,
+    peek,
+    travel,
+    onOpen,
+    onClose,
+  })
+
+  useEffect(() => {
+    const el = cardRef.current
+    if (!el) return
+    const measure = () => setSpan(vertical ? el.offsetHeight : el.offsetWidth)
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [cardRef, vertical])
+
+  // The composer turns transparent for an open sheet so the dim can reach past it.
+  useEffect(() => { setPanelSheetOpen(open) }, [open, setPanelSheetOpen])
+
+  useSheetDismissal(open, onClose)
+  useSheetFocus(cardRef, open)
+  useKeyboardInset()
+
   return (
-    <div className="flex flex-col gap-1.5">
-      <div className="relative">
+    <>
+      {/* The DS DrawerOverlay treatment, copied rather than imported: that component
+          only renders inside DrawerContent's own portal, which is the thing this sheet
+          exists to avoid.
+
+          Sits under the sheet (z-20) and under the composer (z-30), and starts below
+          the h-10 brand bar: the composer and the panel toggle both stay live controls
+          while a panel is open, so neither is dimmed nor blocked.
+
+          Unlike the rest of the sheet this does not scrub with the drag. The composer
+          only turns transparent for a fully open sheet, so a half-dimmed screen leaves
+          a visible seam around it; the dim belongs to the settled state. */}
+      <div
+        onClick={onClose}
+        className={`fixed inset-x-0 bottom-0 top-10 z-10 bg-black/10 transition-opacity duration-300 supports-backdrop-filter:backdrop-blur-xs ${
+          open ? "opacity-100" : "pointer-events-none opacity-0"
+        }`}
+      />
+      {/* A clipping frame ending exactly at the composer, with the card inset inside it.
+          Without it a dragged card slides on past the composer, which paints over its
+          lower half: content cut on a hard edge with its shadow hidden behind the
+          composer. Clipped at the composer line instead, the card reads as tucking
+          under it, and the inset leaves room for the shadow on the other three sides. */}
+      <div className={`${SHEET_FRAME} ${open || peek ? "" : "pointer-events-none"}`}>
+      {/* Resting, the card is a handle and nothing else, so it is a dialog only while
+          it is open. data-resting is written by the gesture, not rendered: it has to
+          follow the finger. */}
+      <div
+        ref={cardRef}
+        role={open ? "dialog" : undefined}
+        aria-label={open ? label : undefined}
+        tabIndex={-1}
+        style={{ opacity: peek || open ? 1 : 0 }}
+        className={`${SHEET_CARD} group flex overflow-hidden outline-none ${
+          vertical ? "flex-col" : "flex-row"
+        } border-border bg-background shadow-2xl data-[resting]:border-transparent data-[resting]:bg-transparent data-[resting]:shadow-none transition-[transform,background-color,border-color,box-shadow] duration-300 ease-out`}
+      >
+        {/* The grab strip runs along the anchored edge: across the top for a bottom
+            sheet, down the left for a right-side one. While peeking it is the whole
+            visible surface, so it takes a tap as well as a drag. */}
         <button
-          onClick={onOpen}
-          aria-label={`Open ${label}`}
-          className="relative block h-[234px] w-full overflow-hidden rounded-xl border bg-background text-left shadow-sm transition-transform active:scale-[0.97]"
+          type="button"
+          {...dragHandlers}
+          onClick={() => {
+            if (consumeClick()) return
+            if (open) onClose()
+            else onOpen()
+          }}
+          aria-label={`${open ? "Hide" : "Show"} ${label ?? "panel"}`}
+          className={`relative flex shrink-0 cursor-grab touch-none justify-center active:cursor-grabbing ${
+            vertical
+              // Resting, the handle sits at the strip's bottom edge, a few px above the
+              // composer, while the rest of the strip stays a comfortable target.
+              ? "h-6 w-full items-center group-data-[resting]:h-8 group-data-[resting]:items-end group-data-[resting]:pb-1"
+              // Same idea rotated: the handle hugs the card's left edge, which is the
+              // part still on screen when the card rests against the right edge.
+              : "h-full w-6 items-center group-data-[resting]:w-10 group-data-[resting]:justify-start group-data-[resting]:pl-1.5"
+          }`}
         >
-          {/* The live panel, scaled. pointer-events-none so taps land on the button. */}
-          <div
-            className="pointer-events-none absolute left-0 top-0 origin-top-left"
-            style={{
-              width: THUMB_SRC_WIDTH,
-              height: THUMB_SRC_HEIGHT,
-              transform: `scale(${THUMB_SCALE})`,
-            }}
-            aria-hidden
+          {/* The iOS grabber. On an open card it is trim, drawn light against the
+              surface. Minimised it is the whole control — the only thing saying a panel
+              is there and can be pulled back up — so it is longer, thicker and darker,
+              with nothing else around it. */}
+          <span
+            className={`rounded-full bg-muted-foreground/30 group-data-[resting]:bg-muted-foreground/70 ${
+              vertical
+                ? "h-1 w-10 group-data-[resting]:h-1.5 group-data-[resting]:w-16"
+                : "h-10 w-1 group-data-[resting]:h-16 group-data-[resting]:w-1.5"
+            }`}
+          />
+        </button>
+        {/* The pager sits with the strip rather than in the panel's own header: it
+            belongs to the container (which panel is showing), not to the panel. A
+            sibling of the strip, not a child, because the strip is a button now. */}
+        {open && pager && (
+          <span
+            className={`absolute top-0 flex h-6 items-center ${vertical ? "right-1.5" : "left-0 pl-1.5"}`}
           >
-            <Panel />
-          </div>
-        </button>
-        <button
-          onClick={onClose}
-          aria-label={`Close ${label}`}
-          className="absolute -right-1.5 -top-1.5 flex size-6 items-center justify-center rounded-full border bg-background text-muted-foreground shadow-sm"
+            {pager}
+          </span>
+        )}
+        <div
+          {...bodyHandlers}
+          aria-hidden={!open}
+          className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden opacity-100 transition-opacity duration-200 group-data-[resting]:opacity-0"
         >
-          <X className="size-3" />
-        </button>
+          {children}
+        </div>
       </div>
-      <span className="truncate px-0.5 text-xs font-medium text-foreground">{label}</span>
-    </div>
+      </div>
+    </>
   )
 }
 
 export function MobilePanelSwitcher() {
-  const { dynamicPanels, closePanel, panelSwitcherOpen, setPanelSwitcherOpen } = useAskNanci()
+  const { dynamicPanels, panelSwitcherOpen, setPanelSwitcherOpen } = useAskNanci()
   const isMobile = useIsMobile()
-  const [openId, setOpenId] = useState<PanelId | null>(null)
+  // Which presentation this session runs, from ?panelui=. Unset means the bottom sheet
+  // that ships, so every existing demo URL is unaffected. See data/panel-ui.ts.
+  const { sheet } = usePanelUi()
+  // Derived from the stack, not a copy of it: one flag says whether the phone's single
+  // sheet has been swiped away, and any panel opening clears it.
+  const [dismissed, setDismissed] = useState(false)
+  // One panel at a time, but not always the newest: a flow that opens two leaves the
+  // first reachable through the pager instead of stranding it behind the badge.
+  const [shownId, setShownId] = useState<PanelId | null>(null)
   const prevCount = useRef(dynamicPanels.length)
 
   // A turn that opens a panel should show it, not just park it behind the trigger —
@@ -77,98 +201,54 @@ export function MobilePanelSwitcher() {
   // there. Only growth counts, so closing one never yanks another into view.
   useEffect(() => {
     if (dynamicPanels.length > prevCount.current) {
-      const newest = dynamicPanels[dynamicPanels.length - 1]
-      setOpenId(newest)
-      setPanelSwitcherOpen(false)
+      setShownId(dynamicPanels[dynamicPanels.length - 1])
+      setDismissed(false)
     }
     prevCount.current = dynamicPanels.length
-  }, [dynamicPanels, setPanelSwitcherOpen])
+  }, [dynamicPanels])
 
-  // Derived, not synced: a panel closed from anywhere (its own X, a turn's
-  // closePanel, closeAllPanels) leaves the drawer closed on the very next render,
-  // with no effect to fall out of step with the stack. The toggle only sets one flag,
-  // so with exactly one panel open it lands straight on that panel and skips the
-  // overview — an overview of one thumbnail is pure friction.
-  const single = dynamicPanels.length === 1
-  const activeId =
-    (openId && dynamicPanels.includes(openId) ? openId : null) ??
-    (panelSwitcherOpen && single ? dynamicPanels[0] : null)
+  // The toggle in the brand bar is the way back to a dismissed panel.
+  useEffect(() => {
+    if (!panelSwitcherOpen) return
+    setDismissed(false)
+    setPanelSwitcherOpen(false)
+  }, [panelSwitcherOpen, setPanelSwitcherOpen])
 
-  // Not `md:hidden`: Sheet and Drawer portal onto <body>, so CSS on this wrapper
-  // would never reach them and a drawer opened on a phone would stay open when the
-  // viewport grows. Skipping the render entirely is what actually keeps desktop clean.
+  // Not `md:hidden`: a sheet opened on a phone would otherwise stay open when the
+  // viewport grows. Skipping the render entirely is what keeps desktop clean.
   if (!isMobile) return null
 
-  const openPanel = activeId ? PANELS[activeId] : null
+  // Derived, never synced: a panel closed from anywhere falls out of the stack and the
+  // sheet lands on the newest survivor on the next render.
+  const sheetId: PanelId | null =
+    (shownId && dynamicPanels.includes(shownId) ? shownId : null) ??
+    dynamicPanels[dynamicPanels.length - 1] ??
+    null
+  const sheetPanel = sheetId ? PANELS[sheetId] : null
+  const index = sheetId ? dynamicPanels.indexOf(sheetId) : -1
 
   return (
-    <>
-      {/* Overview — the thumbnail container. Opened by MobilePanelToggle in the top bar. */}
-      <Sheet open={panelSwitcherOpen && !single} onOpenChange={setPanelSwitcherOpen}>
-        <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-2xl">
-          <SheetTitle className="px-4 pt-4 text-base">Panels</SheetTitle>
-          <SheetDescription className="sr-only">
-            Open panels. Select one to view it full screen.
-          </SheetDescription>
-          {dynamicPanels.length === 0 ? (
-            // The toggle is always in the bar, so this is a real destination rather
-            // than a dead end. Panels are answers to questions — say so, instead of
-            // showing an empty grid that reads as something failing to load.
-            <div className="flex flex-col items-center gap-2 px-6 py-12 text-center">
-              <LayoutGrid className="size-6 text-muted-foreground" />
-              <p className="text-sm font-medium text-foreground">No panels open</p>
-              <p className="text-xs text-muted-foreground">
-                Ask a question and Nanci opens the answer here.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-3 p-4">
-              {dynamicPanels.map((id) => (
-                <PanelThumbnail
-                  key={id}
-                  id={id}
-                  onOpen={() => {
-                    setOpenId(id)
-                    setPanelSwitcherOpen(false)
-                  }}
-                  onClose={() => closePanel(id)}
-                />
-              ))}
-            </div>
-          )}
-        </SheetContent>
-      </Sheet>
-
-      {/* The opened panel. Near-full height so the panel gets the viewport. */}
-      <Drawer
-        open={activeId !== null}
-        onOpenChange={(o) => {
-          if (o) return
-          setOpenId(null)
-          // Also clears the toggle's flag, which is what put a lone panel on screen.
-          setPanelSwitcherOpen(false)
-        }}
-      >
-        <DrawerContent className="h-[92vh] !max-h-[92vh]">
-          <DrawerTitle className="sr-only">{openPanel?.label ?? "Panel"}</DrawerTitle>
-          <DrawerDescription className="sr-only">Panel detail</DrawerDescription>
-          {dynamicPanels.length > 1 && (
-            <button
-              onClick={() => {
-                setOpenId(null)
-                setPanelSwitcherOpen(true)
-              }}
-              className="mx-auto mb-1 flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium text-muted-foreground"
-            >
-              <LayoutGrid className="size-3" />
-              All panels
-            </button>
-          )}
-          <div className="min-h-0 flex-1 overflow-hidden">
-            {openPanel && <openPanel.component />}
-          </div>
-        </DrawerContent>
-      </Drawer>
-    </>
+    <PanelSheet
+      config={sheet}
+      present={!!sheetId}
+      open={!!sheetId && !dismissed}
+      label={sheetPanel?.label}
+      pager={
+        dynamicPanels.length > 1 ? (
+          <button
+            onClick={() => setShownId(dynamicPanels[(index + 1) % dynamicPanels.length])}
+            aria-label="Show the next open panel"
+            className="flex h-6 items-center gap-0.5 rounded-md px-1.5 text-[11px] font-medium text-muted-foreground hover:bg-muted"
+          >
+            {index + 1}/{dynamicPanels.length}
+            <ChevronRight className="size-3.5" />
+          </button>
+        ) : undefined
+      }
+      onOpen={() => setDismissed(false)}
+      onClose={() => setDismissed(true)}
+    >
+      {sheetPanel && <sheetPanel.component />}
+    </PanelSheet>
   )
 }

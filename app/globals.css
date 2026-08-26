@@ -107,6 +107,39 @@
 
 .app-frame { background: var(--app-gradient); }
 
+/* Nesting the background behind a mobile panel sheet: the conversation scales down
+   and dims so the sheet reads as the focused layer, the way iOS treats a card behind
+   a sheet. Only [data-nest] moves — the chat input sits outside it on purpose, so it
+   stays full size, sharp and tappable above the sheet (MobilePanelSwitcher). */
+/* --sheet-progress is 1 when the mobile panel sheet is open, 0 when it rests, and
+   every value between while a finger is on the handle (MobilePanelSwitcher). Declared
+   with @property so it interpolates: the same number drives the transform and the fade,
+   and both follow the gesture rather than waiting for it to end. */
+@property --sheet-progress {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
+/* --sheet-settle is how long the sheet takes to land, published by the gesture so a
+   flick lands as fast as it was thrown and the conversation behind it keeps pace with
+   the card. The fallback is the settle a sheet opened by the script gets. */
+html {
+  transition: --sheet-progress var(--sheet-settle, 0.3s) ease-out;
+}
+
+/* Mid-drag the value is set every frame, so easing it would lag the finger. */
+html[data-sheet-scrub] {
+  transition: none;
+}
+
+[data-nest] {
+  transform: scale(calc(1 - 0.06 * var(--sheet-progress)));
+  transform-origin: top center;
+  border-radius: calc(1rem * var(--sheet-progress));
+  opacity: calc(1 - 0.45 * var(--sheet-progress));
+}
+
 /* Sidebar logos are flat SVGs with baked-in ink, so dark mode inverts them. Scoped
    per slot + theme so a brand shipping a light-ink logo can opt out with its own rule. */
 html.dark [data-logo="sidebar"],

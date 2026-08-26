@@ -78,6 +78,10 @@ interface AskNanciCtx {
   // switcher, which is how open panels are reached below md.
   panelSwitcherOpen: boolean
   setPanelSwitcherOpen: (open: boolean) => void
+  // Whether the mobile panel sheet is open (not merely resting). The composer goes
+  // transparent for it, so the dim reaches the bottom of the screen.
+  panelSheetOpen: boolean
+  setPanelSheetOpen: (open: boolean) => void
   onboardingOpen: boolean
   setOnboardingOpen: (open: boolean) => void
   /** `?mode=onboarding` — replay onboarding on every load and never record that it ran. */
@@ -188,6 +192,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [panelSwitcherOpen, setPanelSwitcherOpen] = useState(false)
+  const [panelSheetOpen, setPanelSheetOpen] = useState(false)
   const [onboardingOpen, setOnboardingOpen] = useState(false)
   const [flowFinished, setFlowFinished] = useState(false)
   const [tourActive, setTourActive] = useState(false)
@@ -825,6 +830,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       settingsOpen, openSettings, setSettingsOpen,
       mobileSidebarOpen, setMobileSidebarOpen,
       panelSwitcherOpen, setPanelSwitcherOpen,
+      panelSheetOpen, setPanelSheetOpen,
       onboardingOpen, setOnboardingOpen, forceOnboarding, genericBrand, tourActive, setTourActive, tourRequest, requestTour, flowFinished, leavesCurrentFlow,
       isConceptVersion,
       submitFormPanel, submitOfferApplication, submitStepUpPanel,

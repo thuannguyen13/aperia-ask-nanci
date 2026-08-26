@@ -48,7 +48,7 @@ function ChatArea({ children }: { children: React.ReactNode }) {
   return (
     <>
       <ServiceMarketplacePanel />
-      <div className={`min-w-0 flex-1 overflow-hidden rounded-xl md:rounded-2xl border bg-background ${marketplaceOpen ? "hidden" : "flex"}`}>
+      <div className={`min-w-0 flex-1 overflow-hidden bg-background md:rounded-2xl md:border ${marketplaceOpen ? "hidden" : "flex"}`}>
         {children}
       </div>
     </>
@@ -83,7 +83,7 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
   }, [isDQ])
 
   return (
-    <div className={`flex min-w-0 flex-1 py-1 pr-1${noSidebar ? " pl-1" : ""}`}>
+    <div className={`flex min-w-0 flex-1 md:py-1 md:pr-1${noSidebar ? " md:pl-1" : ""}`}>
       <TeachNanciPanel />
       {/* Marketplace panel only where a sidebar can open it (not the compact widget). */}
       {!noSidebar && <ServiceMarketplacePanel />}
@@ -96,8 +96,8 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
           : showDQ
           // The fixed DQ chat width only applies once the panel column exists (md+);
           // below that the panel moves into MobilePanelSwitcher and chat takes it all.
-          ? "flex w-full shrink-0 overflow-hidden rounded-xl border bg-background md:mr-1 md:w-97.5 md:rounded-2xl"
-          : `flex min-w-0 flex-1 overflow-hidden rounded-xl md:rounded-2xl border bg-background transition-opacity duration-200 ease-out ${chatFadingIn ? "opacity-0" : "opacity-100"}`
+          ? "flex w-full shrink-0 overflow-hidden bg-background md:mr-1 md:w-97.5 md:rounded-2xl md:border"
+          : `flex min-w-0 flex-1 overflow-hidden bg-background transition-opacity duration-200 ease-out md:rounded-2xl md:border ${chatFadingIn ? "opacity-0" : "opacity-100"}`
       }>
         {children}
       </div>
@@ -167,7 +167,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       >
         <div
           data-embed={embedVariant}
-          className="app-frame relative flex h-screen flex-col overscroll-contain md:px-2 md:pb-2"
+          className="app-frame relative flex h-[100dvh] flex-col overscroll-contain md:px-2 md:pb-2"
         >
           <div className="relative z-10 flex h-10 shrink-0 items-center justify-center">
             <Image data-logo="frame" src={logos.frame.src} alt={logos.frame.alt} width={logos.frame.width} height={logos.frame.height} className="h-6 w-auto" />
@@ -184,7 +184,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 {/* Autoplay means nobody is driving — the rail starts pinned so the
                     marketplace story is visible instead of collapsed to icons. */}
                 <Sidebar initialPinned={autoPlay} />
-                <div className="flex min-w-0 flex-1 py-1 pr-1 pl-1">
+                <div className="flex min-w-0 flex-1 md:py-1 md:pr-1 md:pl-1">
                   <TeachNanciPanel />
                   <ChatArea>{children}</ChatArea>
                 </div>
@@ -192,8 +192,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             ) : isConceptEmbed ? (
               <ConceptContentArea noSidebar>{children}</ConceptContentArea>
             ) : (
-              <div className="flex min-w-0 flex-1 py-1 px-1">
-                <div className="flex min-w-0 flex-1 overflow-hidden rounded-xl md:rounded-2xl border bg-background">
+              <div className="flex min-w-0 flex-1 md:py-1 md:px-1">
+                <div className="flex min-w-0 flex-1 overflow-hidden bg-background md:rounded-2xl md:border">
                   {children}
                 </div>
               </div>

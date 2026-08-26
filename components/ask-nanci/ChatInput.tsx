@@ -103,7 +103,7 @@ export function ChatInput() {
           // Per the design note, the spent-budget warning fires when they go to type,
           // not on arrival — it lands at the moment it actually blocks them.
           onFocus={() => { if (planSpent) setTokenLimitReached(true) }}
-          className="min-h-[72px] resize-none border-0 shadow-none focus-visible:ring-0 focus-visible:border-0 text-sm bg-transparent dark:bg-transparent"
+          className="min-h-[72px] resize-none border-0 shadow-none focus-visible:ring-0 focus-visible:border-0 text-base md:text-sm bg-transparent dark:bg-transparent"
         />
 
         <div className="flex items-center justify-between px-2 pb-2">

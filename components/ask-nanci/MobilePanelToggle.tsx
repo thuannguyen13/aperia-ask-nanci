@@ -23,7 +23,9 @@ export function MobilePanelToggle() {
       }
     >
       <LayoutGrid className="size-5" />
-      {dynamicPanels.length > 1 && (
+      {/* The count shows from the first panel: with one open the badge is what says
+          so, and only an empty stack has nothing to report. */}
+      {dynamicPanels.length > 0 && (
         <span className="absolute right-1 top-1 flex size-4 items-center justify-center rounded-full bg-white text-[10px] font-bold text-primary">
           {dynamicPanels.length}
         </span>

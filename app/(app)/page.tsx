@@ -9,6 +9,8 @@ import { ChatView } from "@/components/ask-nanci/ChatView"
 import { ExplorePrompts } from "@/components/ask-nanci/ExplorePrompts"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { ConceptWelcomeView } from "@/components/ask-nanci/concept/ConceptWelcomeView"
+import { useComposerHeight } from "@/components/ask-nanci/use-composer-height"
+import { MobileFlowChips } from "@/components/ask-nanci/MobileFlowChips"
 
 function WelcomeView() {
   const { sessions, resumeSession, setKbOpen, sources, isEmbed } = useAskNanci()
@@ -99,7 +101,8 @@ function WelcomeView() {
 }
 
 export default function AskNanciPage() {
-  const { view, startNewChat, isEmbed, isConceptVersion, embedVariant } = useAskNanci()
+  const { view, startNewChat, isEmbed, isConceptVersion, embedVariant, panelSheetOpen } = useAskNanci()
+  const composerRef = useComposerHeight()
 
   if (view === "chat") {
     return (
@@ -115,8 +118,18 @@ export default function AskNanciPage() {
           </button>
         )}
         <ChatView />
-        <div className="shrink-0 px-3 pb-3 md:px-4 md:pb-4">
+        {/* The composer owns the bottom of the screen: mobile panel sheets end above
+            it rather than sliding behind it, so it is never covered and never overlaps
+            a drawer's edge. It measures itself into --composer-h for them to sit on
+            (see PanelSheet), and z-30 lifts it over the scrim. Its padding goes
+            transparent only while a sheet is open, so the dim reaches the bottom of the
+            screen then, and a resting sheet's body stays hidden behind it otherwise. */}
+        <div
+          ref={composerRef}
+          className={`relative z-30 shrink-0 px-3 pb-3 md:px-4 md:pb-4 ${panelSheetOpen ? "" : "bg-background"}`}
+        >
           <div className="mx-auto w-full max-w-[800px]">
+            <MobileFlowChips />
             <ChatInput />
           </div>
         </div>

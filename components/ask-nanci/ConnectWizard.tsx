@@ -125,7 +125,7 @@ export function ConnectWizard({ open, onClose, onLinked }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent showCloseButton={false} className="max-sm:inset-0 max-sm:top-0 max-sm:left-0 max-sm:translate-x-0 max-sm:translate-y-0 max-sm:h-screen max-sm:w-screen max-sm:max-w-full max-sm:rounded-none max-sm:flex max-sm:flex-col">
+      <DialogContent showCloseButton={false} className="max-sm:inset-0 max-sm:top-0 max-sm:left-0 max-sm:translate-x-0 max-sm:translate-y-0 max-sm:h-[100dvh] max-sm:w-screen max-sm:max-w-full max-sm:rounded-none max-sm:flex max-sm:flex-col">
         <DialogTitle className="sr-only">Link Accounts</DialogTitle>
 
         {/* Header */}

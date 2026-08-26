@@ -40,7 +40,9 @@ export function ChatView() {
     useChatScroll({ phase: chatState === "thinking" ? "awaiting" : chatState })
 
   return (
-    <div className="relative flex h-full min-h-0 flex-1 flex-col">
+    // data-nest: the conversation is what recedes when a mobile panel sheet opens.
+    // See globals.css — the input is deliberately not inside it, so it stays put.
+    <div data-nest className="relative flex h-full min-h-0 flex-1 flex-col">
       {/* Conversation title — the shared PanelHeader (no close button), above the
           scroll area so it hugs the left on wide panes instead of centering with
           the messages. `size="lg"` is the borderless, bolder title variant. */}

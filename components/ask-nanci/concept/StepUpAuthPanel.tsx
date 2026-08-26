@@ -75,7 +75,7 @@ function Step2() {
           <input
             type="text"
             placeholder="9-digit routing number"
-            className="w-full rounded-lg border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            className="w-full rounded-lg border bg-background px-3 py-2 text-base md:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
         <div className="flex flex-col gap-1.5">
@@ -83,12 +83,12 @@ function Step2() {
           <input
             type="text"
             placeholder="Account number"
-            className="w-full rounded-lg border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            className="w-full rounded-lg border bg-background px-3 py-2 text-base md:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
           />
         </div>
         <div className="flex flex-col gap-1.5">
           <label className="text-sm font-medium text-foreground">Account Type</label>
-          <select className="w-full rounded-lg border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+          <select className="w-full rounded-lg border bg-background px-3 py-2 text-base md:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
             <option>Checking</option>
             <option>Savings</option>
           </select>
