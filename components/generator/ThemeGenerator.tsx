@@ -179,7 +179,7 @@ function Wall() {
           bg-sidebar card as the real shell, laid out like the concept welcome screen.
           Themed surfaces (gradient, primary, sidebar active, ring) paint for real;
           everything that would be content is a placeholder block. */}
-      <div className="app-frame flex h-[420px] flex-col overflow-hidden rounded-xl px-2 pb-2 ring-1 ring-inset ring-black/5">
+      <div className="app-frame flex h-[520px] flex-col overflow-hidden rounded-xl px-2 pb-2 ring-1 ring-inset ring-black/5">
         <div className="relative flex h-12 shrink-0 items-center justify-between px-3">
           <div className="h-6 w-16 rounded-md bg-white/20" />
           <span className="absolute left-1/2 -translate-x-1/2 text-sm font-semibold tracking-tight text-white">
@@ -221,26 +221,57 @@ function Wall() {
               <Progress value={62} className="mt-2 h-1.5" />
             </div>
           </div>
+          {/* The chat pane exercises the wider palette in app context: prompt cards on
+              the card pair (one hovered, on the accent pair), a user bubble on the
+              primary pair, a bot answer in the app's chart chrome with chart-1 bars
+              and a secondary Export, and the ask bar focused on the ring. */}
           <div className="m-2 ml-0 flex min-w-0 flex-1 flex-col rounded-xl border bg-background p-5">
-            <div className="flex flex-1 flex-col items-center justify-center gap-4">
-              <div className="flex flex-col items-center gap-2">
-                <Skeleton className="h-4 w-56" />
-                <Skeleton className="h-2.5 w-40" />
+            <div className="flex flex-1 flex-col justify-end gap-3 overflow-hidden">
+              <div className="mx-auto grid w-full max-w-md grid-cols-2 gap-2.5">
+                <div className="rounded-lg border bg-card p-3 text-card-foreground">
+                  <Skeleton className="h-2.5 w-3/4" />
+                  <Skeleton className="mt-1.5 h-2.5 w-1/2" />
+                  <span className="mt-2 block text-[10px] font-medium" style={{ color: "var(--primary)" }}>
+                    Try it →
+                  </span>
+                </div>
+                {/* Hovered card: the accent pair. */}
+                <div
+                  className="rounded-lg border p-3"
+                  style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
+                >
+                  <span className="block truncate text-[11px] font-medium">Was Saturday worth it?</span>
+                  <Skeleton className="mt-1.5 h-2.5 w-1/2" />
+                  <span className="mt-2 block text-[10px] font-medium" style={{ color: "var(--primary)" }}>
+                    Try it →
+                  </span>
+                </div>
               </div>
-              <div className="grid w-full max-w-md grid-cols-2 gap-2.5">
-                {[0, 1, 2, 3].map((i) => (
-                  <div key={i} className="rounded-lg border p-3">
-                    <Skeleton className="h-2.5 w-3/4" />
-                    <Skeleton className="mt-1.5 h-2.5 w-1/2" />
-                    <span className="mt-2 block text-[10px] font-medium" style={{ color: "var(--primary)" }}>
-                      Try it →
-                    </span>
-                  </div>
-                ))}
+              <div
+                className="ml-auto max-w-[70%] rounded-xl px-3 py-2 text-xs"
+                style={{ background: "var(--primary)", color: "var(--primary-foreground)" }}
+              >
+                How did Saturday go?
+              </div>
+              {/* A bot answer in the app's real chart chrome (MessageChart.tsx). */}
+              <div className="max-w-[85%] overflow-hidden rounded-xl border bg-card text-card-foreground">
+                <div className="flex items-center justify-between border-b px-3 py-1.5">
+                  <span className="text-[11px] font-semibold">Saturday by hour</span>
+                  <span className="rounded-md px-2 py-0.5 text-[10px] font-medium" style={{ background: "var(--secondary)", color: "var(--secondary-foreground)" }}>
+                    Export
+                  </span>
+                </div>
+                <div className="flex items-end gap-1.5 px-3 pb-2 pt-3">
+                  {[35, 55, 80, 100, 70, 45, 60, 30].map((h, i) => (
+                    <div key={i} className="w-5 rounded-t-[2px]" style={{ height: h * 0.5, background: "var(--chart-1)" }} />
+                  ))}
+                </div>
+                <p className="px-3 pb-2 text-[10px] text-muted-foreground">$4,110 total, best day this month.</p>
               </div>
             </div>
-            <div className="mx-auto flex w-full max-w-md shrink-0 items-center gap-2">
-              <div className="flex h-8 flex-1 items-center rounded-lg border px-2.5">
+            {/* Focused: border-input at rest is the field beside it; this one holds the ring. */}
+            <div className="mx-auto mt-3 flex w-full max-w-md shrink-0 items-center gap-2">
+              <div className="flex h-8 flex-1 items-center rounded-lg border border-ring px-2.5 ring-3 ring-ring/50">
                 <span className="text-xs text-muted-foreground">Ask anything…</span>
               </div>
               <Button size="sm">Ask</Button>
