@@ -90,14 +90,6 @@ const TOKEN_GROUPS: { title: string; tokens: TokenDef[] }[] = [
 const ALL_TOKENS = TOKEN_GROUPS.flatMap((g) => g.tokens.map((t) => t.key))
 type Tokens = Record<string, string>
 
-/**
- * The white-label core every existing brand block ships. Always exported; every
- * other token joins the block only when edited away from its seeded value.
- */
-const ESSENTIAL_KEYS = new Set([
-  "primary", "primary-foreground", "ring", "gradient-start", "gradient-end",
-])
-
 const SHADCN_PRESET = "shadcn"
 
 /**
@@ -125,14 +117,13 @@ function buildGradient(t: Tokens) {
 }
 
 /**
- * The paste-ready block: the white-label core always, plus any token edited away
- * from its seeded value — so untouched defaults never bloat the theme.
+ * The paste-ready block: every token, explicitly — the theme is self-contained
+ * rather than leaning on :root defaults for whatever went unedited.
  */
-function buildCss(name: string, t: Tokens, seeded: Tokens) {
+function buildCss(name: string, t: Tokens) {
   const lines: string[] = []
   for (const key of ALL_TOKENS) {
     if (key.startsWith("gradient-")) continue
-    if (!ESSENTIAL_KEYS.has(key) && t[key] === seeded[key]) continue
     lines.push(`  --${key}: ${t[key]};`)
     lines.push(`  --color-${key}: ${t[key]};`)
   }
@@ -619,7 +610,7 @@ export function ThemeGenerator() {
     ["--app-gradient", buildGradient(tokens)],
   ]) as React.CSSProperties
 
-  const css = buildCss(themeName, tokens, seeded)
+  const css = buildCss(themeName, tokens)
 
   const copy = async () => {
     await navigator.clipboard.writeText(css)
@@ -716,8 +707,8 @@ export function ThemeGenerator() {
                 <h2 className="text-sm font-semibold text-foreground">{group.title}</h2>
                 {group.title === "Brand" && (
                   <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
-                    The main tokens for a brand theme: start here. The groups below
-                    fine-tune, and only join the CSS once you change them.
+                    The main tokens for a brand theme: start here. The groups
+                    below fine-tune the rest of the palette.
                   </p>
                 )}
                 <div className="mt-2 flex flex-col">
