@@ -46,7 +46,7 @@ export function DetectionQueue() {
         {DETECTION_QUEUES.map((q, i) => (
           // Only the first (Mastercard) queue drills into the Barometer Report —
           // the second card's actions are inert.
-          <QueueSummaryCard key={q.assignment} queue={q} onBarometer={i === 0 ? openBarometer : undefined} live={i === 0} />
+          <QueueSummaryCard key={q.assignmentId} queue={q} onBarometer={i === 0 ? openBarometer : undefined} live={i === 0} />
         ))}
       </PanelBody>
     </PanelShell>

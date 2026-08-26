@@ -74,6 +74,10 @@ interface AskNanciCtx {
   setSettingsOpen: (open: boolean) => void
   mobileSidebarOpen: boolean
   setMobileSidebarOpen: (open: boolean) => void
+  // Mirror of the sidebar toggle for the other end of the mobile top bar: the panel
+  // switcher, which is how open panels are reached below md.
+  panelSwitcherOpen: boolean
+  setPanelSwitcherOpen: (open: boolean) => void
   onboardingOpen: boolean
   setOnboardingOpen: (open: boolean) => void
   /** `?mode=onboarding` — replay onboarding on every load and never record that it ran. */
@@ -183,6 +187,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [tokenLimitReached, setTokenLimitReached] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+  const [panelSwitcherOpen, setPanelSwitcherOpen] = useState(false)
   const [onboardingOpen, setOnboardingOpen] = useState(false)
   const [flowFinished, setFlowFinished] = useState(false)
   const [tourActive, setTourActive] = useState(false)
@@ -819,6 +824,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       tokenLimitReached, setTokenLimitReached,
       settingsOpen, openSettings, setSettingsOpen,
       mobileSidebarOpen, setMobileSidebarOpen,
+      panelSwitcherOpen, setPanelSwitcherOpen,
       onboardingOpen, setOnboardingOpen, forceOnboarding, genericBrand, tourActive, setTourActive, tourRequest, requestTour, flowFinished, leavesCurrentFlow,
       isConceptVersion,
       submitFormPanel, submitOfferApplication, submitStepUpPanel,

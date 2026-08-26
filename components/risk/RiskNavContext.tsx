@@ -11,7 +11,15 @@ interface RiskNav {
   go: (dest: RiskDest) => void
   openBarometer: (filter?: "critical" | null) => void
   openMerchant: (id: string) => void
+  /**
+   * Opens Assignment Management focused on one assignment. Same shape as
+   * openMerchant: the dashboard's alert-volume bars and re-alert rows drill into the
+   * assignment they describe, rather than being names styled as links.
+   */
+  openAssignment: (id: string) => void
   merchantId: string | null
+  /** The assignment the list should highlight, or null for an unfocused list. */
+  assignmentId: string | null
   barometerFilter: "critical" | null
   /**
    * Work state per merchant, shared rather than local to a screen: marking one in
@@ -39,7 +47,9 @@ const RiskNavContext = createContext<RiskNav>({
   go: () => {},
   openBarometer: () => {},
   openMerchant: () => {},
+  openAssignment: () => {},
   merchantId: null,
+  assignmentId: null,
   barometerFilter: null,
   workStatuses: {},
   markWork: () => {},

@@ -1,13 +1,15 @@
 "use client"
 
 import { useState } from "react"
-import { RefreshCw, SlidersHorizontal, Plus, ChevronDown, ChevronLeft, ChevronRight, ArrowUpDown, SlidersVertical, Pencil, Copy, Trash2, Download, CircleCheck } from "lucide-react"
-import { Button } from "aperia-ds5"
+import { RefreshCw, SlidersHorizontal, Plus, ChevronDown, ChevronLeft, ChevronRight, SlidersVertical, Pencil, Copy, Trash2, Download, CircleCheck } from "lucide-react"
+import { Button, TableBody, TableRow } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
-import { PanelShell, PanelHeader, PanelBody } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelBody, PanelTable, Thead, Th, Td } from "@/components/ask-nanci/shared"
 import { CreateAssignment } from "./CreateAssignment"
 import { AM_INTEGRATION, AM_SUMMARY, ASSIGNMENTS, AM_TOTAL, type Assignment, type AssignmentStatus } from "@/lib/ask-nanci/data/risk-assignments"
+import { alertsToday } from "@/lib/ask-nanci/data/risk-dashboard"
 import { EXAMPLE_ASSIGNMENT_NAME } from "@/lib/ask-nanci/data/risk-create-assignment"
+import { useRiskNav } from "./RiskNavContext"
 
 const TABS: ("All" | AssignmentStatus)[] = ["All", "Active", "Expired"]
 
@@ -17,6 +19,9 @@ const STATUS_PILL: Record<AssignmentStatus, string> = {
 }
 
 export function AssignmentManagement() {
+  // Set when the user arrived from a dashboard chart, so the row they clicked is
+  // findable in a list of 13 rather than left to be hunted for.
+  const focused = useRiskNav().assignmentId
   const [tab, setTab] = useState<"All" | AssignmentStatus>("All")
   // Create Assignment replaces the list in place (Figma 219–225); a submitted
   // assignment lands at the top of the list with a confirmation toast (frame 207).
@@ -28,7 +33,8 @@ export function AssignmentManagement() {
   const rows = tab === "All" ? all : all.filter((a) => a.status === tab)
 
   const submit = (name: string) => {
-    setCreated({ name: name.trim() || EXAMPLE_ASSIGNMENT_NAME, type: "DQ", alerted: null, status: "Active", lastProcessed: "06/18/2026" })
+    const title = name.trim() || EXAMPLE_ASSIGNMENT_NAME
+    setCreated({ id: "created", name: title, short: title, type: "DQ", status: "Active", lastProcessed: "06/18/2026", neverRun: true })
     setCreating(false)
     setToast(true)
   }
@@ -119,40 +125,39 @@ export function AssignmentManagement() {
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-xl border">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b bg-muted/40 text-left text-xs text-muted-foreground">
-                {["Assignment Name", "Type", "Alerted Merchant Count", "Status", "Last Processed Date", "Actions"].map((h) => (
-                  <th key={h} className={cn("px-4 py-2.5 font-medium", h === "Actions" && "text-right")}>
-                    <span className="inline-flex items-center gap-1.5">{h} <ArrowUpDown className="size-3 opacity-60" /></span>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((a) => (
-                <tr key={a.name} className="border-b last:border-0">
-                  <td className="px-4 py-2.5">
-                    <span className="font-medium text-primary">{a.name}</span>
-                    {a.system && <span className="ml-2 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">System</span>}
-                  </td>
-                  <td className="px-4 py-2.5 text-muted-foreground">{a.type}</td>
-                  <td className="px-4 py-2.5 tabular-nums text-foreground">{a.alerted ?? "—"}</td>
-                  <td className="px-4 py-2.5"><span className={cn("rounded px-2 py-0.5 text-xs font-medium", STATUS_PILL[a.status])}>{a.status}</span></td>
-                  <td className="px-4 py-2.5 tabular-nums text-muted-foreground">{a.lastProcessed}</td>
-                  <td className="px-4 py-2.5">
-                    <div className="flex items-center justify-end gap-1 text-muted-foreground">
-                      <button className="rounded border p-1.5 hover:bg-muted"><Pencil className="size-3.5" /></button>
-                      <button className="rounded border p-1.5 hover:bg-muted"><Copy className="size-3.5" /></button>
-                      <button className="rounded border border-rose-200 bg-rose-50 p-1.5 text-rose-500 hover:bg-rose-100 dark:border-rose-900 dark:bg-rose-950/30"><Trash2 className="size-3.5" /></button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <PanelTable density="comfortable">
+          <Thead>
+            <Th sortable>Assignment name</Th>
+            <Th sortable>Type</Th>
+            <Th sortable>Alerted merchant count</Th>
+            <Th sortable>Status</Th>
+            <Th sortable>Last processed date</Th>
+            <Th align="right">Actions</Th>
+          </Thead>
+          <TableBody>
+            {rows.map((a) => (
+              <TableRow key={a.id} className={cn(a.id === focused && "bg-primary/5")}>
+                <Td>
+                  <span className="font-medium text-primary">{a.name}</span>
+                  {a.system && <span className="ml-2 rounded bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">System</span>}
+                </Td>
+                <Td className="text-muted-foreground">{a.type}</Td>
+                {/* Derived, not stored: the same number the dashboard's alert-volume
+                    bar plots for this assignment. */}
+                <Td mono>{a.neverRun ? "—" : alertsToday(a.id)}</Td>
+                <Td><span className={cn("rounded px-2 py-0.5 text-xs font-medium", STATUS_PILL[a.status])}>{a.status}</span></Td>
+                <Td mono className="text-muted-foreground">{a.lastProcessed}</Td>
+                <Td>
+                  <div className="flex items-center justify-end gap-1 text-muted-foreground">
+                    <button className="rounded border p-1.5 hover:bg-muted"><Pencil className="size-3.5" /></button>
+                    <button className="rounded border p-1.5 hover:bg-muted"><Copy className="size-3.5" /></button>
+                    <button className="rounded border border-rose-200 bg-rose-50 p-1.5 text-rose-500 hover:bg-rose-100 dark:border-rose-900 dark:bg-rose-950/30"><Trash2 className="size-3.5" /></button>
+                  </div>
+                </Td>
+              </TableRow>
+            ))}
+          </TableBody>
+        </PanelTable>
 
         {/* Pagination */}
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground">

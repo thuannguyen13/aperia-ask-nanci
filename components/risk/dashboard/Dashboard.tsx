@@ -6,7 +6,7 @@ import { Button } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { PanelShell, PanelHeader, PanelBody } from "@/components/ask-nanci/shared"
-import { useRiskNav } from "../RiskNavContext"
+import { useRiskNav, type RiskDest } from "../RiskNavContext"
 import { RISK_NANCI_TAKES } from "@/lib/ask-nanci/data/risk-landing"
 import { DASH_KPIS, DASH_HIGHLIGHTS, CHART_TAKE, type DashChartId } from "@/lib/ask-nanci/data/risk-dashboard"
 import { DashChart, CHART_TITLES } from "./charts"
@@ -68,6 +68,11 @@ export function Dashboard() {
   // destinations that share the same panel stack.
   useEffect(() => () => closeDynamicPanel(PANEL_ID), [closeDynamicPanel])
 
+  // A KPI drills to the screen behind its number. The Barometer is the one dest
+  // that carries a filter, so it goes through openBarometer rather than `go`.
+  const goKpi = (dest: RiskDest) =>
+    dest === "barometer-report" ? nav.openBarometer("critical") : nav.go(dest)
+
   return (
     <PanelShell className="min-w-0 flex-1">
       <PanelHeader
@@ -107,18 +112,31 @@ export function Dashboard() {
 
         {/* KPI row */}
         <div className={cn("grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5", assistant && "mt-4")}>
-          {DASH_KPIS.map((k) => (
-            <div key={k.label} className="rounded-xl border bg-card p-4">
-              <div className="flex items-center justify-between">
-                <p className="text-sm text-foreground">{k.label}</p>
-                <k.icon className="size-4 text-muted-foreground" />
-              </div>
-              <p className="mt-1 text-[28px] font-bold leading-tight tabular-nums text-foreground">{k.value}</p>
-              <p className="text-xs text-muted-foreground">
-                {k.delta && <span className={`font-medium ${k.deltaCls}`}>{k.delta} </span>}{k.sub}
-              </p>
-            </div>
-          ))}
+          {DASH_KPIS.map((k) => {
+            // Only a KPI with a screen behind it becomes a button — the rest keep
+            // the same card but offer no click, so nothing hovers like a link and
+            // then does nothing.
+            const Card = k.dest ? "button" : "div"
+            return (
+              <Card
+                key={k.label}
+                {...(k.dest ? { onClick: () => goKpi(k.dest!), type: "button" as const } : {})}
+                className={cn(
+                  "rounded-xl border bg-card p-4 text-left",
+                  k.dest && "transition-colors hover:border-primary hover:bg-muted/40",
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-foreground">{k.label}</p>
+                  <k.icon className="size-4 text-muted-foreground" />
+                </div>
+                <p className="mt-1 text-[28px] font-bold leading-tight tabular-nums text-foreground">{k.value}</p>
+                <p className="text-xs text-muted-foreground">
+                  {k.delta && <span className={`font-medium ${k.deltaCls}`}>{k.delta} </span>}{k.sub}
+                </p>
+              </Card>
+            )
+          })}
         </div>
 
         {/* Chart grid — Figma layout */}

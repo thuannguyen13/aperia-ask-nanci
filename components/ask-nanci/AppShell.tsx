@@ -15,12 +15,14 @@ import { Sidebar } from "./Sidebar"
 import { TeachNanciPanel } from "./TeachNanciPanel"
 import { ServiceMarketplacePanel } from "./ServiceMarketplacePanel"
 import { ConceptPanelArea } from "./concept/ConceptPanelArea"
+import { MobilePanelSwitcher } from "./concept/MobilePanelSwitcher"
 import { TokenLimitDialog } from "./TokenLimitDialog"
 import { OnboardingDialog } from "./OnboardingDialog"
 import { Onboarding } from "@/components/onboarding/Onboarding"
 import { SettingsDialog } from "./SettingsDialog"
 import { DarkModeToggle } from "./DarkModeToggle"
 import { MobileSidebarToggle } from "./MobileSidebarToggle"
+import { MobilePanelToggle } from "./MobilePanelToggle"
 
 const DQ_PANELS = new Set(["detection-queue", "barometer-report", "coastal-risk"])
 
@@ -30,7 +32,9 @@ function ReplayButton() {
   // stays hidden while the script is thinking/streaming.
   if (!replayFlow || chatState !== "idle") return null
   return (
-    <Button variant="secondary" size="xs" onClick={replayFlow} className="absolute right-3 gap-1.5">
+    // Sits left of MobilePanelToggle on mobile so the two never overlap once a flow
+    // has finished with panels still open.
+    <Button variant="secondary" size="xs" onClick={replayFlow} className="absolute right-12 gap-1.5 md:right-3">
       <RotateCcw className="size-3" />
       Ask
     </Button>
@@ -90,7 +94,9 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
         marketplaceOpen
           ? "hidden"
           : showDQ
-          ? "mr-1 flex w-[320px] shrink-0 overflow-hidden rounded-xl border bg-background md:w-97.5 md:rounded-2xl"
+          // The fixed DQ chat width only applies once the panel column exists (md+);
+          // below that the panel moves into MobilePanelSwitcher and chat takes it all.
+          ? "flex w-full shrink-0 overflow-hidden rounded-xl border bg-background md:mr-1 md:w-97.5 md:rounded-2xl"
           : `flex min-w-0 flex-1 overflow-hidden rounded-xl md:rounded-2xl border bg-background transition-opacity duration-200 ease-out ${chatFadingIn ? "opacity-0" : "opacity-100"}`
       }>
         {children}
@@ -100,6 +106,7 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
       ) : (
         <ConceptPanelArea />
       )}
+      <MobilePanelSwitcher />
     </div>
   )
 }
@@ -167,6 +174,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             {/* Hidden under ?autoplay — the flow starts itself, so the button has
                 nothing to offer on arrival and only reads as a stray control. */}
             {isConceptEmbed && !fullApp && !autoPlay && <ReplayButton />}
+            <div className="absolute right-0 flex items-center md:hidden">
+              <MobilePanelToggle />
+            </div>
           </div>
           <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden md:rounded-2xl bg-sidebar shadow-sm">
             {fullApp ? (
@@ -209,6 +219,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <MobileSidebarToggle />
             </div>
             <Image data-logo="frame" {...getThemeLogos(theme).frame} className="h-6 w-auto" />
+            <div className="absolute right-0 flex items-center md:hidden">
+              <MobilePanelToggle />
+            </div>
           </div>
         }
         sidebar={<Sidebar />}

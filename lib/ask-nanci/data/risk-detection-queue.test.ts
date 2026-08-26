@@ -14,7 +14,7 @@ const sums = (q: DetectionQueueData) => {
 }
 
 describe("DETECTION_QUEUES", () => {
-  it.each(DETECTION_QUEUES.map((q) => [q.assignment, q] as const))("%s decomposes alerted", (_, q) => {
+  it.each(DETECTION_QUEUES.map((q) => [q.assignmentId, q] as const))("%s decomposes alerted", (_, q) => {
     const s = sums(q)
     expect(s.count).toBe(s.alerted.count)
     expect(s.amount).toBe(s.alerted.amount)

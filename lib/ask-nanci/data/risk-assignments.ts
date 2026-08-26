@@ -1,10 +1,25 @@
-// Aperia Risk — Assignment Management destination (Figma "4. Assignment Management").
-// ponytail: the eligible count and the scored-transaction total are REAL portfolio
-// sizes summed across the four scored client portfolios (ESQR 4,681 / Maverick
-// 4,606 / Clearent 1,586 / Nuvei 1,251 chargeback merchants; 72,985 / 41,062 /
-// 53,156 / 53,771 MC-scored transactions, Sept–Dec 2025 — see
-// wiki/aperia-risk/demo-data-spec.md). The dollar amounts and the per-assignment
-// alert counts below are still illustrative; the source data carried no dollars.
+// Aperia Risk — the assignment registry, and the Assignment Management destination
+// (Figma "4. Assignment Management").
+//
+// ponytail: generated demo content. Portfolio sizes are modeled on real client
+// magnitudes (thousands of chargeback merchants, tens of thousands of scored
+// transactions per portfolio) but every value here is invented; no client file is
+// quoted. Dollar amounts are illustrative.
+//
+// ── Why this file owns identity and nothing else ────────────────────────────
+// Assignments used to be named four different ways across four files — "MC Watch"
+// here, "MC Watchlist (system)" on the dashboard bars, "MC Watchlist (system)" again
+// in the re-alert table, and nothing at all in the queue data — and two assignments
+// (MC Velocity, Authorizations) existed only in a chart, with no row behind them. So
+// no chart could link to the assignment it was describing.
+//
+// Now: this list carries identity (id, names, type, status) and NOT counts. Every
+// count lives in the metric table that measures it, keyed by `id`:
+//   • today's alerts        → ALERT_VOLUME       (risk-dashboard.ts)
+//   • period re-alert rates → REALERT_ROWS       (risk-dashboard.ts)
+//   • standing queue state  → DETECTION_QUEUES   (risk-detection-queue.ts)
+// That is what removed the old contradiction where this file claimed the Esquire
+// Auths queue had alerted 7 merchants while the dashboard chart plotted 357 for it.
 
 export const AM_INTEGRATION = {
   name: "Mastercard Brighterion",
@@ -24,25 +39,49 @@ export const AM_SUMMARY: { label: string; count: string; amount: string }[] = [
 export type AssignmentStatus = "Active" | "Expired"
 
 export interface Assignment {
+  id: string
+  /** Full name, as the Assignment Management list and the queue cards show it. */
   name: string
+  /**
+   * Chart-width label. The dashboard bars and the re-alert table have a ~200px
+   * column, so they render this instead of truncating the full name mid-word — which
+   * is how "Esquire - Phase 2 Parameters - Auths…" ended up looking like a different
+   * assignment from the one the queue card names.
+   */
+  short: string
   system?: boolean // shows a "System" badge next to the name
   type: string
-  alerted: number | null // null → "—", a brand-new assignment that hasn't run yet
   status: AssignmentStatus
   lastProcessed: string
+  /**
+   * A just-created assignment that has not run yet. Its alert count renders "—"
+   * rather than 0 — no alerts *yet* is a different claim from no alerts *today*, and
+   * a fresh 0 beside an Active badge reads as a broken queue.
+   */
+  neverRun?: boolean
 }
 
 export const ASSIGNMENTS: Assignment[] = [
-  { name: "MC Watch", system: true, type: "DQ", alerted: 67, status: "Active",  lastProcessed: "05/06/2026" },
-  { name: "Esquire - Phase 2 Parameters - Auths - Detect Q", type: "DQ", alerted: 7,  status: "Active",  lastProcessed: "05/06/2026" },
-  { name: "Esquire - Phase 2 Parameters - Detect Q",         type: "DQ", alerted: 37, status: "Expired", lastProcessed: "05/06/2026" },
-  { name: "High Risk Detection Queue",                       type: "DQ", alerted: 25, status: "Active",  lastProcessed: "05/06/2026" },
-  { name: "High Risk Detection Queue - By MCC",              type: "DQ", alerted: 3,  status: "Active",  lastProcessed: "05/06/2026" },
-  { name: "Low Risk Detection Queue",                        type: "DQ", alerted: 12, status: "Active",  lastProcessed: "05/06/2026" },
-  { name: "Low Risk Detection Queue - By MCC - Auths",       type: "DQ", alerted: 3,  status: "Active",  lastProcessed: "05/06/2026" },
-  { name: "Moderate Risk Detection Queue",                   type: "DQ", alerted: 19, status: "Expired", lastProcessed: "05/06/2026" },
-  { name: "Moderate Risk Detection Queue - By MCC - Auths",  type: "DQ", alerted: 0,  status: "Active",  lastProcessed: "05/06/2026" },
-  { name: "Unacceptable Risk Detection Queue",              type: "DQ", alerted: 10, status: "Expired", lastProcessed: "05/06/2026" },
+  { id: "mc-watch",          name: "MC Watch",                                        short: "MC Watch (system)",        system: true, type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
+  // Adopted from the dashboard charts, which plotted both of these with no assignment
+  // behind them. MC Velocity in particular drives one of Nanci's three takes.
+  { id: "mc-velocity",       name: "MC Velocity",                                     short: "MC Velocity (system)",     system: true, type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
+  { id: "mc-divergence",     name: "MC Divergence",                                   short: "MC Divergence (system)",   system: true, type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
+  { id: "esqr-phase2-auths", name: "Esquire - Phase 2 Parameters - Auths - Detect Q", short: "Esquire Phase 2 - Auths",  type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
+  // Was Expired while still carrying alerts on the dashboard's "Phase 2 - Auths
+  // Detect Q" bar. A queue that alerted today is running, so it reads Active.
+  { id: "esqr-phase2",       name: "Esquire - Phase 2 Parameters - Detect Q",         short: "Esquire Phase 2",          type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
+  { id: "high-risk",         name: "High Risk Detection Queue",                       short: "High Risk DQ",             type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
+  { id: "high-risk-mcc",     name: "High Risk Detection Queue - By MCC",              short: "High Risk DQ - By MCC",    type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
+  { id: "low-risk",          name: "Low Risk Detection Queue",                        short: "Low Risk DQ",              type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
+  { id: "low-risk-mcc",      name: "Low Risk Detection Queue - By MCC - Auths",       short: "Low Risk DQ - By MCC",     type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
+  { id: "moderate-risk",     name: "Moderate Risk Detection Queue",                   short: "Moderate Risk DQ",         type: "DQ", status: "Expired", lastProcessed: "05/06/2026" },
+  { id: "moderate-risk-mcc", name: "Moderate Risk Detection Queue - By MCC - Auths",  short: "Moderate Risk DQ - By MCC", type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
+  { id: "unacceptable-risk", name: "Unacceptable Risk Detection Queue",               short: "Unacceptable Risk DQ",     type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
+  // Adopted from DETECTION_QUEUES, which rendered a card for it with no registry row.
+  { id: "authorizations",    name: "Authorizations Assignment",                       short: "Authorizations",           type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
 ]
 
-export const AM_TOTAL = 28 // "Showing 10 of 28"
+export const findAssignment = (id: string) => ASSIGNMENTS.find((a) => a.id === id)
+
+export const AM_TOTAL = 28 // "Showing N of 28"

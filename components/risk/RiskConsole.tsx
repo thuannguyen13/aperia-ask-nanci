@@ -52,6 +52,7 @@ export function RiskConsole({ assistant = true }: { assistant?: boolean }) {
     isRiskDest(linked) && (linked !== "ask-nanci" || assistant) ? linked : home,
   )
   const [merchantId, setMerchantId] = useState<string | null>(params.get("merchant"))
+  const [assignmentId, setAssignmentId] = useState<string | null>(params.get("assignment"))
   const [barometerFilter, setBarometerFilter] = useState<"critical" | null>(
     params.get("filter") === "critical" ? "critical" : null,
   )
@@ -64,14 +65,17 @@ export function RiskConsole({ assistant = true }: { assistant?: boolean }) {
     else next.set("view", dest)
     if (dest === "risk-report" && merchantId) next.set("merchant", merchantId)
     else next.delete("merchant")
+    if (dest === "assignment" && assignmentId) next.set("assignment", assignmentId)
+    else next.delete("assignment")
     if (dest === "barometer-report" && barometerFilter) next.set("filter", barometerFilter)
     else next.delete("filter")
     const query = next.toString()
     window.history.replaceState(null, "", query ? `${window.location.pathname}?${query}` : window.location.pathname)
-  }, [dest, merchantId, barometerFilter, home])
+  }, [dest, merchantId, assignmentId, barometerFilter, home])
 
   const openBarometer = (filter: "critical" | null = null) => { setBarometerFilter(filter); setDest("barometer-report") }
   const openMerchant = (id: string) => { setMerchantId(id); setDest("risk-report") }
+  const openAssignment = (id: string) => { setAssignmentId(id); setDest("assignment") }
 
   // Seeded from the merchant rows, then owned here: the Barometer list, the merchant
   // detail and the queue cards all read and write the same marks.
@@ -104,7 +108,7 @@ export function RiskConsole({ assistant = true }: { assistant?: boolean }) {
       }
       sidebar={<Sidebar menu={nav} logos={getThemeLogos(THEME)} hoverNav={false} />}
     >
-      <RiskNavProvider value={{ go: setDest, openBarometer, openMerchant, merchantId, barometerFilter, workStatuses, markWork, assistant, home }}>
+      <RiskNavProvider value={{ go: setDest, openBarometer, openMerchant, openAssignment, merchantId, assignmentId, barometerFilter, workStatuses, markWork, assistant, home }}>
         <div className="flex min-w-0 flex-1 py-1 pr-1">
           {/* Primary box: the active destination panel (or the Ask Nanci home) */}
           <div className="flex min-w-0 flex-1 overflow-hidden rounded-xl border bg-background md:rounded-2xl">
