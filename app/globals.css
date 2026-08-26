@@ -4,10 +4,8 @@
 
 
 :root {
-  --primary: #218400;
-  --color-primary: #218800;
-  --color-primary-foreground: oklch(0.985 0 0);
-  --ring: var(--color-primary);
+  --primary: #218800;
+  --ring: var(--primary);
 
   --chart-1: #3F65C2;
   --chart-2: #F18442;
@@ -35,7 +33,6 @@
 
 [data-theme="aperia"] {
   --primary: #280086;
-  --color-primary: #280086;
   --ring: #280086;
   --sidebar-primary: #280086;
   --app-gradient: linear-gradient(180deg, #280086 0%, #ddd6fe 200px);
@@ -45,7 +42,6 @@
    `?mode=titan` embed after `aperia` was rebranded to ABC Bank. */
 [data-theme="titan"] {
   --primary: #002F67;
-  --color-primary: #002F67;
   --ring: #002F67;
   --sidebar-primary: #002F67;
   --app-gradient: linear-gradient(180deg, #002F67 0%, #c5d5ed 200px);
@@ -57,7 +53,6 @@
    is the Titan brand bar, not a primary-colored surface. */
 [data-theme="aperia-risk"] {
   --primary: #0058CC;
-  --color-primary: #0058CC;
   --ring: #0058CC;
   --sidebar-primary: #0058CC;
   --app-gradient: linear-gradient(180deg, #002F67 0%, #c5d5ed 200px);
@@ -66,12 +61,10 @@
 /* White-label placeholder. Same shape as Woodforest, and for the same reason: the brand
    color is light, so the frame gradient starts on a dark shade of it (the placeholder
    wordmark is white artwork) and --primary-foreground carries dark ink. To stand up a new
-   brand, replace these five values and the logo in theme-logos.ts. */
+   brand, replace these values and the logo in theme-logos.ts. */
 [data-theme="placeholder"] {
   --primary: #FFD8A8;
-  --color-primary: #FFD8A8;
   --primary-foreground: #4A2B00;
-  --color-primary-foreground: #4A2B00;
   --ring: #FFD8A8;
   --sidebar-primary: #FFD8A8;
   --sidebar-primary-foreground: #4A2B00;
@@ -84,9 +77,7 @@
    button labels stay readable on a light primary — the DS default is near-white. */
 [data-theme="woodforest"] {
   --primary: #AED581;
-  --color-primary: #AED581;
   --primary-foreground: #1B3409;
-  --color-primary-foreground: #1B3409;
   --ring: #AED581;
   --sidebar-primary: #AED581;
   --sidebar-primary-foreground: #1B3409;
@@ -98,20 +89,19 @@
    is the one place that changes, and nothing on the live Titan embeds moves with it. */
 [data-theme="tib"] {
   --primary: #002F67;
-  --color-primary: #002F67;
   --ring: #002F67;
   --sidebar-primary: #002F67;
   --app-gradient: linear-gradient(180deg, #002F67 0%, #c5d5ed 200px);
 }
 
 [data-theme="access-one"] {
-  --color-primary: #FC6A25;
+  --primary: #FC6A25;
   --ring: #FC6A25;
   --app-gradient: linear-gradient(180deg, #FC6A25 0%, #fde8d8 200px);
 }
 
 [data-theme="vision-web"] {
-  --color-primary: #1565C0;
+  --primary: #1565C0;
   --ring: #1565C0;
   --app-gradient: linear-gradient(180deg, #1565C0 0%, #d0e4f7 200px);
 }
@@ -133,11 +123,6 @@ html.dark[data-theme="aperia-risk"] [data-logo="sidebar"] { filter: invert(1) hu
 html.dark [data-logo="ask-nanci"] { filter: invert(1) hue-rotate(180deg); }
 
 
-
-@theme inline {
-  --color-primary: var(--color-primary);
-  --color-primary-foreground: var(--color-primary-foreground);
-}
 
 @keyframes marquee-left {
   from { transform: translateX(0); }

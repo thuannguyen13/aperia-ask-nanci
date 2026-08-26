@@ -248,12 +248,12 @@ export function Onboarding() {
       styles={{
         tooltipContainer: { textAlign: "left" },
         tooltipTitle: {
-          color: "var(--color-primary)",
+          color: "var(--primary)",
           fontWeight: "var(--font-weight-medium)",
           fontSize: "var(--font-size-sm)",
         },
         buttonPrimary: {
-          backgroundColor: "var(--color-primary)",
+          backgroundColor: "var(--primary)",
           borderRadius: "var(--radius-md)",
         },
         buttonBack: {

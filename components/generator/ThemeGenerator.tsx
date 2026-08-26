@@ -119,22 +119,15 @@ function buildGradient(t: Tokens) {
 /**
  * The paste-ready block: every token, explicitly, in the form the compiled app
  * consumes. Verified against the built Tailwind output: the DS's @theme inline
- * makes utilities inline the raw var (.bg-muted reads var(--muted); no
- * --color-muted exists at runtime) — EXCEPT primary and primary-foreground,
- * which globals.css declares as --color-* custom properties, so Tailwind rewires
- * those two utilities to read var(--color-primary[-foreground]) instead. Those
- * two get both forms — the --color- form is the operative one for utilities, the
- * raw form feeds direct var(--primary) readers — the same shape every existing
- * brand block uses.
+ * makes utilities inline the raw var for every token (.bg-muted reads
+ * var(--muted), .bg-primary reads var(--primary); no --color-* custom property
+ * exists at runtime — the app no longer declares any).
  */
-const HARDCODED_COLOR_FORMS = new Set(["primary", "primary-foreground"])
-
 function buildCss(name: string, t: Tokens) {
   const lines: string[] = []
   for (const key of ALL_TOKENS) {
     if (key.startsWith("gradient-")) continue
     lines.push(`  --${key}: ${t[key]};`)
-    if (HARDCODED_COLOR_FORMS.has(key)) lines.push(`  --color-${key}: ${t[key]};`)
   }
   lines.push(`  --app-gradient: ${buildGradient(t)};`)
   return `[data-theme="${name}"] {\n${lines.join("\n")}\n}`
@@ -593,8 +586,7 @@ export function ThemeGenerator() {
     for (const key of ALL_TOKENS) {
       if (key.startsWith("gradient-")) continue
       const stock = preset === SHADCN_PRESET ? SHADCN_OVERRIDES[key] : undefined
-      // --color-primary first: two brand blocks set only that form of primary.
-      const value = stock ?? (key === "primary" ? raw("--color-primary") || raw("--primary") : raw(`--${key}`))
+      const value = stock ?? raw(`--${key}`)
       next[key] = value ? resolver.toHex(value) : "#888888"
     }
     const gradient = preset === SHADCN_PRESET ? null : raw("--app-gradient").match(GRADIENT_RE)
@@ -612,10 +604,7 @@ export function ThemeGenerator() {
   if (!tokens || !seeded) return <div className="min-h-screen bg-background" />
 
   const previewVars = Object.fromEntries([
-    ...ALL_TOKENS.filter((k) => !k.startsWith("gradient-")).flatMap((k) => [
-      [`--${k}`, tokens[k]],
-      [`--color-${k}`, tokens[k]],
-    ]),
+    ...ALL_TOKENS.filter((k) => !k.startsWith("gradient-")).map((k) => [`--${k}`, tokens[k]]),
     ["--app-gradient", buildGradient(tokens)],
   ]) as React.CSSProperties
 
