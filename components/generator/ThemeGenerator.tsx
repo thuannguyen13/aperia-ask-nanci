@@ -344,9 +344,9 @@ function Wall() {
           <CardContent className="flex flex-col gap-4">
             <Breadcrumb>
               <BreadcrumbList className="text-xs">
-                <BreadcrumbItem><BreadcrumbLink href="#">Merchants</BreadcrumbLink></BreadcrumbItem>
+                <BreadcrumbItem><BreadcrumbLink>Merchants</BreadcrumbLink></BreadcrumbItem>
                 <BreadcrumbSeparator />
-                <BreadcrumbItem><BreadcrumbLink href="#">Harbor View Hotel</BreadcrumbLink></BreadcrumbItem>
+                <BreadcrumbItem><BreadcrumbLink>Harbor View Hotel</BreadcrumbLink></BreadcrumbItem>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem><BreadcrumbPage>Deposits</BreadcrumbPage></BreadcrumbItem>
               </BreadcrumbList>
@@ -360,16 +360,16 @@ function Wall() {
             </Tabs>
             <Pagination>
               <PaginationContent>
-                <PaginationItem><PaginationPrevious href="#" /></PaginationItem>
-                <PaginationItem><PaginationLink href="#">1</PaginationLink></PaginationItem>
-                <PaginationItem><PaginationLink href="#" isActive>2</PaginationLink></PaginationItem>
-                <PaginationItem><PaginationLink href="#">3</PaginationLink></PaginationItem>
-                <PaginationItem><PaginationNext href="#" /></PaginationItem>
+                <PaginationItem><PaginationPrevious /></PaginationItem>
+                <PaginationItem><PaginationLink>1</PaginationLink></PaginationItem>
+                <PaginationItem><PaginationLink isActive>2</PaginationLink></PaginationItem>
+                <PaginationItem><PaginationLink>3</PaginationLink></PaginationItem>
+                <PaginationItem><PaginationNext /></PaginationItem>
               </PaginationContent>
             </Pagination>
             <div className="flex items-center gap-4 text-xs">
               <Button variant="link" className="h-auto p-0 text-xs">Link button</Button>
-              <a href="#" className="font-medium text-primary underline underline-offset-2">Text link</a>
+              <a className="font-medium text-primary underline underline-offset-2">Text link</a>
             </div>
           </CardContent>
         </Card>
