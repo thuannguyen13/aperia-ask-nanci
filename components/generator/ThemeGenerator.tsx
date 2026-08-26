@@ -530,15 +530,17 @@ function Wall({ vars }: { vars: React.CSSProperties }) {
 
             {/* Part-to-whole: the same five series as a donut, with a legend. */}
             <div className="flex items-center gap-5">
+              {/* The hole is a mask, not a painted disc — a real donut chart's center
+                  is transparent and consumes no token. */}
               <div
-                className="relative size-24 shrink-0 rounded-full"
+                className="size-24 shrink-0 rounded-full"
                 style={{
                   background:
                     "conic-gradient(var(--chart-1) 0 35%, var(--chart-2) 35% 60%, var(--chart-3) 60% 78%, var(--chart-4) 78% 90%, var(--chart-5) 90% 100%)",
+                  mask: "radial-gradient(circle, transparent 27px, black 28px)",
+                  WebkitMask: "radial-gradient(circle, transparent 27px, black 28px)",
                 }}
-              >
-                <div className="absolute inset-5 rounded-full bg-card" />
-              </div>
+              />
               <div className="flex flex-col gap-1">
                 {["In-person", "Online", "Keyed", "Wallet", "ACH"].map((name, i) => (
                   <div key={name} className="flex items-center gap-2 text-[11px] text-muted-foreground">
