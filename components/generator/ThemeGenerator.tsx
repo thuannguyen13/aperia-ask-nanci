@@ -179,7 +179,7 @@ function Wall() {
           bg-sidebar card as the real shell, laid out like the concept welcome screen.
           Themed surfaces (gradient, primary, sidebar active, ring) paint for real;
           everything that would be content is a placeholder block. */}
-      <div className="app-frame flex h-[440px] flex-col overflow-hidden rounded-xl px-2 pb-2 ring-1 ring-inset ring-black/5">
+      <div className="app-frame flex h-[500px] flex-col overflow-hidden rounded-xl px-2 pb-2 ring-1 ring-inset ring-black/5">
         <div className="relative flex h-12 shrink-0 items-center justify-between px-3">
           <div className="h-6 w-16 rounded-md bg-white/20" />
           <span className="absolute left-1/2 -translate-x-1/2 text-sm font-semibold tracking-tight text-white">
@@ -226,48 +226,65 @@ function Wall() {
               <Progress value={62} className="mt-2 h-1.5" />
             </div>
           </div>
-          {/* The start page, as the app opens: greeting, prompt cards on the card
-              pair (one hovered on the accent pair), and the ask bar held focused on
-              the ring. Content is skeleton; themed surfaces paint for real. */}
-          <div className="m-2 ml-0 flex min-w-0 flex-1 flex-col rounded-xl border bg-background p-5">
-            <div className="flex flex-1 flex-col items-center justify-center gap-4">
-              <div className="flex flex-col items-center gap-1">
-                <span className="text-sm font-semibold">Good morning, Maria</span>
-                <span className="text-[11px] text-muted-foreground">What would you like to know about your business?</span>
-              </div>
-              {/* Real prompt-card content, like the app's welcome grid. */}
-              <div className="grid w-full max-w-md grid-cols-2 gap-2.5">
-                {[
-                  { title: "Sales snapshot", desc: "How did this week compare to last?" },
-                  { title: "Pending deposits", desc: "When does Saturday's batch arrive?" },
-                  { title: "Decline report", desc: "Which merchants need a call first?" },
-                ].map((c) => (
-                  <div key={c.title} className="rounded-lg border bg-card p-3 text-card-foreground">
-                    <span className="block truncate text-[11px] font-medium">{c.title}</span>
-                    <span className="mt-0.5 block text-[10px] leading-snug text-muted-foreground">{c.desc}</span>
-                    <span className="mt-2 block text-[10px] font-medium" style={{ color: "var(--primary)" }}>
-                      Try it →
-                    </span>
-                  </div>
-                ))}
-                {/* Hovered card: the accent pair. */}
-                <div
-                  className="rounded-lg border p-3"
-                  style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
-                >
-                  <span className="block truncate text-[11px] font-medium">Busiest times</span>
-                  <span className="mt-0.5 block text-[10px] leading-snug opacity-70">Was Saturday worth it?</span>
-                  <span className="mt-2 block text-[10px] font-medium" style={{ color: "var(--primary)" }}>
-                    Try it →
-                  </span>
-                </div>
-              </div>
+          {/* The start page, mirroring ConceptWelcomeView's real structure: centered
+              logomark + title + subtitle, the chat input directly under the header,
+              then a section label and the flow-card grid — each card a bg-card tile
+              with a number circle, title, badge pill (secondary pair), description
+              and a full-width Try it button (one primary, like Simulate login). */}
+          <div className="m-2 ml-0 flex min-w-0 flex-1 flex-col items-center gap-4 overflow-hidden rounded-xl border bg-background px-6 py-5">
+            <div className="flex flex-col items-center gap-1.5 text-center">
+              <div className="size-7 rounded-lg" style={{ background: "var(--primary)" }} />
+              <span className="text-sm font-medium">Ask Nanci</span>
+              <span className="text-[10px] text-muted-foreground">Each flow demonstrates a distinct AI + panel UX.</span>
             </div>
-            <div className="mx-auto mt-3 flex w-full max-w-md shrink-0 items-center gap-2">
+            <div className="flex w-full max-w-md shrink-0 items-center gap-2">
               <div className="flex h-8 flex-1 items-center rounded-lg border border-ring px-2.5 ring-3 ring-ring/50">
                 <span className="text-xs text-muted-foreground">Ask anything…</span>
               </div>
               <Button size="sm">Ask</Button>
+            </div>
+            <div className="flex w-full max-w-md flex-col gap-2">
+              <span className="text-[9px] font-bold uppercase tracking-[0.1em] text-muted-foreground">
+                Merchant money questions
+              </span>
+              <div className="grid grid-cols-2 gap-2.5">
+                {[
+                  { num: 1, title: "Sales snapshot", badge: "Chat + panel", desc: "How did this week compare to last?", primary: false },
+                  { num: 2, title: "Pending deposits", badge: "Chat only", desc: "When does Saturday's batch arrive?", primary: false },
+                  { num: 3, title: "Proactive alerts", badge: "AI-initiated", desc: "Nanci opens with what she spotted.", primary: true },
+                  { num: 4, title: "Busiest times", badge: "Multi-step", desc: "Was Saturday worth it?", primary: false },
+                ].map((c) => (
+                  <div key={c.num} className="flex flex-col gap-1.5 rounded-xl border bg-card p-3 text-card-foreground">
+                    <div className="flex items-center justify-between gap-1">
+                      <div className="flex min-w-0 items-center gap-1.5">
+                        <span className="flex size-4 shrink-0 items-center justify-center rounded-full bg-muted text-[9px] font-semibold text-muted-foreground">
+                          {c.num}
+                        </span>
+                        <span className="truncate text-[11px] font-semibold">{c.title}</span>
+                      </div>
+                      <span
+                        className="shrink-0 rounded-full px-1.5 py-0.5 text-[8px] font-semibold"
+                        style={{ background: "var(--secondary)", color: "var(--secondary-foreground)" }}
+                      >
+                        {c.badge}
+                      </span>
+                    </div>
+                    <span className="text-[10px] leading-snug text-muted-foreground">{c.desc}</span>
+                    {c.primary ? (
+                      <div
+                        className="mt-auto rounded-md px-2 py-1 text-center text-[10px] font-medium"
+                        style={{ background: "var(--primary)", color: "var(--primary-foreground)" }}
+                      >
+                        Simulate login
+                      </div>
+                    ) : (
+                      <div className="mt-auto rounded-md border px-2 py-1 text-center text-[10px] font-medium">
+                        Try it
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
