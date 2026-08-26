@@ -209,8 +209,10 @@ function Wall() {
               >
                 Saturday sales spike
               </div>
-              {[20, 24, 16].map((w, i) => (
-                <div key={i} className="px-2 py-1.5"><Skeleton className="h-2.5" style={{ width: w * 4 }} /></div>
+              {/* Real text, not skeleton bars: these rows are what sidebar-foreground
+                  paints when nothing is hovered. */}
+              {["Refund policy question", "Weekend staffing", "Deposit timing"].map((t) => (
+                <div key={t} className="truncate rounded-md px-2 py-1.5 text-xs opacity-80">{t}</div>
               ))}
             </div>
             <div className="mt-auto rounded-lg border p-2.5" style={{ borderColor: "var(--sidebar-border)" }}>
