@@ -117,12 +117,15 @@ function buildGradient(t: Tokens) {
 }
 
 /**
- * The paste-ready block: every token, explicitly, in the form the app consumes.
- * Tailwind utilities read var(--color-x), but the DS maps --color-x: var(--x) at
- * :root, so the raw form propagates through — except where app/globals.css
- * hard-codes a concrete --color-* at :root (primary and primary-foreground),
- * which would out-cascade the mapping. Those two get both forms, the same shape
- * the existing brand blocks use.
+ * The paste-ready block: every token, explicitly, in the form the compiled app
+ * consumes. Verified against the built Tailwind output: the DS's @theme inline
+ * makes utilities inline the raw var (.bg-muted reads var(--muted); no
+ * --color-muted exists at runtime) — EXCEPT primary and primary-foreground,
+ * which globals.css declares as --color-* custom properties, so Tailwind rewires
+ * those two utilities to read var(--color-primary[-foreground]) instead. Those
+ * two get both forms — the --color- form is the operative one for utilities, the
+ * raw form feeds direct var(--primary) readers — the same shape every existing
+ * brand block uses.
  */
 const HARDCODED_COLOR_FORMS = new Set(["primary", "primary-foreground"])
 
