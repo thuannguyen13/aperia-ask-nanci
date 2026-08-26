@@ -211,7 +211,7 @@ function Wall() {
               <Progress value={62} className="mt-2 h-1.5" />
             </div>
           </div>
-          <div className="m-2 ml-0 flex min-w-0 flex-1 flex-col rounded-xl bg-background p-5">
+          <div className="m-2 ml-0 flex min-w-0 flex-1 flex-col rounded-xl border bg-background p-5">
             <div className="flex flex-1 flex-col items-center justify-center gap-4">
               <div className="flex flex-col items-center gap-2">
                 <Skeleton className="h-4 w-56" />
