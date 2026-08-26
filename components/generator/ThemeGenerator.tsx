@@ -188,24 +188,32 @@ function Wall() {
           <div className="size-6 rounded-full bg-white/25" />
         </div>
         <div className="flex min-h-0 flex-1 overflow-hidden rounded-2xl bg-sidebar shadow-sm">
-          <div className="flex w-48 shrink-0 flex-col p-3">
-            <div className="flex items-center gap-2 px-1 pb-3">
+          {/* The sidebar consumes its own token family (surface, text, hover/active
+              fill, border) so every Sidebar-group picker has a visible consumer.
+              The accent seeds to the muted-family value, so this matches the app's
+              real look until the token is edited. */}
+          <div className="flex w-48 shrink-0 flex-col p-3" style={{ color: "var(--sidebar-foreground)" }}>
+            <div
+              className="mb-3 flex items-center gap-2 border-b px-1 pb-3"
+              style={{ borderColor: "var(--sidebar-border)" }}
+            >
               <div className="size-5 rounded-md" style={{ background: "var(--primary)" }} />
-              <span className="text-xs font-semibold text-foreground">Ask Nanci</span>
+              <span className="text-xs font-semibold">Ask Nanci</span>
             </div>
             <Button size="sm" className="justify-start text-xs">New chat</Button>
             <div className="mt-4 flex flex-col gap-1">
               <Skeleton className="mb-1 h-2.5 w-14" />
-              {/* The app's real active treatment: bg-muted, not a sidebar-primary var
-                  (that token has no consumers — see the model comment). */}
-              <div className="rounded-md bg-muted px-2 py-1.5 text-xs font-medium text-foreground">
+              <div
+                className="rounded-md px-2 py-1.5 text-xs font-medium"
+                style={{ background: "var(--sidebar-accent)", color: "var(--sidebar-accent-foreground)" }}
+              >
                 Saturday sales spike
               </div>
               {[20, 24, 16].map((w, i) => (
                 <div key={i} className="px-2 py-1.5"><Skeleton className="h-2.5" style={{ width: w * 4 }} /></div>
               ))}
             </div>
-            <div className="mt-auto rounded-lg border p-2.5">
+            <div className="mt-auto rounded-lg border p-2.5" style={{ borderColor: "var(--sidebar-border)" }}>
               <Skeleton className="h-2.5 w-16" />
               <Skeleton className="mt-1.5 h-2.5 w-24" />
               <Progress value={62} className="mt-2 h-1.5" />
@@ -684,7 +692,9 @@ export function ThemeGenerator() {
             ))}
           </div>
 
-          <div style={previewVars}>
+          {/* bg-background here makes the Background token the wall's canvas — it
+              seeds to the page white, so nothing changes until it is edited. */}
+          <div id="wall" className="rounded-2xl bg-background" style={previewVars}>
             <Wall />
           </div>
         </div>
