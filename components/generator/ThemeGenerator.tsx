@@ -20,7 +20,8 @@ import { THEME_IDS, type ThemeId } from "@/lib/ask-nanci/data/theme-logos"
 
 // ── Token model ────────────────────────────────────────────────────────────────
 // Every color token the design system themes, grouped the way a brand thinks about
-// them. Keys are the CSS custom-property names (minus the --); the two gradient
+// them: one group per surface family, its background and its foreground listed
+// together. Keys are the CSS custom-property names (minus the --); the two gradient
 // stops are pseudo-tokens composed into --app-gradient. Non-color knobs (radius,
 // fonts) are deliberately out of scope. Defined-but-dead vars are also left out
 // rather than shown doing nothing — audited 2026-08-25 against the ds5 dist and the
@@ -44,24 +45,49 @@ const TOKEN_GROUPS: { title: string; tokens: TokenDef[] }[] = [
     ],
   },
   {
-    title: "Neutrals",
+    title: "Base",
     tokens: [
       { key: "background", label: "Background", hint: "The page canvas" },
       { key: "foreground", label: "Foreground", hint: "Default body text" },
+    ],
+  },
+  {
+    title: "Card",
+    tokens: [
       { key: "card", label: "Card", hint: "Card and panel surfaces" },
       { key: "card-foreground", label: "Card foreground", hint: "Text on cards" },
+    ],
+  },
+  {
+    title: "Secondary",
+    tokens: [
       { key: "secondary", label: "Secondary", hint: "Secondary buttons and badges" },
       { key: "secondary-foreground", label: "Secondary foreground", hint: "Text on secondary surfaces" },
+    ],
+  },
+  {
+    title: "Muted",
+    tokens: [
       { key: "muted", label: "Muted", hint: "Subtle fills: tracks, hovers, skeletons" },
       { key: "muted-foreground", label: "Muted foreground", hint: "Captions and secondary text" },
+    ],
+  },
+  {
+    title: "Accent",
+    tokens: [
       { key: "accent", label: "Accent", hint: "Hover and selection tint" },
       { key: "accent-foreground", label: "Accent foreground", hint: "Text on the accent tint" },
+    ],
+  },
+  {
+    title: "Borders",
+    tokens: [
       { key: "border", label: "Border", hint: "Dividers and outlines" },
       { key: "input", label: "Input border", hint: "Form field borders" },
     ],
   },
   {
-    title: "Semantic",
+    title: "Destructive",
     tokens: [{ key: "destructive", label: "Destructive", hint: "Delete actions and error text" }],
   },
   {
@@ -139,7 +165,7 @@ function TokenRow({
   label, hint, value, onChange,
 }: { label: string; hint?: string; value: string; onChange: (hex: string) => void }) {
   return (
-    <label className="-mx-2 flex cursor-pointer items-center gap-3 rounded-md px-2 py-1.5 hover:bg-muted/50">
+    <label className="flex cursor-pointer items-center gap-3 rounded-md px-2 -mx-2 py-1.5  hover:bg-muted/50">
       <span
         className="relative size-6 shrink-0 rounded-md ring-1 ring-inset ring-black/10"
         style={{ background: value }}
@@ -160,6 +186,43 @@ function TokenRow({
   )
 }
 
+// The token rail: one section per group, filling its grid column top to bottom and
+// insetting its own content with padding. Nothing inside uses a negative margin, so
+// a row's hover fill paints inside the scroll box instead of being clipped by it.
+
+function TokenPanel({
+  tokens, edit,
+}: { tokens: Tokens; edit: (key: string) => (hex: string) => void }) {
+  return (
+    <div className="flex flex-col gap-5 p-6 lg:sticky lg:top-32 lg:h-[calc(100vh-8rem)] lg:self-start lg:overflow-y-auto">
+      {TOKEN_GROUPS.map((group) => (
+        <section key={group.title}>
+          <h2 className="text-sm font-semibold text-foreground">{group.title}</h2>
+          {group.title === "Brand" && (
+            <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
+              The main tokens for a brand theme: start here. The groups
+              below fine-tune the rest of the palette.
+            </p>
+          )}
+          {/* The rows' container: it owns the group's layout, so the rows
+              themselves carry no margins. */}
+          <div className="mt-2 flex flex-col">
+            {group.tokens.map((row) => (
+              <TokenRow
+                key={row.key}
+                label={row.label}
+                hint={row.hint}
+                value={tokens[row.key]}
+                onChange={edit(row.key)}
+              />
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  )
+}
+
 // ── Specimen wall ──────────────────────────────────────────────────────────────
 // Real DS5 components inside the preview scope. Portal-mounted surfaces (Select's
 // dropdown, dialogs) escape the scope and keep the page theme — deliberately left
@@ -167,7 +230,7 @@ function TokenRow({
 
 function Wall({ vars }: { vars: React.CSSProperties }) {
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 p-6">
       {/* The app itself, skeletonized: the same .app-frame gradient rule and nested
           bg-sidebar card as the real shell, laid out like the concept welcome screen.
           Themed surfaces (gradient, primary, sidebar active, ring) paint for real;
@@ -643,8 +706,8 @@ export function ThemeGenerator() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto min-h-screen max-w-[1400px] border-x px-6 py-10">
-        <header>
+      <div className="mx-auto min-h-screen max-w-[1400px] border-x py-10">
+        <header className="px-6">
           <h1 className="text-3xl font-semibold tracking-tight text-foreground">Theme Generator</h1>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
             Edit the six values a brand theme sets, watch them land on real components, and copy
@@ -653,7 +716,7 @@ export function ThemeGenerator() {
           </p>
         </header>
 
-        <div className="sticky top-0 z-20 -mx-6 mt-8 border-b bg-background/85 px-6 py-4 backdrop-blur">
+        <div className="sticky top-0 z-20 mt-8 border-b bg-background/85 px-6 py-4 backdrop-blur">
           <div className="flex flex-wrap items-end gap-x-8 gap-y-5 pb-5">
             <Control label="Preset">
               <div className="flex items-center gap-2">
@@ -718,31 +781,8 @@ export function ThemeGenerator() {
           </div>
         </div>
 
-        <div className="mt-8 grid gap-8 lg:grid-cols-[320px_minmax(0,1fr)]">
-          <div className="flex flex-col gap-5 lg:sticky lg:top-32 lg:max-h-[calc(100vh-10rem)] lg:self-start lg:overflow-y-auto lg:pr-2">
-            {TOKEN_GROUPS.map((group) => (
-              <section key={group.title}>
-                <h2 className="text-sm font-semibold text-foreground">{group.title}</h2>
-                {group.title === "Brand" && (
-                  <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
-                    The main tokens for a brand theme: start here. The groups
-                    below fine-tune the rest of the palette.
-                  </p>
-                )}
-                <div className="mt-2 flex flex-col">
-                  {group.tokens.map((row) => (
-                    <TokenRow
-                      key={row.key}
-                      label={row.label}
-                      hint={row.hint}
-                      value={tokens[row.key]}
-                      onChange={edit(row.key)}
-                    />
-                  ))}
-                </div>
-              </section>
-            ))}
-          </div>
+        <div className="grid lg:grid-cols-[320px_minmax(0,1fr)]">
+          <TokenPanel tokens={tokens} edit={edit} />
 
           {/* The tokens scope onto each specimen inside Wall — the gallery's own
               cards, titles and descriptions are chrome, not specimens, and stay on
