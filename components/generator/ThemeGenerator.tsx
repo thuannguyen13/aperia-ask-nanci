@@ -226,15 +226,20 @@ function Wall() {
               the ring. Content is skeleton; themed surfaces paint for real. */}
           <div className="m-2 ml-0 flex min-w-0 flex-1 flex-col rounded-xl border bg-background p-5">
             <div className="flex flex-1 flex-col items-center justify-center gap-4">
-              <div className="flex flex-col items-center gap-2">
-                <Skeleton className="h-4 w-56" />
-                <Skeleton className="h-2.5 w-40" />
+              <div className="flex flex-col items-center gap-1">
+                <span className="text-sm font-semibold">Good morning, Maria</span>
+                <span className="text-[11px] text-muted-foreground">What would you like to know about your business?</span>
               </div>
+              {/* Real prompt-card content, like the app's welcome grid. */}
               <div className="grid w-full max-w-md grid-cols-2 gap-2.5">
-                {[0, 1, 2].map((i) => (
-                  <div key={i} className="rounded-lg border bg-card p-3 text-card-foreground">
-                    <Skeleton className="h-2.5 w-3/4" />
-                    <Skeleton className="mt-1.5 h-2.5 w-1/2" />
+                {[
+                  { title: "Sales snapshot", desc: "How did this week compare to last?" },
+                  { title: "Pending deposits", desc: "When does Saturday's batch arrive?" },
+                  { title: "Decline report", desc: "Which merchants need a call first?" },
+                ].map((c) => (
+                  <div key={c.title} className="rounded-lg border bg-card p-3 text-card-foreground">
+                    <span className="block truncate text-[11px] font-medium">{c.title}</span>
+                    <span className="mt-0.5 block text-[10px] leading-snug text-muted-foreground">{c.desc}</span>
                     <span className="mt-2 block text-[10px] font-medium" style={{ color: "var(--primary)" }}>
                       Try it →
                     </span>
@@ -245,8 +250,8 @@ function Wall() {
                   className="rounded-lg border p-3"
                   style={{ background: "var(--accent)", color: "var(--accent-foreground)" }}
                 >
-                  <span className="block truncate text-[11px] font-medium">Was Saturday worth it?</span>
-                  <Skeleton className="mt-1.5 h-2.5 w-1/2" />
+                  <span className="block truncate text-[11px] font-medium">Busiest times</span>
+                  <span className="mt-0.5 block text-[10px] leading-snug opacity-70">Was Saturday worth it?</span>
                   <span className="mt-2 block text-[10px] font-medium" style={{ color: "var(--primary)" }}>
                     Try it →
                   </span>
