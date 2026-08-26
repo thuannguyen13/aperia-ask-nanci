@@ -117,15 +117,21 @@ function buildGradient(t: Tokens) {
 }
 
 /**
- * The paste-ready block: every token, explicitly — the theme is self-contained
- * rather than leaning on :root defaults for whatever went unedited.
+ * The paste-ready block: every token, explicitly, in the form the app consumes.
+ * Tailwind utilities read var(--color-x), but the DS maps --color-x: var(--x) at
+ * :root, so the raw form propagates through — except where app/globals.css
+ * hard-codes a concrete --color-* at :root (primary and primary-foreground),
+ * which would out-cascade the mapping. Those two get both forms, the same shape
+ * the existing brand blocks use.
  */
+const HARDCODED_COLOR_FORMS = new Set(["primary", "primary-foreground"])
+
 function buildCss(name: string, t: Tokens) {
   const lines: string[] = []
   for (const key of ALL_TOKENS) {
     if (key.startsWith("gradient-")) continue
     lines.push(`  --${key}: ${t[key]};`)
-    lines.push(`  --color-${key}: ${t[key]};`)
+    if (HARDCODED_COLOR_FORMS.has(key)) lines.push(`  --color-${key}: ${t[key]};`)
   }
   lines.push(`  --app-gradient: ${buildGradient(t)};`)
   return `[data-theme="${name}"] {\n${lines.join("\n")}\n}`
