@@ -165,14 +165,14 @@ function TokenRow({
 // dropdown, dialogs) escape the scope and keep the page theme — deliberately left
 // off the wall rather than shown mis-themed.
 
-function Wall() {
+function Wall({ vars }: { vars: React.CSSProperties }) {
   return (
     <div className="flex flex-col gap-5">
       {/* The app itself, skeletonized: the same .app-frame gradient rule and nested
           bg-sidebar card as the real shell, laid out like the concept welcome screen.
           Themed surfaces (gradient, primary, sidebar active, ring) paint for real;
           everything that would be content is a placeholder block. */}
-      <div className="app-frame flex h-[500px] flex-col overflow-hidden rounded-xl px-2 pb-2 ring-1 ring-inset ring-black/5">
+      <div style={vars} className="app-frame flex h-[500px] flex-col overflow-hidden rounded-xl px-2 pb-2 ring-1 ring-inset ring-black/5">
         <div className="relative flex h-12 shrink-0 items-center justify-between px-3">
           <div className="h-6 w-16 rounded-md bg-white/20" />
           <span className="absolute left-1/2 -translate-x-1/2 text-sm font-semibold tracking-tight text-white">
@@ -289,7 +289,8 @@ function Wall() {
             <CardTitle className="text-sm">Actions</CardTitle>
             <CardDescription className="text-xs">Primary drives all of these.</CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col gap-4">
+          <CardContent>
+            <div style={vars} className="flex flex-col gap-4">
             <div className="flex flex-wrap items-center gap-2">
               <Button size="sm">Primary</Button>
               <Button size="sm" variant="secondary">Secondary</Button>
@@ -305,6 +306,7 @@ function Wall() {
               <Checkbox defaultChecked aria-label="Sample checkbox" />
             </div>
             <Progress value={64} />
+          </div>
           </CardContent>
         </Card>
 
@@ -313,7 +315,8 @@ function Wall() {
             <CardTitle className="text-sm">Form</CardTitle>
             <CardDescription className="text-xs">The ring shows on focus.</CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col gap-3">
+          <CardContent>
+            <div style={vars} className="flex flex-col gap-3">
             <div className="flex flex-col gap-1.5">
               <Label className="text-xs">Business name</Label>
               <Input placeholder="Harbor View Hotel" />
@@ -330,6 +333,7 @@ function Wall() {
               </div>
             </div>
             <Button className="mt-1 w-full">Continue</Button>
+          </div>
           </CardContent>
         </Card>
 
@@ -338,7 +342,8 @@ function Wall() {
             <CardTitle className="text-sm">Selection</CardTitle>
             <CardDescription className="text-xs">Checked and dragged states take primary.</CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col gap-5">
+          <CardContent>
+            <div style={vars} className="flex flex-col gap-5">
             <RadioGroup defaultValue="monthly" className="flex gap-5">
               {["monthly", "quarterly", "annual"].map((v) => (
                 <label key={v} className="flex items-center gap-2 text-xs capitalize text-foreground">
@@ -356,6 +361,7 @@ function Wall() {
                 ))}
               </ToggleGroup>
             </div>
+          </div>
           </CardContent>
         </Card>
 
@@ -364,9 +370,11 @@ function Wall() {
             <CardTitle className="text-sm">Calendar</CardTitle>
             <CardDescription className="text-xs">The selected day takes primary.</CardDescription>
           </CardHeader>
-          <CardContent className="flex justify-center">
+          <CardContent>
+            <div style={vars} className="flex justify-center">
             {/* Fixed date: today's date would differ between server and client render. */}
             <Calendar mode="single" selected={new Date(2026, 7, 25)} defaultMonth={new Date(2026, 7, 1)} />
+          </div>
           </CardContent>
         </Card>
 
@@ -375,7 +383,8 @@ function Wall() {
             <CardTitle className="text-sm">Navigation</CardTitle>
             <CardDescription className="text-xs">Links and the active page take primary; tabs stay neutral.</CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col gap-4">
+          <CardContent>
+            <div style={vars} className="flex flex-col gap-4">
             <Breadcrumb>
               <BreadcrumbList className="text-xs">
                 <BreadcrumbItem><BreadcrumbLink>Merchants</BreadcrumbLink></BreadcrumbItem>
@@ -405,6 +414,7 @@ function Wall() {
               <Button variant="link" className="h-auto p-0 text-xs">Link button</Button>
               <a className="font-medium text-primary underline underline-offset-2">Text link</a>
             </div>
+          </div>
           </CardContent>
         </Card>
 
@@ -414,6 +424,7 @@ function Wall() {
             <CardDescription className="text-xs">The highlighted row takes the accent tint.</CardDescription>
           </CardHeader>
           <CardContent>
+            <div style={vars}>
             <Command className="rounded-lg border">
               <CommandInput placeholder="Search merchants…" />
               <CommandList>
@@ -424,6 +435,7 @@ function Wall() {
                 </CommandGroup>
               </CommandList>
             </Command>
+          </div>
           </CardContent>
         </Card>
 
@@ -432,7 +444,8 @@ function Wall() {
             <CardTitle className="text-sm">Content</CardTitle>
             <CardDescription className="text-xs">Tables and accordions stay on the neutral tokens.</CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col gap-4">
+          <CardContent>
+            <div style={vars} className="flex flex-col gap-4">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -459,6 +472,7 @@ function Wall() {
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
+          </div>
           </CardContent>
         </Card>
 
@@ -467,7 +481,8 @@ function Wall() {
             <CardTitle className="text-sm">Feedback</CardTitle>
             <CardDescription className="text-xs">Alerts, avatars and loading stay on the neutral tokens.</CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col gap-4">
+          <CardContent>
+            <div style={vars} className="flex flex-col gap-4">
             <Alert>
               <AlertTitle className="text-xs">Deposit on the way</AlertTitle>
               <AlertDescription className="text-xs">$4,620 arrives tomorrow morning.</AlertDescription>
@@ -481,6 +496,7 @@ function Wall() {
               <Skeleton className="h-4 w-2/3" />
               <Skeleton className="h-4 w-1/2" />
             </div>
+          </div>
           </CardContent>
         </Card>
 
@@ -489,7 +505,8 @@ function Wall() {
                         <CardTitle className="text-sm">Charts</CardTitle>
             <CardDescription className="text-xs">Series map to the chart ramp in order; a single series takes chart-1.</CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col gap-5">
+          <CardContent>
+            <div style={vars} className="flex flex-col gap-5">
             <div className="flex items-center gap-1.5">
               {[1, 2, 3, 4, 5, 6].map((n) => (
                 <span
@@ -551,6 +568,7 @@ function Wall() {
                 </div>
               ))}
             </div>
+          </div>
           </CardContent>
         </Card>
       </div>
@@ -724,10 +742,11 @@ export function ThemeGenerator() {
             ))}
           </div>
 
-          {/* bg-background here makes the Background token the wall's canvas — it
-              seeds to the page white, so nothing changes until it is edited. */}
-          <div id="wall" className="rounded-2xl bg-background" style={previewVars}>
-            <Wall />
+          {/* The tokens scope onto each specimen inside Wall — the gallery's own
+              cards, titles and descriptions are chrome, not specimens, and stay on
+              the page theme. */}
+          <div id="wall">
+            <Wall vars={previewVars} />
           </div>
         </div>
       </div>
