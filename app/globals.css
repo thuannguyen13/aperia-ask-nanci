@@ -140,6 +140,38 @@ html[data-sheet-scrub] {
   opacity: calc(1 - 0.45 * var(--sheet-progress));
 }
 
+/* The composer's fill rides the same number: solid at rest (a resting sheet's body
+   hides behind it), gone at 1 (the dim reaches the bottom of the screen). Faded
+   rather than switched so mid-drag and through the settle the card tucks under a
+   fill that leaves with it, instead of being sliced at the clip line by a fill that
+   snapped solid on release. Desktop never moves --sheet-progress off 0, so this is
+   a plain solid background there. A pseudo-element with opacity, not color-mix on
+   the background: Lightning CSS drops a color-mix whose percentage is a var() calc.
+   The composer is already relative z-30, so z-index -1 keeps the fill behind its
+   content while the whole slab still paints over the scrim. */
+/* A list inside the sheet keeps its scroll to itself: without this, a scroll that
+   reaches the list's end chains to whatever scrolls next, and on iOS that ends in
+   the document rubber-banding under the card. Applied to every descendant because
+   the panels roll their own overflow-auto wrappers; it only acts on the ones that
+   actually scroll. */
+[data-sheet-card] * {
+  overscroll-behavior: contain;
+}
+
+[data-composer]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--background);
+  /* Steeper than linear: the card starts tucking under the composer within the
+     first few px of a drag, so the slab has to be near-solid long before the
+     travel is done. Solid below 0.75 progress, fading out only over the top
+     quarter, which lands the transparent state on the settled-open sheet the way
+     the scrim's dim does. */
+  opacity: min(1, calc((1 - var(--sheet-progress)) * 4));
+}
+
 /* Sidebar logos are flat SVGs with baked-in ink, so dark mode inverts them. Scoped
    per slot + theme so a brand shipping a light-ink logo can opt out with its own rule. */
 html.dark [data-logo="sidebar"],

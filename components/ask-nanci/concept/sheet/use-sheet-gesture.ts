@@ -48,7 +48,12 @@ interface DragState {
   t: number
   /** False while a pull on the body still belongs to the list it started on. */
   active: boolean
-  /** The list that pull started on, if any: it keeps the gesture until it runs out. */
+  /**
+   * The list that pull started on, if it scrolls along the sheet's own axis: it keeps
+   * the gesture until it runs out. A scroller on the other axis defers the takeover
+   * (active starts false) but never gates it, since the cross-dominance check in
+   * move() already proves the gesture is not that scroller's.
+   */
   scroller: HTMLElement | null
   /** Whoever holds the pointer capture once the drag takes over. */
   host: HTMLElement
@@ -56,11 +61,20 @@ interface DragState {
 
 const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n))
 
-/** The nearest ancestor that can still scroll: the reason a pull may not be ours yet. */
-function scrollerAt(from: HTMLElement, stop: HTMLElement): HTMLElement | null {
+/**
+ * The nearest ancestor that can still scroll along the sheet's own axis: the reason a
+ * pull may not be ours yet. Axis-aware because the horizontal presentations
+ * (?panelui=right, ?panelui=edge) drag across the same direction a panel's wide table
+ * scrolls in, so asking about overflowY there would hand the sheet a gesture the table
+ * still wants.
+ */
+function scrollerAt(from: HTMLElement, stop: HTMLElement, axis: "y" | "x"): HTMLElement | null {
+  const vertical = axis === "y"
   for (let node: HTMLElement | null = from; node && node !== stop; node = node.parentElement) {
-    const overflow = getComputedStyle(node).overflowY
-    if ((overflow === "auto" || overflow === "scroll") && node.scrollHeight > node.clientHeight) return node
+    const style = getComputedStyle(node)
+    const overflow = vertical ? style.overflowY : style.overflowX
+    const room = vertical ? node.scrollHeight > node.clientHeight : node.scrollWidth > node.clientWidth
+    if ((overflow === "auto" || overflow === "scroll") && room) return node
   }
   return null
 }
@@ -134,6 +148,21 @@ export function useSheetGesture({ axis, open, peek, travel, onOpen, onClose }: S
     [],
   )
 
+  // Once the sheet owns a gesture, the browser must not also scroll with it: pointer
+  // events move the card but never cancel native touch scrolling, so without this the
+  // same finger drags the card AND pans or rubber-bands whatever can still scroll,
+  // the page included. touch-action cannot do it, because whether a body drag is ours
+  // is only decided mid-gesture (the scroll-to-drag handoff). Non-passive, on the
+  // document, active drags only, so a pull that still belongs to a list scrolls it
+  // exactly as before.
+  useEffect(() => {
+    const block = (e: TouchEvent) => {
+      if (drag.current?.active && e.cancelable) e.preventDefault()
+    }
+    document.addEventListener("touchmove", block, { passive: false })
+    return () => document.removeEventListener("touchmove", block)
+  }, [])
+
   /** Hand the card to the finger: no easing here or the sheet lags behind it. */
   function takeOver(e: React.PointerEvent, state: DragState) {
     drag.current = state
@@ -165,12 +194,16 @@ export function useSheetGesture({ axis, open, peek, travel, onOpen, onClose }: S
     if (!target) return
     // Controls inside the panel are the panel's, not the sheet's.
     if (target.closest("button, a, input, select, textarea, [role='button'], [contenteditable='true']")) return
-    const scroller = scrollerAt(target, e.currentTarget)
+    const scroller = scrollerAt(target, e.currentTarget, axis)
+    // A scroller on the other axis also holds off the capture: grabbing the pointer
+    // on a press inside, say, a vertical list under a horizontal sheet would eat the
+    // scroll the finger was there for. It defers the takeover without gating it.
+    const crossScroller = scrollerAt(target, e.currentTarget, vertical ? "x" : "y")
     const state: DragState = {
       pos: along(e),
       cross: across(e),
       t: e.timeStamp,
-      active: !scroller,
+      active: !scroller && !crossScroller,
       scroller,
       host: e.currentTarget,
     }
@@ -193,7 +226,12 @@ export function useSheetGesture({ axis, open, peek, travel, onOpen, onClose }: S
     const off = Math.abs(across(e) - state.cross)
     const towards = open ? delta > 0 : delta < 0
     if (!towards || Math.abs(delta) < HANDOFF_SLOP || Math.abs(delta) <= off) return
-    if (vertical && state.scroller && state.scroller.scrollTop > 0) return
+    // A vertical sheet closes downwards, which is the direction that scrolls a list
+    // back to its top, so it only takes over at scrollTop 0. The horizontal one closes
+    // rightwards, the direction that scrolls a table back to its left edge: same rule,
+    // read off the other axis.
+    const scrolled = state.scroller ? (vertical ? state.scroller.scrollTop : state.scroller.scrollLeft) : 0
+    if (scrolled > 0) return
     // Restart from here so the card does not jump the distance the list already had.
     takeOver(e, { ...state, active: true, pos: along(e), t: e.timeStamp })
   }

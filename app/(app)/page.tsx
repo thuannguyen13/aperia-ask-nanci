@@ -101,7 +101,7 @@ function WelcomeView() {
 }
 
 export default function AskNanciPage() {
-  const { view, startNewChat, isEmbed, isConceptVersion, embedVariant, panelSheetOpen } = useAskNanci()
+  const { view, startNewChat, isEmbed, isConceptVersion, embedVariant } = useAskNanci()
   const composerRef = useComposerHeight()
 
   if (view === "chat") {
@@ -121,12 +121,17 @@ export default function AskNanciPage() {
         {/* The composer owns the bottom of the screen: mobile panel sheets end above
             it rather than sliding behind it, so it is never covered and never overlaps
             a drawer's edge. It measures itself into --composer-h for them to sit on
-            (see PanelSheet), and z-30 lifts it over the scrim. Its padding goes
-            transparent only while a sheet is open, so the dim reaches the bottom of the
-            screen then, and a resting sheet's body stays hidden behind it otherwise. */}
+            (see PanelSheet), and z-30 lifts it over the scrim. Its fill rides
+            --sheet-progress (globals.css, data-composer): solid with no sheet so a
+            resting sheet's body stays hidden behind it, fading out as one opens so the
+            dim reaches the bottom of the screen. CSS rather than a React flag, so
+            mid-drag and the settle the card reads as tucking under a fill that is
+            still there, instead of being sliced at an invisible line the frame clips
+            at while the fill has already snapped solid. */}
         <div
           ref={composerRef}
-          className={`relative z-30 shrink-0 px-3 pb-3 md:px-4 md:pb-4 ${panelSheetOpen ? "" : "bg-background"}`}
+          data-composer
+          className="relative z-30 shrink-0 px-3 pb-3 md:px-4 md:pb-4"
         >
           <div className="mx-auto w-full max-w-[800px]">
             <MobileFlowChips />
