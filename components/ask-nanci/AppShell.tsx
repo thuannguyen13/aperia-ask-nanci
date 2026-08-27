@@ -15,7 +15,7 @@ import { Sidebar } from "./Sidebar"
 import { TeachNanciPanel } from "./TeachNanciPanel"
 import { ServiceMarketplacePanel } from "./ServiceMarketplacePanel"
 import { ConceptPanelArea } from "./concept/ConceptPanelArea"
-import { MobilePanelSwitcher } from "./concept/MobilePanelSwitcher"
+import { MobilePanelSwitcher } from "./concept/sheet/MobilePanelSwitcher"
 import { TokenLimitDialog } from "./TokenLimitDialog"
 import { OnboardingDialog } from "./OnboardingDialog"
 import { Onboarding } from "@/components/onboarding/Onboarding"
@@ -140,12 +140,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!isEmbed) return
     setTheme("light")
-    document.documentElement.style.overscrollBehavior = "none"
-    document.body.style.overscrollBehavior = "none"
-    return () => {
-      document.documentElement.style.overscrollBehavior = ""
-      document.body.style.overscrollBehavior = ""
-    }
   }, [isEmbed, setTheme])
 
   if (isEmbed) {
@@ -174,9 +168,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             {/* Hidden under ?autoplay — the flow starts itself, so the button has
                 nothing to offer on arrival and only reads as a stray control. */}
             {isConceptEmbed && !fullApp && !autoPlay && <ReplayButton />}
-            <div className="absolute right-0 flex items-center md:hidden">
-              <MobilePanelToggle />
-            </div>
+            {/* The sheet the toggle reopens only exists under ConceptContentArea, so
+                the chat-only embeds (clover, business-owner) get no control. */}
+            {isConceptEmbed && !fullApp && (
+              <div className="absolute right-0 flex items-center md:hidden">
+                <MobilePanelToggle />
+              </div>
+            )}
           </div>
           <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden md:rounded-2xl bg-sidebar shadow-sm">
             {fullApp ? (
@@ -219,9 +217,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <MobileSidebarToggle />
             </div>
             <Image data-logo="frame" {...getThemeLogos(theme).frame} className="h-6 w-auto" />
-            <div className="absolute right-0 flex items-center md:hidden">
-              <MobilePanelToggle />
-            </div>
+            {/* Same rule as the embed branch: only the concept layout renders a sheet. */}
+            {isConceptVersion && (
+              <div className="absolute right-0 flex items-center md:hidden">
+                <MobilePanelToggle />
+              </div>
+            )}
           </div>
         }
         sidebar={<Sidebar />}

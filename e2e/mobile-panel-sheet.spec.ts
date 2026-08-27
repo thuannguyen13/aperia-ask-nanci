@@ -1,6 +1,6 @@
 import { test, expect, type Locator, type Page } from "@playwright/test"
 
-// Geometry pins for the mobile panel sheet (components/ask-nanci/concept/MobilePanelSwitcher.tsx).
+// Geometry pins for the mobile panel sheet (components/ask-nanci/concept/sheet/MobilePanelSwitcher.tsx).
 // Below `md` one panel is presented as a card that slides in from an edge, and every
 // number below broke at least once while it was being built: the frame that has to end
 // exactly at the composer, the inset the open card sits at, how far a dismissed card

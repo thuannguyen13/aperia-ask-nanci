@@ -3,6 +3,7 @@
 import { memo, useEffect, useState } from "react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
+import { useIsMobile } from "@/hooks/use-is-mobile"
 import type { PanelId } from "@/lib/ask-nanci/types"
 import { PANELS } from "./panel-registry"
 
@@ -22,6 +23,7 @@ const PanelBox = memo(function PanelBox({ id, closing }: { id: PanelId; closing:
 
 export function ConceptPanelArea({ fillWidth = false, visible = true }: { fillWidth?: boolean; visible?: boolean }) {
   const { closingPanels, dynamicPanels } = useAskNanci()
+  const isMobile = useIsMobile()
   const isOpen = dynamicPanels.length > 0
   const isClosing = closingPanels.length > 0
 
@@ -39,6 +41,13 @@ export function ConceptPanelArea({ fillWidth = false, visible = true }: { fillWi
       return () => clearTimeout(t)
     }
   }, [isOpen, isClosing, dynamicPanels])
+
+  // The wrapper below is `hidden md:flex`, which hides this column on a phone but
+  // still mounts every panel inside it: each one would run twice (here at 0x0 in
+  // display:none, and again in the sheet), which is what breaks anything that
+  // measures itself, like a chart. A JS guard, not CSS, for the same reason
+  // MobilePanelSwitcher uses one: the panels must not mount at all.
+  if (isMobile) return null
 
   return (
     <div

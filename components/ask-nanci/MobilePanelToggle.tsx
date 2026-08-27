@@ -4,15 +4,16 @@ import { LayoutGrid } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 
 // The right-hand counterpart to MobileSidebarToggle: same size and treatment on the
-// brand bar, opening the panel switcher instead of the sidebar. Always present, like
-// the sidebar toggle — a control that comes and goes is one the user has to re-find,
-// and with nothing open the switcher explains where panels come from.
+// brand bar, bringing back a dismissed panel sheet instead of opening the sidebar.
+// Rendered only where a sheet exists at all (the concept layouts, see AppShell): a
+// control with nothing behind it is worse than an absent one. Constant within those,
+// though, because a control that comes and goes is one the user has to re-find.
 export function MobilePanelToggle() {
-  const { dynamicPanels, setPanelSwitcherOpen } = useAskNanci()
+  const { dynamicPanels, reopenPanelSheet } = useAskNanci()
 
   return (
     <button
-      onClick={() => setPanelSwitcherOpen(true)}
+      onClick={reopenPanelSheet}
       className="relative flex size-10 items-center justify-center text-white"
       aria-label={
         dynamicPanels.length === 0

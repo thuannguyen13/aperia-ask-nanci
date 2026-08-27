@@ -23,8 +23,13 @@ export function useSheetDismissal(open: boolean, onClose: () => void) {
 
   // One entry per open, popped again when the sheet closes any other way, so the
   // history stack never grows.
+  //
+  // Top window only. The concept embeds run in iframes on a live marketing site, and a
+  // pushState from inside a frame lands in the host tab's own back history: a visitor
+  // who never touched the demo would find their back button closing panels instead of
+  // leaving the page. Escape stays unconditional, since it costs the host nothing.
   useEffect(() => {
-    if (!open) return
+    if (!open || window.self !== window.top) return
     let entryStanding = true
     window.history.pushState({ panelSheet: true }, "")
     const onPop = () => { entryStanding = false; close.current() }

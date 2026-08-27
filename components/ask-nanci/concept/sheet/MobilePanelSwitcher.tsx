@@ -1,15 +1,15 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { ChevronRight } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { useIsMobile } from "@/hooks/use-is-mobile"
 import type { PanelId } from "@/lib/ask-nanci/types"
-import { PANELS } from "./panel-registry"
+import { PANELS } from "../panel-registry"
 import { usePanelUi } from "./use-panel-ui"
 import { useSheetDismissal } from "./use-sheet-dismissal"
 import { useSheetFocus } from "./use-sheet-focus"
-import { useKeyboardInset } from "../use-keyboard-inset"
+import { useKeyboardInset } from "../../use-keyboard-inset"
 import { useSheetGesture } from "./use-sheet-gesture"
 import type { PanelSheetConfig } from "@/lib/ask-nanci/data/panel-ui"
 
@@ -18,6 +18,25 @@ import type { PanelSheetConfig } from "@/lib/ask-nanci/data/panel-ui"
 // to pick from — a chooser for a single card is pure friction, and only a couple of
 // flows ever open a second. Desktop is untouched: ConceptPanelArea still renders the
 // real stack at `md:` and up.
+//
+// The sheet is a fixed-position layer over the whole app, so it talks to the rest of
+// it through the DOM rather than through props. Every one of those channels, with who
+// writes it and who reads it:
+//
+//   --sheet-progress   written by use-sheet-gesture (0 resting, 1 open, and every
+//                      value between while a finger is down), read by globals.css to
+//                      scale and dim [data-nest].
+//   --sheet-settle     written by use-sheet-gesture on release, read by the same
+//                      globals.css rule so the conversation lands with the card.
+//   data-sheet-scrub   written on <html> by use-sheet-gesture for the length of a
+//                      drag, read by globals.css to drop the easing mid-gesture.
+//   --composer-h       written by use-composer-height (mounted in app/(app)/page.tsx),
+//                      read here: SHEET_FRAME ends exactly at the composer.
+//   --keyboard-h       written by use-keyboard-inset, read by the same SHEET_FRAME so
+//                      an open keyboard lifts the sheet instead of hiding it.
+//   [data-nest]        set in ChatView.tsx on the conversation, styled by globals.css
+//                      off --sheet-progress, and given aria-hidden by use-sheet-focus
+//                      while the sheet is open.
 
 /**
  * A sheet is a card floating on the dimmed page: inset by the same 12px the composer
@@ -51,7 +70,6 @@ function PanelSheet({ config, present, open, label, pager, onOpen, onClose, chil
   const vertical = config.axis === "y"
   // A lip only exists while a panel does, so the two conditions travel together.
   const peek = present && config.lip > 0
-  const { setPanelSheetOpen } = useAskNanci()
 
   // How far the sheet travels between resting and open. Measured into state rather
   // than assumed: the sheet's height depends on the composer, which changes with its
@@ -79,9 +97,6 @@ function PanelSheet({ config, present, open, label, pager, onOpen, onClose, chil
     observer.observe(el)
     return () => observer.disconnect()
   }, [cardRef, vertical])
-
-  // The composer turns transparent for an open sheet so the dim can reach past it.
-  useEffect(() => { setPanelSheetOpen(open) }, [open, setPanelSheetOpen])
 
   useSheetDismissal(open, onClose)
   useSheetFocus(cardRef, open)
@@ -111,17 +126,24 @@ function PanelSheet({ config, present, open, label, pager, onOpen, onClose, chil
           lower half: content cut on a hard edge with its shadow hidden behind the
           composer. Clipped at the composer line instead, the card reads as tucking
           under it, and the inset leaves room for the shadow on the other three sides. */}
-      <div className={`${SHEET_FRAME} ${open || peek ? "" : "pointer-events-none"}`}>
+      {/* The frame is a clip region only. It spans the whole chat area, so it must
+          never take pointer events itself: a resting sheet would otherwise swallow
+          every tap and text selection on the conversation behind it. The card
+          re-enables events for its own box. */}
+      <div className={`${SHEET_FRAME} pointer-events-none`}>
       {/* Resting, the card is a handle and nothing else, so it is a dialog only while
           it is open. data-resting is written by the gesture, not rendered: it has to
           follow the finger. */}
       <div
         ref={cardRef}
+        data-sheet-card
         role={open ? "dialog" : undefined}
         aria-label={open ? label : undefined}
         tabIndex={-1}
         style={{ opacity: peek || open ? 1 : 0 }}
         className={`${SHEET_CARD} group flex overflow-hidden outline-none ${
+          open || peek ? "pointer-events-auto" : ""
+        } ${
           vertical ? "flex-col" : "flex-row"
         } border-border bg-background shadow-2xl data-[resting]:border-transparent data-[resting]:bg-transparent data-[resting]:shadow-none transition-[transform,background-color,border-color,box-shadow] duration-300 ease-out`}
       >
@@ -183,36 +205,23 @@ function PanelSheet({ config, present, open, label, pager, onOpen, onClose, chil
 }
 
 export function MobilePanelSwitcher() {
-  const { dynamicPanels, panelSwitcherOpen, setPanelSwitcherOpen } = useAskNanci()
+  // Which panel and whether it has been dismissed both live in AskNanciContext: the
+  // panel-opening path is what sets them, and the brand-bar toggle is what undoes a
+  // dismissal. One panel at a time, but not always the newest: a flow that opens two
+  // leaves the first reachable through the pager instead of stranding it behind the
+  // badge.
+  const {
+    dynamicPanels,
+    shownPanelId,
+    setShownPanelId,
+    panelSheetDismissed,
+    dismissPanelSheet,
+    reopenPanelSheet,
+  } = useAskNanci()
   const isMobile = useIsMobile()
   // Which presentation this session runs, from ?panelui=. Unset means the bottom sheet
   // that ships, so every existing demo URL is unaffected. See data/panel-ui.ts.
   const { sheet } = usePanelUi()
-  // Derived from the stack, not a copy of it: one flag says whether the phone's single
-  // sheet has been swiped away, and any panel opening clears it.
-  const [dismissed, setDismissed] = useState(false)
-  // One panel at a time, but not always the newest: a flow that opens two leaves the
-  // first reachable through the pager instead of stranding it behind the badge.
-  const [shownId, setShownId] = useState<PanelId | null>(null)
-  const prevCount = useRef(dynamicPanels.length)
-
-  // A turn that opens a panel should show it, not just park it behind the trigger —
-  // the script says "I've opened the breakdown in the panel" and the panel has to be
-  // there. Only growth counts, so closing one never yanks another into view.
-  useEffect(() => {
-    if (dynamicPanels.length > prevCount.current) {
-      setShownId(dynamicPanels[dynamicPanels.length - 1])
-      setDismissed(false)
-    }
-    prevCount.current = dynamicPanels.length
-  }, [dynamicPanels])
-
-  // The toggle in the brand bar is the way back to a dismissed panel.
-  useEffect(() => {
-    if (!panelSwitcherOpen) return
-    setDismissed(false)
-    setPanelSwitcherOpen(false)
-  }, [panelSwitcherOpen, setPanelSwitcherOpen])
 
   // Not `md:hidden`: a sheet opened on a phone would otherwise stay open when the
   // viewport grows. Skipping the render entirely is what keeps desktop clean.
@@ -221,7 +230,7 @@ export function MobilePanelSwitcher() {
   // Derived, never synced: a panel closed from anywhere falls out of the stack and the
   // sheet lands on the newest survivor on the next render.
   const sheetId: PanelId | null =
-    (shownId && dynamicPanels.includes(shownId) ? shownId : null) ??
+    (shownPanelId && dynamicPanels.includes(shownPanelId) ? shownPanelId : null) ??
     dynamicPanels[dynamicPanels.length - 1] ??
     null
   const sheetPanel = sheetId ? PANELS[sheetId] : null
@@ -231,12 +240,12 @@ export function MobilePanelSwitcher() {
     <PanelSheet
       config={sheet}
       present={!!sheetId}
-      open={!!sheetId && !dismissed}
+      open={!!sheetId && !panelSheetDismissed}
       label={sheetPanel?.label}
       pager={
         dynamicPanels.length > 1 ? (
           <button
-            onClick={() => setShownId(dynamicPanels[(index + 1) % dynamicPanels.length])}
+            onClick={() => setShownPanelId(dynamicPanels[(index + 1) % dynamicPanels.length])}
             aria-label="Show the next open panel"
             className="flex h-6 items-center gap-0.5 rounded-md px-1.5 text-[11px] font-medium text-muted-foreground hover:bg-muted"
           >
@@ -245,8 +254,8 @@ export function MobilePanelSwitcher() {
           </button>
         ) : undefined
       }
-      onOpen={() => setDismissed(false)}
-      onClose={() => setDismissed(true)}
+      onOpen={reopenPanelSheet}
+      onClose={dismissPanelSheet}
     >
       {sheetPanel && <sheetPanel.component />}
     </PanelSheet>

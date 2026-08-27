@@ -177,6 +177,22 @@ html.dark [data-logo="ask-nanci"] { filter: invert(1) hue-rotate(180deg); }
 }
 
 @layer base {
+  /* The app is a fixed 100dvh shell that never scrolls as a document, but iOS still
+     lets a touch drag the document itself and rubber-band it, which reads as the whole
+     app lifting off the screen. Only the inner lists scroll; the document never should.
+
+     Scoped to a mounted app shell rather than set globally: /responsive, /charts and
+     /generator are ordinary document-scrolling pages, and locking the document would
+     strand each of them at its first viewport. The match is on [data-embed], which
+     both shells carry (AppFrame.tsx, and the embed branch of AppShell.tsx), because
+     /generator's theme preview reuses the bare .app-frame class for its gradient. */
+  html:has(.app-frame[data-embed]),
+  body:has(.app-frame[data-embed]) {
+    overscroll-behavior: none;
+    overflow: hidden;
+    height: 100%;
+  }
+
   button, [role="button"], label[for],
   [role="menuitem"], [role="option"], [role="menuitemcheckbox"], [role="menuitemradio"] {
     cursor: pointer;

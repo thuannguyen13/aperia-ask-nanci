@@ -74,14 +74,24 @@ interface AskNanciCtx {
   setSettingsOpen: (open: boolean) => void
   mobileSidebarOpen: boolean
   setMobileSidebarOpen: (open: boolean) => void
-  // Mirror of the sidebar toggle for the other end of the mobile top bar: the panel
-  // switcher, which is how open panels are reached below md.
-  panelSwitcherOpen: boolean
-  setPanelSwitcherOpen: (open: boolean) => void
-  // Whether the mobile panel sheet is open (not merely resting). The composer goes
-  // transparent for it, so the dim reaches the bottom of the screen.
+  // The mobile panel sheet (MobilePanelSwitcher). Below md a panel cannot sit beside
+  // the chat, so one sheet carries it and this is the whole of its state: which panel
+  // it shows, and whether it has been swiped away. Both live here rather than in the
+  // sheet because the panel-opening path is what sets them.
+  /** Which panel the phone's single sheet is showing. */
+  shownPanelId: PanelId | null
+  setShownPanelId: (id: PanelId) => void
+  /** The sheet was dismissed (swipe, Escape, back or scrim) with panels still open. */
+  panelSheetDismissed: boolean
+  dismissPanelSheet: () => void
+  /** The brand-bar toggle's way back to a dismissed sheet. */
+  reopenPanelSheet: () => void
+  /**
+   * Derived: a panel is open and the sheet has not been dismissed. True on desktop
+   * too, where no sheet renders, so a consumer that means "the phone sheet is up"
+   * has to pair this with useIsMobile().
+   */
   panelSheetOpen: boolean
-  setPanelSheetOpen: (open: boolean) => void
   onboardingOpen: boolean
   setOnboardingOpen: (open: boolean) => void
   /** `?mode=onboarding` — replay onboarding on every load and never record that it ran. */
@@ -191,15 +201,41 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [tokenLimitReached, setTokenLimitReached] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
-  const [panelSwitcherOpen, setPanelSwitcherOpen] = useState(false)
-  const [panelSheetOpen, setPanelSheetOpen] = useState(false)
   const [onboardingOpen, setOnboardingOpen] = useState(false)
   const [flowFinished, setFlowFinished] = useState(false)
   const [tourActive, setTourActive] = useState(false)
   const [tourRequest, setTourRequest] = useState(0)
   const requestTour = useCallback(() => setTourRequest((n) => n + 1), [])
   const [closingPanels, setClosingPanels] = useState<string[]>([])
-  const { stack: dynamicPanels, stackRef: dynamicPanelsRef, openDynamic, closeDynamic: closeDynamicPanel, resetDynamic } = usePanelStack()
+  const { stack: dynamicPanels, stackRef: dynamicPanelsRef, openDynamic: pushPanel, closeDynamic: closeDynamicPanel, resetDynamic: resetPanelStack } = usePanelStack()
+  // The mobile sheet's state, set from the panel-opening path below rather than
+  // watched for from the sheet: a stack the sheet only observes cannot tell an open
+  // from a close, and only an open should move it.
+  const [shownPanelId, setShownPanelId] = useState<PanelId | null>(null)
+  const [panelSheetDismissed, setPanelSheetDismissed] = useState(false)
+  const dismissPanelSheet = useCallback(() => setPanelSheetDismissed(true), [])
+  const reopenPanelSheet = useCallback(() => setPanelSheetDismissed(false), [])
+  const panelSheetOpen = dynamicPanels.length > 0 && !panelSheetDismissed
+
+  // A turn that opens a panel should show it on a phone, not just park it behind the
+  // brand-bar badge: the script says "I've opened the breakdown in the panel" and the
+  // panel has to be there. Guarded the same way the stack itself is, so re-opening a
+  // panel that is already up is still a no-op and closing one never yanks another
+  // into view.
+  const openDynamic = useCallback((id: PanelId) => {
+    if (dynamicPanelsRef.current.includes(id)) return
+    pushPanel(id)
+    setShownPanelId(id)
+    setPanelSheetDismissed(false)
+  }, [pushPanel, dynamicPanelsRef])
+
+  // Every path that empties the stack goes through here, so the sheet's two fields
+  // are reset in one place rather than at each of the five call sites.
+  const resetDynamic = useCallback(() => {
+    resetPanelStack()
+    setShownPanelId(null)
+    setPanelSheetDismissed(false)
+  }, [resetPanelStack])
   const [declineReportFiltered, setDeclineReportFiltered] = useState(false)
   // Unified panel view state (concept-flow pipeline): one map replaces the per-flow
   // phase enums. A panel reads its view via usePanelView(id, fallback).
@@ -829,8 +865,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       tokenLimitReached, setTokenLimitReached,
       settingsOpen, openSettings, setSettingsOpen,
       mobileSidebarOpen, setMobileSidebarOpen,
-      panelSwitcherOpen, setPanelSwitcherOpen,
-      panelSheetOpen, setPanelSheetOpen,
+      shownPanelId, setShownPanelId, panelSheetDismissed, dismissPanelSheet, reopenPanelSheet, panelSheetOpen,
       onboardingOpen, setOnboardingOpen, forceOnboarding, genericBrand, tourActive, setTourActive, tourRequest, requestTour, flowFinished, leavesCurrentFlow,
       isConceptVersion,
       submitFormPanel, submitOfferApplication, submitStepUpPanel,
