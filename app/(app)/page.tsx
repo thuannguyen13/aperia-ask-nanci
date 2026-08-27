@@ -9,7 +9,7 @@ import { ChatView } from "@/components/ask-nanci/ChatView"
 import { ExplorePrompts } from "@/components/ask-nanci/ExplorePrompts"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { ConceptWelcomeView } from "@/components/ask-nanci/concept/ConceptWelcomeView"
-import { useComposerHeight } from "@/components/ask-nanci/use-composer-height"
+import { useComposerInset } from "@/components/ask-nanci/use-composer-inset"
 import { MobileFlowChips } from "@/components/ask-nanci/MobileFlowChips"
 
 function WelcomeView() {
@@ -102,7 +102,7 @@ function WelcomeView() {
 
 export default function AskNanciPage() {
   const { view, startNewChat, isEmbed, isConceptVersion, embedVariant } = useAskNanci()
-  const composerRef = useComposerHeight()
+  const composerRef = useComposerInset()
 
   if (view === "chat") {
     return (
@@ -120,7 +120,7 @@ export default function AskNanciPage() {
         <ChatView />
         {/* The composer owns the bottom of the screen: mobile panel sheets end above
             it rather than sliding behind it, so it is never covered and never overlaps
-            a drawer's edge. It measures itself into --composer-h for them to sit on
+            a drawer's edge. It measures itself into --composer-inset for them to sit on
             (see PanelSheet), and z-30 lifts it over the scrim. Its fill rides
             --sheet-progress (globals.css, data-composer): solid with no sheet so a
             resting sheet's body stays hidden behind it, fading out as one opens so the

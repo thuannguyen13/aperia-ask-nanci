@@ -12,7 +12,7 @@ import { useIsMobile } from "@/hooks/use-is-mobile"
  * conversation — which the sheet then covers, leaving no way to advance without
  * dismissing the panel the script just announced. The chips belong to the composer for
  * as long as that is true: the composer is the one surface a sheet never covers, and
- * because the sheet is sized off --composer-h it shrinks to make room automatically.
+ * because the sheet is sized off --composer-inset it shrinks to make room automatically.
  *
  * Only while the sheet is open, so the chips are never in both places at once.
  */

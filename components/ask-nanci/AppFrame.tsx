@@ -56,9 +56,9 @@ export function AppFrame({
 }) {
   useAppTheme(theme)
   return (
-    <div data-embed={embed} className="app-frame relative flex h-[100dvh] flex-col md:px-2 md:pb-2">
+    <div data-embed={embed} className="app-frame relative flex h-[100dvh] flex-col px-1 pb-1 md:px-2 md:pb-2">
       {topBar}
-      <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden bg-sidebar shadow-sm md:rounded-2xl">
+      <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden rounded-xl bg-sidebar shadow-sm md:rounded-2xl">
         {sidebar}
         {children}
       </div>

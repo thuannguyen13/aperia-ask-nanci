@@ -164,12 +164,13 @@ html[data-sheet-scrub] {
   inset: 0;
   z-index: -1;
   background: var(--background);
-  /* Steeper than linear: the card starts tucking under the composer within the
-     first few px of a drag, so the slab has to be near-solid long before the
-     travel is done. Solid below 0.75 progress, fading out only over the top
-     quarter, which lands the transparent state on the settled-open sheet the way
-     the scrim's dim does. */
-  opacity: min(1, calc((1 - var(--sheet-progress)) * 4));
+  /* Transparent belongs to the settled-open sheet alone, where the dim has to
+     reach the bottom of the screen. Everywhere else the slab is what the card
+     slides behind, so it must be solid: a half-lit one leaves the card's lower
+     half showing through instead of tucking under a bar. Hence the steep ramp
+     rather than a linear fade, and a ramp rather than a switch so the last
+     stretch of the settle still resolves smoothly. */
+  opacity: min(1, calc((1 - var(--sheet-progress)) * 20));
 }
 
 /* Sidebar logos are flat SVGs with baked-in ink, so dark mode inverts them. Scoped

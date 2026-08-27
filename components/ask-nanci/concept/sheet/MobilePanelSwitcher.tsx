@@ -30,8 +30,9 @@ import type { PanelSheetConfig } from "@/lib/ask-nanci/data/panel-ui"
 //                      globals.css rule so the conversation lands with the card.
 //   data-sheet-scrub   written on <html> by use-sheet-gesture for the length of a
 //                      drag, read by globals.css to drop the easing mid-gesture.
-//   --composer-h       written by use-composer-height (mounted in app/(app)/page.tsx),
-//                      read here: SHEET_FRAME ends exactly at the composer.
+//   --composer-inset   written by use-composer-inset (mounted in app/(app)/page.tsx),
+//                      read here: SHEET_FRAME ends exactly at the composer, whatever
+//                      padding the app frame leaves below it.
 //   --keyboard-h       written by use-keyboard-inset, read by the same SHEET_FRAME so
 //                      an open keyboard lifts the sheet instead of hiding it.
 //   [data-nest]        set in ChatView.tsx on the conversation, styled by globals.css
@@ -42,14 +43,22 @@ import type { PanelSheetConfig } from "@/lib/ask-nanci/data/panel-ui"
  * A sheet is a card floating on the dimmed page: inset by the same 12px the composer
  * uses, so the two line up, stopping a gap above it and below the brand bar — the
  * panel toggle lives up there and has to stay reachable while a panel is open. The
- * composer publishes its own height (use-composer-height.ts); the fallback covers the
+ * composer publishes its own inset (use-composer-inset.ts); the fallback covers the
  * first paint before the observer has run.
  */
+// The clip is held off the card on every side. `overflow-hidden` used to cut it at
+// the frame's own edges, which sliced the card's shadow square: shadow-2xl reaches
+// 13px sideways and 38px down, against the 12px of room the inset leaves it. The
+// negative insets below put every edge of the clip past that reach, so nothing of the
+// card or its shadow is ever cut. What the bottom edge still does is stop a dragged
+// card 48px inside the composer, well before it could reappear in the 4px strip the
+// app frame leaves under it (AppFrame.tsx `pb-1`), which is outside the chat column
+// and so cannot be covered from there.
 const SHEET_FRAME =
-  "fixed inset-x-0 top-9 bottom-[calc(var(--composer-h,0px)+var(--keyboard-h,0px))] z-20 overflow-hidden"
+  "fixed inset-x-0 top-9 bottom-[calc(var(--composer-inset,0px)+var(--keyboard-h,0px))] z-20 [clip-path:inset(-60px_-60px_-48px_-60px)]"
 const SHEET_CARD = "absolute inset-3 rounded-2xl border"
 
-/** The card's inset inside the clipping frame — its gap to the composer when open. */
+/** The card's inset inside the frame: its gap to the composer when open. */
 const CARD_INSET = 12
 /** How far past its own edge a non-peeking sheet goes, so its shadow clears too. */
 const OFF_SCREEN = 48
@@ -75,8 +84,8 @@ function PanelSheet({ config, present, open, label, pager, onOpen, onClose, chil
   // than assumed: the sheet's height depends on the composer, which changes with its
   // own content, and a ref cannot be read during render.
   const [span, setSpan] = useState(600)
-  // Measured from the clip line, not the card's own edge: the frame ends at the
-  // composer, so a card dragged past it is cut there rather than sliding behind it.
+  // Measured from the frame's bottom edge, not the card's own: the frame ends at the
+  // composer, so travel is what it takes to put the card behind it.
   const travel = peek ? span + CARD_INSET - config.lip : span + CARD_INSET + OFF_SCREEN
 
   const { cardRef, dragHandlers, bodyHandlers, consumeClick } = useSheetGesture({
@@ -121,15 +130,13 @@ function PanelSheet({ config, present, open, label, pager, onOpen, onClose, chil
           open ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
       />
-      {/* A clipping frame ending exactly at the composer, with the card inset inside it.
-          Without it a dragged card slides on past the composer, which paints over its
-          lower half: content cut on a hard edge with its shadow hidden behind the
-          composer. Clipped at the composer line instead, the card reads as tucking
-          under it, and the inset leaves room for the shadow on the other three sides. */}
-      {/* The frame is a clip region only. It spans the whole chat area, so it must
-          never take pointer events itself: a resting sheet would otherwise swallow
-          every tap and text selection on the conversation behind it. The card
-          re-enables events for its own box. */}
+      {/* The frame ends exactly at the composer and the card is inset inside it, so a
+          card at rest sits against the composer rather than the screen edge. It only
+          measures: see SHEET_FRAME for why it does not clip.
+
+          It spans the whole chat area, so it must never take pointer events itself: a
+          resting sheet would otherwise swallow every tap and text selection on the
+          conversation behind it. The card re-enables events for its own box. */}
       <div className={`${SHEET_FRAME} pointer-events-none`}>
       {/* Resting, the card is a handle and nothing else, so it is a dialog only while
           it is open. data-resting is written by the gesture, not rendered: it has to

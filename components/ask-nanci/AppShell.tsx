@@ -9,6 +9,7 @@ import { Button } from "aperia-ds5"
 import { AskNanciProvider, useAskNanci } from "@/contexts/AskNanciContext"
 import { ChatStreamProvider } from "@/contexts/ChatStreamContext"
 import { parseMode, CONCEPT_FLOW_SLUGS, CONCEPT_EMBED_FLOW_LAYOUTS } from "@/lib/ask-nanci/embed-demo-config"
+import { parsePanelUiOption } from "@/lib/ask-nanci/data/panel-ui"
 import { AppFrame, useAppTheme } from "./AppFrame"
 import { getThemeLogos } from "@/lib/ask-nanci/data/theme-logos"
 import { Sidebar } from "./Sidebar"
@@ -132,6 +133,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // Per-flow embed layout: some flows (e.g. 22, Service Marketplace) render the full
   // app shell (sidebar + standard welcome) instead of the compact concept-embed widget.
   const embedLayout = (rawFlow && CONCEPT_EMBED_FLOW_LAYOUTS[rawFlow]) || null
+  // The brand-bar panel button is the way back to a sheet that left the screen. A
+  // presentation that rests as a lip never leaves one, so the handle is already the way
+  // back and a second control would be a button with nothing to do.
+  const sheetRestsAsLip = parsePanelUiOption(searchParams.get("panelui")).sheet.lip > 0
   const { setTheme } = useTheme()
 
   // The theme goes on <html> so portaled surfaces inherit it (see useAppTheme).
@@ -161,7 +166,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       >
         <div
           data-embed={embedVariant}
-          className="app-frame relative flex h-[100dvh] flex-col overscroll-contain md:px-2 md:pb-2"
+          className="app-frame relative flex h-[100dvh] flex-col overscroll-contain px-1 pb-1 md:px-2 md:pb-2"
         >
           <div className="relative z-10 flex h-10 shrink-0 items-center justify-center">
             <Image data-logo="frame" src={logos.frame.src} alt={logos.frame.alt} width={logos.frame.width} height={logos.frame.height} className="h-6 w-auto" />
@@ -170,13 +175,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             {isConceptEmbed && !fullApp && !autoPlay && <ReplayButton />}
             {/* The sheet the toggle reopens only exists under ConceptContentArea, so
                 the chat-only embeds (clover, business-owner) get no control. */}
-            {isConceptEmbed && !fullApp && (
+            {isConceptEmbed && !fullApp && !sheetRestsAsLip && (
               <div className="absolute right-0 flex items-center md:hidden">
                 <MobilePanelToggle />
               </div>
             )}
           </div>
-          <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden md:rounded-2xl bg-sidebar shadow-sm">
+          <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden rounded-xl md:rounded-2xl bg-sidebar shadow-sm">
             {fullApp ? (
               <>
                 {/* Autoplay means nobody is driving — the rail starts pinned so the
@@ -218,7 +223,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
             <Image data-logo="frame" {...getThemeLogos(theme).frame} className="h-6 w-auto" />
             {/* Same rule as the embed branch: only the concept layout renders a sheet. */}
-            {isConceptVersion && (
+            {isConceptVersion && !sheetRestsAsLip && (
               <div className="absolute right-0 flex items-center md:hidden">
                 <MobilePanelToggle />
               </div>

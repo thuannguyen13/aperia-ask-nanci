@@ -36,10 +36,13 @@ const DRAG_PX = 260
 const PANEL = "Merchant Volume"
 
 const PRESENTATIONS = [
-  // `rest` is the card's x (horizontal) or y (vertical) once dismissed.
-  { name: "bottom sheet", param: "", axis: "y", lip: 0, rest: 770 },
+  // `rest` is the card's x (horizontal) or y (vertical) once dismissed. The two
+  // vertical values carry the app frame's 4px bottom inset on a phone (AppFrame.tsx):
+  // the composer sits that far off the screen edge, the clip line follows it up, and a
+  // card resting past that line lands 4px higher than the viewport alone would put it.
+  { name: "bottom sheet", param: "", axis: "y", lip: 0, rest: 766 },
   { name: "right-side drawer", param: "right", axis: "x", lip: 0, rest: 438 },
-  { name: "swipe to open", param: "swipe", axis: "y", lip: 40, rest: 682 },
+  { name: "swipe to open", param: "swipe", axis: "y", lip: 40, rest: 678 },
   { name: "swipe from the edge", param: "edge", axis: "x", lip: 40, rest: 350 },
 ] as const
 
@@ -111,22 +114,21 @@ test("the sheet frame ends exactly at the composer's top edge", async ({ page })
   await gotoFlow(page, "flow=2")
   await waitForOpenSheet(page)
 
-  const composer = await page.getByPlaceholder("Ask anything").evaluate((textarea) => {
-    // Published by use-composer-height.ts. It was silently never set in the full app
+  const composer = await page.evaluate(() => {
+    // Published by use-composer-inset.ts. It was silently never set in the full app
     // until recently, which left the sheet reserving its fallback and overlapping the
     // real composer, so an empty value is the regression this asserts against.
-    const raw = document.documentElement.style.getPropertyValue("--composer-h")
-    const height = parseFloat(raw)
-    // The composer container has no role or accessible name of its own, so it is reached
-    // from the textarea inside it: it is the ancestor whose height is the published one.
-    let el: Element | null = textarea
-    while (el && !(Math.abs(el.getBoundingClientRect().height - height) < 0.5)) el = el.parentElement
-    return { raw, height, top: el ? el.getBoundingClientRect().top : null }
+    const raw = document.documentElement.style.getPropertyValue("--composer-inset")
+    // The distance to the bottom of the viewport, not the composer's own height: the
+    // app frame insets itself on a phone, so the two differ by that padding.
+    const inset = parseFloat(raw)
+    const el = document.querySelector("[data-composer]")
+    return { raw, inset, top: el ? el.getBoundingClientRect().top : null }
   })
 
   expect(composer.raw).not.toBe("")
-  expect(composer.height).toBeGreaterThan(0)
-  expect(composer.top, "no ancestor of the composer is --composer-h tall").not.toBeNull()
+  expect(composer.inset).toBeGreaterThan(0)
+  expect(composer.top, "the composer container is not in the document").not.toBeNull()
 
   const frame = await box(frameOf(page))
   expectPx(frame.y + frame.height, composer.top!, 0.5)
