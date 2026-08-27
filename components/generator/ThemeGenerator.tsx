@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Check, Copy, MessageSquare, RotateCcw, SquarePen } from "lucide-react"
+import { Check, Code, Copy, MessageSquare, RotateCcw, SquarePen } from "lucide-react"
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger, Alert, AlertDescription,
   AlertTitle, Avatar, AvatarFallback, Badge, Breadcrumb, BreadcrumbItem, BreadcrumbLink,
@@ -710,36 +710,23 @@ export function ThemeGenerator() {
         <header className="px-6">
           <h1 className="text-3xl font-semibold tracking-tight text-foreground">Theme Generator</h1>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            Edit the six values a brand theme sets, watch them land on real components, and copy
-            the paste-ready CSS block. Add the logo in{" "}
-            <span className="font-mono text-xs">theme-logos.ts</span> and the brand is live.
+            Every color token a theme can set, previewed on the components that read them.
+            Copy the CSS into{" "}
+            <span className="font-mono text-xs">app/globals.css</span>, then add the logo in{" "}
+            <span className="font-mono text-xs">theme-logos.ts</span>.
           </p>
         </header>
 
         <div className="sticky top-0 z-20 mt-8 border-b bg-background/85 px-6 py-4 backdrop-blur">
           <div className="flex flex-wrap items-end gap-x-8 gap-y-5 pb-5">
             <Control label="Preset">
-              <div className="flex items-center gap-2">
-                <Select value={preset} onValueChange={(v) => setPreset(v as ThemeId | typeof SHADCN_PRESET)}>
-                  <SelectTrigger className="w-44 bg-background focus-visible:border-foreground focus-visible:ring-foreground/20"><SelectValue /></SelectTrigger>
-                  <SelectContent position="popper" align="start">
-                    <SelectItem value={SHADCN_PRESET} className="py-1.5 pl-2">shadcn</SelectItem>
-                    {THEME_IDS.map((id) => <SelectItem key={id} value={id}>{id}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-                {/* Discards every edit by re-seeding the same preset; inert while clean. */}
-                <Button
-                  size="icon"
-                  variant="outline"
-                  aria-label="Reset edits"
-                  title="Reset edits"
-                  disabled={!dirty}
-                  onClick={() => setSeedNonce((n) => n + 1)}
-                  className="focus-visible:border-foreground focus-visible:ring-foreground/20"
-                >
-                  <RotateCcw />
-                </Button>
-              </div>
+              <Select value={preset} onValueChange={(v) => setPreset(v as ThemeId | typeof SHADCN_PRESET)}>
+                <SelectTrigger className="w-44 bg-background focus-visible:border-foreground focus-visible:ring-foreground/20"><SelectValue /></SelectTrigger>
+                <SelectContent position="popper" align="start">
+                  <SelectItem value={SHADCN_PRESET} className="py-1.5 pl-2">shadcn</SelectItem>
+                  {THEME_IDS.map((id) => <SelectItem key={id} value={id}>{id}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </Control>
             <Control label="Theme name">
               <Input
@@ -749,9 +736,21 @@ export function ThemeGenerator() {
               />
             </Control>
             <div className="ml-auto flex items-center gap-2">
+              {/* Discards every edit by re-seeding the same preset; inert while clean. */}
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={!dirty}
+                onClick={() => setSeedNonce((n) => n + 1)}
+                className="focus-visible:border-foreground focus-visible:ring-foreground/20"
+              >
+                <RotateCcw className="size-3.5" />
+                Reset
+              </Button>
               <Dialog>
                 <DialogTrigger asChild>
                   <Button size="sm" variant="outline" className="focus-visible:border-foreground focus-visible:ring-foreground/20">
+                    <Code className="size-3.5" />
                     View CSS
                   </Button>
                 </DialogTrigger>
