@@ -423,9 +423,11 @@ const PERIODS = [
   { value: "all", label: "All time" },
 ] as const
 
-// SegmentedGroup's underlying TabsList is `inline-flex w-fit` with no wrap and no scroll — enough
-// options, or long enough labels, push past the frame instead of adapting, unlike PanelTable's
-// deliberate scroll. No mobile-specific fix ships for this yet.
+// TabsList itself is `inline-flex w-fit` with no wrap and no scroll — enough options, or long
+// enough labels, push past the frame instead of adapting. SegmentedGroup's `scrollable` prop wraps
+// it in ScrollArea + a horizontal ScrollBar (whitespace-nowrap keeps labels from shrinking), the
+// same composition shadcn's own "scrollable tabs" example uses — ds5 already ships ScrollArea/
+// ScrollBar, this just hadn't been composed with TabsList here yet.
 function TabsOnMobile() {
   const [period, setPeriod] = useState<(typeof PERIODS)[number]["value"]>("month")
   return (
@@ -433,14 +435,16 @@ function TabsOnMobile() {
       <CardHeader>
         <CardTitle className="text-base">Tab / segmented controls</CardTitle>
         <CardDescription className="text-sm leading-relaxed">
-          <span className="font-mono text-xs">TabsList</span> is <span className="font-mono text-xs">inline-flex w-fit</span> with
-          no wrap and no scroll — enough options push past the frame instead of adapting.
+          <span className="font-mono text-xs">TabsList</span> has no scroll behavior of its own.
+          Wrapped in ScrollArea with a horizontal ScrollBar (<span className="font-mono text-xs">scrollable</span> on{" "}
+          <span className="font-mono text-xs">SegmentedGroup</span>) it scrolls instead of clipping
+          — drag or swipe sideways below.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <PhoneFrame>
           <div className="p-4">
-            <SegmentedGroup value={period} onChange={setPeriod} options={PERIODS} />
+            <SegmentedGroup value={period} onChange={setPeriod} options={PERIODS} scrollable />
           </div>
         </PhoneFrame>
       </CardContent>
