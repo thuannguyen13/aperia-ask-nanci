@@ -175,9 +175,12 @@ export function ResponsiveLab() {
           </p>
         </header>
 
-        {/* items-start: Grid's default align-items:stretch was inflating the Charts card to
-            match Tables' taller card in the same row, leaving a dead gap below the chart. */}
-        <div className="mt-6 grid items-start gap-5 lg:grid-cols-2">
+        {/* Single column, not a 2-up grid: these five cards are naturally very different
+            heights (a phone-frame chart preview vs. a button-sizing demo) — pairing any two
+            side by side means either a stretched dead gap below the shorter one, or jagged,
+            misaligned bottoms. Stacking sidesteps the mismatch instead of picking the lesser
+            evil of either grid alignment mode. */}
+        <div className="mt-6 flex flex-col gap-5">
           <TablesOnMobile />
           <ChartsOnMobile />
           <TypographyOnMobile />
@@ -317,17 +320,10 @@ function ChartsOnMobile() {
           </Button>
         </div>
         <CardDescription className="text-sm leading-relaxed">
-          Inherits the desktop chart as-is — no mobile-only treatment. The legend wraps onto
-          more than one line instead of overflowing, which is now the shipped behavior at any width.
+          Inherits the desktop chart as-is — no mobile-only treatment. The legend renders as a
+          plain row below the chart, sized to its real content instead of overflowing or guessing
+          at reserved space.
         </CardDescription>
-        <p className="text-xs leading-relaxed text-muted-foreground">
-          Recharts&apos; own <span className="font-mono">ResponsiveContainer</span> (what{" "}
-          <span className="font-mono">ChartContainer</span> wraps) already re-measures the chart on
-          resize — width was never the problem. Its <span className="font-mono">{"<Legend>"}</span>{" "}
-          is: it renders through its own absolutely-positioned wrapper with no way to tell the chart
-          how tall it turned out, so this renders the legend as a plain row below the chart instead
-          — real height, no reserved guess.
-        </p>
       </CardHeader>
       <CardContent>
         <PhoneFrame>

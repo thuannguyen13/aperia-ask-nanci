@@ -97,9 +97,7 @@ export function ChartGallery() {
           <h1 className="text-3xl font-semibold tracking-tight text-foreground">Charts</h1>
         </header>
 
-        {/* Controls. Sticky because the point of the page is watching a change ripple
-            across every specimen at once, which means the knobs have to stay reachable. */}
-        <div className="sticky top-0 z-20 -mx-6 mt-8 border-b bg-background/85 px-6 py-4 backdrop-blur">
+        <div className="mt-8 border-b py-4">
           <div className="flex flex-wrap items-end gap-x-8 gap-y-5 pb-5">
             <Control label="Palette">
               <SegmentedGroup
@@ -187,10 +185,12 @@ export function ChartGallery() {
         {SPECIMEN_GROUPS.map((group) => (
           <section key={group.title} className="mt-12">
             <h2 className="text-lg font-semibold tracking-tight text-foreground">{group.title}</h2>
-            {/* items-start: Grid's default align-items:stretch was inflating every specimen
-                card to match the tallest one in its row, leaving fixed-height charts with a
-                dead gap below them instead of a card sized to their own content. */}
-            <div className="mt-5 grid items-start gap-5 md:grid-cols-2">
+            {/* Plain stretch (Grid's default): every specimen in this file now renders at one
+                shared chart height, so the only height difference left between cards is real
+                content — a legend row, or not. That's small enough (~30px) that a flush,
+                equal-height row reads better than the jagged bottoms items-start produced when
+                the difference is this minor. */}
+            <div className="mt-5 grid gap-5 md:grid-cols-2">
               {group.specimens.map((s) => <SpecimenCard key={s.id} specimen={s} opts={opts} />)}
             </div>
           </section>
