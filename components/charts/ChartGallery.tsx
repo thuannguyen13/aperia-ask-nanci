@@ -187,7 +187,10 @@ export function ChartGallery() {
         {SPECIMEN_GROUPS.map((group) => (
           <section key={group.title} className="mt-12">
             <h2 className="text-lg font-semibold tracking-tight text-foreground">{group.title}</h2>
-            <div className="mt-5 grid gap-5 md:grid-cols-2">
+            {/* items-start: Grid's default align-items:stretch was inflating every specimen
+                card to match the tallest one in its row, leaving fixed-height charts with a
+                dead gap below them instead of a card sized to their own content. */}
+            <div className="mt-5 grid items-start gap-5 md:grid-cols-2">
               {group.specimens.map((s) => <SpecimenCard key={s.id} specimen={s} opts={opts} />)}
             </div>
           </section>

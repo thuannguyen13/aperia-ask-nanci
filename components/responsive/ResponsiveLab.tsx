@@ -175,7 +175,9 @@ export function ResponsiveLab() {
           </p>
         </header>
 
-        <div className="mt-6 grid gap-5 lg:grid-cols-2">
+        {/* items-start: Grid's default align-items:stretch was inflating the Charts card to
+            match Tables' taller card in the same row, leaving a dead gap below the chart. */}
+        <div className="mt-6 grid items-start gap-5 lg:grid-cols-2">
           <TablesOnMobile />
           <ChartsOnMobile />
           <TypographyOnMobile />
