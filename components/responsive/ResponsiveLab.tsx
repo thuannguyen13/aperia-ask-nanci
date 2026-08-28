@@ -7,8 +7,12 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "aperia-ds5"
 import { SegmentedGroup } from "@/components/charts/controls"
+import { SPECIMEN_GROUPS, type GalleryOptions } from "@/components/charts/specimens"
 import { PANEL_UI_OPTIONS } from "@/lib/ask-nanci/data/panel-ui"
 import { FLOW_DEFS } from "@/lib/ask-nanci/data/flows.concept"
+import { MERCHANT_VOLUME_DATA } from "@/lib/ask-nanci/data/merchants"
+import { PALETTES } from "@/lib/ask-nanci/data/chart-gallery"
+import { PanelTable, Thead, Th, Td, formatCurrency, formatWholeCurrency } from "@/components/ask-nanci/shared"
 
 // ── What this page is ──────────────────────────────────────────────────────────
 // The index for how a panel reaches a phone. Option A is what ships; the page
@@ -149,6 +153,20 @@ export function ResponsiveLab() {
           ))}
         </div>
 
+        <header className="mt-14">
+          <h2 className="text-2xl font-semibold tracking-tight text-foreground">Content on mobile</h2>
+          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+            How the content <em>inside</em> a panel copes with a narrow screen — a different question
+            from how the panel itself arrives. Both previews below are framed at 380px so the effect
+            shows without resizing the window.
+          </p>
+        </header>
+
+        <div className="mt-6 grid gap-5 lg:grid-cols-2">
+          <TablesOnMobile />
+          <ChartsOnMobile />
+        </div>
+
         <Card className="mt-8">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
@@ -196,5 +214,100 @@ function Column({ label, children }: { label: string; children: React.ReactNode 
       <p className="text-[10px] font-bold uppercase tracking-[0.1em] text-muted-foreground">{label}</p>
       <div className="mt-2">{children}</div>
     </div>
+  )
+}
+
+// A fixed 380px frame (roughly a small phone's viewport width) so the mobile
+// treatment is visible without actually shrinking the browser window.
+function PhoneFrame({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mx-auto w-[380px] max-w-full overflow-hidden rounded-2xl border bg-background">
+      {children}
+    </div>
+  )
+}
+
+// Real merchant-volume rows (same data MerchantVolumePanel shows), forced to
+// nowrap so the scroll behavior added to PanelTable is visible regardless of
+// frame width — PanelTable's own cells wrap by default, which is the *other*
+// half of how it degrades and doesn't need a demo of its own here.
+function TablesOnMobile() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Tables</CardTitle>
+        <CardDescription className="text-sm leading-relaxed">
+          Ships in <span className="font-mono text-xs">PanelTable</span> — scrolls sideways instead of
+          squeezing columns, no columns hidden, no card-stacking. Cells that wrap (like most panel
+          tables) shrink first instead; this is the case where they can&apos;t.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <PhoneFrame>
+          <div className="p-3">
+            <PanelTable>
+              <Thead>
+                <Th className="w-8">#</Th>
+                <Th className="whitespace-nowrap">Merchant</Th>
+                <Th align="right" className="whitespace-nowrap">Volume</Th>
+                <Th align="right" className="whitespace-nowrap">Txns</Th>
+                <Th align="right" className="whitespace-nowrap">Avg Ticket</Th>
+              </Thead>
+              <tbody>
+                {MERCHANT_VOLUME_DATA.slice(0, 6).map((row) => (
+                  <tr key={row.rank}>
+                    <Td mono className="text-muted-foreground">{row.rank}</Td>
+                    <Td className="whitespace-nowrap">{row.merchant}</Td>
+                    <Td align="right" mono className="whitespace-nowrap">{formatWholeCurrency(row.volume)}</Td>
+                    <Td align="right" mono className="whitespace-nowrap">{row.txnCount.toLocaleString()}</Td>
+                    <Td align="right" mono className="whitespace-nowrap">{formatCurrency(row.avgTicket)}</Td>
+                  </tr>
+                ))}
+              </tbody>
+            </PanelTable>
+          </div>
+        </PhoneFrame>
+      </CardContent>
+    </Card>
+  )
+}
+
+const CHART_PREVIEW = SPECIMEN_GROUPS[0].specimens.find((s) => s.id === "bar-grouped")!
+
+// No mobile-only variant — the desktop chart is the mobile chart. This specimen has
+// a 5-series legend, the case that used to overflow; the fix (Key in specimens.tsx
+// wraps the legend instead of forcing it onto one line) is what's on display here.
+function ChartsOnMobile() {
+  const opts: GalleryOptions = {
+    grid: true,
+    legend: true,
+    indicator: "dot",
+    dark: false,
+    swatches: PALETTES.ds5.swatches,
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <CardTitle className="text-base">Charts</CardTitle>
+          <Button size="sm" variant="outline" asChild>
+            <a href="/charts" target="_blank" rel="noreferrer">
+              All 19 specimens on /charts
+              <ArrowUpRight className="size-3.5" />
+            </a>
+          </Button>
+        </div>
+        <CardDescription className="text-sm leading-relaxed">
+          Inherits the desktop chart as-is — no mobile-only treatment. The legend wraps onto
+          more than one line instead of overflowing, which is now the shipped behavior at any width.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <PhoneFrame>
+          <div className="p-3">{CHART_PREVIEW.render(opts)}</div>
+        </PhoneFrame>
+      </CardContent>
+    </Card>
   )
 }

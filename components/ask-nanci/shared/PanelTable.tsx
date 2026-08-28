@@ -44,19 +44,24 @@ const CELL_PADDING: Record<PanelTableDensity, string> = {
 export function PanelTable({ density = "compact", className, children }: { density?: PanelTableDensity; className?: string; children: React.ReactNode }) {
   return (
     <DensityContext.Provider value={density}>
-      <Table
-        className={cn(
-          // border-separate (not ds5's inherited collapse) so the rounded corners and
-          // overflow actually clip. Row borders do not paint in the separated model,
-          // so the dividers ride on the cells instead.
-          "border-separate border-spacing-0 overflow-hidden border",
-          "[&_tr:not(:last-child)_td]:border-b",
-          density === "comfortable" ? "rounded-xl text-sm" : "rounded-lg text-xs",
-          className,
-        )}
-      >
-        {children}
-      </Table>
+      {/* Scrolls sideways instead of squeezing columns when the table is wider than
+          its container (narrow panels, phones). No-op when it already fits — this
+          is the one shipped table treatment, not a mobile-only mode. */}
+      <div className="overflow-x-auto">
+        <Table
+          className={cn(
+            // border-separate (not ds5's inherited collapse) so the rounded corners and
+            // overflow actually clip. Row borders do not paint in the separated model,
+            // so the dividers ride on the cells instead.
+            "border-separate border-spacing-0 overflow-hidden border",
+            "[&_tr:not(:last-child)_td]:border-b",
+            density === "comfortable" ? "rounded-xl text-sm" : "rounded-lg text-xs",
+            className,
+          )}
+        >
+          {children}
+        </Table>
+      </div>
     </DensityContext.Provider>
   )
 }

@@ -71,9 +71,27 @@ const AXIS = { tickLine: false, axisLine: false, tickMargin: 8 } as const
 // Y-axis labels are currency, so they need real width and a left margin of zero. A
 // negative left inset (the usual trick for tightening a chart) clips them from the left.
 const MARGIN = { top: 4, right: 8, left: 0, bottom: 0 } as const
+// ChartLegend renders via recharts' own absolutely-positioned wrapper anchored to the
+// bottom of the chart's fixed-height box — it does NOT push the plot up to make room,
+// it draws on top of whatever's there. bottom: 0 (or recharts' un-set default of ~5)
+// only avoided visible overlap by accident, on charts whose plot happened to leave
+// some empty margin near the axis. A wrapped two-line legend needs real reserved
+// space regardless of luck — every specimen with a legend uses this margin instead.
+const MARGIN_LEGEND = { ...MARGIN, bottom: 60 } as const
+// Polar charts (Radial, Radar) center themselves on half the container height no
+// matter what margin.bottom says — margin.bottom only shifts the legend, which
+// recharts insets from the container's true bottom edge by that same amount. So for
+// these two, a *smaller* bottom margin pulls the legend down toward the real edge
+// (more clearance from the plot) instead of eating into it. A shared axis-based
+// margin like MARGIN_LEGEND actively works against these two chart types.
+const MARGIN_LEGEND_POLAR = { ...MARGIN, bottom: 16 } as const
 const MONEY_AXIS_WIDTH = 56
 
 const BOX = "aspect-auto h-[220px] w-full"
+// Pairs with MARGIN_LEGEND: +60px of container height matches the +60px of reserved
+// bottom margin, so the plot's own drawing area comes out identical to BOX's — the
+// legend gets genuinely new space below, not space carved out of the chart.
+const BOX_LEGEND = "aspect-auto h-[280px] w-full"
 
 function Grid({ opts, vertical = false }: { opts: GalleryOptions; vertical?: boolean }) {
   return opts.grid ? <CartesianGrid vertical={vertical} horizontal={!vertical} strokeDasharray="3 3" /> : null
@@ -87,8 +105,16 @@ function Tip({ opts }: { opts: GalleryOptions }) {
   return <ChartTooltip content={<ChartTooltipContent indicator={opts.indicator} className={TOOLTIP_SPACING} />} />
 }
 
-function Key({ opts }: { opts: GalleryOptions }) {
-  return opts.legend ? <ChartLegend content={<ChartLegendContent />} /> : null
+// ChartLegendContent's own container is "flex items-center justify-center gap-4" with
+// no wrap, so a series list that doesn't fit one line overflows instead of breaking —
+// exactly what makes a narrow chart look broken. flex-wrap fixes it at any width, so
+// it's the shipped behavior rather than a mobile-only variant. pt-4 (up from the
+// default pt-3) is deliberate: a wrapped, two-line legend sits taller, and the
+// default gap read as crowding the plot above it once it wraps.
+function Key({ opts, nameKey }: { opts: GalleryOptions; nameKey?: string }) {
+  return opts.legend
+    ? <ChartLegend content={<ChartLegendContent nameKey={nameKey} className="flex-wrap gap-x-4 gap-y-2 pt-4" />} />
+    : null
 }
 
 const money = (v: number) => `$${Number(v.toFixed(1))}M`
@@ -127,8 +153,8 @@ const CHANNEL_MIX_H2 = GALLERY_CHANNEL_MIX.slice(6)
 
 function GroupedBar({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX}>
-      <BarChart data={CHANNEL_MIX_H2} margin={MARGIN}>
+    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX_LEGEND}>
+      <BarChart data={CHANNEL_MIX_H2} margin={MARGIN_LEGEND}>
         <Grid opts={opts} />
         <XAxis dataKey="month" {...AXIS} />
         <YAxis {...AXIS} tickFormatter={money} width={MONEY_AXIS_WIDTH} />
@@ -144,8 +170,8 @@ function GroupedBar({ opts }: { opts: GalleryOptions }) {
 
 function StackedBar({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX}>
-      <BarChart data={GALLERY_CHANNEL_MIX} margin={MARGIN}>
+    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX_LEGEND}>
+      <BarChart data={GALLERY_CHANNEL_MIX} margin={MARGIN_LEGEND}>
         <Grid opts={opts} />
         <XAxis dataKey="month" {...AXIS} />
         <YAxis {...AXIS} tickFormatter={money} width={MONEY_AXIS_WIDTH} />
@@ -210,8 +236,8 @@ function SingleLine({ opts }: { opts: GalleryOptions }) {
 
 function MultiLine({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX}>
-      <LineChart data={GALLERY_CHANNEL_MIX} margin={MARGIN}>
+    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX_LEGEND}>
+      <LineChart data={GALLERY_CHANNEL_MIX} margin={MARGIN_LEGEND}>
         <Grid opts={opts} />
         <XAxis dataKey="month" {...AXIS} />
         <YAxis {...AXIS} tickFormatter={money} width={MONEY_AXIS_WIDTH} />
@@ -260,8 +286,8 @@ function SingleArea({ opts }: { opts: GalleryOptions }) {
 
 function StackedArea({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX}>
-      <AreaChart data={GALLERY_CHANNEL_MIX} margin={MARGIN}>
+    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX_LEGEND}>
+      <AreaChart data={GALLERY_CHANNEL_MIX} margin={MARGIN_LEGEND}>
         <Grid opts={opts} />
         <XAxis dataKey="month" {...AXIS} />
         <YAxis {...AXIS} tickFormatter={money} width={MONEY_AXIS_WIDTH} />
@@ -291,8 +317,8 @@ const COMBO_SERIES = [
 
 function Combo({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(COMBO_SERIES, opts.swatches)} className={BOX}>
-      <ComposedChart data={GALLERY_MONTHLY} margin={{ ...MARGIN, right: 0 }}>
+    <ChartContainer config={buildChartConfig(COMBO_SERIES, opts.swatches)} className={BOX_LEGEND}>
+      <ComposedChart data={GALLERY_MONTHLY} margin={{ ...MARGIN_LEGEND, right: 0 }}>
         <Grid opts={opts} />
         <XAxis dataKey="month" {...AXIS} />
         <YAxis yAxisId="left" {...AXIS} tickFormatter={money} width={MONEY_AXIS_WIDTH} />
@@ -344,8 +370,8 @@ function Points({ opts }: { opts: GalleryOptions }) {
 
 function Quadrant({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(SCORE_SERIES, opts.swatches)} className={BOX}>
-      <ScatterChart margin={{ ...MARGIN, bottom: 16 }}>
+    <ChartContainer config={buildChartConfig(SCORE_SERIES, opts.swatches)} className={BOX_LEGEND}>
+      <ScatterChart margin={MARGIN_LEGEND}>
         <XAxis
           type="number" dataKey="vw" domain={[0, 100]} {...AXIS}
           label={{ value: "VisionWeb score", position: "insideBottom", offset: -12, fontSize: 10, style: { textAnchor: "middle" } }}
@@ -375,8 +401,8 @@ const DECLINE_SERIES = GALLERY_DECLINE_REASONS.map((d) => ({ key: d.key, label: 
 function Slices({ opts, donut }: { opts: GalleryOptions; donut?: boolean }) {
   const config = buildChartConfig(DECLINE_SERIES, opts.swatches)
   return (
-    <ChartContainer config={config} className={BOX}>
-      <PieChart>
+    <ChartContainer config={config} className={BOX_LEGEND}>
+      <PieChart margin={MARGIN_LEGEND}>
         <ChartTooltip content={<ChartTooltipContent nameKey="key" hideLabel className={TOOLTIP_SPACING} />} />
         <Pie
           data={GALLERY_DECLINE_REASONS}
@@ -407,7 +433,7 @@ function Slices({ opts, donut }: { opts: GalleryOptions; donut?: boolean }) {
             />
           )}
         </Pie>
-        {opts.legend && <ChartLegend content={<ChartLegendContent nameKey="key" />} />}
+        <Key opts={opts} nameKey="key" />
       </PieChart>
     </ChartContainer>
   )
@@ -421,12 +447,17 @@ const SLA_DATA = GALLERY_SLA.map((s) => ({ ...s, fill: `var(--color-${s.key})` }
 
 function Radial({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(SLA_SERIES, opts.swatches)} className={BOX}>
-      <RadialBarChart data={SLA_DATA} innerRadius="30%" outerRadius="98%" startAngle={90} endAngle={-270}>
+    <ChartContainer config={buildChartConfig(SLA_SERIES, opts.swatches)} className={BOX_LEGEND}>
+      {/* Fixed pixels, not percentages — recharts scales a percentage radius off the full
+          container's min(width, height), ignoring margin, so a taller box (reserving
+          legend room) makes a percentage ring bigger instead of leaving it be. Pie/Donut
+          already use this fixed-radius pattern for the same reason. Margin is
+          MARGIN_LEGEND_POLAR, not MARGIN_LEGEND — see its comment. */}
+      <RadialBarChart data={SLA_DATA} innerRadius={18} outerRadius={58} startAngle={90} endAngle={-270} margin={MARGIN_LEGEND_POLAR}>
         <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
         <ChartTooltip content={<ChartTooltipContent nameKey="key" hideLabel className={TOOLTIP_SPACING} />} />
         <RadialBar dataKey="attainment" background cornerRadius={6} />
-        {opts.legend && <ChartLegend content={<ChartLegendContent nameKey="key" />} />}
+        <Key opts={opts} nameKey="key" />
       </RadialBarChart>
     </ChartContainer>
   )
@@ -508,8 +539,10 @@ const PROFILE_SERIES = [
 
 function Profile({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(PROFILE_SERIES, opts.swatches)} className={BOX}>
-      <RadarChart data={GALLERY_HEALTH_PROFILE} outerRadius="72%">
+    <ChartContainer config={buildChartConfig(PROFILE_SERIES, opts.swatches)} className={BOX_LEGEND}>
+      {/* Fixed pixels, not a percentage — see the note on Radial's outerRadius. Margin is
+          MARGIN_LEGEND_POLAR, not MARGIN_LEGEND — see its comment. */}
+      <RadarChart data={GALLERY_HEALTH_PROFILE} outerRadius={78} margin={MARGIN_LEGEND_POLAR}>
         <PolarGrid strokeDasharray="3 3" />
         <PolarAngleAxis dataKey="axis" tick={{ fontSize: 10 }} />
         <Tip opts={opts} />
