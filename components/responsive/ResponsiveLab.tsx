@@ -67,13 +67,11 @@ export function ResponsiveLab() {
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-[1100px] px-6 py-10">
         <header>
-          <h1 className="text-3xl font-semibold tracking-tight text-foreground">Mobile panel options</h1>
+          <h1 className="text-3xl font-semibold tracking-tight text-foreground">Mobile reference</h1>
           <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-            Below <span className="font-mono text-xs">md</span> the chat and the panel column cannot
-            sit side by side, so a panel has to arrive some other way. Option A is what ships today;
-            the rest are live behind <span className="font-mono text-xs">?panelui=</span>. Pick a
-            configuration and launch one on a phone: the gestures, the browser toolbar and whether a
-            scaled thumbnail is readable are only answerable on a device.
+            One consolidated place to see how the app&apos;s UI holds up below{" "}
+            <span className="font-mono text-xs">md</span>: how a panel arrives on a phone, and how
+            what&apos;s already inside it — tables, charts, type, controls — copes with the width.
           </p>
         </header>
 
@@ -101,7 +99,22 @@ export function ResponsiveLab() {
           </CardContent>
         </Card>
 
-        <div className="mt-8 flex flex-col gap-5">
+        <header className="mt-10">
+          <h2 className="text-2xl font-semibold tracking-tight text-foreground">Mobile-specific behaviors</h2>
+          <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+            Four candidate ways for a panel to arrive on a phone. Option A is what ships; the rest
+            are live behind <span className="font-mono text-xs">?panelui=</span>.
+          </p>
+          <p className="mt-2 max-w-3xl text-xs leading-relaxed text-muted-foreground">
+            shadcn&apos;s own <span className="font-mono">Sidebar</span> already ships a version of
+            this — an internal, unexported <span className="font-mono">useIsMobile</span> hook swaps
+            it for a <span className="font-mono">Sheet</span> below 768px. A content panel isn&apos;t
+            primary nav though, so the four behaviors below are hand-built rather than reached for
+            that default.
+          </p>
+        </header>
+
+        <div className="mt-6 flex flex-col gap-5">
           {PANEL_UI_OPTIONS.map((o) => (
             <Card key={o.id}>
               <CardHeader>
@@ -157,7 +170,7 @@ export function ResponsiveLab() {
           <h2 className="text-2xl font-semibold tracking-tight text-foreground">Content on mobile</h2>
           <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
             How the content <em>inside</em> a panel copes with a narrow screen — a different question
-            from how the panel itself arrives. Both previews below are framed at 380px so the effect
+            from how the panel itself arrives. Every preview below is framed at 380px so the effect
             shows without resizing the window.
           </p>
         </header>
@@ -165,6 +178,9 @@ export function ResponsiveLab() {
         <div className="mt-6 grid gap-5 lg:grid-cols-2">
           <TablesOnMobile />
           <ChartsOnMobile />
+          <TypographyOnMobile />
+          <SizingOnMobile />
+          <TabsOnMobile />
         </div>
 
         <Card className="mt-8">
@@ -302,10 +318,130 @@ function ChartsOnMobile() {
           Inherits the desktop chart as-is — no mobile-only treatment. The legend wraps onto
           more than one line instead of overflowing, which is now the shipped behavior at any width.
         </CardDescription>
+        <p className="text-xs leading-relaxed text-muted-foreground">
+          Recharts&apos; own <span className="font-mono">ResponsiveContainer</span> (what{" "}
+          <span className="font-mono">ChartContainer</span> wraps) already re-measures on resize —
+          width was never the problem. The legend positions itself absolutely outside that measured
+          box, which is the one thing <span className="font-mono">ResponsiveContainer</span> has no
+          opinion on.
+        </p>
       </CardHeader>
       <CardContent>
         <PhoneFrame>
           <div className="p-3">{CHART_PREVIEW.render(opts)}</div>
+        </PhoneFrame>
+      </CardContent>
+    </Card>
+  )
+}
+
+// Type never scales down for width — every Tailwind step (text-xs, text-sm, ...) renders at the
+// same size regardless of viewport. Shown with the two label tiers panel-design.md defines (a 9px
+// micro-label, a 12px mono data value) plus a body paragraph, because that pairing is already the
+// densest text this app ships — if it holds up at 380px, everything looser than it does too.
+function TypographyOnMobile() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Typography</CardTitle>
+        <CardDescription className="text-sm leading-relaxed">
+          No fluid type scale — every step renders at the same size on any width. The two-tier
+          system panels already use (a 9px micro-label, a 12px mono data value) is dense enough on
+          desktop that it never needed a smaller mobile-specific size.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <PhoneFrame>
+          <div className="flex flex-col gap-4 p-4">
+            <div>
+              <p className="text-[9px] font-bold tracking-[0.12em] uppercase text-muted-foreground">Merchant</p>
+              <p className="mt-1 font-mono text-xs font-medium text-foreground">Harbor View Hotel</p>
+            </div>
+            <div>
+              <p className="text-[9px] font-bold tracking-[0.12em] uppercase text-muted-foreground">Volume, this month</p>
+              <p className="mt-1 font-mono text-xs font-medium text-foreground">$3,241,880</p>
+            </div>
+            <p className="text-sm leading-relaxed text-foreground">
+              Volume is up 14% from last month, led by a jump in card-present transactions across
+              the top five merchants.
+            </p>
+          </div>
+        </PhoneFrame>
+      </CardContent>
+    </Card>
+  )
+}
+
+const BUTTON_SIZES = [
+  { size: "xs", label: "xs · 24px" },
+  { size: "sm", label: "sm · 28px" },
+  { size: "default", label: "default · 32px" },
+  { size: "lg", label: "lg · 36px" },
+] as const
+
+// Every DS control size, next to a 44px reference box — the ~44px minimum Apple and Material both
+// recommend for a touch target. Nothing here opts into that size for touch; there's no separate
+// mobile scale, so the box is the gap, not a treatment.
+function SizingOnMobile() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Sizing</CardTitle>
+        <CardDescription className="text-sm leading-relaxed">
+          Control sizes top out at 36px (<span className="font-mono text-xs">lg</span>); the
+          default button is 32px. Apple and Material both recommend a ~44px minimum touch target —
+          nothing here opts into a larger size for touch.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <PhoneFrame>
+          <div className="flex flex-wrap items-end gap-4 p-4">
+            {BUTTON_SIZES.map((b) => (
+              <div key={b.size} className="flex flex-col items-center gap-1.5">
+                <Button size={b.size} variant="outline">Ok</Button>
+                <span className="text-[10px] text-muted-foreground">{b.label}</span>
+              </div>
+            ))}
+            <div className="flex flex-col items-center gap-1.5">
+              <div className="flex size-11 items-center justify-center rounded-lg border border-dashed text-[9px] text-muted-foreground">
+                44
+              </div>
+              <span className="text-[10px] text-muted-foreground">reference</span>
+            </div>
+          </div>
+        </PhoneFrame>
+      </CardContent>
+    </Card>
+  )
+}
+
+const PERIODS = [
+  { value: "week", label: "This week" },
+  { value: "month", label: "This month" },
+  { value: "quarter", label: "This quarter" },
+  { value: "year", label: "This year" },
+  { value: "all", label: "All time" },
+] as const
+
+// SegmentedGroup's underlying TabsList is `inline-flex w-fit` with no wrap and no scroll — enough
+// options, or long enough labels, push past the frame instead of adapting, unlike PanelTable's
+// deliberate scroll. No mobile-specific fix ships for this yet.
+function TabsOnMobile() {
+  const [period, setPeriod] = useState<(typeof PERIODS)[number]["value"]>("month")
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base">Tab / segmented controls</CardTitle>
+        <CardDescription className="text-sm leading-relaxed">
+          <span className="font-mono text-xs">TabsList</span> is <span className="font-mono text-xs">inline-flex w-fit</span> with
+          no wrap and no scroll — enough options push past the frame instead of adapting.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <PhoneFrame>
+          <div className="p-4">
+            <SegmentedGroup value={period} onChange={setPeriod} options={PERIODS} />
+          </div>
         </PhoneFrame>
       </CardContent>
     </Card>
