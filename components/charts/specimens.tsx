@@ -87,11 +87,12 @@ const MARGIN_LEGEND = { ...MARGIN, bottom: 60 } as const
 const MARGIN_LEGEND_POLAR = { ...MARGIN, bottom: 16 } as const
 const MONEY_AXIS_WIDTH = 56
 
-const BOX = "aspect-auto h-[220px] w-full"
-// Pairs with MARGIN_LEGEND: +60px of container height matches the +60px of reserved
-// bottom margin, so the plot's own drawing area comes out identical to BOX's — the
-// legend gets genuinely new space below, not space carved out of the chart.
-const BOX_LEGEND = "aspect-auto h-[280px] w-full"
+// One height for every specimen, legend or not. A shorter box for no-legend charts
+// (used to be 220px against this one's 280px) reads fine in isolation, but the two
+// sizes land in the same md:grid-cols-2 row unpredictably — whichever specimen comes
+// first in a group pairs with whatever comes second, so rows went jagged as often as
+// they matched. One height keeps every row flush regardless of pairing.
+const BOX = "aspect-auto h-[280px] w-full"
 
 function Grid({ opts, vertical = false }: { opts: GalleryOptions; vertical?: boolean }) {
   return opts.grid ? <CartesianGrid vertical={vertical} horizontal={!vertical} strokeDasharray="3 3" /> : null
@@ -153,7 +154,7 @@ const CHANNEL_MIX_H2 = GALLERY_CHANNEL_MIX.slice(6)
 
 function GroupedBar({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX_LEGEND}>
+    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX}>
       <BarChart data={CHANNEL_MIX_H2} margin={MARGIN_LEGEND}>
         <Grid opts={opts} />
         <XAxis dataKey="month" {...AXIS} />
@@ -170,7 +171,7 @@ function GroupedBar({ opts }: { opts: GalleryOptions }) {
 
 function StackedBar({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX_LEGEND}>
+    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX}>
       <BarChart data={GALLERY_CHANNEL_MIX} margin={MARGIN_LEGEND}>
         <Grid opts={opts} />
         <XAxis dataKey="month" {...AXIS} />
@@ -236,7 +237,7 @@ function SingleLine({ opts }: { opts: GalleryOptions }) {
 
 function MultiLine({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX_LEGEND}>
+    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX}>
       <LineChart data={GALLERY_CHANNEL_MIX} margin={MARGIN_LEGEND}>
         <Grid opts={opts} />
         <XAxis dataKey="month" {...AXIS} />
@@ -286,7 +287,7 @@ function SingleArea({ opts }: { opts: GalleryOptions }) {
 
 function StackedArea({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX_LEGEND}>
+    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX}>
       <AreaChart data={GALLERY_CHANNEL_MIX} margin={MARGIN_LEGEND}>
         <Grid opts={opts} />
         <XAxis dataKey="month" {...AXIS} />
@@ -317,7 +318,7 @@ const COMBO_SERIES = [
 
 function Combo({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(COMBO_SERIES, opts.swatches)} className={BOX_LEGEND}>
+    <ChartContainer config={buildChartConfig(COMBO_SERIES, opts.swatches)} className={BOX}>
       <ComposedChart data={GALLERY_MONTHLY} margin={{ ...MARGIN_LEGEND, right: 0 }}>
         <Grid opts={opts} />
         <XAxis dataKey="month" {...AXIS} />
@@ -370,7 +371,7 @@ function Points({ opts }: { opts: GalleryOptions }) {
 
 function Quadrant({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(SCORE_SERIES, opts.swatches)} className={BOX_LEGEND}>
+    <ChartContainer config={buildChartConfig(SCORE_SERIES, opts.swatches)} className={BOX}>
       <ScatterChart margin={MARGIN_LEGEND}>
         <XAxis
           type="number" dataKey="vw" domain={[0, 100]} {...AXIS}
@@ -401,7 +402,7 @@ const DECLINE_SERIES = GALLERY_DECLINE_REASONS.map((d) => ({ key: d.key, label: 
 function Slices({ opts, donut }: { opts: GalleryOptions; donut?: boolean }) {
   const config = buildChartConfig(DECLINE_SERIES, opts.swatches)
   return (
-    <ChartContainer config={config} className={BOX_LEGEND}>
+    <ChartContainer config={config} className={BOX}>
       <PieChart margin={MARGIN_LEGEND}>
         <ChartTooltip content={<ChartTooltipContent nameKey="key" hideLabel className={TOOLTIP_SPACING} />} />
         <Pie
@@ -447,7 +448,7 @@ const SLA_DATA = GALLERY_SLA.map((s) => ({ ...s, fill: `var(--color-${s.key})` }
 
 function Radial({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(SLA_SERIES, opts.swatches)} className={BOX_LEGEND}>
+    <ChartContainer config={buildChartConfig(SLA_SERIES, opts.swatches)} className={BOX}>
       {/* Fixed pixels, not percentages — recharts scales a percentage radius off the full
           container's min(width, height), ignoring margin, so a taller box (reserving
           legend room) makes a percentage ring bigger instead of leaving it be. Pie/Donut
@@ -539,7 +540,7 @@ const PROFILE_SERIES = [
 
 function Profile({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(PROFILE_SERIES, opts.swatches)} className={BOX_LEGEND}>
+    <ChartContainer config={buildChartConfig(PROFILE_SERIES, opts.swatches)} className={BOX}>
       {/* Fixed pixels, not a percentage — see the note on Radial's outerRadius. Margin is
           MARGIN_LEGEND_POLAR, not MARGIN_LEGEND — see its comment. */}
       <RadarChart data={GALLERY_HEALTH_PROFILE} outerRadius={78} margin={MARGIN_LEGEND_POLAR}>
