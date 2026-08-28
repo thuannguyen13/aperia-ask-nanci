@@ -36,14 +36,15 @@ const DRAG_PX = 260
 const PANEL = "Merchant Volume"
 
 const PRESENTATIONS = [
-  // `rest` is the card's x (horizontal) or y (vertical) once dismissed. The two
-  // vertical values carry the app frame's 4px bottom inset on a phone (AppFrame.tsx):
-  // the composer sits that far off the screen edge, the clip line follows it up, and a
-  // card resting past that line lands 4px higher than the viewport alone would put it.
-  { name: "bottom sheet", param: "", axis: "y", lip: 0, rest: 766 },
-  { name: "right-side drawer", param: "right", axis: "x", lip: 0, rest: 438 },
-  { name: "swipe to open", param: "swipe", axis: "y", lip: 40, rest: 678 },
-  { name: "swipe from the edge", param: "edge", axis: "x", lip: 40, rest: 350 },
+  // Where a dismissed card rests is asserted against the clip line, never as an
+  // absolute coordinate. The clip line is the composer's top edge, so pinning the
+  // number meant re-pinning it every time the composer changed height: the frame's
+  // 4px bottom inset moved it once, a 4px taller send button moved it again. Neither
+  // was a regression, and both failed the suite.
+  { name: "bottom sheet", param: "", axis: "y", lip: 0 },
+  { name: "right-side drawer", param: "right", axis: "x", lip: 0 },
+  { name: "swipe to open", param: "swipe", axis: "y", lip: 40 },
+  { name: "swipe from the edge", param: "edge", axis: "x", lip: 40 },
 ] as const
 
 type Presentation = (typeof PRESENTATIONS)[number]
@@ -164,13 +165,14 @@ for (const p of PRESENTATIONS) {
     // against where the frame is at that moment.
     const frame = await box(frameOf(page))
     const rest = await box(cardOf(page))
-    expectPx(p.axis === "y" ? rest.y : rest.x, p.rest)
 
     if (p.lip === 0) {
       // Nothing is left on screen: the card clears the clip line by more than its own
-      // shadow can reach, so neither it nor the shadow is drawn.
-      if (p.axis === "y") expect(rest.y).toBeGreaterThanOrEqual(frame.y + frame.height + 40)
-      else expect(rest.x).toBeGreaterThanOrEqual(PHONE.width + 40)
+      // shadow can reach, so neither it nor the shadow is drawn. Bounded above as well,
+      // or a card flung to an absurd offset would still pass.
+      const past = p.axis === "y" ? rest.y - (frame.y + frame.height) : rest.x - PHONE.width
+      expect(past, `card rests ${past}px past the clip line`).toBeGreaterThanOrEqual(40)
+      expect(past, `card rests ${past}px past the clip line`).toBeLessThanOrEqual(frame.height)
     } else {
       // A lip stays: exactly `lip` px of the card is still inside the frame.
       const inside = p.axis === "y" ? frame.y + frame.height - rest.y : PHONE.width - rest.x

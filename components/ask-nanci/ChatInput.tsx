@@ -172,12 +172,15 @@ export function ChatInput() {
           {/* Grouped so the toolbar's justify-between still has exactly two sides */}
           <div className="flex items-center gap-1">
             <PlanUsageChip demo={planDemo} />
+            {/* `icon` (32px), not `icon-sm` (28px): the design sizes the send button a
+                tier above the rest of the toolbar, and stop has to match it or the
+                control resizes the moment a flow starts streaming. */}
             {isBusy ? (
-              <Button size="icon-sm" variant="secondary" onClick={stopAnimation}>
+              <Button size="icon" variant="secondary" onClick={stopAnimation}>
                 <Square className="size-3.5 fill-current" />
               </Button>
             ) : (
-              <Button size="icon-sm" variant="default" onClick={submit} disabled={(isEmbed && !isDetect) || !value.trim()}>
+              <Button size="icon" variant="default" onClick={submit} disabled={(isEmbed && !isDetect) || !value.trim()}>
                 <ArrowUp />
               </Button>
             )}
