@@ -345,9 +345,9 @@ function TypographyOnMobile() {
       <CardHeader>
         <CardTitle className="text-base">Typography</CardTitle>
         <CardDescription className="text-sm leading-relaxed">
-          No fluid type scale — every step renders at the same size on any width. The two-tier
-          system panels already use (a 9px micro-label, a 12px mono data value) is dense enough on
-          desktop that it never needed a smaller mobile-specific size.
+          Text stays the same size at any width — nothing shrinks for mobile. Panel labels and
+          values are already small and dense on desktop (a 9px label, a 12px value), so they hold
+          up fine at 380px without needing a smaller scale.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -388,9 +388,9 @@ function SizingOnMobile() {
       <CardHeader>
         <CardTitle className="text-base">Sizing</CardTitle>
         <CardDescription className="text-sm leading-relaxed">
-          Control sizes top out at 36px (<span className="font-mono text-xs">lg</span>); the
-          default button is 32px. Apple and Material both recommend a ~44px minimum touch target —
-          nothing here opts into a larger size for touch.
+          Buttons range from 24px to 36px depending on size — none reach the ~44px Apple and
+          Material both recommend as a minimum touch target. Nothing switches to a larger size on
+          mobile; the dashed box below is a 44px reference, not a button we have.
         </CardDescription>
       </CardHeader>
       <CardContent>
