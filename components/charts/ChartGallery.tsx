@@ -182,19 +182,31 @@ export function ChartGallery() {
           </div>
         </div>
 
-        {SPECIMEN_GROUPS.map((group) => (
-          <section key={group.title} className="mt-12">
-            <h2 className="text-lg font-semibold tracking-tight text-foreground">{group.title}</h2>
-            {/* Plain stretch (Grid's default): every specimen in this file now renders at one
-                shared chart height, so the only height difference left between cards is real
-                content — a legend row, or not. That's small enough (~30px) that a flush,
-                equal-height row reads better than the jagged bottoms items-start produced when
-                the difference is this minor. */}
-            <div className="mt-5 grid gap-5 md:grid-cols-2">
-              {group.specimens.map((s) => <SpecimenCard key={s.id} specimen={s} opts={opts} />)}
-            </div>
-          </section>
-        ))}
+        {SPECIMEN_GROUPS.map((group) => {
+          const standalone = group.specimens.filter((s) => s.maxWidth)
+          const paired = group.specimens.filter((s) => !s.maxWidth)
+          return (
+            <section key={group.title} className="mt-12">
+              <h2 className="text-lg font-semibold tracking-tight text-foreground">{group.title}</h2>
+              {/* maxWidth specimens (e.g. Sparkline) get their own row first, capped to their
+                  own width — stretching a single number across half the page reads worse, not
+                  better. */}
+              {standalone.map((s) => (
+                <div key={s.id} className="mt-5" style={{ maxWidth: s.maxWidth }}>
+                  <SpecimenCard specimen={s} opts={opts} />
+                </div>
+              ))}
+              {/* Plain stretch (Grid's default): every specimen in this file now renders at one
+                  shared chart height, so the only height difference left between cards is real
+                  content — a legend row, or not. That's small enough (~30px) that a flush,
+                  equal-height row reads better than the jagged bottoms items-start produced when
+                  the difference is this minor. */}
+              <div className="mt-5 grid gap-5 md:grid-cols-2">
+                {paired.map((s) => <SpecimenCard key={s.id} specimen={s} opts={opts} />)}
+              </div>
+            </section>
+          )
+        })}
 
       </div>
     </div>

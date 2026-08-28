@@ -697,6 +697,12 @@ export interface Specimen {
   id: string
   name: string
   render: (opts: GalleryOptions) => React.ReactNode
+  /**
+   * Renders on its own row, capped to this pixel width, instead of joining the
+   * md:grid-cols-2 pairing — for a specimen that doesn't need a full card's width
+   * (a single-number sparkline stretched to ~630px reads worse, not better).
+   */
+  maxWidth?: number
 }
 
 export interface SpecimenGroup {
@@ -822,6 +828,7 @@ export const SPECIMEN_GROUPS: SpecimenGroup[] = [
         id: "spark",
         name: "Sparkline",
         render: (o) => <Spark opts={o} />,
+        maxWidth: 400,
       },
       {
         id: "css-bars",
