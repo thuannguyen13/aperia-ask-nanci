@@ -7,7 +7,7 @@ import {
   Treemap, XAxis, YAxis, ZAxis,
 } from "recharts"
 import {
-  ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent,
+  ChartContainer, ChartTooltip, ChartTooltipContent,
   type ChartConfig,
 } from "aperia-ds5"
 import { HEATMAP_HOURS, HEATMAP_ROWS } from "@/lib/ask-nanci/data/panels/busiest-times"
@@ -70,21 +70,9 @@ const AXIS = { tickLine: false, axisLine: false, tickMargin: 8 } as const
 
 // Y-axis labels are currency, so they need real width and a left margin of zero. A
 // negative left inset (the usual trick for tightening a chart) clips them from the left.
+// One margin for every specimen now — legend charts no longer reserve extra
+// margin.bottom for recharts' own <Legend>, because they don't use it (see Legend below).
 const MARGIN = { top: 4, right: 8, left: 0, bottom: 0 } as const
-// ChartLegend renders via recharts' own absolutely-positioned wrapper anchored to the
-// bottom of the chart's fixed-height box — it does NOT push the plot up to make room,
-// it draws on top of whatever's there. bottom: 0 (or recharts' un-set default of ~5)
-// only avoided visible overlap by accident, on charts whose plot happened to leave
-// some empty margin near the axis. A wrapped two-line legend needs real reserved
-// space regardless of luck — every specimen with a legend uses this margin instead.
-const MARGIN_LEGEND = { ...MARGIN, bottom: 60 } as const
-// Polar charts (Radial, Radar) center themselves on half the container height no
-// matter what margin.bottom says — margin.bottom only shifts the legend, which
-// recharts insets from the container's true bottom edge by that same amount. So for
-// these two, a *smaller* bottom margin pulls the legend down toward the real edge
-// (more clearance from the plot) instead of eating into it. A shared axis-based
-// margin like MARGIN_LEGEND actively works against these two chart types.
-const MARGIN_LEGEND_POLAR = { ...MARGIN, bottom: 16 } as const
 const MONEY_AXIS_WIDTH = 56
 
 // One height for every specimen, legend or not. A shorter box for no-legend charts
@@ -106,16 +94,34 @@ function Tip({ opts }: { opts: GalleryOptions }) {
   return <ChartTooltip content={<ChartTooltipContent indicator={opts.indicator} className={TOOLTIP_SPACING} />} />
 }
 
-// ChartLegendContent's own container is "flex items-center justify-center gap-4" with
-// no wrap, so a series list that doesn't fit one line overflows instead of breaking —
-// exactly what makes a narrow chart look broken. flex-wrap fixes it at any width, so
-// it's the shipped behavior rather than a mobile-only variant. pt-4 (up from the
-// default pt-3) is deliberate: a wrapped, two-line legend sits taller, and the
-// default gap read as crowding the plot above it once it wraps.
-function Key({ opts, nameKey }: { opts: GalleryOptions; nameKey?: string }) {
-  return opts.legend
-    ? <ChartLegend content={<ChartLegendContent nameKey={nameKey} className="flex-wrap gap-x-4 gap-y-2 pt-4" />} />
-    : null
+// Not ds5's ChartLegend/ChartLegendContent (recharts' <Legend>) — that renders through
+// its own absolutely-positioned wrapper, sized off a worst-case guess (a fixed
+// margin.bottom reservation) because recharts never tells the chart how tall the
+// legend actually turned out. Neither ResponsiveContainer nor ChartContainer are
+// legend-aware; the reservation is a hand-built guess layered on top of both, not
+// something either one manages. That guess is either too small (clipped/overlapping)
+// or too big (a dead gap below a legend that only needed one line) depending on how
+// many items actually wrap at the current width.
+//
+// This renders as a normal sibling below ChartContainer instead — real flow, real
+// height, sized to what's actually there. It reads straight off the same `series`
+// list + swatches every specimen already builds its ChartConfig from, so the dot
+// colors always match the chart exactly.
+function Legend({ opts, series }: { opts: GalleryOptions; series: readonly { key: string; label: string }[] }) {
+  if (!opts.legend) return null
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 pt-4">
+      {series.map((s, i) => (
+        <div key={s.key} className="flex items-center gap-1.5 text-xs">
+          <div
+            className="h-2 w-2 shrink-0 rounded-[2px]"
+            style={{ backgroundColor: resolveSwatch(opts.swatches[i % opts.swatches.length], opts.dark) }}
+          />
+          <span className="text-foreground">{s.label}</span>
+        </div>
+      ))}
+    </div>
+  )
 }
 
 const money = (v: number) => `$${Number(v.toFixed(1))}M`
@@ -154,41 +160,45 @@ const CHANNEL_MIX_H2 = GALLERY_CHANNEL_MIX.slice(6)
 
 function GroupedBar({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX}>
-      <BarChart data={CHANNEL_MIX_H2} margin={MARGIN_LEGEND}>
-        <Grid opts={opts} />
-        <XAxis dataKey="month" {...AXIS} />
-        <YAxis {...AXIS} tickFormatter={money} width={MONEY_AXIS_WIDTH} />
-        <Tip opts={opts} />
-        <Key opts={opts} />
-        {CHANNEL_SERIES.map((s) => (
-          <Bar key={s.key} dataKey={s.key} fill={`var(--color-${s.key})`} radius={[3, 3, 0, 0]} />
-        ))}
-      </BarChart>
-    </ChartContainer>
+    <div className="flex flex-col">
+      <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX}>
+        <BarChart data={CHANNEL_MIX_H2} margin={MARGIN}>
+          <Grid opts={opts} />
+          <XAxis dataKey="month" {...AXIS} />
+          <YAxis {...AXIS} tickFormatter={money} width={MONEY_AXIS_WIDTH} />
+          <Tip opts={opts} />
+          {CHANNEL_SERIES.map((s) => (
+            <Bar key={s.key} dataKey={s.key} fill={`var(--color-${s.key})`} radius={[3, 3, 0, 0]} />
+          ))}
+        </BarChart>
+      </ChartContainer>
+      <Legend opts={opts} series={CHANNEL_SERIES} />
+    </div>
   )
 }
 
 function StackedBar({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX}>
-      <BarChart data={GALLERY_CHANNEL_MIX} margin={MARGIN_LEGEND}>
-        <Grid opts={opts} />
-        <XAxis dataKey="month" {...AXIS} />
-        <YAxis {...AXIS} tickFormatter={money} width={MONEY_AXIS_WIDTH} />
-        <Tip opts={opts} />
-        <Key opts={opts} />
-        {CHANNEL_SERIES.map((s, i) => (
-          <Bar
-            key={s.key}
-            dataKey={s.key}
-            stackId="mix"
-            fill={`var(--color-${s.key})`}
-            radius={i === CHANNEL_SERIES.length - 1 ? [4, 4, 0, 0] : 0}
-          />
-        ))}
-      </BarChart>
-    </ChartContainer>
+    <div className="flex flex-col">
+      <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX}>
+        <BarChart data={GALLERY_CHANNEL_MIX} margin={MARGIN}>
+          <Grid opts={opts} />
+          <XAxis dataKey="month" {...AXIS} />
+          <YAxis {...AXIS} tickFormatter={money} width={MONEY_AXIS_WIDTH} />
+          <Tip opts={opts} />
+          {CHANNEL_SERIES.map((s, i) => (
+            <Bar
+              key={s.key}
+              dataKey={s.key}
+              stackId="mix"
+              fill={`var(--color-${s.key})`}
+              radius={i === CHANNEL_SERIES.length - 1 ? [4, 4, 0, 0] : 0}
+            />
+          ))}
+        </BarChart>
+      </ChartContainer>
+      <Legend opts={opts} series={CHANNEL_SERIES} />
+    </div>
   )
 }
 
@@ -237,25 +247,27 @@ function SingleLine({ opts }: { opts: GalleryOptions }) {
 
 function MultiLine({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX}>
-      <LineChart data={GALLERY_CHANNEL_MIX} margin={MARGIN_LEGEND}>
-        <Grid opts={opts} />
-        <XAxis dataKey="month" {...AXIS} />
-        <YAxis {...AXIS} tickFormatter={money} width={MONEY_AXIS_WIDTH} />
-        <Tip opts={opts} />
-        <Key opts={opts} />
-        {CHANNEL_SERIES.map((s) => (
-          <Line
-            key={s.key}
-            dataKey={s.key}
-            type="monotone"
-            stroke={`var(--color-${s.key})`}
-            strokeWidth={2}
-            dot={false}
-          />
-        ))}
-      </LineChart>
-    </ChartContainer>
+    <div className="flex flex-col">
+      <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX}>
+        <LineChart data={GALLERY_CHANNEL_MIX} margin={MARGIN}>
+          <Grid opts={opts} />
+          <XAxis dataKey="month" {...AXIS} />
+          <YAxis {...AXIS} tickFormatter={money} width={MONEY_AXIS_WIDTH} />
+          <Tip opts={opts} />
+          {CHANNEL_SERIES.map((s) => (
+            <Line
+              key={s.key}
+              dataKey={s.key}
+              type="monotone"
+              stroke={`var(--color-${s.key})`}
+              strokeWidth={2}
+              dot={false}
+            />
+          ))}
+        </LineChart>
+      </ChartContainer>
+      <Legend opts={opts} series={CHANNEL_SERIES} />
+    </div>
   )
 }
 
@@ -287,27 +299,29 @@ function SingleArea({ opts }: { opts: GalleryOptions }) {
 
 function StackedArea({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX}>
-      <AreaChart data={GALLERY_CHANNEL_MIX} margin={MARGIN_LEGEND}>
-        <Grid opts={opts} />
-        <XAxis dataKey="month" {...AXIS} />
-        <YAxis {...AXIS} tickFormatter={money} width={MONEY_AXIS_WIDTH} />
-        <Tip opts={opts} />
-        <Key opts={opts} />
-        {CHANNEL_SERIES.map((s) => (
-          <Area
-            key={s.key}
-            dataKey={s.key}
-            type="monotone"
-            stackId="mix"
-            stroke={`var(--color-${s.key})`}
-            fill={`var(--color-${s.key})`}
-            fillOpacity={0.25}
-            strokeWidth={2}
-          />
-        ))}
-      </AreaChart>
-    </ChartContainer>
+    <div className="flex flex-col">
+      <ChartContainer config={buildChartConfig(CHANNEL_SERIES, opts.swatches)} className={BOX}>
+        <AreaChart data={GALLERY_CHANNEL_MIX} margin={MARGIN}>
+          <Grid opts={opts} />
+          <XAxis dataKey="month" {...AXIS} />
+          <YAxis {...AXIS} tickFormatter={money} width={MONEY_AXIS_WIDTH} />
+          <Tip opts={opts} />
+          {CHANNEL_SERIES.map((s) => (
+            <Area
+              key={s.key}
+              dataKey={s.key}
+              type="monotone"
+              stackId="mix"
+              stroke={`var(--color-${s.key})`}
+              fill={`var(--color-${s.key})`}
+              fillOpacity={0.25}
+              strokeWidth={2}
+            />
+          ))}
+        </AreaChart>
+      </ChartContainer>
+      <Legend opts={opts} series={CHANNEL_SERIES} />
+    </div>
   )
 }
 
@@ -318,25 +332,27 @@ const COMBO_SERIES = [
 
 function Combo({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(COMBO_SERIES, opts.swatches)} className={BOX}>
-      <ComposedChart data={GALLERY_MONTHLY} margin={{ ...MARGIN_LEGEND, right: 0 }}>
-        <Grid opts={opts} />
-        <XAxis dataKey="month" {...AXIS} />
-        <YAxis yAxisId="left" {...AXIS} tickFormatter={money} width={MONEY_AXIS_WIDTH} />
-        <YAxis yAxisId="right" orientation="right" {...AXIS} tickFormatter={pct} width={44} />
-        <Tip opts={opts} />
-        <Key opts={opts} />
-        <Bar yAxisId="left" dataKey="volume" fill="var(--color-volume)" radius={[4, 4, 0, 0]} />
-        <Line
-          yAxisId="right"
-          dataKey="declines"
-          type="monotone"
-          stroke="var(--color-declines)"
-          strokeWidth={2}
-          dot={false}
-        />
-      </ComposedChart>
-    </ChartContainer>
+    <div className="flex flex-col">
+      <ChartContainer config={buildChartConfig(COMBO_SERIES, opts.swatches)} className={BOX}>
+        <ComposedChart data={GALLERY_MONTHLY} margin={{ ...MARGIN, right: 0 }}>
+          <Grid opts={opts} />
+          <XAxis dataKey="month" {...AXIS} />
+          <YAxis yAxisId="left" {...AXIS} tickFormatter={money} width={MONEY_AXIS_WIDTH} />
+          <YAxis yAxisId="right" orientation="right" {...AXIS} tickFormatter={pct} width={44} />
+          <Tip opts={opts} />
+          <Bar yAxisId="left" dataKey="volume" fill="var(--color-volume)" radius={[4, 4, 0, 0]} />
+          <Line
+            yAxisId="right"
+            dataKey="declines"
+            type="monotone"
+            stroke="var(--color-declines)"
+            strokeWidth={2}
+            dot={false}
+          />
+        </ComposedChart>
+      </ChartContainer>
+      <Legend opts={opts} series={COMBO_SERIES} />
+    </div>
   )
 }
 
@@ -371,27 +387,32 @@ function Points({ opts }: { opts: GalleryOptions }) {
 
 function Quadrant({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(SCORE_SERIES, opts.swatches)} className={BOX}>
-      <ScatterChart margin={MARGIN_LEGEND}>
-        <XAxis
-          type="number" dataKey="vw" domain={[0, 100]} {...AXIS}
-          label={{ value: "VisionWeb score", position: "insideBottom", offset: -12, fontSize: 10, style: { textAnchor: "middle" } }}
-        />
-        <YAxis
-          type="number" dataKey="mc" domain={[0, 100]} {...AXIS} width={56}
-          label={{ value: "Mastercard score", angle: -90, position: "insideLeft", offset: 6, fontSize: 10, style: { textAnchor: "middle" } }}
-        />
-        <ZAxis type="number" dataKey="mc" range={[24, 260]} />
-        <ReferenceArea x1={0} x2={65} y1={65} y2={100} fill="var(--color-mc)" fillOpacity={0.07} />
-        <ReferenceLine x={65} strokeDasharray="4 4" />
-        <ReferenceLine y={65} strokeDasharray="4 4" />
-        <Tip opts={opts} />
-        <Key opts={opts} />
-        {SCATTER_BY_CAT.map((s) => (
-          <Scatter key={s.key} name={s.key} data={s.points} fill={`var(--color-${s.key})`} fillOpacity={0.6} />
-        ))}
-      </ScatterChart>
-    </ChartContainer>
+    <div className="flex flex-col">
+      <ChartContainer config={buildChartConfig(SCORE_SERIES, opts.swatches)} className={BOX}>
+        {/* bottom: 24 is this chart's own axis title ("VisionWeb score"), not a legend
+            reservation — at margin 0 its "insideBottom" position renders past the SVG's
+            bottom edge and gets clipped entirely. */}
+        <ScatterChart margin={{ ...MARGIN, bottom: 24 }}>
+          <XAxis
+            type="number" dataKey="vw" domain={[0, 100]} {...AXIS}
+            label={{ value: "VisionWeb score", position: "insideBottom", offset: -12, fontSize: 10, style: { textAnchor: "middle" } }}
+          />
+          <YAxis
+            type="number" dataKey="mc" domain={[0, 100]} {...AXIS} width={56}
+            label={{ value: "Mastercard score", angle: -90, position: "insideLeft", offset: 6, fontSize: 10, style: { textAnchor: "middle" } }}
+          />
+          <ZAxis type="number" dataKey="mc" range={[24, 260]} />
+          <ReferenceArea x1={0} x2={65} y1={65} y2={100} fill="var(--color-mc)" fillOpacity={0.07} />
+          <ReferenceLine x={65} strokeDasharray="4 4" />
+          <ReferenceLine y={65} strokeDasharray="4 4" />
+          <Tip opts={opts} />
+          {SCATTER_BY_CAT.map((s) => (
+            <Scatter key={s.key} name={s.key} data={s.points} fill={`var(--color-${s.key})`} fillOpacity={0.6} />
+          ))}
+        </ScatterChart>
+      </ChartContainer>
+      <Legend opts={opts} series={SCORE_SERIES} />
+    </div>
   )
 }
 
@@ -402,41 +423,43 @@ const DECLINE_SERIES = GALLERY_DECLINE_REASONS.map((d) => ({ key: d.key, label: 
 function Slices({ opts, donut }: { opts: GalleryOptions; donut?: boolean }) {
   const config = buildChartConfig(DECLINE_SERIES, opts.swatches)
   return (
-    <ChartContainer config={config} className={BOX}>
-      <PieChart margin={MARGIN_LEGEND}>
-        <ChartTooltip content={<ChartTooltipContent nameKey="key" hideLabel className={TOOLTIP_SPACING} />} />
-        <Pie
-          data={GALLERY_DECLINE_REASONS}
-          dataKey="share"
-          nameKey="key"
-          innerRadius={donut ? 52 : 0}
-          outerRadius={82}
-          strokeWidth={donut ? 3 : 1}
-        >
-          {GALLERY_DECLINE_REASONS.map((d) => (
-            <Cell key={d.key} fill={`var(--color-${d.key})`} />
-          ))}
-          {donut && (
-            <Label
-              position="center"
-              content={({ viewBox }) =>
-                viewBox && "cx" in viewBox ? (
-                  <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle">
-                    <tspan x={viewBox.cx} dy="-2" className="fill-foreground text-xl font-semibold">
-                      8.4%
-                    </tspan>
-                    <tspan x={viewBox.cx} dy="18" className="fill-muted-foreground text-[10px]">
-                      decline rate
-                    </tspan>
-                  </text>
-                ) : null
-              }
-            />
-          )}
-        </Pie>
-        <Key opts={opts} nameKey="key" />
-      </PieChart>
-    </ChartContainer>
+    <div className="flex flex-col">
+      <ChartContainer config={config} className={BOX}>
+        <PieChart margin={MARGIN}>
+          <ChartTooltip content={<ChartTooltipContent nameKey="key" hideLabel className={TOOLTIP_SPACING} />} />
+          <Pie
+            data={GALLERY_DECLINE_REASONS}
+            dataKey="share"
+            nameKey="key"
+            innerRadius={donut ? 52 : 0}
+            outerRadius={82}
+            strokeWidth={donut ? 3 : 1}
+          >
+            {GALLERY_DECLINE_REASONS.map((d) => (
+              <Cell key={d.key} fill={`var(--color-${d.key})`} />
+            ))}
+            {donut && (
+              <Label
+                position="center"
+                content={({ viewBox }) =>
+                  viewBox && "cx" in viewBox ? (
+                    <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle">
+                      <tspan x={viewBox.cx} dy="-2" className="fill-foreground text-xl font-semibold">
+                        8.4%
+                      </tspan>
+                      <tspan x={viewBox.cx} dy="18" className="fill-muted-foreground text-[10px]">
+                        decline rate
+                      </tspan>
+                    </text>
+                  ) : null
+                }
+              />
+            )}
+          </Pie>
+        </PieChart>
+      </ChartContainer>
+      <Legend opts={opts} series={DECLINE_SERIES} />
+    </div>
   )
 }
 
@@ -448,19 +471,19 @@ const SLA_DATA = GALLERY_SLA.map((s) => ({ ...s, fill: `var(--color-${s.key})` }
 
 function Radial({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(SLA_SERIES, opts.swatches)} className={BOX}>
-      {/* Fixed pixels, not percentages — recharts scales a percentage radius off the full
-          container's min(width, height), ignoring margin, so a taller box (reserving
-          legend room) makes a percentage ring bigger instead of leaving it be. Pie/Donut
-          already use this fixed-radius pattern for the same reason. Margin is
-          MARGIN_LEGEND_POLAR, not MARGIN_LEGEND — see its comment. */}
-      <RadialBarChart data={SLA_DATA} innerRadius={18} outerRadius={58} startAngle={90} endAngle={-270} margin={MARGIN_LEGEND_POLAR}>
-        <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
-        <ChartTooltip content={<ChartTooltipContent nameKey="key" hideLabel className={TOOLTIP_SPACING} />} />
-        <RadialBar dataKey="attainment" background cornerRadius={6} />
-        <Key opts={opts} nameKey="key" />
-      </RadialBarChart>
-    </ChartContainer>
+    <div className="flex flex-col">
+      <ChartContainer config={buildChartConfig(SLA_SERIES, opts.swatches)} className={BOX}>
+        {/* Fixed pixels, not percentages — recharts scales a percentage radius off the
+            full container's min(width, height), ignoring margin. Pie/Donut use the same
+            fixed-radius pattern. */}
+        <RadialBarChart data={SLA_DATA} innerRadius={18} outerRadius={58} startAngle={90} endAngle={-270} margin={MARGIN}>
+          <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
+          <ChartTooltip content={<ChartTooltipContent nameKey="key" hideLabel className={TOOLTIP_SPACING} />} />
+          <RadialBar dataKey="attainment" background cornerRadius={6} />
+        </RadialBarChart>
+      </ChartContainer>
+      <Legend opts={opts} series={SLA_SERIES} />
+    </div>
   )
 }
 
@@ -540,26 +563,27 @@ const PROFILE_SERIES = [
 
 function Profile({ opts }: { opts: GalleryOptions }) {
   return (
-    <ChartContainer config={buildChartConfig(PROFILE_SERIES, opts.swatches)} className={BOX}>
-      {/* Fixed pixels, not a percentage — see the note on Radial's outerRadius. Margin is
-          MARGIN_LEGEND_POLAR, not MARGIN_LEGEND — see its comment. */}
-      <RadarChart data={GALLERY_HEALTH_PROFILE} outerRadius={78} margin={MARGIN_LEGEND_POLAR}>
-        <PolarGrid strokeDasharray="3 3" />
-        <PolarAngleAxis dataKey="axis" tick={{ fontSize: 10 }} />
-        <Tip opts={opts} />
-        <Key opts={opts} />
-        {PROFILE_SERIES.map((s) => (
-          <Radar
-            key={s.key}
-            dataKey={s.key}
-            stroke={`var(--color-${s.key})`}
-            fill={`var(--color-${s.key})`}
-            fillOpacity={0.18}
-            strokeWidth={2}
-          />
-        ))}
-      </RadarChart>
-    </ChartContainer>
+    <div className="flex flex-col">
+      <ChartContainer config={buildChartConfig(PROFILE_SERIES, opts.swatches)} className={BOX}>
+        {/* Fixed pixels, not a percentage — see the note on Radial's outerRadius. */}
+        <RadarChart data={GALLERY_HEALTH_PROFILE} outerRadius={78} margin={MARGIN}>
+          <PolarGrid strokeDasharray="3 3" />
+          <PolarAngleAxis dataKey="axis" tick={{ fontSize: 10 }} />
+          <Tip opts={opts} />
+          {PROFILE_SERIES.map((s) => (
+            <Radar
+              key={s.key}
+              dataKey={s.key}
+              stroke={`var(--color-${s.key})`}
+              fill={`var(--color-${s.key})`}
+              fillOpacity={0.18}
+              strokeWidth={2}
+            />
+          ))}
+        </RadarChart>
+      </ChartContainer>
+      <Legend opts={opts} series={PROFILE_SERIES} />
+    </div>
   )
 }
 

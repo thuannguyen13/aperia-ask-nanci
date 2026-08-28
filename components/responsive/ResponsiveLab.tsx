@@ -322,10 +322,11 @@ function ChartsOnMobile() {
         </CardDescription>
         <p className="text-xs leading-relaxed text-muted-foreground">
           Recharts&apos; own <span className="font-mono">ResponsiveContainer</span> (what{" "}
-          <span className="font-mono">ChartContainer</span> wraps) already re-measures on resize —
-          width was never the problem. The legend positions itself absolutely outside that measured
-          box, which is the one thing <span className="font-mono">ResponsiveContainer</span> has no
-          opinion on.
+          <span className="font-mono">ChartContainer</span> wraps) already re-measures the chart on
+          resize — width was never the problem. Its <span className="font-mono">{"<Legend>"}</span>{" "}
+          is: it renders through its own absolutely-positioned wrapper with no way to tell the chart
+          how tall it turned out, so this renders the legend as a plain row below the chart instead
+          — real height, no reserved guess.
         </p>
       </CardHeader>
       <CardContent>
