@@ -431,8 +431,8 @@ function Slices({ opts, donut }: { opts: GalleryOptions; donut?: boolean }) {
             data={GALLERY_DECLINE_REASONS}
             dataKey="share"
             nameKey="key"
-            innerRadius={donut ? 52 : 0}
-            outerRadius={82}
+            innerRadius={donut ? 70 : 0}
+            outerRadius={110}
             strokeWidth={donut ? 3 : 1}
           >
             {GALLERY_DECLINE_REASONS.map((d) => (
@@ -476,7 +476,7 @@ function Radial({ opts }: { opts: GalleryOptions }) {
         {/* Fixed pixels, not percentages — recharts scales a percentage radius off the
             full container's min(width, height), ignoring margin. Pie/Donut use the same
             fixed-radius pattern. */}
-        <RadialBarChart data={SLA_DATA} innerRadius={18} outerRadius={58} startAngle={90} endAngle={-270} margin={MARGIN}>
+        <RadialBarChart data={SLA_DATA} innerRadius={35} outerRadius={110} startAngle={90} endAngle={-270} margin={MARGIN}>
           <PolarAngleAxis type="number" domain={[0, 100]} tick={false} />
           <ChartTooltip content={<ChartTooltipContent nameKey="key" hideLabel className={TOOLTIP_SPACING} />} />
           <RadialBar dataKey="attainment" background cornerRadius={6} />
@@ -566,7 +566,7 @@ function Profile({ opts }: { opts: GalleryOptions }) {
     <div className="flex flex-col">
       <ChartContainer config={buildChartConfig(PROFILE_SERIES, opts.swatches)} className={BOX}>
         {/* Fixed pixels, not a percentage — see the note on Radial's outerRadius. */}
-        <RadarChart data={GALLERY_HEALTH_PROFILE} outerRadius={78} margin={MARGIN}>
+        <RadarChart data={GALLERY_HEALTH_PROFILE} outerRadius={100} margin={MARGIN}>
           <PolarGrid strokeDasharray="3 3" />
           <PolarAngleAxis dataKey="axis" tick={{ fontSize: 10 }} />
           <Tip opts={opts} />
