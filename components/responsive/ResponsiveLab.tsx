@@ -293,7 +293,7 @@ function ChartsOnMobile() {
           <CardTitle className="text-base">Charts</CardTitle>
           <Button size="sm" variant="outline" asChild>
             <a href="/charts" target="_blank" rel="noreferrer">
-              All 19 specimens on /charts
+              View all chart specimens
               <ArrowUpRight className="size-3.5" />
             </a>
           </Button>
