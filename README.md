@@ -23,7 +23,7 @@ Keep the dev server running while working. Saved files reload automatically.
 ## 2. Running a demo
 
 Each demo is a URL. Everything below also works on the client-facing site by replacing
-`http://localhost:3000` with `https://aperia-ask-nanci-embed.vercel.app`.
+`http://localhost:3000` with `https://ask-nanci.vercel.app`.
 
 **live** marks a URL currently embedded on the production site. Changes affecting those pages are
 customer-facing.

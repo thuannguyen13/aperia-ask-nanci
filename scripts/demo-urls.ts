@@ -16,7 +16,7 @@ import {
   CONCEPT_EMBED_FLOW_LAYOUTS,
 } from "../lib/ask-nanci/embed-demo-config"
 
-const PROD_BASE = "https://aperia-ask-nanci-embed.vercel.app"
+const PROD_BASE = "https://ask-nanci.vercel.app"
 const BASE = process.env.BASE ?? "http://localhost:3000"
 
 /**
