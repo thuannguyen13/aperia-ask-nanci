@@ -1,0 +1,1724 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile Adaptation: What We Have, What Is Missing</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --aperia-blue: #002F67;
+      --dark-blue: #004785;
+      --sapphire: #2563EB;
+      --sky-blue: #7ED3F7;
+      --light-blue: #C8EAF5;
+      --black: #000000;
+      --white: #FFFFFF;
+      --dark-gray: #58595B;
+      --med-gray: #A7A9AC;
+      --light-gray: #F1F2F2;
+      --bg: #ffffff;
+      --fg: #14181f;
+      --muted: #F1F2F2;
+      --muted-fg: #4b4f57;
+      --border: #e3e6ea;
+      --primary: var(--aperia-blue);
+      --success: #16a34a;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --sans: 'Inter', sans-serif;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html {
+      scroll-behavior: smooth
+    }
+
+    body {
+      overflow-x: hidden
+    }
+
+    body {
+      font-family: var(--sans);
+      font-weight: 400;
+      background: var(--bg);
+      color: var(--fg);
+      font-size: 19px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 40px
+    }
+
+    section {
+      padding: 108px 0;
+      border-bottom: 1px solid var(--border)
+    }
+
+    section:last-of-type {
+      border-bottom: none
+    }
+
+    h2 {
+      font-size: clamp(34px, 5.4vw, 58px);
+      font-weight: 800;
+      line-height: 1.06;
+      letter-spacing: -.025em;
+      margin-bottom: 22px
+    }
+
+    h3 {
+      font-weight: 700
+    }
+
+    em {
+      font-style: normal
+    }
+
+    /* ── Chapter opener ── */
+    .chapter {
+      display: flex;
+      gap: 36px;
+      align-items: flex-start;
+      margin-bottom: 44px
+    }
+
+    .chapter-head {
+      flex: 1;
+      min-width: 0;
+      padding-top: 10px
+    }
+
+    .sec-label {
+      font-size: 13.5px;
+      color: var(--sapphire);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      font-weight: 600
+    }
+
+    .lede {
+      font-size: clamp(20px, 2.4vw, 24px);
+      color: var(--muted-fg);
+      line-height: 1.6;
+      font-weight: 400
+    }
+
+    .lede strong {
+      color: var(--fg);
+      font-weight: 700
+    }
+
+    /* ── Sub-headings and body prose ── */
+    .sub-h3 {
+      font-size: clamp(20px, 2.4vw, 25px);
+      font-weight: 700;
+      letter-spacing: -.01em;
+      margin: 56px 0 14px
+    }
+
+    .body-p {
+      font-size: 18px;
+      color: var(--muted-fg);
+      line-height: 1.75
+    }
+
+    .body-p strong {
+      color: var(--fg)
+    }
+
+    .body-p+.body-p {
+      margin-top: 18px
+    }
+
+    /* ── Approach comparison boxes ── */
+    .approach-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin: 48px 0 0
+    }
+
+    .approach-card {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 30px 32px;
+      background: #fff
+    }
+
+    .approach-card--selected {
+      border-color: var(--aperia-blue);
+      background: #f0f5fb
+    }
+
+    .approach-card-label {
+      font-size: 12.5px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted-fg);
+      margin-bottom: 12px;
+      font-weight: 600
+    }
+
+    .approach-card--selected .approach-card-label {
+      color: var(--sapphire)
+    }
+
+    .approach-card-title {
+      font-size: clamp(19px, 2.2vw, 23px);
+      font-weight: 700;
+      line-height: 1.3;
+      min-height: 2.6em;
+      margin-bottom: 18px;
+      color: var(--fg)
+    }
+
+    .approach-card--selected .approach-card-title {
+      color: var(--aperia-blue)
+    }
+
+    .approach-items {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      font-size: 18px;
+      color: var(--muted-fg);
+      line-height: 1.5
+    }
+
+    .approach-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start
+    }
+
+    .ai-icon {
+      flex: 0 0 18px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      margin-top: 3px
+    }
+
+    .ai-icon svg {
+      display: block;
+      width: 10px;
+      height: 10px
+    }
+
+    .ai-icon--yes {
+      background: var(--success)
+    }
+
+    .ai-icon--no {
+      background: var(--danger)
+    }
+
+    #screens .approach-card-title {
+      color: var(--muted-fg);
+      min-height: 0
+    }
+
+    #screens .approach-card--selected .approach-card-title {
+      color: var(--aperia-blue)
+    }
+
+    .sub-h3+.approach-grid {
+      margin-top: 22px
+    }
+
+    @media(max-width:700px) {
+      .approach-grid {
+        grid-template-columns: 1fr
+      }
+
+      .approach-card {
+        padding: 24px 22px
+      }
+    }
+
+    /* ── Paired comparison ── */
+    .cmp {
+      display: grid;
+      grid-template-columns: 190px 1fr 1fr;
+      margin: 48px 0 0;
+      font-size: 16px
+    }
+
+    .cmp>div {
+      padding: 18px 22px
+    }
+
+    .cmp>div:nth-child(n+4) {
+      border-top: 1px solid var(--border)
+    }
+
+    .cmp>.cmp-dim {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--fg);
+      line-height: 1.45;
+      padding-left: 0
+    }
+
+    .cmp-cell {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      min-width: 0;
+      overflow-wrap: break-word;
+      color: var(--muted-fg);
+      line-height: 1.5
+    }
+
+    .cmp-h-label {
+      font-size: 12.5px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted-fg);
+      font-weight: 600;
+      margin-bottom: 6px
+    }
+
+    .cmp-h-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--fg);
+      line-height: 1.3
+    }
+
+    .cmp-h--win {
+      background: #f0f5fb;
+      border-radius: 12px 12px 0 0
+    }
+
+    .cmp-h--win .cmp-h-label {
+      color: var(--sapphire)
+    }
+
+    .cmp-h--win .cmp-h-title {
+      color: var(--aperia-blue)
+    }
+
+    .cmp-cell--win {
+      background: #f0f5fb
+    }
+
+    .cmp>div:last-child {
+      border-radius: 0 0 12px 12px
+    }
+
+    /* mobile: one frame, title band above its two cells, radius on the frame only */
+    @media(max-width:700px) {
+      .cmp {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden
+      }
+
+      .cmp-dim--head {
+        display: none
+      }
+
+      .cmp>div,
+      .cmp>div:last-child {
+        padding: 14px;
+        border-radius: 0
+      }
+
+      .cmp>div:nth-child(n+4) {
+        border-top: none
+      }
+
+      /* the band carries the winner tint and the column rule straight through */
+      .cmp>div.cmp-dim {
+        grid-column: 1 / -1;
+        padding: 14px 14px 0;
+        background: linear-gradient(to right,
+            transparent 50%,
+            var(--border) 50%,
+            var(--border) calc(50% + 1px),
+            #f0f5fb calc(50% + 1px));
+        border-top: 1px solid var(--border)
+      }
+
+      .cmp-cell--win,
+      .cmp-h--win {
+        border-left: 1px solid var(--border)
+      }
+    }
+
+    /* ── Full-bleed imagery ── */
+    .bleed {
+      width: 100vw;
+      position: relative;
+      left: 50%;
+      margin: 52px 0 52px -50vw
+    }
+
+    .bleed img {
+      display: block;
+      width: 100%;
+      max-width: 1120px;
+      height: auto;
+      margin: 0 auto
+    }
+
+    .img-ph {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 300px;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 40px;
+      background: var(--muted);
+      border: 1px dashed var(--border);
+      border-radius: 12px
+    }
+
+    .img-ph-name {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--muted-fg)
+    }
+
+    .img-ph-hint {
+      font-size: 14px;
+      color: var(--med-gray)
+    }
+
+    .cap {
+      font-size: 13.5px;
+      letter-spacing: .02em;
+      color: var(--muted-fg);
+      text-align: center;
+      margin-top: 18px;
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.6
+    }
+
+    .cap strong {
+      color: var(--fg)
+    }
+
+    /* ── Key numbers ── */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin: 22px 0 0
+    }
+
+    .stat-card {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 26px 28px;
+      background: #fff
+    }
+
+    .stat-val {
+      font-size: 46px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -.025em;
+      color: var(--aperia-blue);
+      height: 46px;
+      margin-bottom: 14px
+    }
+
+    .stat-val.sm {
+      font-size: 32px;
+      padding-top: 12px
+    }
+
+    .stat-lbl {
+      font-size: 16px;
+      color: var(--muted-fg);
+      line-height: 1.55
+    }
+
+    .stat-row+.body-p {
+      margin-top: 22px
+    }
+
+    @media(max-width:700px) {
+      .stat-row {
+        grid-template-columns: 1fr
+      }
+    }
+
+    /* ── Screen anatomy ── */
+    .anatomy {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      background: #fff;
+      margin: 22px 0 0
+    }
+
+    .anat-row {
+      display: flex;
+      gap: 24px;
+      padding: 22px 28px;
+      align-items: flex-start
+    }
+
+    .anat-row+.anat-row {
+      border-top: 1px solid var(--border)
+    }
+
+    .anat-label {
+      flex: 0 0 220px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.6;
+      color: var(--aperia-blue)
+    }
+
+    .anat-num {
+      flex: 0 0 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--sapphire);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1;
+      margin-top: 2px
+    }
+
+    .anat-desc {
+      flex: 1;
+      font-size: 17px;
+      color: var(--muted-fg);
+      line-height: 1.6
+    }
+
+    @media(max-width:700px) {
+      .anat-row {
+        flex-direction: column;
+        gap: 8px;
+        padding: 20px 22px
+      }
+
+      .anat-label {
+        flex: none
+      }
+    }
+
+    /* ── Editorial step flow ── */
+    .estep {
+      display: flex;
+      gap: 22px;
+      padding: 16px 0;
+      position: relative
+    }
+
+    /* connector rail: badge centre is 16px padding + 19px radius from the row top */
+    .estep:has(+ .estep)::after,
+    .estep+.estep::before {
+      content: '';
+      position: absolute;
+      left: 18px;
+      width: 2px;
+      background: var(--border)
+    }
+
+    .estep:has(+ .estep)::after {
+      top: 35px;
+      bottom: 0
+    }
+
+    .estep+.estep::before {
+      top: 0;
+      height: 35px
+    }
+
+    .estep:first-child {
+      padding-top: 0
+    }
+
+    .body-p+.estep {
+      margin-top: 26px
+    }
+
+    .estep-num {
+      position: relative;
+      z-index: 1;
+      flex: 0 0 38px;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--sapphire);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700
+    }
+
+    .estep-body {
+      flex: 1;
+      min-width: 0
+    }
+
+    .estep-title {
+      font-size: clamp(20px, 2.4vw, 25px);
+      font-weight: 400;
+      margin-bottom: 8px;
+      letter-spacing: -.01em;
+      line-height: 1.3;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      min-height: 38px
+    }
+
+    .estep-desc {
+      font-size: 18px;
+      color: var(--muted-fg);
+      line-height: 1.7
+    }
+
+    .estep-desc strong {
+      color: var(--fg)
+    }
+
+    /* ── Prototype button ── */
+    .btn-proto {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 28px;
+      padding: 14px 28px;
+      background: var(--aperia-blue);
+      color: #fff;
+      border-radius: 100px;
+      text-decoration: none;
+      font-size: 14.5px;
+      font-weight: 600;
+      font-family: var(--sans);
+      box-shadow: 0 2px 8px rgba(0, 47, 103, .2)
+    }
+
+    .btn-proto svg {
+      display: block;
+      width: 17px;
+      height: 17px
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, .95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border)
+    }
+
+    .nav-inner {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 40px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0 16px
+    }
+
+    .nav-brand {
+      display: inline-flex;
+      align-items: center;
+      line-height: 0;
+      flex-shrink: 0;
+      height: 60px
+    }
+
+    .nav-brand svg {
+      display: block;
+      height: 26px;
+      width: auto
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 4px;
+      list-style: none;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      min-width: 0;
+      scrollbar-width: none;
+      /* own row under the brand, so seven links have space to breathe */
+      order: 3;
+      width: 100%;
+      margin-left: -11px;
+      padding-bottom: 12px
+    }
+
+    .nav-links::-webkit-scrollbar {
+      display: none
+    }
+
+    .nav-links a {
+      font-size: 13px;
+      color: var(--muted-fg);
+      text-decoration: none;
+      padding: 6px 11px;
+      border-radius: 6px;
+      transition: all .15s;
+      white-space: nowrap;
+      font-weight: 500
+    }
+
+    .nav-links a:hover {
+      color: var(--aperia-blue);
+      background: var(--muted)
+    }
+
+    .nav-burger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 6px;
+      border: none;
+      background: transparent;
+      flex-shrink: 0
+    }
+
+    .nav-burger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--aperia-blue);
+      border-radius: 2px;
+      transition: all .25s
+    }
+
+    .nav-burger.open span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg)
+    }
+
+    .nav-burger.open span:nth-child(2) {
+      opacity: 0
+    }
+
+    .nav-burger.open span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg)
+    }
+
+    .nav-drawer {
+      display: none;
+      position: fixed;
+      top: 60px;
+      left: 0;
+      right: 0;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      z-index: 99;
+      box-shadow: 0 8px 24px rgba(0, 47, 103, .1)
+    }
+
+    .nav-drawer.open {
+      display: block
+    }
+
+    .nav-drawer ul {
+      list-style: none;
+      padding: 14px 22px 18px
+    }
+
+    .nav-drawer ul li a {
+      display: block;
+      padding: 12px;
+      font-size: 16px;
+      color: var(--fg);
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 600
+    }
+
+    .nav-drawer ul li a:hover {
+      background: var(--muted);
+      color: var(--aperia-blue)
+    }
+
+    @media(max-width:700px) {
+      .nav-links {
+        display: none
+      }
+
+      .nav-burger {
+        display: flex
+      }
+    }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 0;
+      background: linear-gradient(120deg, var(--aperia-blue) 0%, var(--dark-blue) 55%, var(--sapphire) 130%);
+      position: relative;
+      overflow: hidden
+    }
+
+    .hero-inner {
+      padding: 150px 0 130px;
+      position: relative;
+      z-index: 1
+    }
+
+    .hero .eyebrow {
+      font-size: 13.5px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--sky-blue);
+      margin-bottom: 28px;
+      font-weight: 600
+    }
+
+    .hero h1 {
+      font-size: clamp(40px, 7.5vw, 92px);
+      font-weight: 800;
+      line-height: 1.02;
+      letter-spacing: -.03em;
+      max-width: 920px;
+      margin-bottom: 28px;
+      color: #fff
+    }
+
+    .hero h1 span {
+      color: var(--sky-blue);
+      font-weight: 400;
+      font-size: clamp(19px, 2.4vw, 28px);
+      line-height: 1.45;
+      display: block;
+      margin-top: 14px;
+      letter-spacing: -.005em
+    }
+
+    .hero-sub {
+      font-size: clamp(19px, 2vw, 22px);
+      color: #cfe0f0;
+      max-width: 640px;
+      line-height: 1.7;
+      font-weight: 300
+    }
+
+    .hero-shape {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+      width: auto;
+      z-index: 0;
+      opacity: 1
+    }
+
+    @media(max-width:700px) {
+      .hero-inner {
+        padding: 96px 0
+      }
+    }
+
+    /* ── Footer ── */
+    footer {
+      padding: 56px 0;
+      background: var(--aperia-blue)
+    }
+
+    footer .fbrand {
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 16px;
+      line-height: 0
+    }
+
+    footer .fbrand svg {
+      display: block;
+      height: 30px;
+      width: auto
+    }
+
+    footer p {
+      font-size: 13px;
+      color: #9fbedb
+    }
+
+    @media(max-width:700px) {
+      .wrap {
+        padding: 0 20px
+      }
+
+      .nav-inner {
+        padding: 0 20px
+      }
+
+      /* keep full-bleed images on the content gutter, not the screen edge */
+      .bleed {
+        padding: 0 20px;
+        margin: 40px 0 40px -50vw
+      }
+
+      body {
+        font-size: 17px
+      }
+    }
+
+    @media print {
+      nav {
+        display: none
+      }
+
+      section {
+        page-break-inside: avoid
+      }
+
+      .hero-shape {
+        display: none
+      }
+
+      .bleed {
+        width: 100%;
+        left: 0;
+        margin-left: 0
+      }
+    }
+
+    /* ── Live demo ── */
+    .demo {
+      display: flex;
+      gap: 48px;
+      align-items: center;
+      margin: 26px 0 0;
+      flex-wrap: wrap
+    }
+
+    .demo-phone {
+      flex: 0 0 330px;
+      max-width: 330px;
+      width: 100%;
+      aspect-ratio: 390/800;
+      border: 9px solid var(--black);
+      border-radius: 40px;
+      overflow: hidden;
+      background: var(--black);
+      box-shadow: 0 18px 50px rgba(0, 47, 103, .18)
+    }
+
+    .demo-frame {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      background: #fff
+    }
+
+    .demo-note {
+      flex: 1;
+      min-width: 300px
+    }
+
+    .demo-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--sapphire);
+      text-decoration: none
+    }
+
+    /* ── Have / missing ── */
+    .gap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin: 26px 0 0
+    }
+
+    .gap-card {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 24px;
+      background: #fff
+    }
+
+    .gap-card--miss {
+      border-color: #f0d9b8;
+      background: #fffcf6
+    }
+
+    .gap-label {
+      font-size: 12.5px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-weight: 600;
+      color: var(--success);
+      margin-bottom: 12px
+    }
+
+    .gap-card--miss .gap-label {
+      color: var(--warning)
+    }
+
+    .gap-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 16px;
+      color: var(--muted-fg);
+      line-height: 1.5
+    }
+
+    /* Not flex: the items contain inline <strong>, which flex would blow apart into
+       separate columns. Relative + absolute bullet keeps the text as one run. */
+    .gap-list div {
+      position: relative;
+      padding-left: 16px
+    }
+
+    .gap-list div::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 8px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--success)
+    }
+
+    .gap-card--miss .gap-list div::before {
+      background: var(--warning)
+    }
+
+    .gap-list strong {
+      color: var(--fg);
+      font-weight: 600
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: .88em
+    }
+
+    @media(max-width:700px) {
+      .gap {
+        grid-template-columns: 1fr
+      }
+
+      .demo-phone {
+        flex: 0 0 auto;
+        margin: 0 auto
+      }
+    }
+
+    /* ── Side-by-side panes ── */
+    .sxs {
+      display: grid;
+      grid-template-columns: 1fr 390px;
+      gap: 20px;
+      margin: 26px 0 0;
+      align-items: start
+    }
+
+    .sxs-pane {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+      overflow: hidden;
+      min-width: 0
+    }
+
+    .sxs-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--muted)
+    }
+
+    .sxs-name {
+      font-size: 12.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted-fg)
+    }
+
+    .sxs-pane--phone .sxs-name {
+      color: var(--sapphire)
+    }
+
+    .sxs-w {
+      font-size: 12px;
+      color: var(--med-gray)
+    }
+
+    .sxs-body {
+      padding: 16px
+    }
+
+    .sxs-note {
+      font-size: 13.5px;
+      color: var(--muted-fg);
+      margin-top: 12px;
+      line-height: 1.6
+    }
+
+    .sxs-note strong {
+      color: var(--fg)
+    }
+
+    @media(max-width:860px) {
+      .sxs {
+        grid-template-columns: 1fr
+      }
+
+      .sxs-pane--phone {
+        max-width: 390px
+      }
+    }
+
+    /* ── Demo internals ── */
+    .d-scroll {
+      overflow-x: auto
+    }
+
+    .d-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      white-space: nowrap
+    }
+
+    .d-table th {
+      text-align: left;
+      font-weight: 600;
+      color: var(--fg);
+      padding: 7px 10px;
+      border-bottom: 1px solid var(--border);
+      background: var(--muted)
+    }
+
+    .d-table td {
+      padding: 7px 10px;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted-fg);
+      font-variant-numeric: tabular-nums
+    }
+
+    .d-table tr:last-child td {
+      border-bottom: none
+    }
+
+    .d-table .num {
+      text-align: right
+    }
+
+    .d-tabs {
+      display: inline-flex;
+      gap: 2px;
+      padding: 3px;
+      background: var(--muted);
+      border-radius: 10px;
+      white-space: nowrap
+    }
+
+    .d-tab {
+      padding: 5px 12px;
+      border-radius: 7px;
+      font-size: 13px;
+      color: var(--muted-fg);
+      white-space: nowrap
+    }
+
+    .d-tab[aria-selected="true"] {
+      background: #fff;
+      color: var(--fg);
+      font-weight: 600;
+      box-shadow: 0 1px 2px rgba(0, 47, 103, .12)
+    }
+
+    .d-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted-fg)
+    }
+
+    .d-value {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--fg);
+      margin-top: 3px
+    }
+
+    .d-body {
+      font-size: 14px;
+      color: var(--muted-fg);
+      line-height: 1.6;
+      margin-top: 12px
+    }
+
+    .d-btns {
+      display: flex;
+      align-items: flex-end;
+      gap: 14px;
+      flex-wrap: wrap
+    }
+
+    .d-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 9px;
+      background: var(--aperia-blue);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600
+    }
+
+    .d-btn-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px
+    }
+
+    .d-btn-cap {
+      font-size: 10.5px;
+      color: var(--muted-fg);
+      white-space: nowrap
+    }
+
+    .d-ref {
+      width: 44px;
+      height: 44px;
+      border: 1px dashed var(--med-gray);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: var(--med-gray)
+    }
+
+    .d-legend {
+      margin-top: 10px;
+      line-height: 1.9
+    }
+
+    .d-key {
+      display: inline-block;
+      margin-right: 14px;
+      font-size: 12px;
+      color: var(--muted-fg);
+      white-space: nowrap
+    }
+
+    .d-key i {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 2px;
+      margin-right: 6px
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="ic-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+      stroke-linejoin="round">
+      <path d="M20 6 9 17l-5-5" />
+    </symbol>
+    <symbol id="ic-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+      stroke-linejoin="round">
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </symbol>
+    <symbol id="ic-arrow-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 12h14" />
+      <path d="m12 5 7 7-7 7" />
+    </symbol>
+  </svg>
+
+  <nav>
+    <div class="nav-inner">
+      <a href="#" class="nav-brand" aria-label="Aperia home">
+        <svg width="108" height="32" viewBox="0 0 135 40" fill="none" xmlns="http://www.w3.org/2000/svg" role="img"
+          aria-label="Aperia">
+          <g clip-path="url(#clip0_nav)">
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M22.9449 25.9157L25.7618 32.8812H32.9321L19.6159 1.63916H13.3163L0 32.8812H7.01664L9.83355 25.9157H22.9449ZM12.292 19.9234L16.3893 9.83377L20.5378 19.9234H12.292Z"
+              fill="#002F67" />
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M41.4854 29.8082C43.1243 31.7032 45.3266 33.3421 48.9118 33.3421C54.5456 33.3421 59.7184 28.9887 59.7184 21.1014V20.999C59.7184 13.0604 54.4432 8.70703 48.9118 8.70703C45.3779 8.70703 43.1243 10.346 41.4854 12.5483V9.11676H34.7249V40.0002H41.4854V29.8082ZM47.2216 14.392C50.3458 14.392 53.0091 17.0041 53.0091 20.9477V21.0502C53.0091 25.045 50.3458 27.6059 47.2216 27.6059C44.0462 27.6059 41.4342 24.9938 41.4342 21.0502V20.9477C41.4342 17.0041 44.0974 14.392 47.2216 14.392Z"
+              fill="#002F67" />
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M68.0154 23.3549H84.5583C84.6096 22.7403 84.6096 22.3305 84.5583 21.6647V21.5623C84.5583 14.8017 80.922 8.65576 72.9834 8.65576C66.0692 8.65576 61.2549 14.2896 61.2549 21.0501V21.1526C61.2549 28.4253 66.5302 33.4445 73.6493 33.4445C77.9514 33.4445 81.1781 31.7544 83.3804 28.9887L79.5391 25.5572C77.6953 27.2985 76.0564 28.0156 73.8029 28.0156C70.8323 28.0156 68.6813 26.4278 68.0154 23.3549ZM67.9643 19.1551C68.4764 16.0821 70.269 14.0847 73.0859 14.0847C75.9028 14.0847 77.6954 16.1333 78.1051 19.1551H67.9643Z"
+              fill="#002F67" />
+            <path
+              d="M101.357 15.7234C96.9015 15.7234 94.1358 18.4379 94.1358 24.1229V32.8809H87.3752V9.1165H94.1358V13.8796C95.5186 10.6018 97.721 8.45069 101.716 8.65555V15.7234H101.357Z"
+              fill="#002F67" />
+            <path d="M104.021 32.8811V9.1167H110.781V32.8811H104.021Z" fill="#002F67" />
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M128.809 30.32V32.8808H135.314V19.1036C135.314 12.6504 132.087 8.86035 124.712 8.86035C120.666 8.86035 118.105 9.6286 115.493 10.7554L117.183 15.877C119.334 15.1088 121.178 14.5966 123.739 14.5966C127.119 14.5966 128.861 16.1331 128.861 18.95V19.3597C127.17 18.7963 125.48 18.3866 123.073 18.3866C117.439 18.3866 113.496 20.7938 113.496 25.9666V26.0691C113.496 30.781 117.183 33.3418 121.639 33.3418C124.917 33.3418 127.17 32.1126 128.809 30.32ZM124.661 22.4327C126.3 22.4327 127.785 22.7912 128.963 23.3034V24.5326C128.963 26.9398 126.812 28.6811 123.688 28.6811C121.485 28.6811 120 27.6056 120 25.813V25.7106C120 23.6107 121.793 22.4327 124.661 22.4327Z"
+              fill="#002F67" />
+            <ellipse cx="107.401" cy="3.53393" rx="3.53393" ry="3.53393" fill="#002F67" />
+          </g>
+          <defs><clipPath id="clip0_nav"><rect width="135" height="40" fill="white" /></clipPath></defs>
+        </svg>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#typography">Typography</a></li>
+        <li><a href="#sizing">Sizing</a></li>
+        <li><a href="#behaviors">Mobile-Specific Behaviors</a></li>
+        <li><a href="#charts">Charts</a></li>
+        <li><a href="#table">Table</a></li>
+        <li><a href="#tabs">Tab And Segmented Controls</a></li>
+        <li><a href="#shadcn">What Shadcn Gives Us</a></li>
+        <li><a href="#recharts">What Recharts Gives Us</a></li>
+      </ul>
+      <button class="nav-burger" id="burger" aria-label="Menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+  <div class="nav-drawer" id="drawer">
+    <ul>
+      <li><a href="#typography">01 · Typography</a></li>
+      <li><a href="#sizing">02 · Sizing</a></li>
+      <li><a href="#behaviors">03 · Mobile-Specific Behaviors</a></li>
+      <li><a href="#charts">04 · Charts</a></li>
+      <li><a href="#table">05 · Table</a></li>
+      <li><a href="#tabs">06 · Tab And Segmented Controls</a></li>
+      <li><a href="#shadcn">07 · What Shadcn Gives Us</a></li>
+      <li><a href="#recharts">08 · What Recharts Gives Us</a></li>
+    </ul>
+  </div>
+
+  <header class="hero">
+    <svg class="hero-shape" viewBox="0 0 406.1 283.3" preserveAspectRatio="xMaxYMin meet" aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="heroGradA" x1="279.9" y1="319.7" x2="397.4" y2="-3.1" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#002f67" />
+          <stop offset="1" stop-color="#004583" />
+        </linearGradient>
+        <linearGradient id="heroGradB" x1="174.1" y1="306.1" x2="252.7" y2="90.3" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#002f67" />
+          <stop offset="1" stop-color="#0072bc" />
+        </linearGradient>
+      </defs>
+      <path fill="url(#heroGradA)" d="M406.6,283.3h-226.8l84.9-212.2C281.9,28.1,323.6-.2,369.9-.2L406.1,0l.5,283.3Z" />
+      <path fill="url(#heroGradB)" d="M247.4,283.3H111.3l50.9-127.3c10.3-25.8,35.3-42.8,63.2-42.8h90l-68,170.1Z" />
+    </svg>
+    <div class="wrap">
+      <div class="hero-inner">
+        <p class="eyebrow">Ask Nanci · Mobile Adaptation · August 2026</p>
+        <h1>What adapts, what does not<span>Eight aspects, and the gap in each</span></h1>
+        <p class="hero-sub">Where the app already handles a phone, where it does not, and which of
+          the gaps the design system could close for us.</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- 01 · TYPOGRAPHY -->
+  <section id="typography">
+    <div class="wrap">
+      <div class="chapter">
+        <div class="chapter-head">
+          <h2>Typography</h2>
+          <p class="lede">Type needs the least work of anything here. It never changes size between a computer and a phone, and mostly it does not need to.</p>
+        </div>
+      </div>
+
+      <div class="gap">
+        <div class="gap-card">
+          <div class="gap-label">What we have</div>
+          <div class="gap-list"><div>Panel type is already dense: a <strong>9px label</strong> over a <strong>12px value</strong>, built for a narrow column</div><div>It holds at 390px, and there is no smaller scale beneath it to reach for</div><div>Body copy wraps rather than shrinking</div></div>
+        </div>
+        <div class="gap-card gap-card--miss">
+          <div class="gap-label">What is missing</div>
+          <div class="gap-list"><div><strong>Nine of the eleven</strong> files containing inputs miss the 16px minimum, so iOS zooms the page when the field is focused</div><div>No line-length cap, so a paragraph runs the full width of a wide panel</div><div><strong>The design system offers no type-scale guidance</strong>, so every decision here is ours</div></div>
+        </div>
+      </div>
+      <div class="sxs">
+        <div class="sxs-pane">
+          <div class="sxs-head"><span class="sxs-name">On a computer</span><span class="sxs-w">1280px</span></div>
+          <div class="sxs-body"><div class="d-label">Merchant</div>
+          <div class="d-value">Harbor View Hotel</div>
+          <div class="d-label" style="margin-top:12px">Volume, this month</div>
+          <div class="d-value">$3,241,880</div>
+          <p class="d-body">Volume is up 14% from last month, led by a jump in card-present
+            transactions across the top five merchants.</p></div>
+        </div>
+        <div class="sxs-pane sxs-pane--phone">
+          <div class="sxs-head"><span class="sxs-name">On a phone</span><span class="sxs-w">390px</span></div>
+          <div class="sxs-body"><div class="d-label">Merchant</div>
+          <div class="d-value">Harbor View Hotel</div>
+          <div class="d-label" style="margin-top:12px">Volume, this month</div>
+          <div class="d-value">$3,241,880</div>
+          <p class="d-body">Volume is up 14% from last month, led by a jump in card-present
+            transactions across the top five merchants.</p></div>
+        </div>
+      </div>
+      <p class="sxs-note">Identical in both panes. <strong>The only responsive type rule in the codebase is the 16px input minimum</strong>, applied in two files out of eleven.</p>
+    </div>
+  </section>
+
+  <!-- 02 · SIZING -->
+  <section id="sizing">
+    <div class="wrap">
+      <div class="chapter">
+        <div class="chapter-head">
+          <h2>Sizing</h2>
+          <p class="lede">Controls are sized for a pointer on every screen. Nothing grows for touch, and the design system has no opinion about it either.</p>
+        </div>
+      </div>
+
+      <div class="gap">
+        <div class="gap-card">
+          <div class="gap-label">What we have</div>
+          <div class="gap-list"><div>Four consistent sizes: <strong>24, 28, 32 and 36px</strong></div><div>The send button was raised to 32px to match the design</div></div>
+        </div>
+        <div class="gap-card gap-card--miss">
+          <div class="gap-label">What is missing</div>
+          <div class="gap-list"><div><strong>No size reaches 44px</strong>, the minimum Apple and Material both give for touch</div><div><strong>Zero</strong> responsive size variants exist, so a phone gets exactly what a 1440px screen gets</div><div>At phone density 28px is roughly <strong>4.7mm</strong> of glass against the 9mm a fingertip needs</div><div>Shadcn ships no touch-target guidance, and its own default button is 36px</div></div>
+        </div>
+      </div>
+      <div class="sxs">
+        <div class="sxs-pane">
+          <div class="sxs-head"><span class="sxs-name">On a computer</span><span class="sxs-w">1280px</span></div>
+          <div class="sxs-body"><div class="d-btns"><div class="d-btn-wrap"><span class="d-btn" style="width:24px;height:24px">Ok</span><span class="d-btn-cap">xs &middot; 24px</span></div><div class="d-btn-wrap"><span class="d-btn" style="width:28px;height:28px">Ok</span><span class="d-btn-cap">sm &middot; 28px</span></div><div class="d-btn-wrap"><span class="d-btn" style="width:32px;height:32px">Ok</span><span class="d-btn-cap">default &middot; 32px</span></div><div class="d-btn-wrap"><span class="d-btn" style="width:36px;height:36px">Ok</span><span class="d-btn-cap">lg &middot; 36px</span></div>
+            <div class="d-btn-wrap"><span class="d-ref">44</span><span class="d-btn-cap">minimum</span></div>
+          </div></div>
+        </div>
+        <div class="sxs-pane sxs-pane--phone">
+          <div class="sxs-head"><span class="sxs-name">On a phone</span><span class="sxs-w">390px</span></div>
+          <div class="sxs-body"><div class="d-btns"><div class="d-btn-wrap"><span class="d-btn" style="width:24px;height:24px">Ok</span><span class="d-btn-cap">xs &middot; 24px</span></div><div class="d-btn-wrap"><span class="d-btn" style="width:28px;height:28px">Ok</span><span class="d-btn-cap">sm &middot; 28px</span></div><div class="d-btn-wrap"><span class="d-btn" style="width:32px;height:32px">Ok</span><span class="d-btn-cap">default &middot; 32px</span></div><div class="d-btn-wrap"><span class="d-btn" style="width:36px;height:36px">Ok</span><span class="d-btn-cap">lg &middot; 36px</span></div>
+            <div class="d-btn-wrap"><span class="d-ref">44</span><span class="d-btn-cap">minimum</span></div>
+          </div></div>
+        </div>
+      </div>
+      <p class="sxs-note">The dashed box is the 44px reference, not a size we ship. <strong>Every real control fits inside it.</strong></p>
+    </div>
+  </section>
+
+  <!-- 03 · MOBILE-SPECIFIC BEHAVIORS -->
+  <section id="behaviors">
+    <div class="wrap">
+      <div class="chapter">
+        <div class="chapter-head">
+          <h2>Mobile-Specific Behaviors</h2>
+          <p class="lede">The one area with real mobile work. Two surfaces change shape below the breakpoint, and several hooks exist only for phones.</p>
+        </div>
+      </div>
+
+      <div class="gap">
+        <div class="gap-card">
+          <div class="gap-label">What we have</div>
+          <div class="gap-list"><div>The <strong>Sidebar</strong> becomes a drawer over the conversation, 288px, from one button</div><div>The <strong>panel</strong> becomes a sheet that rests as a handle above the message box</div><div>A drag gesture with velocity, a scroll handoff, and a scrub that recedes the conversation</div><div>Keyboard inset and composer inset published and tracked live</div><div>The conversation is hidden from screen readers while a sheet is open</div></div>
+        </div>
+        <div class="gap-card gap-card--miss">
+          <div class="gap-label">What is missing</div>
+          <div class="gap-list"><div><strong>No safe-area insets anywhere.</strong> Zero uses of <span class="mono">env(safe-area-inset)</span>, so the composer sits in the home indicator on newer iPhones</div><div>Panel swap and close do not animate</div><div>One panel is reachable at a time, and the resting handle does not say which</div></div>
+        </div>
+      </div>
+
+      <div class="bleed">
+        <img
+          src="https://www.dl.dropboxusercontent.com/scl/fi/x3r7k01nhe5219s02bllb/image-2.jpg?rlkey=5fgcvxg1phly5cjf5j10px167&amp;st=efiugj01&amp;dl=0"
+          alt="A phone with the sidebar closed, and the same phone with the sidebar open as a drawer"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="img-ph"><span class="img-ph-name">Sidebar</span><span class="img-ph-hint">Screenshot unavailable</span></div>
+        <p class="cap"><strong>Sidebar</strong> &middot; closed, and open over the conversation</p>
+      </div>
+
+      <div class="bleed">
+        <img
+          src="https://www.dl.dropboxusercontent.com/scl/fi/5bmi8disghngaq6ldnuci/image-3.jpg?rlkey=nzkooqxs5m6r1nwwve0r9bnf1&amp;st=mksvcatc&amp;dl=0"
+          alt="A phone with the panel open, and the same phone with the panel resting as a handle"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="img-ph"><span class="img-ph-name">Panel</span><span class="img-ph-hint">Screenshot unavailable</span></div>
+        <p class="cap"><strong>Panel</strong> &middot; open, and resting as a handle</p>
+      </div>
+
+      <div class="demo">
+        <div class="demo-phone">
+          <iframe class="demo-frame" src="https://aperia-ask-nanci-embed.vercel.app/?mode=concept&amp;flow=2&amp;panelui=swipe&amp;autoplay" title="The running app at phone size" loading="lazy"></iframe>
+        </div>
+        <div class="demo-note">
+          <p class="sxs-note" style="margin-top:0">The running app at phone size. Drag the card down by its top edge,
+            then drag the handle back up. <strong>A mouse works the same way a thumb does.</strong></p>
+          <a class="demo-link" style="margin-top:14px" href="https://aperia-ask-nanci-embed.vercel.app/?mode=concept&amp;flow=2&amp;panelui=swipe&amp;autoplay" target="_blank" rel="noopener noreferrer">Open it full size <svg>
+              <use href="#ic-arrow-r" />
+            </svg></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 · CHARTS -->
+  <section id="charts">
+    <div class="wrap">
+      <div class="chapter">
+        <div class="chapter-head">
+          <h2>Charts</h2>
+          <p class="lede">Recharts sizes a chart to any box and thins its own axis ticks. We have switched that thinning off, and we are one version behind a fix for the legend.</p>
+        </div>
+      </div>
+
+      <div class="gap">
+        <div class="gap-card">
+          <div class="gap-label">What we have</div>
+          <div class="gap-list"><div><strong>ResponsiveContainer</strong> in five places, so a chart fills whatever box it is given</div><div>Recharts thins colliding tick labels by default (<span class="mono">interval=&quot;preserveEnd&quot;</span>)</div><div>The legend was rebuilt as a normal element beneath the chart, so it wraps and takes its real height</div><div>Tooltips already respond to a tap</div></div>
+        </div>
+        <div class="gap-card gap-card--miss">
+          <div class="gap-label">What is missing</div>
+          <div class="gap-list"><div><strong>We set <span class="mono">interval={0}</span> in three charts</strong>, which forces every tick and disables the one adaptation Recharts gives us</div><div><strong>We are on recharts 3.8.1</strong>, which has a legend-overlap regression fixed in 3.9.0. Bumping is a free win</div><div>The <span class="mono">responsive</span> prop (3.3+) supersedes ResponsiveContainer and drops its sized-parent requirement, which is what bites in flex layouts</div><div>Default chart margin is 5px on every side, so long or rotated labels clip</div><div>Tooltips still trigger on hover, where <span class="mono">trigger=&quot;click&quot;</span> suits a phone</div></div>
+        </div>
+      </div>
+      <div class="sxs">
+        <div class="sxs-pane">
+          <div class="sxs-head"><span class="sxs-name">On a computer</span><span class="sxs-w">1280px</span></div>
+          <div class="sxs-body"><svg width="100%" height="150" role="img" aria-label="Monthly volume by channel"><line x1="0" x2="100%" y1="8.0" y2="8.0" stroke="#e3e6ea" stroke-width="1" /><line x1="0" x2="100%" y1="46.7" y2="46.7" stroke="#e3e6ea" stroke-width="1" /><line x1="0" x2="100%" y1="85.3" y2="85.3" stroke="#e3e6ea" stroke-width="1" /><line x1="0" x2="100%" y1="124.0" y2="124.0" stroke="#e3e6ea" stroke-width="1" /><rect x="2.25%" y="33.5" width="2.50%" height="90.5" fill="#002F67" rx="1" /><rect x="5.00%" y="75.3" width="2.50%" height="48.7" fill="#0072BC" rx="1" /><rect x="7.75%" y="103.1" width="2.50%" height="20.9" fill="#7ED3F7" rx="1" /><rect x="14.75%" y="26.6" width="2.50%" height="97.4" fill="#002F67" rx="1" /><rect x="17.50%" y="70.6" width="2.50%" height="53.4" fill="#0072BC" rx="1" /><rect x="20.25%" y="100.8" width="2.50%" height="23.2" fill="#7ED3F7" rx="1" /><rect x="27.25%" y="40.5" width="2.50%" height="83.5" fill="#002F67" rx="1" /><rect x="30.00%" y="77.6" width="2.50%" height="46.4" fill="#0072BC" rx="1" /><rect x="32.75%" y="105.4" width="2.50%" height="18.6" fill="#7ED3F7" rx="1" /><rect x="39.75%" y="21.9" width="2.50%" height="102.1" fill="#002F67" rx="1" /><rect x="42.50%" y="66.0" width="2.50%" height="58.0" fill="#0072BC" rx="1" /><rect x="45.25%" y="98.5" width="2.50%" height="25.5" fill="#7ED3F7" rx="1" /><rect x="52.25%" y="13.8" width="2.50%" height="110.2" fill="#002F67" rx="1" /><rect x="55.00%" y="60.2" width="2.50%" height="63.8" fill="#0072BC" rx="1" /><rect x="57.75%" y="96.2" width="2.50%" height="27.8" fill="#7ED3F7" rx="1" /><rect x="64.75%" y="8.0" width="2.50%" height="116.0" fill="#002F67" rx="1" /><rect x="67.50%" y="56.7" width="2.50%" height="67.3" fill="#0072BC" rx="1" /><rect x="70.25%" y="93.8" width="2.50%" height="30.2" fill="#7ED3F7" rx="1" /><rect x="77.25%" y="18.4" width="2.50%" height="105.6" fill="#002F67" rx="1" /><rect x="80.00%" y="63.7" width="2.50%" height="60.3" fill="#0072BC" rx="1" /><rect x="82.75%" y="99.6" width="2.50%" height="24.4" fill="#7ED3F7" rx="1" /><rect x="89.75%" y="11.5" width="2.50%" height="112.5" fill="#002F67" rx="1" /><rect x="92.50%" y="53.2" width="2.50%" height="70.8" fill="#0072BC" rx="1" /><rect x="95.25%" y="91.5" width="2.50%" height="32.5" fill="#7ED3F7" rx="1" /><text x="6.25%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">January</text><text x="18.75%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">February</text><text x="31.25%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">March</text><text x="43.75%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">April</text><text x="56.25%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">May</text><text x="68.75%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">June</text><text x="81.25%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">July</text><text x="93.75%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">August</text></svg><div class="d-legend"><span class="d-key"><i style="background:#002F67"></i>Card present</span><span class="d-key"><i style="background:#0072BC"></i>E-commerce</span><span class="d-key"><i style="background:#7ED3F7"></i>Keyed</span></div></div>
+        </div>
+        <div class="sxs-pane sxs-pane--phone">
+          <div class="sxs-head"><span class="sxs-name">On a phone</span><span class="sxs-w">390px</span></div>
+          <div class="sxs-body"><svg width="100%" height="150" role="img" aria-label="Monthly volume by channel"><line x1="0" x2="100%" y1="8.0" y2="8.0" stroke="#e3e6ea" stroke-width="1" /><line x1="0" x2="100%" y1="46.7" y2="46.7" stroke="#e3e6ea" stroke-width="1" /><line x1="0" x2="100%" y1="85.3" y2="85.3" stroke="#e3e6ea" stroke-width="1" /><line x1="0" x2="100%" y1="124.0" y2="124.0" stroke="#e3e6ea" stroke-width="1" /><rect x="2.25%" y="33.5" width="2.50%" height="90.5" fill="#002F67" rx="1" /><rect x="5.00%" y="75.3" width="2.50%" height="48.7" fill="#0072BC" rx="1" /><rect x="7.75%" y="103.1" width="2.50%" height="20.9" fill="#7ED3F7" rx="1" /><rect x="14.75%" y="26.6" width="2.50%" height="97.4" fill="#002F67" rx="1" /><rect x="17.50%" y="70.6" width="2.50%" height="53.4" fill="#0072BC" rx="1" /><rect x="20.25%" y="100.8" width="2.50%" height="23.2" fill="#7ED3F7" rx="1" /><rect x="27.25%" y="40.5" width="2.50%" height="83.5" fill="#002F67" rx="1" /><rect x="30.00%" y="77.6" width="2.50%" height="46.4" fill="#0072BC" rx="1" /><rect x="32.75%" y="105.4" width="2.50%" height="18.6" fill="#7ED3F7" rx="1" /><rect x="39.75%" y="21.9" width="2.50%" height="102.1" fill="#002F67" rx="1" /><rect x="42.50%" y="66.0" width="2.50%" height="58.0" fill="#0072BC" rx="1" /><rect x="45.25%" y="98.5" width="2.50%" height="25.5" fill="#7ED3F7" rx="1" /><rect x="52.25%" y="13.8" width="2.50%" height="110.2" fill="#002F67" rx="1" /><rect x="55.00%" y="60.2" width="2.50%" height="63.8" fill="#0072BC" rx="1" /><rect x="57.75%" y="96.2" width="2.50%" height="27.8" fill="#7ED3F7" rx="1" /><rect x="64.75%" y="8.0" width="2.50%" height="116.0" fill="#002F67" rx="1" /><rect x="67.50%" y="56.7" width="2.50%" height="67.3" fill="#0072BC" rx="1" /><rect x="70.25%" y="93.8" width="2.50%" height="30.2" fill="#7ED3F7" rx="1" /><rect x="77.25%" y="18.4" width="2.50%" height="105.6" fill="#002F67" rx="1" /><rect x="80.00%" y="63.7" width="2.50%" height="60.3" fill="#0072BC" rx="1" /><rect x="82.75%" y="99.6" width="2.50%" height="24.4" fill="#7ED3F7" rx="1" /><rect x="89.75%" y="11.5" width="2.50%" height="112.5" fill="#002F67" rx="1" /><rect x="92.50%" y="53.2" width="2.50%" height="70.8" fill="#0072BC" rx="1" /><rect x="95.25%" y="91.5" width="2.50%" height="32.5" fill="#7ED3F7" rx="1" /><text x="6.25%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">January</text><text x="18.75%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">February</text><text x="31.25%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">March</text><text x="43.75%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">April</text><text x="56.25%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">May</text><text x="68.75%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">June</text><text x="81.25%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">July</text><text x="93.75%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">August</text></svg><div class="d-legend"><span class="d-key"><i style="background:#002F67"></i>Card present</span><span class="d-key"><i style="background:#0072BC"></i>E-commerce</span><span class="d-key"><i style="background:#7ED3F7"></i>Keyed</span></div></div>
+        </div>
+      </div>
+      <p class="sxs-note">The same chart in a narrower box, at the same text size. <strong>On the phone the month labels run together</strong>, which is what tick thinning exists to prevent and what <span class="mono">interval={0}</span> switches off.</p>
+    </div>
+  </section>
+
+  <!-- 05 · TABLE -->
+  <section id="table">
+    <div class="wrap">
+      <div class="chapter">
+        <div class="chapter-head">
+          <h2>Table</h2>
+          <p class="lede">Handled, but not by us. The design system already shipped the fix, and we added a second one on top that does nothing.</p>
+        </div>
+      </div>
+
+      <div class="gap">
+        <div class="gap-card">
+          <div class="gap-label">What we have</div>
+          <div class="gap-list"><div><strong>Shadcn's Table ships its own scroll container</strong>, and that is the element that actually scrolls</div><div>Nothing is hidden and nothing restacks into cards, so the figures keep one order</div><div>No panel hand-rolls a table, so the treatment is universal</div></div>
+        </div>
+        <div class="gap-card gap-card--miss">
+          <div class="gap-label">What is missing</div>
+          <div class="gap-list"><div><strong>Our extra wrapper is inert.</strong> We added a second <span class="mono">overflow-x-auto</span> around a table that was already wrapped; measured on a phone, it never scrolls</div><div>No cue that columns continue past the right edge</div><div>No sticky first column, and shadcn ships neither that nor column priority</div></div>
+        </div>
+      </div>
+      <div class="sxs">
+        <div class="sxs-pane">
+          <div class="sxs-head"><span class="sxs-name">On a computer</span><span class="sxs-w">1280px</span></div>
+          <div class="sxs-body"><div class="d-scroll">
+            <table class="d-table">
+              <thead><tr><th>#</th><th>Merchant</th><th class="num">Volume</th><th class="num">Txns</th><th class="num">Avg ticket</th></tr></thead>
+              <tbody><tr><td>1</td><td>Harbor View Hotel</td><td class="num">$3,241,880</td><td class="num">14,312</td><td class="num">$226.50</td></tr><tr><td>2</td><td>Summit Auto Group</td><td class="num">$2,918,440</td><td class="num">1,047</td><td class="num">$2,787.00</td></tr><tr><td>3</td><td>Coastal Fresh Market</td><td class="num">$2,104,320</td><td class="num">41,208</td><td class="num">$51.06</td></tr><tr><td>4</td><td>Pinnacle Dental Group</td><td class="num">$1,876,200</td><td class="num">3,881</td><td class="num">$483.40</td></tr></tbody>
+            </table>
+          </div></div>
+        </div>
+        <div class="sxs-pane sxs-pane--phone">
+          <div class="sxs-head"><span class="sxs-name">On a phone</span><span class="sxs-w">390px</span></div>
+          <div class="sxs-body"><div class="d-scroll">
+            <table class="d-table">
+              <thead><tr><th>#</th><th>Merchant</th><th class="num">Volume</th><th class="num">Txns</th><th class="num">Avg ticket</th></tr></thead>
+              <tbody><tr><td>1</td><td>Harbor View Hotel</td><td class="num">$3,241,880</td><td class="num">14,312</td><td class="num">$226.50</td></tr><tr><td>2</td><td>Summit Auto Group</td><td class="num">$2,918,440</td><td class="num">1,047</td><td class="num">$2,787.00</td></tr><tr><td>3</td><td>Coastal Fresh Market</td><td class="num">$2,104,320</td><td class="num">41,208</td><td class="num">$51.06</td></tr><tr><td>4</td><td>Pinnacle Dental Group</td><td class="num">$1,876,200</td><td class="num">3,881</td><td class="num">$483.40</td></tr></tbody>
+            </table>
+          </div></div>
+        </div>
+      </div>
+      <p class="sxs-note">Drag either table sideways. <strong>The left one fits; the right one scrolls</strong>, which is the shipped behaviour.</p>
+    </div>
+  </section>
+
+  <!-- 06 · TAB AND SEGMENTED CONTROLS -->
+  <section id="tabs">
+    <div class="wrap">
+      <div class="chapter">
+        <div class="chapter-head">
+          <h2>Tab And Segmented Controls</h2>
+          <p class="lede">A tab strip wider than the screen loses its tabs. Shadcn has never fixed this, so the fix is ours and it is opt-in.</p>
+        </div>
+      </div>
+
+      <div class="gap">
+        <div class="gap-card">
+          <div class="gap-label">What we have</div>
+          <div class="gap-list"><div><strong>SegmentedGroup</strong> takes a <span class="mono">scrollable</span> prop that wraps it in a scroll area</div><div>Labels never shrink, so nothing becomes unreadable</div></div>
+        </div>
+        <div class="gap-card gap-card--miss">
+          <div class="gap-label">What is missing</div>
+          <div class="gap-list"><div><strong>Opt-in, not default.</strong> A plain TabsList still clips</div><div><strong>Shadcn ships nothing for tab overflow</strong> and no official scrollable example. The community issue was closed stale</div><div>No edge fade or arrow to say more tabs exist, and the selected tab is not scrolled into view</div></div>
+        </div>
+      </div>
+      <div class="sxs">
+        <div class="sxs-pane">
+          <div class="sxs-head"><span class="sxs-name">On a computer</span><span class="sxs-w">1280px</span></div>
+          <div class="sxs-body"><div class="d-scroll"><div class="d-tabs"><span class="d-tab">This week</span><span class="d-tab" aria-selected="true">This month</span><span class="d-tab">This quarter</span><span class="d-tab">This year</span><span class="d-tab">All time</span></div></div></div>
+        </div>
+        <div class="sxs-pane sxs-pane--phone">
+          <div class="sxs-head"><span class="sxs-name">On a phone</span><span class="sxs-w">390px</span></div>
+          <div class="sxs-body"><div class="d-scroll"><div class="d-tabs"><span class="d-tab">This week</span><span class="d-tab" aria-selected="true">This month</span><span class="d-tab">This quarter</span><span class="d-tab">This year</span><span class="d-tab">All time</span></div></div></div>
+        </div>
+      </div>
+      <p class="sxs-note">Five periods fit on a computer. <strong>On a phone the last sits past the edge</strong>, reachable only because this strip is set to scroll.</p>
+    </div>
+  </section>
+
+  <!-- 07 · WHAT SHADCN GIVES US -->
+  <section id="shadcn">
+    <div class="wrap">
+      <div class="chapter">
+        <div class="chapter-head">
+          <h2>What Shadcn Gives Us</h2>
+          <p class="lede">More than we use. One thing we hand-built already existed in the system, and we arrived at the same number it did.</p>
+        </div>
+      </div>
+
+      <div class="gap">
+        <div class="gap-card">
+          <div class="gap-label">What we have</div>
+          <div class="gap-list"><div><strong>Sidebar swaps to a Sheet below 768px</strong> at a built-in <span class="mono">SIDEBAR_WIDTH_MOBILE</span> of 18rem</div><div>Table ships a horizontal scroll container</div><div>Sheet, Drawer and ScrollArea are all available</div><div>The responsive-dialog pattern is official: Dialog on a computer, Drawer on a phone</div></div>
+        </div>
+        <div class="gap-card gap-card--miss">
+          <div class="gap-label">What is missing</div>
+          <div class="gap-list"><div><strong>We do not use the Sidebar primitive.</strong> Ours reimplements the swap and independently landed on 288px, which is that same 18rem</div><div><strong>No breakpoint hook is exported.</strong> It exists inside the bundle but is reachable only through <span class="mono">useSidebar()</span>, so ours is hand-built</div><div>The official responsive-dialog example depends on a media-query hook that <strong>is not shipped</strong></div><div>The Drawer could not carry the panel sheet: it renders in its own portal, over the composer, and keeping the composer usable is the point</div><div>Nothing on touch targets or type scale</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 · WHAT RECHARTS GIVES US -->
+  <section id="recharts">
+    <div class="wrap">
+      <div class="chapter">
+        <div class="chapter-head">
+          <h2>What Recharts Gives Us</h2>
+          <p class="lede">It makes a chart fit any width and thins its own ticks. Everything about the width being small is left to us.</p>
+        </div>
+      </div>
+
+      <div class="gap">
+        <div class="gap-card">
+          <div class="gap-label">What we have</div>
+          <div class="gap-list"><div><strong>ResponsiveContainer</strong> measures the parent and redraws at its size</div><div><strong>Tick thinning is on by default</strong>, and it measures the label text to decide</div><div>Touch is wired through: tooltips answer a tap, and Brush drags</div><div>A newer <span class="mono">responsive</span> prop removes the sized-parent requirement</div></div>
+        </div>
+        <div class="gap-card gap-card--miss">
+          <div class="gap-label">What is missing</div>
+          <div class="gap-list"><div><strong>The built-in Legend is absolutely positioned and never reports its height</strong>, so the space for it is a fixed guess: too small and it clips, too big and it leaves a gap. We replaced it</div><div>Neither ResponsiveContainer nor ChartContainer is legend-aware, so that guess sits on top of both</div><div><strong>No mobile mode of any kind.</strong> Label formatting, tick density, margins and legend placement are all ours</div><div>Nothing widens the 5px default margin as labels grow</div></div>
+        </div>
+      </div>
+      <div class="sxs">
+        <div class="sxs-pane">
+          <div class="sxs-head"><span class="sxs-name">On a computer</span><span class="sxs-w">1280px</span></div>
+          <div class="sxs-body"><div class="d-legend"><span class="d-key"><i style="background:#002F67"></i>Card present</span><span class="d-key"><i style="background:#004785"></i>E-commerce</span><span class="d-key"><i style="background:#0072BC"></i>Keyed</span><span class="d-key"><i style="background:#7ED3F7"></i>Wallet</span><span class="d-key"><i style="background:#C8EAF5"></i>ACH</span></div></div>
+        </div>
+        <div class="sxs-pane sxs-pane--phone">
+          <div class="sxs-head"><span class="sxs-name">On a phone</span><span class="sxs-w">390px</span></div>
+          <div class="sxs-body"><div class="d-legend"><span class="d-key"><i style="background:#002F67"></i>Card present</span><span class="d-key"><i style="background:#004785"></i>E-commerce</span><span class="d-key"><i style="background:#0072BC"></i>Keyed</span><span class="d-key"><i style="background:#7ED3F7"></i>Wallet</span><span class="d-key"><i style="background:#C8EAF5"></i>ACH</span></div></div>
+        </div>
+      </div>
+      <p class="sxs-note">Five entries on one line on a computer. <strong>On the phone they wrap and the block gets taller</strong>, and that new height is what recharts never reports back to the chart.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <div class="fbrand">
+        <svg width="135" height="40" viewBox="0 0 135 40" fill="none" xmlns="http://www.w3.org/2000/svg" role="img"
+          aria-label="Aperia">
+          <g clip-path="url(#clip0_ftr)">
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M22.9449 25.9157L25.7618 32.8812H32.9321L19.6159 1.63916H13.3163L0 32.8812H7.01664L9.83355 25.9157H22.9449ZM12.292 19.9234L16.3893 9.83377L20.5378 19.9234H12.292Z"
+              fill="#FFFFFF" />
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M41.4854 29.8082C43.1243 31.7032 45.3266 33.3421 48.9118 33.3421C54.5456 33.3421 59.7184 28.9887 59.7184 21.1014V20.999C59.7184 13.0604 54.4432 8.70703 48.9118 8.70703C45.3779 8.70703 43.1243 10.346 41.4854 12.5483V9.11676H34.7249V40.0002H41.4854V29.8082ZM47.2216 14.392C50.3458 14.392 53.0091 17.0041 53.0091 20.9477V21.0502C53.0091 25.045 50.3458 27.6059 47.2216 27.6059C44.0462 27.6059 41.4342 24.9938 41.4342 21.0502V20.9477C41.4342 17.0041 44.0974 14.392 47.2216 14.392Z"
+              fill="#FFFFFF" />
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M68.0154 23.3549H84.5583C84.6096 22.7403 84.6096 22.3305 84.5583 21.6647V21.5623C84.5583 14.8017 80.922 8.65576 72.9834 8.65576C66.0692 8.65576 61.2549 14.2896 61.2549 21.0501V21.1526C61.2549 28.4253 66.5302 33.4445 73.6493 33.4445C77.9514 33.4445 81.1781 31.7544 83.3804 28.9887L79.5391 25.5572C77.6953 27.2985 76.0564 28.0156 73.8029 28.0156C70.8323 28.0156 68.6813 26.4278 68.0154 23.3549ZM67.9643 19.1551C68.4764 16.0821 70.269 14.0847 73.0859 14.0847C75.9028 14.0847 77.6954 16.1333 78.1051 19.1551H67.9643Z"
+              fill="#FFFFFF" />
+            <path
+              d="M101.357 15.7234C96.9015 15.7234 94.1358 18.4379 94.1358 24.1229V32.8809H87.3752V9.1165H94.1358V13.8796C95.5186 10.6018 97.721 8.45069 101.716 8.65555V15.7234H101.357Z"
+              fill="#FFFFFF" />
+            <path d="M104.021 32.8811V9.1167H110.781V32.8811H104.021Z" fill="#FFFFFF" />
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M128.809 30.32V32.8808H135.314V19.1036C135.314 12.6504 132.087 8.86035 124.712 8.86035C120.666 8.86035 118.105 9.6286 115.493 10.7554L117.183 15.877C119.334 15.1088 121.178 14.5966 123.739 14.5966C127.119 14.5966 128.861 16.1331 128.861 18.95V19.3597C127.17 18.7963 125.48 18.3866 123.073 18.3866C117.439 18.3866 113.496 20.7938 113.496 25.9666V26.0691C113.496 30.781 117.183 33.3418 121.639 33.3418C124.917 33.3418 127.17 32.1126 128.809 30.32ZM124.661 22.4327C126.3 22.4327 127.785 22.7912 128.963 23.3034V24.5326C128.963 26.9398 126.812 28.6811 123.688 28.6811C121.485 28.6811 120 27.6056 120 25.813V25.7106C120 23.6107 121.793 22.4327 124.661 22.4327Z"
+              fill="#FFFFFF" />
+            <ellipse cx="107.401" cy="3.53393" rx="3.53393" ry="3.53393" fill="#FFFFFF" />
+          </g>
+          <defs><clipPath id="clip0_ftr"><rect width="135" height="40" fill="white" /></clipPath></defs>
+        </svg>
+      </div>
+      <p>Mobile Adaptation · Ask Nanci · August 2026</p>
+    </div>
+  </footer>
+
+  <script>
+    const burger = document.getElementById('burger');
+    const drawer = document.getElementById('drawer');
+    burger.addEventListener('click', () => {
+      const open = drawer.classList.toggle('open');
+      burger.classList.toggle('open', open);
+      burger.setAttribute('aria-expanded', open);
+    });
+    drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      drawer.classList.remove('open');
+      burger.classList.remove('open');
+      burger.setAttribute('aria-expanded', false);
+    }));
+  </script>
+</body>
+
+</html>
