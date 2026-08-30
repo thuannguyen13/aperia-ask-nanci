@@ -1,12 +1,10 @@
----
-paths:
-  - "components/ask-nanci/**"
----
+# Panel design rules and visual language
 
-# Panel design rules
+**Read when:** deciding what goes inside a panel; colors, type, or picking a pattern
 
-How a panel should look and what it should contain. The mechanics of registering and
-opening one stay in CLAUDE.md ("One unified panel stack", "Adding a new panel").
+How a panel should look and what it should contain. The recipe for building one, and the shared
+primitives to build it from, are in `docs/ui/actions/add-panel.md`; the registry and open stack are
+in `docs/ui/panels.md`.
 
 ## Generative UI content rules
 
@@ -131,3 +129,20 @@ Panels slide in by transitioning `width` and `opacity`. The panel is always moun
 - Use `pointer-events-none` when closed to prevent invisible click targets
 - Use `border-transparent` when closed to hide the border without layout shift
 - Width percentage is typically 55–58% for a single panel, 50/50 split for two columns
+
+## Visual DNA
+
+The user finds visual problems hard to put into words and wants a named design language so words
+become *pointers* rather than descriptions rebuilt from memory. Agreed direction:
+
+- **Feel — precise & trustworthy.** Bank/analytics-tool rigor: tight, exact, monospace figures,
+  restrained color. Confidence through rigor, not friendliness. (Closest to what the code already
+  does.)
+- **Density — adaptive.** Dense and efficient for data panels (tables, queues); calm and spacious
+  for answer/summary panels. Density follows the data shape.
+
+How to help the user pin down a visual direction is working style, not architecture: see
+`.claude/working-style.md`.
+
+A rendered design-language reference page (every token, pattern and state side by side) is agreed
+but deferred until after the current demo.

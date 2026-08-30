@@ -15,7 +15,8 @@
     "e2e": "playwright test",
     "e2e:ui": "playwright test --ui",
     "demo:urls": "tsx scripts/demo-urls.ts",
-    "fallow": "npx fallow"
+    "fallow": "npx fallow",
+    "check:docs": "tsx scripts/check-docs.ts"
   },
   "dependencies": {
     "@lottiefiles/dotlottie-react": "^0.19.2",

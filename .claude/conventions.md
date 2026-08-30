@@ -1,0 +1,43 @@
+# Coding conventions
+
+**Read when:** naming a file, function, hook or constant
+
+Audited 2026-07-22 against the standard React conventions. The repo follows them, with one
+deliberate divergence worth not re-litigating.
+
+- **Components:** PascalCase file named for the component (`PanelTable.tsx` → `PanelTable`).
+  Multi-component modules are named for their role instead (`offer-shared.tsx`, `charts.tsx`,
+  `ChatMessage.tsx` → `UserMessage`/`BotMessage`) — that's intentional, not drift.
+- **Non-component files: kebab-case** — `stream-words.ts`, `panel-actions.ts`, `use-panel-stack.ts`.
+  **Not camelCase.** The generic React convention says camelCase, but that's the Create-React-App
+  rule; the Next.js ecosystem is kebab, and so is this stack: Next.js core ships
+  `add-base-path.js`/`app-bootstrap.js`, `aperia-ds5` ships `theme-provider.ts`, and the App
+  Router *mandates* lowercase for `page.tsx`/`not-found.tsx`/`global-error.tsx`. All 47
+  non-component files are kebab as of 2026-07-22. Don't convert to camelCase — it would put the
+  repo out of step with both Next.js and our own design system.
+- **Identifiers stay camelCase** — only filenames are kebab. `use-chat-scroll.ts` exports
+  `useChatScroll`.
+- **Filenames mirror what the file *is*, so the verb rule does not apply to them.** A file whose
+  only export is one function takes that function's name (`stream-words.ts` → `streamWords`), and
+  reads verb-first because the *function* does. A module or collection takes the domain noun
+  (`session-store.ts`, `source-store.ts`, `panel-actions.ts`, `mock-data.ts`). An executable in
+  `scripts/` is named for the action it performs (`check-flows.ts`). Next.js splits it the same
+  way: `add-base-path.js` exports the single `addBasePath`; `app-bootstrap.js` is a module. So
+  `session-store.ts` is correct and `store-session.ts` would not be — it has three exports, and
+  "store" there is the noun (*the store for sessions*), not the verb.
+- **Functions are verbs, values are nouns.** A non-component function name starts with a verb
+  describing what it does (`fetchSessions`, `parseMode`, `turnToPanelActions`, `formatCurrency`);
+  variables, objects and data exports are nouns or adjectives (`userData`, `FLAGS`, `isActive`).
+  Boolean-returning helpers keep the `is`/`has`/`should` predicate form (`isAtBottom`,
+  `hasRoomForAnswer`, `shouldFollowToBottom`) — that is the intended exception, not a violation.
+  **Exempt:** terse fixture builders inside `*.test.ts` (`bank()`, `user()`, `turn()`, `p()`) and
+  local helpers inside one-off `scripts/` — renaming those adds noise without adding clarity.
+  Audited 2026-07-22: production code follows this, and re-checked 2026-08-29 with no exported
+  violations outstanding. The one that was open, `themeLogos(id)` in `data/theme-logos.ts`, has
+  since been renamed to `getThemeLogos`.
+- **Hooks** `use*` (7/7), **callback props** `on*` (13/13), **constants** `UPPER_SNAKE_CASE`,
+  **contexts** suffixed `Context` (never `Ctx`).
+- **Known gap, deliberately not fixed:** 0 of 34 boolean states use an `is`/`has`/`should` prefix.
+  There is a consistent internal pattern instead (`kbOpen`, `settingsOpen`, `sheetOpen`), which is
+  fine. Bulk-renaming them is a large diff with no user-facing gain — same call as the panel
+  type-tier drift.
