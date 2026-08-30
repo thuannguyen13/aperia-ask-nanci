@@ -22,7 +22,32 @@ Every demo is a relative path, appended to the dev server address or to the depl
 - `/?mode=concept-embed&flow=18` — one story, no sidebar
 - `&autoplay` — start the story on load instead of waiting for the Ask button
 
-`docs/artifacts/demo-urls.md` is the full catalogue: every mode and flow, which ones are embedded in production, and the rest of the URL params. It is generated from the flow registry by `npm run demo:urls`, so never edit it by hand.
+`docs/artifacts/demo-urls.md` is the full catalogue: every mode, which URLs are embedded in production, and the rest of the params. It is generated from the flow registry by `npm run demo:urls`, so never edit it by hand.
+
+### Demo stories
+
+Add `&flow=` to `?mode=concept-embed`. **Automatic** stories play every turn on their own; **Manual** stories stop at each customer turn and wait for the suggestion chip to be clicked.
+
+| Flow | Story | Type |
+|---|---|---|
+| 1 | Simple Update | Automatic |
+| 2 | Data Lookup | Automatic |
+| 5 | Error Recovery | Manual |
+| 6 | Proactive Surfacing | Automatic |
+| 11 | Detection Queue, alternate entry | Automatic |
+| 12 | Detection Queue | Automatic |
+| 13 | Deposit Tracker | Manual |
+| 14 | Fee Change Explainer | Manual |
+| 15 | Sales Snapshot | Manual |
+| 16 | Account Change | Manual |
+| 17 | Escalation | Manual |
+| 18 | Running Low | Manual |
+| 19 | Address Change | Manual |
+| 20 | Credit Card Offer | Manual |
+| 21 | Business Loan Offer | Manual |
+| 22 | Service Marketplace | Opens a page, not a story |
+
+Six further stories have no URL and are reachable only from the `?mode=concept` cards: Panel as Form, Step-up Auth, Case Management, Bulk Action, Risk Investigation, Work Queue.
 
 ## Where things live
 
