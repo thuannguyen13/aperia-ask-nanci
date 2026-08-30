@@ -13,7 +13,7 @@ A disciplined surface — strict types (0 `any`/`ts-ignore`), a clean `api.ts` b
 - fallow will keep ranking `AskNanciContext.tsx` its #1 refactoring target on cognitive complexity alone. That signal is now spent: the perf win is banked, and what's left is a large diff with no user-facing gain. Skip it unless the file becomes hard to *author flows* in.
 - A `PanelAction` protocol (pure `turnToPanelActions` mapper + one `applyPanelAction`, with an `action` seam on `ChatStreamChunk`) is the right shape for panel side effects. Nothing emits them yet; that wiring waits for a backend.
 - **RSC is blocked by design, not effort** — all panels are client/mock-state-driven. Don't fake it.
-- Live status for this work lives in `design-plans/embed-optimization-roadmap.md` **on the `embed-optimization` branch** (not present on `main`), not here.
+- The `embed-optimization` roadmap that staged this work is **finished and its branch is deleted**; everything it marked done is on `main`. Read it at `git show 5e73a00:design-plans/embed-optimization-roadmap.md` if you need the reasoning, but treat it as a July snapshot, not status.
 
 ## Adjacent work
 
