@@ -4,7 +4,7 @@ import { Landmark, ArrowRight, CheckCircle2, Lock } from "lucide-react"
 import { Button, Input, Label, Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "aperia-ds5"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { CURRENT_ACCOUNT, NEW_ACCOUNT, CONFIRMATION_EMAIL } from "@/lib/ask-nanci/data/panels/account-change"
-import { PanelShell, PanelHeader, Callout, VerificationCode } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, Callout, VerificationCode } from "@/components/shared"
 
 function AccountRow({ last4, className }: { last4: string; className?: string }) {
   return (

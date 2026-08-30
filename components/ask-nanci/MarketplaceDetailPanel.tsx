@@ -5,7 +5,7 @@ import { Check, Plus } from "lucide-react"
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger, Badge, Button, ScrollArea,
 } from "aperia-ds5"
-import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader } from "@/components/shared"
 import {
   MARKETPLACE_DETAIL_LABELS as L,
   MARKETPLACE_VENDOR,

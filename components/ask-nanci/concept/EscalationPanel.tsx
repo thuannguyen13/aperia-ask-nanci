@@ -4,7 +4,7 @@ import { Phone, Ticket, CheckCircle2 } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { PAYOUT_DISCREPANCY, ESCALATION_PATHS, ESCALATION_BOOKING } from "@/lib/ask-nanci/data/panels/escalation"
-import { PanelShell, PanelHeader, PanelExportButton, PanelTable, Th, Callout, formatCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelExportButton, PanelTable, Th, Callout, formatCurrency } from "@/components/shared"
 
 const PATH_ICONS = { call: Phone, ticket: Ticket } as const
 

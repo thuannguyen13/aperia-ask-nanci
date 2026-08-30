@@ -3,7 +3,7 @@
 import { Send } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { EVIDENCE } from "@/lib/ask-nanci/data/panels/dispute-draft"
-import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader } from "@/components/shared"
 
 export function DisputeDraftPanel() {
   const { closePanel, submitDisputeDraft } = useAskNanci()

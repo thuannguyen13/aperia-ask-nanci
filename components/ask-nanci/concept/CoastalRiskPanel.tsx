@@ -4,7 +4,7 @@ import { TrendingUp } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { RISK_INFO, ACCOUNT_INFO, ACTIVITY_TABS, VOLUME_ROWS } from "@/lib/ask-nanci/data/panels/coastal-risk"
-import { PanelShell, PanelHeader, PanelTable, Th, Td, Callout } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelTable, Th, Td, Callout } from "@/components/shared"
 
 function InfoRow({ label, value, badge, highlight, large }: { label: string; value: string; badge?: boolean; highlight?: string; large?: boolean }) {
   return (

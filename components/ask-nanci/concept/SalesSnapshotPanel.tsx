@@ -2,7 +2,7 @@
 
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { WEEK_COMPARE, DAILY_SALES, WEEKDAY_AVG_TRANSACTIONS, WEEKDAY_AVG_TICKET, SATURDAY_DRILLDOWN, SLOWEST_DAY } from "@/lib/ask-nanci/data/panels/sales-snapshot"
-import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelFigureTable, Td, formatCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelFigureTable, Td, formatCurrency } from "@/components/shared"
 
 export function SalesSnapshotPanel() {
   const { closeDynamicPanel } = useAskNanci()

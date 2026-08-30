@@ -2,7 +2,7 @@
 
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { TIMELINE } from "@/lib/ask-nanci/data/panels/case-detail"
-import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader } from "@/components/shared"
 
 export function CaseDetailPanel() {
   const { closePanel } = useAskNanci()

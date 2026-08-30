@@ -3,7 +3,7 @@
 import { REALERT_ROWS } from "@/lib/ask-nanci/data/risk-dashboard"
 import { findAssignment } from "@/lib/ask-nanci/data/risk-assignments"
 import { TableBody, TableRow } from "aperia-ds5"
-import { PanelTable, Thead, Th, Td, formatPercent } from "@/components/ask-nanci/shared"
+import { PanelTable, Thead, Th, Td, formatPercent } from "@/components/shared"
 import { useRiskNav } from "../RiskNavContext"
 
 // Re-alert rate by assignment with an inline rate bar and Nanci's suggested action.

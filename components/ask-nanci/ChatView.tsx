@@ -5,7 +5,7 @@ import { Button } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { usePendingBot } from "@/contexts/ChatStreamContext"
 import { useChatScroll } from "@/hooks/use-chat-scroll"
-import { PanelHeader } from "./shared"
+import { PanelHeader } from "@/components/shared"
 import { UserMessage, BotMessage } from "./ChatMessage"
 import { ThinkingIndicator } from "./ThinkingIndicator"
 

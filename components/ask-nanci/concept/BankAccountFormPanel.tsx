@@ -4,7 +4,7 @@ import { useState } from "react"
 import { CheckCircle2 } from "lucide-react"
 import { Button, Input, Label, Separator } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader } from "@/components/shared"
 
 export function BankAccountFormPanel() {
   const { closeDynamicPanel, submitFormPanel } = useAskNanci()

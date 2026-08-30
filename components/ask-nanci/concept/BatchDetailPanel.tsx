@@ -3,7 +3,7 @@
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { BATCH_TRANSACTIONS } from "@/lib/ask-nanci/data/panels/batch-detail"
-import { PanelShell, PanelHeader, Callout, PanelTable, Th, Td, formatCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, Callout, PanelTable, Th, Td, formatCurrency } from "@/components/shared"
 
 export function BatchDetailPanel() {
   const { closeDynamicPanel } = useAskNanci()

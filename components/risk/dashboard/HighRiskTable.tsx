@@ -3,7 +3,7 @@
 import { HIGH_RISK_MERCHANTS } from "@/lib/ask-nanci/data/risk-dashboard"
 import { formatMcScore } from "@/lib/ask-nanci/data/risk-merchants"
 import { TableBody, TableRow } from "aperia-ds5"
-import { PanelTable, Thead, Th, Td } from "@/components/ask-nanci/shared"
+import { PanelTable, Thead, Th, Td } from "@/components/shared"
 import { useRiskNav } from "../RiskNavContext"
 
 // Merchants whose MC score jumped most — the drivers behind today's risk. Each name

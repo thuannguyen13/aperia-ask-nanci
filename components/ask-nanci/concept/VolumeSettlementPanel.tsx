@@ -3,7 +3,7 @@
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { FLAT_BARS, MAX } from "@/lib/ask-nanci/data/panels/volume-settlement"
-import { PanelShell, PanelHeader, Callout } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, Callout } from "@/components/shared"
 
 export function VolumeSettlementPanel() {
   const { closePanel } = useAskNanci()

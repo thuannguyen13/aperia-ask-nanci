@@ -8,7 +8,7 @@ import {
   TableBody, TableRow,
 } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
-import { PanelShell, PanelHeader, PanelBody, PanelTable, Thead, Th, Td } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelBody, PanelTable, Thead, Th, Td } from "@/components/shared"
 import { MarkWorkPopover } from "./MarkWorkPopover"
 import { QueueSummaryCard } from "./QueueSummaryCard"
 import { useRiskNav } from "./RiskNavContext"

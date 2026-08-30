@@ -5,7 +5,7 @@ import { useAskNanci } from "@/contexts/AskNanciContext"
 import {
   HEATMAP_HOURS, HEATMAP_ROWS, HEATMAP_APPROX, BUSIEST_TIMES_TILES,
 } from "@/lib/ask-nanci/data/panels/busiest-times"
-import { PanelShell, PanelHeader, PanelExportButton, StatCard } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelExportButton, StatCard } from "@/components/shared"
 
 const LEVEL_CLS = [
   "bg-muted",

@@ -9,7 +9,7 @@ import {
 import {
   PanelShell, PanelHeader, PanelBody, PanelExportButton, StatCard,
   PanelTable, Th, Td,
-} from "@/components/ask-nanci/shared"
+} from "@/components/shared"
 
 const PANEL_ID = "running-low"
 

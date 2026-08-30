@@ -7,7 +7,7 @@ import {
   getLoanBrand, LOAN_APPLICANT, LOAN_SUGGESTED, LOAN_COST, LOAN_CONSENT, LOAN_INSIGHT_PRE, LOAN_INSIGHT_BOLD, LOAN_INSIGHT_POST, LOAN_PREFILL_NOTE,
   LOAN_REQUEST_REF, LOAN_SUBMITTED_TITLE, LOAN_SUCCESS_MESSAGE, LOAN_VERIFY,
 } from "@/lib/ask-nanci/data/panels/business-loan-offer"
-import { PanelShell, PanelHeader, NanciInsight, Callout, formatCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, NanciInsight, Callout, formatCurrency } from "@/components/shared"
 import { ApplicantFields, BrandMonogram, OfferField, OfferLogo, OfferSelect, OfferVerifyStep, SectionLabel } from "./offer-shared"
 
 const PANEL_ID = "business-loan-offer"

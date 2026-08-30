@@ -4,7 +4,7 @@ import { CheckCircle2, AlertCircle } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { QUICK_WINS, OUTAGE_MERCHANTS } from "@/lib/ask-nanci/data/panels/work-queue"
-import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelTable, Th } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelTable, Th } from "@/components/shared"
 
 const reviewCount = QUICK_WINS.filter((r) => !r.valid).length
 const cleanCount = QUICK_WINS.length - reviewCount

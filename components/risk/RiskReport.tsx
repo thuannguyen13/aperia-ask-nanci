@@ -12,7 +12,7 @@ import {
   TableBody, TableRow,
 } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
-import { PanelShell, PanelHeader, PanelBody, PanelTable, Thead, Th, Td } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelBody, PanelTable, Thead, Th, Td } from "@/components/shared"
 import { MarkWorkPopover } from "./MarkWorkPopover"
 import { useRiskNav } from "./RiskNavContext"
 import { findMerchant, getVwLevel, getMcLevel, getRiskLevel, formatMcScore, RISK_REPORT_DETAILS, getDefaultRiskDetail, TXN_VOLUME_ROWS, RISK_VIOLATION_CYCLE, VIOLATION_ROWS, CROSS_QUEUE_ROWS, MERCHANT_NOTES_SEED, DEFAULT_MERCHANT_NOTES, statusForDisposition, type WorkStatus, type ViolationRow, type NoteEntry, type RiskLevel } from "@/lib/ask-nanci/data/risk-merchants"

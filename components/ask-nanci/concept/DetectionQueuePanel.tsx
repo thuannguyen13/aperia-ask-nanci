@@ -3,7 +3,7 @@
 import { ArrowRight, FileBarChart2, ShieldCheck } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { ASSIGNMENT, STATUS_ROWS } from "@/lib/ask-nanci/data/panels/barometer"
-import { PanelShell, PanelHeader, PanelTable, Th, Td } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelTable, Th, Td } from "@/components/shared"
 
 export function DetectionQueuePanel() {
   const { closePanel, closeAllNewPanels } = useAskNanci()

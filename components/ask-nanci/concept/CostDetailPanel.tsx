@@ -2,7 +2,7 @@
 
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { HERO_ITEM, COMBO_COST_BREAKDOWN, COMBO_MENU_PRICE, COMBO_TOTAL_INGREDIENT_COST, COMBO_MARGIN } from "@/lib/ask-nanci/data/panels/menu-margin"
-import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelTable, Th, formatCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelTable, Th, formatCurrency } from "@/components/shared"
 
 export function CostDetailPanel() {
   const { closeDynamicPanel } = useAskNanci()

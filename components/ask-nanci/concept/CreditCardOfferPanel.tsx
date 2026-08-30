@@ -8,7 +8,7 @@ import {
   CARD_INSIGHT_LEAD, CARD_INSIGHT_BODY, CARD_INSIGHT_OFFER_PRE, CARD_INSIGHT_OFFER_BOLD, CARD_INSIGHT_OFFER_POST,
   CARD_PREFILL_NOTE, CARD_CONSENT, CARD_REQUEST_REF, CARD_SUCCESS_MESSAGE, CARD_VERIFY,
 } from "@/lib/ask-nanci/data/panels/credit-card-offer"
-import { PanelShell, PanelHeader, NanciInsight, Callout, formatWholeCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, NanciInsight, Callout, formatWholeCurrency } from "@/components/shared"
 import { ApplicantFields, BrandMonogram, OfferField, OfferLogo, OfferSelect, OfferVerifyStep, SectionLabel, StatStrip } from "./offer-shared"
 
 const PANEL_ID = "credit-card-offer"

@@ -3,7 +3,7 @@
 import { ShieldCheck } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { TXN_FIELDS } from "@/lib/ask-nanci/data/panels/transaction-receipt"
-import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader } from "@/components/shared"
 
 export function TransactionReceiptPanel() {
   const { closePanel } = useAskNanci()

@@ -10,7 +10,7 @@ import {
   Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
-import { VerificationCode, maskDigits } from "@/components/ask-nanci/shared"
+import { VerificationCode, maskDigits } from "@/components/shared"
 
 // Step-up gate both offer panels open on, before any terms are shown. The offer is
 // derived from the merchant's own financial data, so the panel establishes who is

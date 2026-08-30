@@ -4,7 +4,7 @@ import { ArrowUpRight } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { CONCEPT_FLOW15_FOLLOWUP } from "@/lib/ask-nanci/data/flows.concept"
 import { SATURDAY_DRILLDOWN, WEEKDAY_AVG_TRANSACTIONS, WEEKDAY_AVG_TICKET } from "@/lib/ask-nanci/data/panels/sales-snapshot"
-import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, StatCard, formatCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, StatCard, formatCurrency } from "@/components/shared"
 
 export function SalesDrilldownPanel() {
   const { closeDynamicPanel, handlePrompt } = useAskNanci()

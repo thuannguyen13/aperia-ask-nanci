@@ -1,7 +1,7 @@
 "use client"
 
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, formatWholeCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, formatWholeCurrency } from "@/components/shared"
 import { SLOWEST_WINDOWS, SLOWEST_WINDOWS_HIGH } from "@/lib/ask-nanci/data/panels/busiest-times"
 
 export function SlowestWindowsPanel() {

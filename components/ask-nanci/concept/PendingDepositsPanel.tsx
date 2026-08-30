@@ -6,7 +6,7 @@ import { cn } from "aperia-ds5/utils"
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Button } from "aperia-ds5"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { BATCHES, CASH_DEPOSITS, DEPOSIT_ACCOUNT_LAST4, HELD_TXN } from "@/lib/ask-nanci/data/panels/pending-deposits"
-import { PanelShell, PanelHeader, PanelExportButton, StatCard, NanciInsight, formatCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelExportButton, StatCard, NanciInsight, formatCurrency } from "@/components/shared"
 
 // How long the held row pulses brighter when its detail appears, before it settles
 // back to its resting "on hold" tint.

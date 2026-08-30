@@ -3,7 +3,7 @@
 import { Check } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
-import { PanelShell, PanelHeader, Callout, PanelTable, Th, Td } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, Callout, PanelTable, Th, Td } from "@/components/shared"
 
 const STEPS = ["Verify Identity", "New Account", "Review & Confirm"] as const
 

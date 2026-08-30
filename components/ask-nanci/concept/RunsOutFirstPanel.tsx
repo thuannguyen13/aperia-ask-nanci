@@ -7,7 +7,7 @@ import {
 } from "@/lib/ask-nanci/data/panels/inventory"
 import {
   PanelShell, PanelHeader, PanelBody, PanelExportButton, NanciInsight,
-} from "@/components/ask-nanci/shared"
+} from "@/components/shared"
 
 const PANEL_ID = "runs-out-first"
 

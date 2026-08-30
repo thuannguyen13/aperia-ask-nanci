@@ -2,7 +2,7 @@
 
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { MENU_ITEMS, HERO_ITEM } from "@/lib/ask-nanci/data/panels/menu-margin"
-import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelTable, Th, formatCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelTable, Th, formatCurrency } from "@/components/shared"
 
 const hero = MENU_ITEMS.find((item) => item.name === HERO_ITEM)!
 const topProfitItem = [...MENU_ITEMS].sort((a, b) => b.margin - a.margin)[0]

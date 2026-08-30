@@ -3,7 +3,7 @@
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { ASSIGNMENT, STATUS_ROWS, MERCHANT_ROWS, eligibleMerchantCount } from "@/lib/ask-nanci/data/panels/barometer"
-import { PanelShell, PanelHeader, ScoreBadge, PanelTable, Th, Td } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, ScoreBadge, PanelTable, Th, Td } from "@/components/shared"
 
 export function BarometerReportPanel() {
   const { closePanel, closeAllNewPanels } = useAskNanci()

@@ -3,7 +3,7 @@
 import Image from "next/image"
 import { CornerDownRight } from "lucide-react"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ReferenceLine, ResponsiveContainer } from "recharts"
-import { PanelHeader } from "@/components/ask-nanci/shared"
+import { PanelHeader } from "@/components/shared"
 import { ChatInput } from "@/components/ask-nanci/ChatInput"
 import { NANCI_REVIEW, NANCI_PROJECTION, EXAMPLE_ASSIGNMENT_NAME } from "@/lib/ask-nanci/data/risk-create-assignment"
 

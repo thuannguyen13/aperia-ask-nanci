@@ -9,7 +9,7 @@ import {
   Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator,
 } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
-import { PanelHeader, PanelBody } from "@/components/ask-nanci/shared"
+import { PanelHeader, PanelBody } from "@/components/shared"
 import {
   MC_PARAMETERS, MC_PARAM_LABEL, ASSIGNED_GROUPS, DATE_WINDOWS, ASSIGNMENT_TYPES,
   NANCI_REVIEW, type McParameter,

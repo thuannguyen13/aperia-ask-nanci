@@ -12,7 +12,7 @@ That is the whole checklist. If you find yourself editing a third file to make a
 
 ## Shared primitives
 
-`components/ask-nanci/shared/` — import from `@/components/ask-nanci/shared`. Rebuilding one of these inline is the single most common form of panel drift.
+`components/shared/` — import from `@/components/shared`. Rebuilding one of these inline is the single most common form of panel drift.
 
 - `PanelShell` — the outer `flex h-full flex-col overflow-hidden` wrapper; replaces the raw div
 - `PanelHeader` — shrink-0 header with title and close button built in

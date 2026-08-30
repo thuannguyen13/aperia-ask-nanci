@@ -12,7 +12,7 @@ import { PANEL_UI_OPTIONS } from "@/lib/ask-nanci/data/panel-ui"
 import { FLOW_DEFS } from "@/lib/ask-nanci/data/flows.concept"
 import { MERCHANT_VOLUME_DATA } from "@/lib/ask-nanci/data/merchants"
 import { PALETTES } from "@/lib/ask-nanci/data/chart-gallery"
-import { PanelTable, Thead, Th, Td, formatCurrency, formatWholeCurrency } from "@/components/ask-nanci/shared"
+import { PanelTable, Thead, Th, Td, formatCurrency, formatWholeCurrency } from "@/components/shared"
 
 // ── What this page is ──────────────────────────────────────────────────────────
 // The index for how a panel reaches a phone. Option A is what ships; the page

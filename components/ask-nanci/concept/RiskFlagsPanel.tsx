@@ -3,7 +3,7 @@
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { FLAGS, flagCount, criticalCount, mediumCount, FLAG_SEVERITY_CLS } from "@/lib/ask-nanci/data/panels/risk-flags"
-import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader } from "@/components/shared"
 
 export function RiskFlagsPanel() {
   const { closePanel } = useAskNanci()

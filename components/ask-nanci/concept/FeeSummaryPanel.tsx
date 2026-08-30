@@ -6,7 +6,7 @@ import { cn } from "aperia-ds5/utils"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { DRIVER_SUMMARY, EFFECTIVE_RATE, VOLUME, FEES, FEES_TOTAL } from "@/lib/ask-nanci/data/panels/fee-summary"
 import { CHARGEBACK } from "@/lib/ask-nanci/data/panels/chargeback-status"
-import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, Callout, PanelFigureTable, Td, formatCurrency } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, Callout, PanelFigureTable, Td, formatCurrency } from "@/components/shared"
 
 // How long the volume row stays tinted before it fades on its own — the flow
 // reads it aloud, then it clears so the panel returns to a neutral state.

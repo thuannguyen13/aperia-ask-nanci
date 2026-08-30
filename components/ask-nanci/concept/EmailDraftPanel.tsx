@@ -4,7 +4,7 @@ import { Send } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { CONCEPT_FLOW8_FINAL } from "@/lib/ask-nanci/data/flows.concept"
 import { PREVIEWS } from "@/lib/ask-nanci/data/panels/email-draft"
-import { PanelShell, PanelHeader } from "@/components/ask-nanci/shared"
+import { PanelShell, PanelHeader } from "@/components/shared"
 
 function Var({ children }: { children: string }) {
   return (
