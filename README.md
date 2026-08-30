@@ -168,7 +168,7 @@ If a new demo URL was added, run `npm run demo:urls` to regenerate the URL list.
 
 ## 6. Constraints
 
-- Push to `embed` only. Another team develops against `main`.
+- Never push without an explicit go-ahead. `main` ships to production on the next push.
 - `docs/artifacts/demo-urls.md` is generated. Regenerate it with `npm run demo:urls` instead of editing it.
 - Demo text and numbers belong in `lib/ask-nanci/data/`, not in component files.
 - Use `npm`. This project does not use `pnpm` or `yarn`.
@@ -208,11 +208,7 @@ Claude reads `CLAUDE.md` in this repository automatically. That file holds no de
 
 ### Suggested opening message
 
-> This is the Ask Nanci demo repo, a front-end prototype with no backend where all answers are
-> hand-written scripts. Read `CLAUDE.md` before making changes. I am covering for a teammate and am not
-> familiar with this codebase, so explain each change and the reason for it. Push to `embed` only,
-> never `main`. Before reporting work as complete, run `npm run typecheck`, `npm run check:flows`,
-> `npm run check:docs` and `npm run lint`, and verify the result in a browser.
+> This is the Ask Nanci demo repo, a front-end prototype with no backend where all answers are hand-written scripts. Read `CLAUDE.md` before making changes. I am covering for a teammate and am not familiar with this codebase, so explain each change and the reason for it. Don't push without asking me. Before reporting work as complete, run `npm run typecheck`, `npm run check:flows`, `npm run check:docs` and `npm run lint`, and verify the result in a browser.
 
 ### Suitable requests
 
@@ -238,4 +234,4 @@ Complete before the next handover.
 |---|---|
 | Demo content and story decisions | |
 | Design and Figma | |
-| The `main` branch | |
+| Deploys and the live client site | |
