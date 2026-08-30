@@ -18,18 +18,16 @@ Run that before starting work and open only the rows that match the task. Do it 
 - Step-by-step recipes live in each category's `actions/`.
 - `docs/artifacts/` is generated output and raw source material, excluded from the grep on purpose.
 
-No file stores a path to a doc, this one included. A doc's address is its trigger, so one doc
-points at another by citing the phrase and letting you re-run the grep:
+No file stores a path to a doc, this one included. A doc's address is its trigger, so one doc points at another by citing the phrase and letting you re-run the grep:
 
 > The recipe for building one is Read-when **adding a panel**.
 
 Moving a doc between categories therefore breaks nothing, because nothing recorded where it was.
 
-`npm run check:docs` enforces the contract: every doc carries a marker, no file hardcodes a path
-to one, every cited trigger matches a real marker, and this file stays path-free.
+`npm run check:docs` enforces the contract: every doc carries a marker, no file hardcodes a path to one, every cited trigger matches a real marker, no doc is hard-wrapped, and this file stays path-free.
 
 ## Writing here
 
-Concise and clear, in docs and in replies. Open with the answer. Cut preamble, restatements of the
-request, and closing recaps: nobody reads them. Say the thing once, at full detail if the thing
-needs it, and stop.
+Concise and clear, in docs and in replies. Open with the answer. Cut preamble, restatements of the request, and closing recaps: nobody reads them. Say the thing once, at full detail if the thing needs it, and stop.
+
+Never hard-wrap prose. One paragraph, list item or table row per line, wrapped by the editor rather than by newlines in the file — otherwise editing one word reflows the whole block and the diff hides what actually changed.

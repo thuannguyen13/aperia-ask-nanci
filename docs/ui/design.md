@@ -2,9 +2,7 @@
 
 **Read when:** deciding what goes inside a panel; colors, type, or picking a pattern
 
-How a panel should look and what it should contain. The recipe for building one, and the shared
-primitives to build it from, are Read-when **adding a panel**; the registry and open stack are
-Read-when **registering or opening a panel**.
+How a panel should look and what it should contain. The recipe for building one, and the shared primitives to build it from, are Read-when **adding a panel**; the registry and open stack are Read-when **registering or opening a panel**.
 
 ## Generative UI content rules
 
@@ -70,14 +68,12 @@ These keep every panel looking like one system. They're extracted from the exist
 
 2. **Two type tiers, used consistently.**
    - Micro-labels (section headers, field labels): `text-[9px] font-bold tracking-[0.12em] uppercase text-muted-foreground`
-   - Data values (amounts, IDs, dates, times): `font-mono text-xs font-medium text-foreground`
-   Never invent a third label style — every panel above uses exactly these two.
+   - Data values (amounts, IDs, dates, times): `font-mono text-xs font-medium text-foreground` Never invent a third label style — every panel above uses exactly these two.
 
 3. **One badge shape for status pills:**
    ```
    rounded bg-{color}-100 px-1.5 py-px text-[9px] font-bold tracking-wide text-{color}-700 dark:bg-{color}-900/40 dark:text-{color}-400
-   ```
-   Used identically in `PanelHeader`'s `badge` prop and inline status chips. Don't hand-rebuild this — reuse the shape.
+   ``` Used identically in `PanelHeader`'s `badge` prop and inline status chips. Don't hand-rebuild this — reuse the shape.
 
 4. **Radius is tiered by element size**, not chosen per-component: `rounded-full` for dots/pills, `rounded-lg` for row cards and list items, `rounded-xl` for `Callout`. A callout inside a list should still be `rounded-xl` even if surrounding rows are `rounded-lg`.
 
@@ -132,17 +128,11 @@ Panels slide in by transitioning `width` and `opacity`. The panel is always moun
 
 ## Visual DNA
 
-The user finds visual problems hard to put into words and wants a named design language so words
-become *pointers* rather than descriptions rebuilt from memory. Agreed direction:
+The user finds visual problems hard to put into words and wants a named design language so words become *pointers* rather than descriptions rebuilt from memory. Agreed direction:
 
-- **Feel — precise & trustworthy.** Bank/analytics-tool rigor: tight, exact, monospace figures,
-  restrained color. Confidence through rigor, not friendliness. (Closest to what the code already
-  does.)
-- **Density — adaptive.** Dense and efficient for data panels (tables, queues); calm and spacious
-  for answer/summary panels. Density follows the data shape.
+- **Feel — precise & trustworthy.** Bank/analytics-tool rigor: tight, exact, monospace figures, restrained color. Confidence through rigor, not friendliness. (Closest to what the code already does.)
+- **Density — adaptive.** Dense and efficient for data panels (tables, queues); calm and spacious for answer/summary panels. Density follows the data shape.
 
-How to help the user pin down a visual direction is working style, not architecture: see Read-when
-**any multi-step task, staging, subagents, or visual direction**.
+How to help the user pin down a visual direction is working style, not architecture: see Read-when **any multi-step task, staging, subagents, or visual direction**.
 
-A rendered design-language reference page (every token, pattern and state side by side) is agreed
-but deferred until after the current demo.
+A rendered design-language reference page (every token, pattern and state side by side) is agreed but deferred until after the current demo.

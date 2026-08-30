@@ -39,6 +39,48 @@ const sources = [
 /** The generator must name its own output file; that path is the program, not a reference. */
 const PATH_EXEMPT = new Set(["scripts/demo-urls.ts", "scripts/check-docs.ts"])
 
+/** Markdown that opens a new block rather than continuing the line above it. */
+const BLOCK_START = /^(\s*([-*+]|\d+[.)])\s|#{1,6}\s|>|\||---|\*\*\*|___|<!--|\s*(```|~~~))/
+
+/**
+ * Prose is soft-wrapped by the editor, never hard-wrapped in the file: one paragraph, list item or
+ * table row per line. Hard wraps make every later edit reflow a whole block, which buries the real
+ * change in a diff full of moved words.
+ */
+function hardWrapLines(src: string): number[] {
+  const lines = src.split("\n")
+  const wrapped: number[] = []
+  let fence = false
+  let html = false
+
+  for (const [i, line] of lines.entries()) {
+    if (/^\s*(```|~~~)/.test(line)) {
+      fence = !fence
+      continue
+    }
+    if (fence) continue
+    if (html) {
+      if (line.includes("-->")) html = false
+      continue
+    }
+    if (line.trimStart().startsWith("<!--")) {
+      html = !line.includes("-->")
+      continue
+    }
+    const prev = lines[i - 1]
+    if (
+      line.trim() !== "" &&
+      prev !== undefined &&
+      prev.trim() !== "" &&
+      !BLOCK_START.test(line) &&
+      !/^\s*(---|\*\*\*|___)\s*$/.test(prev)
+    ) {
+      wrapped.push(i + 1)
+    }
+  }
+  return wrapped
+}
+
 const triggers = new Map<string, string>()
 const missingMarker: string[] = []
 
@@ -51,6 +93,12 @@ for (const file of docs) {
 const storedPaths: string[] = []
 const deadRefs: string[] = []
 const deadCitations: string[] = []
+const hardWrapped: string[] = []
+
+for (const file of [...docs, "README.md", "CLAUDE.md"]) {
+  const at = hardWrapLines(readFileSync(file, "utf8"))
+  if (at.length) hardWrapped.push(`${file} — ${at.length} line(s): ${at.slice(0, 6).join(", ")}${at.length > 6 ? ", …" : ""}`)
+}
 
 for (const file of sources) {
   const body = readFileSync(file, "utf8")
@@ -77,7 +125,14 @@ for (const file of sources) {
 // CLAUDE.md must stay path-free: paths there are what goes stale.
 const claudeRefs = readFileSync("CLAUDE.md", "utf8").match(FILE_PATH) ?? []
 
-if (missingMarker.length || storedPaths.length || deadRefs.length || deadCitations.length || claudeRefs.length) {
+if (
+  missingMarker.length ||
+  storedPaths.length ||
+  deadRefs.length ||
+  deadCitations.length ||
+  hardWrapped.length ||
+  claudeRefs.length
+) {
   if (missingMarker.length) {
     console.error(`\n✗ ${missingMarker.length} doc(s) with no "**Read when:**" marker — invisible to discovery:`)
     for (const f of missingMarker) console.error(`    ${f}`)
@@ -94,6 +149,10 @@ if (missingMarker.length || storedPaths.length || deadRefs.length || deadCitatio
     console.error(`\n✗ ${deadRefs.length} dead reference(s) into docs/artifacts:`)
     for (const r of deadRefs) console.error(`    ${r}`)
   }
+  if (hardWrapped.length) {
+    console.error(`\n✗ ${hardWrapped.length} doc(s) hard-wrapped — one paragraph, list item or table row per line:`)
+    for (const r of hardWrapped) console.error(`    ${r}`)
+  }
   if (claudeRefs.length) {
     console.error(`\n✗ CLAUDE.md must not hardcode doc paths — found ${claudeRefs.length}:`)
     for (const r of claudeRefs) console.error(`    ${r}`)
@@ -103,5 +162,5 @@ if (missingMarker.length || storedPaths.length || deadRefs.length || deadCitatio
 }
 
 console.log(
-  `✓ docs OK — ${docs.length} docs discoverable by trigger, ${sources.length} files carry no stored doc paths.`,
+  `✓ docs OK — ${docs.length} docs discoverable by trigger and soft-wrapped, ${sources.length} files carry no stored doc paths.`,
 )

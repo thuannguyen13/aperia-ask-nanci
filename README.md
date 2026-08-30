@@ -2,8 +2,7 @@
 
 A demo of an AI assistant for payment-processing customers, used in sales meetings and pitches.
 
-There is no AI and no server in this project. Every answer is text written by hand and played back on
-a timer. Changing what Nanci says means editing a text file.
+There is no AI and no server in this project. Every answer is text written by hand and played back on a timer. Changing what Nanci says means editing a text file.
 
 ---
 
@@ -14,8 +13,7 @@ npm install
 npm run dev
 ```
 
-The dev server prints the address it is running on. No credentials, environment variables or
-database are required.
+The dev server prints the address it is running on. No credentials, environment variables or database are required.
 
 Keep the dev server running while working. Saved files reload automatically.
 
@@ -23,11 +21,9 @@ Keep the dev server running while working. Saved files reload automatically.
 
 ## 2. Running a demo
 
-Each demo is a path. The paths below are relative, so the same ones work against the dev server and
-against the deployed site: append them to whichever host you are on.
+Each demo is a path. The paths below are relative, so the same ones work against the dev server and against the deployed site: append them to whichever host you are on.
 
-**live** marks a URL currently embedded on the production site. Changes affecting those pages are
-customer-facing.
+**live** marks a URL currently embedded on the production site. Changes affecting those pages are customer-facing.
 
 ### Modes
 
@@ -53,8 +49,7 @@ Any other `?mode=` value loads the full app.
 
 ### Demo stories
 
-Add `&flow=` and a number to `?mode=concept-embed`. **Automatic** stories play every turn on their own.
-**Manual** stories stop at each customer turn and wait for the suggestion chip to be clicked.
+Add `&flow=` and a number to `?mode=concept-embed`. **Automatic** stories play every turn on their own. **Manual** stories stop at each customer turn and wait for the suggestion chip to be clicked.
 
 | URL | Story | Type |
 |---|---|---|
@@ -75,8 +70,7 @@ Add `&flow=` and a number to `?mode=concept-embed`. **Automatic** stories play e
 | `/?mode=concept-embed&flow=21` **live** | Business Loan Offer | Manual |
 | `/?mode=concept-embed&flow=22` **live** | Service Marketplace | Opens a page, not a story |
 
-Six further stories have no URL and are reachable only from the `?mode=concept` cards: Panel as Form,
-Step-up Auth, Case Management, Bulk Action, Risk Investigation, Work Queue.
+Six further stories have no URL and are reachable only from the `?mode=concept` cards: Panel as Form, Step-up Auth, Case Management, Bulk Action, Risk Investigation, Work Queue.
 
 ### Extra settings
 
@@ -105,11 +99,9 @@ Five building blocks. Most edits touch the first two rows only.
 | **Panel registry** | The list of panels a flow is allowed to open. A panel must be listed here to be usable | `components/ask-nanci/concept/panel-registry.ts` |
 | **Mode** | The `?mode=` part of the URL. Selects the layout and the branding around the chat | `lib/ask-nanci/embed-demo-config.ts` |
 
-A flow opens a panel by naming it on a turn, for example `panel: "running-low"`. Up to three panels
-can be open at once.
+A flow opens a panel by naming it on a turn, for example `panel: "running-low"`. Up to three panels can be open at once.
 
-Flows run in one of two ways. Which one is decided by the flow's `section`, so it is not set per flow
-by hand.
+Flows run in one of two ways. Which one is decided by the flow's `section`, so it is not set per flow by hand.
 
 | Type | Behaviour | Which flows |
 |---|---|---|
@@ -129,11 +121,9 @@ Text lives in two places depending on where it appears on screen.
 | Chat messages and suggestion chips | `lib/ask-nanci/data/flows.concept.ts` |
 | Anything inside a panel | The matching file in `lib/ask-nanci/data/panels/` |
 
-Search the relevant file for the sentence, edit it, and save. Searching the whole
-`lib/ask-nanci/data/` folder finds it either way.
+Search the relevant file for the sentence, edit it, and save. Searching the whole `lib/ask-nanci/data/` folder finds it either way.
 
-Some lists in `flows.concept.ts` are marked "Derived, do not hand-maintain". Those are built
-automatically from `FLOW_DEFS`. Edit `FLOW_DEFS` and the lists update on their own.
+Some lists in `flows.concept.ts` are marked "Derived, do not hand-maintain". Those are built automatically from `FLOW_DEFS`. Edit `FLOW_DEFS` and the lists update on their own.
 
 ### Changing a number in a panel
 
@@ -145,15 +135,11 @@ lib/ask-nanci/data/panels/
 
 One file per panel. For example, `inventory.ts` holds the "Running Low" panel.
 
-Some values are calculated from other values so the arithmetic stays consistent. Where a calculation
-exists, such as `sales / transactions`, edit the inputs rather than the result. Do not replace a
-calculation with a typed number.
+Some values are calculated from other values so the arithmetic stays consistent. Where a calculation exists, such as `sales / transactions`, edit the inputs rather than the result. Do not replace a calculation with a typed number.
 
 ### Adding a new demo story
 
-Follow Read-when **adding or editing a concept flow**, which lists the required steps in order.
-Docs are cited by their "Read when" trigger rather than by path: grep `docs/` for that phrase to
-find the file.
+Follow Read-when **adding or editing a concept flow**, which lists the required steps in order. Docs are cited by their "Read when" trigger rather than by path: grep `docs/` for that phrase to find the file.
 
 ---
 
@@ -170,8 +156,7 @@ npm run lint          # code style
 
 These checks do not detect visual problems. Confirm the result in a browser as well.
 
-When checking a story that has no URL of its own, open `?mode=concept` and run this in the browser
-console first, otherwise the onboarding dialog covers the story cards:
+When checking a story that has no URL of its own, open `?mode=concept` and run this in the browser console first, otherwise the onboarding dialog covers the story cards:
 
 ```js
 localStorage.ask_nanci_onboarded = "1"
@@ -208,29 +193,18 @@ If a new demo URL was added, run `npm run demo:urls` to regenerate the URL list.
 
 None of these prevent a demo from running.
 
-- **One failing test.** `npm test` reports 80 passing and 1 failing. The failure predates the most
-  recent work and concerns an unrouted demo conversation, not anything visible on screen.
-- **Inconsistent figures.** The credit card panel suggests a $45,000 limit while describing it as about
-  2x a $31,800 spend, which would be $63,600. Reference code `AD-3307` is shared by two unrelated
-  requests in flows 19 and 21. Flow 21's loan figures have not been checked against the other numbers
-  in the demo.
-- **Welcome popup animation.** The scrolling logos ignore the operating system "reduce motion" setting,
-  and screen readers announce 30 bank names.
-- **Wording mismatches.** The sidebar reads "Personalize Nanci" while two other locations still read
-  "Teach Nanci". Flow 19 contains an unused chip reading "Update payment processor MID".
-- **Oversized image.** `public/credit-card-offer/citi-double-cash.png` is 5.1 MB and slows the load of
-  flow 20.
-- **Unconfirmed report.** A teammate reported that the "Restart demo" button does not reset the panel.
-  This could not be reproduced across 13 demos. Record the exact URL if it occurs.
+- **One failing test.** `npm test` reports 80 passing and 1 failing. The failure predates the most recent work and concerns an unrouted demo conversation, not anything visible on screen.
+- **Inconsistent figures.** The credit card panel suggests a $45,000 limit while describing it as about 2x a $31,800 spend, which would be $63,600. Reference code `AD-3307` is shared by two unrelated requests in flows 19 and 21. Flow 21's loan figures have not been checked against the other numbers in the demo.
+- **Welcome popup animation.** The scrolling logos ignore the operating system "reduce motion" setting, and screen readers announce 30 bank names.
+- **Wording mismatches.** The sidebar reads "Personalize Nanci" while two other locations still read "Teach Nanci". Flow 19 contains an unused chip reading "Update payment processor MID".
+- **Oversized image.** `public/credit-card-offer/citi-double-cash.png` is 5.1 MB and slows the load of flow 20.
+- **Unconfirmed report.** A teammate reported that the "Restart demo" button does not reset the panel. This could not be reproduced across 13 demos. Record the exact URL if it occurs.
 
 ---
 
 ## 9. Working with Claude Code
 
-Claude reads `CLAUDE.md` in this repository automatically. That file holds no detail itself: it tells
-Claude to grep `docs/` for the doc whose "Read when" line matches the task. Nothing needs to be pasted
-in. This README is the summary; `docs/` carries the detail, so a request to change panel structure or
-add a flow should send Claude there.
+Claude reads `CLAUDE.md` in this repository automatically. That file holds no detail itself: it tells Claude to grep `docs/` for the doc whose "Read when" line matches the task. Nothing needs to be pasted in. This README is the summary; `docs/` carries the detail, so a request to change panel structure or add a flow should send Claude there.
 
 ### Suggested opening message
 
@@ -249,14 +223,10 @@ add a flow should send Claude there.
 
 ### Points to enforce
 
-- **Require browser verification.** Passing checks do not confirm that a visual demo looks correct.
-  Claude can drive a browser and capture screenshots; request it.
-- **Limit commits to the current task.** The working directory frequently contains unrelated
-  in-progress changes.
-- **Treat "cannot reproduce" as a request for detail.** Supply the exact URL and click sequence. Two
-  reported issues in this repository turned out to describe different problems.
-- **Require derived values over duplicated ones.** A figure appearing in both the chat and a panel
-  should be calculated in one place rather than typed twice.
+- **Require browser verification.** Passing checks do not confirm that a visual demo looks correct. Claude can drive a browser and capture screenshots; request it.
+- **Limit commits to the current task.** The working directory frequently contains unrelated in-progress changes.
+- **Treat "cannot reproduce" as a request for detail.** Supply the exact URL and click sequence. Two reported issues in this repository turned out to describe different problems.
+- **Require derived values over duplicated ones.** A figure appearing in both the chat and a panel should be calculated in one place rather than typed twice.
 
 ---
 
