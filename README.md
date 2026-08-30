@@ -28,24 +28,24 @@ Every demo is a relative path, appended to the dev server address or to the depl
 
 Add `&flow=` to `?mode=concept-embed`. **Automatic** stories play every turn on their own; **Manual** stories stop at each customer turn and wait for the suggestion chip to be clicked.
 
-| Flow | Story | Type |
+| URL | Story | Type |
 |---|---|---|
-| 1 | Simple Update | Automatic |
-| 2 | Data Lookup | Automatic |
-| 5 | Error Recovery | Manual |
-| 6 | Proactive Surfacing | Automatic |
-| 11 | Detection Queue, alternate entry | Automatic |
-| 12 | Detection Queue | Automatic |
-| 13 | Deposit Tracker | Manual |
-| 14 | Fee Change Explainer | Manual |
-| 15 | Sales Snapshot | Manual |
-| 16 | Account Change | Manual |
-| 17 | Escalation | Manual |
-| 18 | Running Low | Manual |
-| 19 | Address Change | Manual |
-| 20 | Credit Card Offer | Manual |
-| 21 | Business Loan Offer | Manual |
-| 22 | Service Marketplace | Opens a page, not a story |
+| `/?mode=concept-embed&flow=1` | Simple Update | Automatic |
+| `/?mode=concept-embed&flow=2` | Data Lookup | Automatic |
+| `/?mode=concept-embed&flow=5` | Error Recovery | Manual |
+| `/?mode=concept-embed&flow=6` | Proactive Surfacing | Automatic |
+| `/?mode=concept-embed&flow=11` | Detection Queue, alternate entry | Automatic |
+| `/?mode=concept-embed&flow=12` | Detection Queue | Automatic |
+| `/?mode=concept-embed&flow=13` | Deposit Tracker | Manual |
+| `/?mode=concept-embed&flow=14` | Fee Change Explainer | Manual |
+| `/?mode=concept-embed&flow=15` | Sales Snapshot | Manual |
+| `/?mode=concept-embed&flow=16` | Account Change | Manual |
+| `/?mode=concept-embed&flow=17` | Escalation | Manual |
+| `/?mode=concept-embed&flow=18` | Running Low | Manual |
+| `/?mode=concept-embed&flow=19` | Address Change | Manual |
+| `/?mode=concept-embed&flow=20` | Credit Card Offer | Manual |
+| `/?mode=concept-embed&flow=21` | Business Loan Offer | Manual |
+| `/?mode=concept-embed&flow=22` | Service Marketplace | Opens a page, not a story |
 
 Six further stories have no URL and are reachable only from the `?mode=concept` cards: Panel as Form, Step-up Auth, Case Management, Bulk Action, Risk Investigation, Work Queue.
 
