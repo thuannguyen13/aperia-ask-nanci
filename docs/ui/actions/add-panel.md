@@ -4,7 +4,7 @@
 
 Mechanics only. What the panel should *contain* and *look like* is Read-when **deciding what goes inside a panel**; whether a panel is the right answer at all is `/panels` (`public/panels/index.html`).
 
-1. Create the panel component in `components/ask-nanci/concept/`. Build it from the shared primitives tabled below — never re-implement the header, scroll structure, severity box or table chrome.
+1. Create the panel component in `components/ask-nanci/concept/`. Build it from the shared primitives listed below — never re-implement the header, scroll structure, severity box or table chrome.
 2. Import it and add a key + `{ component }` entry to the `PANELS` map in `components/ask-nanci/concept/panel-registry.ts`. `PanelId` updates automatically: there is no `PanelId` union to edit, no `PanelContent` switch, and no slot mapping.
 3. To open it from a script, set `panel: "<its-key>"` on a turn. No per-panel `case` in `playConceptScripted` is needed — `applyTurnEffects` opens any registered panel generically. The full field list is under "Turn effects" in Read-when **adding or editing a concept flow**.
 
@@ -12,9 +12,7 @@ That is the whole checklist. If you find yourself editing a third file to make a
 
 ## Shared primitives
 
-`components/ask-nanci/shared/` — import from `@/components/ask-nanci/shared`.
-
-Use these instead of re-implementing the header/scroll structure, severity box, or table chrome in each panel. Rebuilding one inline is the single most common form of panel drift.
+`components/ask-nanci/shared/` — import from `@/components/ask-nanci/shared`. Rebuilding one of these inline is the single most common form of panel drift.
 
 - `PanelShell` — the outer `flex h-full flex-col overflow-hidden` wrapper; replaces the raw div
 - `PanelHeader` — shrink-0 header with title and close button built in

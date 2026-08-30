@@ -2,11 +2,11 @@
 
 **Read when:** proposing a refactor, or asking why something was not done
 
-Read this before proposing a refactor. Most of the obvious targets here have already been considered and deliberately declined; the reasons are below.
+Most of the obvious refactor targets have already been considered and deliberately declined. The reasons are below.
 
 ## Verdict
 
-A disciplined surface — strict types (0 `any`/`ts-ignore`), a clean `api.ts` backend seam, registry-driven panels — sitting on **one monolithic `contexts/AskNanciContext.tsx`** (~880 lines as of 2026-08-29, ~50 fields, 0 `useMemo`) that every interactive panel must edit. This is a well-organized *demo* being judged as a product; the demo-first mocking is load-bearing debt, and it's a stakeholder constraint — not the developer's fault, so don't frame it that way.
+A disciplined surface — strict types (0 `any`/`ts-ignore`), a clean `api.ts` backend seam, registry-driven panels — sitting on **one monolithic `contexts/AskNanciContext.tsx`** (~880 lines, ~50 fields, 0 `useMemo`) that every interactive panel must edit. This is a well-organized *demo* being judged as a product; the demo-first mocking is load-bearing debt and a stakeholder constraint, not the developer's fault, so don't frame it that way.
 
 - **The per-token re-render fan-out is already fixed — don't re-plan it.** `pendingBot` lives in `contexts/ChatStreamContext.tsx`, split into separate state/setter contexts: the provider writes through the stable setter (never re-renders on a token), `ChatView` reads the state (re-renders per token, correctly). Wired at both entry points — `AppShell.tsx` and `app/risk/page.tsx`. Splitting anything *further* out of the god-context is tidiness only.
 - **Memoizing the mega-context was deliberately not done** — a fragile 45-item `useMemo` deps array risks stale values for no real gain on a scripted demo.
@@ -14,7 +14,6 @@ A disciplined surface — strict types (0 `any`/`ts-ignore`), a clean `api.ts` b
 - A `PanelAction` protocol (pure `turnToPanelActions` mapper + one `applyPanelAction`, with an `action` seam on `ChatStreamChunk`) is the right shape for panel side effects. Nothing emits them yet; that wiring waits for a backend.
 - **RSC is blocked by design, not effort** — all panels are client/mock-state-driven. Don't fake it.
 - Live status for this work lives in `design-plans/embed-optimization-roadmap.md` **on the `embed-optimization` branch** (not present on `main`), not here.
-
 
 ## Adjacent work
 

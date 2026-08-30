@@ -2,8 +2,6 @@
 
 **Read when:** any multi-step task, staging, subagents, or visual direction
 
-Repo-specific habits. Read before a multi-step task, before staging anything, and before delegating to subagents.
-
 - **Skip the code-quality review round.** When running subagent-driven development here, do spec-compliance verification only: does the diff match what was asked, nothing missing or extra. They said plainly: "i don't care about code quality review, the demo is missing panels." Getting to a demonstrable state beats review ceremony.
 - **The working tree carries pre-existing uncommitted WIP in almost every file.** Before staging, `git diff <file>` against HEAD and stage only the hunks belonging to the current task. Warn implementer subagents explicitly; never assume a file is clean because your task touches two lines of it.
 - **Take spatial instructions literally.** "Down below and share half of Pending Deposits" meant vertical stacking; the existing horizontal-split precedent in the codebase was allowed to override their actual words, and the layout had to be rebuilt. Re-read what they said before defaulting to what the code already does.

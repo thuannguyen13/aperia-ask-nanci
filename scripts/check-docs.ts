@@ -73,7 +73,8 @@ function hardWrapLines(src: string): number[] {
       prev !== undefined &&
       prev.trim() !== "" &&
       !BLOCK_START.test(line) &&
-      !/^\s*(---|\*\*\*|___)\s*$/.test(prev)
+      // A line after a closing fence or a rule opens a block; it is not a wrap.
+      !/^\s*(```|~~~|---|\*\*\*|___)/.test(prev)
     ) {
       wrapped.push(i + 1)
     }

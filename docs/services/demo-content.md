@@ -24,7 +24,7 @@ Everything the assistant "answers" comes from one of three mocked paths in `hand
 - `data/panel-ui.ts` — mobile panel presentation candidates (see Read-when **panel layout**)
 - `data/panels/` — per-panel data (timeline rows, risk flags, batch lines, etc.); one file per panel
 
-The lib shells (`mock-data.ts`, `embed-demo-config.ts`) contain logic alongside re-exports: edit the `data/` files for content, these for routing/merge logic. `concept-config.ts` was removed; import directly from `data/flows.concept.ts` and `data/merchants.ts`.
+The lib shells (`mock-data.ts`, `embed-demo-config.ts`) contain logic alongside re-exports: edit the `data/` files for content, these for routing/merge logic.
 
 ## Personas are deliberately separate
 
@@ -32,4 +32,4 @@ The lib shells (`mock-data.ts`, `embed-demo-config.ts`) contain logic alongside 
 
 ## Financing flows target Mastercard
 
-Flow 20 (Credit Card Offer) is reduced to one card, "Silicon Valley Bank Business Card"; Flow 21 (Business Loan) to one product, "Mastercard Business Installments" ($5M / 9.75% / 5–7 days / up to 25 yr). The audience is Mastercard itself, so these show a single product, not a comparison list. Data lives in `lib/ask-nanci/data/panels/{credit-card,business-loan}-offer.ts` as single-element `*_OFFERS` arrays; card/loan art is pasted in by the user under `public/{credit-card,business-loan}-offer/` (monogram fallback until then), not fetched. Both flows open their panel directly on "Yes, show me", with no intermediate assistant bubble.
+The audience is Mastercard itself, so these show a single product, not a comparison list: Flow 20 (Credit Card Offer) shows one card, "Silicon Valley Bank Business Card"; Flow 21 (Business Loan) one product, "Mastercard Business Installments" ($5M / 9.75% / 5–7 days / up to 25 yr). Data lives in `lib/ask-nanci/data/panels/{credit-card,business-loan}-offer.ts` as single-element `*_OFFERS` arrays; card/loan art is pasted in by the user under `public/{credit-card,business-loan}-offer/` (monogram fallback until then), not fetched. Both flows open their panel directly on "Yes, show me", with no intermediate assistant bubble.

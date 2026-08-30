@@ -6,15 +6,15 @@ How a panel is registered, held open and laid out. The recipe for adding one is 
 
 ## Foundational principles: `/panels`
 
-**`public/panels/index.html`** carries the *why*: what a panel is, the Four Parts layout (Navigation / Primary / Secondary / Tertiary), the three triggers (navigate, summon, drill), the four rules of getting around, ship tests and open questions, with a playable prototype. Derived from the production vision (`docs/artifacts/demo-context/product-vision.mhtml`). Read it first if you're deciding *whether* a panel is the right answer at all. It is the single source for panel interaction principles (`panel-principles.md` was removed 2026-07-28).
+**`public/panels/index.html`** is the single source for panel interaction principles, and carries the *why*: what a panel is, the Four Parts layout (Navigation / Primary / Secondary / Tertiary), the three triggers (navigate, summon, drill), the four rules of getting around, ship tests and open questions, with a playable prototype. Derived from the production vision (`docs/artifacts/demo-context/product-vision.mhtml`). Read it first if you're deciding *whether* a panel is the right answer at all.
 
-It moved out of `docs/` on 2026-07-29 so the same Next app serves it: **`/panels`** alongside the live console. Its "See it running" link points at **`/risk`** (the console *with* the assistant, not the assistant-free `/risk-phase1`). The link is one-way: the console's top bar has no link back. It is still one self-contained file with no local asset dependencies (inline SVG, Google-hosted fonts), so it stays portable to the `../webflow` marketing repo. `/panels` needs the rewrite in `next.config.mjs` because Next's static handler serves exact paths only; `/panels/index.html` works without it.
+The Next app serves it at **`/panels`**, alongside the live console. Its "See it running" link points at **`/risk`** (the console *with* the assistant, not the assistant-free `/risk-phase1`); the link is one-way, the console's top bar has no link back. Keep it self-contained with no local asset dependencies (inline SVG, Google-hosted fonts) so it stays portable to the `../webflow` marketing repo. `/panels` needs the rewrite in `next.config.mjs` because Next's static handler serves exact paths only; `/panels/index.html` works without it.
 
 ## One unified panel stack
 
-There is no longer a "simple vs multi" split — every concept panel goes through one path.
+Every concept panel goes through one path.
 
-- **Registry.** Every panel is an entry in the `PANELS` map in `components/ask-nanci/concept/panel-registry.ts`. `PanelId` is derived from its keys (`export type PanelId = keyof typeof PANELS`), so adding a key is all it takes to make a panel referenceable everywhere — there is no separate union to keep in sync. Panels that used to be one-off "simple" panels (`bank-account-form`, `step-up-auth`, `batch-detail`) are ordinary entries in this same map.
+- **Registry.** Every panel is an entry in the `PANELS` map in `components/ask-nanci/concept/panel-registry.ts`. `PanelId` is derived from its keys (`export type PanelId = keyof typeof PANELS`), so adding a key is all it takes to make a panel referenceable everywhere — there is no separate union to keep in sync.
 - **Open stack.** The open panels are an ordered `PanelId[]` managed by `usePanelStack` (`lib/ask-nanci/use-panel-stack.ts`) and exposed from `AskNanciContext` as `dynamicPanels`. Insertion order is render order; the stack is capped at 3 (chat is the conceptual 4th slot). Helpers: `openDynamic(id)` pushes a panel (idempotent — no-op if already open), `closeDynamicPanel(id)` / `closePanel(id)` removes one, `closeAllNewPanels()` / `resetDynamic()` clears the stack (and also resets per-panel views + the decline-report filter).
 - **Layout.** `ConceptPanelArea` (`components/ask-nanci/concept/ConceptPanelArea.tsx`) renders `dynamicPanels`: each panel is one equal-height `PanelBox`, looked up by ID in `PANELS` and stacked vertically with a gap, in open order. There are no A/B/C/D grid slots and no `ResizablePanelGroup` in this layout.
 - **Per-panel view state.** A separate `panelViews` record (`PanelId → view string`) is set by `setPanelView(id, view)` and cleared by `clearPanelView(id)`. This is what a turn's `view` field drives — the same panel component can render different views over the flow without being reopened.
@@ -30,9 +30,7 @@ Below `md` the chat and the panel column cannot sit side by side, so one present
 
 ## Panel drift
 
-A 2026-07-22 audit of the then-26 concept panels against the design rules found 132 findings. Summary: the two-type-tier rule is effectively unenforced (22 of 25 panels), and `Callout` / `PanelHeader` / `Td` are rebuilt inline in 4–7 panels each. Treat the inline rebuilds as safe pure-deletion sweeps; **do not** bulk-fix the type-tier drift unless asked, since it is a large diff with no user-facing gain. The audit write-up (a docs/ file dated 2026-07-22) has since been deleted, and the registry has grown to 37 panels, so the counts above are a snapshot, not a live tally. Re-audit before acting on them.
-
-The one bug that audit left open, `MerchantVolumePanel.tsx` tinting its "reason this opened" row off a static `rank === 1`, is fixed: the row is matched by merchant identity instead, with the reasoning recorded in a comment at `MerchantVolumePanel.tsx:78`.
+Two known drifts from the design rules: the two-type-tier rule is largely unenforced, and `Callout` / `PanelHeader` / `Td` are rebuilt inline in several panels each. Treat the inline rebuilds as safe pure-deletion sweeps. **Do not** bulk-fix the type-tier drift unless asked: large diff, no user-facing gain. The counts came from a 2026-07-22 audit of 26 panels and the registry is now 37, so re-audit before acting.
 
 ## Resizable panels (`ResizablePanelGroup`, `ResizablePanel`, `ResizableHandle`)
 

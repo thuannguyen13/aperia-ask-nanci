@@ -2,7 +2,7 @@
 
 **Read when:** adding or editing a concept flow
 
-The recurring work in this repo, and the task every architectural decision is scored against. The turn-effect fields used in step 3 are tabled at the bottom of this file.
+The recurring work in this repo, and the task every architectural decision is scored against.
 
 1. Add a flow definition to `FLOW_DEFS` in `lib/ask-nanci/data/flows.concept.ts`. The prompt lists are all *derived* from it, so do not hand-edit them: `CONCEPT_ALL_PROMPTS` (from each flow's `key`), `CONCEPT_NO_RESET_PROMPTS` (from `keepSession` + `followups`), and `CONCEPT_MANUAL_PROMPTS` (from `manual`/`section` + `followups`).
 2. Add the full turn sequence to `CONCEPT_SCRIPTED_CONVERSATIONS`, keyed by the flow's `key`.
