@@ -134,6 +134,6 @@ Panels slide in by transitioning `width` and `opacity`. The panel is always moun
 - **Feel — precise & trustworthy.** Bank/analytics-tool rigor: tight, exact, monospace figures, restrained color. Confidence through rigor, not friendliness.
 - **Density — adaptive.** Dense and efficient for data panels (tables, queues); calm and spacious for answer/summary panels. Density follows the data shape.
 
-How to help the user pin down a visual direction is working style, not architecture: see Read-when **any multi-step task, staging, subagents, or visual direction**.
+How to help the user pin down a visual direction is working style, not architecture: see Read-when **visual direction**.
 
 A rendered design-language reference page (every token, pattern and state side by side) is agreed but deferred until after the current demo.

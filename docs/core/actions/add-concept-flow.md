@@ -13,7 +13,7 @@ The recurring work in this repo, and the task every architectural decision is sc
 
 ## Reaching non-embeddable flows locally
 
-To reach non-embeddable flows (Case, Bulk, Risk, form, step-up) in `?mode=concept`, pre-set `localStorage.ask_nanci_onboarded = "1"` — `OnboardingDialog` otherwise blocks the welcome cards — then click the flow card's "Try it".
+To reach a flow with no URL of its own (Case, Bulk, Risk, form, step-up) in `?mode=concept`, pre-set `localStorage.ask_nanci_onboarded = "1"` in the browser console — `OnboardingDialog` otherwise covers the welcome cards — then click the flow card's "Try it".
 
 ## Turn effects
 

@@ -2,6 +2,8 @@
 
 **Read when:** running checks, and before and after any cleanup or refactor sweep
 
+Run `npm run typecheck`, `check:flows`, `check:docs` and `lint` before committing. None of them detect visual problems, so confirm the result in a browser too.
+
 - `npm run check:flows` (`scripts/check-flows.ts`) — validates the flow registry is internally consistent: every routed key resolves to a conversation, nums and slugs unique. **Run it after touching flows.**
 - `npm run check:docs` (`scripts/check-docs.ts`) — validates the discovery contract across README.md, CLAUDE.md, the docs tree and every `.ts`/`.tsx` comment: every doc carries a `**Read when:**` marker, no file hardcodes a path to a doc, every trigger citation matches a real marker, no doc is hard-wrapped, CLAUDE.md stays path-free. **Run it after moving or renaming a doc, and after editing any `Read when` line** — a reworded trigger orphans the citations that named it, the one thing this design can still break.
 - `npm run demo:urls` (`scripts/demo-urls.ts`) — regenerates `docs/artifacts/demo-urls.md`, the catalog of every demo URL (modes, embeddable flow slugs, layout-only entries, flows with no embed URL). Generated from `FLOW_DEFS` / `EMBED_VARIANTS`, so never hand-edit the doc — add a slug and rerun. `BASE=https://... npm run demo:urls` writes deployed URLs instead of localhost.

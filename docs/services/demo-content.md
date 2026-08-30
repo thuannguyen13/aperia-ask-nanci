@@ -4,6 +4,8 @@
 
 All demo data lives in `lib/ask-nanci/data/`. **Never put mock content in component files.**
 
+Some values are calculated from others so the arithmetic stays consistent. Where a calculation exists, such as `sales / transactions`, edit the inputs rather than the result: never replace a calculation with a typed number. A figure appearing in both the chat and its panel should be derived in one place, not typed twice.
+
 ## Three dispatch paths
 
 Everything the assistant "answers" comes from one of three mocked paths in `handlePrompt` (`contexts/AskNanciContext.tsx`). Start here when output looks wrong.
