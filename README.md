@@ -33,17 +33,19 @@ The `?mode=` value selects the layout and branding.
 |---|---|
 | `/` | Full app: sidebar, knowledge base panel, chat history |
 | `/?mode=concept` | All demo stories as selectable cards |
-| `/?mode=concept-embed` | A single demo story, no sidebar |
+| `/?mode=concept-embed` **live** | A single demo story, no sidebar |
+| `/?mode=titan-embed` **live** | As `concept-embed`, with the Titan theme |
 | `/?mode=clover` **live** | Chat-only embed, Clover persona |
 | `/?mode=business-owner` **live** | Chat-only embed, business owner persona |
 | `/?mode=vw` **live** | Chat-only embed, VisionWeb persona |
+| `/?mode=abc` **live** | Chat-only embed, ABC persona |
 | `/?mode=iso` | Chat-only embed, ISO persona |
 | `/?mode=tib` | Full app with TIB branding |
 | `/?mode=woodforest` | Full app with Woodforest branding |
 | `/?mode=placeholder` | Full app with white-label branding |
-| `/?mode=onboarding` | Full app with the onboarding dialog on every load |
+| `/?mode=onboarding` **live** | Full app with the onboarding dialog on every load |
 | `/?mode=concept-nav` | Alias of `concept`, kept so older links keep working |
-| `/risk` | Aperia Risk shell, a separate product surface |
+| `/risk` **live** | Aperia Risk shell, a separate product surface |
 
 Any other `?mode=` value loads the full app.
 
@@ -168,7 +170,9 @@ If a new demo URL was added, run `npm run demo:urls` to regenerate the URL list.
 
 ## 6. Constraints
 
-- Never push without an explicit go-ahead. `main` ships to production on the next push.
+- Never push without an explicit go-ahead. `main` ships to production on the next push, via the `ask-nanci` Vercel project.
+- 38 embeds across 11 pages of `asknanci.ai` load this app in an iframe. Verify embed changes in a browser, not just `next build`.
+- The embed URLs live in Webflow, not here: a `Demo URL` prop on the `Browser` and `Ask Nanci Demo Wrapper` components, overridden per instance. Changing the host means editing every override.
 - `docs/artifacts/demo-urls.md` is generated. Regenerate it with `npm run demo:urls` instead of editing it.
 - Demo text and numbers belong in `lib/ask-nanci/data/`, not in component files.
 - Use `npm`. This project does not use `pnpm` or `yarn`.
