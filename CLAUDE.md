@@ -27,3 +27,9 @@ Moving a doc between categories therefore breaks nothing, because nothing record
 
 `npm run check:docs` enforces the contract: every doc carries a marker, no file hardcodes a path
 to one, every cited trigger matches a real marker, and this file stays path-free.
+
+## Writing here
+
+Concise and clear, in docs and in replies. Open with the answer. Cut preamble, restatements of the
+request, and closing recaps: nobody reads them. Say the thing once, at full detail if the thing
+needs it, and stop.
