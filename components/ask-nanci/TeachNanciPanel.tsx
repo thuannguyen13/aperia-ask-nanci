@@ -173,14 +173,6 @@ export function TeachNanciPanel() {
           </div>
         </div>
       </ScrollArea>
-
-      <input ref={fileRef} type="file" multiple className="hidden" onChange={handleFileChange} />
-
-      <ConnectWizard
-        open={wizardOpen}
-        onClose={() => setWizardOpen(false)}
-        onLinked={() => { refresh(); setWizardOpen(false) }}
-      />
     </>
   )
 
@@ -213,6 +205,18 @@ export function TeachNanciPanel() {
       >
         {panelContent}
       </div>
+
+      {/* Outside panelContent on purpose: that value renders in both the mobile and
+          desktop wrappers, so anything with a ref or a portal would exist twice —
+          two stacked ConnectWizard dialogs, and a fileRef pointing at whichever
+          input mounted last. */}
+      <input ref={fileRef} type="file" multiple className="hidden" onChange={handleFileChange} />
+
+      <ConnectWizard
+        open={wizardOpen}
+        onClose={() => setWizardOpen(false)}
+        onLinked={() => { refresh(); setWizardOpen(false) }}
+      />
     </>
   )
 }

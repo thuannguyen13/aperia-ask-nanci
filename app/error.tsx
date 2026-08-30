@@ -4,6 +4,10 @@ import { useEffect } from "react"
 import { AlertTriangle } from "lucide-react"
 import { Button } from "aperia-ds5"
 
+// Sits at app/ rather than app/(app)/ so it also covers /risk, /risk-phase1,
+// /charts, /generator and /responsive. Below this, global-error.tsx renders
+// outside the CSS scope and is deliberately unstyled, so a throw on a pitch
+// surface should never reach it.
 export default function AppError({
   error,
   reset,

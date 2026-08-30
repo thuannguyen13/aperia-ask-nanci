@@ -11,7 +11,6 @@ import { CARD_FIGURES } from "./panels/credit-card-offer";
 // ─── Flow-key constants ───────────────────────────────────────────────────────
 
 const CONCEPT_FLOW2_PROMPT = "Show me merchant volume for this week";
-const CONCEPT_FLOW2_FOLLOWUP = "Just the top 5";
 export const CONCEPT_FLOW6_KEY = "__proactive__";
 const CONCEPT_DETECT_WELCOME_KEY = "__detect_welcome__";
 
@@ -158,7 +157,6 @@ export const FLOW_DEFS: FlowDef[] = [
     badge: "Chat + panel",
     key: CONCEPT_FLOW2_PROMPT,
     slug: "2",
-    followups: [CONCEPT_FLOW2_FOLLOWUP],
     description: "Merchant volume table opens in a side panel, sortable by column.",
   },
   {
@@ -458,16 +456,6 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       content: "Here's your merchant volume for the week of May 15–21. I've opened the full breakdown in the panel — you can sort by any column.",
       panel: "merchant-volume",
       pauseAfter: 800,
-    },
-  ],
-  [CONCEPT_FLOW2_FOLLOWUP]: [
-    { role: "user", content: CONCEPT_FLOW2_FOLLOWUP },
-    {
-      role: "assistant",
-      content: "Got it — filtered to your top 5 by volume.",
-      panel: "merchant-volume",
-      view: "top5",
-      suggestions: ["Show me merchants with decline rates above 15% last week", CONCEPT_FLOW2_PROMPT],
     },
   ],
 

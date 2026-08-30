@@ -443,7 +443,10 @@ const QUESTION_TITLES: Record<string, string> = {
   "card-spend":     "Which card brand has the highest spend per customer?",
 }
 
-export const ALL_QUESTIONS = MOCK_RESPONSES.map((r) => QUESTION_TITLES[r.id] ?? r.id)
+// Only titled responses are offered in the slash-command list. An untitled one
+// (business-address) still answers when its keywords are typed, it just isn't
+// advertised — so a missing title drops the row instead of leaking the raw id.
+export const ALL_QUESTIONS = MOCK_RESPONSES.flatMap((r) => QUESTION_TITLES[r.id] ?? [])
 
 
 export const DEFAULT_RESPONSE =
