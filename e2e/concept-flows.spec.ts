@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test"
+import { ONBOARDING_KEY, TOUR_DONE_KEY } from "../lib/ask-nanci/storage-keys"
 
 // Smoke net for the concept demo flows (`/?mode=concept`). These exercise the two
 // things a later context refactor must not break: (1) an assistant answer streams
@@ -22,12 +23,14 @@ async function askPrompt(page: Page, prompt: string) {
 }
 
 test.beforeEach(async ({ page }) => {
-  // The non-embed concept view shows a blocking onboarding dialog until accounts
-  // are linked; this localStorage flag marks onboarding done so the welcome view
-  // is interactive. (Same key AskNanciContext checks on mount.)
-  await page.addInitScript(() => {
-    window.localStorage.setItem("ask_nanci_onboarded", "1")
-  })
+  // The non-embed concept view blocks on two things: the link-accounts dialog,
+  // then the product tour. Both must be marked done or their overlay swallows
+  // every click. Keys are imported, never retyped — adding the tour is exactly
+  // what silently broke this file before.
+  await page.addInitScript(([onboarded, tour]) => {
+    window.localStorage.setItem(onboarded, "1")
+    window.localStorage.setItem(tour, "1")
+  }, [ONBOARDING_KEY, TOUR_DONE_KEY])
   await page.goto(CONCEPT_URL)
   // Welcome view is up once the chat input has rendered.
   await expect(page.getByPlaceholder("Ask anything")).toBeVisible({ timeout: 30_000 })

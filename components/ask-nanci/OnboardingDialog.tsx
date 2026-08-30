@@ -6,7 +6,8 @@ import { useEffect, useState } from "react"
 import { Button, Dialog, DialogContent, DialogTitle } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { ConnectWizard } from "./ConnectWizard"
-import { FOUNDATION_SOURCE, ONBOARDING_KEY, readSources } from "@/lib/ask-nanci/source-store"
+import { FOUNDATION_SOURCE, readSources } from "@/lib/ask-nanci/source-store"
+import { ONBOARDING_KEY } from "@/lib/ask-nanci/storage-keys"
 
 
 const ROW1 = [

@@ -1,7 +1,8 @@
 import type { Session, Message } from "./types"
 import { generateId } from "./utils"
+import { SESSIONS_KEY } from "./storage-keys"
 
-const SESSIONS_KEY = "asknanci_chats"
+
 const MAX_SESSIONS = 20
 
 export function readSessions(): Session[] {

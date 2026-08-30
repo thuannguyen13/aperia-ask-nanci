@@ -1,10 +1,11 @@
 import type { Source } from "./types"
 import { generateId } from "./utils"
+import { SOURCES_KEY } from "./storage-keys"
 
-const SOURCES_KEY = "asknanci_sources"
+
 
 export const FOUNDATION_SOURCE_ID = "foundation-built-in"
-export const ONBOARDING_KEY   = "ask_nanci_onboarded"
+
 
 // The pre-configured foundation datasource the product ships with (the dataset a
 // merchant's own added accounts layer on top of). Its value is per-host/theme —

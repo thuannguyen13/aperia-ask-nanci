@@ -5,7 +5,7 @@ import { InfoIcon } from "lucide-react"
 import { Joyride, EVENTS, STATUS, type Step, type EventData } from "react-joyride"
 import { Dialog, DialogContent, DialogTitle } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { ONBOARDING_KEY } from "@/lib/ask-nanci/source-store"
+import { ONBOARDING_KEY, TOUR_DONE_KEY, TOUR_STEP_KEY } from "@/lib/ask-nanci/storage-keys"
 import { TutorialModal } from "./TutorialModal"
 
 /**
@@ -15,8 +15,6 @@ import { TutorialModal } from "./TutorialModal"
  * Exported so the `/onboarding` slash command can re-arm the tour alongside the
  * dialog — otherwise a demo can only ever be seen once per browser.
  */
-export const TOUR_DONE_KEY = "ask_nanci_tour_done"
-export const TOUR_STEP_KEY = "ask_nanci_tour_step"
 
 function Callout({ children }: { children: React.ReactNode }) {
   return (

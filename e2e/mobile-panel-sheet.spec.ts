@@ -1,4 +1,5 @@
 import { test, expect, type Locator, type Page } from "@playwright/test"
+import { ONBOARDING_KEY, TOUR_DONE_KEY } from "../lib/ask-nanci/storage-keys"
 
 // Geometry pins for the mobile panel sheet (components/ask-nanci/concept/sheet/MobilePanelSwitcher.tsx).
 // Below `md` one panel is presented as a card that slides in from an edge, and every
@@ -73,11 +74,12 @@ const frameOf = (page: Page, label = PANEL) => cardOf(page, label).locator("..")
 const box = async (locator: Locator) => (await locator.boundingBox())!
 
 async function gotoFlow(page: Page, query: string) {
-  // The concept demo blocks on an onboarding dialog until this flag is set — same key
-  // AskNanciContext reads on mount (and the same beforeEach concept-flows.spec.ts uses).
-  await page.addInitScript(() => {
-    window.localStorage.setItem("ask_nanci_onboarded", "1")
-  })
+  // Onboarding dialog and product tour both block interaction until marked done.
+  // Keys imported from the shared module, never retyped.
+  await page.addInitScript(([onboarded, tour]) => {
+    window.localStorage.setItem(onboarded, "1")
+    window.localStorage.setItem(tour, "1")
+  }, [ONBOARDING_KEY, TOUR_DONE_KEY])
   await page.goto(`/?mode=concept-embed&${query}&autoplay`)
 }
 
