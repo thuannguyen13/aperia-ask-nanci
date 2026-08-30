@@ -6,8 +6,7 @@ Read before any git action, deploy, or change to a URL-mode code path.
 
 ## Branches and deploys
 
-- **`main` is the branch: work on it, ship from it.** It was pinned at `d718bba` for another team until 2026-08-30 and `embed` was the working branch; both are history now. Anything that moves `main` reaches production on the next push.
-- **Never `git push` without an explicit go-ahead.**
+- **Pushing `main` ships to production.** Never `git push` without an explicit go-ahead.
 - **Two Vercel projects build this repo.** `ask-nanci` deploys `main` and serves **`https://ask-nanci.vercel.app`**, the host every production embed points at. The older `aperia-ask-nanci-embed` project deploys `embed` and is no longer referenced by anything; treat it as a stale fallback, not a target.
 
 ## The live embeds
