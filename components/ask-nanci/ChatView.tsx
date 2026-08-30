@@ -30,7 +30,7 @@ function RestartDemoButton() {
 }
 
 // Dormant: the scroll-to-bottom affordance is fully built below but shipped off.
-// Flip to `true` to activate it (see docs/plans / useChatScroll JSDoc).
+// Flip to `true` to activate it (see the useChatScroll JSDoc).
 const ENABLE_SCROLL_TO_BOTTOM_BUTTON = false
 
 export function ChatView() {

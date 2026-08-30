@@ -24,7 +24,7 @@ import { PanelTable, Thead, Th, Td, formatCurrency, formatWholeCurrency } from "
 // hands out links that already point at the right host.
 
 // Derived from the registry, not hand-listed: a flow that gains a slug shows up here
-// on its own, the same way docs/artifacts/demo-urls.md is generated rather than maintained.
+// on its own, the same way the demo URL catalog is generated rather than maintained.
 const FLOWS = [
   { value: "none", label: "None — start on the welcome screen" },
   ...FLOW_DEFS.filter((f) => f.slug).map((f) => ({ value: f.slug as string, label: `${f.slug} · ${f.title}` })),

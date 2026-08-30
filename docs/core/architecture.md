@@ -42,7 +42,7 @@ it's a stakeholder constraint — not the developer's fault, so don't frame it t
   **Ask Nanci appears in two placements** — the "Ask Nanci" nav item is the full-center home/chat,
   while Dashboard and Detection Queue get it as a **right-side drawer** over the data. An early
   `/risk` MVP inverted this and was wrong.
-- **Financing flows target Mastercard.** See `docs/services/demo-content.md` for the flow 20 / 21
+- **Financing flows target Mastercard.** See Read-when **changing demo data** for the flow 20 / 21
   single-product rule.
 - **The marketing decks are a different repo** — `../webflow` (remote `aperia-ask-nanci-marketing`),
   checked out locally as `~/Documents/code/aperia-ask-nanci-marketing`. Same product, static HTML

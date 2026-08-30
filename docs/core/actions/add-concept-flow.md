@@ -12,10 +12,10 @@ The turn-effect fields used in step 3 are tabled at the bottom of this file.
 2. Add the full turn sequence to `CONCEPT_SCRIPTED_CONVERSATIONS`, keyed by the flow's `key`.
 3. Wire panel effects in the turn objects: `panel`, `view`, `closePanel`, `filterDeclineReport`,
    `closeAllPanels`. See "Turn effects" below.
-4. If the flow needs a new panel, do `docs/ui/actions/add-panel.md` first.
+4. If the flow needs a new panel, do Read-when **adding a panel** first.
 5. Run `npm run check:flows`.
 6. If the flow should be reachable as an embed, add its slug and rerun `npm run demo:urls`
-   (see `docs/operations/testing.md`).
+   (see Read-when **running checks**).
 
 ## Reaching non-embeddable flows locally
 

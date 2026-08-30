@@ -14,7 +14,8 @@ npm install
 npm run dev
 ```
 
-The app runs at http://localhost:3000. No credentials, environment variables or database are required.
+The dev server prints the address it is running on. No credentials, environment variables or
+database are required.
 
 Keep the dev server running while working. Saved files reload automatically.
 
@@ -22,8 +23,8 @@ Keep the dev server running while working. Saved files reload automatically.
 
 ## 2. Running a demo
 
-Each demo is a URL. Everything below also works on the client-facing site by replacing
-`http://localhost:3000` with `https://ask-nanci.vercel.app`.
+Each demo is a path. The paths below are relative, so the same ones work against the dev server and
+against the deployed site: append them to whichever host you are on.
 
 **live** marks a URL currently embedded on the production site. Changes affecting those pages are
 customer-facing.
@@ -34,19 +35,19 @@ The `?mode=` value selects the layout and branding.
 
 | URL | Shows |
 |---|---|
-| `http://localhost:3000/` | Full app: sidebar, knowledge base panel, chat history |
-| `http://localhost:3000/?mode=concept` | All demo stories as selectable cards |
-| `http://localhost:3000/?mode=concept-embed` | A single demo story, no sidebar |
-| `http://localhost:3000/?mode=clover` **live** | Chat-only embed, Clover persona |
-| `http://localhost:3000/?mode=business-owner` **live** | Chat-only embed, business owner persona |
-| `http://localhost:3000/?mode=vw` **live** | Chat-only embed, VisionWeb persona |
-| `http://localhost:3000/?mode=iso` | Chat-only embed, ISO persona |
-| `http://localhost:3000/?mode=tib` | Full app with TIB branding |
-| `http://localhost:3000/?mode=woodforest` | Full app with Woodforest branding |
-| `http://localhost:3000/?mode=placeholder` | Full app with white-label branding |
-| `http://localhost:3000/?mode=onboarding` | Full app with the onboarding dialog on every load |
-| `http://localhost:3000/?mode=concept-nav` | Alias of `concept`, kept so older links keep working |
-| `http://localhost:3000/risk` | Aperia Risk shell, a separate product surface |
+| `/` | Full app: sidebar, knowledge base panel, chat history |
+| `/?mode=concept` | All demo stories as selectable cards |
+| `/?mode=concept-embed` | A single demo story, no sidebar |
+| `/?mode=clover` **live** | Chat-only embed, Clover persona |
+| `/?mode=business-owner` **live** | Chat-only embed, business owner persona |
+| `/?mode=vw` **live** | Chat-only embed, VisionWeb persona |
+| `/?mode=iso` | Chat-only embed, ISO persona |
+| `/?mode=tib` | Full app with TIB branding |
+| `/?mode=woodforest` | Full app with Woodforest branding |
+| `/?mode=placeholder` | Full app with white-label branding |
+| `/?mode=onboarding` | Full app with the onboarding dialog on every load |
+| `/?mode=concept-nav` | Alias of `concept`, kept so older links keep working |
+| `/risk` | Aperia Risk shell, a separate product surface |
 
 Any other `?mode=` value loads the full app.
 
@@ -57,22 +58,22 @@ Add `&flow=` and a number to `?mode=concept-embed`. **Automatic** stories play e
 
 | URL | Story | Type |
 |---|---|---|
-| `?mode=concept-embed&flow=1` | Simple Update | Automatic |
-| `?mode=concept-embed&flow=2` **live** | Data Lookup | Automatic |
-| `?mode=concept-embed&flow=5` **live** | Error Recovery | Manual |
-| `?mode=concept-embed&flow=6` | Proactive Surfacing | Automatic |
-| `?mode=concept-embed&flow=11` **live** | Detection Queue, alternate entry | Automatic |
-| `?mode=concept-embed&flow=12` | Detection Queue | Automatic |
-| `?mode=concept-embed&flow=13` **live** | Deposit Tracker | Manual |
-| `?mode=concept-embed&flow=14` **live** | Fee Change Explainer | Manual |
-| `?mode=concept-embed&flow=15` **live** | Sales Snapshot | Manual |
-| `?mode=concept-embed&flow=16` **live** | Account Change | Manual |
-| `?mode=concept-embed&flow=17` **live** | Escalation | Manual |
-| `?mode=concept-embed&flow=18` **live** | Running Low | Manual |
-| `?mode=concept-embed&flow=19` **live** | Address Change | Manual |
-| `?mode=concept-embed&flow=20` **live** | Credit Card Offer | Manual |
-| `?mode=concept-embed&flow=21` **live** | Business Loan Offer | Manual |
-| `?mode=concept-embed&flow=22` **live** | Service Marketplace | Opens a page, not a story |
+| `/?mode=concept-embed&flow=1` | Simple Update | Automatic |
+| `/?mode=concept-embed&flow=2` **live** | Data Lookup | Automatic |
+| `/?mode=concept-embed&flow=5` **live** | Error Recovery | Manual |
+| `/?mode=concept-embed&flow=6` | Proactive Surfacing | Automatic |
+| `/?mode=concept-embed&flow=11` **live** | Detection Queue, alternate entry | Automatic |
+| `/?mode=concept-embed&flow=12` | Detection Queue | Automatic |
+| `/?mode=concept-embed&flow=13` **live** | Deposit Tracker | Manual |
+| `/?mode=concept-embed&flow=14` **live** | Fee Change Explainer | Manual |
+| `/?mode=concept-embed&flow=15` **live** | Sales Snapshot | Manual |
+| `/?mode=concept-embed&flow=16` **live** | Account Change | Manual |
+| `/?mode=concept-embed&flow=17` **live** | Escalation | Manual |
+| `/?mode=concept-embed&flow=18` **live** | Running Low | Manual |
+| `/?mode=concept-embed&flow=19` **live** | Address Change | Manual |
+| `/?mode=concept-embed&flow=20` **live** | Credit Card Offer | Manual |
+| `/?mode=concept-embed&flow=21` **live** | Business Loan Offer | Manual |
+| `/?mode=concept-embed&flow=22` **live** | Service Marketplace | Opens a page, not a story |
 
 Six further stories have no URL and are reachable only from the `?mode=concept` cards: Panel as Form,
 Step-up Auth, Case Management, Bulk Action, Risk Investigation, Work Queue.
@@ -86,7 +87,7 @@ Both can be added to any of the URLs above.
 | `&autoplay` | Starts the story on load. Without it, the story waits for the "Ask" button |
 | `&brand=generic` | Removes partner branding from flows 20 and 21 for sales demos. Amounts and terms are unchanged. Other flows ignore it |
 
-Example: `http://localhost:3000/?mode=concept-embed&flow=18&autoplay`
+Example: `/?mode=concept-embed&flow=18&autoplay`
 
 `docs/artifacts/demo-urls.md` holds the same list and is regenerated by `npm run demo:urls`.
 
@@ -150,17 +151,20 @@ calculation with a typed number.
 
 ### Adding a new demo story
 
-Follow "Adding a new concept scripted flow" in `CLAUDE.md`, which lists the required steps in order.
+Follow Read-when **adding or editing a concept flow**, which lists the required steps in order.
+Docs are cited by their "Read when" trigger rather than by path: grep `docs/` for that phrase to
+find the file.
 
 ---
 
 ## 5. Verification
 
-Run all three before committing. All three must pass.
+Run all four before committing. All four must pass.
 
 ```bash
 npm run typecheck     # type errors
 npm run check:flows   # broken demo routes
+npm run check:docs    # doc paths that no longer exist
 npm run lint          # code style
 ```
 
@@ -195,7 +199,8 @@ If a new demo URL was added, run `npm run demo:urls` to regenerate the URL list.
 | `components/ask-nanci/` | On-screen components |
 | `docs/artifacts/demo-urls.md` | Generated list of every demo URL |
 | `docs/artifacts/demo-context/` | Background on the customers and their workflows |
-| `CLAUDE.md` | Full technical detail and conventions |
+| `docs/` | Full technical detail, split into `core`, `ui` and `services` |
+| `CLAUDE.md` | How to find the right doc for a task |
 
 ---
 
@@ -222,22 +227,23 @@ None of these prevent a demo from running.
 
 ## 9. Working with Claude Code
 
-Claude reads `CLAUDE.md` in this repository automatically, and `.claude/rules/panel-design.md` when it
-opens a panel component. Neither needs to be pasted in. This README is the summary; those two files
-carry the detail, so a request to change panel structure or add a flow should send Claude there.
+Claude reads `CLAUDE.md` in this repository automatically. That file holds no detail itself: it tells
+Claude to grep `docs/` for the doc whose "Read when" line matches the task. Nothing needs to be pasted
+in. This README is the summary; `docs/` carries the detail, so a request to change panel structure or
+add a flow should send Claude there.
 
 ### Suggested opening message
 
 > This is the Ask Nanci demo repo, a front-end prototype with no backend where all answers are
 > hand-written scripts. Read `CLAUDE.md` before making changes. I am covering for a teammate and am not
 > familiar with this codebase, so explain each change and the reason for it. Push to `embed` only,
-> never `main`. Before reporting work as complete, run `npm run typecheck`, `npm run check:flows` and
-> `npm run lint`, and verify the result in a browser.
+> never `main`. Before reporting work as complete, run `npm run typecheck`, `npm run check:flows`,
+> `npm run check:docs` and `npm run lint`, and verify the result in a browser.
 
 ### Suitable requests
 
 - Rewording specific text, where the correct file needs locating
-- Adding a new demo flow, following the recipe in `CLAUDE.md`
+- Adding a new demo flow, following the recipe under Read-when **adding or editing a concept flow**
 - Checking whether figures are consistent across the chat and its panel
 - Explaining how an existing flow behaves
 

@@ -28,8 +28,8 @@ delegating to subagents.
 ## Helping them decide on visuals
 
 They find visual problems hard to put into words and want a named design language so words become
-*pointers* rather than descriptions rebuilt from memory. The agreed direction itself is in
-`docs/ui/design.md`; this is how to get there.
+*pointers* rather than descriptions rebuilt from memory. The agreed direction itself is Read-when
+**picking a pattern**; this is how to get there.
 
 Don't ask them to describe from imagination. Point, don't describe (screenshots). Compare, don't
 characterize ("why does A differ from B"). Treat a named feeling ("feels cheap", "cluttered") as

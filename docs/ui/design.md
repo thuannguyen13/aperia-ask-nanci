@@ -3,8 +3,8 @@
 **Read when:** deciding what goes inside a panel; colors, type, or picking a pattern
 
 How a panel should look and what it should contain. The recipe for building one, and the shared
-primitives to build it from, are in `docs/ui/actions/add-panel.md`; the registry and open stack are
-in `docs/ui/panels.md`.
+primitives to build it from, are Read-when **adding a panel**; the registry and open stack are
+Read-when **registering or opening a panel**.
 
 ## Generative UI content rules
 
@@ -141,8 +141,8 @@ become *pointers* rather than descriptions rebuilt from memory. Agreed direction
 - **Density — adaptive.** Dense and efficient for data panels (tables, queues); calm and spacious
   for answer/summary panels. Density follows the data shape.
 
-How to help the user pin down a visual direction is working style, not architecture: see
-`.claude/working-style.md`.
+How to help the user pin down a visual direction is working style, not architecture: see Read-when
+**any multi-step task, staging, subagents, or visual direction**.
 
 A rendered design-language reference page (every token, pattern and state side by side) is agreed
 but deferred until after the current demo.

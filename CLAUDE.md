@@ -18,5 +18,12 @@ Run that before starting work and open only the rows that match the task. Do it 
 - Step-by-step recipes live in each category's `actions/`.
 - `docs/artifacts/` is generated output and raw source material, excluded from the grep on purpose.
 
-`npm run check:docs` enforces the contract: every doc carries a marker, every cross-reference
-resolves, and this file stays path-free.
+No file stores a path to a doc, this one included. A doc's address is its trigger, so one doc
+points at another by citing the phrase and letting you re-run the grep:
+
+> The recipe for building one is Read-when **adding a panel**.
+
+Moving a doc between categories therefore breaks nothing, because nothing recorded where it was.
+
+`npm run check:docs` enforces the contract: every doc carries a marker, no file hardcodes a path
+to one, every cited trigger matches a real marker, and this file stays path-free.

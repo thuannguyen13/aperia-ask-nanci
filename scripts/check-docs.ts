@@ -1,42 +1,97 @@
 /**
  * Validates the doc discovery contract that CLAUDE.md depends on.
  *
- * CLAUDE.md holds no paths. It tells you to run a grep for `**Read when:**` and open what
- * matches, so a doc without that marker is invisible, and a cross-reference to a moved file
- * is a dead end. Both are silent failures, which is what this catches.
+ * Docs are retrieved on the fly, never by stored path. A doc's address is its `**Read when:**`
+ * trigger: you grep for the trigger and open what matches. So a doc without a marker is
+ * invisible, and a hardcoded path to a doc is a landmine — it survives the move that
+ * invalidates it and nothing notices. This enforces both halves:
+ *
+ *   1. Every doc carries a marker.
+ *   2. Nothing anywhere hardcodes a path to a markered doc. Cite it as
+ *      `Read-when **<trigger phrase>**` instead, and that citation must match a real marker.
+ *
+ * `docs/artifacts/` is the deliberate exception: generated output and raw source material carry
+ * no markers and cannot be found by trigger, so those paths stay literal and are existence-checked.
  */
 import { readFileSync } from "node:fs"
 import { globSync } from "node:fs"
 import { existsSync } from "node:fs"
 
-const MARKER = /^\*\*Read when:\*\* \S/m
-const REF = /`((?:docs|\.claude)\/[A-Za-z0-9_/.-]+\.(?:md|mhtml))`/g
+const MARKER = /^\*\*Read when:\*\* (\S.*)$/m
+/** How one doc cites another: by trigger phrase, resolved by grep at read time. */
+const CITATION = /Read-when \*\*([^*]+)\*\*/g
+/** A path to a specific file under docs/ or .claude/, with or without surrounding backticks. */
+const FILE_PATH = /(?:docs|\.claude)\/[A-Za-z0-9_.-]+(?:\/[A-Za-z0-9_.-]+)*\.[A-Za-z0-9]+/g
+/** A directory under docs/ or .claude/, written with a trailing slash. Bare `docs/` is prose. */
+const DIR_PATH = /(?:docs|\.claude)\/[A-Za-z0-9_.-]+(?:\/[A-Za-z0-9_.-]+)*\//g
 
-const files = globSync("{docs,.claude}/**/*.md").filter(
-  (f) => !f.startsWith("docs/artifacts/demo-context/"),
-)
+/** Retrieved by trigger. A path to one of these is what goes stale. */
+const docs = globSync("{docs,.claude}/**/*.md").filter((f) => !f.startsWith("docs/artifacts/"))
 
+/** Everywhere a path or a citation can be written. */
+const sources = [
+  ...docs,
+  "README.md",
+  "CLAUDE.md",
+  ...globSync("{app,components,lib,scripts}/**/*.{ts,tsx}"),
+]
+
+/** The generator must name its own output file; that path is the program, not a reference. */
+const PATH_EXEMPT = new Set(["scripts/demo-urls.ts", "scripts/check-docs.ts"])
+
+const triggers = new Map<string, string>()
 const missingMarker: string[] = []
-const deadRefs: string[] = []
 
-for (const file of files) {
+for (const file of docs) {
+  const m = readFileSync(file, "utf8").match(MARKER)
+  if (!m) missingMarker.push(file)
+  else triggers.set(file, m[1].toLowerCase())
+}
+
+const storedPaths: string[] = []
+const deadRefs: string[] = []
+const deadCitations: string[] = []
+
+for (const file of sources) {
   const body = readFileSync(file, "utf8")
-  if (!MARKER.test(body)) missingMarker.push(file)
-  for (const [, target] of body.matchAll(REF)) {
-    if (!existsSync(target)) deadRefs.push(`${file} → ${target}`)
+
+  // This file quotes the citation syntax to explain it; it cites nothing.
+  if (file === "scripts/check-docs.ts") continue
+
+  for (const [, phrase] of body.matchAll(CITATION)) {
+    // Citations wrap across lines in prose; match on the collapsed phrase.
+    const needle = phrase.replace(/\s+/g, " ").trim().toLowerCase()
+    if (![...triggers.values()].some((t) => t.replace(/\s+/g, " ").includes(needle))) {
+      deadCitations.push(`${file} → Read-when **${phrase}**`)
+    }
+  }
+
+  if (PATH_EXEMPT.has(file)) continue
+  for (const target of new Set([...(body.match(FILE_PATH) ?? []), ...(body.match(DIR_PATH) ?? [])])) {
+    // A path into a markered doc is banned outright, even while it still resolves.
+    if (docs.some((d) => d === target || d.startsWith(target))) storedPaths.push(`${file} → ${target}`)
+    else if (!existsSync(target)) deadRefs.push(`${file} → ${target}`)
   }
 }
 
 // CLAUDE.md must stay path-free: paths there are what goes stale.
-const claudeRefs = [...readFileSync("CLAUDE.md", "utf8").matchAll(REF)].map((m) => m[1])
+const claudeRefs = readFileSync("CLAUDE.md", "utf8").match(FILE_PATH) ?? []
 
-if (missingMarker.length || deadRefs.length || claudeRefs.length) {
+if (missingMarker.length || storedPaths.length || deadRefs.length || deadCitations.length || claudeRefs.length) {
   if (missingMarker.length) {
     console.error(`\n✗ ${missingMarker.length} doc(s) with no "**Read when:**" marker — invisible to discovery:`)
     for (const f of missingMarker) console.error(`    ${f}`)
   }
+  if (storedPaths.length) {
+    console.error(`\n✗ ${storedPaths.length} hardcoded path(s) to a doc — cite the "Read when" trigger instead:`)
+    for (const r of storedPaths) console.error(`    ${r}`)
+  }
+  if (deadCitations.length) {
+    console.error(`\n✗ ${deadCitations.length} citation(s) matching no "Read when" trigger:`)
+    for (const r of deadCitations) console.error(`    ${r}`)
+  }
   if (deadRefs.length) {
-    console.error(`\n✗ ${deadRefs.length} dead cross-reference(s):`)
+    console.error(`\n✗ ${deadRefs.length} dead reference(s) into docs/artifacts:`)
     for (const r of deadRefs) console.error(`    ${r}`)
   }
   if (claudeRefs.length) {
@@ -47,4 +102,6 @@ if (missingMarker.length || deadRefs.length || claudeRefs.length) {
   process.exit(1)
 }
 
-console.log(`✓ docs OK — ${files.length} files, all discoverable, no dead refs, CLAUDE.md path-free.`)
+console.log(
+  `✓ docs OK — ${docs.length} docs discoverable by trigger, ${sources.length} files carry no stored doc paths.`,
+)

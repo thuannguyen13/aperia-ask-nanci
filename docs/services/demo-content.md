@@ -22,7 +22,7 @@ Everything the assistant "answers" comes from one of three mocked paths in `hand
 - `data/sources.ts` — embed source arrays per variant
 - `data/account.ts` — mock usage, plan tiers, activity, current user
 - `data/merchants.ts` — merchant volume table data
-- `data/panel-ui.ts` — mobile panel presentation candidates (see `docs/ui/panels.md`)
+- `data/panel-ui.ts` — mobile panel presentation candidates (see Read-when **panel layout**)
 - `data/panels/` — per-panel data (timeline rows, risk flags, batch lines, etc.); one file per panel
 
 The lib shells (`mock-data.ts`, `embed-demo-config.ts`) contain logic alongside re-exports: edit

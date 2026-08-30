@@ -2,8 +2,8 @@
 
 **Read when:** registering or opening a panel, panel layout, the mobile sheet
 
-How a panel is registered, held open and laid out. The recipe for adding one is
-`docs/ui/actions/add-panel.md`; what goes inside one is `docs/ui/design.md`.
+How a panel is registered, held open and laid out. The recipe for adding one is Read-when
+**adding a panel**; what goes inside one is Read-when **deciding what goes inside a panel**.
 
 ## Foundational principles: `/panels`
 

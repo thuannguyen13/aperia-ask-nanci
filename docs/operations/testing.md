@@ -8,6 +8,13 @@ open a file. CLAUDE.md points here.
 - `npm run check:flows` (`scripts/check-flows.ts`) — validates the flow registry is internally
   consistent: every routed key resolves to a conversation, nums and slugs unique. **Run it after
   touching flows.**
+- `npm run check:docs` (`scripts/check-docs.ts`) — validates the discovery contract: every doc
+  carries a `**Read when:**` marker, no file hardcodes a path to a doc, every trigger citation
+  matches a real marker, and CLAUDE.md stays path-free. It scans README.md, CLAUDE.md, the
+  docs tree and every `.ts`/`.tsx` comment, because source comments are where stale paths hid
+  longest. **Run it after moving or renaming a doc, and after editing any `Read when` line** — a
+  reworded trigger orphans the citations that named it, which is the one thing this design can
+  still break.
 - `npm run demo:urls` (`scripts/demo-urls.ts`) — regenerates `docs/artifacts/demo-urls.md`, the catalog of
   every demo URL (modes, embeddable flow slugs, layout-only entries, flows with no embed URL).
   Generated from `FLOW_DEFS` / `EMBED_VARIANTS`, so never hand-edit the doc — add a slug and rerun.

@@ -2,8 +2,9 @@
 
 **Read when:** adding a panel
 
-Mechanics only. What the panel should *contain* and *look like* is `docs/ui/design.md`;
-whether a panel is the right answer at all is `/panels` (`public/panels/index.html`).
+Mechanics only. What the panel should *contain* and *look like* is Read-when **deciding what goes
+inside a panel**; whether a panel is the right answer at all is `/panels`
+(`public/panels/index.html`).
 
 1. Create the panel component in `components/ask-nanci/concept/`. Build it from the shared
    primitives tabled below — never re-implement the header, scroll structure,
@@ -13,7 +14,7 @@ whether a panel is the right answer at all is `/panels` (`public/panels/index.ht
    `PanelId` union to edit, no `PanelContent` switch, and no slot mapping.
 3. To open it from a script, set `panel: "<its-key>"` on a turn. No per-panel `case` in
    `playConceptScripted` is needed — `applyTurnEffects` opens any registered panel generically.
-   The full field list is under "Turn effects" in `docs/core/actions/add-concept-flow.md`.
+   The full field list is under "Turn effects" in Read-when **adding or editing a concept flow**.
 
 That is the whole checklist. If you find yourself editing a third file to make a panel appear,
 something has regressed against the north star; fix that instead of working around it.
