@@ -8,7 +8,7 @@ import {
   CONCEPT_MANUAL_PROMPTS,
 } from "./flows.concept"
 import { RISK_QUICK_ACTIONS, RISK_NANCI_TAKES } from "./risk-landing"
-import { RISK_SUGGESTION_DESTS } from "./risk-conversations"
+import { RISK_SUGGESTION_DESTS, DETECTION_QUEUE_PROMPT } from "./risk-conversations"
 import type { ConceptScriptedTurn } from "../types"
 
 const CONVERSATIONS = CONCEPT_SCRIPTED_CONVERSATIONS as Record<string, ConceptScriptedTurn[]>
@@ -92,6 +92,9 @@ describe("concept routing tables", () => {
     // from the risk landing's own surfaces, not from FLOW_DEFS or suggestion pills.
     RISK_QUICK_ACTIONS.forEach((a) => routed.add(a.prompt))
     RISK_NANCI_TAKES.forEach((t) => routed.add(t.prompt))
+    // Summoned from the Detection Queue header, so its only entry point is a
+    // component prop (DetectionQueueInsightPanel) rather than a data file.
+    routed.add(DETECTION_QUEUE_PROMPT)
     const orphans = [...convKeys].filter((k) => !routed.has(k))
     expect(orphans).toEqual([])
   })
