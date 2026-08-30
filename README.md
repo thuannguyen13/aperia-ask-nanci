@@ -26,26 +26,25 @@ Every demo is a relative path, appended to the dev server address or to the depl
 
 ### Demo stories
 
-Add `&flow=` to `?mode=concept-embed`. **Automatic** stories play every turn on their own; **Manual** stories stop at each customer turn and wait for the suggestion chip to be clicked.
 
-| URL | Story | Type |
-|---|---|---|
-| `/?mode=concept-embed&flow=1` | Simple Update | Automatic |
-| `/?mode=concept-embed&flow=2` | Data Lookup | Automatic |
-| `/?mode=concept-embed&flow=5` | Error Recovery | Manual |
-| `/?mode=concept-embed&flow=6` | Proactive Surfacing | Automatic |
-| `/?mode=concept-embed&flow=11` | Detection Queue, alternate entry | Automatic |
-| `/?mode=concept-embed&flow=12` | Detection Queue | Automatic |
-| `/?mode=concept-embed&flow=13` | Deposit Tracker | Manual |
-| `/?mode=concept-embed&flow=14` | Fee Change Explainer | Manual |
-| `/?mode=concept-embed&flow=15` | Sales Snapshot | Manual |
-| `/?mode=concept-embed&flow=16` | Account Change | Manual |
-| `/?mode=concept-embed&flow=17` | Escalation | Manual |
-| `/?mode=concept-embed&flow=18` | Running Low | Manual |
-| `/?mode=concept-embed&flow=19` | Address Change | Manual |
-| `/?mode=concept-embed&flow=20` | Credit Card Offer | Manual |
-| `/?mode=concept-embed&flow=21` | Business Loan Offer | Manual |
-| `/?mode=concept-embed&flow=22` | Service Marketplace | Opens a page, not a story |
+| URL | Story |
+|---|---|
+| `/?mode=concept-embed&flow=1` | Simple Update |
+| `/?mode=concept-embed&flow=2` | Data Lookup |
+| `/?mode=concept-embed&flow=5` | Error Recovery |
+| `/?mode=concept-embed&flow=6` | Proactive Surfacing |
+| `/?mode=concept-embed&flow=11` | Detection Queue, alternate entry |
+| `/?mode=concept-embed&flow=12` | Detection Queue |
+| `/?mode=concept-embed&flow=13` | Deposit Tracker |
+| `/?mode=concept-embed&flow=14` | Fee Change Explainer |
+| `/?mode=concept-embed&flow=15` | Sales Snapshot |
+| `/?mode=concept-embed&flow=16` | Account Change |
+| `/?mode=concept-embed&flow=17` | Escalation |
+| `/?mode=concept-embed&flow=18` | Running Low |
+| `/?mode=concept-embed&flow=19` | Address Change |
+| `/?mode=concept-embed&flow=20` | Credit Card Offer |
+| `/?mode=concept-embed&flow=21` | Business Loan Offer |
+| `/?mode=concept-embed&flow=22` | Service Marketplace |
 
 Six further stories have no URL and are reachable only from the `?mode=concept` cards: Panel as Form, Step-up Auth, Case Management, Bulk Action, Risk Investigation, Work Queue.
 
@@ -58,9 +57,3 @@ Six further stories have no URL and are reachable only from the `?mode=concept` 
 | `docs/` | Technical detail, split into `core` (the engine), `ui` (anything rendered) and `services` (data seams) |
 | `docs/artifacts/demo-context/` | Background on the customers and their workflows |
 | `CLAUDE.md` | How to find the right doc for a task |
-
-Docs are found by trigger rather than by path. Grep for the `**Read when:**` line matching your task:
-
-```sh
-grep -rn --include='*.md' '^\*\*Read when:\*\*' docs .claude | sort
-```
