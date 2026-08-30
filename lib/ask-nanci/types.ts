@@ -1,9 +1,14 @@
 // PanelId is derived from the panel registry — add a panel there, not here.
-import type { PanelId } from "@/components/ask-nanci/concept/panel-registry"
+import type { PanelId } from "@/components/panel-registry"
 import type { DashChartId } from "./data/risk-dashboard"
 export type { PanelId }
 
 type MessageRole = "user" | "assistant"
+
+// Every Risk destination is a registered, prop-less panel. The union lives here
+// rather than in RiskNavContext so demo data can name a destination without
+// importing a client component.
+export type RiskDest = "ask-nanci" | "dashboard" | "detection-queue" | "barometer-report" | "risk-report" | "assignment"
 
 // ─── Demo data types ───────────────────────────────────────────────────────────
 

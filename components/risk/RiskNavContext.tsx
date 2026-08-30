@@ -2,10 +2,8 @@
 
 import { createContext, useContext } from "react"
 import type { WorkStatus } from "@/lib/ask-nanci/data/risk-merchants"
+import type { RiskDest } from "@/lib/ask-nanci/types"
 
-// Every Risk destination is a registered, prop-less panel, so all navigation and
-// selection state flows through this context instead of props.
-export type RiskDest = "ask-nanci" | "dashboard" | "detection-queue" | "barometer-report" | "risk-report" | "assignment"
 
 interface RiskNav {
   go: (dest: RiskDest) => void

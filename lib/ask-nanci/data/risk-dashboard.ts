@@ -8,7 +8,7 @@
 import {
   AlertTriangle, Inbox, BarChart3, Briefcase, Timer, type LucideIcon,
 } from "lucide-react"
-import type { RiskDest } from "@/components/risk/RiskNavContext"
+import type { RiskDest } from "@/lib/ask-nanci/types"
 
 // Chart ids used by the insight → highlight mapping.
 export type DashChartId = "scatter" | "alert-volume" | "high-risk" | "param-heat" | "realert"

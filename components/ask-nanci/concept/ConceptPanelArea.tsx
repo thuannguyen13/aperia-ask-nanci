@@ -5,7 +5,7 @@ import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { useIsMobile } from "@/hooks/use-is-mobile"
 import type { PanelId } from "@/lib/ask-nanci/types"
-import { PANELS } from "./panel-registry"
+import { PANELS } from "@/components/panel-registry"
 
 // Every concept panel renders here as its own separate box, stacked vertically
 // with a gap — one layout for all flows. Order is the open order of the stack.
