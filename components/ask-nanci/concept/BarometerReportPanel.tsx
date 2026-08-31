@@ -3,7 +3,7 @@
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { ASSIGNMENT, STATUS_ROWS, MERCHANT_ROWS, eligibleMerchantCount } from "@/lib/ask-nanci/data/panels/barometer"
-import { PanelShell, PanelHeader, ScoreBadge, PanelTable, Th, Td } from "@/components/shared"
+import { PanelShell, PanelHeader, ScoreBadge, PanelTable, Thead, Th, Td } from "@/components/shared"
 
 export function BarometerReportPanel() {
   const { closePanel, closeAllNewPanels } = useAskNanci()
@@ -46,13 +46,11 @@ export function BarometerReportPanel() {
 
           {/* Status table */}
           <PanelTable>
-            <thead>
-              <tr className="border-b bg-muted/40">
-                <Th>Status</Th>
-                <Th align="right">Count</Th>
-                <Th align="right">Amount</Th>
-              </tr>
-            </thead>
+            <Thead>
+              <Th>Status</Th>
+              <Th align="right">Count</Th>
+              <Th align="right">Amount</Th>
+            </Thead>
             <tbody>
               {STATUS_ROWS.map(({ label, count, amount }) => (
                 <tr key={label}>
@@ -73,14 +71,12 @@ export function BarometerReportPanel() {
           </div>
 
           <PanelTable>
-            <thead>
-              <tr className="border-b bg-muted/40">
-                <Th>Merchant</Th>
-                <Th align="right">Score</Th>
-                <Th>Status</Th>
-                <Th align="right">Amount</Th>
-              </tr>
-            </thead>
+            <Thead>
+              <Th>Merchant</Th>
+              <Th align="right">Score</Th>
+              <Th>Status</Th>
+              <Th align="right">Amount</Th>
+            </Thead>
             <tbody>
               {MERCHANT_ROWS.map((row, i) => (
                 <tr

@@ -4,7 +4,7 @@ import { ArrowUpRight } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { CONCEPT_FLOW15_FOLLOWUP } from "@/lib/ask-nanci/data/flows.concept"
 import { SATURDAY_DRILLDOWN, WEEKDAY_AVG_TRANSACTIONS, WEEKDAY_AVG_TICKET } from "@/lib/ask-nanci/data/panels/sales-snapshot"
-import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, StatCard, formatCurrency } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody, PanelExportButton, NanciInsight, StatCard, formatCurrency } from "@/components/shared"
 
 export function SalesDrilldownPanel() {
   const { closeDynamicPanel, handlePrompt } = useAskNanci()
@@ -27,7 +27,7 @@ export function SalesDrilldownPanel() {
         onClose={() => closeDynamicPanel("sales-drilldown")}
       />
 
-      <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
+      <PanelBody className="space-y-4">
         <NanciInsight>
               Saturday was your best day at {formatCurrency(SATURDAY_DRILLDOWN.sales)}, and it was traffic — not ticket size. You ran {SATURDAY_DRILLDOWN.transactions} transactions versus a weekday average of {WEEKDAY_AVG_TRANSACTIONS}, while your average ticket held steady at {formatCurrency(SATURDAY_DRILLDOWN.avgTicket)} against a {formatCurrency(WEEKDAY_AVG_TICKET)} weekday average.
         </NanciInsight>
@@ -62,7 +62,7 @@ export function SalesDrilldownPanel() {
         >
           {CONCEPT_FLOW15_FOLLOWUP} <ArrowUpRight className="size-3.5" />
         </button>
-      </div>
+      </PanelBody>
     </PanelShell>
   )
 }

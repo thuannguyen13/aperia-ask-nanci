@@ -1,9 +1,10 @@
 "use client"
 
 import { Check } from "lucide-react"
+import { Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
-import { PanelShell, PanelHeader, Callout, PanelTable, Th, Td } from "@/components/shared"
+import { PanelShell, PanelHeader, Callout, PanelTable, Thead, Th, Td } from "@/components/shared"
 
 const STEPS = ["Verify Identity", "New Account", "Review & Confirm"] as const
 
@@ -45,12 +46,12 @@ function Step1() {
         A 6-digit verification code was sent to your phone ending in <span className="font-medium text-foreground">••0142</span>. Enter it below to continue.
       </p>
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium text-foreground">Verification Code</label>
-        <input
+        <Label>Verification Code</Label>
+        <Input
           type="text"
           maxLength={6}
           placeholder="_ _ _ _ _ _"
-          className="w-full rounded-lg border bg-background px-3 py-2.5 text-center text-xl font-mono tracking-[0.5em] text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+          className="h-auto px-3 py-2.5 text-center text-xl font-mono tracking-[0.5em]"
         />
       </div>
       <button className="text-xs text-primary hover:underline underline-offset-2 text-left">
@@ -71,27 +72,26 @@ function Step2() {
       </p>
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-foreground">Routing Number</label>
-          <input
-            type="text"
-            placeholder="9-digit routing number"
-            className="w-full rounded-lg border bg-background px-3 py-2 text-base md:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-          />
+          <Label>Routing Number</Label>
+          <Input type="text" placeholder="9-digit routing number" />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-foreground">Account Number</label>
-          <input
-            type="text"
-            placeholder="Account number"
-            className="w-full rounded-lg border bg-background px-3 py-2 text-base md:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-          />
+          <Label>Account Number</Label>
+          <Input type="text" placeholder="Account number" />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-foreground">Account Type</label>
-          <select className="w-full rounded-lg border bg-background px-3 py-2 text-base md:text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
-            <option>Checking</option>
-            <option>Savings</option>
-          </select>
+          <Label>Account Type</Label>
+          {/* Uncontrolled, same as the <select> it replaces: a native select with no
+              value shows its first option, so the default is seeded to match. */}
+          <Select defaultValue="Checking">
+            <SelectTrigger className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Checking">Checking</SelectItem>
+              <SelectItem value="Savings">Savings</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
       <Callout variant="blue">
@@ -108,13 +108,11 @@ function Step3({ onSubmit }: { onSubmit: () => void }) {
         Review your account change before confirming.
       </p>
       <PanelTable>
-        <thead>
-          <tr className="border-b bg-muted/40">
-            <Th>Field</Th>
-            <Th>Current</Th>
-            <Th>New</Th>
-          </tr>
-        </thead>
+        <Thead>
+          <Th>Field</Th>
+          <Th>Current</Th>
+          <Th>New</Th>
+        </Thead>
         <tbody>
           <tr>
             <Td className="font-medium">Routing</Td>
@@ -136,12 +134,7 @@ function Step3({ onSubmit }: { onSubmit: () => void }) {
       <Callout variant="amber">
         Two micro-deposits will be sent to verify the new account. Deposits continue to your current account until verification is complete.
       </Callout>
-      <button
-        onClick={onSubmit}
-        className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white hover:bg-primary/90 transition-colors"
-      >
-        Confirm & Submit
-      </button>
+      <Button className="w-full" onClick={onSubmit}>Confirm & Submit</Button>
     </div>
   )
 }

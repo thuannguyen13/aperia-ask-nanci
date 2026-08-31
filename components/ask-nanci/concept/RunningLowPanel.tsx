@@ -8,7 +8,7 @@ import {
 } from "@/lib/ask-nanci/data/panels/inventory"
 import {
   PanelShell, PanelHeader, PanelBody, PanelExportButton, StatCard,
-  PanelTable, Th, Td,
+  PanelTable, Thead, Th, Td,
 } from "@/components/shared"
 
 const PANEL_ID = "running-low"
@@ -38,15 +38,13 @@ export function RunningLowPanel() {
 
         <p className="mb-2 mt-5 text-sm font-bold text-foreground">{STOCK_TABLE_LABEL}</p>
         <PanelTable>
-          <thead>
-            <tr className="border-b bg-muted/40">
-              <Th>Item</Th>
-              <Th align="right">On hand</Th>
-              <Th align="right">Selling</Th>
-              <Th align="right">Days left</Th>
-              <Th align="right">Runs out</Th>
-            </tr>
-          </thead>
+          <Thead>
+            <Th>Item</Th>
+            <Th align="right">On hand</Th>
+            <Th align="right">Selling</Th>
+            <Th align="right">Days left</Th>
+            <Th align="right">Runs out</Th>
+          </Thead>
           <tbody>
             {STOCK_ITEMS.map((item) => {
               const critical = isCritical(item)

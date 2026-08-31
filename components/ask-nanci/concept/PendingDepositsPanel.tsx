@@ -6,7 +6,7 @@ import { cn } from "aperia-ds5/utils"
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Button } from "aperia-ds5"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { BATCHES, CASH_DEPOSITS, DEPOSIT_ACCOUNT_LAST4, HELD_TXN } from "@/lib/ask-nanci/data/panels/pending-deposits"
-import { PanelShell, PanelHeader, PanelExportButton, StatCard, NanciInsight, formatCurrency } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody, PanelExportButton, StatCard, NanciInsight, formatCurrency } from "@/components/shared"
 
 // How long the held row pulses brighter when its detail appears, before it settles
 // back to its resting "on hold" tint.
@@ -44,7 +44,10 @@ export function PendingDepositsPanel() {
         onClose={() => closeDynamicPanel("pending-deposits")}
       />
 
-      <div className="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-4">
+      {/* overflow-x-auto restores what the original `overflow-auto` body gave: this
+          panel's two tables are raw ds5 inside `overflow-hidden` wrappers, so unlike
+          a PanelTable they have no horizontal scroller of their own. */}
+      <PanelBody className="flex flex-col gap-4 overflow-x-auto">
         <div className="grid grid-cols-4 gap-3">
           <StatCard label="Total Expected" value={formatCurrency(totalExpected)} sublabel="card + cash" />
           <StatCard label="In Transit" value={formatCurrency(inTransit)} sublabel={`${inTransitBatches.length} batches`} />
@@ -180,7 +183,7 @@ export function PendingDepositsPanel() {
             </Button>
           </div>
         )}
-      </div>
+      </PanelBody>
     </PanelShell>
   )
 }

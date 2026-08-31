@@ -3,7 +3,7 @@
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { FLAT_BARS, MAX } from "@/lib/ask-nanci/data/panels/volume-settlement"
-import { PanelShell, PanelHeader, Callout } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody, Callout } from "@/components/shared"
 
 export function VolumeSettlementPanel() {
   const { closePanel } = useAskNanci()
@@ -20,7 +20,7 @@ export function VolumeSettlementPanel() {
 
       <div className="flex flex-1 overflow-hidden divide-x">
         {/* Volume chart */}
-        <div className="flex-1 overflow-auto px-4 py-3">
+        <PanelBody>
           <p className="text-[9px] font-bold tracking-[0.12em] uppercase text-muted-foreground mb-3">Transaction Volume Index</p>
           <div className="flex items-end gap-[3px] h-[120px]">
             {FLAT_BARS.map((bar, i) => {
@@ -49,7 +49,7 @@ export function VolumeSettlementPanel() {
             <p className="text-[10px] font-semibold text-red-800 dark:text-red-300">+340% volume increase</p>
             <p className="text-[9px] text-red-600 dark:text-red-400">Apr W1–W4 vs Feb average</p>
           </Callout>
-        </div>
+        </PanelBody>
 
         {/* Settlement change */}
         <div className="w-[175px] shrink-0 overflow-auto px-3 py-3">

@@ -1,10 +1,11 @@
 "use client"
 
 import { Send } from "lucide-react"
+import { Button } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { CONCEPT_FLOW8_FINAL } from "@/lib/ask-nanci/data/flows.concept"
 import { PREVIEWS } from "@/lib/ask-nanci/data/panels/email-draft"
-import { PanelShell, PanelHeader } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody } from "@/components/shared"
 
 function Var({ children }: { children: string }) {
   return (
@@ -27,7 +28,7 @@ export function EmailDraftPanel() {
         onClose={() => closePanel("email-draft")}
       />
 
-      <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
+      <PanelBody className="space-y-4">
         {/* Template */}
         <div>
           <p className="text-[9px] font-bold tracking-[0.12em] uppercase text-muted-foreground mb-2">Template</p>
@@ -74,16 +75,13 @@ export function EmailDraftPanel() {
           </div>
           <p className="mt-2 text-center text-[10px] text-muted-foreground">+ 19 more</p>
         </div>
-      </div>
+      </PanelBody>
 
       {/* Send */}
       <div className="shrink-0 border-t px-4 py-3">
-        <button
-          onClick={() => handlePrompt(CONCEPT_FLOW8_FINAL)}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-white hover:bg-primary/90 transition-colors"
-        >
+        <Button className="w-full gap-2" onClick={() => handlePrompt(CONCEPT_FLOW8_FINAL)}>
           <Send className="size-3.5" /> Send All 22
-        </button>
+        </Button>
       </div>
     </PanelShell>
   )

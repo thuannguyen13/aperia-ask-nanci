@@ -4,7 +4,7 @@ import { CheckCircle2, AlertCircle } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { QUICK_WINS, OUTAGE_MERCHANTS } from "@/lib/ask-nanci/data/panels/work-queue"
-import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelTable, Th } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody, PanelExportButton, NanciInsight, PanelTable, Thead, Th } from "@/components/shared"
 
 const reviewCount = QUICK_WINS.filter((r) => !r.valid).length
 const cleanCount = QUICK_WINS.length - reviewCount
@@ -23,7 +23,7 @@ export function WorkQueuePanel() {
         onClose={() => closeDynamicPanel("work-queue")}
       />
 
-      <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
+      <PanelBody className="space-y-4">
         <NanciInsight>
               {isOutage
                 ? <><span className="font-bold">Processor X posted an outage at 06:14</span> (ETA noon) — 8 merchants are waiting on settlement. I can notify all 8, mark them Waiting on Vendor, and auto-close when the processor confirms.</>
@@ -33,13 +33,11 @@ export function WorkQueuePanel() {
         {/* Quick-wins phase */}
         {!isOutage && (
           <PanelTable>
-            <thead>
-              <tr className="border-b bg-muted/40">
-                <Th>Merchant</Th>
-                <Th>Doc</Th>
-                <Th align="right">AI Read</Th>
-              </tr>
-            </thead>
+            <Thead>
+              <Th>Merchant</Th>
+              <Th>Doc</Th>
+              <Th align="right">AI Read</Th>
+            </Thead>
             <tbody>
               {QUICK_WINS.map((row) => (
                 <tr
@@ -83,7 +81,7 @@ export function WorkQueuePanel() {
             ))}
           </div>
         )}
-      </div>
+      </PanelBody>
     </PanelShell>
   )
 }

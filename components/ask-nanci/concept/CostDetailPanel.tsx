@@ -2,7 +2,7 @@
 
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { HERO_ITEM, COMBO_COST_BREAKDOWN, COMBO_MENU_PRICE, COMBO_TOTAL_INGREDIENT_COST, COMBO_MARGIN } from "@/lib/ask-nanci/data/panels/menu-margin"
-import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelTable, Th, formatCurrency } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody, PanelExportButton, NanciInsight, PanelTable, Thead, Th, formatCurrency } from "@/components/shared"
 
 export function CostDetailPanel() {
   const { closeDynamicPanel } = useAskNanci()
@@ -16,18 +16,16 @@ export function CostDetailPanel() {
         onClose={() => closeDynamicPanel("menu-cost-detail")}
       />
 
-      <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
+      <PanelBody className="space-y-4">
         <NanciInsight>Three imported meats carry it. Prosciutto and mortadella together are 60% of the ingredient cost. The provolone and bread are minor. Nothing here is wrong — it&apos;s just an expensive sandwich to make.</NanciInsight>
 
         <div>
           <p className="mb-2 text-base font-bold text-foreground">Ingredient Cost per Sandwich</p>
           <PanelTable>
-            <thead>
-              <tr className="border-b bg-muted/40">
-                <Th>Ingredient</Th>
-                <Th align="right">Cost</Th>
-              </tr>
-            </thead>
+            <Thead>
+              <Th>Ingredient</Th>
+              <Th align="right">Cost</Th>
+            </Thead>
             <tbody>
               {COMBO_COST_BREAKDOWN.map((row) => (
                 <tr key={row.ingredient} className="border-b last:border-0">
@@ -50,7 +48,7 @@ export function CostDetailPanel() {
             </tbody>
           </PanelTable>
         </div>
-      </div>
+      </PanelBody>
     </PanelShell>
   )
 }

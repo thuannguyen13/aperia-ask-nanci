@@ -4,7 +4,7 @@ import { TrendingUp } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { RISK_INFO, ACCOUNT_INFO, ACTIVITY_TABS, VOLUME_ROWS } from "@/lib/ask-nanci/data/panels/coastal-risk"
-import { PanelShell, PanelHeader, PanelTable, Th, Td, Callout } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody, PanelTable, Thead, Th, Td, Callout } from "@/components/shared"
 
 function InfoRow({ label, value, badge, highlight, large }: { label: string; value: string; badge?: boolean; highlight?: string; large?: boolean }) {
   return (
@@ -41,7 +41,7 @@ export function CoastalRiskPanel() {
         onClose={() => { closePanel("coastal-risk"); closeAllNewPanels() }}
       />
 
-      <div className="flex-1 overflow-auto px-4 py-3 space-y-3">
+      <PanelBody className="space-y-3">
         {/* Risk score callout */}
         <Callout variant="red" className="flex flex-col gap-2 rounded-lg px-3 py-3">
           <div className="flex items-center gap-2">
@@ -112,14 +112,12 @@ export function CoastalRiskPanel() {
 
           <div className="overflow-x-auto">
             <PanelTable className="min-w-[280px]">
-              <thead>
-                <tr className="border-b bg-muted/40">
-                  <Th className="whitespace-nowrap">Date</Th>
-                  <Th align="right" className="whitespace-nowrap">Txns</Th>
-                  <Th align="right" className="whitespace-nowrap">Amount</Th>
-                  <Th align="right" className="whitespace-nowrap">Avg</Th>
-                </tr>
-              </thead>
+              <Thead>
+                <Th className="whitespace-nowrap">Date</Th>
+                <Th align="right" className="whitespace-nowrap">Txns</Th>
+                <Th align="right" className="whitespace-nowrap">Amount</Th>
+                <Th align="right" className="whitespace-nowrap">Avg</Th>
+              </Thead>
               <tbody>
                 {VOLUME_ROWS.map((row) => (
                   <tr key={row.date}>
@@ -133,7 +131,7 @@ export function CoastalRiskPanel() {
             </PanelTable>
           </div>
         </div>
-      </div>
+      </PanelBody>
     </PanelShell>
   )
 }

@@ -8,7 +8,7 @@ import {
   CARD_INSIGHT_LEAD, CARD_INSIGHT_BODY, CARD_INSIGHT_OFFER_PRE, CARD_INSIGHT_OFFER_BOLD, CARD_INSIGHT_OFFER_POST,
   CARD_PREFILL_NOTE, CARD_CONSENT, CARD_REQUEST_REF, CARD_SUCCESS_MESSAGE, CARD_VERIFY,
 } from "@/lib/ask-nanci/data/panels/credit-card-offer"
-import { PanelShell, PanelHeader, NanciInsight, Callout, formatWholeCurrency } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody, NanciInsight, Callout, formatWholeCurrency } from "@/components/shared"
 import { ApplicantFields, BrandMonogram, OfferField, OfferLogo, OfferSelect, OfferVerifyStep, SectionLabel, StatStrip } from "./offer-shared"
 
 const PANEL_ID = "credit-card-offer"
@@ -76,7 +76,7 @@ export function CreditCardOfferPanel() {
     <PanelShell>
       <PanelHeader title="Credit Card Application" size="lg" onClose={() => closeDynamicPanel(PANEL_ID)} />
 
-      <div className="flex-1 overflow-auto px-4 py-3 space-y-5">
+      <PanelBody className="space-y-5">
         <NanciInsight>
           <span className="block">
             <strong className="font-semibold">{CARD_INSIGHT_LEAD}</strong>{CARD_INSIGHT_BODY}
@@ -152,7 +152,7 @@ export function CreditCardOfferPanel() {
         </div>
 
         <Button className="w-full" onClick={submit}>Submit Application</Button>
-      </div>
+      </PanelBody>
     </PanelShell>
   )
 }

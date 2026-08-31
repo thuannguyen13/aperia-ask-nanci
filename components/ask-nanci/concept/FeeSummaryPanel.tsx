@@ -6,7 +6,7 @@ import { cn } from "aperia-ds5/utils"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { DRIVER_SUMMARY, EFFECTIVE_RATE, VOLUME, FEES, FEES_TOTAL } from "@/lib/ask-nanci/data/panels/fee-summary"
 import { CHARGEBACK } from "@/lib/ask-nanci/data/panels/chargeback-status"
-import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, Callout, PanelFigureTable, Td, formatCurrency } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody, PanelExportButton, NanciInsight, Callout, PanelFigureTable, Td, formatCurrency } from "@/components/shared"
 
 // How long the volume row stays tinted before it fades on its own — the flow
 // reads it aloud, then it clears so the panel returns to a neutral state.
@@ -34,7 +34,7 @@ export function FeeSummaryPanel() {
         onClose={() => closeDynamicPanel("fee-summary")}
       />
 
-      <div className="flex-1 overflow-auto px-4 py-3 space-y-5">
+      <PanelBody className="space-y-5">
           <NanciInsight>
                 <span className="font-bold">+{formatCurrency(DRIVER_SUMMARY.deltaAmount)} vs April</span> — almost all of it is volume. You processed {DRIVER_SUMMARY.volumeChangePct}% more transactions this month. Your effective rate held roughly steady at {EFFECTIVE_RATE.april}–{EFFECTIVE_RATE.may}; the small uptick is entirely the one-time {formatCurrency(DRIVER_SUMMARY.chargebackFee)} chargeback fee from a dispute on May 3, not a pricing change.
           </NanciInsight>
@@ -115,7 +115,7 @@ export function FeeSummaryPanel() {
             </div>
           </div>
         )}
-      </div>
+      </PanelBody>
     </PanelShell>
   )
 }

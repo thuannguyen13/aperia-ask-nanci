@@ -4,7 +4,7 @@ import { Download } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { ALL_MERCHANTS, FILTERED } from "@/lib/ask-nanci/data/panels/decline-report"
-import { PanelShell, PanelHeader, PanelTable, Th, Td, formatPercent } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody, PanelTable, Thead, Th, Td, formatPercent } from "@/components/shared"
 
 function rateColor(r: number) {
   if (r >= 25) return "text-red-600 dark:text-red-400"
@@ -41,16 +41,14 @@ export function DeclineReportPanel() {
       />
 
       {/* Table */}
-      <div className="flex-1 overflow-auto px-4 py-3">
+      <PanelBody>
         <PanelTable>
-          <thead>
-            <tr className="border-b bg-muted/40">
-              <Th>Merchant</Th>
-              <Th>ISO</Th>
-              <Th align="right">Rate</Th>
-              <Th align="right">Contact</Th>
-            </tr>
-          </thead>
+          <Thead>
+            <Th>Merchant</Th>
+            <Th>ISO</Th>
+            <Th align="right">Rate</Th>
+            <Th align="right">Contact</Th>
+          </Thead>
           <tbody>
             {rows.map((row, i) => {
               const { pct, color } = rateBar(row.rate)
@@ -74,7 +72,7 @@ export function DeclineReportPanel() {
             })}
           </tbody>
         </PanelTable>
-      </div>
+      </PanelBody>
 
       {/* Footer */}
       <div className="shrink-0 border-t px-4 py-2.5">

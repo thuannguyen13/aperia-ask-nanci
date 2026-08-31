@@ -3,7 +3,7 @@
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { BATCH_TRANSACTIONS } from "@/lib/ask-nanci/data/panels/batch-detail"
-import { PanelShell, PanelHeader, Callout, PanelTable, Th, Td, formatCurrency } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody, Callout, PanelTable, Thead, Th, Td, formatCurrency } from "@/components/shared"
 
 export function BatchDetailPanel() {
   const { closeDynamicPanel } = useAskNanci()
@@ -24,16 +24,14 @@ export function BatchDetailPanel() {
         1 transaction held for review — exceeds your single-ticket limit of $2,500.
       </Callout>
 
-      <div className="flex-1 overflow-auto px-4 pb-3">
+      <PanelBody className="pt-0 pb-3">
         <PanelTable>
-          <thead>
-            <tr className="border-b bg-muted/40">
-              <Th>Time</Th>
-              <Th>Card</Th>
-              <Th align="right">Amount</Th>
-              <Th>Status</Th>
-            </tr>
-          </thead>
+          <Thead>
+            <Th>Time</Th>
+            <Th>Card</Th>
+            <Th align="right">Amount</Th>
+            <Th>Status</Th>
+          </Thead>
           <tbody>
             {BATCH_TRANSACTIONS.map((txn) => (
               <tr key={txn.id} className={txn.flagged ? "bg-amber-50 dark:bg-amber-950/20" : ""}>
@@ -55,7 +53,7 @@ export function BatchDetailPanel() {
             ))}
           </tbody>
         </PanelTable>
-      </div>
+      </PanelBody>
     </PanelShell>
   )
 }

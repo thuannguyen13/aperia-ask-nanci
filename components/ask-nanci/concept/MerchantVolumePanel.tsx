@@ -5,7 +5,7 @@ import { Badge } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { MERCHANT_VOLUME_DATA } from "@/lib/ask-nanci/data/merchants"
-import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelTable, Th, Td, formatCurrency, formatWholeCurrency } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody, PanelExportButton, NanciInsight, PanelTable, Thead, Th, Td, formatCurrency, formatWholeCurrency } from "@/components/shared"
 
 type SortKey = "volume" | "txnCount" | "avgTicket"
 
@@ -37,7 +37,7 @@ export function MerchantVolumePanel() {
         onClose={() => closeDynamicPanel("merchant-volume")}
       />
 
-      <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
+      <PanelBody className="space-y-4">
         <NanciInsight>
               {view === "top5"
                 ? <>Your top 5 by volume. <span className="font-bold">{leader.merchant}</span> still leads at {formatWholeCurrency(leader.volume)} across {leader.txnCount.toLocaleString()} transactions. Sort by any column to reorder.</>
@@ -60,15 +60,13 @@ export function MerchantVolumePanel() {
         </div>
 
         <PanelTable>
-          <thead>
-            <tr className="border-b bg-muted/40">
-              <Th className="w-8">#</Th>
-              <Th>Merchant</Th>
-              <Th align="right">Volume</Th>
-              <Th align="right">Txns</Th>
-              <Th align="right">Avg Ticket</Th>
-            </tr>
-          </thead>
+          <Thead>
+            <Th className="w-8">#</Th>
+            <Th>Merchant</Th>
+            <Th align="right">Volume</Th>
+            <Th align="right">Txns</Th>
+            <Th align="right">Avg Ticket</Th>
+          </Thead>
           <tbody>
             {rows.map((row, i) => (
               <tr
@@ -90,7 +88,7 @@ export function MerchantVolumePanel() {
             ))}
           </tbody>
         </PanelTable>
-      </div>
+      </PanelBody>
     </PanelShell>
   )
 }

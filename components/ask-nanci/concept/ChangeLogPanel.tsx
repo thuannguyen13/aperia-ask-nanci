@@ -4,7 +4,7 @@ import { AlertTriangle } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { CHANGES, CHANGE_SEVERITY_CLS } from "@/lib/ask-nanci/data/panels/change-log"
-import { PanelShell, PanelHeader } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody } from "@/components/shared"
 
 export function ChangeLogPanel() {
   const { closePanel } = useAskNanci()
@@ -28,7 +28,7 @@ export function ChangeLogPanel() {
       </div>
 
       {/* Timeline */}
-      <div className="flex-1 overflow-auto px-4 py-3">
+      <PanelBody>
         <p className="text-[9px] font-bold tracking-[0.12em] uppercase text-muted-foreground mb-3">Change Timeline</p>
         <div className="relative">
           {/* Connecting line */}
@@ -86,7 +86,7 @@ export function ChangeLogPanel() {
             ))}
           </div>
         </div>
-      </div>
+      </PanelBody>
     </PanelShell>
   )
 }

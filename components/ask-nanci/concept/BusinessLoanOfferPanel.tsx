@@ -7,7 +7,7 @@ import {
   getLoanBrand, LOAN_APPLICANT, LOAN_SUGGESTED, LOAN_COST, LOAN_CONSENT, LOAN_INSIGHT_PRE, LOAN_INSIGHT_BOLD, LOAN_INSIGHT_POST, LOAN_PREFILL_NOTE,
   LOAN_REQUEST_REF, LOAN_SUBMITTED_TITLE, LOAN_SUCCESS_MESSAGE, LOAN_VERIFY,
 } from "@/lib/ask-nanci/data/panels/business-loan-offer"
-import { PanelShell, PanelHeader, NanciInsight, Callout, formatCurrency } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody, NanciInsight, Callout, formatCurrency } from "@/components/shared"
 import { ApplicantFields, BrandMonogram, OfferField, OfferLogo, OfferSelect, OfferVerifyStep, SectionLabel } from "./offer-shared"
 
 const PANEL_ID = "business-loan-offer"
@@ -65,7 +65,7 @@ export function BusinessLoanOfferPanel() {
     <PanelShell>
       <PanelHeader title="Business Loan Application" size="lg" onClose={() => closeDynamicPanel(PANEL_ID)} />
 
-      <div className="flex-1 overflow-auto px-4 py-3 space-y-5">
+      <PanelBody className="space-y-5">
         <NanciInsight>{LOAN_INSIGHT_PRE}<strong className="font-semibold">{LOAN_INSIGHT_BOLD}</strong>{LOAN_INSIGHT_POST}</NanciInsight>
 
         {/* The offer is why the panel opened: what it is (tinted) over what Nanci sized
@@ -137,7 +137,7 @@ export function BusinessLoanOfferPanel() {
         </div>
 
         <Button className="w-full" onClick={submit}>Submit Application</Button>
-      </div>
+      </PanelBody>
     </PanelShell>
   )
 }
