@@ -10,8 +10,9 @@
  *   2. Nothing anywhere hardcodes a path to a markered doc. Cite it as
  *      `Read-when **<trigger phrase>**` instead, and that citation must match a real marker.
  *
- * `docs/artifacts/` is the deliberate exception: generated output and raw source material carry
- * no markers and cannot be found by trigger, so those paths stay literal and are existence-checked.
+ * `docs/artifacts/` is the deliberate exception: it carries no markers and cannot be found by
+ * trigger, so those paths stay literal and are existence-checked. It splits in two —
+ * `generated/` is output this repo produces, `source/` is raw material from elsewhere.
  */
 import { readFileSync } from "node:fs"
 import { globSync } from "node:fs"

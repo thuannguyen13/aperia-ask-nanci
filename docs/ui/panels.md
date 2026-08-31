@@ -6,7 +6,7 @@ How a panel is registered, held open and laid out. The recipe for adding one is 
 
 ## Foundational principles: `/panels`
 
-**`public/panels/index.html`** is the single source for panel interaction principles, and carries the *why*: what a panel is, the Four Parts layout (Navigation / Primary / Secondary / Tertiary), the three triggers (navigate, summon, drill), the four rules of getting around, ship tests and open questions, with a playable prototype. Derived from the production vision (`docs/artifacts/demo-context/product-vision.mhtml`). Read it first if you're deciding *whether* a panel is the right answer at all.
+**`public/panels/index.html`** is the single source for panel interaction principles, and carries the *why*: what a panel is, the Four Parts layout (Navigation / Primary / Secondary / Tertiary), the three triggers (navigate, summon, drill), the four rules of getting around, ship tests and open questions, with a playable prototype. Derived from the production vision (`docs/artifacts/source/product-vision.mhtml`). Read it first if you're deciding *whether* a panel is the right answer at all.
 
 The Next app serves it at **`/panels`**, alongside the live console. Its "See it running" link points at **`/risk`** (the console *with* the assistant, not the assistant-free `/risk-phase1`); the link is one-way, the console's top bar has no link back. Keep it self-contained with no local asset dependencies (inline SVG, Google-hosted fonts) so it stays portable to the `../webflow` marketing repo. `/panels` needs the rewrite in `next.config.mjs` because Next's static handler serves exact paths only; `/panels/index.html` works without it.
 

@@ -13,7 +13,7 @@ Run it before starting and again whenever the task changes; open only the rows t
 - `.claude/` is how to work here.
 - `docs/` is what the project is: **core** (the engine: flows, dispatch, state), **ui** (anything rendered), **services** (data and integration seams).
 - Step-by-step recipes live in each category's `actions/`.
-- `docs/artifacts/` is generated output and raw source material, excluded from the grep on purpose.
+- `docs/artifacts/` is excluded from the grep on purpose, and splits in two: `generated/` is output this repo produces (regenerate it, never hand-edit), `source/` is raw material that came from elsewhere (read it, never regenerate it).
 
 Nothing stores a path to a doc, this file included. Cite the trigger and let the reader re-grep:
 

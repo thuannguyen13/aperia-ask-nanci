@@ -1,7 +1,7 @@
 /**
  * Demo URL catalog generator.
  *
- * Run: `npm run demo:urls` (writes docs/artifacts/demo-urls.md and prints the table).
+ * Run: `npm run demo:urls` (writes docs/artifacts/generated/demo-urls.md and prints the table).
  * Point it at a deployed host with `BASE=https://... npm run demo:urls`.
  *
  * Derived entirely from FLOW_DEFS / EMBED_VARIANTS / CONCEPT_EMBED_FLOW_LAYOUTS, so
@@ -196,8 +196,8 @@ if (unknownMode.length) {
 }
 
 const out = lines.join("\n")
-writeFileSync("docs/artifacts/demo-urls.md", out)
+writeFileSync("docs/artifacts/generated/demo-urls.md", out)
 console.log(out)
 console.error(
-  `\n✓ wrote docs/artifacts/demo-urls.md — ${entries.length} embeddable flows, ${layoutOnly.length} layout-only, ${noSlug.length} card-only.`,
+  `\n✓ wrote docs/artifacts/generated/demo-urls.md — ${entries.length} embeddable flows, ${layoutOnly.length} layout-only, ${noSlug.length} card-only.`,
 )
