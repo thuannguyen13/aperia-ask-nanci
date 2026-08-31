@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mobile Adaptation: What We Have, What Is Missing</title>
+  <title>Mobile Foundation: Recommendations and Practices</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
@@ -113,11 +113,27 @@
       font-weight: 600
     }
 
+    .block-label {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--fg);
+      margin: 34px 0 10px
+    }
+
+    .block-label:first-of-type {
+      margin-top: 0
+    }
+
     .lede {
       font-size: clamp(20px, 2.4vw, 24px);
       color: var(--muted-fg);
-      line-height: 1.6;
+      line-height: 1.5;
+      letter-spacing: -.015em;
       font-weight: 400
+    }
+
+    .lede+.body-p {
+      margin-top: 20px
     }
 
     .lede strong {
@@ -255,6 +271,26 @@
       .approach-card {
         padding: 24px 22px
       }
+    }
+
+    /* ── "What to prepare" callout, one per aspect ── */
+    .prep {
+      margin-top: 26px
+    }
+
+    .prep .approach-card-title {
+      min-height: 0;
+      margin-bottom: 16px
+    }
+
+    .prep .approach-card-label a {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid currentColor
+    }
+
+    .ai-icon--do {
+      background: var(--sapphire)
     }
 
     /* ── Paired comparison ── */
@@ -619,6 +655,23 @@
       color: var(--fg)
     }
 
+    .estep-own {
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted-fg);
+      background: var(--muted);
+      border-radius: 999px;
+      padding: 5px 11px;
+      white-space: nowrap
+    }
+
+    .estep-own--ds {
+      color: var(--aperia-blue);
+      background: var(--light-blue)
+    }
+
     /* ── Prototype button ── */
     .btn-proto {
       display: inline-flex;
@@ -841,6 +894,16 @@
       font-weight: 300
     }
 
+    .hero-note {
+      font-size: 15px;
+      color: #9fb8d0;
+      max-width: 640px;
+      line-height: 1.65;
+      margin-top: 18px;
+      padding-left: 14px;
+      border-left: 2px solid rgba(255, 255, 255, .22)
+    }
+
     .hero-shape {
       position: absolute;
       top: 0;
@@ -968,9 +1031,10 @@
     /* ── Have / missing ── */
     .gap {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(3, 1fr);
       gap: 18px;
-      margin: 26px 0 0
+      margin: 26px 0 0;
+      align-items: start
     }
 
     .gap-card {
@@ -985,6 +1049,11 @@
       background: #fffcf6
     }
 
+    .gap-card--prep {
+      border-color: var(--aperia-blue);
+      background: #f0f5fb
+    }
+
     .gap-label {
       font-size: 12.5px;
       text-transform: uppercase;
@@ -996,6 +1065,10 @@
 
     .gap-card--miss .gap-label {
       color: var(--warning)
+    }
+
+    .gap-card--prep .gap-label {
+      color: var(--sapphire)
     }
 
     .gap-list {
@@ -1029,6 +1102,10 @@
       background: var(--warning)
     }
 
+    .gap-card--prep .gap-list div::before {
+      background: var(--sapphire)
+    }
+
     .gap-list strong {
       color: var(--fg);
       font-weight: 600
@@ -1051,12 +1128,19 @@
     }
 
     /* ── Side-by-side panes ── */
+    /* Stacked, not side by side: the wide pane has to be genuinely wide or it
+       clips too, and then the comparison shows nothing. */
     .sxs {
       display: grid;
-      grid-template-columns: 1fr 390px;
-      gap: 20px;
-      margin: 26px 0 0;
-      align-items: start
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin: 0
+    }
+
+    .sxs-pane--phone {
+      width: 390px;
+      max-width: 100%;
+      position: relative
     }
 
     .sxs-pane {
@@ -1078,6 +1162,9 @@
     }
 
     .sxs-name {
+      display: flex;
+      align-items: center;
+      gap: 7px;
       font-size: 12.5px;
       font-weight: 600;
       text-transform: uppercase;
@@ -1085,8 +1172,10 @@
       color: var(--muted-fg)
     }
 
-    .sxs-pane--phone .sxs-name {
-      color: var(--sapphire)
+    .sxs-ic {
+      width: 14px;
+      height: 14px;
+      display: block
     }
 
     .sxs-w {
@@ -1096,6 +1185,18 @@
 
     .sxs-body {
       padding: 16px
+    }
+
+    /* The cut-off edge is the point of the phone pane, so mark it. */
+    .sxs-pane--phone .sxs-body::after {
+      content: '';
+      position: absolute;
+      top: 45px;
+      right: 0;
+      bottom: 0;
+      width: 34px;
+      pointer-events: none;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0), #fff 78%)
     }
 
     .sxs-note {
@@ -1109,13 +1210,161 @@
       color: var(--fg)
     }
 
-    @media(max-width:860px) {
-      .sxs {
+    @media(max-width:980px) {
+      .gap {
         grid-template-columns: 1fr
       }
+    }
 
-      .sxs-pane--phone {
-        max-width: 390px
+
+    /* ── Status column in the decision table ── */
+    .tt-state {
+      width: 1%;
+      white-space: nowrap
+    }
+
+    .tt-link {
+      color: var(--aperia-blue);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(0, 47, 103, .25)
+    }
+
+    .tt-link:hover {
+      border-bottom-color: var(--aperia-blue)
+    }
+
+    .type-table td:last-child .estep-own {
+      float: right
+    }
+
+    .tt-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 3px 8px 3px 6px;
+      border-radius: 999px
+    }
+
+    .tt-pill svg {
+      width: 9px;
+      height: 9px;
+      display: block
+    }
+
+    .tt-pill--in {
+      color: #fff;
+      background: var(--success)
+    }
+
+    .tt-pill--do {
+      color: #fff;
+      background: var(--warning)
+    }
+
+    .tt-pill--check {
+      color: #fff;
+      background: var(--med-gray)
+    }
+
+    .tt-pill--practice {
+      color: #fff;
+      background: var(--sapphire)
+    }
+
+    /* ── Type specimen table ── */
+    .type-table-wrap {
+      margin-top: 0;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden
+    }
+
+    .type-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff
+    }
+
+    .type-table th {
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted-fg);
+      background: var(--muted);
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap
+    }
+
+    .type-table td {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted-fg);
+      font-size: 14px;
+      vertical-align: middle
+    }
+
+    .type-table tr:last-child td {
+      border-bottom: 0
+    }
+
+    .type-table strong {
+      color: var(--fg);
+      font-weight: 600
+    }
+
+    .tt-what {
+      width: 42%
+    }
+
+    .tt-none {
+      color: var(--med-gray)
+    }
+
+    .type-table .tt-spec {
+      color: var(--fg);
+      width: 34%;
+      white-space: nowrap;
+      font-weight: 500;
+      letter-spacing: -.01em
+    }
+
+    .type-table .tt-size {
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      color: var(--fg);
+      font-weight: 600
+    }
+
+    .tt-from {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12.5px;
+      white-space: nowrap
+    }
+
+    .tt-row--gap td {
+      background: #fff8ef;
+      color: var(--fg)
+    }
+
+    .tt-from--off {
+      color: var(--warning);
+      font-weight: 600
+    }
+
+    @media(max-width:760px) {
+      .type-table-wrap {
+        overflow-x: auto
+      }
+
+      .type-table {
+        min-width: 620px
       }
     }
 
@@ -1281,6 +1530,21 @@
       <path d="M18 6 6 18" />
       <path d="m6 6 12 12" />
     </symbol>
+    <symbol id="ic-monitor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+      stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="3.5" width="20" height="13" rx="1.6" />
+      <path d="M8.5 20.5h7M12 16.5v4" />
+    </symbol>
+    <symbol id="ic-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+      stroke-linecap="round" stroke-linejoin="round">
+      <rect x="6.5" y="2.5" width="11" height="19" rx="2.2" />
+      <path d="M11 18.6h2" />
+    </symbol>
+    <symbol id="ic-q" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9.2 9.2a3 3 0 1 1 3.8 3.3c-.7.3-1 .9-1 1.6v.4" />
+      <path d="M12 18.2v.01" />
+    </symbol>
     <symbol id="ic-arrow-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"
       stroke-linecap="round" stroke-linejoin="round">
       <path d="M5 12h14" />
@@ -1316,14 +1580,14 @@
         </svg>
       </a>
       <ul class="nav-links">
+        <li><a href="#foundation">Overview</a></li>
         <li><a href="#typography">Typography</a></li>
         <li><a href="#sizing">Sizing</a></li>
         <li><a href="#behaviors">Mobile-Specific Behaviors</a></li>
         <li><a href="#charts">Charts</a></li>
         <li><a href="#table">Table</a></li>
-        <li><a href="#tabs">Tab And Segmented Controls</a></li>
-        <li><a href="#shadcn">What Shadcn Gives Us</a></li>
-        <li><a href="#recharts">What Recharts Gives Us</a></li>
+        <li><a href="#tabs">Tab and Segmented Controls</a></li>
+        <li><a href="#live">The App on a Phone</a></li>
       </ul>
       <button class="nav-burger" id="burger" aria-label="Menu" aria-expanded="false">
         <span></span><span></span><span></span>
@@ -1332,14 +1596,14 @@
   </nav>
   <div class="nav-drawer" id="drawer">
     <ul>
+      <li><a href="#foundation">00 · Overview</a></li>
       <li><a href="#typography">01 · Typography</a></li>
       <li><a href="#sizing">02 · Sizing</a></li>
       <li><a href="#behaviors">03 · Mobile-Specific Behaviors</a></li>
       <li><a href="#charts">04 · Charts</a></li>
       <li><a href="#table">05 · Table</a></li>
-      <li><a href="#tabs">06 · Tab And Segmented Controls</a></li>
-      <li><a href="#shadcn">07 · What Shadcn Gives Us</a></li>
-      <li><a href="#recharts">08 · What Recharts Gives Us</a></li>
+      <li><a href="#tabs">06 · Tab and Segmented Controls</a></li>
+      <li><a href="#live">07 · The App on a Phone</a></li>
     </ul>
   </div>
 
@@ -1362,12 +1626,25 @@
     <div class="wrap">
       <div class="hero-inner">
         <p class="eyebrow">Ask Nanci · Mobile Adaptation · August 2026</p>
-        <h1>What adapts, what does not<span>Eight aspects, and the gap in each</span></h1>
-        <p class="hero-sub">Where the app already handles a phone, where it does not, and which of
-          the gaps the design system could close for us.</p>
+        <h1>Mobile foundation<span>Recommendations and practices to follow</span></h1>
+        <p class="hero-sub">What to settle before mobile work starts.</p>
       </div>
     </div>
   </header>
+
+  <!-- 00 · FOUNDATION -->
+  <section id="foundation">
+    <div class="wrap">
+      <div class="chapter">
+        <div class="chapter-head">
+          <h2>Overview</h2>
+          <p class="lede">This report lists what we have today and what we should do before building for mobile.</p>
+          <p class="body-p">A phone is not a narrow desktop. The input is a thumb, not a pointer, so targets need more room and anything that depends on hover has nowhere to go. The screen is roughly a third the width, so a layout built in columns has to scroll, stack or drop. And the reader is usually one-handed and moving, not seated in front of it.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
 
   <!-- 01 · TYPOGRAPHY -->
   <section id="typography">
@@ -1375,41 +1652,44 @@
       <div class="chapter">
         <div class="chapter-head">
           <h2>Typography</h2>
-          <p class="lede">Type needs the least work of anything here. It never changes size between a computer and a phone, and mostly it does not need to.</p>
+          <p class="lede">One scale serves both screens. What is unsettled is where the sizes come from.</p>
         </div>
       </div>
 
-      <div class="gap">
-        <div class="gap-card">
-          <div class="gap-label">What we have</div>
-          <div class="gap-list"><div>Panel type is already dense: a <strong>9px label</strong> over a <strong>12px value</strong>, built for a narrow column</div><div>It holds at 390px, and there is no smaller scale beneath it to reach for</div><div>Body copy wraps rather than shrinking</div></div>
-        </div>
-        <div class="gap-card gap-card--miss">
-          <div class="gap-label">What is missing</div>
-          <div class="gap-list"><div><strong>Nine of the eleven</strong> files containing inputs miss the 16px minimum, so iOS zooms the page when the field is focused</div><div>No line-length cap, so a paragraph runs the full width of a wide panel</div><div><strong>The design system offers no type-scale guidance</strong>, so every decision here is ours</div></div>
-        </div>
+      <div class="block-label">Recommendation</div>
+      <div class="type-table-wrap">
+        <table class="type-table">
+          <thead>
+            <tr><th>State</th><th>What it is</th><th>What to do</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>One scale.</strong> Interface text shares it across desktop and mobile, and it stays readable at phone width</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--do"><svg><use href="#ic-x"/></svg>Missing</span></td><td class="tt-what"><strong>No shared answer style.</strong> Every element in an answer carries its own Tailwind utilities</td><td><strong>shadcn/typeset</strong> replaces them with one container class. Released July 2026</td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--do"><svg><use href="#ic-x"/></svg>Missing</span></td><td class="tt-what"><strong>iOS zooms small inputs.</strong> Focusing anything below 16px zooms the whole page</td><td><strong>Set the 16px floor</strong> in the shared input, not per screen</td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--check"><svg><use href="#ic-q"/></svg>Verify</span></td><td class="tt-what"><strong>px ignores the reader.</strong> Sizes in px do not follow the font size set in the browser</td><td><strong>Check sizes use rem</strong></td></tr>
+          </tbody>
+        </table>
       </div>
-      <div class="sxs">
-        <div class="sxs-pane">
-          <div class="sxs-head"><span class="sxs-name">On a computer</span><span class="sxs-w">1280px</span></div>
-          <div class="sxs-body"><div class="d-label">Merchant</div>
-          <div class="d-value">Harbor View Hotel</div>
-          <div class="d-label" style="margin-top:12px">Volume, this month</div>
-          <div class="d-value">$3,241,880</div>
-          <p class="d-body">Volume is up 14% from last month, led by a jump in card-present
-            transactions across the top five merchants.</p></div>
-        </div>
-        <div class="sxs-pane sxs-pane--phone">
-          <div class="sxs-head"><span class="sxs-name">On a phone</span><span class="sxs-w">390px</span></div>
-          <div class="sxs-body"><div class="d-label">Merchant</div>
-          <div class="d-value">Harbor View Hotel</div>
-          <div class="d-label" style="margin-top:12px">Volume, this month</div>
-          <div class="d-value">$3,241,880</div>
-          <p class="d-body">Volume is up 14% from last month, led by a jump in card-present
-            transactions across the top five merchants.</p></div>
-        </div>
+      <div class="block-label">Preview</div>
+      <div class="type-table-wrap">
+        <table class="type-table">
+          <thead>
+            <tr><th>Specimen</th><th>Size / line height</th><th>Used for</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="tt-spec"><span style="font-size:36px">text-4xl</span></td><td class="tt-size">36 / 40</td><td>The 404 numeral</td></tr>
+            <tr><td class="tt-spec"><span style="font-size:30px">text-3xl</span></td><td class="tt-size">30 / 36</td><td>Page titles, largest metrics</td></tr>
+            <tr><td class="tt-spec"><span style="font-size:24px">text-2xl</span></td><td class="tt-size">24 / 32</td><td>Welcome and dialog headlines, large metrics</td></tr>
+            <tr><td class="tt-spec"><span style="font-size:20px">text-xl</span></td><td class="tt-size">20 / 28</td><td>Panel page titles, error titles, stat values</td></tr>
+            <tr><td class="tt-spec"><span style="font-size:18px">text-lg</span></td><td class="tt-size">18 / 28</td><td>Section headings, smaller stat values</td></tr>
+            <tr><td class="tt-spec"><span style="font-size:16px">text-base</span></td><td class="tt-size">16 / 24</td><td>Chat input on phones, card and panel titles</td></tr>
+            <tr><td class="tt-spec"><span style="font-size:14px">text-sm</span></td><td class="tt-size">14 / 20</td><td>Default interface text, chat and answer text</td></tr>
+            <tr><td class="tt-spec"><span style="font-size:12px">text-xs</span></td><td class="tt-size">12 / 16</td><td>Secondary and meta text</td></tr>
+          </tbody>
+        </table>
       </div>
-      <p class="sxs-note">Identical in both panes. <strong>The only responsive type rule in the codebase is the 16px input minimum</strong>, applied in two files out of eleven.</p>
+      <p class="sxs-note">The design system uses three steps: <span class="mono">text-xs</span>, <span class="mono">text-sm</span>, <span class="mono">text-base</span>. <strong>Everything above 16px and below 12px is the app's own choice.</strong></p>
+
     </div>
   </section>
 
@@ -1419,35 +1699,39 @@
       <div class="chapter">
         <div class="chapter-head">
           <h2>Sizing</h2>
-          <p class="lede">Controls are sized for a pointer on every screen. Nothing grows for touch, and the design system has no opinion about it either.</p>
+          <p class="lede">Controls are sized for a pointer on every screen. Nothing in the system grows them for touch.</p>
         </div>
       </div>
 
-      <div class="gap">
-        <div class="gap-card">
-          <div class="gap-label">What we have</div>
-          <div class="gap-list"><div>Four consistent sizes: <strong>24, 28, 32 and 36px</strong></div><div>The send button was raised to 32px to match the design</div></div>
-        </div>
-        <div class="gap-card gap-card--miss">
-          <div class="gap-label">What is missing</div>
-          <div class="gap-list"><div><strong>No size reaches 44px</strong>, the minimum Apple and Material both give for touch</div><div><strong>Zero</strong> responsive size variants exist, so a phone gets exactly what a 1440px screen gets</div><div>At phone density 28px is roughly <strong>4.7mm</strong> of glass against the 9mm a fingertip needs</div><div>Shadcn ships no touch-target guidance, and its own default button is 36px</div></div>
-        </div>
+      <div class="block-label">Recommendation</div>
+      <div class="type-table-wrap">
+        <table class="type-table">
+          <thead>
+            <tr><th>State</th><th>What it is</th><th>What to do</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>Four control sizes.</strong> 24, 28, 32 and 36px, applied consistently</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--do"><svg><use href="#ic-x"/></svg>Missing</span></td><td class="tt-what"><strong>36px at most.</strong> The biggest control sits under the touch minimums Apple (44pt) and Google (48dp) ask for</td><td><strong>Make the tap area 44px</strong> with padding. The button still looks the same size</td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--do"><svg><use href="#ic-x"/></svg>Missing</span></td><td class="tt-what"><strong>No touch-target rule.</strong> The design system says nothing about them</td><td><strong>Set the rule once</strong> in the system, for touch input</td></tr>
+          </tbody>
+        </table>
       </div>
+      <div class="block-label">Preview</div>
       <div class="sxs">
         <div class="sxs-pane">
-          <div class="sxs-head"><span class="sxs-name">On a computer</span><span class="sxs-w">1280px</span></div>
+          <div class="sxs-head"><span class="sxs-name"><svg class="sxs-ic"><use href="#ic-monitor"/></svg>Wide screen</span><span class="sxs-w">900px</span></div>
           <div class="sxs-body"><div class="d-btns"><div class="d-btn-wrap"><span class="d-btn" style="width:24px;height:24px">Ok</span><span class="d-btn-cap">xs &middot; 24px</span></div><div class="d-btn-wrap"><span class="d-btn" style="width:28px;height:28px">Ok</span><span class="d-btn-cap">sm &middot; 28px</span></div><div class="d-btn-wrap"><span class="d-btn" style="width:32px;height:32px">Ok</span><span class="d-btn-cap">default &middot; 32px</span></div><div class="d-btn-wrap"><span class="d-btn" style="width:36px;height:36px">Ok</span><span class="d-btn-cap">lg &middot; 36px</span></div>
             <div class="d-btn-wrap"><span class="d-ref">44</span><span class="d-btn-cap">minimum</span></div>
           </div></div>
         </div>
         <div class="sxs-pane sxs-pane--phone">
-          <div class="sxs-head"><span class="sxs-name">On a phone</span><span class="sxs-w">390px</span></div>
+          <div class="sxs-head"><span class="sxs-name"><svg class="sxs-ic"><use href="#ic-phone"/></svg>Phone</span><span class="sxs-w">390px</span></div>
           <div class="sxs-body"><div class="d-btns"><div class="d-btn-wrap"><span class="d-btn" style="width:24px;height:24px">Ok</span><span class="d-btn-cap">xs &middot; 24px</span></div><div class="d-btn-wrap"><span class="d-btn" style="width:28px;height:28px">Ok</span><span class="d-btn-cap">sm &middot; 28px</span></div><div class="d-btn-wrap"><span class="d-btn" style="width:32px;height:32px">Ok</span><span class="d-btn-cap">default &middot; 32px</span></div><div class="d-btn-wrap"><span class="d-btn" style="width:36px;height:36px">Ok</span><span class="d-btn-cap">lg &middot; 36px</span></div>
             <div class="d-btn-wrap"><span class="d-ref">44</span><span class="d-btn-cap">minimum</span></div>
           </div></div>
         </div>
       </div>
-      <p class="sxs-note">The dashed box is the 44px reference, not a size we ship. <strong>Every real control fits inside it.</strong></p>
+      <p class="sxs-note">The dashed box is the 44px reference. <strong>Every control sits inside it.</strong></p>
     </div>
   </section>
 
@@ -1457,19 +1741,29 @@
       <div class="chapter">
         <div class="chapter-head">
           <h2>Mobile-Specific Behaviors</h2>
-          <p class="lede">The one area with real mobile work. Two surfaces change shape below the breakpoint, and several hooks exist only for phones.</p>
+          <p class="lede">Two surfaces change shape below the breakpoint. The demo already shows most of this working.</p>
         </div>
       </div>
 
-      <div class="gap">
-        <div class="gap-card">
-          <div class="gap-label">What we have</div>
-          <div class="gap-list"><div>The <strong>Sidebar</strong> becomes a drawer over the conversation, 288px, from one button</div><div>The <strong>panel</strong> becomes a sheet that rests as a handle above the message box</div><div>A drag gesture with velocity, a scroll handoff, and a scrub that recedes the conversation</div><div>Keyboard inset and composer inset published and tracked live</div><div>The conversation is hidden from screen readers while a sheet is open</div></div>
-        </div>
-        <div class="gap-card gap-card--miss">
-          <div class="gap-label">What is missing</div>
-          <div class="gap-list"><div><strong>No safe-area insets anywhere.</strong> Zero uses of <span class="mono">env(safe-area-inset)</span>, so the composer sits in the home indicator on newer iPhones</div><div>Panel swap and close do not animate</div><div>One panel is reachable at a time, and the resting handle does not say which</div></div>
-        </div>
+      <div class="block-label">Recommendation</div>
+      <div class="type-table-wrap">
+        <table class="type-table">
+          <thead>
+            <tr><th>State</th><th>What it is</th><th>What to do</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>Sidebar becomes a sheet.</strong> Below 768px it opens at 288px, a width the library fixes</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>Drawer is a real bottom sheet.</strong> Drag down to close, opens from any screen edge, never taller than 80% of the screen</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>One panel at a time.</strong> On a phone only one is open, so the handle never has to reach a second</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--do"><svg><use href="#ic-x"/></svg>Missing</span></td><td class="tt-what"><strong>No safe-area padding.</strong> Nothing reads <span class="mono">env(safe-area-inset)</span>, so anything against the screen edge sits under the home indicator</td><td><strong>Add safe-area padding</strong> to anything that touches the screen edge</td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--do"><svg><use href="#ic-x"/></svg>Missing</span></td><td class="tt-what"><strong>Breakpoint is private.</strong> The design system uses <span class="mono">useIsMobile</span> at 768px inside but does not export it, so the demo had to keep its own copy</td><td><strong>Export one breakpoint and one hook</strong> for everything to share</td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--do"><svg><use href="#ic-x"/></svg>Missing</span></td><td class="tt-what"><strong>Dialogs stay dialogs.</strong> On a phone nothing swaps them unless told to</td><td><strong>Swap Dialog to Drawer</strong> below the breakpoint, the pattern shadcn documents</td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--check"><svg><use href="#ic-q"/></svg>Verify</span></td><td class="tt-what"><strong>The panel becomes a bottom sheet.</strong> In the demo it rests as a handle above the composer</td><td><strong>Confirm the shipped code</strong> does the same</td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--check"><svg><use href="#ic-q"/></svg>Verify</span></td><td class="tt-what"><strong>Hidden from screen readers.</strong> The demo hides the conversation while a sheet is open</td><td><strong>Confirm the shipped code</strong> does the same</td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--check"><svg><use href="#ic-q"/></svg>Verify</span></td><td class="tt-what"><strong>May not animate.</strong> Neither the panel swap nor the close is confirmed to</td><td><strong>Confirm both animate</strong></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--check"><svg><use href="#ic-q"/></svg>Verify</span></td><td class="tt-what"><strong>Handle may be nameless.</strong> Nothing confirms it says which panel it holds</td><td><strong>Confirm it names the panel</strong></td></tr>
+          </tbody>
+        </table>
       </div>
 
       <div class="bleed">
@@ -1478,7 +1772,7 @@
           alt="A phone with the sidebar closed, and the same phone with the sidebar open as a drawer"
           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
         <div class="img-ph"><span class="img-ph-name">Sidebar</span><span class="img-ph-hint">Screenshot unavailable</span></div>
-        <p class="cap"><strong>Sidebar</strong> &middot; closed, and open over the conversation</p>
+        <p class="cap"><strong>Sidebar</strong>, closed and open. Open, it covers the conversation.</p>
       </div>
 
       <div class="bleed">
@@ -1487,21 +1781,9 @@
           alt="A phone with the panel open, and the same phone with the panel resting as a handle"
           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
         <div class="img-ph"><span class="img-ph-name">Panel</span><span class="img-ph-hint">Screenshot unavailable</span></div>
-        <p class="cap"><strong>Panel</strong> &middot; open, and resting as a handle</p>
+        <p class="cap"><strong>Panel</strong>, open and at rest. The handle keeps the composer usable.</p>
       </div>
 
-      <div class="demo">
-        <div class="demo-phone">
-          <iframe class="demo-frame" src="https://ask-nanci.vercel.app/?mode=concept&amp;flow=2&amp;panelui=swipe&amp;autoplay" title="The running app at phone size" loading="lazy"></iframe>
-        </div>
-        <div class="demo-note">
-          <p class="sxs-note" style="margin-top:0">The running app at phone size. Drag the card down by its top edge,
-            then drag the handle back up. <strong>A mouse works the same way a thumb does.</strong></p>
-          <a class="demo-link" style="margin-top:14px" href="https://ask-nanci.vercel.app/?mode=concept&amp;flow=2&amp;panelui=swipe&amp;autoplay" target="_blank" rel="noopener noreferrer">Open it full size <svg>
-              <use href="#ic-arrow-r" />
-            </svg></a>
-        </div>
-      </div>
     </div>
   </section>
 
@@ -1511,31 +1793,51 @@
       <div class="chapter">
         <div class="chapter-head">
           <h2>Charts</h2>
-          <p class="lede">Recharts sizes a chart to any box and thins its own axis ticks. We have switched that thinning off, and we are one version behind a fix for the legend.</p>
+          <p class="lede">Recharts fits a chart to any width and thins its own ticks. Everything about that width being small is ours to decide.</p>
         </div>
       </div>
 
-      <div class="gap">
-        <div class="gap-card">
-          <div class="gap-label">What we have</div>
-          <div class="gap-list"><div><strong>ResponsiveContainer</strong> in five places, so a chart fills whatever box it is given</div><div>Recharts thins colliding tick labels by default (<span class="mono">interval=&quot;preserveEnd&quot;</span>)</div><div>The legend was rebuilt as a normal element beneath the chart, so it wraps and takes its real height</div><div>Tooltips already respond to a tap</div></div>
-        </div>
-        <div class="gap-card gap-card--miss">
-          <div class="gap-label">What is missing</div>
-          <div class="gap-list"><div><strong>We set <span class="mono">interval={0}</span> in three charts</strong>, which forces every tick and disables the one adaptation Recharts gives us</div><div><strong>We are on recharts 3.8.1</strong>, which has a legend-overlap regression fixed in 3.9.0. Bumping is a free win</div><div>The <span class="mono">responsive</span> prop (3.3+) supersedes ResponsiveContainer and drops its sized-parent requirement, which is what bites in flex layouts</div><div>Default chart margin is 5px on every side, so long or rotated labels clip</div><div>Tooltips still trigger on hover, where <span class="mono">trigger=&quot;click&quot;</span> suits a phone</div></div>
-        </div>
+      <div class="block-label">Recommendation</div>
+      <div class="type-table-wrap">
+        <table class="type-table">
+          <thead>
+            <tr><th>State</th><th>What it is</th><th>What to do</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>Fits any width.</strong> ResponsiveContainer redraws a chart at its parent&rsquo;s size</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>Ticks thin out.</strong> Labels drop on their own when they would collide</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>Touch works.</strong> Tooltips answer a tap, Brush drags</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--do"><svg><use href="#ic-x"/></svg>Missing</span></td><td class="tt-what"><strong>No mobile mode.</strong> How many labels show, margins, legend and tooltips are all ours to set</td><td><strong>Set these once</strong> in a shared chart wrapper, not chart by chart</td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--do"><svg><use href="#ic-x"/></svg>Missing</span></td><td class="tt-what"><strong>Long labels get clipped.</strong> The default margin is 5px on every side</td><td><strong>Add more margin</strong> where labels are long or turned</td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--do"><svg><use href="#ic-x"/></svg>Missing</span></td><td class="tt-what"><strong>Legend height is a guess.</strong> The legend never reports it, so the chart cannot make room when entries wrap</td><td><strong>Put the legend below the chart</strong> as a normal element</td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--check"><svg><use href="#ic-q"/></svg>Verify</span></td><td class="tt-what"><strong>Thinning can be switched off.</strong> <span class="mono">interval={0}</span> forces every label</td><td><strong>Check no chart sets it</strong></td></tr>
+          </tbody>
+        </table>
       </div>
+      <div class="block-label">Preview</div>
       <div class="sxs">
         <div class="sxs-pane">
-          <div class="sxs-head"><span class="sxs-name">On a computer</span><span class="sxs-w">1280px</span></div>
+          <div class="sxs-head"><span class="sxs-name"><svg class="sxs-ic"><use href="#ic-monitor"/></svg>Wide screen</span><span class="sxs-w">900px</span></div>
           <div class="sxs-body"><svg width="100%" height="150" role="img" aria-label="Monthly volume by channel"><line x1="0" x2="100%" y1="8.0" y2="8.0" stroke="#e3e6ea" stroke-width="1" /><line x1="0" x2="100%" y1="46.7" y2="46.7" stroke="#e3e6ea" stroke-width="1" /><line x1="0" x2="100%" y1="85.3" y2="85.3" stroke="#e3e6ea" stroke-width="1" /><line x1="0" x2="100%" y1="124.0" y2="124.0" stroke="#e3e6ea" stroke-width="1" /><rect x="2.25%" y="33.5" width="2.50%" height="90.5" fill="#002F67" rx="1" /><rect x="5.00%" y="75.3" width="2.50%" height="48.7" fill="#0072BC" rx="1" /><rect x="7.75%" y="103.1" width="2.50%" height="20.9" fill="#7ED3F7" rx="1" /><rect x="14.75%" y="26.6" width="2.50%" height="97.4" fill="#002F67" rx="1" /><rect x="17.50%" y="70.6" width="2.50%" height="53.4" fill="#0072BC" rx="1" /><rect x="20.25%" y="100.8" width="2.50%" height="23.2" fill="#7ED3F7" rx="1" /><rect x="27.25%" y="40.5" width="2.50%" height="83.5" fill="#002F67" rx="1" /><rect x="30.00%" y="77.6" width="2.50%" height="46.4" fill="#0072BC" rx="1" /><rect x="32.75%" y="105.4" width="2.50%" height="18.6" fill="#7ED3F7" rx="1" /><rect x="39.75%" y="21.9" width="2.50%" height="102.1" fill="#002F67" rx="1" /><rect x="42.50%" y="66.0" width="2.50%" height="58.0" fill="#0072BC" rx="1" /><rect x="45.25%" y="98.5" width="2.50%" height="25.5" fill="#7ED3F7" rx="1" /><rect x="52.25%" y="13.8" width="2.50%" height="110.2" fill="#002F67" rx="1" /><rect x="55.00%" y="60.2" width="2.50%" height="63.8" fill="#0072BC" rx="1" /><rect x="57.75%" y="96.2" width="2.50%" height="27.8" fill="#7ED3F7" rx="1" /><rect x="64.75%" y="8.0" width="2.50%" height="116.0" fill="#002F67" rx="1" /><rect x="67.50%" y="56.7" width="2.50%" height="67.3" fill="#0072BC" rx="1" /><rect x="70.25%" y="93.8" width="2.50%" height="30.2" fill="#7ED3F7" rx="1" /><rect x="77.25%" y="18.4" width="2.50%" height="105.6" fill="#002F67" rx="1" /><rect x="80.00%" y="63.7" width="2.50%" height="60.3" fill="#0072BC" rx="1" /><rect x="82.75%" y="99.6" width="2.50%" height="24.4" fill="#7ED3F7" rx="1" /><rect x="89.75%" y="11.5" width="2.50%" height="112.5" fill="#002F67" rx="1" /><rect x="92.50%" y="53.2" width="2.50%" height="70.8" fill="#0072BC" rx="1" /><rect x="95.25%" y="91.5" width="2.50%" height="32.5" fill="#7ED3F7" rx="1" /><text x="6.25%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">January</text><text x="18.75%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">February</text><text x="31.25%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">March</text><text x="43.75%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">April</text><text x="56.25%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">May</text><text x="68.75%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">June</text><text x="81.25%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">July</text><text x="93.75%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">August</text></svg><div class="d-legend"><span class="d-key"><i style="background:#002F67"></i>Card present</span><span class="d-key"><i style="background:#0072BC"></i>E-commerce</span><span class="d-key"><i style="background:#7ED3F7"></i>Keyed</span></div></div>
         </div>
         <div class="sxs-pane sxs-pane--phone">
-          <div class="sxs-head"><span class="sxs-name">On a phone</span><span class="sxs-w">390px</span></div>
+          <div class="sxs-head"><span class="sxs-name"><svg class="sxs-ic"><use href="#ic-phone"/></svg>Phone</span><span class="sxs-w">390px</span></div>
           <div class="sxs-body"><svg width="100%" height="150" role="img" aria-label="Monthly volume by channel"><line x1="0" x2="100%" y1="8.0" y2="8.0" stroke="#e3e6ea" stroke-width="1" /><line x1="0" x2="100%" y1="46.7" y2="46.7" stroke="#e3e6ea" stroke-width="1" /><line x1="0" x2="100%" y1="85.3" y2="85.3" stroke="#e3e6ea" stroke-width="1" /><line x1="0" x2="100%" y1="124.0" y2="124.0" stroke="#e3e6ea" stroke-width="1" /><rect x="2.25%" y="33.5" width="2.50%" height="90.5" fill="#002F67" rx="1" /><rect x="5.00%" y="75.3" width="2.50%" height="48.7" fill="#0072BC" rx="1" /><rect x="7.75%" y="103.1" width="2.50%" height="20.9" fill="#7ED3F7" rx="1" /><rect x="14.75%" y="26.6" width="2.50%" height="97.4" fill="#002F67" rx="1" /><rect x="17.50%" y="70.6" width="2.50%" height="53.4" fill="#0072BC" rx="1" /><rect x="20.25%" y="100.8" width="2.50%" height="23.2" fill="#7ED3F7" rx="1" /><rect x="27.25%" y="40.5" width="2.50%" height="83.5" fill="#002F67" rx="1" /><rect x="30.00%" y="77.6" width="2.50%" height="46.4" fill="#0072BC" rx="1" /><rect x="32.75%" y="105.4" width="2.50%" height="18.6" fill="#7ED3F7" rx="1" /><rect x="39.75%" y="21.9" width="2.50%" height="102.1" fill="#002F67" rx="1" /><rect x="42.50%" y="66.0" width="2.50%" height="58.0" fill="#0072BC" rx="1" /><rect x="45.25%" y="98.5" width="2.50%" height="25.5" fill="#7ED3F7" rx="1" /><rect x="52.25%" y="13.8" width="2.50%" height="110.2" fill="#002F67" rx="1" /><rect x="55.00%" y="60.2" width="2.50%" height="63.8" fill="#0072BC" rx="1" /><rect x="57.75%" y="96.2" width="2.50%" height="27.8" fill="#7ED3F7" rx="1" /><rect x="64.75%" y="8.0" width="2.50%" height="116.0" fill="#002F67" rx="1" /><rect x="67.50%" y="56.7" width="2.50%" height="67.3" fill="#0072BC" rx="1" /><rect x="70.25%" y="93.8" width="2.50%" height="30.2" fill="#7ED3F7" rx="1" /><rect x="77.25%" y="18.4" width="2.50%" height="105.6" fill="#002F67" rx="1" /><rect x="80.00%" y="63.7" width="2.50%" height="60.3" fill="#0072BC" rx="1" /><rect x="82.75%" y="99.6" width="2.50%" height="24.4" fill="#7ED3F7" rx="1" /><rect x="89.75%" y="11.5" width="2.50%" height="112.5" fill="#002F67" rx="1" /><rect x="92.50%" y="53.2" width="2.50%" height="70.8" fill="#0072BC" rx="1" /><rect x="95.25%" y="91.5" width="2.50%" height="32.5" fill="#7ED3F7" rx="1" /><text x="6.25%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">January</text><text x="18.75%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">February</text><text x="31.25%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">March</text><text x="43.75%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">April</text><text x="56.25%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">May</text><text x="68.75%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">June</text><text x="81.25%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">July</text><text x="93.75%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">August</text></svg><div class="d-legend"><span class="d-key"><i style="background:#002F67"></i>Card present</span><span class="d-key"><i style="background:#0072BC"></i>E-commerce</span><span class="d-key"><i style="background:#7ED3F7"></i>Keyed</span></div></div>
         </div>
       </div>
-      <p class="sxs-note">The same chart in a narrower box, at the same text size. <strong>On the phone the month labels run together</strong>, which is what tick thinning exists to prevent and what <span class="mono">interval={0}</span> switches off.</p>
+      <p class="sxs-note">The same chart in a narrower box, at the same text size. <strong>At 390px the month labels collide</strong>, which is what tick thinning prevents and <span class="mono">interval={0}</span> switches off.</p>
+      <div class="block-label">Preview</div>
+      <div class="sxs">
+        <div class="sxs-pane">
+          <div class="sxs-head"><span class="sxs-name"><svg class="sxs-ic"><use href="#ic-monitor"/></svg>Wide screen</span><span class="sxs-w">900px</span></div>
+          <div class="sxs-body"><div class="d-legend"><span class="d-key"><i style="background:#002F67"></i>Card present</span><span class="d-key"><i style="background:#004785"></i>E-commerce</span><span class="d-key"><i style="background:#0072BC"></i>Keyed</span><span class="d-key"><i style="background:#7ED3F7"></i>Wallet</span><span class="d-key"><i style="background:#C8EAF5"></i>ACH</span></div></div>
+        </div>
+        <div class="sxs-pane sxs-pane--phone">
+          <div class="sxs-head"><span class="sxs-name"><svg class="sxs-ic"><use href="#ic-phone"/></svg>Phone</span><span class="sxs-w">390px</span></div>
+          <div class="sxs-body"><div class="d-legend"><span class="d-key"><i style="background:#002F67"></i>Card present</span><span class="d-key"><i style="background:#004785"></i>E-commerce</span><span class="d-key"><i style="background:#0072BC"></i>Keyed</span><span class="d-key"><i style="background:#7ED3F7"></i>Wallet</span><span class="d-key"><i style="background:#C8EAF5"></i>ACH</span></div></div>
+        </div>
+      </div>
+      <p class="sxs-note">The legend entries fit one line on a wide screen. <strong>At 390px they wrap and the block grows taller</strong>, and that height is never reported back to the chart.</p>
     </div>
   </section>
 
@@ -1545,23 +1847,28 @@
       <div class="chapter">
         <div class="chapter-head">
           <h2>Table</h2>
-          <p class="lede">Handled, but not by us. The design system already shipped the fix, and we added a second one on top that does nothing.</p>
+          <p class="lede">The design system already ships horizontal scrolling. What is missing is any sign that columns continue.</p>
         </div>
       </div>
 
-      <div class="gap">
-        <div class="gap-card">
-          <div class="gap-label">What we have</div>
-          <div class="gap-list"><div><strong>Shadcn's Table ships its own scroll container</strong>, and that is the element that actually scrolls</div><div>Nothing is hidden and nothing restacks into cards, so the figures keep one order</div><div>No panel hand-rolls a table, so the treatment is universal</div></div>
-        </div>
-        <div class="gap-card gap-card--miss">
-          <div class="gap-label">What is missing</div>
-          <div class="gap-list"><div><strong>Our extra wrapper is inert.</strong> We added a second <span class="mono">overflow-x-auto</span> around a table that was already wrapped; measured on a phone, it never scrolls</div><div>No cue that columns continue past the right edge</div><div>No sticky first column, and shadcn ships neither that nor column priority</div></div>
-        </div>
+      <div class="block-label">Recommendation</div>
+      <div class="type-table-wrap">
+        <table class="type-table">
+          <thead>
+            <tr><th>State</th><th>What it is</th><th>What to do</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>Scrolls sideways.</strong> Table ships its own horizontal scroll container</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--do"><svg><use href="#ic-x"/></svg>Missing</span></td><td class="tt-what"><strong>No edge cue.</strong> Nothing shows that columns continue past the right edge</td><td><strong>Add an edge fade</strong> while there is more to see</td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--do"><svg><use href="#ic-x"/></svg>Missing</span></td><td class="tt-what"><strong>No pinned column.</strong> The first column scrolls away, and no rule says which columns hide first</td><td><strong>Pin the name column</strong>, or hide the least useful columns first</td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--check"><svg><use href="#ic-q"/></svg>Verify</span></td><td class="tt-what"><strong>A second wrapper does nothing.</strong> Table already ships its own scroll container</td><td><strong>Check nothing wraps</strong> the built-in container</td></tr>
+          </tbody>
+        </table>
       </div>
+      <div class="block-label">Preview</div>
       <div class="sxs">
         <div class="sxs-pane">
-          <div class="sxs-head"><span class="sxs-name">On a computer</span><span class="sxs-w">1280px</span></div>
+          <div class="sxs-head"><span class="sxs-name"><svg class="sxs-ic"><use href="#ic-monitor"/></svg>Wide screen</span><span class="sxs-w">900px</span></div>
           <div class="sxs-body"><div class="d-scroll">
             <table class="d-table">
               <thead><tr><th>#</th><th>Merchant</th><th class="num">Volume</th><th class="num">Txns</th><th class="num">Avg ticket</th></tr></thead>
@@ -1570,7 +1877,7 @@
           </div></div>
         </div>
         <div class="sxs-pane sxs-pane--phone">
-          <div class="sxs-head"><span class="sxs-name">On a phone</span><span class="sxs-w">390px</span></div>
+          <div class="sxs-head"><span class="sxs-name"><svg class="sxs-ic"><use href="#ic-phone"/></svg>Phone</span><span class="sxs-w">390px</span></div>
           <div class="sxs-body"><div class="d-scroll">
             <table class="d-table">
               <thead><tr><th>#</th><th>Merchant</th><th class="num">Volume</th><th class="num">Txns</th><th class="num">Avg ticket</th></tr></thead>
@@ -1579,7 +1886,7 @@
           </div></div>
         </div>
       </div>
-      <p class="sxs-note">Drag either table sideways. <strong>The left one fits; the right one scrolls</strong>, which is the shipped behaviour.</p>
+      <p class="sxs-note">Drag either table sideways. <strong>The wide one fits, the phone one scrolls</strong>, which is the shipped behavior.</p>
     </div>
   </section>
 
@@ -1588,91 +1895,62 @@
     <div class="wrap">
       <div class="chapter">
         <div class="chapter-head">
-          <h2>Tab And Segmented Controls</h2>
-          <p class="lede">A tab strip wider than the screen loses its tabs. Shadcn has never fixed this, so the fix is ours and it is opt-in.</p>
+          <h2>Tab and Segmented Controls</h2>
+          <p class="lede">A tab strip wider than the screen clips. The design system ships no answer, so the fix is ours.</p>
         </div>
       </div>
 
-      <div class="gap">
-        <div class="gap-card">
-          <div class="gap-label">What we have</div>
-          <div class="gap-list"><div><strong>SegmentedGroup</strong> takes a <span class="mono">scrollable</span> prop that wraps it in a scroll area</div><div>Labels never shrink, so nothing becomes unreadable</div></div>
-        </div>
-        <div class="gap-card gap-card--miss">
-          <div class="gap-label">What is missing</div>
-          <div class="gap-list"><div><strong>Opt-in, not default.</strong> A plain TabsList still clips</div><div><strong>Shadcn ships nothing for tab overflow</strong> and no official scrollable example. The community issue was closed stale</div><div>No edge fade or arrow to say more tabs exist, and the selected tab is not scrolled into view</div></div>
-        </div>
+      <div class="block-label">Recommendation</div>
+      <div class="type-table-wrap">
+        <table class="type-table">
+          <thead>
+            <tr><th>State</th><th>What it is</th><th>What to do</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--do"><svg><use href="#ic-x"/></svg>Missing</span></td><td class="tt-what"><strong>Wide strips clip.</strong> <span class="mono">TabsList</span> is <span class="mono">inline-flex w-fit</span>, so anything past the screen edge is cut off</td><td><strong>Swap to a Select</strong> on phones when a strip passes three items or labels run long. The design system already has the Select component, so nothing new to build</td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--check"><svg><use href="#ic-q"/></svg>Verify</span></td><td class="tt-what"><strong>Nothing swaps on its own.</strong> A strip stays a strip unless each one is told to change</td><td><strong>Check every strip</strong> either fits the screen or swaps</td></tr>
+          </tbody>
+        </table>
       </div>
+      <div class="block-label">Preview</div>
       <div class="sxs">
         <div class="sxs-pane">
-          <div class="sxs-head"><span class="sxs-name">On a computer</span><span class="sxs-w">1280px</span></div>
+          <div class="sxs-head"><span class="sxs-name"><svg class="sxs-ic"><use href="#ic-monitor"/></svg>Wide screen</span><span class="sxs-w">900px</span></div>
           <div class="sxs-body"><div class="d-scroll"><div class="d-tabs"><span class="d-tab">This week</span><span class="d-tab" aria-selected="true">This month</span><span class="d-tab">This quarter</span><span class="d-tab">This year</span><span class="d-tab">All time</span></div></div></div>
         </div>
         <div class="sxs-pane sxs-pane--phone">
-          <div class="sxs-head"><span class="sxs-name">On a phone</span><span class="sxs-w">390px</span></div>
-          <div class="sxs-body"><div class="d-scroll"><div class="d-tabs"><span class="d-tab">This week</span><span class="d-tab" aria-selected="true">This month</span><span class="d-tab">This quarter</span><span class="d-tab">This year</span><span class="d-tab">All time</span></div></div></div>
+          <div class="sxs-head"><span class="sxs-name"><svg class="sxs-ic"><use href="#ic-phone"/></svg>Phone</span><span class="sxs-w">390px</span></div>
+          <div class="sxs-body"><div style="display:inline-flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:14px;font-weight:600">This month <span style="opacity:.5">&#9662;</span></div></div>
         </div>
       </div>
-      <p class="sxs-note">Five periods fit on a computer. <strong>On a phone the last sits past the edge</strong>, reachable only because this strip is set to scroll.</p>
+      <p class="sxs-note">Every period fits a wide screen. <strong>At 390px the strip passes three items</strong>, so it becomes a Select.</p>
     </div>
   </section>
 
-  <!-- 07 · WHAT SHADCN GIVES US -->
-  <section id="shadcn">
+  <!-- 07 · LIVE -->
+  <section id="live">
     <div class="wrap">
       <div class="chapter">
         <div class="chapter-head">
-          <h2>What Shadcn Gives Us</h2>
-          <p class="lede">More than we use. One thing we hand-built already existed in the system, and we arrived at the same number it did.</p>
+          <h2>The App on a Phone</h2>
+          <p class="lede">The panel sheet, running at 390px. This is the demo the Verify rows point at.</p>
         </div>
       </div>
-
-      <div class="gap">
-        <div class="gap-card">
-          <div class="gap-label">What we have</div>
-          <div class="gap-list"><div><strong>Sidebar swaps to a Sheet below 768px</strong> at a built-in <span class="mono">SIDEBAR_WIDTH_MOBILE</span> of 18rem</div><div>Table ships a horizontal scroll container</div><div>Sheet, Drawer and ScrollArea are all available</div><div>The responsive-dialog pattern is official: Dialog on a computer, Drawer on a phone</div></div>
+      <div class="demo">
+        <div class="demo-phone">
+          <iframe class="demo-frame" src="https://ask-nanci.vercel.app/?mode=concept&amp;flow=2&amp;panelui=swipe&amp;autoplay" title="The running app at phone size" loading="lazy"></iframe>
         </div>
-        <div class="gap-card gap-card--miss">
-          <div class="gap-label">What is missing</div>
-          <div class="gap-list"><div><strong>We do not use the Sidebar primitive.</strong> Ours reimplements the swap and independently landed on 288px, which is that same 18rem</div><div><strong>No breakpoint hook is exported.</strong> It exists inside the bundle but is reachable only through <span class="mono">useSidebar()</span>, so ours is hand-built</div><div>The official responsive-dialog example depends on a media-query hook that <strong>is not shipped</strong></div><div>The Drawer could not carry the panel sheet: it renders in its own portal, over the composer, and keeping the composer usable is the point</div><div>Nothing on touch targets or type scale</div></div>
+        <div class="demo-note">
+          <p class="sxs-note" style="margin-top:0"><strong>A mouse works the same way a thumb does.</strong> Drag the card down by its top edge, then drag the handle back up.</p>
+          <a class="demo-link" style="margin-top:14px" href="https://ask-nanci.vercel.app/?mode=concept&amp;flow=2&amp;panelui=swipe&amp;autoplay" target="_blank" rel="noopener noreferrer">Open it full size <svg>
+              <use href="#ic-arrow-r" />
+            </svg></a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- 08 · WHAT RECHARTS GIVES US -->
-  <section id="recharts">
-    <div class="wrap">
-      <div class="chapter">
-        <div class="chapter-head">
-          <h2>What Recharts Gives Us</h2>
-          <p class="lede">It makes a chart fit any width and thins its own ticks. Everything about the width being small is left to us.</p>
-        </div>
-      </div>
 
-      <div class="gap">
-        <div class="gap-card">
-          <div class="gap-label">What we have</div>
-          <div class="gap-list"><div><strong>ResponsiveContainer</strong> measures the parent and redraws at its size</div><div><strong>Tick thinning is on by default</strong>, and it measures the label text to decide</div><div>Touch is wired through: tooltips answer a tap, and Brush drags</div><div>A newer <span class="mono">responsive</span> prop removes the sized-parent requirement</div></div>
-        </div>
-        <div class="gap-card gap-card--miss">
-          <div class="gap-label">What is missing</div>
-          <div class="gap-list"><div><strong>The built-in Legend is absolutely positioned and never reports its height</strong>, so the space for it is a fixed guess: too small and it clips, too big and it leaves a gap. We replaced it</div><div>Neither ResponsiveContainer nor ChartContainer is legend-aware, so that guess sits on top of both</div><div><strong>No mobile mode of any kind.</strong> Label formatting, tick density, margins and legend placement are all ours</div><div>Nothing widens the 5px default margin as labels grow</div></div>
-        </div>
-      </div>
-      <div class="sxs">
-        <div class="sxs-pane">
-          <div class="sxs-head"><span class="sxs-name">On a computer</span><span class="sxs-w">1280px</span></div>
-          <div class="sxs-body"><div class="d-legend"><span class="d-key"><i style="background:#002F67"></i>Card present</span><span class="d-key"><i style="background:#004785"></i>E-commerce</span><span class="d-key"><i style="background:#0072BC"></i>Keyed</span><span class="d-key"><i style="background:#7ED3F7"></i>Wallet</span><span class="d-key"><i style="background:#C8EAF5"></i>ACH</span></div></div>
-        </div>
-        <div class="sxs-pane sxs-pane--phone">
-          <div class="sxs-head"><span class="sxs-name">On a phone</span><span class="sxs-w">390px</span></div>
-          <div class="sxs-body"><div class="d-legend"><span class="d-key"><i style="background:#002F67"></i>Card present</span><span class="d-key"><i style="background:#004785"></i>E-commerce</span><span class="d-key"><i style="background:#0072BC"></i>Keyed</span><span class="d-key"><i style="background:#7ED3F7"></i>Wallet</span><span class="d-key"><i style="background:#C8EAF5"></i>ACH</span></div></div>
-        </div>
-      </div>
-      <p class="sxs-note">Five entries on one line on a computer. <strong>On the phone they wrap and the block gets taller</strong>, and that new height is what recharts never reports back to the chart.</p>
-    </div>
-  </section>
 
   <footer>
     <div class="wrap">
