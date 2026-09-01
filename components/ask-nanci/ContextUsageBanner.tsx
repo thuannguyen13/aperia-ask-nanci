@@ -2,9 +2,8 @@
 
 import { useState } from "react"
 import { X } from "lucide-react"
-import {
-  Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, Progress,
-} from "aperia-ds5"
+import { Button, Progress } from "aperia-ds5"
+import { ResponsiveDialog, ResponsiveDialogContent, ResponsiveDialogDescription, ResponsiveDialogHeader, ResponsiveDialogTitle, ResponsiveDialogTrigger } from "@/components/shared"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import {
   formatContextTokens, getContextUsage,
@@ -30,17 +29,17 @@ const BANNER_COPY: Record<Exclude<ContextUsageState, "ok">, string> = {
 
 function ContextUsageDialog({ usage }: { usage: ContextUsage }) {
   return (
-    <Dialog>
-      <DialogTrigger asChild>
+    <ResponsiveDialog>
+      <ResponsiveDialogTrigger asChild>
         <button className="underline underline-offset-2 hover:no-underline">Learn more</button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[400px]">
-        <DialogHeader>
-          <DialogTitle>Context Usage</DialogTitle>
-          <DialogDescription>
+      </ResponsiveDialogTrigger>
+      <ResponsiveDialogContent className="sm:max-w-[400px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>Context Usage</ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
             {"How much of this conversation's memory Nanci is currently using."}
-          </DialogDescription>
-        </DialogHeader>
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
         <div className="flex flex-col gap-1">
           <div className="flex items-center justify-between text-xs font-medium leading-none text-muted-foreground">
             <span>Context window</span>
@@ -54,8 +53,8 @@ function ContextUsageDialog({ usage }: { usage: ContextUsage }) {
             className={usage.state === "full" ? "[&>[data-slot=progress-indicator]]:bg-destructive" : undefined}
           />
         </div>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   )
 }
 

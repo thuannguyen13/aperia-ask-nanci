@@ -2,7 +2,8 @@
 
 import Image from "next/image"
 import { CornerDownRight } from "lucide-react"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ReferenceLine, ResponsiveContainer } from "recharts"
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, ReferenceLine } from "recharts"
+import { ResponsiveChart, chartTickProps } from "@/components/shared/ResponsiveChart"
 import { PanelHeader } from "@/components/shared"
 import { ChatInput } from "@/components/ask-nanci/ChatInput"
 import { NANCI_REVIEW, NANCI_PROJECTION, EXAMPLE_ASSIGNMENT_NAME } from "@/lib/ask-nanci/data/risk-create-assignment"
@@ -26,20 +27,24 @@ function Chip({ label, onClick }: { label: string; onClick?: () => void }) {
 function Projection() {
   return (
     <div className="[&_*]:outline-none">
-      <ResponsiveContainer width="100%" height={190}>
+      <ResponsiveChart
+        height={190}
+        legend={[
+          { label: "Current Setup", color: "var(--muted-foreground)" },
+          { label: "Ask Nanci Recommended", color: "var(--primary)" },
+        ]}
+      >
+        {(narrow) => (
         <LineChart data={NANCI_PROJECTION} margin={{ top: 20, right: 4, bottom: 0, left: 0 }}>
           <CartesianGrid vertical={false} stroke="var(--border)" />
-          <XAxis dataKey="month" tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} tickLine={false} axisLine={false} interval={0} />
+          <XAxis dataKey="month" {...chartTickProps(narrow)} tick={{ fontSize: narrow ? 10 : 11, fill: "var(--muted-foreground)" }} tickLine={false} axisLine={false} />
           <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} tickLine={false} axisLine={false} ticks={[0, 20, 40, 60, 80, 100]} width={36} />
           <ReferenceLine x="Jun" stroke="var(--border)" label={{ value: "Today", position: "top", fontSize: 10, fill: "var(--muted-foreground)" }} />
           <Line dataKey="current" stroke="var(--muted-foreground)" strokeWidth={1.5} dot={false} />
           <Line dataKey="recommended" stroke="var(--primary)" strokeWidth={1.5} strokeDasharray="4 3" dot={false} connectNulls />
         </LineChart>
-      </ResponsiveContainer>
-      <div className="flex items-center justify-center gap-4 text-[11px] text-muted-foreground">
-        <span className="flex items-center gap-1.5"><span className="size-2 rounded-[2px] bg-muted-foreground/60" /> Current Setup</span>
-        <span className="flex items-center gap-1.5"><span className="size-2 rounded-[2px] bg-primary" /> Ask Nanci Recommended</span>
-      </div>
+        )}
+      </ResponsiveChart>
     </div>
   )
 }

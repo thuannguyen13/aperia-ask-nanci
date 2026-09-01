@@ -1,7 +1,8 @@
 "use client"
 
 import { ArrowDown, X } from "lucide-react"
-import { Badge, Dialog, DialogContent, DialogTitle, Progress } from "aperia-ds5"
+import { Badge, Progress } from "aperia-ds5"
+import { ResponsiveDialog, ResponsiveDialogContent, ResponsiveDialogTitle } from "@/components/shared"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 
 function fmt(n: number) {
@@ -77,13 +78,13 @@ export function SettingsDialog() {
   const { settingsOpen, setSettingsOpen } = useAskNanci()
 
   return (
-    <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-      <DialogContent
+    <ResponsiveDialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+      <ResponsiveDialogContent
         showCloseButton={false}
         className="p-0 gap-0 overflow-hidden max-sm:inset-0 max-sm:top-0 max-sm:left-0 max-sm:translate-x-0 max-sm:translate-y-0 max-sm:h-[100dvh] max-sm:w-screen max-sm:max-w-full max-sm:rounded-none"
         style={{ maxWidth: "min(640px, calc(100vw - 2rem))", width: "100%" }}
       >
-        <DialogTitle className="sr-only">Usage</DialogTitle>
+        <ResponsiveDialogTitle className="sr-only">Usage</ResponsiveDialogTitle>
         <div className="flex min-h-0 flex-col overflow-hidden max-h-[100dvh] sm:max-h-[80vh]">
 
           {/* Header */}
@@ -103,7 +104,7 @@ export function SettingsDialog() {
           </div>
 
         </div>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   )
 }

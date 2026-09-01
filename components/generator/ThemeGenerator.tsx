@@ -3,17 +3,9 @@
 import { useEffect, useState } from "react"
 import { Check, Code, Copy, MessageSquare, RotateCcw, SquarePen } from "lucide-react"
 import {
-  Accordion, AccordionContent, AccordionItem, AccordionTrigger, Alert, AlertDescription,
-  AlertTitle, Avatar, AvatarFallback, Badge, Breadcrumb, BreadcrumbItem, BreadcrumbLink,
-  BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, Button, Calendar, Card, CardContent,
-  CardDescription, CardHeader, CardTitle, Checkbox, Command, CommandGroup, CommandInput,
-  CommandItem, CommandList, Input, Label, Pagination, PaginationContent, PaginationItem,
-  PaginationLink, PaginationNext, PaginationPrevious, Progress, RadioGroup, RadioGroupItem,
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
-  DialogTrigger, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Skeleton,
-  Slider, Switch, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Tabs,
-  TabsList, TabsTrigger, Textarea, Toggle, ToggleGroup, ToggleGroupItem,
+  Accordion, AccordionContent, AccordionItem, AccordionTrigger, Alert, AlertDescription, AlertTitle, Avatar, AvatarFallback, Badge, Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator, Button, Calendar, Card, CardContent, CardDescription, CardHeader, CardTitle, Checkbox, Command, CommandGroup, CommandInput, CommandItem, CommandList, Input, Label, Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious, Progress, RadioGroup, RadioGroupItem, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Skeleton, Slider, Switch, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Tabs, TabsList, TabsTrigger, Textarea, Toggle, ToggleGroup, ToggleGroupItem,
 } from "aperia-ds5"
+import { ResponsiveDialog, ResponsiveDialogContent, ResponsiveDialogDescription, ResponsiveDialogFooter, ResponsiveDialogHeader, ResponsiveDialogTitle, ResponsiveDialogTrigger } from "@/components/shared"
 import { Control } from "@/components/charts/controls"
 import { createColorResolver } from "@/lib/ask-nanci/resolve-color"
 import { THEME_IDS, type ThemeId } from "@/lib/ask-nanci/data/theme-logos"
@@ -747,31 +739,31 @@ export function ThemeGenerator() {
                 <RotateCcw className="size-3.5" />
                 Reset
               </Button>
-              <Dialog>
-                <DialogTrigger asChild>
+              <ResponsiveDialog>
+                <ResponsiveDialogTrigger asChild>
                   <Button size="sm" variant="outline" className="focus-visible:border-foreground focus-visible:ring-foreground/20">
                     <Code className="size-3.5" />
                     View CSS
                   </Button>
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-2xl">
-                  <DialogHeader>
-                    <DialogTitle>Theme CSS</DialogTitle>
-                    <DialogDescription>
+                </ResponsiveDialogTrigger>
+                <ResponsiveDialogContent className="sm:max-w-2xl">
+                  <ResponsiveDialogHeader>
+                    <ResponsiveDialogTitle>Theme CSS</ResponsiveDialogTitle>
+                    <ResponsiveDialogDescription>
                       Paste into app/globals.css, then add the logo in theme-logos.ts.
-                    </DialogDescription>
-                  </DialogHeader>
+                    </ResponsiveDialogDescription>
+                  </ResponsiveDialogHeader>
                   <pre className="max-h-[60vh] overflow-auto rounded-lg border bg-muted/40 p-4 font-mono text-[11px] leading-relaxed text-foreground">
                     {css}
                   </pre>
-                  <DialogFooter>
+                  <ResponsiveDialogFooter>
                     <Button size="sm" onClick={copy} className="bg-foreground text-background hover:bg-foreground/90">
                       {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
                       {copied ? "Copied" : "Copy CSS"}
                     </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+                  </ResponsiveDialogFooter>
+                </ResponsiveDialogContent>
+              </ResponsiveDialog>
               <Button size="sm" onClick={copy} className="bg-foreground text-background hover:bg-foreground/90">
                 {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
                 {copied ? "Copied" : "Copy CSS"}

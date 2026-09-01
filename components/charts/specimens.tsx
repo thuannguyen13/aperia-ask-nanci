@@ -137,7 +137,7 @@ function VerticalBar({ opts }: { opts: GalleryOptions }) {
     <ChartContainer config={buildChartConfig(MERCHANT_SERIES, opts.swatches)} className={BOX}>
       <BarChart data={GALLERY_TOP_MERCHANTS} margin={MARGIN}>
         <Grid opts={opts} />
-        <XAxis dataKey="merchant" {...AXIS} interval={0} tickFormatter={(v: string) => v.split(" ")[0]} />
+        <XAxis dataKey="merchant" {...AXIS} tickFormatter={(v: string) => v.split(" ")[0]} />
         <YAxis {...AXIS} tickFormatter={money} width={MONEY_AXIS_WIDTH} />
         <Tip opts={opts} />
         <Bar dataKey="volume" fill="var(--color-volume)" radius={[4, 4, 0, 0]} />

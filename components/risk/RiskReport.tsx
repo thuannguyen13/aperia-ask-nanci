@@ -4,13 +4,9 @@ import { useState } from "react"
 import Image from "next/image"
 import { MoreHorizontal, FileText, FolderPlus, Loader, CircleCheckBig, TriangleAlert, List, Filter, Download, Settings, Pencil, Trash2 } from "lucide-react"
 import {
-  Badge, Button,
-  Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose,
-  Alert, AlertTitle, AlertDescription,
-  Tabs, TabsList, TabsTrigger, TabsContent, Avatar, AvatarFallback,
-  Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator,
-  TableBody, TableRow,
+  Badge, Button, Alert, AlertTitle, AlertDescription, Tabs, TabsList, TabsTrigger, TabsContent, Avatar, AvatarFallback, Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator, TableBody, TableRow, Textarea,
 } from "aperia-ds5"
+import { ResponsiveDialog, ResponsiveDialogTrigger, ResponsiveDialogContent, ResponsiveDialogHeader, ResponsiveDialogTitle, ResponsiveDialogDescription, ResponsiveDialogFooter, ResponsiveDialogClose } from "@/components/shared"
 import { cn } from "aperia-ds5/utils"
 import { PanelShell, PanelHeader, PanelBody, PanelTable, Thead, Th, Td } from "@/components/shared"
 import { MarkWorkPopover } from "./MarkWorkPopover"
@@ -39,17 +35,17 @@ const VIOLATION_COLS: { key: keyof ViolationRow; label: string; blue?: boolean; 
 // "N Violations" pill → this modal. Table scrolls horizontally over all 14 columns.
 function ViolationsPill({ count }: { count: number }) {
   return (
-    <Dialog>
-      <DialogTrigger asChild>
+    <ResponsiveDialog>
+      <ResponsiveDialogTrigger asChild>
         <Badge asChild className="cursor-pointer bg-red-500 text-white hover:bg-red-600">
           <button type="button"><TriangleAlert /> {count} Violations</button>
         </Badge>
-      </DialogTrigger>
-      <DialogContent showCloseButton className="w-[92vw] gap-0 overflow-hidden p-0 sm:max-w-[1400px]">
-        <DialogHeader className="px-6 pb-0 pt-6">
-          <DialogTitle>Parameter Violation Details</DialogTitle>
-          <DialogDescription className="sr-only">Parameter violations for this merchant.</DialogDescription>
-        </DialogHeader>
+      </ResponsiveDialogTrigger>
+      <ResponsiveDialogContent showCloseButton className="w-[92vw] gap-0 overflow-hidden p-0 sm:max-w-[1400px]">
+        <ResponsiveDialogHeader className="px-6 pb-0 pt-6">
+          <ResponsiveDialogTitle>Parameter Violation Details</ResponsiveDialogTitle>
+          <ResponsiveDialogDescription className="sr-only">Parameter violations for this merchant.</ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
 
         <div className="flex min-w-0 flex-col gap-4 px-6 py-4">
           <div className="flex items-center justify-between gap-2">
@@ -82,13 +78,13 @@ function ViolationsPill({ count }: { count: number }) {
           </div>
         </div>
 
-        <DialogFooter className="m-0 border-t bg-muted/40 px-6 py-4">
-          <DialogClose asChild>
+        <ResponsiveDialogFooter className="m-0 border-t bg-muted/40 px-6 py-4">
+          <ResponsiveDialogClose asChild>
             <Button variant="outline" size="sm">Close</Button>
-          </DialogClose>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </ResponsiveDialogClose>
+        </ResponsiveDialogFooter>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   )
 }
 
@@ -156,19 +152,19 @@ function ScoreCard({ brand, logo, score, max, level, deltas, params, extra, dark
 // "In N Queues" badge → this modal. Shows every queue the merchant currently alerts in.
 function QueuesPill({ count }: { count: number }) {
   return (
-    <Dialog>
-      <DialogTrigger asChild>
+    <ResponsiveDialog>
+      <ResponsiveDialogTrigger asChild>
         <Badge asChild className="cursor-pointer bg-yellow-500 text-white hover:bg-yellow-600">
           <button type="button"><List /> In {count} Queues</button>
         </Badge>
-      </DialogTrigger>
-      <DialogContent showCloseButton className="w-[92vw] gap-0 overflow-hidden p-0 sm:max-w-[600px]">
-        <DialogHeader className="px-6 pb-0 pt-6">
-          <DialogTitle>Cross-Queue Presence</DialogTitle>
-          <DialogDescription className="sr-only">
+      </ResponsiveDialogTrigger>
+      <ResponsiveDialogContent showCloseButton className="w-[92vw] gap-0 overflow-hidden p-0 sm:max-w-[600px]">
+        <ResponsiveDialogHeader className="px-6 pb-0 pt-6">
+          <ResponsiveDialogTitle>Cross-Queue Presence</ResponsiveDialogTitle>
+          <ResponsiveDialogDescription className="sr-only">
             This action updates all queues, removes the merchant from Ready-to-Work counts, and records the source queue in the audit trail.
-          </DialogDescription>
-        </DialogHeader>
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
 
         <div className="flex min-w-0 flex-col gap-4 px-6 py-4">
           <Alert className="border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-100">
@@ -197,13 +193,13 @@ function QueuesPill({ count }: { count: number }) {
           </PanelTable>
         </div>
 
-        <DialogFooter className="m-0 border-t bg-muted/40 px-6 py-4">
-          <DialogClose asChild>
+        <ResponsiveDialogFooter className="m-0 border-t bg-muted/40 px-6 py-4">
+          <ResponsiveDialogClose asChild>
             <Button variant="outline" size="sm">Close</Button>
-          </DialogClose>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+          </ResponsiveDialogClose>
+        </ResponsiveDialogFooter>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   )
 }
 
@@ -350,11 +346,11 @@ export function RiskReport() {
             {noteOpen && (
               <div className="absolute right-0 top-full z-20 mt-2 w-96 rounded-xl border bg-card p-3 text-left shadow-lg">
                 <p className="mb-2 text-sm font-semibold text-foreground">Note</p>
-                <textarea
+                <Textarea
                   value={note}
                   onChange={(e) => setNote(e.target.value.slice(0, 7000))}
                   placeholder="Enter note..."
-                  className="h-24 w-full resize-none rounded-lg border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+                  className="h-24 resize-none"
                 />
                 <div className="mt-1 flex items-center justify-between">
                   <span className="text-xs text-muted-foreground">{note.length}/7,000 characters</span>

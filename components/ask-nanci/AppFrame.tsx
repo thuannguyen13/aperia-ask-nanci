@@ -55,8 +55,22 @@ export function AppFrame({
   children: React.ReactNode
 }) {
   useAppTheme(theme)
+  // The frame owns the app's outer edge, so the safe-area insets belong here and nowhere
+  // else — everything below it is already inside this padding. Each side adds its inset to
+  // the gap the design already had, rather than replacing it, so nothing moves on hardware
+  // that reports no inset (every desktop, and any phone whose browser chrome already
+  // clears the notch).
   return (
-    <div data-embed={embed} className="app-frame relative flex h-[100dvh] flex-col px-1 pb-1 md:px-2 md:pb-2">
+    <div
+      data-embed={embed}
+      className="app-frame relative flex h-[100dvh] flex-col
+        pl-[calc(var(--spacing)+var(--spacing-safe-l))]
+        pr-[calc(var(--spacing)+var(--spacing-safe-r))]
+        pb-[calc(var(--spacing)+var(--spacing-safe-b))]
+        md:pl-[calc(var(--spacing)*2+var(--spacing-safe-l))]
+        md:pr-[calc(var(--spacing)*2+var(--spacing-safe-r))]
+        md:pb-[calc(var(--spacing)*2+var(--spacing-safe-b))]"
+    >
       {topBar}
       <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden rounded-xl bg-sidebar shadow-sm md:rounded-2xl">
         {sidebar}

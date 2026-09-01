@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext } from "react"
+import { createContext, useContext, useCallback, useEffect, useRef, useState } from "react"
 import { ChevronsUpDown } from "lucide-react"
 import { Table, TableHeader, TableRow, TableHead, TableCell } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
@@ -41,13 +41,69 @@ const CELL_PADDING: Record<PanelTableDensity, string> = {
   comfortable: "px-4 py-2.5",
 }
 
-export function PanelTable({ density = "compact", className, children }: { density?: PanelTableDensity; className?: string; children: React.ReactNode }) {
+export function PanelTable({
+  density = "compact",
+  pinFirst = false,
+  className,
+  children,
+}: {
+  density?: PanelTableDensity
+  /**
+   * Freezes the first column while the rest scroll under it. Worth it when that column
+   * is what identifies the row (a merchant, an account) and worthless without it; not
+   * worth the seam it draws when the first column is an index or a checkbox.
+   */
+  pinFirst?: boolean
+  className?: string
+  children: React.ReactNode
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+  // Which directions still have columns in them. Both start false so the first paint
+  // shows no cue, and the measure below turns on whichever one is real.
+  const [more, setMore] = useState({ left: false, right: false })
+
+  // ds5's <Table> renders its own scrolling div (data-slot="table-container"); the
+  // element we can reach is the wrapper outside it, so the scroller is found rather
+  // than held. Wrapping it in a second overflow-x-auto would do nothing — the inner one
+  // is w-full and consumes the overflow itself.
+  const measure = useCallback(() => {
+    const scroller = ref.current?.querySelector<HTMLElement>('[data-slot="table-container"]')
+    if (!scroller) return
+    const { scrollLeft, scrollWidth, clientWidth } = scroller
+    setMore({
+      left: scrollLeft > 1,
+      // 1px of slack: sub-pixel widths leave a fractional remainder at the far end that
+      // would otherwise keep the cue lit on a table that has nothing left to show.
+      right: scrollLeft + clientWidth < scrollWidth - 1,
+    })
+  }, [])
+
+  useEffect(() => {
+    const scroller = ref.current?.querySelector<HTMLElement>('[data-slot="table-container"]')
+    if (!scroller) return
+    measure()
+    scroller.addEventListener("scroll", measure, { passive: true })
+    // Catches both the container being resized and columns changing width under it.
+    const ro = new ResizeObserver(measure)
+    ro.observe(scroller)
+    const table = scroller.firstElementChild
+    if (table) ro.observe(table)
+    return () => {
+      scroller.removeEventListener("scroll", measure)
+      ro.disconnect()
+    }
+  }, [measure])
+
   return (
     <DensityContext.Provider value={density}>
       {/* Scrolls sideways instead of squeezing columns when the table is wider than
           its container (narrow panels, phones). No-op when it already fits — this
-          is the one shipped table treatment, not a mobile-only mode. */}
-      <div className="overflow-x-auto">
+          is the one shipped table treatment, not a mobile-only mode.
+
+          The scrolling itself is ds5's; what this wrapper adds is the fade that says
+          there is more to see, which a bare scroll container never tells you on a
+          touchscreen where no scrollbar is drawn. */}
+      <div ref={ref} className="relative">
         <Table
           className={cn(
             // border-separate (not ds5's inherited collapse) so the rounded corners and
@@ -56,11 +112,32 @@ export function PanelTable({ density = "compact", className, children }: { densi
             "border-separate border-spacing-0 overflow-hidden border",
             "[&_tr:not(:last-child)_td]:border-b",
             density === "comfortable" ? "rounded-xl text-sm" : "rounded-lg text-xs",
+            // The pinned column carries its own background, or the scrolling cells
+            // would show through it, and a right border so the seam reads as deliberate.
+            pinFirst && "[&_tr>*:first-child]:sticky [&_tr>*:first-child]:left-0 [&_tr>*:first-child]:z-10 [&_tr>*:first-child]:bg-background [&_tr>*:first-child]:border-r",
             className,
           )}
         >
           {children}
         </Table>
+
+        {/* Painted over the table rather than inside the scroller, so the fade stays put
+            while the columns move under it. aria-hidden and pointer-events-none: it is a
+            hint for the eye, and it must never eat a tap meant for a cell. */}
+        <div
+          aria-hidden
+          className={cn(
+            "pointer-events-none absolute inset-y-0 left-0 w-6 rounded-l-lg bg-gradient-to-r from-background to-transparent transition-opacity duration-150",
+            more.left ? "opacity-100" : "opacity-0",
+          )}
+        />
+        <div
+          aria-hidden
+          className={cn(
+            "pointer-events-none absolute inset-y-0 right-0 w-6 rounded-r-lg bg-gradient-to-l from-background to-transparent transition-opacity duration-150",
+            more.right ? "opacity-100" : "opacity-0",
+          )}
+        />
       </div>
     </DensityContext.Provider>
   )
@@ -73,7 +150,7 @@ export function PanelTable({ density = "compact", className, children }: { densi
 // columns split the leftover width equally, which is what every call site wants.
 export function PanelFigureTable({ headers, children }: { headers: React.ReactNode[]; children: React.ReactNode }) {
   return (
-    <PanelTable className="table-fixed">
+    <PanelTable pinFirst className="table-fixed">
       <colgroup>
         <col className="w-[40%]" />
       </colgroup>

@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react"
 import { Bell, Check } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, Button } from "aperia-ds5"
+import { TableBody, TableRow, TableCell, Button } from "aperia-ds5"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { BATCHES, CASH_DEPOSITS, DEPOSIT_ACCOUNT_LAST4, HELD_TXN } from "@/lib/ask-nanci/data/panels/pending-deposits"
-import { PanelShell, PanelHeader, PanelBody, PanelExportButton, StatCard, NanciInsight, formatCurrency } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody, PanelExportButton, PanelTable, Thead, Th, StatCard, NanciInsight, formatCurrency } from "@/components/shared"
 
 // How long the held row pulses brighter when its detail appears, before it settles
 // back to its resting "on hold" tint.
@@ -44,10 +44,7 @@ export function PendingDepositsPanel() {
         onClose={() => closeDynamicPanel("pending-deposits")}
       />
 
-      {/* overflow-x-auto restores what the original `overflow-auto` body gave: this
-          panel's two tables are raw ds5 inside `overflow-hidden` wrappers, so unlike
-          a PanelTable they have no horizontal scroller of their own. */}
-      <PanelBody className="flex flex-col gap-4 overflow-x-auto">
+      <PanelBody className="flex flex-col gap-4">
         <div className="grid grid-cols-4 gap-3">
           <StatCard label="Total Expected" value={formatCurrency(totalExpected)} sublabel="card + cash" />
           <StatCard label="In Transit" value={formatCurrency(inTransit)} sublabel={`${inTransitBatches.length} batches`} />
@@ -65,20 +62,17 @@ export function PendingDepositsPanel() {
 
         <div>
           <p className="mb-2 text-base font-semibold text-foreground">Batches</p>
-          <div className="overflow-hidden rounded-lg border">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-muted/50 hover:bg-muted/50">
-                  <TableHead>Day</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Txns</TableHead>
-                  <TableHead className="text-right">Gross</TableHead>
-                  <TableHead className="text-right">Fees</TableHead>
-                  <TableHead className="text-right">Net</TableHead>
-                  <TableHead className="text-right">Expected</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+          <PanelTable density="comfortable" pinFirst>
+            <Thead>
+              <Th>Day</Th>
+              <Th>Status</Th>
+              <Th align="right">Txns</Th>
+              <Th align="right">Gross</Th>
+              <Th align="right">Fees</Th>
+              <Th align="right">Net</Th>
+              <Th align="right">Expected</Th>
+            </Thead>
+            <TableBody>
                 {BATCHES.map((b) => (
                   <TableRow
                     key={b.day}
@@ -111,26 +105,22 @@ export function PendingDepositsPanel() {
                     </TableCell>
                   </TableRow>
                 ))}
-              </TableBody>
-            </Table>
-          </div>
+            </TableBody>
+          </PanelTable>
         </div>
 
         <div>
           <p className="mb-2 text-base font-semibold text-foreground">
             Cash deposits <span className="font-normal text-muted-foreground">(from your connected bank)</span>
           </p>
-          <div className="overflow-hidden rounded-lg border">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-muted/50 hover:bg-muted/50">
-                  <TableHead>Date</TableHead>
-                  <TableHead>Source</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
-                  <TableHead>Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
+          <PanelTable density="comfortable" pinFirst>
+            <Thead>
+              <Th>Date</Th>
+              <Th>Source</Th>
+              <Th align="right">Amount</Th>
+              <Th>Status</Th>
+            </Thead>
+            <TableBody>
                 {CASH_DEPOSITS.map((d) => (
                   <TableRow key={`${d.date}-${d.amount}`}>
                     <TableCell className="font-mono text-muted-foreground">{d.date}</TableCell>
@@ -143,9 +133,8 @@ export function PendingDepositsPanel() {
                     </TableCell>
                   </TableRow>
                 ))}
-              </TableBody>
-            </Table>
-          </div>
+            </TableBody>
+          </PanelTable>
           <p className="mt-2 text-xs text-muted-foreground">
             Pulled from your account ending ••{DEPOSIT_ACCOUNT_LAST4}. Cash is already in your account, card batches are still settling.
           </p>
