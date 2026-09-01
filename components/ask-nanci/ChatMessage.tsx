@@ -149,7 +149,9 @@ function renderContent(content: string) {
 function UserMessageBase({ message }: { message: Message }) {
   return (
     <div className="flex justify-end px-4 py-2">
-      <div className="max-w-[75%] rounded-2xl rounded-tr-sm bg-primary px-4 py-2.5 text-sm text-white">
+      {/* Matches the answer at 16px: a question and its answer are one exchange, and a
+          smaller question reads as a caption on the reply rather than half of a pair. */}
+      <div className="max-w-[75%] rounded-2xl rounded-tr-sm bg-primary px-4 py-2.5 text-base text-white">
         {message.content}
       </div>
     </div>
@@ -170,10 +172,10 @@ function BotMessageBase({
   return (
     <div className="flex items-start gap-3 px-4 py-3">
       <div className="min-w-0 flex-1">
-        {/* Answer text reads at 16px on every screen. It is the one thing on the page
-            people actually read a paragraph of, so it takes the reading size rather
-            than the 14px interface size everything around it uses. */}
-        <div className="text-base leading-relaxed text-foreground">
+        {/* 16px on every screen, with Tailwind's own 1.5 line height rather than the
+            leading-relaxed this used to carry. Question and answer are one exchange and
+            share both numbers. */}
+        <div className="text-base text-foreground">
           {displayedContent.includes("{{MAP}}") ? (() => {
             const [before, after] = displayedContent.split("{{MAP}}")
             return (
