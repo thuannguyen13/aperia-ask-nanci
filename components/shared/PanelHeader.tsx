@@ -72,8 +72,13 @@ export function PanelHeader({ title, subtitle, actions, onClose, dot, badge, siz
         <div className={cn("min-w-0", isPage && "flex flex-1 flex-col gap-2")}>
           <p
             className={cn(
-              "truncate text-foreground",
-              isPage ? "text-xl font-semibold leading-none" : size === "lg" ? "text-base font-semibold" : "text-sm font-semibold",
+              "text-foreground",
+              // A page title carries the merchant name and its status pills, which no
+              // phone fits on one line — it wraps rather than truncating, so the pills
+              // stay reachable. leading-tight because a wrapped line needs the room.
+              isPage
+                ? "text-xl font-semibold leading-tight"
+                : cn("truncate", size === "lg" ? "text-base font-semibold" : "text-sm font-semibold"),
             )}
           >
             {title}
