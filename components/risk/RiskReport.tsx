@@ -638,12 +638,15 @@ export function RiskReport() {
                     <Td>{a.type}</Td>
                     <Td>{a.result}</Td>
                     <Td>
-                      {/* A scored authorization takes the destructive Badge; below the
-                          threshold the number stands on its own, so a glance down the
-                          column lands on the ones that fired. */}
-                      {alert
-                        ? <Badge variant="destructive" className="tabular-nums">{a.mcScore}</Badge>
-                        : <span className="font-medium tabular-nums text-muted-foreground">{a.mcScore}</span>}
+                      {/* Every score is a badge, so the column reads as one scale;
+                          the ones at or above the threshold take the destructive
+                          treatment and the rest sit quiet. */}
+                      <Badge
+                        variant={alert ? "destructive" : "secondary"}
+                        className="tabular-nums"
+                      >
+                        {a.mcScore}
+                      </Badge>
                     </Td>
                     <Td>
                       {a.mcReason
