@@ -329,3 +329,45 @@ export const CROSS_QUEUE_ROWS: QueueRow[] = [
   { name: "High Risk DQ — By MCC", status: "Ready to Work", alertedAt: "alerted 05/03/2026 06:14 AM" },
   { name: "⚹ MC Watch (system)", status: "Ready to Work", alertedAt: "alerted 05/03/2026 06:14 AM" },
 ]
+
+// ── Recent Authorizations ────────────────────────────────────────────────────
+// The last ten authorizations with their Mastercard score, which is where the
+// "Mastercard sees it, VisionWeb does not" argument becomes something you can
+// point at: the same $420 sale, approved every time, scoring 960 at 6am and 420
+// the night before.
+//
+// ponytail: illustrative. The real data carries scores per merchant, not per
+// authorization, so the per-auth scores and reasons here are invented to show the
+// shape. The flat $420 amount is deliberate — a card-testing run repeats one
+// amount, and that is what the velocity reasons are describing.
+export interface AuthRow {
+  at: string
+  /** Last four only; the demo never holds a full PAN. */
+  card: string
+  amount: number
+  type: string
+  result: string
+  /** Mastercard score for this authorization, 0–1000. */
+  mcScore: number
+  /** Why it scored, or null where nothing fired. */
+  mcReason: string | null
+}
+
+/** Above this an authorization reads as scored, not merely observed. */
+export const AUTH_SCORE_ALERT = 700
+
+/** How many the merchant has in the period, against the ten the table shows. */
+export const AUTH_TOTAL = 156
+
+export const RECENT_AUTHS: AuthRow[] = [
+  { at: "05/03 06:11:42", card: "4889", amount: 420, type: "Sale", result: "Approved", mcScore: 960, mcReason: "Velocity, novel card" },
+  { at: "05/03 05:58:11", card: "5212", amount: 420, type: "Sale", result: "Approved", mcScore: 940, mcReason: "Velocity" },
+  { at: "05/03 05:42:09", card: "5212", amount: 420, type: "Sale", result: "Approved", mcScore: 910, mcReason: "Repeat card" },
+  { at: "05/03 05:14:55", card: "3782", amount: 420, type: "Sale", result: "Approved", mcScore: 780, mcReason: "High-risk MCC" },
+  { at: "05/03 04:47:33", card: "4147", amount: 420, type: "Sale", result: "Approved", mcScore: 660, mcReason: "High-risk MCC" },
+  { at: "05/03 03:12:18", card: "5419", amount: 420, type: "Sale", result: "Approved", mcScore: 620, mcReason: "High-risk MCC" },
+  { at: "05/02 23:55:01", card: "4147", amount: 420, type: "Sale", result: "Approved", mcScore: 480, mcReason: null },
+  { at: "05/02 22:08:47", card: "3782", amount: 420, type: "Sale", result: "Approved", mcScore: 420, mcReason: null },
+  { at: "05/02 21:33:20", card: "4889", amount: 420, type: "Sale", result: "Approved", mcScore: 390, mcReason: null },
+  { at: "05/02 20:02:14", card: "5212", amount: 420, type: "Sale", result: "Approved", mcScore: 310, mcReason: null },
+]

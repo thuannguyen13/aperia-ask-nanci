@@ -11,7 +11,7 @@ import { cn } from "aperia-ds5/utils"
 import { PanelShell, PanelHeader, PanelBody, PanelTable, Thead, Th, Td, formatCurrency } from "@/components/shared"
 import { MarkWorkPopover } from "./MarkWorkPopover"
 import { useRiskNav } from "./RiskNavContext"
-import { findMerchant, getVwLevel, getMcLevel, getRiskLevel, formatMcScore, formatMerchantName, RISK_REPORT_DETAILS, getDefaultRiskDetail, TXN_VOLUME_ROWS, RISK_VIOLATION_CYCLE, VIOLATION_ROWS, CROSS_QUEUE_ROWS, MERCHANT_NOTES_SEED, DEFAULT_MERCHANT_NOTES, statusForDisposition, type WorkStatus, type ViolationRow, type NoteEntry, type RiskLevel, type RiskReportDetail } from "@/lib/ask-nanci/data/risk-merchants"
+import { findMerchant, getVwLevel, getMcLevel, getRiskLevel, formatMcScore, formatMerchantName, RISK_REPORT_DETAILS, getDefaultRiskDetail, TXN_VOLUME_ROWS, RECENT_AUTHS, AUTH_TOTAL, AUTH_SCORE_ALERT, RISK_VIOLATION_CYCLE, VIOLATION_ROWS, CROSS_QUEUE_ROWS, MERCHANT_NOTES_SEED, DEFAULT_MERCHANT_NOTES, statusForDisposition, type WorkStatus, type ViolationRow, type NoteEntry, type RiskLevel, type RiskReportDetail } from "@/lib/ask-nanci/data/risk-merchants"
 import { getRiskLevelStyles } from "./risk-level"
 
 // Parameter Violation Details modal columns (Figma order + widths).
@@ -218,6 +218,14 @@ const ACTIVITY_TABS = [
   { value: "related", label: "Related Merchants" },
 ]
 const TXN_COLS = ["CB #", "CB % by #", "CB $", "CB % by $", "RDR #", "RDR $"]
+/** The Mastercard pair, tinted together so they read as one column group. */
+const AUTH_COL = "bg-amber-50/60 dark:bg-amber-950/20"
+/**
+ * The Transactions sub-views. Volume by period is history — today against the 7 and
+ * 30 day windows and the months behind them — so it lives under Transaction History
+ * rather than under a label of its own.
+ */
+const TXN_VIEWS = ["Recent Authorizations", "Transaction History"]
 
 // A section header ("Merchant Notes" / "Case History") with its right-aligned actions.
 function NotesSectionHeader({ title, children }: { title: string; children: React.ReactNode }) {
@@ -285,6 +293,7 @@ export function RiskReport() {
   const nav = useRiskNav()
   const m = findMerchant(nav.merchantId ?? "")
   const d = m ? (RISK_REPORT_DETAILS[m.id] ?? getDefaultRiskDetail(m)) : null
+  const [txnView, setTxnView] = useState(TXN_VIEWS[0])
   const [noteOpen, setNoteOpen] = useState(false)
   const [note, setNote] = useState("")
   // The disposition is the single source of truth — "" means untouched, and
@@ -483,7 +492,7 @@ export function RiskReport() {
             variant="line"
             // h-auto! and p-0!: ds5 pins the strip to h-8 through a group-data variant,
             // which outranks a plain utility.
-            className="h-auto! w-max min-w-full p-0! [&_[data-slot=tabs-trigger]]:h-auto [&_[data-slot=tabs-trigger]]:py-1.5 [&_[data-slot=tabs-trigger]]:after:bottom-0"
+            className="h-auto! w-max min-w-full p-0! [&_[data-slot=tabs-trigger]]:h-auto [&_[data-slot=tabs-trigger]]:py-1.5 [&_[data-slot=tabs-trigger]]:after:-bottom-px"
           >
             {ACTIVITY_TABS.map((t) => (
               <TabsTrigger key={t.value} value={t.value}>{t.label}</TabsTrigger>
@@ -492,12 +501,25 @@ export function RiskReport() {
         </div>
 
         <TabsContent value="transactions">
-          {/* Transaction sub-tabs */}
+          {/* Transaction sub-tabs. Both views are real now — the placeholder label
+              is gone, because the table it was standing in for is the one behind it. */}
           <div className="mt-3 inline-flex gap-1 rounded-lg bg-muted p-1 text-sm">
-            <span className="rounded-md bg-background px-3 py-1 font-medium text-foreground shadow-sm">Transaction Volume Analysis</span>
-            <span className="rounded-md px-3 py-1 text-muted-foreground">Transaction History</span>
+            {TXN_VIEWS.map((v) => (
+              <button
+                key={v}
+                onClick={() => setTxnView(v)}
+                className={cn(
+                  "rounded-md px-3 py-1 transition-colors",
+                  txnView === v ? "bg-background font-medium text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
+                )}
+              >
+                {v}
+              </button>
+            ))}
           </div>
 
+          {txnView === "Transaction History" ? (
+          <>
           {/* Table heading + actions */}
           <div className="mt-4 flex items-center justify-between">
             <h3 className="text-base font-semibold text-foreground">Transaction Volume Analysis</h3>
@@ -540,6 +562,65 @@ export function RiskReport() {
               </TableBody>
             </PanelTable>
           </div>
+          </>
+          ) : (
+          <>
+
+        <div className="mt-4 flex items-center justify-between gap-3">
+          <h3 className="text-base font-semibold text-foreground">
+            Recent Authorizations{" "}
+            <span className="font-normal text-muted-foreground">— last {RECENT_AUTHS.length} with MC scoring</span>
+          </h3>
+          <Button variant="outline" size="sm">View all {AUTH_TOTAL}</Button>
+        </div>
+
+        {/* The two MC columns are tinted as a pair: the point of the table is that
+            the same approved sale carries a different score each time, and the tint
+            is what separates what the processor saw from what Mastercard made of it. */}
+        <div className="mt-3">
+          <PanelTable density="comfortable">
+            <Thead>
+              <Th sortable>Date / Time</Th>
+              <Th>Card</Th>
+              <Th sortable align="right">Amount</Th>
+              <Th>Type</Th>
+              <Th>Result</Th>
+              <Th sortable className={AUTH_COL}>MC Score</Th>
+              <Th className={AUTH_COL}>MC Reason</Th>
+            </Thead>
+            <TableBody>
+              {RECENT_AUTHS.map((a) => {
+                const alert = a.mcScore >= AUTH_SCORE_ALERT
+                return (
+                  <TableRow key={a.at}>
+                    <Td mono>{a.at}</Td>
+                    <Td mono className="text-muted-foreground">···· {a.card}</Td>
+                    <Td mono align="right">{formatCurrency(a.amount)}</Td>
+                    <Td>{a.type}</Td>
+                    <Td>{a.result}</Td>
+                    <Td className={AUTH_COL}>
+                      <span className={cn(
+                        "font-semibold tabular-nums",
+                        alert
+                          ? "rounded bg-rose-100 px-2 py-0.5 text-rose-600 dark:bg-rose-900/40 dark:text-rose-300"
+                          : "text-amber-600 dark:text-amber-400",
+                      )}>
+                        {a.mcScore}
+                      </span>
+                    </Td>
+                    <Td className={AUTH_COL}>
+                      {a.mcReason
+                        ? <span className="rounded bg-amber-200/70 px-2 py-0.5 text-xs font-medium text-amber-950 dark:bg-amber-900/50 dark:text-amber-100">{a.mcReason}</span>
+                        : <span className="text-muted-foreground">—</span>}
+                    </Td>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </PanelTable>
+        </div>
+          </>
+          )}
         </TabsContent>
 
         <TabsContent value="notes">
