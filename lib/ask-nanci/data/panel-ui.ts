@@ -38,9 +38,8 @@ export const PANEL_UI_OPTIONS: PanelUiOption[] = [
   {
     id: "a",
     name: "Bottom sheet",
-    param: "",
+    param: "away",
     sheet: { axis: "y", lip: 0 },
-    current: true,
     blurb: "The panel rises from the bottom and ends above the chat input. Dismissing sends it away for good.",
     taps: "0 taps: it opens itself",
     pros: [
@@ -75,8 +74,9 @@ export const PANEL_UI_OPTIONS: PanelUiOption[] = [
   {
     id: "c",
     name: "Swipe to open",
-    param: "swipe",
+    param: "",
     sheet: { axis: "y", lip: 40 },
+    current: true,
     blurb: "The panel never fully leaves: it rests as a handle above the composer and is swiped up to full height, swiped down to rest.",
     taps: "0 taps, one swipe",
     pros: [
@@ -110,6 +110,14 @@ export const PANEL_UI_OPTIONS: PanelUiOption[] = [
   },
 ]
 
+/**
+ * The presentation that ships, named rather than positional. It used to be whichever
+ * option sat first in the array, which quietly tied what every demo URL renders to the
+ * order of a list that exists to be reordered for comparison.
+ */
+export const DEFAULT_PANEL_UI: PanelUiOption =
+  PANEL_UI_OPTIONS.find((o) => o.current) ?? PANEL_UI_OPTIONS[0]
+
 export function parsePanelUiOption(value: string | null | undefined): PanelUiOption {
-  return PANEL_UI_OPTIONS.find((o) => o.param && o.param === value) ?? PANEL_UI_OPTIONS[0]
+  return PANEL_UI_OPTIONS.find((o) => o.param && o.param === value) ?? DEFAULT_PANEL_UI
 }

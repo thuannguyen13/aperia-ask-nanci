@@ -487,7 +487,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const playAssistantTurn = useCallback(async (turn: ConceptScriptedTurn, suggestions: string[] | undefined) => {
     await streamWords(turn.content, { id: newSessionId(), shouldStop: () => scriptStopRef.current })
     if (turn.widgetDelay) await sleep(turn.widgetDelay)
-    if (turn.sheetAction || suggestions || turn.widget || turn.dashChart || turn.map || turn.source) {
+    if (turn.sheetAction || suggestions || turn.widget || turn.dashChart || turn.map || turn.source || turn.panel) {
       setMessages((prev) => {
         const next = [...prev]
         const last = next[next.length - 1]
@@ -500,6 +500,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
             ...(turn.dashChart ? { dashChart: turn.dashChart } : {}),
             ...(turn.map ? { map: turn.map } : {}),
             ...(turn.source ? { source: turn.source } : {}),
+            ...(turn.panel ? { panel: turn.panel } : {}),
           }
         }
         return next

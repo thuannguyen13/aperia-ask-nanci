@@ -6,6 +6,7 @@ import type { Message, SheetActionData } from "@/lib/ask-nanci/types"
 import { ChatCitedSources } from "./ChatCitedSources"
 import { SuggestedQuestions } from "./SuggestedQuestions"
 import { MessageChart } from "./MessageChart"
+import { PanelArtifactCard } from "./PanelArtifactCard"
 import { MessageMap } from "./MessageMap"
 import { ChangeAuditSheet } from "./concept/ChangeAuditSheet"
 import { AiTriageSummaryWidget } from "./AiTriageSummaryWidget"
@@ -190,6 +191,7 @@ function BotMessageBase({
           <AiTriageSummaryWidget />
         )}
         {showExtras && message.dashChart && <DashChartCard id={message.dashChart} />}
+        {showExtras && message.panel && <PanelArtifactCard id={message.panel} />}
         {showExtras && message.sheetAction && (
           <>
             <ChangeRequestCard data={message.sheetAction} onClick={() => setSheetOpen(true)} />

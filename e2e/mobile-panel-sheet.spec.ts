@@ -42,9 +42,11 @@ const PRESENTATIONS = [
   // number meant re-pinning it every time the composer changed height: the frame's
   // 4px bottom inset moved it once, a 4px taller send button moved it again. Neither
   // was a regression, and both failed the suite.
-  { name: "bottom sheet", param: "", axis: "y", lip: 0 },
+  // `param: ""` is whichever option is marked current in panel-ui.ts, not whichever is
+  // listed first: the swipe presentation ships, so a minimised panel leaves its handle.
+  { name: "swipe to open", param: "", axis: "y", lip: 40 },
+  { name: "bottom sheet", param: "away", axis: "y", lip: 0 },
   { name: "right-side drawer", param: "right", axis: "x", lip: 0 },
-  { name: "swipe to open", param: "swipe", axis: "y", lip: 40 },
   { name: "swipe from the edge", param: "edge", axis: "x", lip: 40 },
 ] as const
 
@@ -56,8 +58,15 @@ function expectPx(actual: number, expected: number, slack = 2) {
   expect(actual, `expected ${expected}px +/- ${slack}, got ${actual}px`).toBeLessThanOrEqual(expected + slack)
 }
 
-/** The grab strip: a button, named for the panel and for what a press would do to it. */
-const handle = (page: Page, label = PANEL) => page.getByRole("button", { name: label })
+/**
+ * The grab strip: a button, named for the panel and for what a press would do to it.
+ *
+ * Anchored, because `name` is a substring match by default and the panel's artifact card
+ * in the conversation is also a button carrying the panel's name. Only the strip is
+ * exactly "Show X" or "Hide X".
+ */
+const handle = (page: Page, label = PANEL) =>
+  page.getByRole("button", { name: new RegExp(`^(Show|Hide) ${label}$`) })
 
 /**
  * The card, and the clipping frame around it.
@@ -241,7 +250,8 @@ test("dismissing the sheet reaches the follow-up chip, and a second panel brings
   const chip = page.getByRole("button", { name: "what drove saturday?" })
   await expect(chip).toHaveCount(0)
 
-  // dismiss() defaults to flow 2's panel; this flow's sheet is named for its own.
+  // dismiss() defaults to flow 2's panel; this flow's sheet is named for its own. The
+  // shipped presentation rests as a handle, so this minimises rather than sends it away.
   await dragHandle(page, handle(page, "Sales Snapshot"), "y", DRAG_PX)
   await page.waitForTimeout(SETTLE_MS)
   await expect(chip).toHaveCount(1)
@@ -260,4 +270,23 @@ test("dismissing the sheet reaches the follow-up chip, and a second panel brings
   await pager.click()
   await expect(page.getByRole("dialog", { name: "Sales Drilldown" })).toBeVisible()
   await expect(pager).toHaveText("2/2")
+})
+
+test("the artifact card reopens a panel that was closed outright", async ({ page }) => {
+  await gotoFlow(page, "flow=2")
+  await waitForOpenSheet(page)
+
+  // The card lives in the conversation, which the open sheet covers and marks
+  // aria-hidden, so it is out of the tree until the panel is off the screen.
+  await expect(page.getByRole("button", { name: `Bring ${PANEL} to the front` })).toHaveCount(0)
+
+  await page.getByRole("button", { name: "Close", exact: true }).first().click()
+  await expect(page.getByRole("dialog", { name: PANEL })).toBeHidden()
+
+  // Closed, the card changes what it offers rather than disappearing with the panel.
+  const reopen = page.getByRole("button", { name: `Reopen ${PANEL}` })
+  await expect(reopen).toBeVisible()
+  await reopen.click()
+
+  await expect(page.getByRole("dialog", { name: PANEL })).toBeVisible({ timeout: PANEL_TIMEOUT })
 })
