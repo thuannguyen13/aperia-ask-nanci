@@ -83,11 +83,13 @@ export function AssignmentManagement() {
 
       {/* Distinct Merchant Summary */}
       <h2 className="mb-2 mt-6 text-base font-semibold text-foreground">Distinct Merchant Summary</h2>
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      {/* One card per row on a phone: the amounts run to $18,082,415.58, which
+          clips at half of 390px. Same shape as the concept stat rows. */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {AM_SUMMARY.map((s) => (
           <div key={s.label} className="rounded-xl border bg-card p-4">
             <p className="text-sm font-semibold text-foreground">{s.label}</p>
-            <div className="mt-3 flex items-end gap-4">
+            <div className="mt-3 flex flex-wrap items-end gap-x-4 gap-y-2">
               <div>
                 <p className="text-xs text-muted-foreground">Count</p>
                 <p className="text-lg font-semibold tabular-nums text-foreground">{s.count}</p>
