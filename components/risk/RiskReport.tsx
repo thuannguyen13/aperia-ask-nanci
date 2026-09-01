@@ -218,8 +218,6 @@ const ACTIVITY_TABS = [
   { value: "related", label: "Related Merchants" },
 ]
 const TXN_COLS = ["CB #", "CB % by #", "CB $", "CB % by $", "RDR #", "RDR $"]
-/** The Mastercard pair, tinted together so they read as one column group. */
-const AUTH_COL = "bg-amber-50/60 dark:bg-amber-950/20"
 /**
  * Down the side of the volume table. Net volume and the chargeback share are
  * derived from the measured figures above them, so a column cannot disagree with
@@ -626,8 +624,8 @@ export function RiskReport() {
               <Th sortable align="right">Amount</Th>
               <Th>Type</Th>
               <Th>Result</Th>
-              <Th sortable className={AUTH_COL}>MC Score</Th>
-              <Th className={AUTH_COL}>MC Reason</Th>
+              <Th sortable>MC Score</Th>
+              <Th>MC Reason</Th>
             </Thead>
             <TableBody>
               {RECENT_AUTHS.map((a) => {
@@ -639,19 +637,20 @@ export function RiskReport() {
                     <Td mono align="right">{formatCurrency(a.amount)}</Td>
                     <Td>{a.type}</Td>
                     <Td>{a.result}</Td>
-                    <Td className={AUTH_COL}>
-                      <span className={cn(
-                        "font-semibold tabular-nums",
-                        alert
-                          ? "rounded bg-rose-100 px-2 py-0.5 text-rose-600 dark:bg-rose-900/40 dark:text-rose-300"
-                          : "text-amber-600 dark:text-amber-400",
-                      )}>
-                        {a.mcScore}
-                      </span>
+                    <Td>
+                      {/* A scored authorization takes the destructive Badge; below the
+                          threshold the number stands on its own, so a glance down the
+                          column lands on the ones that fired. */}
+                      {alert
+                        ? <Badge variant="destructive" className="tabular-nums">{a.mcScore}</Badge>
+                        : <span className="font-medium tabular-nums text-muted-foreground">{a.mcScore}</span>}
                     </Td>
-                    <Td className={AUTH_COL}>
+                    <Td>
                       {a.mcReason
-                        ? <span className="rounded bg-amber-200/70 px-2 py-0.5 text-xs font-medium text-amber-950 dark:bg-amber-900/50 dark:text-amber-100">{a.mcReason}</span>
+                        // Amber rather than the grey secondary: the reason is why the
+                        // row is worth reading, and ds5 has no warning variant — the
+                        // same colour override Row and the violations pill already use.
+                        ? <Badge className="bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-200">{a.mcReason}</Badge>
                         : <span className="text-muted-foreground">—</span>}
                     </Td>
                   </TableRow>
