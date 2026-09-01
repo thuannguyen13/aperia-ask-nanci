@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Image from "next/image"
 import { RefreshCw, SlidersHorizontal, Plus, ChevronDown, ChevronLeft, ChevronRight, SlidersVertical, Pencil, Copy, Trash2, Download, CircleCheck } from "lucide-react"
 import { Button, TableBody, TableRow } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
@@ -71,7 +72,9 @@ export function AssignmentManagement() {
       <PanelBody>
       {/* Integration card */}
       <div className="flex flex-wrap items-center gap-3 rounded-xl border bg-card px-4 py-3">
-        <div className="flex size-7 items-center justify-center rounded-full bg-gradient-to-br from-red-500 to-orange-400 text-[10px] font-bold text-white">MC</div>
+        {/* The real mark, not an MC monogram: this row names the integration, and
+            the same asset already tags the Mastercard queue on the Detection Queue. */}
+        <Image src="/iso/mastercard.svg" alt="Mastercard" width={28} height={28} className="size-7 shrink-0" />
         <span className="text-sm font-semibold text-foreground">{AM_INTEGRATION.name}</span>
         <span className="flex items-center gap-1 rounded bg-green-100 px-1.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/40 dark:text-green-300">
           <CircleCheck className="size-3" /> {AM_INTEGRATION.status}
