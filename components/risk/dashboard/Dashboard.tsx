@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Download, Sparkles, MoreHorizontal, BarChartBig } from "lucide-react"
 import { Button } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
@@ -8,11 +8,12 @@ import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { PanelShell, PanelHeader, PanelBody } from "@/components/shared"
 import { useRiskNav } from "../RiskNavContext"
 import { RISK_NANCI_TAKES } from "@/lib/ask-nanci/data/risk-landing"
-import { DASH_KPIS, DASH_HIGHLIGHTS, CHART_TAKE, type DashChartId } from "@/lib/ask-nanci/data/risk-dashboard"
+import { DASH_KPIS, DASH_HIGHLIGHTS, CHART_TAKE, DASH_TODAY, DASH_SCOPE_ALL, DASH_ANALYST_EVERYONE, type DashChartId } from "@/lib/ask-nanci/data/risk-dashboard"
 import { DashChart, CHART_TITLES } from "./charts"
 import { AskNanciButton } from "../AskNanciButton"
 import { NanciTakeCard } from "../NanciTakeCard"
 import { DashboardFilters } from "./DashboardFilters"
+import { DashboardScopeProvider, resolveScope } from "./DashboardScope"
 
 const PANEL_ID = "dashboard-insight"
 
@@ -57,6 +58,13 @@ export function Dashboard() {
   const isOn = (id: DashChartId) => highlight?.includes(id) ?? false
   const anyActive = !!highlight
 
+  // What the dashboard is reporting on. Held here rather than in the filter row,
+  // because two of the charts read it.
+  const [range, setRange] = useState(DASH_TODAY)
+  const [scope, setScope] = useState(DASH_SCOPE_ALL)
+  const [analyst, setAnalyst] = useState(DASH_ANALYST_EVERYONE)
+  const dashScope = resolveScope(range, scope, analyst)
+
   // Clicking a take opens/updates the registered insight panel (or closes it if
   // it's already showing that take).
   const toggleTake = (title: string) => {
@@ -90,7 +98,12 @@ export function Dashboard() {
       />
       <PanelBody>
         {/* What the numbers below are describing, before the numbers themselves. */}
-        <DashboardFilters />
+        <DashboardFilters
+          range={range} scope={scope} analyst={analyst}
+          onRange={setRange} onScope={setScope} onAnalyst={setAnalyst}
+          showing={dashScope.assignmentIds?.length ?? null}
+        />
+        <DashboardScopeProvider value={dashScope}>
 
         {/* Ask Nanci's take on today */}
         {assistant && (
@@ -149,6 +162,7 @@ export function Dashboard() {
             </ChartPanel>
           </div>
         </div>
+        </DashboardScopeProvider>
       </PanelBody>
     </PanelShell>
   )

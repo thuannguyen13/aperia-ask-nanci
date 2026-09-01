@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   // One title for every route in this app, the Ask Nanci modes included: the root
   // layout is the only place metadata is set, and the risk console is what this
   // deployment is shown as.
-  title: "Aperia Risk",
+  title: "Aperia Risk – Powered by Mastercard",
   description: "AI-powered analytics assistant",
 }
 

@@ -5,6 +5,7 @@ import { findAssignment } from "@/lib/ask-nanci/data/risk-assignments"
 import { TableBody, TableRow } from "aperia-ds5"
 import { PanelTable, Thead, Th, Td, formatPercent } from "@/components/shared"
 import { useRiskNav } from "../RiskNavContext"
+import { useDashboardScope } from "./DashboardScope"
 
 // Re-alert rate by assignment with an inline rate bar and Nanci's suggested action.
 // Every row is a detection queue, so the name opens that queue's Barometer Report —
@@ -12,6 +13,10 @@ import { useRiskNav } from "../RiskNavContext"
 // The alert-volume bars still go to Assignment Management.
 export function RealertTable() {
   const nav = useRiskNav()
+  // Re-alert rate is a period metric of its own (see REALERT_ROWS), so the row's
+  // period does not reach it — only the assignment narrowing does.
+  const { assignmentIds } = useDashboardScope()
+  const rows = REALERT_ROWS.filter((r) => !assignmentIds || assignmentIds.includes(r.assignmentId))
   return (
     <PanelTable density="comfortable">
       <Thead>
@@ -22,7 +27,14 @@ export function RealertTable() {
         <Th sortable>Suggested action</Th>
       </Thead>
       <TableBody>
-        {REALERT_ROWS.map((r) => (
+        {rows.length === 0 && (
+          <TableRow>
+            <Td colSpan={5} className="py-8 text-center text-muted-foreground">
+              No assignment in scope has a re-alert rate.
+            </Td>
+          </TableRow>
+        )}
+        {rows.map((r) => (
           <TableRow key={r.assignmentId}>
             <Td>
               <button

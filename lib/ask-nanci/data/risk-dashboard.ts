@@ -8,6 +8,7 @@
 import {
   AlertTriangle, Inbox, BarChart3, Briefcase, Timer, type LucideIcon,
 } from "lucide-react"
+import { ASSIGNMENTS } from "./risk-assignments"
 
 // Chart ids used by the insight → highlight mapping.
 export type DashChartId = "scatter" | "alert-volume" | "high-risk" | "param-heat" | "realert"
@@ -67,21 +68,32 @@ export const SCATTER_COLORS: Record<ScatterCat, string> = {
 // Note this measures *alerts raised today*, which is a different quantity from the
 // standing queue depth in DETECTION_QUEUES — a queue can hold 1,022 unworked items
 // and still raise none today. Both are real; neither derives from the other.
-export const ALERT_VOLUME: { assignmentId: string; count: number; prev: number }[] = [
-  { assignmentId: "esqr-phase2-auths", count: 357, prev: 294 },
-  { assignmentId: "low-risk-mcc",      count: 303, prev: 311 },
-  { assignmentId: "mc-watch",          count: 52,  prev: 47 },
-  { assignmentId: "high-risk-mcc",     count: 25,  prev: 28 },
-  { assignmentId: "moderate-risk-mcc", count: 19,  prev: 21 },
-  { assignmentId: "mc-velocity",       count: 18,  prev: 12 },
-  { assignmentId: "unacceptable-risk", count: 10,  prev: 10 },
-  { assignmentId: "mc-divergence",     count: 9,   prev: 11 },
-  { assignmentId: "esqr-phase2",       count: 7,   prev: 6 },
+export const ALERT_VOLUME: { assignmentId: string; count: number; prev: number; week: number; month: number }[] = [
+  { assignmentId: "esqr-phase2-auths", count: 357, prev: 294, week: 2284, month: 9663 },
+  { assignmentId: "low-risk-mcc",      count: 303, prev: 311, week: 1939, month: 8202 },
+  { assignmentId: "mc-watch",          count: 52,  prev: 47, week: 333, month: 1409 },
+  { assignmentId: "high-risk-mcc",     count: 25,  prev: 28, week: 160, month: 677 },
+  { assignmentId: "moderate-risk-mcc", count: 19,  prev: 21, week: 122, month: 515 },
+  { assignmentId: "mc-velocity",       count: 18,  prev: 12, week: 115, month: 487 },
+  { assignmentId: "unacceptable-risk", count: 10,  prev: 10, week: 64, month: 271 },
+  { assignmentId: "mc-divergence",     count: 9,   prev: 11, week: 58, month: 244 },
+  { assignmentId: "esqr-phase2",       count: 7,   prev: 6, week: 45, month: 190 },
 ]
 
 /** Today's alert count for an assignment — 0 for one that did not fire. */
 export const alertsToday = (assignmentId: string) =>
   ALERT_VOLUME.find((a) => a.assignmentId === assignmentId)?.count ?? 0
+
+/**
+ * Which field a period reads. "This cycle" is the month figure: the risk cycle and
+ * the 30-day window are the same span in this data, and quoting a third number for
+ * them would imply a distinction the demo cannot back.
+ */
+export const alertsForRange = (row: (typeof ALERT_VOLUME)[number], range: string) =>
+  range === "Yesterday" ? row.prev
+    : range === "Last 7 days" ? row.week
+    : range === "Last 30 days" || range === "This cycle" ? row.month
+    : row.count
 
 // ── High Risk Merchants (MC score jumpers) ───────────────────────────────────
 // The ten biggest 30-day MC movers, all drawn from the Barometer Report's merchant
@@ -170,7 +182,15 @@ export const DASH_DATE_RANGES = [DASH_TODAY, "Yesterday", "Last 7 days", "Last 3
 export const DASH_SCOPE_ALL = "All"
 
 export const DASH_ANALYST_EVERYONE = "Everyone"
-export const DASH_ANALYSTS = [DASH_ANALYST_EVERYONE, "Teresa Walker", "Unassigned"]
+/**
+ * Derived from who actually owns a queue, not hand-listed: a name that owns nothing
+ * would filter every chart to empty, and an owner missing from the list would be
+ * unreachable. Ordered by the assignment list so it is stable between renders.
+ */
+export const DASH_ANALYSTS = [
+  DASH_ANALYST_EVERYONE,
+  ...Array.from(new Set(ASSIGNMENTS.map((a) => a.owner))),
+]
 
 /** What "+ Add filter" offers. Named here so the row stays data, not markup. */
 export const DASH_MORE_FILTERS = ["Risk level", "MCC", "Card network", "Alert reason"]

@@ -1,6 +1,5 @@
 "use client"
 
-import { useState } from "react"
 import { Plus } from "lucide-react"
 import {
   Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -8,7 +7,7 @@ import {
 } from "aperia-ds5"
 import { ASSIGNMENTS } from "@/lib/ask-nanci/data/risk-assignments"
 import {
-  DASH_TODAY, DASH_DATE_RANGES, DASH_SCOPE_ALL, DASH_ANALYSTS, DASH_ANALYST_EVERYONE, DASH_MORE_FILTERS,
+  DASH_DATE_RANGES, DASH_SCOPE_ALL, DASH_ANALYSTS, DASH_MORE_FILTERS,
 } from "@/lib/ask-nanci/data/risk-dashboard"
 
 // The scope line under the dashboard title: what period, which assignments, whose
@@ -16,10 +15,13 @@ import {
 // and the Barometer toolbar already use, so this row reads as the rest of the
 // console rather than as a widget with its own shape.
 //
-// ponytail: a control holds and shows a choice, but the figures behind it do not
-// move. Every number on this dashboard is one fixed snapshot with no per-day or
-// per-analyst dimension under it, so filtering would have to invent data rather than
-// select it. Same standing as Refresh, Export and the sort arrows on these screens.
+// The choices live in Dashboard, not here: two charts read them through
+// DashboardScope, so the row cannot be the one holding them.
+//
+// Period and scope reach the assignment-keyed views only — the alert-volume bars and
+// the re-alert table. The scatter, the high-risk merchants and the parameter heat are
+// not keyed by assignment or by day, so they show the same population whatever the
+// row says. That is a gap in the data, not in the wiring.
 
 function FilterSelect({ label, value, options, onChange }: {
   /** Prefix shown before the value, e.g. "Analyst". Omitted on the period control. */
@@ -51,20 +53,25 @@ function FilterSelect({ label, value, options, onChange }: {
   )
 }
 
-export function DashboardFilters() {
-  const [range, setRange] = useState(DASH_TODAY)
-  const [scope, setScope] = useState(DASH_SCOPE_ALL)
-  const [analyst, setAnalyst] = useState(DASH_ANALYST_EVERYONE)
-
+export function DashboardFilters({ range, scope, analyst, onRange, onScope, onAnalyst, showing }: {
+  range: string
+  scope: string
+  analyst: string
+  onRange: (v: string) => void
+  onScope: (v: string) => void
+  onAnalyst: (v: string) => void
+  /** How many assignments the choices leave standing, or null when they leave all. */
+  showing: number | null
+}) {
   // Scope reads off the real assignment list, so the control and the console can
   // never name a queue the other does not have.
   const scopes = [DASH_SCOPE_ALL, ...ASSIGNMENTS.map((a) => a.name)]
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <FilterSelect value={range} options={DASH_DATE_RANGES} onChange={setRange} />
-      <FilterSelect label="Assignment scope" value={scope} options={scopes} onChange={setScope} />
-      <FilterSelect label="Analyst" value={analyst} options={DASH_ANALYSTS} onChange={setAnalyst} />
+      <FilterSelect value={range} options={DASH_DATE_RANGES} onChange={onRange} />
+      <FilterSelect label="Assignment scope" value={scope} options={scopes} onChange={onScope} />
+      <FilterSelect label="Analyst" value={analyst} options={DASH_ANALYSTS} onChange={onAnalyst} />
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -79,6 +86,14 @@ export function DashboardFilters() {
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
+
+      {/* Says what the choices did, so a filter that empties a chart reads as a
+          filter rather than as a chart that broke. */}
+      {showing !== null && (
+        <span className="text-sm text-muted-foreground">
+          {showing} of {ASSIGNMENTS.length} assignments
+        </span>
+      )}
     </div>
   )
 }

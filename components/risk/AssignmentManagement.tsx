@@ -34,7 +34,9 @@ export function AssignmentManagement() {
 
   const submit = (name: string) => {
     const title = name.trim() || EXAMPLE_ASSIGNMENT_NAME
-    setCreated({ id: "created", name: title, short: title, type: "DQ", status: "Active", lastProcessed: "06/18/2026", neverRun: true })
+    // A queue you just made is yours, which is also what puts it inside the
+    // dashboard's Analyst filter straight away.
+    setCreated({ id: "created", name: title, short: title, owner: "Teresa Walker", type: "DQ", status: "Active", lastProcessed: "06/18/2026", neverRun: true })
     setCreating(false)
     setToast(true)
   }
