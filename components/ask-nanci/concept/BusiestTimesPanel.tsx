@@ -28,7 +28,11 @@ export function BusiestTimesPanel() {
       />
 
       <PanelBody className="flex flex-col gap-4">
-        <div className="grid grid-cols-3 gap-3">
+        {/* Three across at 390px gives each card ~78px of content, which cuts "Saturday"
+            off. On a phone the first two share a row and the third takes the width, so
+            no card is narrower than half the panel. The last-child variant does it
+            without threading an index through the map. */}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 [&>:last-child]:col-span-2 sm:[&>:last-child]:col-span-1">
           {BUSIEST_TIMES_TILES.map((tile) => (
             <StatCard key={tile.label} label={tile.label} value={tile.value} sublabel={tile.sublabel} emphasis={tile.emphasis} />
           ))}
