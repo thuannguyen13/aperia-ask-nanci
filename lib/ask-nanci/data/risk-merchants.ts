@@ -145,7 +145,7 @@ export const findMerchant = (id: string) => RISK_MERCHANTS.find((m) => m.id === 
 
 // Risk Report detail. The MID and MCC live on the merchant row above, so they are
 // not repeated here — one source each.
-interface RiskReportDetail {
+export interface RiskReportDetail {
   violations: number
   inQueues: number
   vwDelta30: string
@@ -159,6 +159,24 @@ interface RiskReportDetail {
   lastUpdate: string
   profile: { status: string; profile: string; multiWatch: string; classification: string }
   account: { lastBatch: string; lastStatement: string; phone: string; address: string }
+  /**
+   * The header card: who the account is and how today compares to what it signed
+   * for. `todayNet` against `contractDailyNet` is the pair that matters — a merchant
+   * running far over its contracted daily volume is the shape a bust-out makes, so
+   * the ratio is derived at render rather than stored, and cannot drift from the two
+   * figures it comes from.
+   */
+  merchant: {
+    dba: string
+    iso: string
+    /** Boarding date, MM/DD/YYYY. */
+    approved: string
+    businessAge: string
+    watchStatus: string
+    contractDailyNet: number
+    todayNet: number
+    accountStatus: "Active" | "Suspended" | "Terminated"
+  }
 }
 
 export const RISK_REPORT_DETAILS: Record<string, RiskReportDetail> = {
@@ -175,6 +193,7 @@ export const RISK_REPORT_DETAILS: Record<string, RiskReportDetail> = {
     lastUpdate: "05/03/2026 06:14 AM",
     profile: { status: "In Review", profile: "No-Profile", multiWatch: "ISO", classification: "—" },
     account: { lastBatch: "05/12/2026", lastStatement: "05/12/2026", phone: "(972) 392-2882", address: "PAPILLION, FL 010853016" },
+    merchant: { dba: "0553 OH TOLEDO - CENTRAL", iso: "North Central Group", approved: "12/14/2024", businessAge: "91+ days", watchStatus: "On Watch — Phase 2 Review", contractDailyNet: 8500, todayNet: 21930, accountStatus: "Active" },
   },
   // The two bust-out case studies. Their score shapes are the point: Meridian is
   // near-zero on MC and critical on VW, Cascade is the reverse.
@@ -191,6 +210,9 @@ export const RISK_REPORT_DETAILS: Record<string, RiskReportDetail> = {
     lastUpdate: "05/03/2026 06:14 AM",
     profile: { status: "Terminated", profile: "No-Profile", multiWatch: "ISO", classification: "Bust-out" },
     account: { lastBatch: "12/19/2025", lastStatement: "12/19/2025", phone: "(972) 771-4408", address: "MESQUITE, TX 751490112" },
+    // Terminated in December, so nothing settles today: the ratio reads 0%, which is
+    // the other half of the bust-out shape.
+    merchant: { dba: "0118 TX MESQUITE - DENTAL", iso: "Lone Star Payments", approved: "08/02/2025", businessAge: "91+ days", watchStatus: "Closed — Bust-out confirmed", contractDailyNet: 3200, todayNet: 0, accountStatus: "Terminated" },
   },
   cascade: {
     violations: 2,
@@ -205,6 +227,7 @@ export const RISK_REPORT_DETAILS: Record<string, RiskReportDetail> = {
     lastUpdate: "05/03/2026 06:14 AM",
     profile: { status: "Terminated", profile: "No-Profile", multiWatch: "ISO", classification: "Bust-out" },
     account: { lastBatch: "11/07/2025", lastStatement: "11/07/2025", phone: "(918) 244-6035", address: "BROKEN ARROW, OK 740121884" },
+    merchant: { dba: "0553 OK BROKEN ARROW - AUTO", iso: "Heartland Merchant Svcs", approved: "06/21/2025", businessAge: "91+ days", watchStatus: "Closed — Bust-out confirmed", contractDailyNet: 12000, todayNet: 0, accountStatus: "Terminated" },
   },
 }
 
@@ -215,9 +238,14 @@ export const RISK_REPORT_DETAILS: Record<string, RiskReportDetail> = {
  * scoring 33.75 — a 30-day gain larger than the score itself, and a percentile
  * that contradicts the number printed directly above it.
  */
+/** The agents the portfolio boards through, cycled so the card is not all one name. */
+const ISO_AGENTS = ["North Central Group", "Lone Star Payments", "Heartland Merchant Svcs", "Gulf Coast Bankcard"]
+const BOARDED_DATES = ["12/14/2024", "03/09/2025", "06/21/2025", "08/02/2025", "10/17/2025"]
+
 export const getDefaultRiskDetail = (m: RiskMerchant): RiskReportDetail => {
   const delta30 = Math.round(m.mc * 0.35)
   const level = getMcLevel(m.mc)
+  const contract = 2500 + (Number(m.mid.slice(-3)) % 40) * 250
   return {
     violations: 2,
     inQueues: 2,
@@ -231,6 +259,20 @@ export const getDefaultRiskDetail = (m: RiskMerchant): RiskReportDetail => {
     lastUpdate: "05/03/2026 06:14 AM",
     profile: { status: "In Review", profile: "No-Profile", multiWatch: "ISO", classification: "—" },
     account: { lastBatch: "05/12/2026", lastStatement: "05/12/2026", phone: "(972) 000-0000", address: "PAPILLION, FL 010853016" },
+    // Derived, not fixed: a flat contract and a flat day would put the same ratio on
+    // every merchant, and the ratio is the one figure on this card worth reading. The
+    // contract scales with the MCC's own size and today's take with the MC score, so
+    // a high scorer runs over its contract and a quiet one sits under it.
+    merchant: {
+      dba: `${m.mid.slice(-4)} ${m.mccDesc.split(",")[0].toUpperCase()}`,
+      iso: ISO_AGENTS[Number(m.mid.slice(-1)) % ISO_AGENTS.length],
+      approved: BOARDED_DATES[Number(m.mid.slice(-2, -1)) % BOARDED_DATES.length],
+      businessAge: "91+ days",
+      watchStatus: level === "High" ? "On Watch — Phase 2 Review" : "Not on watch",
+      contractDailyNet: contract,
+      todayNet: Math.round(contract * (0.4 + m.mc / 500)),
+      accountStatus: "Active",
+    },
   }
 }
 

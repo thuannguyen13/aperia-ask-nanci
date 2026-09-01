@@ -8,10 +8,10 @@ import {
 } from "aperia-ds5"
 import { ResponsiveDialog, ResponsiveDialogTrigger, ResponsiveDialogContent, ResponsiveDialogHeader, ResponsiveDialogTitle, ResponsiveDialogDescription, ResponsiveDialogFooter, ResponsiveDialogClose } from "@/components/shared"
 import { cn } from "aperia-ds5/utils"
-import { PanelShell, PanelHeader, PanelBody, PanelTable, Thead, Th, Td } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody, PanelTable, Thead, Th, Td, formatCurrency } from "@/components/shared"
 import { MarkWorkPopover } from "./MarkWorkPopover"
 import { useRiskNav } from "./RiskNavContext"
-import { findMerchant, getVwLevel, getMcLevel, getRiskLevel, formatMcScore, formatMerchantName, RISK_REPORT_DETAILS, getDefaultRiskDetail, TXN_VOLUME_ROWS, RISK_VIOLATION_CYCLE, VIOLATION_ROWS, CROSS_QUEUE_ROWS, MERCHANT_NOTES_SEED, DEFAULT_MERCHANT_NOTES, statusForDisposition, type WorkStatus, type ViolationRow, type NoteEntry, type RiskLevel } from "@/lib/ask-nanci/data/risk-merchants"
+import { findMerchant, getVwLevel, getMcLevel, getRiskLevel, formatMcScore, formatMerchantName, RISK_REPORT_DETAILS, getDefaultRiskDetail, TXN_VOLUME_ROWS, RISK_VIOLATION_CYCLE, VIOLATION_ROWS, CROSS_QUEUE_ROWS, MERCHANT_NOTES_SEED, DEFAULT_MERCHANT_NOTES, statusForDisposition, type WorkStatus, type ViolationRow, type NoteEntry, type RiskLevel, type RiskReportDetail } from "@/lib/ask-nanci/data/risk-merchants"
 import { getRiskLevelStyles } from "./risk-level"
 
 // Parameter Violation Details modal columns (Figma order + widths).
@@ -87,6 +87,13 @@ function ViolationsPill({ count }: { count: number }) {
     </ResponsiveDialog>
   )
 }
+
+/**
+ * Today's take against the contracted daily net, as a percentage. Derived from the
+ * two figures printed beside it so it can never contradict them.
+ */
+const salesRatio = (d: RiskReportDetail) =>
+  d.merchant.contractDailyNet ? Math.round((d.merchant.todayNet / d.merchant.contractDailyNet) * 100) : 0
 
 // Card into thirds: label takes 1, value takes 2, value left-aligned at the ⅓ mark.
 // `badgeClass` renders the value as a DS Badge with a color override (design has no
@@ -402,9 +409,35 @@ export function RiskReport() {
         />
       </div>
 
-      {/* Merchant Information */}
+      {/* Merchant Information — three cards in one row, all the same shape: who the
+          account is, its risk profile, its account details. */}
       <h2 className="mb-3 mt-6 text-base font-semibold text-foreground">Merchant Information</h2>
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="rounded-xl border bg-card p-4">
+          <p className="mb-1 text-sm font-semibold text-foreground">Account</p>
+          <Row label="DBA" value={d.merchant.dba} />
+          <Row label="MID" value={m.mid} />
+          <Row label="MCC" value={`${m.mcc} (${m.mccDesc})`} />
+          <Row label="Business Age" value={d.merchant.businessAge} />
+          <Row label="Watch Status" value={d.merchant.watchStatus} />
+          <Row label="ISO / Agent" value={d.merchant.iso} />
+          <Row label="Approved" value={d.merchant.approved} />
+          <Row label="Contractual Daily Net" value={formatCurrency(d.merchant.contractDailyNet)} />
+          {/* Over contract is the shape a bust-out makes, so it is the one value here
+              that carries colour — through Row's own badge slot. */}
+          <Row
+            label="Today's Sales Ratio"
+            value={salesRatio(d) > 100 ? `${salesRatio(d)}% — over contract` : `${salesRatio(d)}%`}
+            badgeClass={salesRatio(d) > 100 ? "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300" : undefined}
+          />
+          <Row
+            label="Status"
+            value={d.merchant.accountStatus}
+            badgeClass={d.merchant.accountStatus === "Active"
+              ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
+              : "bg-muted text-muted-foreground"}
+          />
+        </div>
         <div className="rounded-xl border bg-card p-4">
           <p className="mb-1 text-sm font-semibold text-foreground">Risk Profile Summary</p>
           <Row label="Watch" value="No" />
