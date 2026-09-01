@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Image from "next/image"
 import { RefreshCw, SlidersHorizontal, Plus, ChevronDown, ChevronLeft, ChevronRight, SlidersVertical, Pencil, Copy, Trash2, Download, CircleCheck } from "lucide-react"
-import { Button, TableBody, TableRow } from "aperia-ds5"
+import { Badge, Button, TableBody, TableRow } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { PanelShell, PanelHeader, PanelBody, PanelTable, Thead, Th, Td } from "@/components/shared"
 import { CreateAssignment } from "./CreateAssignment"
@@ -14,6 +14,9 @@ import { useRiskNav } from "./RiskNavContext"
 
 const TABS: ("All" | AssignmentStatus)[] = ["All", "Active", "Expired"]
 
+// Colour only. ds5 ships no success variant, so a live status takes the Badge with
+// an override — the same shape Row and the violations pill use. Connected reads as
+// Active because it is the same state on a different noun.
 const STATUS_PILL: Record<AssignmentStatus, string> = {
   Active:  "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300",
   Expired: "bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300",
@@ -76,9 +79,9 @@ export function AssignmentManagement() {
             the same asset already tags the Mastercard queue on the Detection Queue. */}
         <Image src="/iso/mastercard.svg" alt="Mastercard" width={28} height={28} className="size-7 shrink-0" />
         <span className="text-sm font-semibold text-foreground">{AM_INTEGRATION.name}</span>
-        <span className="flex items-center gap-1 rounded bg-green-100 px-1.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/40 dark:text-green-300">
-          <CircleCheck className="size-3" /> {AM_INTEGRATION.status}
-        </span>
+        <Badge className={STATUS_PILL.Active}>
+          <CircleCheck /> {AM_INTEGRATION.status}
+        </Badge>
         <div className="ml-auto flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
           <span>Last score sync: <span className="font-medium text-foreground">{AM_INTEGRATION.lastSync}</span></span>
           <span>{AM_INTEGRATION.scored}</span>
@@ -152,7 +155,7 @@ export function AssignmentManagement() {
                 {/* Derived, not stored: the same number the dashboard's alert-volume
                     bar plots for this assignment. */}
                 <Td mono>{a.neverRun ? "—" : alertsToday(a.id)}</Td>
-                <Td><span className={cn("rounded px-2 py-0.5 text-xs font-medium", STATUS_PILL[a.status])}>{a.status}</span></Td>
+                <Td><Badge className={STATUS_PILL[a.status]}>{a.status}</Badge></Td>
                 <Td mono className="text-muted-foreground">{a.lastProcessed}</Td>
                 <Td>
                   <div className="flex items-center justify-end gap-1 text-muted-foreground">
