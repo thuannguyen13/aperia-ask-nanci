@@ -607,11 +607,11 @@ export function RiskReport() {
           ) : (
           <>
 
-        <div className="mt-4 flex items-center justify-between gap-3">
-          <h3 className="text-base font-semibold text-foreground">
-            Recent Authorizations{" "}
-            <span className="font-normal text-muted-foreground">— last {RECENT_AUTHS.length} with MC scoring</span>
-          </h3>
+        <div className="mt-4 flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h3 className="text-base font-semibold text-foreground">Recent Authorizations</h3>
+            <p className="text-sm text-muted-foreground">Last {RECENT_AUTHS.length} with MC scoring</p>
+          </div>
           <Button variant="outline" size="sm">View all {AUTH_TOTAL}</Button>
         </div>
 
