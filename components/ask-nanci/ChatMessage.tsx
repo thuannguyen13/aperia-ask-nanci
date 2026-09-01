@@ -170,7 +170,10 @@ function BotMessageBase({
   return (
     <div className="flex items-start gap-3 px-4 py-3">
       <div className="min-w-0 flex-1">
-        <div className="text-sm leading-relaxed text-foreground">
+        {/* Answer text reads at 16px on every screen. It is the one thing on the page
+            people actually read a paragraph of, so it takes the reading size rather
+            than the 14px interface size everything around it uses. */}
+        <div className="text-base leading-relaxed text-foreground">
           {displayedContent.includes("{{MAP}}") ? (() => {
             const [before, after] = displayedContent.split("{{MAP}}")
             return (
