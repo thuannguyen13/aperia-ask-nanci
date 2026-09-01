@@ -319,7 +319,7 @@ export function RiskReport() {
           </Breadcrumb>
         }
         title={
-          <span className="flex items-center gap-2">
+          <span className="flex flex-wrap items-center gap-2">
             {m.name}
             <ViolationsPill count={d.violations} />
             <QueuesPill count={d.inQueues} />
@@ -327,7 +327,7 @@ export function RiskReport() {
         }
         subtitle={<span className="text-base font-medium tabular-nums text-primary">{m.mid}</span>}
         actions={
-          <div className="relative flex items-center gap-2">
+          <div className="relative flex flex-wrap items-center gap-2">
             <Button variant="outline" size="icon"><MoreHorizontal className="size-4" /></Button>
             <Button variant="outline" onClick={() => setNoteOpen((o) => !o)}><FileText className="size-4" /> Add Notes</Button>
             <Button variant="outline"><FolderPlus className="size-4" /> Open New Case</Button>
@@ -439,11 +439,17 @@ export function RiskReport() {
       {/* Merchant Activity */}
       <h2 className="mb-2 mt-6 text-base font-semibold text-foreground">Merchant Activity</h2>
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList variant="line">
-          {ACTIVITY_TABS.map((t) => (
-            <TabsTrigger key={t.value} value={t.value}>{t.label}</TabsTrigger>
-          ))}
-        </TabsList>
+        {/* Five tabs run to 719px, so on a phone the strip scrolls rather than
+            losing the last three off the edge. Same answer PanelTable gives a wide
+            table; the audit's TabsList-to-Select swap is the larger change this
+            defers to, not a different verdict. */}
+        <div className="-mx-1 overflow-x-auto px-1">
+          <TabsList variant="line" className="w-max min-w-full">
+            {ACTIVITY_TABS.map((t) => (
+              <TabsTrigger key={t.value} value={t.value}>{t.label}</TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
 
         <TabsContent value="transactions">
           {/* Transaction sub-tabs */}
