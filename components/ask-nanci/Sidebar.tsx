@@ -68,7 +68,7 @@ const HOVER_CLOSE_MS = 250
 // `hoverNav` is the Ask Nanci default: rail + hover peek + pin. Aperia Risk opts out
 // (`hoverNav={false}`) — its rail is a fixed destination menu for a different product,
 // so it keeps the plain collapse toggle.
-export function Sidebar({ menu, logos, hoverNav = true, initialPinned = false }: { menu?: SidebarNavItem[]; logos?: ThemeLogos; hoverNav?: boolean; initialPinned?: boolean } = {}) {
+export function Sidebar({ menu, search, logos, hoverNav = true, initialPinned = false }: { menu?: SidebarNavItem[]; search?: (collapsed: boolean) => React.ReactNode; logos?: ThemeLogos; hoverNav?: boolean; initialPinned?: boolean } = {}) {
   const { startNewChat, setKbOpen, marketplaceOpen, setMarketplaceOpen, mobileSidebarOpen, setMobileSidebarOpen, currentUser, tourActive } = useAskNanci()
   const [collapsed, setCollapsed] = useState(false)
   const [wizardOpen, setWizardOpen] = useState(false)
@@ -181,8 +181,17 @@ export function Sidebar({ menu, logos, hoverNav = true, initialPinned = false }:
         )}
       </div>
 
+      {/* An optional field above the destinations — the Aperia Risk console puts its
+          search here. Given the collapsed state rather than reading it, because only
+          the caller knows what its control should shrink to. */}
+      {search && (
+        <div className={cn("shrink-0 min-w-12 px-2 pb-1", !isMobile && isCollapsed && "px-1")}>
+          {search(!isMobile && isCollapsed)}
+        </div>
+      )}
+
       {/* Nav list (menu mode) or New Chat — stays onscreen above the scroll area */}
-      <div className={cn("shrink-0 min-w-12 p-2", !isMobile && isCollapsed && "px-1")}>
+      <div className={cn("shrink-0 min-w-12 p-2 pt-1", !isMobile && isCollapsed && "px-1")}>
         {menu ? (
           menu.map((item) => (
             <SidebarItem
