@@ -341,6 +341,7 @@ export const CROSS_QUEUE_ROWS: QueueRow[] = [
 // shape. The flat $420 amount is deliberate — a card-testing run repeats one
 // amount, and that is what the velocity reasons are describing.
 export interface AuthRow {
+  /** MM/DD/YYYY HH:MM:SS, the format every other date on this screen uses. */
   at: string
   /** Last four only; the demo never holds a full PAN. */
   card: string
@@ -360,16 +361,16 @@ export const AUTH_SCORE_ALERT = 700
 export const AUTH_TOTAL = 156
 
 export const RECENT_AUTHS: AuthRow[] = [
-  { at: "05/03 06:11:42", card: "4889", amount: 420, type: "Sale", result: "Approved", mcScore: 960, mcReason: "Velocity, novel card" },
-  { at: "05/03 05:58:11", card: "5212", amount: 420, type: "Sale", result: "Approved", mcScore: 940, mcReason: "Velocity" },
-  { at: "05/03 05:42:09", card: "5212", amount: 420, type: "Sale", result: "Approved", mcScore: 910, mcReason: "Repeat card" },
-  { at: "05/03 05:14:55", card: "3782", amount: 420, type: "Sale", result: "Approved", mcScore: 780, mcReason: "High-risk MCC" },
-  { at: "05/03 04:47:33", card: "4147", amount: 420, type: "Sale", result: "Approved", mcScore: 660, mcReason: "High-risk MCC" },
-  { at: "05/03 03:12:18", card: "5419", amount: 420, type: "Sale", result: "Approved", mcScore: 620, mcReason: "High-risk MCC" },
-  { at: "05/02 23:55:01", card: "4147", amount: 420, type: "Sale", result: "Approved", mcScore: 480, mcReason: null },
-  { at: "05/02 22:08:47", card: "3782", amount: 420, type: "Sale", result: "Approved", mcScore: 420, mcReason: null },
-  { at: "05/02 21:33:20", card: "4889", amount: 420, type: "Sale", result: "Approved", mcScore: 390, mcReason: null },
-  { at: "05/02 20:02:14", card: "5212", amount: 420, type: "Sale", result: "Approved", mcScore: 310, mcReason: null },
+  { at: "05/03/2026 06:11:42", card: "4889", amount: 420, type: "Sale", result: "Approved", mcScore: 960, mcReason: "Velocity, novel card" },
+  { at: "05/03/2026 05:58:11", card: "5212", amount: 420, type: "Sale", result: "Approved", mcScore: 940, mcReason: "Velocity" },
+  { at: "05/03/2026 05:42:09", card: "5212", amount: 420, type: "Sale", result: "Approved", mcScore: 910, mcReason: "Repeat card" },
+  { at: "05/03/2026 05:14:55", card: "3782", amount: 420, type: "Sale", result: "Approved", mcScore: 780, mcReason: "High-risk MCC" },
+  { at: "05/03/2026 04:47:33", card: "4147", amount: 420, type: "Sale", result: "Approved", mcScore: 660, mcReason: "High-risk MCC" },
+  { at: "05/03/2026 03:12:18", card: "5419", amount: 420, type: "Sale", result: "Approved", mcScore: 620, mcReason: "High-risk MCC" },
+  { at: "05/02/2026 23:55:01", card: "4147", amount: 420, type: "Sale", result: "Approved", mcScore: 480, mcReason: null },
+  { at: "05/02/2026 22:08:47", card: "3782", amount: 420, type: "Sale", result: "Approved", mcScore: 420, mcReason: null },
+  { at: "05/02/2026 21:33:20", card: "4889", amount: 420, type: "Sale", result: "Approved", mcScore: 390, mcReason: null },
+  { at: "05/02/2026 20:02:14", card: "5212", amount: 420, type: "Sale", result: "Approved", mcScore: 310, mcReason: null },
 ]
 
 // ── Transaction Volume Analysis ──────────────────────────────────────────────
