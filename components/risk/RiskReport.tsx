@@ -445,9 +445,18 @@ export function RiskReport() {
             defers to, not a different verdict. */}
         {/* border-b is ours, not ds5's: the line variant ships the active tab's own
             indicator and no rule for the strip to sit on, so the row floated. It goes
-            on the scroller, which stays put while the tabs move under it. */}
+            on the scroller, which stays put while the tabs move under it.
+            The strip takes its height from the tabs rather than ds5's fixed h-8, and
+            the active indicator sits on the strip's own bottom edge rather than the
+            5px below it ds5 ships. That is what closes the gap: the rule and the
+            indicator are the same line, and the row is only as tall as a tab. */}
         <div className="-mx-1 overflow-x-auto border-b px-1">
-          <TabsList variant="line" className="w-max min-w-full">
+          <TabsList
+            variant="line"
+            // h-auto! and p-0!: ds5 pins the strip to h-8 through a group-data variant,
+            // which outranks a plain utility.
+            className="h-auto! w-max min-w-full p-0! [&_[data-slot=tabs-trigger]]:h-auto [&_[data-slot=tabs-trigger]]:py-1.5 [&_[data-slot=tabs-trigger]]:after:bottom-0"
+          >
             {ACTIVITY_TABS.map((t) => (
               <TabsTrigger key={t.value} value={t.value}>{t.label}</TabsTrigger>
             ))}

@@ -8,20 +8,19 @@
 import {
   AlertTriangle, Inbox, BarChart3, Briefcase, Timer, type LucideIcon,
 } from "lucide-react"
-import type { RiskDest } from "@/lib/ask-nanci/types"
 
 // Chart ids used by the insight → highlight mapping.
 export type DashChartId = "scatter" | "alert-volume" | "high-risk" | "param-heat" | "realert"
 
 // ── Top KPI row ────────────────────────────────────────────────────────────
-// `dest` is where the card drills to. Partial on purpose: a card only carries one
-// when a screen exists behind it, so nothing on the dashboard offers a click that
-// lands nowhere. `barometer-report` opens filtered to the critical merchants.
-export const DASH_KPIS: { label: string; value: string; delta: string; deltaCls: string; sub: string; icon: LucideIcon; dest?: RiskDest }[] = [
-  { label: "Alerted Today",     value: "364", delta: "+12%", deltaCls: "text-rose-600 dark:text-rose-400",    sub: "across 23 assignments",     icon: AlertTriangle, dest: "detection-queue" },
-  { label: "Ready to Work",     value: "298", delta: "+8%",  deltaCls: "text-rose-600 dark:text-rose-400",    sub: "66 oldest > 24h",           icon: Inbox,         dest: "detection-queue" },
+// Read-only. These are the shape of the day, not a way into it: the screens they
+// would drill to are all one click away on the rail, and a card that navigates on
+// the same tap that reads its number makes the number feel like a control.
+export const DASH_KPIS: { label: string; value: string; delta: string; deltaCls: string; sub: string; icon: LucideIcon }[] = [
+  { label: "Alerted Today",     value: "364", delta: "+12%", deltaCls: "text-rose-600 dark:text-rose-400",    sub: "across 23 assignments",     icon: AlertTriangle },
+  { label: "Ready to Work",     value: "298", delta: "+8%",  deltaCls: "text-rose-600 dark:text-rose-400",    sub: "66 oldest > 24h",           icon: Inbox },
   // The standing finding, not a today number — hence the explicit period in `sub`.
-  { label: "MC >700, No Alert", value: "3,556", delta: "", deltaCls: "text-muted-foreground",                sub: "Sept–Dec 2025 · 317 confirmed fraud", icon: BarChart3, dest: "barometer-report" },
+  { label: "MC >700, No Alert", value: "3,556", delta: "", deltaCls: "text-muted-foreground",                sub: "Sept–Dec 2025 · 317 confirmed fraud", icon: BarChart3 },
   { label: "Case Opened (Week)",value: "42",  delta: "-18m", deltaCls: "text-emerald-600 dark:text-emerald-400", sub: "avg time to case: 3h12m",   icon: Briefcase },
   { label: "% Worked in SLA",   value: "87%", delta: "-3%",  deltaCls: "text-rose-600 dark:text-rose-400",    sub: "target 90%",                icon: Timer },
 ]
@@ -152,3 +151,26 @@ export const CHART_TAKE: Partial<Record<DashChartId, string>> = {
   scatter:        "5 merchants are both VW critical and MC critical",
   "high-risk":    "5 merchants are both VW critical and MC critical",
 }
+
+// ── Dashboard filter chips ───────────────────────────────────────────────────
+// The scope the dashboard is reporting on, shown as chips under the title.
+//
+// ponytail: the chips hold and show a choice but do not narrow the numbers. Every
+// figure on this dashboard is a single fixed snapshot — there is no per-day or
+// per-analyst dimension behind it — so filtering would have to invent data rather
+// than select it. Same reasoning as the Refresh, Export and sort affordances on
+// these screens, which are also chrome the demo shows without wiring.
+
+/** The day every figure on this dashboard describes. Matches VIOLATION_ROWS' alertOn. */
+export const DASH_TODAY = "Today · May 3, 2026"
+
+export const DASH_DATE_RANGES = [DASH_TODAY, "Yesterday", "Last 7 days", "Last 30 days", "This cycle"]
+
+/** Assignment scope reads off the real assignment list, so the two cannot drift. */
+export const DASH_SCOPE_ALL = "All"
+
+export const DASH_ANALYST_EVERYONE = "Everyone"
+export const DASH_ANALYSTS = [DASH_ANALYST_EVERYONE, "Teresa Walker", "Unassigned"]
+
+/** What "+ Add filter" offers. Named here so the row stays data, not markup. */
+export const DASH_MORE_FILTERS = ["Risk level", "MCC", "Card network", "Alert reason"]
