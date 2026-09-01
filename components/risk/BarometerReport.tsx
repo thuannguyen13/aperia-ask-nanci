@@ -117,7 +117,7 @@ export function BarometerReport() {
             {merchants.map((m) => (
               <TableRow key={m.id}>
                 <Td>
-                  <button onClick={() => nav.openMerchant(m.id)} className="block max-w-[220px] truncate font-medium text-primary hover:underline">{m.name}</button>
+                  <button onClick={() => nav.openMerchant(m.id)} className="block max-w-[220px] truncate text-left font-medium text-primary hover:underline">{m.name}</button>
                   <span className="font-mono text-xs text-muted-foreground">{m.mid}</span>
                 </Td>
                 <Td>

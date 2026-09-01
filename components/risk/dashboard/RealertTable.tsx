@@ -26,7 +26,7 @@ export function RealertTable() {
               <button
                 onClick={() => nav.openAssignment(r.assignmentId)}
                 title={findAssignment(r.assignmentId)?.name}
-                className="font-medium text-primary hover:underline"
+                className="text-left font-medium text-primary hover:underline"
               >
                 {findAssignment(r.assignmentId)?.short ?? r.assignmentId}
               </button>

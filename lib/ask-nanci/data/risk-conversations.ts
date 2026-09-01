@@ -47,7 +47,7 @@ export const RISK_LANDING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> =
       role: "assistant",
       content:
         "**13 of the 30 merchants on page one are High risk** — but they are High for three different reasons, and that split is the part worth reading:\n\n- **5 are critical on both models.** Start here: Northgate Appliance Ctr (VW 91 / MC 731.44), Regency Furniture Manchester (89 / 737.33, $14,896.06), Coastal Wellness Partners (86 / 704.88), Brighton Medical Supply (84 / 712.40), Harbor Point Marine Svcs (81 / 726.05).\n- **4 are Mastercard only.** Goldleaf Jewelry Exchange (78 / 733.12), Ashley Homestore – Mechanicsbu (74 / 701.05), Apex Roofing Solutions (66 / 707.19) and **Cascade Auto Parts Warehouse (62 / 711.08)** — Cascade ranks 25th of 30 on VisionWeb.\n- **4 are VisionWeb only.** Summit Ridge Outfitters (94 / 688.21), Meridian Dental Group (87 / 95.99), Velocity Wireless Retail (83 / 358.19) and Elevate Fitness Club (80 / 612.77).\n\nWork the list top-down on VW score and you reach Cascade 25th. Sort by MC and it is 4th. Want me to open the Barometer Report?",
-      source: "Barometer Report · Esquire - Phase 2",
+      source: "Barometer Report · Phase 2",
       dashChart: "high-risk",
       suggestions: ["Which merchants are critical on both models?", "Why is alert volume running hot today?"],
     },
@@ -133,8 +133,8 @@ export const RISK_LANDING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> =
     {
       role: "assistant",
       content:
-        "Here are the key insights from **Esquire - Phase 2 Parameters - Auths - Detect Q**:\n\n- **Alert Volume**: 357 of 1,240 eligible merchants (28.8%) triggered alerts, representing a total exposure of $84,901.89.\n- **Operational Bottleneck**: the workflow is completely stalled. % Worked is 0.00%, with zero items in progress and zero items completed.\n- **Idle Financials**: all 357 alerted merchants are sitting in \"Ready to work\", so the entire $84,901.89 is idle. Eleven of them have already been re-queued once.",
-      source: "Detection Queue · Esquire - Phase 2",
+        "Here are the key insights from **Phase 2 Parameters - Auths - Detect Q**:\n\n- **Alert Volume**: 357 of 1,240 eligible merchants (28.8%) triggered alerts, representing a total exposure of $84,901.89.\n- **Operational Bottleneck**: the workflow is completely stalled. % Worked is 0.00%, with zero items in progress and zero items completed.\n- **Idle Financials**: all 357 alerted merchants are sitting in \"Ready to work\", so the entire $84,901.89 is idle. Eleven of them have already been re-queued once.",
+      source: "Detection Queue · Phase 2",
       suggestions: ["Analyze the Barometer Report", "Allocate 'Ready to Work' Items", "Unblock the Workflow"],
     },
   ],
@@ -145,7 +145,7 @@ export const RISK_LANDING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> =
       role: "assistant",
       content:
         "The Barometer Report ranks all 357 alerted merchants by VisionWeb score, 30 to a page. On page one, **13 are High risk and 5 are critical on both models** — Regency Furniture Manchester alone carries $14,896.06.\n\nBut ranking by VW score buries the Mastercard-only cases. **Cascade Auto Parts Warehouse sits 25th of 30 on VisionWeb at 62, while Mastercard has it at 711.08** — top five on MC, $1,469.00 of exposure. Apex Roofing (66 / 707.19) has the same problem eight rows above it.\n\nSort by MC score instead and four merchants jump the queue. Open it from the queue card when you want to start.",
-      source: "Barometer Report · Esquire - Phase 2",
+      source: "Barometer Report · Phase 2",
       suggestions: ["Show me today's high risk merchants", "Allocate 'Ready to Work' Items", "Unblock the Workflow"],
     },
   ],
@@ -156,7 +156,7 @@ export const RISK_LANDING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> =
       role: "assistant",
       content:
         "There are **357 items ready to work, worth $84,901.89**, and none are assigned to an analyst yet. That is the whole alerted volume sitting in one bucket, 11 of it already re-queued once.\n\nAt your team's current throughput 357 items is several days for a single analyst, so split it rather than handing it to one person. The Barometer Report has already ranked them, so allocating the top band first puts the largest exposure under an owner today.",
-      source: "Detection Queue · Esquire - Phase 2",
+      source: "Detection Queue · Phase 2",
       suggestions: ["Unblock the Workflow", "Analyze the Barometer Report"],
     },
   ],
@@ -167,7 +167,7 @@ export const RISK_LANDING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> =
       role: "assistant",
       content:
         "The block is allocation, not capacity. **357 alerted, 357 ready, 11 re-queued, 0 in progress, 0 worked** is the signature of a queue nobody has been assigned to — if analysts were working it and stalling, you would see a work-in-progress count instead.\n\nSo the unblock is one step: put owners on the ready items. The 357 are already prioritised by the Barometer Report, so nothing else needs re-tuning first.",
-      source: "Detection Queue · Esquire - Phase 2",
+      source: "Detection Queue · Phase 2",
       suggestions: ["Allocate 'Ready to Work' Items", "Show me today's high risk merchants"],
     },
   ],

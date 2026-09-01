@@ -22,7 +22,9 @@ export function HighRiskTable() {
         {HIGH_RISK_MERCHANTS.map((m) => (
           <TableRow key={m.id}>
             <Td>
-              <button onClick={() => nav.openMerchant(m.id)} className="font-medium text-primary hover:underline">{m.name}</button>
+              {/* text-left because a button centres its text by default, and these
+                  names wrap to two lines in a narrow column. */}
+              <button onClick={() => nav.openMerchant(m.id)} className="text-left font-medium text-primary hover:underline">{m.name}</button>
             </Td>
             <Td mono>{formatMcScore(m.from)} → {formatMcScore(m.to)}</Td>
             <Td mono align="right">+{m.delta}</Td>

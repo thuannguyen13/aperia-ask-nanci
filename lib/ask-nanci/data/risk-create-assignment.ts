@@ -33,7 +33,7 @@ export const MC_PARAM_LABEL = (p: McParameter) => `${p.id} — ${p.name}`
 export const ASSIGNED_GROUPS = [
   "MC Risk Team",
   "Card Network Risk — MC",
-  "Esquire Portfolio Ops",
+  "Portfolio Ops",
   "New Merchant Review",
 ]
 
@@ -46,7 +46,7 @@ export const DATE_WINDOWS = [
 export const ASSIGNMENT_TYPES = ["Detection Queue (DQ)", "Security Queue (SQ)", "Watch List (WL)"]
 
 // Prefilled example the Figma walks through, used as the Nanci-review trigger name.
-export const EXAMPLE_ASSIGNMENT_NAME = "Esquire New Merchants - High MC Trans"
+export const EXAMPLE_ASSIGNMENT_NAME = "New Merchants - High MC Trans"
 
 // "Review with Nanci" — the analysis panel beside the form (frames 224/225).
 export const NANCI_REVIEW = {

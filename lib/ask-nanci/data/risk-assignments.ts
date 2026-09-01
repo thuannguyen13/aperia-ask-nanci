@@ -45,7 +45,7 @@ export interface Assignment {
   /**
    * Chart-width label. The dashboard bars and the re-alert table have a ~200px
    * column, so they render this instead of truncating the full name mid-word — which
-   * is how "Esquire - Phase 2 Parameters - Auths…" ended up looking like a different
+   * is how "Phase 2 Parameters - Auths…" ended up looking like a different
    * assignment from the one the queue card names.
    */
   short: string
@@ -67,10 +67,10 @@ export const ASSIGNMENTS: Assignment[] = [
   // behind them. MC Velocity in particular drives one of Nanci's three takes.
   { id: "mc-velocity",       name: "MC Velocity",                                     short: "MC Velocity (system)",     system: true, type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
   { id: "mc-divergence",     name: "MC Divergence",                                   short: "MC Divergence (system)",   system: true, type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
-  { id: "esqr-phase2-auths", name: "Esquire - Phase 2 Parameters - Auths - Detect Q", short: "Esquire Phase 2 - Auths",  type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
+  { id: "esqr-phase2-auths", name: "Phase 2 Parameters - Auths - Detect Q",           short: "Phase 2 - Auths",          type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
   // Was Expired while still carrying alerts on the dashboard's "Phase 2 - Auths
   // Detect Q" bar. A queue that alerted today is running, so it reads Active.
-  { id: "esqr-phase2",       name: "Esquire - Phase 2 Parameters - Detect Q",         short: "Esquire Phase 2",          type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
+  { id: "esqr-phase2",       name: "Phase 2 Parameters - Detect Q",                   short: "Phase 2",                  type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
   { id: "high-risk",         name: "High Risk Detection Queue",                       short: "High Risk DQ",             type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
   { id: "high-risk-mcc",     name: "High Risk Detection Queue - By MCC",              short: "High Risk DQ - By MCC",    type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
   { id: "low-risk",          name: "Low Risk Detection Queue",                        short: "Low Risk DQ",              type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
