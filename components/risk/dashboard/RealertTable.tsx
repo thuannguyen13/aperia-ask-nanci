@@ -7,7 +7,9 @@ import { PanelTable, Thead, Th, Td, formatPercent } from "@/components/shared"
 import { useRiskNav } from "../RiskNavContext"
 
 // Re-alert rate by assignment with an inline rate bar and Nanci's suggested action.
-// The assignment name drills into Assignment Management, same as the alert-volume bars.
+// Every row is a detection queue, so the name opens that queue's Barometer Report —
+// the ranked merchant list behind the rate — rather than the assignment's settings.
+// The alert-volume bars still go to Assignment Management.
 export function RealertTable() {
   const nav = useRiskNav()
   return (
@@ -24,7 +26,7 @@ export function RealertTable() {
           <TableRow key={r.assignmentId}>
             <Td>
               <button
-                onClick={() => nav.openAssignment(r.assignmentId)}
+                onClick={() => nav.openBarometer()}
                 title={findAssignment(r.assignmentId)?.name}
                 className="text-left font-medium text-primary hover:underline"
               >
