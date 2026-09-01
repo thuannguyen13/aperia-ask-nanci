@@ -437,6 +437,12 @@ export function RiskReport() {
               ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300"
               : "bg-muted text-muted-foreground"}
           />
+          {/* Who the merchant is, rather than how the account has behaved — so these
+              sit here and not in the details card, which is now batches and terms. */}
+          <Row label="Owner" value="—" />
+          <Row label="Phone" value={d.account.phone} />
+          <Row label="Address" value={d.account.address} />
+          <Row label="URL" value="—" />
         </div>
         <div className="rounded-xl border bg-card p-4">
           <p className="mb-1 text-sm font-semibold text-foreground">Risk Profile Summary</p>
@@ -458,11 +464,6 @@ export function RiskReport() {
           <Row label="First Batch Date" value="—" />
           <Row label="Last Batch" value={d.account.lastBatch} />
           <Row label="Last Statement" value={d.account.lastStatement} />
-          <Row label="SIC/MCC" value={`${m.mcc} — ${m.mccDesc}`} />
-          <Row label="Owner" value="—" />
-          <Row label="Phone" value={d.account.phone} />
-          <Row label="Address" value={d.account.address} />
-          <Row label="URL" value="—" />
           <Row label="Adv. Deposit %" value="—" />
           <Row label="Reserve Indicator" value="—" />
           <Row label="Reserve Target" value="—" />
