@@ -8,10 +8,10 @@ import {
 } from "aperia-ds5"
 import { ResponsiveDialog, ResponsiveDialogTrigger, ResponsiveDialogContent, ResponsiveDialogHeader, ResponsiveDialogTitle, ResponsiveDialogDescription, ResponsiveDialogFooter, ResponsiveDialogClose } from "@/components/shared"
 import { cn } from "aperia-ds5/utils"
-import { PanelShell, PanelHeader, PanelBody, PanelTable, Thead, Th, Td, formatCurrency } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody, PanelTable, Thead, Th, Td, formatCurrency, formatPercent } from "@/components/shared"
 import { MarkWorkPopover } from "./MarkWorkPopover"
 import { useRiskNav } from "./RiskNavContext"
-import { findMerchant, getVwLevel, getMcLevel, getRiskLevel, formatMcScore, formatMerchantName, RISK_REPORT_DETAILS, getDefaultRiskDetail, TXN_VOLUME_ROWS, RECENT_AUTHS, AUTH_TOTAL, AUTH_SCORE_ALERT, RISK_VIOLATION_CYCLE, VIOLATION_ROWS, CROSS_QUEUE_ROWS, MERCHANT_NOTES_SEED, DEFAULT_MERCHANT_NOTES, statusForDisposition, type WorkStatus, type ViolationRow, type NoteEntry, type RiskLevel, type RiskReportDetail } from "@/lib/ask-nanci/data/risk-merchants"
+import { findMerchant, getVwLevel, getMcLevel, getRiskLevel, formatMcScore, formatMerchantName, RISK_REPORT_DETAILS, getDefaultRiskDetail, TXN_VOLUME_ROWS, VOLUME_PERIODS, netVolume, chargebackPct, type VolumePeriod, RECENT_AUTHS, AUTH_TOTAL, AUTH_SCORE_ALERT, RISK_VIOLATION_CYCLE, VIOLATION_ROWS, CROSS_QUEUE_ROWS, MERCHANT_NOTES_SEED, DEFAULT_MERCHANT_NOTES, statusForDisposition, type WorkStatus, type ViolationRow, type NoteEntry, type RiskLevel, type RiskReportDetail } from "@/lib/ask-nanci/data/risk-merchants"
 import { getRiskLevelStyles } from "./risk-level"
 
 // Parameter Violation Details modal columns (Figma order + widths).
@@ -221,11 +221,25 @@ const TXN_COLS = ["CB #", "CB % by #", "CB $", "CB % by $", "RDR #", "RDR $"]
 /** The Mastercard pair, tinted together so they read as one column group. */
 const AUTH_COL = "bg-amber-50/60 dark:bg-amber-950/20"
 /**
+ * Down the side of the volume table. Net volume and the chargeback share are
+ * derived from the measured figures above them, so a column cannot disagree with
+ * itself.
+ */
+const VOLUME_MEASURES: { label: string; value: (p: VolumePeriod) => string }[] = [
+  { label: "Gross Sales",  value: (p) => formatCurrency(p.grossSales) },
+  { label: "Transactions", value: (p) => p.transactions.toLocaleString() },
+  { label: "Returns",      value: (p) => formatCurrency(p.returns) },
+  { label: "Net Volume",   value: (p) => formatCurrency(netVolume(p)) },
+  { label: "Chargebacks",  value: (p) => formatCurrency(p.chargebacks) },
+  { label: "% Sales",      value: (p) => formatPercent(chargebackPct(p), 2) },
+]
+
+/**
  * The Transactions sub-views. Volume by period is history — today against the 7 and
  * 30 day windows and the months behind them — so it lives under Transaction History
  * rather than under a label of its own.
  */
-const TXN_VIEWS = ["Recent Authorizations", "Transaction History"]
+const TXN_VIEWS = ["Recent Authorizations", "Transaction Volume Analysis", "Transaction History"]
 
 // A section header ("Merchant Notes" / "Case History") with its right-aligned actions.
 function NotesSectionHeader({ title, children }: { title: string; children: React.ReactNode }) {
@@ -518,7 +532,34 @@ export function RiskReport() {
             ))}
           </div>
 
-          {txnView === "Transaction History" ? (
+          {txnView === "Transaction Volume Analysis" ? (
+          <>
+          <div className="mt-4 flex items-center justify-between gap-3">
+            <h3 className="text-base font-semibold text-foreground">Transaction Volume Analysis</h3>
+            <Button variant="outline" size="sm"><Download className="size-4" /> Export</Button>
+          </div>
+          <div className="mt-3">
+            <PanelTable density="comfortable">
+              <Thead>
+                <Th>{""}</Th>
+                {VOLUME_PERIODS.map((p) => (
+                  <Th key={p.label} align="right">{p.label}</Th>
+                ))}
+              </Thead>
+              <TableBody>
+                {VOLUME_MEASURES.map((measure) => (
+                  <TableRow key={measure.label}>
+                    <Td className="font-medium">{measure.label}</Td>
+                    {VOLUME_PERIODS.map((p) => (
+                      <Td key={p.label} mono align="right">{measure.value(p)}</Td>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </PanelTable>
+          </div>
+          </>
+          ) : txnView === "Transaction History" ? (
           <>
           {/* Table heading + actions */}
           <div className="mt-4 flex items-center justify-between">

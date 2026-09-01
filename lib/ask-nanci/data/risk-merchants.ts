@@ -371,3 +371,29 @@ export const RECENT_AUTHS: AuthRow[] = [
   { at: "05/02 21:33:20", card: "4889", amount: 420, type: "Sale", result: "Approved", mcScore: 390, mcReason: null },
   { at: "05/02 20:02:14", card: "5212", amount: 420, type: "Sale", result: "Approved", mcScore: 310, mcReason: null },
 ]
+
+// ── Transaction Volume Analysis ──────────────────────────────────────────────
+// Three periods side by side: this month, this year, last year. Only the four
+// measured figures are stored — net volume and the chargeback percentage are
+// derived, so the column cannot say $283,060 net beside a gross and a returns
+// figure that do not subtract to it.
+//
+// MTD transactions is AUTH_TOTAL: the authorization tab offers "View all 156" and
+// this row is where that 156 comes from.
+export interface VolumePeriod {
+  label: string
+  grossSales: number
+  transactions: number
+  returns: number
+  chargebacks: number
+}
+
+export const VOLUME_PERIODS: VolumePeriod[] = [
+  { label: "MTD",           grossSales: 21_981,    transactions: AUTH_TOTAL, returns: 0,     chargebacks: 0 },
+  { label: "YTD",           grossSales: 284_310,   transactions: 2_114,      returns: 1_250, chargebacks: 2_840 },
+  { label: "Previous Year", grossSales: 1_142_809, transactions: 9_830,      returns: 8_914, chargebacks: 11_720 },
+]
+
+export const netVolume = (p: VolumePeriod) => p.grossSales - p.returns
+/** Chargebacks as a share of gross sales — the ratio the card networks watch. */
+export const chargebackPct = (p: VolumePeriod) => (p.grossSales ? (p.chargebacks / p.grossSales) * 100 : 0)
