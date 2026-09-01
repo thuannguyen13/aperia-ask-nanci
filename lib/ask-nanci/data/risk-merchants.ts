@@ -14,7 +14,7 @@
  * anonymizing before an external demo is a single-file edit.
  */
 export const REAL_DATA_NOTICE =
-  "Real merchant IDs from Clearent, Woodforest and ESQR portfolios (Sept–Dec 2025). Anonymize before external use."
+  "Real merchant IDs from the Clearent and ESQR portfolios (Sept–Dec 2025). Anonymize before external use."
 
 export type RiskLevel = "High" | "Medium" | "Low"
 export type WorkStatus = "mark-work" | "wip" | "worked"
@@ -74,7 +74,7 @@ export const getRiskLevel = (m: { vw: number; mc: number }): RiskLevel => {
 export interface RiskMerchant {
   id: string
   name: string
-  /** 16-digit = Clearent/ESQR, 12-digit = Woodforest. `real` marks a live MID. */
+  /** 16 digits throughout: a list that mixes lengths reads as two systems. `real` marks a live MID. */
   mid: string
   /** True only for the seven MIDs that came out of the client data verbatim. */
   real?: boolean
@@ -112,30 +112,30 @@ export const RISK_MERCHANTS: RiskMerchant[] = [
   { id: "meridian",     name: "MERIDIAN DENTAL GROUP",         mid: "6588000002811586", real: true,  mcc: "8021", mccDesc: "Dentists, Orthodontists",       alertTag: 4, listTag: 2, vw: 87, mc: 95.99,  status: "mark-work" },
   { id: "coastalwell",  name: "COASTAL WELLNESS PARTNERS",     mid: "9180675172408815",              mcc: "8099", mccDesc: "Health Services",               alertTag: 3, listTag: 1, vw: 86, mc: 704.88, status: "mark-work" },
   { id: "brighton",     name: "BRIGHTON MEDICAL SUPPLY",       mid: "6588000004417209",              mcc: "5047", mccDesc: "Medical Equipment",             alertTag: 6, listTag: 2, vw: 84, mc: 712.40, status: "mark-work" },
-  { id: "velocitywls",  name: "VELOCITY WIRELESS RETAIL",      mid: "460100001884",                  mcc: "4812", mccDesc: "Telecom Equipment",             alertTag: 2, listTag: 5, vw: 83, mc: 358.19, status: "mark-work" },
+  { id: "velocitywls",  name: "VELOCITY WIRELESS RETAIL",      mid: "4601000000001884",                  mcc: "4812", mccDesc: "Telecom Equipment",             alertTag: 2, listTag: 5, vw: 83, mc: 358.19, status: "mark-work" },
   { id: "harborpoint",  name: "HARBOR POINT MARINE SVCS",      mid: "6588000003925641",              mcc: "5551", mccDesc: "Boat Dealers",                  alertTag: 4, listTag: 2, vw: 81, mc: 726.05, status: "mark-work" },
   { id: "elevatefit",   name: "ELEVATE FITNESS CLUB LLC",      mid: "9180675172661043",              mcc: "7997", mccDesc: "Membership Clubs",              alertTag: 3, listTag: 3, vw: 80, mc: 612.77, status: "mark-work" },
   { id: "premiertitle", name: "PREMIER TITLE LOANS TX",        mid: "6588000004093778",              mcc: "6051", mccDesc: "Non-FI Money Orders",           alertTag: 7, listTag: 1, vw: 79, mc: 698.30, status: "mark-work" },
   { id: "goldleaf",     name: "GOLDLEAF JEWELRY EXCHANGE",     mid: "6588000003318902",              mcc: "5944", mccDesc: "Jewelry Stores",                alertTag: 5, listTag: 4, vw: 78, mc: 733.12, status: "mark-work" },
   { id: "pbbiller",     name: "PBBILLER.COM",                  mid: "6588000002907459", real: true,  mcc: "5967", mccDesc: "Direct Marketing — Inbound",    alertTag: 3, listTag: 2, vw: 76, mc: 83.69,  status: "mark-work" },
-  { id: "stonebridge",  name: "STONEBRIDGE HOME SVCS",         mid: "460100002935",                  mcc: "1731", mccDesc: "Electrical Contractors",        alertTag: 2, listTag: 2, vw: 75, mc: 421.66, status: "mark-work" },
+  { id: "stonebridge",  name: "STONEBRIDGE HOME SVCS",         mid: "4601000000002935",                  mcc: "1731", mccDesc: "Electrical Contractors",        alertTag: 2, listTag: 2, vw: 75, mc: 421.66, status: "mark-work" },
   { id: "ashley",       name: "ASHLEY HOMESTORE - MECHANICSBU", mid: "9180675172134302", real: true, mcc: "5712", mccDesc: "Furniture, Home Furnishings",   alertTag: 4, listTag: 1, vw: 74, mc: 701.05, status: "mark-work" },
   { id: "atlasnutr",    name: "ATLAS NUTRITION DIRECT",        mid: "6588000004736155",              mcc: "5499", mccDesc: "Misc Food Stores",              alertTag: 3, listTag: 3, vw: 73, mc: 289.54, status: "mark-work" },
-  { id: "cedarwood",    name: "CEDARWOOD ANIMAL HOSPITAL",     mid: "460100004427",                  mcc: "0742", mccDesc: "Veterinary Services",           alertTag: 1, listTag: 2, vw: 72, mc: 176.28, status: "mark-work" },
-  { id: "jbhealth",     name: "JB HEALTH SHOP",                mid: "460100000172",     real: true,  mcc: "5912", mccDesc: "Drug Stores, Pharmacies",       alertTag: 3, listTag: 4, vw: 71, mc: 339.64, status: "mark-work" },
+  { id: "cedarwood",    name: "CEDARWOOD ANIMAL HOSPITAL",     mid: "4601000000004427",                  mcc: "0742", mccDesc: "Veterinary Services",           alertTag: 1, listTag: 2, vw: 72, mc: 176.28, status: "mark-work" },
+  { id: "jbhealth",     name: "JB HEALTH SHOP",                mid: "4601000000000172",                  mcc: "5912", mccDesc: "Drug Stores, Pharmacies",       alertTag: 3, listTag: 4, vw: 71, mc: 339.64, status: "mark-work" },
   { id: "truenorth",    name: "TRUENORTH TRAVEL GROUP",        mid: "9180675172937268",              mcc: "4722", mccDesc: "Travel Agencies",               alertTag: 6, listTag: 1, vw: 70, mc: 655.91, status: "mark-work" },
   { id: "silverline",   name: "SILVERLINE AUTO GLASS",         mid: "6588000003504816",              mcc: "7531", mccDesc: "Automotive Body Repair",        alertTag: 2, listTag: 3, vw: 69, mc: 244.07, status: "mark-work" },
-  { id: "jbvitality",   name: "JB VITALITY BEAUTY",            mid: "460100003142",     real: true,  mcc: "5977", mccDesc: "Cosmetic Stores",               alertTag: 8, listTag: 3, vw: 68, mc: 329.52, status: "mark-work" },
+  { id: "jbvitality",   name: "JB VITALITY BEAUTY",            mid: "4601000000003142",                  mcc: "5977", mccDesc: "Cosmetic Stores",               alertTag: 8, listTag: 3, vw: 68, mc: 329.52, status: "mark-work" },
   { id: "lakeshorepet", name: "LAKESHORE PET BOUTIQUE",        mid: "6588000004260934",              mcc: "5995", mccDesc: "Pet Shops",                     alertTag: 1, listTag: 1, vw: 67, mc: 118.63, status: "mark-work" },
   { id: "apexroofing",  name: "APEX ROOFING SOLUTIONS",        mid: "6588000003871527",              mcc: "1761", mccDesc: "Roofing, Siding",               alertTag: 5, listTag: 2, vw: 66, mc: 707.19, status: "mark-work" },
-  { id: "oakfield",     name: "OAKFIELD PARK LIQUORS",         mid: "460100005619",                  mcc: "5921", mccDesc: "Package Stores",                alertTag: 2, listTag: 4, vw: 65, mc: 302.85, status: "mark-work" },
+  { id: "oakfield",     name: "OAKFIELD PARK LIQUORS",         mid: "4601000000005619",                  mcc: "5921", mccDesc: "Package Stores",                alertTag: 2, listTag: 4, vw: 65, mc: 302.85, status: "mark-work" },
   { id: "quantumpc",    name: "QUANTUM PC REPAIR LLC",         mid: "9180675172550471",              mcc: "7379", mccDesc: "Computer Maintenance",          alertTag: 1, listTag: 2, vw: 63, mc: 91.42,  status: "mark-work" },
   { id: "cascade",      name: "CASCADE AUTO PARTS WAREHOUSE",  mid: "6588000002940328", real: true,  mcc: "5533", mccDesc: "Automotive Parts, Accessories", alertTag: 2, listTag: 4, vw: 62, mc: 711.08, status: "mark-work" },
   { id: "blueheron",    name: "BLUE HERON LANDSCAPING",        mid: "6588000004605283",              mcc: "0780", mccDesc: "Landscaping Services",          alertTag: 1, listTag: 1, vw: 60, mc: 187.33, status: "mark-work" },
-  { id: "fairview",     name: "FAIRVIEW DRY CLEANERS",         mid: "460100006073",                  mcc: "7210", mccDesc: "Laundry, Cleaning",             alertTag: 1, listTag: 2, vw: 57, mc: 62.10,  status: "mark-work" },
+  { id: "fairview",     name: "FAIRVIEW DRY CLEANERS",         mid: "4601000000006073",                  mcc: "7210", mccDesc: "Laundry, Cleaning",             alertTag: 1, listTag: 2, vw: 57, mc: 62.10,  status: "mark-work" },
   { id: "tridentsec",   name: "TRIDENT SECURITY SYSTEMS",      mid: "9180675172284690",              mcc: "1731", mccDesc: "Electrical Contractors",        alertTag: 3, listTag: 1, vw: 54, mc: 448.92, status: "mark-work" },
   { id: "maplewood",    name: "MAPLEWOOD FLORAL DESIGN",       mid: "6588000003146058",              mcc: "5992", mccDesc: "Florists",                      alertTag: 1, listTag: 1, vw: 49, mc: 33.75,  status: "mark-work" },
-  { id: "granitecity",  name: "GRANITE CITY HARDWARE",         mid: "460100007281",                  mcc: "5251", mccDesc: "Hardware Stores",               alertTag: 2, listTag: 3, vw: 41, mc: 205.60, status: "mark-work" },
+  { id: "granitecity",  name: "GRANITE CITY HARDWARE",         mid: "4601000000007281",                  mcc: "5251", mccDesc: "Hardware Stores",               alertTag: 2, listTag: 3, vw: 41, mc: 205.60, status: "mark-work" },
 ]
 
 /** Alerted merchants in the assignment; the list above is page one of them. */
