@@ -10,7 +10,8 @@ import {
 import { cn } from "aperia-ds5/utils"
 import { PanelShell, PanelHeader, PanelBody, PanelTable, Thead, Th, Td } from "@/components/shared"
 import { MarkWorkPopover } from "./MarkWorkPopover"
-import { QueueSummaryCard } from "./QueueSummaryCard"
+import { QueueSummaryCard, QueueTitle } from "./QueueSummaryCard"
+import { DETECTION_QUEUE } from "@/lib/ask-nanci/data/risk-detection-queue"
 import { useRiskNav } from "./RiskNavContext"
 import { RISK_MERCHANTS, RISK_MERCHANTS_TOTAL, getRiskLevel, formatMcScore, statusForDisposition } from "@/lib/ask-nanci/data/risk-merchants"
 import { RISK_PILL } from "./risk-level"
@@ -50,8 +51,11 @@ export function BarometerReport() {
 
   return (
     <PanelShell className="min-w-0 flex-1">
+      {/* The assignment names the page; "Barometer Report" is already the last
+          breadcrumb. Same shape the Risk Report uses, where the merchant is the
+          title and its tags sit beside it. */}
       <PanelHeader
-        title="Barometer Report"
+        title={<QueueTitle queue={DETECTION_QUEUE} />}
         subtitle="04/23/2026"
         size="page"
         breadcrumb={
@@ -70,7 +74,7 @@ export function BarometerReport() {
 
       <PanelBody>
       {/* live: this list's Mark Work buttons feed the card directly above them. */}
-      <QueueSummaryCard live />
+      <QueueSummaryCard live header={false} />
 
       {/* Merchant list */}
       <div className="mt-6">

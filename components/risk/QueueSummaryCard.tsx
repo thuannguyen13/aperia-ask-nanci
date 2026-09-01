@@ -66,8 +66,34 @@ function StatusTrail({ alerted, statuses }: { alerted: QueueStatus; statuses: Qu
   )
 }
 
-export function QueueSummaryCard({ queue = DETECTION_QUEUE, onBarometer, live = false }:
-  { queue?: DetectionQueueData; onBarometer?: () => void; live?: boolean }) {
+/**
+ * The assignment's name and its tags. Exported because the Barometer Report shows
+ * this cluster as its page title instead of inside the card — same markup either
+ * way, so the two can never drift.
+ */
+export function QueueTitle({ queue }: { queue: DetectionQueueData }) {
+  return (
+    <span className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
+      {findAssignment(queue.assignmentId)?.name ?? queue.assignmentId}
+      {/* Same outline badge as the code pill — the network mark is a tag too.
+          Both take an explicit background: the outline variant is transparent,
+          which would let the gray card show through a tag meant to read white. */}
+      {queue.mastercard && (
+        <Badge variant="outline" className="shrink-0 bg-background">
+          <Image src="/iso/mastercard.svg" alt="Mastercard" width={16} height={16} />
+        </Badge>
+      )}
+      <Badge variant="outline" className="shrink-0 bg-background">{queue.code}</Badge>
+    </span>
+  )
+}
+
+export function QueueSummaryCard({ queue = DETECTION_QUEUE, onBarometer, live = false, header = true }:
+  // `header` drops the name-and-switch row entirely. The Detection Queue keeps it
+  // on every card, inert ones included, because that row of queues has to read the
+  // same; the Barometer Report shows the name as its page title instead, and has no
+  // use for a button to the page you are already on.
+  { queue?: DetectionQueueData; onBarometer?: () => void; live?: boolean; header?: boolean }) {
   // `live` belongs to the Mastercard queue alone — it is the one with a merchant
   // list behind it, so it is the only one a Mark Work click can move.
   const marks = Object.values(useRiskNav().workStatuses)
@@ -85,29 +111,22 @@ export function QueueSummaryCard({ queue = DETECTION_QUEUE, onBarometer, live = 
   return (
     <div className="flex flex-col gap-1 rounded-xl bg-muted p-1">
       {/* Header — transparent on the gray card */}
-      <div className="flex flex-wrap items-center gap-4 px-3 py-2">
-        {/* Tags belong to the title, so they travel with it rather than drifting
-            over to the buttons: the name takes the slack, the tags never do. */}
-        <div className="flex min-w-0 flex-1 items-center gap-2">
-          <p className="truncate text-base font-semibold text-foreground">{findAssignment(q.assignmentId)?.name ?? q.assignmentId}</p>
-          {/* Same outline badge as the code pill — the network mark is a tag too.
-              Both take an explicit background: the outline variant is transparent,
-              which would let the gray card show through a tag meant to read white. */}
-          {q.mastercard && (
-            <Badge variant="outline" className="shrink-0 bg-background">
-              <Image src="/iso/mastercard.svg" alt="Mastercard" width={16} height={16} />
-            </Badge>
-          )}
-          <Badge variant="outline" className="shrink-0 bg-background">{q.code}</Badge>
+      {header && (
+        <div className="flex flex-wrap items-center gap-4 px-3 py-2">
+          {/* Tags belong to the title, so they travel with it rather than drifting
+              over to the buttons: the name takes the slack, the tags never do. */}
+          <span className="min-w-0 flex-1 text-base font-semibold text-foreground">
+            <QueueTitle queue={q} />
+          </span>
+          {/* Only a queue with a drill-in handler is actionable. The others keep the
+              same chrome but are inert — nothing behind them in the demo. */}
+          <div className={cn("flex items-center gap-2", !onBarometer && "pointer-events-none")} aria-hidden={!onBarometer}>
+            <Button variant="outline" size="sm" tabIndex={onBarometer ? undefined : -1}>Security Report</Button>
+            <Button variant="default" size="sm" onClick={onBarometer} tabIndex={onBarometer ? undefined : -1}>Barometer Report</Button>
+            <Button variant="outline" size="icon-sm" tabIndex={onBarometer ? undefined : -1}><Settings className="size-4" /></Button>
+          </div>
         </div>
-        {/* Only a queue with a drill-in handler is actionable. The others keep the
-            same chrome but are inert — nothing behind them in the demo. */}
-        <div className={cn("flex items-center gap-2", !onBarometer && "pointer-events-none")} aria-hidden={!onBarometer}>
-          <Button variant="outline" size="sm" tabIndex={onBarometer ? undefined : -1}>Security Report</Button>
-          <Button variant="default" size="sm" onClick={onBarometer} tabIndex={onBarometer ? undefined : -1}>Barometer Report</Button>
-          <Button variant="outline" size="icon-sm" tabIndex={onBarometer ? undefined : -1}><Settings className="size-4" /></Button>
-        </div>
-      </div>
+      )}
 
       {/* KPI row — transparent */}
       <div className="grid grid-cols-2 gap-4 px-3 py-1 sm:grid-cols-4">
