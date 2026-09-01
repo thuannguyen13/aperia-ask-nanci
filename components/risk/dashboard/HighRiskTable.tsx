@@ -1,7 +1,7 @@
 "use client"
 
 import { HIGH_RISK_MERCHANTS } from "@/lib/ask-nanci/data/risk-dashboard"
-import { formatMcScore } from "@/lib/ask-nanci/data/risk-merchants"
+import { formatMcScore, formatMerchantName } from "@/lib/ask-nanci/data/risk-merchants"
 import { TableBody, TableRow } from "aperia-ds5"
 import { PanelTable, Thead, Th, Td } from "@/components/shared"
 import { useRiskNav } from "../RiskNavContext"
@@ -24,7 +24,7 @@ export function HighRiskTable() {
             <Td>
               {/* text-left because a button centres its text by default, and these
                   names wrap to two lines in a narrow column. */}
-              <button onClick={() => nav.openMerchant(m.id)} className="text-left font-medium text-primary hover:underline">{m.name}</button>
+              <button onClick={() => nav.openMerchant(m.id)} className="text-left font-medium text-primary hover:underline">{formatMerchantName(m.name)}</button>
             </Td>
             <Td mono>{formatMcScore(m.from)} → {formatMcScore(m.to)}</Td>
             <Td mono align="right">+{m.delta}</Td>

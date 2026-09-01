@@ -41,6 +41,19 @@ export const statusForDisposition = (choice: string): WorkStatus =>
  */
 export const formatMcScore = (mc: number) => mc.toFixed(2)
 
+/**
+ * Merchant names arrive from the processor in caps, which reads as shouting in a
+ * list of thirty. Rendered in normal case instead — the same way the assistant
+ * already writes them in prose ("Harbor Point Marine Svcs"). Tokens that are
+ * acronyms rather than words keep their caps; everything else takes one capital.
+ */
+const NAME_KEEPS_CAPS = new Set(["LLC", "INC", "LP", "LTD", "CO", "USA", "TX", "PC", "JB", "DQ", "MCC"])
+export const formatMerchantName = (name: string) =>
+  name
+    .split(" ")
+    .map((word) => (NAME_KEEPS_CAPS.has(word) ? word : word.charAt(0) + word.slice(1).toLowerCase()))
+    .join(" ")
+
 // Each model gets its own bands rather than a shared percentage: 700 is the real
 // P-MC1 Score Threshold floor from the spec, 65 is the VW critical line the
 // dashboard scatter already draws its quadrants on.

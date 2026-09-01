@@ -3,7 +3,10 @@ import { ThemeProvider } from "@/components/ask-nanci/ThemeProvider"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "Ask Nanci",
+  // One title for every route in this app, the Ask Nanci modes included: the root
+  // layout is the only place metadata is set, and the risk console is what this
+  // deployment is shown as.
+  title: "Aperia Risk",
   description: "AI-powered analytics assistant",
 }
 

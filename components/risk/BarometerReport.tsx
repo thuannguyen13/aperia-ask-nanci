@@ -13,7 +13,7 @@ import { MarkWorkPopover } from "./MarkWorkPopover"
 import { QueueSummaryCard, QueueTitle } from "./QueueSummaryCard"
 import { DETECTION_QUEUE } from "@/lib/ask-nanci/data/risk-detection-queue"
 import { useRiskNav } from "./RiskNavContext"
-import { RISK_MERCHANTS, RISK_MERCHANTS_TOTAL, getRiskLevel, formatMcScore, statusForDisposition } from "@/lib/ask-nanci/data/risk-merchants"
+import { RISK_MERCHANTS, RISK_MERCHANTS_TOTAL, getRiskLevel, formatMcScore, formatMerchantName, statusForDisposition } from "@/lib/ask-nanci/data/risk-merchants"
 import { RISK_PILL } from "./risk-level"
 
 function TagBadges({ alert, list }: { alert: number; list: number }) {
@@ -121,7 +121,7 @@ export function BarometerReport() {
             {merchants.map((m) => (
               <TableRow key={m.id}>
                 <Td>
-                  <button onClick={() => nav.openMerchant(m.id)} className="block max-w-[220px] truncate text-left font-medium text-primary hover:underline">{m.name}</button>
+                  <button onClick={() => nav.openMerchant(m.id)} className="block max-w-[220px] truncate text-left font-medium text-primary hover:underline">{formatMerchantName(m.name)}</button>
                   <span className="font-mono text-xs text-muted-foreground">{m.mid}</span>
                 </Td>
                 <Td>

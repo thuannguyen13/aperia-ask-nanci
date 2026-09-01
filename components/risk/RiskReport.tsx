@@ -11,7 +11,7 @@ import { cn } from "aperia-ds5/utils"
 import { PanelShell, PanelHeader, PanelBody, PanelTable, Thead, Th, Td } from "@/components/shared"
 import { MarkWorkPopover } from "./MarkWorkPopover"
 import { useRiskNav } from "./RiskNavContext"
-import { findMerchant, getVwLevel, getMcLevel, getRiskLevel, formatMcScore, RISK_REPORT_DETAILS, getDefaultRiskDetail, TXN_VOLUME_ROWS, RISK_VIOLATION_CYCLE, VIOLATION_ROWS, CROSS_QUEUE_ROWS, MERCHANT_NOTES_SEED, DEFAULT_MERCHANT_NOTES, statusForDisposition, type WorkStatus, type ViolationRow, type NoteEntry, type RiskLevel } from "@/lib/ask-nanci/data/risk-merchants"
+import { findMerchant, getVwLevel, getMcLevel, getRiskLevel, formatMcScore, formatMerchantName, RISK_REPORT_DETAILS, getDefaultRiskDetail, TXN_VOLUME_ROWS, RISK_VIOLATION_CYCLE, VIOLATION_ROWS, CROSS_QUEUE_ROWS, MERCHANT_NOTES_SEED, DEFAULT_MERCHANT_NOTES, statusForDisposition, type WorkStatus, type ViolationRow, type NoteEntry, type RiskLevel } from "@/lib/ask-nanci/data/risk-merchants"
 import { getRiskLevelStyles } from "./risk-level"
 
 // Parameter Violation Details modal columns (Figma order + widths).
@@ -320,7 +320,7 @@ export function RiskReport() {
         }
         title={
           <span className="flex flex-wrap items-center gap-2">
-            {m.name}
+            {formatMerchantName(m.name)}
             <ViolationsPill count={d.violations} />
             <QueuesPill count={d.inQueues} />
           </span>
@@ -443,7 +443,10 @@ export function RiskReport() {
             losing the last three off the edge. Same answer PanelTable gives a wide
             table; the audit's TabsList-to-Select swap is the larger change this
             defers to, not a different verdict. */}
-        <div className="-mx-1 overflow-x-auto px-1">
+        {/* border-b is ours, not ds5's: the line variant ships the active tab's own
+            indicator and no rule for the strip to sit on, so the row floated. It goes
+            on the scroller, which stays put while the tabs move under it. */}
+        <div className="-mx-1 overflow-x-auto border-b px-1">
           <TabsList variant="line" className="w-max min-w-full">
             {ACTIVITY_TABS.map((t) => (
               <TabsTrigger key={t.value} value={t.value}>{t.label}</TabsTrigger>
