@@ -409,10 +409,12 @@ export function RiskReport() {
         />
       </div>
 
-      {/* Merchant Information — three cards in one row, all the same shape: who the
-          account is, its risk profile, its account details. */}
+      {/* Merchant Information — who the account is, and its risk profile. The old
+          Merchant Account Details card is gone: five of its seven rows were a literal
+          "—", and the two that carried a value (last batch, last statement) sit on
+          Account, which is where the rest of the account already was. */}
       <h2 className="mb-3 mt-6 text-base font-semibold text-foreground">Merchant Information</h2>
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="rounded-xl border bg-card p-4">
           <p className="mb-1 text-sm font-semibold text-foreground">Account</p>
           <Row label="DBA" value={d.merchant.dba} />
@@ -443,6 +445,8 @@ export function RiskReport() {
           <Row label="Phone" value={d.account.phone} />
           <Row label="Address" value={d.account.address} />
           <Row label="URL" value="—" />
+          <Row label="Last Batch" value={d.account.lastBatch} />
+          <Row label="Last Statement" value={d.account.lastStatement} />
         </div>
         <div className="rounded-xl border bg-card p-4">
           <p className="mb-1 text-sm font-semibold text-foreground">Risk Profile Summary</p>
@@ -457,16 +461,6 @@ export function RiskReport() {
           <Row label="Multiplier" value="—" />
           <Row label="Risk Level" value={getRiskLevel(m)} />
           <Row label="Risk Score" value={String(m.vw)} />
-        </div>
-        <div className="rounded-xl border bg-card p-4">
-          <p className="mb-1 text-sm font-semibold text-foreground">Merchant Account Details</p>
-          <Row label="First Batch Amount" value="—" />
-          <Row label="First Batch Date" value="—" />
-          <Row label="Last Batch" value={d.account.lastBatch} />
-          <Row label="Last Statement" value={d.account.lastStatement} />
-          <Row label="Adv. Deposit %" value="—" />
-          <Row label="Reserve Indicator" value="—" />
-          <Row label="Reserve Target" value="—" />
         </div>
       </div>
 
