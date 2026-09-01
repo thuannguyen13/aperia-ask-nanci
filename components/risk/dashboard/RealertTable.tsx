@@ -27,10 +27,12 @@ export function RealertTable() {
             <Td>
               <button
                 onClick={() => nav.openBarometer()}
-                title={findAssignment(r.assignmentId)?.name}
                 className="text-left font-medium text-primary hover:underline"
               >
-                {findAssignment(r.assignmentId)?.short ?? r.assignmentId}
+                {/* The full name, the same string the Detection Queue card and the
+                    Barometer Report title show. The chart-width `short` label read
+                    as a different assignment from the page it opens. */}
+                {findAssignment(r.assignmentId)?.name ?? r.assignmentId}
               </button>
             </Td>
             <Td mono>{r.worked.toLocaleString()}</Td>
