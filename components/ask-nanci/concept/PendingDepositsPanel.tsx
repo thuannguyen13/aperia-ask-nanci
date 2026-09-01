@@ -45,7 +45,10 @@ export function PendingDepositsPanel() {
       />
 
       <PanelBody className="flex flex-col gap-4">
-        <div className="grid grid-cols-4 gap-3">
+        {/* Two across on a phone, four once there is room. Four at 390px leaves each card
+            about 80px of content, which cuts a currency value mid-number. Same shape as
+            the offer summary grid in offer-shared.tsx. */}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <StatCard label="Total Expected" value={formatCurrency(totalExpected)} sublabel="card + cash" />
           <StatCard label="In Transit" value={formatCurrency(inTransit)} sublabel={`${inTransitBatches.length} batches`} />
           <StatCard
