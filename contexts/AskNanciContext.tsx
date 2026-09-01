@@ -135,7 +135,13 @@ interface AskNanciCtx {
   closingPanels: string[]
   closePanel: (type: string) => void
   dynamicPanels: PanelId[]
-  openDynamic: (id: PanelId) => void
+  /**
+   * Opens a panel. `reveal` is whether the phone's sheet should come up with it:
+   * true when the reader asked (tapping the artifact card, a console button), false
+   * when a scripted turn opened it on their behalf. Defaults to true, so a caller that
+   * has not thought about it gets the deliberate case.
+   */
+  openDynamic: (id: PanelId, opts?: { reveal?: boolean }) => void
   closeDynamicPanel: (id: PanelId) => void
   setPanelView: (id: PanelId, view: string) => void
   closeAllNewPanels: () => void
@@ -223,11 +229,15 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   // panel has to be there. Guarded the same way the stack itself is, so re-opening a
   // panel that is already up is still a no-op and closing one never yanks another
   // into view.
-  const openDynamic = useCallback((id: PanelId) => {
+  const openDynamic = useCallback((id: PanelId, opts?: { reveal?: boolean }) => {
     if (dynamicPanelsRef.current.includes(id)) return
     pushPanel(id)
     setShownPanelId(id)
-    setPanelSheetDismissed(false)
+    // Only a panel the reader asked for takes over the phone's screen. One the script
+    // opened waits as its handle instead, because covering the answer they are still
+    // reading to show them the thing that answer just described is the wrong trade.
+    // Nothing changes on desktop: panelSheetDismissed only feeds the mobile sheet.
+    setPanelSheetDismissed(opts?.reveal === false)
   }, [pushPanel, dynamicPanelsRef])
 
   // Every path that empties the stack goes through here, so the sheet's two fields
@@ -462,7 +472,9 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const applyPanelAction = useCallback((action: PanelAction) => {
     switch (action.op) {
       case "open":
-        openDynamic(action.id)
+        // A scripted turn, or a backend "action" chunk: the reader did not ask for this
+        // panel, so it arrives resting rather than open. See openDynamic.
+        openDynamic(action.id, { reveal: false })
         // With a view, set it; without, reset the panel to its own default view.
         if (action.view) setPanelView(action.id, action.view)
         else clearPanelView(action.id)

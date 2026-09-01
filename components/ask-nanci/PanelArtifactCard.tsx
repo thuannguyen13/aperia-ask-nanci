@@ -25,7 +25,10 @@ export function PanelArtifactCard({ id }: { id: PanelId }) {
   // once a panel could be minimised: a minimised panel is still open, just parked.
   const inStack = dynamicPanels.includes(id)
   const showing = inStack && !panelSheetDismissed && (shownPanelId === id || dynamicPanels[dynamicPanels.length - 1] === id)
-  const status = !inStack ? "Tap to reopen" : showing ? "Open" : "Minimised, tap to bring back"
+  // "Minimised" no longer fits the middle state: a scripted panel arrives resting
+  // without ever having been open, so the copy says what a tap does rather than
+  // claiming a history the panel may not have.
+  const status = !inStack ? "Tap to reopen" : showing ? "Open" : "Tap to open"
 
   const handleClick = () => {
     // Already in the stack: bring it to the front and undo a minimise, rather than

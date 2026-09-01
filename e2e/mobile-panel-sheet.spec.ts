@@ -92,8 +92,18 @@ async function gotoFlow(page: Page, query: string) {
   await page.goto(`/?mode=concept-embed&${query}&autoplay`)
 }
 
-/** Wait for the flow to open its panel, and for the card to finish sliding in. */
+/**
+ * Wait for the flow to open its panel, ask for the sheet, and let it settle.
+ *
+ * A scripted panel arrives resting rather than open (`openDynamic`'s `reveal: false`),
+ * so every test that measures an open card has to open it first. The way in is the
+ * artifact card in the conversation, not the grab strip: the strip is off screen while
+ * a lip-0 presentation rests, and the card is the one control all four share.
+ */
 async function waitForOpenSheet(page: Page, label = PANEL) {
+  const card = page.getByRole("button", { name: `Bring ${label} to the front` })
+  await expect(card).toBeVisible({ timeout: PANEL_TIMEOUT })
+  await card.click()
   await expect(page.getByRole("dialog", { name: label })).toBeVisible({ timeout: PANEL_TIMEOUT })
   await page.waitForTimeout(SETTLE_MS)
 }
@@ -239,7 +249,7 @@ for (const p of PRESENTATIONS.filter((option) => option.lip > 0)) {
   })
 }
 
-test("dismissing the sheet reaches the follow-up chip, and a second panel brings the sheet back", async ({ page }) => {
+test("dismissing the sheet reaches the follow-up chip, and the second panel arrives resting too", async ({ page }) => {
   await gotoFlow(page, "flow=15")
   await waitForOpenSheet(page, "Sales Snapshot")
 
@@ -257,8 +267,14 @@ test("dismissing the sheet reaches the follow-up chip, and a second panel brings
   await expect(chip).toHaveCount(1)
   await chip.click()
 
-  // Opening a panel clears the dismissed flag (openDynamic in AskNanciContext), so the
-  // sheet comes back on its own rather than stranding the panel the flow just announced.
+  // The chip's turn opens a second panel, and it arrives resting like the first: nothing
+  // the script opens takes the screen. The conversation stays readable, and the new
+  // panel announces itself as a card rather than by covering the answer.
+  const secondCard = page.getByRole("button", { name: "Bring Sales Drilldown to the front" })
+  await expect(secondCard).toBeVisible({ timeout: PANEL_TIMEOUT })
+  await expect(page.getByRole("dialog", { name: "Sales Drilldown" })).toHaveCount(0)
+
+  await secondCard.click()
   await expect(page.getByRole("dialog", { name: "Sales Drilldown" })).toBeVisible({ timeout: PANEL_TIMEOUT })
 
   // With two panels open the phone shows the newest and the pager reaches the other.
