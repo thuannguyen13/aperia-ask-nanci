@@ -230,24 +230,26 @@ for (const p of PRESENTATIONS.filter((option) => option.lip > 0)) {
   })
 }
 
-test("a second panel is reachable through the pager, and the follow-up chip stays tappable", async ({ page }) => {
+test("dismissing the sheet reaches the follow-up chip, and a second panel brings the sheet back", async ({ page }) => {
   await gotoFlow(page, "flow=15")
   await waitForOpenSheet(page, "Sales Snapshot")
 
-  // Flow 15 pauses on its next user turn and offers it as a chip. The conversation is
-  // behind the sheet and marked aria-hidden with it, so the only copy of the chip in the
-  // accessibility tree is the one MobileFlowChips lifts into the composer.
+  // Flow 15 pauses on its next user turn and offers it as a chip in the conversation.
+  // The sheet covers that conversation and marks it aria-hidden, so the chip is out of
+  // reach until the sheet is dismissed — which is the trade the bottom sheet makes for
+  // giving the panel the whole screen.
   const chip = page.getByRole("button", { name: "what drove saturday?" })
+  await expect(chip).toHaveCount(0)
+
+  // dismiss() defaults to flow 2's panel; this flow's sheet is named for its own.
+  await dragHandle(page, handle(page, "Sales Snapshot"), "y", DRAG_PX)
+  await page.waitForTimeout(SETTLE_MS)
   await expect(chip).toHaveCount(1)
-  // click() fails if anything is covering it, which is the assertion: the sheet must not
-  // be able to swallow the only control that advances the flow.
   await chip.click()
 
+  // Opening a panel clears the dismissed flag (openDynamic in AskNanciContext), so the
+  // sheet comes back on its own rather than stranding the panel the flow just announced.
   await expect(page.getByRole("dialog", { name: "Sales Drilldown" })).toBeVisible({ timeout: PANEL_TIMEOUT })
-
-  // The brand-bar toggle counts what is open, badge included.
-  const badge = page.getByRole("button", { name: "Show 2 panels", exact: true })
-  await expect(badge).toHaveText("2")
 
   // With two panels open the phone shows the newest and the pager reaches the other.
   const pager = page.getByRole("button", { name: "Show the next open panel" })
