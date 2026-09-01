@@ -93,7 +93,10 @@ export function BarometerReport() {
               <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search merchant or MID..."
+                // "Filter", not "Search": the console's own search jumps to a
+                // merchant, this narrows the 357 rows in place. Two boxes on one
+                // screen only read as one job if they are named differently.
+                placeholder="Filter this list..."
                 className="w-full pl-8 sm:w-56"
               />
             </div>

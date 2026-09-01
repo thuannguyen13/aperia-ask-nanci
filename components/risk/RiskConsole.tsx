@@ -14,6 +14,7 @@ import { ConceptPanelArea } from "@/components/ask-nanci/concept/ConceptPanelAre
 import { PANELS } from "@/components/panel-registry"
 import type { PanelId } from "@/lib/ask-nanci/types"
 import { RiskLanding } from "./RiskLanding"
+import { RiskSearchDialog, RiskSearchField } from "./RiskSearch"
 import { RiskNavProvider } from "./RiskNavContext"
 import type { RiskDest } from "@/lib/ask-nanci/types"
 import { RISK_MERCHANTS, type WorkStatus } from "@/lib/ask-nanci/data/risk-merchants"
@@ -86,6 +87,9 @@ export function RiskConsole({ assistant = true }: { assistant?: boolean }) {
   )
   const markWork = (id: string, status: WorkStatus) => setWorkStatuses((s) => ({ ...s, [id]: status }))
 
+  // Search lives at the top of the rail, so the rail's owner owns whether it is open.
+  const [searchOpen, setSearchOpen] = useState(false)
+
   // The Detection Queue nav item stays highlighted across its child reports.
   const inQueue = dest === "detection-queue" || dest === "barometer-report" || dest === "risk-report"
 
@@ -114,7 +118,14 @@ export function RiskConsole({ assistant = true }: { assistant?: boolean }) {
           <Image data-logo="frame" {...getThemeLogos(THEME).frame} className="h-6 w-auto" />
         </div>
       }
-      sidebar={<Sidebar menu={nav} logos={getThemeLogos(THEME)} hoverNav={false} />}
+      sidebar={
+        <Sidebar
+          menu={nav}
+          search={(collapsed) => <RiskSearchField collapsed={collapsed} onOpen={() => setSearchOpen(true)} />}
+          logos={getThemeLogos(THEME)}
+          hoverNav={false}
+        />
+      }
     >
       <RiskNavProvider value={{ go: setDest, openBarometer, openMerchant, openAssignment, merchantId, assignmentId, barometerFilter, workStatuses, markWork, assistant, home }}>
         <div className="flex min-w-0 flex-1 py-1 pr-1">
@@ -141,6 +152,7 @@ export function RiskConsole({ assistant = true }: { assistant?: boolean }) {
           {/* Side panels (e.g. the Dashboard insight) — siblings, not nested */}
           {assistant && <ConceptPanelArea />}
         </div>
+        <RiskSearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
       </RiskNavProvider>
     </AppFrame>
   )

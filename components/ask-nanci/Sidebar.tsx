@@ -68,7 +68,7 @@ const HOVER_CLOSE_MS = 250
 // `hoverNav` is the Ask Nanci default: rail + hover peek + pin. Aperia Risk opts out
 // (`hoverNav={false}`) — its rail is a fixed destination menu for a different product,
 // so it keeps the plain collapse toggle.
-export function Sidebar({ menu, logos, hoverNav = true, initialPinned = false }: { menu?: SidebarNavItem[]; logos?: ThemeLogos; hoverNav?: boolean; initialPinned?: boolean } = {}) {
+export function Sidebar({ menu, search, logos, hoverNav = true, initialPinned = false }: { menu?: SidebarNavItem[]; search?: (collapsed: boolean) => React.ReactNode; logos?: ThemeLogos; hoverNav?: boolean; initialPinned?: boolean } = {}) {
   const { startNewChat, setKbOpen, marketplaceOpen, setMarketplaceOpen, mobileSidebarOpen, setMobileSidebarOpen, currentUser, tourActive } = useAskNanci()
   const [collapsed, setCollapsed] = useState(false)
   const [wizardOpen, setWizardOpen] = useState(false)
@@ -105,8 +105,16 @@ export function Sidebar({ menu, logos, hoverNav = true, initialPinned = false }:
 
   const sidebarContent = (isMobile: boolean) => (
     <>
-      {/* Header */}
-      <div className="flex items-center justify-between p-2 pl-1 min-w-[256px]">
+      {/* Header. Roomier than the rows below it on purpose: the lockup is the one
+          thing in the rail that is not a control, so it gets air rather than sitting
+          at the same rhythm as the destinations.
+          Collapsed is the exception and keeps the tighter inset: the logomark is the
+          only thing left, and 8px here plus the 8px below would put it off centre in
+          a 48px rail. */}
+      <div className={cn(
+        "flex items-center justify-between min-w-[256px]",
+        !isMobile && isCollapsed ? "p-2 pl-1" : "p-3 pl-2",
+      )}>
         <div className="flex h-9 shrink-0 items-center gap-2 px-2">
           {!isMobile && isCollapsed ? (
             <Tooltip>
@@ -181,8 +189,17 @@ export function Sidebar({ menu, logos, hoverNav = true, initialPinned = false }:
         )}
       </div>
 
+      {/* An optional field above the destinations — the Aperia Risk console puts its
+          search here. Given the collapsed state rather than reading it, because only
+          the caller knows what its control should shrink to. */}
+      {search && (
+        <div className={cn("shrink-0 min-w-12 px-2 pb-1", !isMobile && isCollapsed && "px-1")}>
+          {search(!isMobile && isCollapsed)}
+        </div>
+      )}
+
       {/* Nav list (menu mode) or New Chat — stays onscreen above the scroll area */}
-      <div className={cn("shrink-0 min-w-12 p-2", !isMobile && isCollapsed && "px-1")}>
+      <div className={cn("shrink-0 min-w-12 p-2 pt-1", !isMobile && isCollapsed && "px-1")}>
         {menu ? (
           menu.map((item) => (
             <SidebarItem
