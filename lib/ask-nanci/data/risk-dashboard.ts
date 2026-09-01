@@ -122,12 +122,12 @@ export const PARAM_HEAT: { param: string; fires: number; caseRate: number }[] = 
 // assignment over the reporting window, and `realerted` how much of it came back.
 // Keyed by assignment id like ALERT_VOLUME, so a row here and a bar there resolve to
 // the same assignment.
+// The two assignments the Detection Queue actually carries, and nothing else: each
+// name here opens that queue's Barometer Report, so a row for a queue with no report
+// behind it would land on someone else's merchant list.
 export const REALERT_ROWS: { assignmentId: string; worked: number; realerted: number; rate: number; action: string }[] = [
-  { assignmentId: "esqr-phase2-auths", worked: 2184, realerted: 438, rate: 20.1, action: "+180" },
-  { assignmentId: "low-risk-mcc",      worked: 1724, realerted: 512, rate: 29.7, action: "Tighten re-alert delta on P11/P12" },
-  { assignmentId: "high-risk-mcc",     worked: 182,  realerted: 22,  rate: 12.1, action: "+120" },
-  { assignmentId: "mc-watch",          worked: 312,  realerted: 28,  rate: 9.0,  action: "+90" },
-  { assignmentId: "mc-velocity",       worked: 68,   realerted: 31,  rate: 45.6, action: "Raise velocity threshold from 15 → 20 pts" },
+  { assignmentId: "esqr-phase2-auths", worked: 2184, realerted: 438, rate: 20.1, action: "Tighten re-alert delta on P11/P12" },
+  { assignmentId: "authorizations",    worked: 1540, realerted: 247, rate: 16.0, action: "Review the re-alert window on declines" },
 ]
 
 // ── Take → the charts its answer points at (keyed by RISK_NANCI_TAKES title) ──
