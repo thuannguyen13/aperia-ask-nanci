@@ -14,8 +14,9 @@ export interface PanelSheetConfig {
   /** The edge the card is anchored to, and the axis it is dragged along. */
   axis: "y" | "x"
   /**
-   * How much of the card stays on screen at rest, in px. 0 sends it away entirely, so
-   * the brand-bar toggle is the only way back; anything else leaves a grabbable lip.
+   * How much of the card stays on screen at rest, in px. 0 sends it away entirely and
+   * nothing brings it back until the flow opens another panel; anything else leaves a
+   * grabbable lip that reopens it.
    */
   lip: number
 }
@@ -40,16 +41,16 @@ export const PANEL_UI_OPTIONS: PanelUiOption[] = [
     param: "",
     sheet: { axis: "y", lip: 0 },
     current: true,
-    blurb: "The panel rises from the bottom and ends above the chat input. Dismissing sends it away; the bar toggle brings it back.",
-    taps: "1 tap to bring back, or it opens itself",
+    blurb: "The panel rises from the bottom and ends above the chat input. Dismissing sends it away for good.",
+    taps: "0 taps: it opens itself",
     pros: [
       "Chat input stays visible and usable",
       "Drag down to dismiss, thumb where it rests",
       "Nothing left on screen once dismissed",
     ],
     cons: [
-      "Only the badge says a panel exists",
-      "Reopening costs a trip to the top bar",
+      "A dismissed panel cannot be reopened",
+      "Nothing on screen says a panel existed",
       "Loses the composer's height off the panel",
     ],
   },
@@ -79,7 +80,7 @@ export const PANEL_UI_OPTIONS: PanelUiOption[] = [
     blurb: "The panel never fully leaves: it rests as a handle above the composer and is swiped up to full height, swiped down to rest.",
     taps: "0 taps, one swipe",
     pros: [
-      "An open panel is always visible, no badge to notice",
+      "An open panel is always visible, nothing to go looking for",
       "Reopening costs a swipe, not two taps",
       "The handle sits where the thumb already is",
     ],
