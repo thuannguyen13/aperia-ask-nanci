@@ -190,7 +190,10 @@ export function Sidebar({ menu, logos, hoverNav = true, initialPinned = false }:
               icon={item.icon}
               label={item.label}
               collapsed={!isMobile && isCollapsed}
-              onClick={item.onClick}
+              // The drawer is an overlay, so a destination chosen inside it has to
+              // dismiss it or the screen it navigated to stays covered. Marketplace
+              // below does the same on its own click.
+              onClick={() => { item.onClick?.(); if (isMobile) setMobileSidebarOpen(false) }}
               className={item.active ? "bg-muted font-medium" : undefined}
             />
           ))
