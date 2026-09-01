@@ -105,8 +105,16 @@ export function Sidebar({ menu, search, logos, hoverNav = true, initialPinned = 
 
   const sidebarContent = (isMobile: boolean) => (
     <>
-      {/* Header */}
-      <div className="flex items-center justify-between p-2 pl-1 min-w-[256px]">
+      {/* Header. Roomier than the rows below it on purpose: the lockup is the one
+          thing in the rail that is not a control, so it gets air rather than sitting
+          at the same rhythm as the destinations.
+          Collapsed is the exception and keeps the tighter inset: the logomark is the
+          only thing left, and 8px here plus the 8px below would put it off centre in
+          a 48px rail. */}
+      <div className={cn(
+        "flex items-center justify-between min-w-[256px]",
+        !isMobile && isCollapsed ? "p-2 pl-1" : "p-3 pl-2",
+      )}>
         <div className="flex h-9 shrink-0 items-center gap-2 px-2">
           {!isMobile && isCollapsed ? (
             <Tooltip>
