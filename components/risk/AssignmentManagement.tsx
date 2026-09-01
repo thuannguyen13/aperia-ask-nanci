@@ -76,9 +76,13 @@ export function AssignmentManagement() {
       {/* Integration card */}
       <div className="flex flex-wrap items-center gap-3 rounded-xl border bg-card px-4 py-3">
         {/* The real mark, not an MC monogram: this row names the integration, and
-            the same asset already tags the Mastercard queue on the Detection Queue. */}
-        <Image src="/iso/mastercard.svg" alt="Mastercard" width={28} height={28} className="size-7 shrink-0" />
-        <span className="text-sm font-semibold text-foreground">{AM_INTEGRATION.name}</span>
+            the same asset already tags the Mastercard queue on the Detection Queue.
+            Mark and name pair at gap-2 inside the row's gap-3, so the name reads as
+            the logo's label rather than as the next item along. */}
+        <span className="flex shrink-0 items-center gap-2">
+          <Image src="/iso/mastercard.svg" alt="Mastercard" width={28} height={28} className="size-7" />
+          <span className="text-sm font-semibold text-foreground">{AM_INTEGRATION.name}</span>
+        </span>
         <Badge className={STATUS_PILL.Active}>
           <CircleCheck /> {AM_INTEGRATION.status}
         </Badge>
@@ -158,10 +162,20 @@ export function AssignmentManagement() {
                 <Td><Badge className={STATUS_PILL[a.status]}>{a.status}</Badge></Td>
                 <Td mono className="text-muted-foreground">{a.lastProcessed}</Td>
                 <Td>
-                  <div className="flex items-center justify-end gap-1 text-muted-foreground">
-                    <button className="rounded border p-1.5 hover:bg-muted"><Pencil className="size-3.5" /></button>
-                    <button className="rounded border p-1.5 hover:bg-muted"><Copy className="size-3.5" /></button>
-                    <button className="rounded border border-rose-200 bg-rose-50 p-1.5 text-rose-500 hover:bg-rose-100 dark:border-rose-900 dark:bg-rose-950/30"><Trash2 className="size-3.5" /></button>
+                  {/* ds5 Buttons. Delete keeps a colour override rather than the solid
+                      destructive variant: three solid red rows down a table reads as an
+                      error state, not as an action you may take. */}
+                  <div className="flex items-center justify-end gap-1">
+                    <Button variant="outline" size="icon-sm" aria-label={`Edit ${a.name}`}><Pencil /></Button>
+                    <Button variant="outline" size="icon-sm" aria-label={`Duplicate ${a.name}`}><Copy /></Button>
+                    <Button
+                      variant="outline"
+                      size="icon-sm"
+                      aria-label={`Delete ${a.name}`}
+                      className="border-rose-200 bg-rose-50 text-rose-500 hover:bg-rose-100 hover:text-rose-600 dark:border-rose-900 dark:bg-rose-950/30"
+                    >
+                      <Trash2 />
+                    </Button>
                   </div>
                 </Td>
               </TableRow>
