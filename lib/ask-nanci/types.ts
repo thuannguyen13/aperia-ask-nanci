@@ -125,6 +125,12 @@ export interface Message {
   source?: string // muted "Source: …" attribution line under a scripted answer
   widget?: "ai-triage-summary"
   dashChart?: DashChartId // embeds a live Risk dashboard chart card in the answer
+  /**
+   * The panel this answer opened. Rendered as a card in the conversation so the panel
+   * has a home to go back to: closing it leaves the card behind, and the card reopens
+   * it without asking Nanci for it again.
+   */
+  panel?: PanelId
   /** True when the stream ended (user stopped or natural completion). Prevents re-appending a partial response on session resume. */
   stopped?: boolean
 }

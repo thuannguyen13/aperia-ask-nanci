@@ -3,7 +3,7 @@
 import { ArrowRight, FileBarChart2, ShieldCheck } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { ASSIGNMENT, STATUS_ROWS } from "@/lib/ask-nanci/data/panels/barometer"
-import { PanelShell, PanelHeader, PanelTable, Th, Td } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody, PanelTable, Thead, Th, Td } from "@/components/shared"
 
 export function DetectionQueuePanel() {
   const { closePanel, closeAllNewPanels } = useAskNanci()
@@ -15,7 +15,7 @@ export function DetectionQueuePanel() {
         onClose={() => { closePanel("detection-queue"); closeAllNewPanels() }}
       />
 
-      <div className="flex-1 overflow-auto px-4 py-4 space-y-4">
+      <PanelBody className="py-4 space-y-4">
         {/* Assignment header */}
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
@@ -40,13 +40,11 @@ export function DetectionQueuePanel() {
 
         {/* Status table */}
         <PanelTable>
-          <thead>
-            <tr className="border-b bg-muted/40">
-              <Th>Distinct Merchants — Current Status</Th>
-              <Th align="right">Count</Th>
-              <Th align="right">Amount</Th>
-            </tr>
-          </thead>
+          <Thead>
+            <Th>Distinct Merchants — Current Status</Th>
+            <Th align="right">Count</Th>
+            <Th align="right">Amount</Th>
+          </Thead>
           <tbody>
             {STATUS_ROWS.map(({ label, count, amount }) => (
               <tr key={label}>
@@ -73,7 +71,7 @@ export function DetectionQueuePanel() {
             <ArrowRight className="size-3.5" />
           </button>
         </div>
-      </div>
+      </PanelBody>
     </PanelShell>
   )
 }

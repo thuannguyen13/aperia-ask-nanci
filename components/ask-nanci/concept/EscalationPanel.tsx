@@ -4,7 +4,7 @@ import { Phone, Ticket, CheckCircle2 } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { PAYOUT_DISCREPANCY, ESCALATION_PATHS, ESCALATION_BOOKING } from "@/lib/ask-nanci/data/panels/escalation"
-import { PanelShell, PanelHeader, PanelExportButton, PanelTable, Th, Callout, formatCurrency } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody, PanelExportButton, PanelTable, Thead, Th, Callout, formatCurrency } from "@/components/shared"
 
 const PATH_ICONS = { call: Phone, ticket: Ticket } as const
 
@@ -31,16 +31,14 @@ export function EscalationPanel() {
         onClose={() => closeDynamicPanel("escalation")}
       />
 
-      <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
+      <PanelBody className="space-y-4">
         <p className="text-sm font-semibold text-foreground">Batch {PAYOUT_DISCREPANCY.batchId}</p>
 
         <PanelTable>
-          <thead>
-            <tr className="border-b bg-muted/40">
-              <Th>Fee Type</Th>
-              <Th>Amount</Th>
-            </tr>
-          </thead>
+          <Thead>
+            <Th>Fee Type</Th>
+            <Th>Amount</Th>
+          </Thead>
           <tbody>
             {DETAIL_ROWS.map(([label, value]) => (
               <tr key={label} className="border-b last:border-0">
@@ -93,7 +91,7 @@ export function EscalationPanel() {
             <p className="text-[10px] text-muted-foreground">Reference {ESCALATION_BOOKING.reference} · Batch details carried over</p>
           </Callout>
         )}
-      </div>
+      </PanelBody>
     </PanelShell>
   )
 }

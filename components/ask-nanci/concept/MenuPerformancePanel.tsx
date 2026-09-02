@@ -2,7 +2,7 @@
 
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { MENU_ITEMS, HERO_ITEM } from "@/lib/ask-nanci/data/panels/menu-margin"
-import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, PanelTable, Th, formatCurrency } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody, PanelExportButton, NanciInsight, PanelTable, Thead, Th, formatCurrency } from "@/components/shared"
 
 const hero = MENU_ITEMS.find((item) => item.name === HERO_ITEM)!
 const topProfitItem = [...MENU_ITEMS].sort((a, b) => b.margin - a.margin)[0]
@@ -27,13 +27,11 @@ function VolumeTable({ compact }: { compact?: boolean }) {
   const rows = [...MENU_ITEMS].sort((a, b) => b.unitsSold - a.unitsSold)
   return (
     <PanelTable>
-      <thead>
-        <tr className="border-b bg-muted/40">
-          <Th>Product</Th>
-          <Th align="right">Unit Sold</Th>
-          {!compact && <Th align="right">Amount</Th>}
-        </tr>
-      </thead>
+      <Thead>
+        <Th>Product</Th>
+        <Th align="right">Unit Sold</Th>
+        {!compact && <Th align="right">Amount</Th>}
+      </Thead>
       <tbody>
         {rows.map((item) => (
           <tr key={item.name} className="border-b last:border-0">
@@ -51,14 +49,12 @@ function ProfitTable({ compact }: { compact?: boolean }) {
   const rows = [...MENU_ITEMS].sort((a, b) => b.margin - a.margin)
   return (
     <PanelTable>
-      <thead>
-        <tr className="border-b bg-muted/40">
-          <Th>Product</Th>
-          {!compact && <Th align="right">Unit Sold</Th>}
-          <Th align="right">Margin</Th>
-          {!compact && <Th align="right">Amount</Th>}
-        </tr>
-      </thead>
+      <Thead>
+        <Th>Product</Th>
+        {!compact && <Th align="right">Unit Sold</Th>}
+        <Th align="right">Margin</Th>
+        {!compact && <Th align="right">Amount</Th>}
+      </Thead>
       <tbody>
         {rows.map((item) => (
           <tr key={item.name} className={item.name === HERO_ITEM ? "border-b bg-amber-50 last:border-0 dark:bg-amber-950/20" : "border-b last:border-0"}>
@@ -86,7 +82,7 @@ export function MenuPerformancePanel() {
         onClose={() => closeDynamicPanel("menu-performance")}
       />
 
-      <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
+      <PanelBody className="space-y-4">
         <NanciInsight>{view ==="margin" ? MARGIN_REVEAL_CALLOUT : VOLUME_LEADER_CALLOUT}</NanciInsight>
 
         {view ==="volume" && (
@@ -115,7 +111,7 @@ export function MenuPerformancePanel() {
             </div>
           </div>
         )}
-      </div>
+      </PanelBody>
     </PanelShell>
   )
 }

@@ -42,9 +42,11 @@ const PRESENTATIONS = [
   // number meant re-pinning it every time the composer changed height: the frame's
   // 4px bottom inset moved it once, a 4px taller send button moved it again. Neither
   // was a regression, and both failed the suite.
-  { name: "bottom sheet", param: "", axis: "y", lip: 0 },
+  // `param: ""` is whichever option is marked current in panel-ui.ts, not whichever is
+  // listed first: the swipe presentation ships, so a minimised panel leaves its handle.
+  { name: "swipe to open", param: "", axis: "y", lip: 40 },
+  { name: "bottom sheet", param: "away", axis: "y", lip: 0 },
   { name: "right-side drawer", param: "right", axis: "x", lip: 0 },
-  { name: "swipe to open", param: "swipe", axis: "y", lip: 40 },
   { name: "swipe from the edge", param: "edge", axis: "x", lip: 40 },
 ] as const
 
@@ -56,8 +58,15 @@ function expectPx(actual: number, expected: number, slack = 2) {
   expect(actual, `expected ${expected}px +/- ${slack}, got ${actual}px`).toBeLessThanOrEqual(expected + slack)
 }
 
-/** The grab strip: a button, named for the panel and for what a press would do to it. */
-const handle = (page: Page, label = PANEL) => page.getByRole("button", { name: label })
+/**
+ * The grab strip: a button, named for the panel and for what a press would do to it.
+ *
+ * Anchored, because `name` is a substring match by default and the panel's artifact card
+ * in the conversation is also a button carrying the panel's name. Only the strip is
+ * exactly "Show X" or "Hide X".
+ */
+const handle = (page: Page, label = PANEL) =>
+  page.getByRole("button", { name: new RegExp(`^(Show|Hide) ${label}$`) })
 
 /**
  * The card, and the clipping frame around it.
@@ -83,8 +92,18 @@ async function gotoFlow(page: Page, query: string) {
   await page.goto(`/?mode=concept-embed&${query}&autoplay`)
 }
 
-/** Wait for the flow to open its panel, and for the card to finish sliding in. */
+/**
+ * Wait for the flow to open its panel, ask for the sheet, and let it settle.
+ *
+ * A scripted panel arrives resting rather than open (`openDynamic`'s `reveal: false`),
+ * so every test that measures an open card has to open it first. The way in is the
+ * artifact card in the conversation, not the grab strip: the strip is off screen while
+ * a lip-0 presentation rests, and the card is the one control all four share.
+ */
 async function waitForOpenSheet(page: Page, label = PANEL) {
+  const card = page.getByRole("button", { name: `Bring ${label} to the front` })
+  await expect(card).toBeVisible({ timeout: PANEL_TIMEOUT })
+  await card.click()
   await expect(page.getByRole("dialog", { name: label })).toBeVisible({ timeout: PANEL_TIMEOUT })
   await page.waitForTimeout(SETTLE_MS)
 }
@@ -230,24 +249,33 @@ for (const p of PRESENTATIONS.filter((option) => option.lip > 0)) {
   })
 }
 
-test("a second panel is reachable through the pager, and the follow-up chip stays tappable", async ({ page }) => {
+test("dismissing the sheet reaches the follow-up chip, and the second panel arrives resting too", async ({ page }) => {
   await gotoFlow(page, "flow=15")
   await waitForOpenSheet(page, "Sales Snapshot")
 
-  // Flow 15 pauses on its next user turn and offers it as a chip. The conversation is
-  // behind the sheet and marked aria-hidden with it, so the only copy of the chip in the
-  // accessibility tree is the one MobileFlowChips lifts into the composer.
+  // Flow 15 pauses on its next user turn and offers it as a chip in the conversation.
+  // The sheet covers that conversation and marks it aria-hidden, so the chip is out of
+  // reach until the sheet is dismissed — which is the trade the bottom sheet makes for
+  // giving the panel the whole screen.
   const chip = page.getByRole("button", { name: "what drove saturday?" })
+  await expect(chip).toHaveCount(0)
+
+  // dismiss() defaults to flow 2's panel; this flow's sheet is named for its own. The
+  // shipped presentation rests as a handle, so this minimises rather than sends it away.
+  await dragHandle(page, handle(page, "Sales Snapshot"), "y", DRAG_PX)
+  await page.waitForTimeout(SETTLE_MS)
   await expect(chip).toHaveCount(1)
-  // click() fails if anything is covering it, which is the assertion: the sheet must not
-  // be able to swallow the only control that advances the flow.
   await chip.click()
 
-  await expect(page.getByRole("dialog", { name: "Sales Drilldown" })).toBeVisible({ timeout: PANEL_TIMEOUT })
+  // The chip's turn opens a second panel, and it arrives resting like the first: nothing
+  // the script opens takes the screen. The conversation stays readable, and the new
+  // panel announces itself as a card rather than by covering the answer.
+  const secondCard = page.getByRole("button", { name: "Bring Sales Drilldown to the front" })
+  await expect(secondCard).toBeVisible({ timeout: PANEL_TIMEOUT })
+  await expect(page.getByRole("dialog", { name: "Sales Drilldown" })).toHaveCount(0)
 
-  // The brand-bar toggle counts what is open, badge included.
-  const badge = page.getByRole("button", { name: "Show 2 panels", exact: true })
-  await expect(badge).toHaveText("2")
+  await secondCard.click()
+  await expect(page.getByRole("dialog", { name: "Sales Drilldown" })).toBeVisible({ timeout: PANEL_TIMEOUT })
 
   // With two panels open the phone shows the newest and the pager reaches the other.
   const pager = page.getByRole("button", { name: "Show the next open panel" })
@@ -258,4 +286,23 @@ test("a second panel is reachable through the pager, and the follow-up chip stay
   await pager.click()
   await expect(page.getByRole("dialog", { name: "Sales Drilldown" })).toBeVisible()
   await expect(pager).toHaveText("2/2")
+})
+
+test("the artifact card reopens a panel that was closed outright", async ({ page }) => {
+  await gotoFlow(page, "flow=2")
+  await waitForOpenSheet(page)
+
+  // The card lives in the conversation, which the open sheet covers and marks
+  // aria-hidden, so it is out of the tree until the panel is off the screen.
+  await expect(page.getByRole("button", { name: `Bring ${PANEL} to the front` })).toHaveCount(0)
+
+  await page.getByRole("button", { name: "Close", exact: true }).first().click()
+  await expect(page.getByRole("dialog", { name: PANEL })).toBeHidden()
+
+  // Closed, the card changes what it offers rather than disappearing with the panel.
+  const reopen = page.getByRole("button", { name: `Reopen ${PANEL}` })
+  await expect(reopen).toBeVisible()
+  await reopen.click()
+
+  await expect(page.getByRole("dialog", { name: PANEL })).toBeVisible({ timeout: PANEL_TIMEOUT })
 })

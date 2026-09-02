@@ -3,7 +3,8 @@
 import Image from "next/image"
 import { useState } from "react"
 import { ArrowLeft, CheckCircle2 } from "lucide-react"
-import { Button, Checkbox, Dialog, DialogContent, DialogTitle, Input, Label } from "aperia-ds5"
+import { Button, Checkbox, Input, Label } from "aperia-ds5"
+import { ResponsiveDialog, ResponsiveDialogContent, ResponsiveDialogTitle } from "@/components/shared"
 import { cn } from "aperia-ds5/utils"
 import { addBankSource } from "@/lib/ask-nanci/source-store"
 
@@ -124,9 +125,9 @@ export function ConnectWizard({ open, onClose, onLinked }: Props) {
     "Account Linked"
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent showCloseButton={false} className="max-sm:inset-0 max-sm:top-0 max-sm:left-0 max-sm:translate-x-0 max-sm:translate-y-0 max-sm:h-[100dvh] max-sm:w-screen max-sm:max-w-full max-sm:rounded-none max-sm:flex max-sm:flex-col">
-        <DialogTitle className="sr-only">Link Accounts</DialogTitle>
+    <ResponsiveDialog open={open} onOpenChange={handleOpenChange}>
+      <ResponsiveDialogContent showCloseButton={false} className="max-sm:inset-0 max-sm:top-0 max-sm:left-0 max-sm:translate-x-0 max-sm:translate-y-0 max-sm:h-[100dvh] max-sm:w-screen max-sm:max-w-full max-sm:rounded-none max-sm:flex max-sm:flex-col">
+        <ResponsiveDialogTitle className="sr-only">Link Accounts</ResponsiveDialogTitle>
 
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -293,7 +294,7 @@ export function ConnectWizard({ open, onClose, onLinked }: Props) {
 
         </div>
 
-      </DialogContent>
-    </Dialog>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   )
 }

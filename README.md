@@ -22,7 +22,7 @@ Every demo is a relative path, appended to the dev server address or to the depl
 - `/?mode=concept-embed&flow=18` — one story, no sidebar
 - `&autoplay` — start the story on load instead of waiting for the Ask button
 
-`docs/artifacts/demo-urls.md` is the full catalogue: every mode, which URLs are embedded in production, and the rest of the params. It is generated from the flow registry by `npm run demo:urls`, so never edit it by hand.
+`docs/generated/demo-urls.md` is the full catalogue: every mode, which URLs are embedded in production, and the rest of the params. It is generated from the flow registry by `npm run demo:urls`, so never edit it by hand.
 
 ### Demo stories
 
@@ -55,5 +55,5 @@ Six further stories have no URL and are reachable only from the `?mode=concept` 
 | `lib/ask-nanci/data/` | Every demo text and number, including one file per panel under `data/panels/` |
 | `components/ask-nanci/` | On-screen components; panels under `concept/` |
 | `docs/` | Technical detail, split into `core` (the engine), `ui` (anything rendered) and `services` (data seams) |
-| `docs/artifacts/demo-context/` | Background on the customers and their workflows |
+| `docs/source/` | Background on the customers and their workflows |
 | `CLAUDE.md` | How to find the right doc for a task |

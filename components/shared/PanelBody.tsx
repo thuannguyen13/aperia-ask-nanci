@@ -3,14 +3,17 @@
 import { cn } from "aperia-ds5/utils"
 
 /**
- * The scrolling half of a panel: 16px inset, and the top inset is dynamic —
- * `first:pt-4` applies it only when nothing renders above the body, so a
- * `PanelHeader` sibling's own bottom padding owns the gap instead of the two
- * stacking into a double-height space.
+ * The scrolling half of a panel: 16px inset, 12px vertical.
+ *
+ * The default used to be `pb-4 first:pt-4`, which matched no caller — 25 panels
+ * hand-rolled `px-4 py-3` instead, so the primitive had 8 adopters out of 33.
+ * It now defaults to what panels actually write. Anything else goes through
+ * `className`, which tailwind-merge resolves against these, rather than a
+ * bespoke prop.
  */
 export function PanelBody({ className, children }: { className?: string; children: React.ReactNode }) {
   return (
-    <div className={cn("flex-1 overflow-y-auto px-4 pb-4 first:pt-4", className)}>
+    <div className={cn("flex-1 overflow-y-auto px-4 py-3", className)}>
       {children}
     </div>
   )

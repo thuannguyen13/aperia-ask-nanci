@@ -10,7 +10,6 @@ import { ExplorePrompts } from "@/components/ask-nanci/ExplorePrompts"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { ConceptWelcomeView } from "@/components/ask-nanci/concept/ConceptWelcomeView"
 import { useComposerInset } from "@/components/ask-nanci/use-composer-inset"
-import { MobileFlowChips } from "@/components/ask-nanci/MobileFlowChips"
 
 function WelcomeView() {
   const { sessions, resumeSession, setKbOpen, sources, isEmbed } = useAskNanci()
@@ -134,7 +133,6 @@ export default function AskNanciPage() {
           className="relative z-30 shrink-0 px-3 pb-3 md:px-4 md:pb-4"
         >
           <div className="mx-auto w-full max-w-[800px]">
-            <MobileFlowChips />
             <ChatInput />
           </div>
         </div>

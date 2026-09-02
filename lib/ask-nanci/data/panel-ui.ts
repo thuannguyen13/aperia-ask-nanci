@@ -14,8 +14,9 @@ export interface PanelSheetConfig {
   /** The edge the card is anchored to, and the axis it is dragged along. */
   axis: "y" | "x"
   /**
-   * How much of the card stays on screen at rest, in px. 0 sends it away entirely, so
-   * the brand-bar toggle is the only way back; anything else leaves a grabbable lip.
+   * How much of the card stays on screen at rest, in px. 0 sends it away entirely and
+   * nothing brings it back until the flow opens another panel; anything else leaves a
+   * grabbable lip that reopens it.
    */
   lip: number
 }
@@ -37,19 +38,18 @@ export const PANEL_UI_OPTIONS: PanelUiOption[] = [
   {
     id: "a",
     name: "Bottom sheet",
-    param: "",
+    param: "away",
     sheet: { axis: "y", lip: 0 },
-    current: true,
-    blurb: "The panel rises from the bottom and ends above the chat input. Dismissing sends it away; the bar toggle brings it back.",
-    taps: "1 tap to bring back, or it opens itself",
+    blurb: "The panel rises from the bottom and ends above the chat input. Dismissing sends it away for good.",
+    taps: "0 taps: it opens itself",
     pros: [
       "Chat input stays visible and usable",
       "Drag down to dismiss, thumb where it rests",
       "Nothing left on screen once dismissed",
     ],
     cons: [
-      "Only the badge says a panel exists",
-      "Reopening costs a trip to the top bar",
+      "A dismissed panel cannot be reopened",
+      "Nothing on screen says a panel existed",
       "Loses the composer's height off the panel",
     ],
   },
@@ -74,12 +74,13 @@ export const PANEL_UI_OPTIONS: PanelUiOption[] = [
   {
     id: "c",
     name: "Swipe to open",
-    param: "swipe",
+    param: "",
     sheet: { axis: "y", lip: 40 },
+    current: true,
     blurb: "The panel never fully leaves: it rests as a handle above the composer and is swiped up to full height, swiped down to rest.",
     taps: "0 taps, one swipe",
     pros: [
-      "An open panel is always visible, no badge to notice",
+      "An open panel is always visible, nothing to go looking for",
       "Reopening costs a swipe, not two taps",
       "The handle sits where the thumb already is",
     ],
@@ -109,6 +110,14 @@ export const PANEL_UI_OPTIONS: PanelUiOption[] = [
   },
 ]
 
+/**
+ * The presentation that ships, named rather than positional. It used to be whichever
+ * option sat first in the array, which quietly tied what every demo URL renders to the
+ * order of a list that exists to be reordered for comparison.
+ */
+export const DEFAULT_PANEL_UI: PanelUiOption =
+  PANEL_UI_OPTIONS.find((o) => o.current) ?? PANEL_UI_OPTIONS[0]
+
 export function parsePanelUiOption(value: string | null | undefined): PanelUiOption {
-  return PANEL_UI_OPTIONS.find((o) => o.param && o.param === value) ?? PANEL_UI_OPTIONS[0]
+  return PANEL_UI_OPTIONS.find((o) => o.param && o.param === value) ?? DEFAULT_PANEL_UI
 }

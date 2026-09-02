@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react"
 import { ArrowUp, Square, Bell, MessageCircleQuestion, Clock5 } from "lucide-react"
-import { Button, Textarea, Popover, PopoverTrigger, PopoverContent, Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, Dialog, DialogContent, DialogHeader, DialogTitle } from "aperia-ds5"
+import { Button, Textarea, Popover, PopoverTrigger, PopoverContent, Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "aperia-ds5"
+import { ResponsiveDialog, ResponsiveDialogContent, ResponsiveDialogHeader, ResponsiveDialogTitle } from "@/components/shared"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY } from "@/lib/ask-nanci/data/flows.concept"
 import { SlashCommandPopover, type SlashAction } from "./SlashCommandPopover"
@@ -103,7 +104,7 @@ export function ChatInput() {
           // Per the design note, the spent-budget warning fires when they go to type,
           // not on arrival — it lands at the moment it actually blocks them.
           onFocus={() => { if (planSpent) setTokenLimitReached(true) }}
-          className="min-h-[72px] resize-none border-0 shadow-none focus-visible:ring-0 focus-visible:border-0 text-base md:text-sm bg-transparent dark:bg-transparent"
+          className="min-h-[72px] resize-none border-0 shadow-none focus-visible:ring-0 focus-visible:border-0 bg-transparent dark:bg-transparent"
         />
 
         <div className="flex items-center justify-between px-2 pb-2">
@@ -188,18 +189,18 @@ export function ChatInput() {
         </div>
       </div>
 
-      <Dialog open={commonQOpen} onOpenChange={setCommonQOpen}>
-        <DialogContent className="sm:max-w-[750px]">
-          <DialogHeader>
-            <DialogTitle className="sr-only">Common Questions</DialogTitle>
-          </DialogHeader>
+      <ResponsiveDialog open={commonQOpen} onOpenChange={setCommonQOpen}>
+        <ResponsiveDialogContent className="sm:max-w-[750px]">
+          <ResponsiveDialogHeader>
+            <ResponsiveDialogTitle className="sr-only">Common Questions</ResponsiveDialogTitle>
+          </ResponsiveDialogHeader>
           <ExplorePrompts onPromptClick={(prompt) => {
             setCommonQOpen(false)
             if (!isDetect) startNewChat()
             handlePrompt(prompt)
           }} />
-        </DialogContent>
-      </Dialog>
+        </ResponsiveDialogContent>
+      </ResponsiveDialog>
     </div>
   )
 }

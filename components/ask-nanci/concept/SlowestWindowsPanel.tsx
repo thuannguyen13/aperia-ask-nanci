@@ -1,7 +1,7 @@
 "use client"
 
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { PanelShell, PanelHeader, PanelExportButton, NanciInsight, formatWholeCurrency } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody, PanelExportButton, NanciInsight, formatWholeCurrency } from "@/components/shared"
 import { SLOWEST_WINDOWS, SLOWEST_WINDOWS_HIGH } from "@/lib/ask-nanci/data/panels/busiest-times"
 
 export function SlowestWindowsPanel() {
@@ -16,7 +16,7 @@ export function SlowestWindowsPanel() {
         onClose={() => closeDynamicPanel("slowest-windows")}
       />
 
-      <div className="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-4">
+      <PanelBody className="flex flex-col gap-4">
         <NanciInsight>
           Tuesday and Wednesday afternoons are the safest to trim. Each two-hour window rings up under{" "}
           <span className="font-bold">{formatWholeCurrency(SLOWEST_WINDOWS_HIGH.sales)}</span> across roughly{" "}
@@ -46,7 +46,7 @@ export function SlowestWindowsPanel() {
             ))}
           </div>
         </div>
-      </div>
+      </PanelBody>
     </PanelShell>
   )
 }

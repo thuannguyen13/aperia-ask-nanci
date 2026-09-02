@@ -10,8 +10,9 @@
  *   2. Nothing anywhere hardcodes a path to a markered doc. Cite it as
  *      `Read-when **<trigger phrase>**` instead, and that citation must match a real marker.
  *
- * `docs/artifacts/` is the deliberate exception: generated output and raw source material carry
- * no markers and cannot be found by trigger, so those paths stay literal and are existence-checked.
+ * `docs/generated/` and `docs/source/` are the deliberate exceptions: they carry no markers and
+ * cannot be found by trigger, so those paths stay literal and are existence-checked.
+ * `generated/` is output this repo produces, `source/` is raw material from elsewhere.
  */
 import { readFileSync } from "node:fs"
 import { globSync } from "node:fs"
@@ -26,7 +27,8 @@ const FILE_PATH = /(?:docs|\.claude)\/[A-Za-z0-9_.-]+(?:\/[A-Za-z0-9_.-]+)*\.[A-
 const DIR_PATH = /(?:docs|\.claude)\/[A-Za-z0-9_.-]+(?:\/[A-Za-z0-9_.-]+)*\//g
 
 /** Retrieved by trigger. A path to one of these is what goes stale. */
-const docs = globSync("{docs,.claude}/**/*.md").filter((f) => !f.startsWith("docs/artifacts/"))
+const UNMARKERED = ["docs/generated/", "docs/source/"]
+const docs = globSync("{docs,.claude}/**/*.md").filter((f) => !UNMARKERED.some((d) => f.startsWith(d)))
 
 /** Everywhere a path or a citation can be written. */
 const sources = [
@@ -147,7 +149,7 @@ if (
     for (const r of deadCitations) console.error(`    ${r}`)
   }
   if (deadRefs.length) {
-    console.error(`\n✗ ${deadRefs.length} dead reference(s) into docs/artifacts:`)
+    console.error(`\n✗ ${deadRefs.length} dead reference(s) into docs/generated or docs/source:`)
     for (const r of deadRefs) console.error(`    ${r}`)
   }
   if (hardWrapped.length) {

@@ -3,7 +3,7 @@
 import { ShieldCheck } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { TXN_FIELDS } from "@/lib/ask-nanci/data/panels/transaction-receipt"
-import { PanelShell, PanelHeader } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody } from "@/components/shared"
 
 export function TransactionReceiptPanel() {
   const { closePanel } = useAskNanci()
@@ -20,7 +20,7 @@ export function TransactionReceiptPanel() {
 
       <div className="flex flex-1 overflow-hidden divide-x">
         {/* Transaction detail */}
-        <div className="flex-1 overflow-auto px-4 py-3">
+        <PanelBody>
           <p className="text-[9px] font-bold tracking-[0.12em] uppercase text-muted-foreground mb-2.5">Transaction Detail</p>
           <div className="space-y-2.5">
             {TXN_FIELDS.map(([label, value]) => (
@@ -30,7 +30,7 @@ export function TransactionReceiptPanel() {
               </div>
             ))}
           </div>
-        </div>
+        </PanelBody>
 
         {/* Receipt mock */}
         <div className="w-[170px] shrink-0 overflow-auto bg-neutral-50 dark:bg-neutral-900 p-3">

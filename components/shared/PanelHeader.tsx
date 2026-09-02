@@ -61,15 +61,24 @@ export function PanelHeader({ title, subtitle, actions, onClose, dot, badge, siz
       <div
         className={cn(
           "flex items-center justify-between",
-          isPage ? "w-full" : "px-4 py-3",
+          // A page header carries a full toolbar, which no phone fits beside the
+          // title: below sm the actions drop to their own line and wrap there,
+          // rather than being clipped at the panel's edge. Page size only — the
+          // in-panel headers carry a close button, which always fits.
+          isPage ? "w-full flex-col items-start gap-3 sm:flex-row sm:items-center" : "px-4 py-3",
           !isPage && breadcrumb && "pt-2",
         )}
       >
         <div className={cn("min-w-0", isPage && "flex flex-1 flex-col gap-2")}>
           <p
             className={cn(
-              "truncate text-foreground",
-              isPage ? "text-xl font-semibold leading-none" : size === "lg" ? "text-base font-semibold" : "text-sm font-semibold",
+              "text-foreground",
+              // A page title carries the merchant name and its status pills, which no
+              // phone fits on one line — it wraps rather than truncating, so the pills
+              // stay reachable. leading-tight because a wrapped line needs the room.
+              isPage
+                ? "text-xl font-semibold leading-tight"
+                : cn("truncate", size === "lg" ? "text-base font-semibold" : "text-sm font-semibold"),
             )}
           >
             {title}
@@ -79,7 +88,7 @@ export function PanelHeader({ title, subtitle, actions, onClose, dot, badge, siz
           )}
         </div>
         {(actions || onClose) && (
-          <div className={cn("flex shrink-0 items-center gap-2", isPage ? "pl-4" : "ml-2")}>
+          <div className={cn("flex shrink-0 items-center gap-2", isPage ? "w-full flex-wrap sm:w-auto sm:pl-4" : "ml-2")}>
             {actions}
             {onClose && (
               <button

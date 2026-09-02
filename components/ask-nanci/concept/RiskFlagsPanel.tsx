@@ -3,7 +3,7 @@
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { FLAGS, flagCount, criticalCount, mediumCount, FLAG_SEVERITY_CLS } from "@/lib/ask-nanci/data/panels/risk-flags"
-import { PanelShell, PanelHeader } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody } from "@/components/shared"
 
 export function RiskFlagsPanel() {
   const { closePanel } = useAskNanci()
@@ -38,7 +38,7 @@ export function RiskFlagsPanel() {
       </div>
 
       {/* Flags */}
-      <div className="flex-1 overflow-auto px-3 py-2.5 space-y-1.5">
+      <PanelBody className="px-3 py-2.5 space-y-1.5">
         {FLAGS.map(({ icon: Icon, label, detail, severity }, i) => {
           const cls = FLAG_SEVERITY_CLS[severity]
           return (
@@ -54,7 +54,7 @@ export function RiskFlagsPanel() {
             </div>
           )
         })}
-      </div>
+      </PanelBody>
     </PanelShell>
   )
 }

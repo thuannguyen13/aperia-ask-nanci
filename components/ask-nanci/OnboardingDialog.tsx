@@ -3,7 +3,8 @@
 import Image from "next/image"
 import { Link2 } from "lucide-react"
 import { useEffect, useState } from "react"
-import { Button, Dialog, DialogContent, DialogTitle } from "aperia-ds5"
+import { Button } from "aperia-ds5"
+import { ResponsiveDialog, ResponsiveDialogContent, ResponsiveDialogTitle } from "@/components/shared"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { ConnectWizard } from "./ConnectWizard"
 import { FOUNDATION_SOURCE, readSources } from "@/lib/ask-nanci/source-store"
@@ -82,15 +83,15 @@ export function OnboardingDialog() {
 
   return (
     <>
-      <Dialog open={onboardingOpen} onOpenChange={() => {}}>
-        <DialogContent
+      <ResponsiveDialog open={onboardingOpen} onOpenChange={() => {}}>
+        <ResponsiveDialogContent
           showCloseButton={false}
           className="overflow-hidden p-0 sm:max-w-[720px] gap-0"
           onEscapeKeyDown={(e) => e.preventDefault()}
           onPointerDownOutside={(e) => e.preventDefault()}
           onInteractOutside={(e) => e.preventDefault()}
         >
-          <DialogTitle className="sr-only">Welcome to Ask Nanci</DialogTitle>
+          <ResponsiveDialogTitle className="sr-only">Welcome to Ask Nanci</ResponsiveDialogTitle>
 
           {step === 1 ? (
             <div className="flex overflow-hidden max-sm:flex-col-reverse sm:h-[22.75rem]">
@@ -173,8 +174,8 @@ export function OnboardingDialog() {
               </div>
             </div>
           )}
-        </DialogContent>
-      </Dialog>
+        </ResponsiveDialogContent>
+      </ResponsiveDialog>
 
       <ConnectWizard
         open={wizardOpen}

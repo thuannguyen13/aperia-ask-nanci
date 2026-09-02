@@ -1,9 +1,10 @@
 "use client"
 
 import { Send } from "lucide-react"
+import { Button } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { EVIDENCE } from "@/lib/ask-nanci/data/panels/dispute-draft"
-import { PanelShell, PanelHeader } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody } from "@/components/shared"
 
 export function DisputeDraftPanel() {
   const { closePanel, submitDisputeDraft } = useAskNanci()
@@ -18,7 +19,7 @@ export function DisputeDraftPanel() {
         onClose={() => closePanel("dispute-draft")}
       />
 
-      <div className="flex-1 overflow-auto px-4 py-3 space-y-4">
+      <PanelBody className="space-y-4">
         {/* Letter header */}
         <div className="rounded-lg border bg-card px-3.5 py-3 space-y-1 text-[11px]">
           <div className="flex justify-between text-muted-foreground">
@@ -54,17 +55,14 @@ export function DisputeDraftPanel() {
           <p>We respectfully request that the chargeback be reversed in favor of the merchant.</p>
           <p className="mt-2 font-mono">Oak Street Coffee · MID 4831••••7291</p>
         </div>
-      </div>
+      </PanelBody>
 
       {/* Submit */}
       <div className="shrink-0 border-t px-4 py-3">
-        <button
-          onClick={submitDisputeDraft}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-white hover:bg-primary/90 transition-colors"
-        >
+        <Button className="w-full gap-2" onClick={submitDisputeDraft}>
           <Send className="size-3.5" />
           Submit to Processor
-        </button>
+        </Button>
       </div>
     </PanelShell>
   )

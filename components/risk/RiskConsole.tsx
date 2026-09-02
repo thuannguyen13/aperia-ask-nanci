@@ -7,6 +7,7 @@ import Image from "next/image"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { AppFrame } from "@/components/ask-nanci/AppFrame"
 import { Sidebar } from "@/components/ask-nanci/Sidebar"
+import { MobileSidebarToggle } from "@/components/ask-nanci/MobileSidebarToggle"
 import { ChatView } from "@/components/ask-nanci/ChatView"
 import { ChatInput } from "@/components/ask-nanci/ChatInput"
 import { ConceptPanelArea } from "@/components/ask-nanci/concept/ConceptPanelArea"
@@ -104,6 +105,12 @@ export function RiskConsole({ assistant = true }: { assistant?: boolean }) {
       theme={THEME}
       topBar={
         <div className="relative z-10 flex h-10 shrink-0 items-center justify-center">
+          {/* Below md the rail is hidden and the drawer has no other opener, so the
+              console would strand a phone on whatever screen it opened. Same shape
+              as the Ask Nanci top bar, which is where this pattern comes from. */}
+          <div className="absolute left-0 flex items-center md:hidden">
+            <MobileSidebarToggle />
+          </div>
           <Image data-logo="frame" {...getThemeLogos(THEME).frame} className="h-6 w-auto" />
         </div>
       }

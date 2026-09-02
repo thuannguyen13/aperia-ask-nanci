@@ -235,3 +235,87 @@ html.dark [data-logo="ask-nanci"] { filter: invert(1) hue-rotate(180deg); }
     transition: flex 0.3s ease-out;
   }
 }
+
+/* ── Mobile foundation ──────────────────────────────────────────────────────
+   Two rules the design system does not carry: safe-area insets and touch
+   targets. Both live here rather than in a component so every demo picks them
+   up without importing anything, the same reasoning as the cursor rule above. */
+
+@theme {
+  /* Registered as spacing so they compose with every Tailwind spacing utility:
+     pb-safe-b, mb-safe-b, bottom-safe-b all work, and each falls back to 0px on
+     hardware with no inset. Needs viewportFit "cover" in app/layout.tsx to be
+     anything but zero. */
+  --spacing-safe-t: env(safe-area-inset-top, 0px);
+  --spacing-safe-b: env(safe-area-inset-bottom, 0px);
+  --spacing-safe-l: env(safe-area-inset-left, 0px);
+  --spacing-safe-r: env(safe-area-inset-right, 0px);
+}
+
+/* Grows the hit area to 44px (Apple's minimum; Google asks 48dp) without moving
+   a pixel of the control itself, which is the whole point — the design system's
+   sizes are 24/28/32/36px and they are meant to look that way. The overlay is
+   centred on the control and paints nothing.
+
+   Keyed on pointer, not width: a touchscreen laptop earns the bigger target and
+   a phone driven by a mouse does not. */
+@utility touch-target {
+  @media (pointer: coarse) {
+    position: relative;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: max(100%, 44px);
+      height: max(100%, 44px);
+      transform: translate(-50%, -50%);
+    }
+  }
+}
+
+@layer base {
+  /* Applied by slot rather than at each call site, so it reaches every control in
+     every demo, including ones not written yet. ds5 stamps data-slot on every
+     primitive it ships, which is the only stable hook it gives us. Listed
+     explicitly instead of matched with a wildcard: these are the slots whose
+     controls are smaller than 44px. */
+  @media (pointer: coarse) {
+    [data-slot="button"],
+    [data-slot="checkbox"],
+    [data-slot="radio-group-item"],
+    [data-slot="switch"],
+    [data-slot="toggle"],
+    [data-slot="toggle-group-item"],
+    [data-slot="select-trigger"],
+    [data-slot="tabs-trigger"],
+    [data-slot="dialog-close"],
+    [data-slot="sheet-close"],
+    [data-slot="dropdown-menu-item"],
+    [data-slot="pagination-link"] {
+      position: relative;
+    }
+
+    [data-slot="button"]::after,
+    [data-slot="checkbox"]::after,
+    [data-slot="radio-group-item"]::after,
+    [data-slot="switch"]::after,
+    [data-slot="toggle"]::after,
+    [data-slot="toggle-group-item"]::after,
+    [data-slot="select-trigger"]::after,
+    [data-slot="tabs-trigger"]::after,
+    [data-slot="dialog-close"]::after,
+    [data-slot="sheet-close"]::after,
+    [data-slot="dropdown-menu-item"]::after,
+    [data-slot="pagination-link"]::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: max(100%, 44px);
+      height: max(100%, 44px);
+      transform: translate(-50%, -50%);
+    }
+  }
+}

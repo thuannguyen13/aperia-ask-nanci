@@ -9,7 +9,6 @@ import { Button } from "aperia-ds5"
 import { AskNanciProvider, useAskNanci } from "@/contexts/AskNanciContext"
 import { ChatStreamProvider } from "@/contexts/ChatStreamContext"
 import { parseMode, CONCEPT_FLOW_SLUGS, CONCEPT_EMBED_FLOW_LAYOUTS } from "@/lib/ask-nanci/embed-demo-config"
-import { parsePanelUiOption } from "@/lib/ask-nanci/data/panel-ui"
 import { AppFrame, useAppTheme } from "./AppFrame"
 import { getThemeLogos } from "@/lib/ask-nanci/data/theme-logos"
 import { Sidebar } from "./Sidebar"
@@ -23,7 +22,6 @@ import { Onboarding } from "@/components/onboarding/Onboarding"
 import { SettingsDialog } from "./SettingsDialog"
 import { DarkModeToggle } from "./DarkModeToggle"
 import { MobileSidebarToggle } from "./MobileSidebarToggle"
-import { MobilePanelToggle } from "./MobilePanelToggle"
 
 const DQ_PANELS = new Set(["detection-queue", "barometer-report", "coastal-risk"])
 
@@ -33,9 +31,7 @@ function ReplayButton() {
   // stays hidden while the script is thinking/streaming.
   if (!replayFlow || chatState !== "idle") return null
   return (
-    // Sits left of MobilePanelToggle on mobile so the two never overlap once a flow
-    // has finished with panels still open.
-    <Button variant="secondary" size="xs" onClick={replayFlow} className="absolute right-12 gap-1.5 md:right-3">
+    <Button variant="secondary" size="xs" onClick={replayFlow} className="absolute right-3 gap-1.5">
       <RotateCcw className="size-3" />
       Ask
     </Button>
@@ -133,10 +129,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // Per-flow embed layout: some flows (e.g. 22, Service Marketplace) render the full
   // app shell (sidebar + standard welcome) instead of the compact concept-embed widget.
   const embedLayout = (rawFlow && CONCEPT_EMBED_FLOW_LAYOUTS[rawFlow]) || null
-  // The brand-bar panel button is the way back to a sheet that left the screen. A
-  // presentation that rests as a lip never leaves one, so the handle is already the way
-  // back and a second control would be a button with nothing to do.
-  const sheetRestsAsLip = parsePanelUiOption(searchParams.get("panelui")).sheet.lip > 0
   const { setTheme } = useTheme()
 
   // The theme goes on <html> so portaled surfaces inherit it (see useAppTheme).
@@ -173,13 +165,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             {/* Hidden under ?autoplay — the flow starts itself, so the button has
                 nothing to offer on arrival and only reads as a stray control. */}
             {isConceptEmbed && !fullApp && !autoPlay && <ReplayButton />}
-            {/* The sheet the toggle reopens only exists under ConceptContentArea, so
-                the chat-only embeds (clover, business-owner) get no control. */}
-            {isConceptEmbed && !fullApp && !sheetRestsAsLip && (
-              <div className="absolute right-0 flex items-center md:hidden">
-                <MobilePanelToggle />
-              </div>
-            )}
           </div>
           <div className="relative z-10 flex min-h-0 flex-1 overflow-hidden rounded-xl md:rounded-2xl bg-sidebar shadow-sm">
             {fullApp ? (
@@ -222,12 +207,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <MobileSidebarToggle />
             </div>
             <Image data-logo="frame" {...getThemeLogos(theme).frame} className="h-6 w-auto" />
-            {/* Same rule as the embed branch: only the concept layout renders a sheet. */}
-            {isConceptVersion && !sheetRestsAsLip && (
-              <div className="absolute right-0 flex items-center md:hidden">
-                <MobilePanelToggle />
-              </div>
-            )}
           </div>
         }
         sidebar={<Sidebar />}
