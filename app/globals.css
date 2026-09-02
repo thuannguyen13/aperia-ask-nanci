@@ -209,6 +209,102 @@ html.dark [data-logo="ask-nanci"] { filter: invert(1) hue-rotate(180deg); }
   --animate-panel-in: panel-fade-in 0.28s ease-out;
 }
 
+/* The arrival cue for a panel that reaches a phone resting. A scripted turn opens its
+   panel with `reveal: false`, so all that appears is a handle a few px above the
+   composer — below where anyone reading the answer is looking. The grabber breathes
+   twice and then stays still: enough to be caught in peripheral vision, not a loop
+   that keeps asking.
+
+   The iOS reading of a grabber: it swells and softens in place rather than travelling,
+   which is why it needs no axis. The presentations in data/panel-ui.ts are dragged
+   along different ones (data-pulse is written by MobilePanelSwitcher for all four) and
+   a pulse is the same gesture-neutral cue on every one of them.
+
+   Slight on purpose. The pill is 6px of solid colour against a white conversation, so
+   1.14 of scale is about a pixel of thickness and a few of length — visible in the
+   corner of an eye, invisible if you are looking straight at it. Anything more reads
+   as a notification badge.
+
+   The 0.3s delay clears the card's own 300ms settle, so the cue is a second beat
+   rather than something fighting the arrival. */
+/* The four colours the pill lights up with mid-beat, all registered so they
+   interpolate — the same reason --sheet-progress is registered above. Transparent at
+   both ends of the keyframe, which is what leaves the pill its flat grey at rest.
+
+   Deliberately not var(--primary). The brand colour is what the app uses to mean
+   "this is a control, press it", and the cue is not asking to be pressed; it is
+   saying a panel landed. So the core goes white and the halo is a soft spectrum that
+   belongs to no theme, which reads as something lighting up rather than as one more
+   primary-coloured button appearing at the bottom of the screen. */
+@property --pulse-core { syntax: "<color>"; inherits: false; initial-value: transparent; }
+@property --pulse-warm { syntax: "<color>"; inherits: false; initial-value: transparent; }
+@property --pulse-mid  { syntax: "<color>"; inherits: false; initial-value: transparent; }
+@property --pulse-cool { syntax: "<color>"; inherits: false; initial-value: transparent; }
+
+@keyframes grabber-pulse {
+  0%, 100% {
+    transform: scale(1);
+    --pulse-core: transparent;
+    --pulse-warm: transparent;
+    --pulse-mid: transparent;
+    --pulse-cool: transparent;
+  }
+  45% {
+    transform: scale(1.2);
+    --pulse-core: rgb(255 255 255 / 0.95);
+    --pulse-warm: rgb(255 120 195 / 0.75);
+    --pulse-mid:  rgb(140 118 255 / 0.6);
+    --pulse-cool: rgb(90 205 250 / 0.5);
+  }
+}
+
+/* The same two beats with nothing moving, for a reader who asked for no motion. Light
+   is not motion, so the glow stays; only the swell goes. */
+@keyframes grabber-pulse-still {
+  0%, 100% {
+    --pulse-core: transparent;
+    --pulse-warm: transparent;
+    --pulse-mid: transparent;
+    --pulse-cool: transparent;
+  }
+  45% {
+    --pulse-core: rgb(255 255 255 / 0.95);
+    --pulse-warm: rgb(255 120 195 / 0.75);
+    --pulse-mid:  rgb(140 118 255 / 0.6);
+    --pulse-cool: rgb(90 205 250 / 0.5);
+  }
+}
+
+/* The pill fills flat white and the colour sits entirely outside it, in the halo. Two
+   other shapes were tried and both look worse: a conic gradient along the pill greys
+   itself out, because a pastel at half alpha over grey desaturates rather than tints;
+   and a radial white core leaves a specular blob down the middle that reads as a
+   plastic tube. Flat fill, coloured rim, nothing shaded.
+
+   A linear-gradient with one colour at both ends rather than a background-color,
+   because the colour has to come from a registered custom property to interpolate, and
+   a gradient is what lets one declaration stay put while the value under it animates.
+
+   The halo is three concentric shadows rather than one: a single colour reads as a
+   drop shadow, and three at widening blurs read as light coming off the pill, because
+   each is still visible past the edge of the one inside it — the warm hugs the edge,
+   the cool is what is left at the outside. Kept tight (13px at the widest, 2px of
+   spread): wider stops reading as a glow and starts reading as a blurred smudge.
+   Offsets stay at 0 because an offset has a direction, and the two orientations do
+   not share one. */
+[data-pulse] {
+  background-image: linear-gradient(var(--pulse-core), var(--pulse-core));
+  box-shadow:
+    0 0 3px 0px var(--pulse-warm),
+    0 0 7px 0px var(--pulse-mid),
+    0 0 13px 2px var(--pulse-cool);
+  animation: grabber-pulse 0.9s ease-in-out 0.3s 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-pulse] { animation-name: grabber-pulse-still; }
+}
+
 @layer base {
   /* The app is a fixed 100dvh shell that never scrolls as a document, but iOS still
      lets a touch drag the document itself and rubber-band it, which reads as the whole
