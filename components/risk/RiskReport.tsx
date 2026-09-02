@@ -393,6 +393,16 @@ export function RiskReport() {
 
   if (!m || !d) return null
 
+  // A closed account settles nothing. Both transaction views read module-level demo
+  // data shared by every merchant, so without this the two bust-out case studies
+  // print this month's sales under a Terminated status and a last batch in 2025.
+  const closed = d.merchant.accountStatus === "Terminated"
+  const noActivity = (
+    <p className="py-10 text-center text-sm text-muted-foreground">
+      No activity since {d.account.lastBatch}. This account is {d.merchant.accountStatus.toLowerCase()}.
+    </p>
+  )
+
   return (
     <PanelShell className="min-w-0 flex-1">
       <PanelHeader
@@ -602,6 +612,7 @@ export function RiskReport() {
             <Button variant="outline" size="sm"><Download className="size-4" /> Export</Button>
           </div>
           <div className="mt-3">
+            {closed ? noActivity : (
             <PanelTable density="comfortable">
               <Thead>
                 <Th>{""}</Th>
@@ -620,6 +631,7 @@ export function RiskReport() {
                 ))}
               </TableBody>
             </PanelTable>
+            )}
           </div>
           </>
           ) : txnView === "Transaction History" ? (
@@ -678,10 +690,8 @@ export function RiskReport() {
           <Button variant="outline" size="sm">View all {AUTH_TOTAL}</Button>
         </div>
 
-        {/* The two MC columns are tinted as a pair: the point of the table is that
-            the same approved sale carries a different score each time, and the tint
-            is what separates what the processor saw from what Mastercard made of it. */}
         <div className="mt-3">
+          {closed ? noActivity : (
           <PanelTable density="comfortable">
             <Thead>
               <Th sortable>Date / Time</Th>
@@ -726,6 +736,7 @@ export function RiskReport() {
               })}
             </TableBody>
           </PanelTable>
+          )}
         </div>
           </>
           )}

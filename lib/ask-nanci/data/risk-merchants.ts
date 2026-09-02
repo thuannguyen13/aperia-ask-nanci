@@ -336,10 +336,14 @@ export const CROSS_QUEUE_ROWS: QueueRow[] = [
 // point at: the same $420 sale, approved every time, scoring 960 at 6am and 420
 // the night before.
 //
+// The six scored rows repeat $420 and the four unscored ones do not: that contrast
+// is the table's argument. A card-testing run repeats one amount, so the repeats are
+// the anomaly and the ordinary tickets around them are what the month normally looks
+// like. Making every row $420 would have implied 156 x $420 for the month, three
+// times the gross the volume view reports.
+//
 // ponytail: illustrative. The real data carries scores per merchant, not per
-// authorization, so the per-auth scores and reasons here are invented to show the
-// shape. The flat $420 amount is deliberate — a card-testing run repeats one
-// amount, and that is what the velocity reasons are describing.
+// authorization, so the per-auth scores, amounts and reasons here are invented.
 export interface AuthRow {
   /** MM/DD/YYYY HH:MM:SS, the format every other date on this screen uses. */
   at: string
@@ -367,10 +371,10 @@ export const RECENT_AUTHS: AuthRow[] = [
   { at: "05/03/2026 05:14:55", card: "3782", amount: 420, type: "Sale", result: "Approved", mcScore: 780, mcReason: "High-risk MCC" },
   { at: "05/03/2026 04:47:33", card: "4147", amount: 420, type: "Sale", result: "Approved", mcScore: 660, mcReason: "High-risk MCC" },
   { at: "05/03/2026 03:12:18", card: "5419", amount: 420, type: "Sale", result: "Approved", mcScore: 620, mcReason: "High-risk MCC" },
-  { at: "05/02/2026 23:55:01", card: "4147", amount: 420, type: "Sale", result: "Approved", mcScore: 480, mcReason: null },
-  { at: "05/02/2026 22:08:47", card: "3782", amount: 420, type: "Sale", result: "Approved", mcScore: 420, mcReason: null },
-  { at: "05/02/2026 21:33:20", card: "4889", amount: 420, type: "Sale", result: "Approved", mcScore: 390, mcReason: null },
-  { at: "05/02/2026 20:02:14", card: "5212", amount: 420, type: "Sale", result: "Approved", mcScore: 310, mcReason: null },
+  { at: "05/02/2026 23:55:01", card: "4147", amount: 86.40,  type: "Sale", result: "Approved", mcScore: 480, mcReason: null },
+  { at: "05/02/2026 22:08:47", card: "3782", amount: 214.99, type: "Sale", result: "Approved", mcScore: 420, mcReason: null },
+  { at: "05/02/2026 21:33:20", card: "4889", amount: 52.10,  type: "Sale", result: "Approved", mcScore: 390, mcReason: null },
+  { at: "05/02/2026 20:02:14", card: "5212", amount: 137.65, type: "Sale", result: "Approved", mcScore: 310, mcReason: null },
 ]
 
 // ── Transaction Volume Analysis ──────────────────────────────────────────────
@@ -379,8 +383,10 @@ export const RECENT_AUTHS: AuthRow[] = [
 // derived, so the column cannot say $283,060 net beside a gross and a returns
 // figure that do not subtract to it.
 //
-// MTD transactions is AUTH_TOTAL: the authorization tab offers "View all 156" and
-// this row is where that 156 comes from.
+// MTD transactions is AUTH_TOTAL: the authorization view offers "View all 156" and
+// this row is where that 156 comes from — the same population, which is why the ten
+// on screen cannot all carry the burst amount. $21,981 over 156 is a $140.90 average
+// ticket, and the $420 repeats sit above it as the outliers they are meant to be.
 export interface VolumePeriod {
   label: string
   grossSales: number
