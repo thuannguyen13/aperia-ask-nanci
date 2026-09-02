@@ -43,11 +43,18 @@ export type ChartLegendEntry = {
 
 export function ResponsiveChart({
   height = 200,
+  minHeight,
   legend,
   className,
   children,
 }: {
-  height?: number
+  /**
+   * A number, or "100%" for a chart that fills a flex parent. The percentage form
+   * needs `minHeight` with it: recharts measures once, and a percentage against a
+   * parent that has not been laid out yet resolves to 0 and never re-measures.
+   */
+  height?: number | `${number}%`
+  minHeight?: number
   legend?: ChartLegendEntry[]
   className?: string
   /**
@@ -81,7 +88,7 @@ export function ResponsiveChart({
 
   return (
     <div ref={ref} className={className}>
-      <ResponsiveContainer width="100%" height={height}>
+      <ResponsiveContainer width="100%" height={height} minHeight={minHeight}>
         {framed}
       </ResponsiveContainer>
 

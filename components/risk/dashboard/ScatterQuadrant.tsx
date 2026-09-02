@@ -1,6 +1,7 @@
 "use client"
 
-import { ScatterChart, Scatter, XAxis, YAxis, ZAxis, ReferenceLine, ReferenceArea, ResponsiveContainer } from "recharts"
+import { ScatterChart, Scatter, XAxis, YAxis, ZAxis, ReferenceLine, ReferenceArea } from "recharts"
+import { ResponsiveChart } from "@/components/shared"
 import { SCATTER_POINTS, SCATTER_COLORS, type ScatterCat } from "@/lib/ask-nanci/data/risk-dashboard"
 
 const CATS: ScatterCat[] = ["none", "vw", "mc", "both"]
@@ -25,7 +26,10 @@ export function ScatterQuadrant() {
         {/* minHeight matches the card's own min-h: height="100%" resolves to 0 when
             the parent has no fixed height (the chat's DashChartCard), and recharts
             never re-measures, so the chart silently renders nothing there. */}
-        <ResponsiveContainer width="100%" height="100%" minHeight={240}>
+        {/* h-full so the percentage height has a box to resolve against: the wrapper
+            div is what recharts measures, and an auto-height div measures 0. */}
+        <ResponsiveChart height="100%" minHeight={240} className="h-full">
+          {() => (
           <ScatterChart margin={{ top: 10, right: 16, bottom: 20, left: 0 }}>
             {QUADRANTS.map((q) => (
               <ReferenceArea
@@ -47,7 +51,8 @@ export function ScatterQuadrant() {
               <Scatter key={cat} data={SCATTER_POINTS.filter((p) => p.cat === cat)} fill={SCATTER_COLORS[cat]} fillOpacity={0.9} />
             ))}
           </ScatterChart>
-        </ResponsiveContainer>
+          )}
+        </ResponsiveChart>
       </div>
 
       <p className="shrink-0 px-1 text-[11px] text-muted-foreground">
