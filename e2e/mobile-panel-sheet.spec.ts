@@ -33,6 +33,11 @@ const SETTLE_MS = 700
 // does not depend on how fast Playwright happened to move the pointer.
 const DRAG_PX = 260
 
+// The air ?panelui=over-bottom leaves above the composer when it rests (REST_GAP in
+// use-sheet-gesture.ts). Every other presentation gets the same from the card's own
+// 12px inset; this one is lifted by a calc and has to add it back.
+const REST_GAP = 12
+
 /** The panel flow 2 opens, and the accessible name every sheet locator hangs off. */
 const PANEL = "Merchant Volume"
 
@@ -48,6 +53,10 @@ const PRESENTATIONS = [
   { name: "bottom sheet", param: "away", axis: "y", lip: 0 },
   { name: "right-side drawer", param: "right", axis: "x", lip: 0 },
   { name: "swipe from the edge", param: "edge", axis: "x", lip: 40 },
+  // Same card and same axis as the edge strip; the difference is that its frame runs
+  // past the composer instead of stopping at it, which the test below asserts.
+  { name: "edge strip over the composer", param: "over-right", axis: "x", lip: 32 },
+  { name: "bottom sheet over the composer", param: "over-bottom", axis: "y", lip: 32 },
 ] as const
 
 type Presentation = (typeof PRESENTATIONS)[number]
@@ -194,6 +203,13 @@ for (const p of PRESENTATIONS) {
       const past = p.axis === "y" ? rest.y - (frame.y + frame.height) : rest.x - PHONE.width
       expect(past, `card rests ${past}px past the clip line`).toBeGreaterThanOrEqual(40)
       expect(past, `card rests ${past}px past the clip line`).toBeLessThanOrEqual(frame.height)
+    } else if (p.param === "over-bottom") {
+      // This one's frame ends at the screen so an open card can cover the composer, and
+      // the card is lifted back above it to rest. So the lip is measured from where it
+      // actually lands — the composer's top edge — rather than from the frame.
+      const composerTop = await page.evaluate(() => document.querySelector("[data-composer]")!.getBoundingClientRect().top)
+      const inside = composerTop - rest.y
+      expectPx(inside, p.lip + REST_GAP)
     } else {
       // A lip stays: exactly `lip` px of the card is still inside the frame.
       const inside = p.axis === "y" ? frame.y + frame.height - rest.y : PHONE.width - rest.x
@@ -205,7 +221,11 @@ for (const p of PRESENTATIONS) {
   })
 }
 
-for (const p of PRESENTATIONS.filter((option) => option.lip > 0)) {
+// `over` is excluded from the gap assertion below and only from that one: its frame
+// deliberately ends at the screen rather than at the composer, so "the handle sits just
+// clear of the composer" is not a claim it makes. It still gets the open-position, the
+// dismiss-to-a-lip and the tap-to-reopen tests.
+for (const p of PRESENTATIONS.filter((option) => option.lip > 0 && option.param !== "over-right" && option.param !== "over-bottom")) {
   test(`${p.name}: the resting handle clears the composer and swipes back open`, async ({ page }) => {
     await gotoFlow(page, `flow=2&panelui=${p.param}`)
     await waitForOpenSheet(page)
@@ -348,4 +368,21 @@ test("prefers-reduced-motion: the arrival cue drops the swell and keeps the colo
   await expect(grabber).toHaveAttribute("data-pulse", "", { timeout: PANEL_TIMEOUT })
   const name = await grabber.evaluate((el) => getComputedStyle(el).animationName)
   expect(name).toBe("grabber-pulse-still")
+})
+
+test("?panelui=over-right puts the sheet over the composer, and the shipped option does not", async ({ page }) => {
+  await gotoFlow(page, "flow=2&panelui=over-right")
+  await waitForOpenSheet(page)
+
+  // The frame ends at the bottom of the screen rather than at the composer, and the
+  // scrim above it takes the composer with it — which is the whole difference between
+  // this option and the right-side drawer, and the trade it exists to put a number on.
+  const frame = await box(frameOf(page))
+  expect(Math.round(frame.y + frame.height)).toBe(PHONE.height)
+
+  const typable = await page.getByPlaceholder("Ask anything").evaluate((textarea) => {
+    const r = textarea.getBoundingClientRect()
+    return document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2) === textarea
+  })
+  expect(typable, "the composer must be covered under ?panelui=over-right").toBe(false)
 })

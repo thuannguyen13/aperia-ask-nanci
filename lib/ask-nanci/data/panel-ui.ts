@@ -19,6 +19,15 @@ export interface PanelSheetConfig {
    * grabbable lip that reopens it.
    */
   lip: number
+  /**
+   * Whether the card and its scrim go over the composer instead of stopping at it.
+   *
+   * Everything else here ends at the composer's top edge and sits under it (the sheet
+   * is z-20, the composer z-30), so a reader can keep typing with a panel open. This
+   * gives the panel the whole screen and takes the composer with it — the trade this
+   * option exists to put a number on.
+   */
+  coversComposer?: boolean
 }
 
 export interface PanelUiOption {
@@ -106,6 +115,42 @@ export const PANEL_UI_OPTIONS: PanelUiOption[] = [
       "Fights the iOS back gesture on the same edge",
       "A vertical strip is a smaller target than a full-width lip",
       "Nothing on the strip says which panel it is",
+    ],
+  },
+  {
+    id: "e",
+    name: "Edge strip, over the composer",
+    param: "over-right",
+    sheet: { axis: "x", lip: 32, coversComposer: true },
+    blurb: "Option D taken to the bottom of the screen: full width over the composer when open, resting as a strip against the right edge when not.",
+    taps: "0 taps, one swipe",
+    pros: [
+      "The panel gets the whole screen, not the screen minus the composer",
+      "The strip stays, so a dismissed panel is still a swipe away",
+      "The dim reaches every edge, so the panel is unambiguously the layer in front",
+    ],
+    cons: [
+      "The composer cannot be reached while the panel is open",
+      "The resting strip is 32px against option D's 40, so it is a smaller target",
+      "Fights the iOS back gesture on the same edge",
+    ],
+  },
+  {
+    id: "f",
+    name: "Bottom sheet, over the composer",
+    param: "over-bottom",
+    sheet: { axis: "y", lip: 32, coversComposer: true },
+    blurb: "The shipped swipe-to-open sheet taken to the bottom of the screen: full height over the composer when open, resting as a handle on top of it when not.",
+    taps: "0 taps, one swipe",
+    pros: [
+      "The panel gets the whole screen, not the screen minus the composer",
+      "The handle sits at the bottom edge, where the thumb already is",
+      "Swiping up to open is the same gesture the shipped option uses",
+    ],
+    cons: [
+      "Two heights to design for, like the shipped option, plus a covered composer",
+      "The composer cannot be reached while the panel is open",
+      "Swiping up competes with scrolling the conversation",
     ],
   },
 ]

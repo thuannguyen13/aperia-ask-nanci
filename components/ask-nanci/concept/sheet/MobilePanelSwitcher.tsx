@@ -41,6 +41,11 @@ import type { PanelSheetConfig } from "@/lib/ask-nanci/data/panel-ui"
 //   data-pulse         written here on the grabber when a panel arrives resting, read
 //                      by globals.css for the arrival cue. Valueless: the cue swells
 //                      in place, so it is the same on all four presentations.
+//   --nest-lip-b/-r    written here while a lip is on screen, read by globals.css to
+//                      pad [data-nest] by exactly that much. The lip is the one part
+//                      of the sheet that shares the screen with the conversation
+//                      rather than covering it, so it is the one part the conversation
+//                      has to make room for.
 
 /**
  * A sheet is a card floating on the dimmed page: inset by the same 12px the composer
@@ -59,6 +64,18 @@ import type { PanelSheetConfig } from "@/lib/ask-nanci/data/panel-ui"
 // and so cannot be covered from there.
 const SHEET_FRAME =
   "fixed inset-x-0 top-9 bottom-[calc(var(--composer-inset,0px)+var(--keyboard-h,0px))] z-20 [clip-path:inset(-60px_-60px_-48px_-60px)]"
+/**
+ * ?panelui=over. The same frame taken to the bottom of the screen and lifted over the
+ * composer, which is the only thing that stops at it (z-30, app/(app)/page.tsx).
+ *
+ * The bottom inset is the keyboard and the home indicator rather than the composer,
+ * and the clip opens up to match: the reason the default frame clips 48px inside the
+ * composer is to stop a dragged card reappearing in the strip below it, and there is
+ * no strip below it here. Everything else — the drag, the settle, the dismissal — is
+ * the shipped sheet unchanged.
+ */
+const SHEET_FRAME_OVER =
+  "fixed inset-x-0 top-9 bottom-[calc(var(--keyboard-h,0px)+var(--spacing-safe-b,0px))] z-40 [clip-path:inset(-60px_-60px_-60px_-60px)]"
 const SHEET_CARD = "absolute inset-3 rounded-2xl border"
 
 /** The card's inset inside the frame: its gap to the composer when open. */
@@ -84,6 +101,7 @@ function PanelSheet({ config, panelId, present, open, label, pager, onOpen, onCl
   const vertical = config.axis === "y"
   // A lip only exists while a panel does, so the two conditions travel together.
   const peek = present && config.lip > 0
+  const overComposer = !!config.coversComposer
 
   // How far the sheet travels between resting and open. Measured into state rather
   // than assumed: the sheet's height depends on the composer, which changes with its
@@ -98,6 +116,10 @@ function PanelSheet({ config, panelId, present, open, label, pager, onOpen, onCl
     open,
     peek,
     travel,
+    // A bottom sheet that covers the composer when open still rests above it, the way
+    // every other presentation does. Only the vertical one needs it: resting against
+    // the right edge has nothing to do with the composer's height.
+    liftAtRest: overComposer && vertical,
     onOpen,
     onClose,
   })
@@ -142,6 +164,24 @@ function PanelSheet({ config, panelId, present, open, label, pager, onOpen, onCl
     el.dataset.pulse = ""
   }, [panelId, open])
 
+  // A lip sits on the conversation rather than over it: 40px of card against the right
+  // edge, or above the composer, for as long as a panel is open. Left alone the text
+  // runs under it, so the conversation gives back exactly the lip's width and takes it
+  // again when the panel closes.
+  //
+  // Reserved while the lip exists, not while it is visible. Open, the card covers the
+  // conversation anyway, so tying the padding to `open` would animate something nobody
+  // can see and then animate it back — one transition per panel instead of three.
+  useEffect(() => {
+    const root = document.documentElement
+    const side = vertical ? "--nest-lip-b" : "--nest-lip-r"
+    root.style.setProperty(side, peek ? `${config.lip}px` : "0px")
+    return () => {
+      root.style.removeProperty("--nest-lip-b")
+      root.style.removeProperty("--nest-lip-r")
+    }
+  }, [peek, config.lip, vertical])
+
   useSheetDismissal(open, onClose)
   useSheetFocus(cardRef, open)
   useKeyboardInset()
@@ -161,9 +201,11 @@ function PanelSheet({ config, panelId, present, open, label, pager, onOpen, onCl
           a visible seam around it; the dim belongs to the settled state. */}
       <div
         onClick={onClose}
-        className={`fixed inset-x-0 bottom-0 top-10 z-10 bg-black/10 transition-opacity duration-300 supports-backdrop-filter:backdrop-blur-xs ${
-          open ? "opacity-100" : "pointer-events-none opacity-0"
-        }`}
+        className={`fixed inset-x-0 bottom-0 top-10 bg-black/10 transition-opacity duration-300 supports-backdrop-filter:backdrop-blur-xs ${
+          // Over the composer the scrim has to outrank it too, or the one control the
+          // reader can still touch is the one this option exists to take away.
+          overComposer ? "z-30" : "z-10"
+        } ${open ? "opacity-100" : "pointer-events-none opacity-0"}`}
       />
       {/* The frame ends exactly at the composer and the card is inset inside it, so a
           card at rest sits against the composer rather than the screen edge. It only
@@ -172,7 +214,7 @@ function PanelSheet({ config, panelId, present, open, label, pager, onOpen, onCl
           It spans the whole chat area, so it must never take pointer events itself: a
           resting sheet would otherwise swallow every tap and text selection on the
           conversation behind it. The card re-enables events for its own box. */}
-      <div className={`${SHEET_FRAME} pointer-events-none`}>
+      <div className={`${overComposer ? SHEET_FRAME_OVER : SHEET_FRAME} pointer-events-none`}>
       {/* Resting, the card is a handle and nothing else, so it is a dialog only while
           it is open. data-resting is written by the gesture, not rendered: it has to
           follow the finger. */}
@@ -187,7 +229,7 @@ function PanelSheet({ config, panelId, present, open, label, pager, onOpen, onCl
           open || peek ? "pointer-events-auto" : ""
         } ${
           vertical ? "flex-col" : "flex-row"
-        } border-border bg-background shadow-2xl data-[resting]:border-transparent data-[resting]:bg-transparent data-[resting]:shadow-none transition-[transform,background-color,border-color,box-shadow] duration-300 ease-out`}
+        } border-border bg-background shadow-2xl data-[resting]:pointer-events-none data-[resting]:border-transparent data-[resting]:bg-transparent data-[resting]:shadow-none transition-[transform,background-color,border-color,box-shadow] duration-300 ease-out`}
       >
         {/* The grab strip runs along the anchored edge: across the top for a bottom
             sheet, down the left for a right-side one. While peeking it is the whole
@@ -201,7 +243,11 @@ function PanelSheet({ config, panelId, present, open, label, pager, onOpen, onCl
             else onOpen()
           }}
           aria-label={`${open ? "Hide" : "Show"} ${label ?? "panel"}`}
-          className={`relative flex shrink-0 cursor-grab touch-none justify-center active:cursor-grabbing ${
+          // Resting, the card gives up pointer events and the strip takes them back:
+          // the card's box stays full size wherever it is translated to, and a lifted
+          // bottom sheet parks that box straight over the composer. Without this the
+          // composer sits under a transparent card and stops answering taps.
+          className={`relative flex shrink-0 cursor-grab touch-none justify-center group-data-[resting]:pointer-events-auto active:cursor-grabbing ${
             vertical
               // Resting, the handle sits at the strip's bottom edge, a few px above the
               // composer, while the rest of the strip stays a comfortable target.
