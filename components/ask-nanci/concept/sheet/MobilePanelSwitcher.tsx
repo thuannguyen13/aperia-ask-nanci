@@ -41,6 +41,11 @@ import type { PanelSheetConfig } from "@/lib/ask-nanci/data/panel-ui"
 //   data-pulse         written here on the grabber when a panel arrives resting, read
 //                      by globals.css for the arrival cue. Valueless: the cue swells
 //                      in place, so it is the same on all four presentations.
+//   --nest-lip-b/-r    written here while a lip is on screen, read by globals.css to
+//                      pad [data-nest] by exactly that much. The lip is the one part
+//                      of the sheet that shares the screen with the conversation
+//                      rather than covering it, so it is the one part the conversation
+//                      has to make room for.
 
 /**
  * A sheet is a card floating on the dimmed page: inset by the same 12px the composer
@@ -154,6 +159,24 @@ function PanelSheet({ config, panelId, present, open, label, pager, onOpen, onCl
     void el.offsetWidth
     el.dataset.pulse = ""
   }, [panelId, open])
+
+  // A lip sits on the conversation rather than over it: 40px of card against the right
+  // edge, or above the composer, for as long as a panel is open. Left alone the text
+  // runs under it, so the conversation gives back exactly the lip's width and takes it
+  // again when the panel closes.
+  //
+  // Reserved while the lip exists, not while it is visible. Open, the card covers the
+  // conversation anyway, so tying the padding to `open` would animate something nobody
+  // can see and then animate it back — one transition per panel instead of three.
+  useEffect(() => {
+    const root = document.documentElement
+    const side = vertical ? "--nest-lip-b" : "--nest-lip-r"
+    root.style.setProperty(side, peek ? `${config.lip}px` : "0px")
+    return () => {
+      root.style.removeProperty("--nest-lip-b")
+      root.style.removeProperty("--nest-lip-r")
+    }
+  }, [peek, config.lip, vertical])
 
   useSheetDismissal(open, onClose)
   useSheetFocus(cardRef, open)

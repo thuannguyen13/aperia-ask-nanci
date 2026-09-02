@@ -50,7 +50,7 @@ const PRESENTATIONS = [
   { name: "swipe from the edge", param: "edge", axis: "x", lip: 40 },
   // Same card and same axis as the edge strip; the difference is that its frame runs
   // past the composer instead of stopping at it, which the test below asserts.
-  { name: "edge strip over the composer", param: "over", axis: "x", lip: 40 },
+  { name: "edge strip over the composer", param: "over", axis: "x", lip: 32 },
 ] as const
 
 type Presentation = (typeof PRESENTATIONS)[number]

@@ -138,6 +138,14 @@ html[data-sheet-scrub] {
   transform-origin: top center;
   border-radius: calc(1rem * var(--sheet-progress));
   opacity: calc(1 - 0.45 * var(--sheet-progress));
+  /* The lip is the one part of a sheet that shares the screen with the conversation
+     instead of covering it, so it is the one part the conversation makes room for:
+     the padding is exactly the lip, published by MobilePanelSwitcher. Eased over the
+     same 300ms the card settles in, so the text moves aside with the panel arriving
+     rather than jumping out from under it. */
+  padding-right: var(--nest-lip-r, 0px);
+  padding-bottom: var(--nest-lip-b, 0px);
+  transition: padding 300ms ease-out;
 }
 
 /* The composer's fill rides the same number: solid at rest (a resting sheet's body

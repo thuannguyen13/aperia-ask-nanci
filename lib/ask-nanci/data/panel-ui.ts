@@ -121,7 +121,7 @@ export const PANEL_UI_OPTIONS: PanelUiOption[] = [
     id: "e",
     name: "Edge strip, over the composer",
     param: "over",
-    sheet: { axis: "x", lip: 40, coversComposer: true },
+    sheet: { axis: "x", lip: 32, coversComposer: true },
     blurb: "Option D taken to the bottom of the screen: full width over the composer when open, resting as a strip against the right edge when not.",
     taps: "0 taps, one swipe",
     pros: [
@@ -131,7 +131,7 @@ export const PANEL_UI_OPTIONS: PanelUiOption[] = [
     ],
     cons: [
       "The composer cannot be reached while the panel is open",
-      "The resting strip centres on a taller frame, so it sits higher than option D's",
+      "The resting strip is 32px against option D's 40, so it is a smaller target",
       "Fights the iOS back gesture on the same edge",
     ],
   },
