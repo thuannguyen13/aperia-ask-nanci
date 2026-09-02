@@ -21,8 +21,11 @@ export function RealertTable() {
     <PanelTable density="comfortable">
       <Thead>
         <Th sortable>Assignment</Th>
-        <Th sortable>Worked</Th>
-        <Th sortable>Re-alerted</Th>
+        {/* Scoped on purpose: the queue cards report today (0 worked), these are
+            the reporting window the rate is measured over. Unlabelled, the two
+            read as the same quantity with two values. */}
+        <Th sortable>Worked (30d)</Th>
+        <Th sortable>Re-alerted (30d)</Th>
         <Th sortable>Re-alert rate</Th>
         <Th sortable>Suggested action</Th>
       </Thead>

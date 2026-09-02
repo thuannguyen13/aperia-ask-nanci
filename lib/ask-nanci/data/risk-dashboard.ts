@@ -9,17 +9,72 @@ import {
   AlertTriangle, Inbox, BarChart3, Briefcase, Timer, type LucideIcon,
 } from "lucide-react"
 import { ASSIGNMENTS } from "./risk-assignments"
+import { DETECTION_QUEUES } from "./risk-detection-queue"
+
+/** Ready items across every queue the console actually renders. */
+const READY_TOTAL = DETECTION_QUEUES.reduce(
+  (n, q) => n + (q.statuses.find((s) => s.key === "ready")?.count ?? 0),
+  0,
+)
 
 // Chart ids used by the insight → highlight mapping.
 export type DashChartId = "scatter" | "alert-volume" | "high-risk" | "param-heat" | "realert"
+
+// ── Alert Volume by Assignment (horizontal bars) ─────────────────────────────
+// Today's new alerts per assignment. Keyed by assignment id, not by a display name:
+// the label the bar renders comes from ASSIGNMENTS, so the chart and the queue card
+// can no longer call the same assignment two different things.
+//
+// `prev` is yesterday's count for the same assignment. It is what lets the Alert
+// Volume take say "63 more than yesterday" instead of asserting a delta from
+// nowhere; the chart itself still plots `count`.
+//
+// Note this measures *alerts raised today*, which is a different quantity from the
+// standing queue depth in DETECTION_QUEUES — a queue can hold 1,022 unworked items
+// and still raise none today. Both are real; neither derives from the other.
+export const ALERT_VOLUME: { assignmentId: string; count: number; prev: number; week: number; month: number }[] = [
+  { assignmentId: "esqr-phase2-auths", count: 357, prev: 294, week: 2284, month: 9663 },
+  { assignmentId: "low-risk-mcc",      count: 303, prev: 311, week: 1939, month: 8202 },
+  { assignmentId: "mc-watch",          count: 52,  prev: 47, week: 333, month: 1409 },
+  { assignmentId: "high-risk-mcc",     count: 25,  prev: 28, week: 160, month: 677 },
+  { assignmentId: "moderate-risk-mcc", count: 19,  prev: 21, week: 122, month: 515 },
+  { assignmentId: "mc-velocity",       count: 18,  prev: 12, week: 115, month: 487 },
+  { assignmentId: "unacceptable-risk", count: 10,  prev: 10, week: 64, month: 271 },
+  { assignmentId: "mc-divergence",     count: 9,   prev: 11, week: 58, month: 244 },
+  { assignmentId: "esqr-phase2",       count: 7,   prev: 6, week: 45, month: 190 },
+]
+
+/** Every alert raised today, across assignments. Distinct merchants is the KPI. */
+export const ALERT_TOTAL = ALERT_VOLUME.reduce((n, a) => n + a.count, 0)
+
+/** Today's alert count for an assignment — 0 for one that did not fire. */
+export const alertsToday = (assignmentId: string) =>
+  ALERT_VOLUME.find((a) => a.assignmentId === assignmentId)?.count ?? 0
+
+/**
+ * Which field a period reads. "This cycle" is the month figure: the risk cycle and
+ * the 30-day window are the same span in this data, and quoting a third number for
+ * them would imply a distinction the demo cannot back.
+ */
+export const alertsForRange = (row: (typeof ALERT_VOLUME)[number], range: string) =>
+  range === "Yesterday" ? row.prev
+    : range === "Last 7 days" ? row.week
+    : range === "Last 30 days" || range === "This cycle" ? row.month
+    : row.count
 
 // ── Top KPI row ────────────────────────────────────────────────────────────
 // Read-only. These are the shape of the day, not a way into it: the screens they
 // would drill to are all one click away on the rail, and a card that navigates on
 // the same tap that reads its number makes the number feel like a control.
 export const DASH_KPIS: { label: string; value: string; delta: string; deltaCls: string; sub: string; icon: LucideIcon }[] = [
-  { label: "Alerted Today",     value: "364", delta: "+12%", deltaCls: "text-rose-600 dark:text-rose-400",    sub: `across ${ASSIGNMENTS.length} assignments`,     icon: AlertTriangle },
-  { label: "Ready to Work",     value: "298", delta: "+8%",  deltaCls: "text-rose-600 dark:text-rose-400",    sub: "66 oldest > 24h",           icon: Inbox },
+  // 364 is distinct merchants; the alert-volume bars below sum to 800 because one
+  // merchant can trip several assignments in a day. The subtitle says both, since a
+  // reader who adds the bars up is otherwise reading a contradiction.
+  { label: "Alerted Today",     value: "364", delta: "+12%", deltaCls: "text-rose-600 dark:text-rose-400",    sub: `merchants · ${ALERT_TOTAL.toLocaleString()} alerts across ${ASSIGNMENTS.length} assignments`, icon: AlertTriangle },
+  // Derived from the queues themselves: the Detection Queue is two clicks away and
+  // states its own ready counts, so a headline that disagrees with them is the one
+  // number a reader can check without leaving the dashboard.
+  { label: "Ready to Work",     value: READY_TOTAL.toLocaleString(), delta: "+8%", deltaCls: "text-rose-600 dark:text-rose-400", sub: "66 oldest > 24h", icon: Inbox },
   // The standing finding, not a today number — hence the explicit period in `sub`.
   { label: "MC >700, No Alert", value: "3,556", delta: "", deltaCls: "text-muted-foreground",                sub: "Sept–Dec 2025 · 317 confirmed fraud", icon: BarChart3 },
   { label: "Case Opened (Week)",value: "42",  delta: "-18m", deltaCls: "text-emerald-600 dark:text-emerald-400", sub: "avg time to case: 3h12m",   icon: Briefcase },
@@ -55,45 +110,6 @@ export const SCATTER_COLORS: Record<ScatterCat, string> = {
   vw:   "#0d9488", // teal
   none: "#94a3b8", // slate
 }
-
-// ── Alert Volume by Assignment (horizontal bars) ─────────────────────────────
-// Today's new alerts per assignment. Keyed by assignment id, not by a display name:
-// the label the bar renders comes from ASSIGNMENTS, so the chart and the queue card
-// can no longer call the same assignment two different things.
-//
-// `prev` is yesterday's count for the same assignment. It is what lets the Alert
-// Volume take say "63 more than yesterday" instead of asserting a delta from
-// nowhere; the chart itself still plots `count`.
-//
-// Note this measures *alerts raised today*, which is a different quantity from the
-// standing queue depth in DETECTION_QUEUES — a queue can hold 1,022 unworked items
-// and still raise none today. Both are real; neither derives from the other.
-export const ALERT_VOLUME: { assignmentId: string; count: number; prev: number; week: number; month: number }[] = [
-  { assignmentId: "esqr-phase2-auths", count: 357, prev: 294, week: 2284, month: 9663 },
-  { assignmentId: "low-risk-mcc",      count: 303, prev: 311, week: 1939, month: 8202 },
-  { assignmentId: "mc-watch",          count: 52,  prev: 47, week: 333, month: 1409 },
-  { assignmentId: "high-risk-mcc",     count: 25,  prev: 28, week: 160, month: 677 },
-  { assignmentId: "moderate-risk-mcc", count: 19,  prev: 21, week: 122, month: 515 },
-  { assignmentId: "mc-velocity",       count: 18,  prev: 12, week: 115, month: 487 },
-  { assignmentId: "unacceptable-risk", count: 10,  prev: 10, week: 64, month: 271 },
-  { assignmentId: "mc-divergence",     count: 9,   prev: 11, week: 58, month: 244 },
-  { assignmentId: "esqr-phase2",       count: 7,   prev: 6, week: 45, month: 190 },
-]
-
-/** Today's alert count for an assignment — 0 for one that did not fire. */
-export const alertsToday = (assignmentId: string) =>
-  ALERT_VOLUME.find((a) => a.assignmentId === assignmentId)?.count ?? 0
-
-/**
- * Which field a period reads. "This cycle" is the month figure: the risk cycle and
- * the 30-day window are the same span in this data, and quoting a third number for
- * them would imply a distinction the demo cannot back.
- */
-export const alertsForRange = (row: (typeof ALERT_VOLUME)[number], range: string) =>
-  range === "Yesterday" ? row.prev
-    : range === "Last 7 days" ? row.week
-    : range === "Last 30 days" || range === "This cycle" ? row.month
-    : row.count
 
 // ── High Risk Merchants (MC score jumpers) ───────────────────────────────────
 // The ten biggest 30-day MC movers, all drawn from the Barometer Report's merchant

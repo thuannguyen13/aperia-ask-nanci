@@ -189,14 +189,15 @@ export function AssignmentManagement() {
           <span>Showing {rows.length} of {AM_TOTAL}</span>
           <div className="flex items-center gap-2">
             <button className="flex items-center gap-1 hover:text-foreground"><ChevronLeft className="size-4" /> Previous</button>
-            {[1, 2, 3].map((p) => (
-              <button key={p} className={cn("size-7 rounded", p === 1 ? "border bg-background text-foreground" : "hover:bg-muted")}>{p}</button>
-            ))}
+            {/* One page: 13 rows against 25 per page. Three numbered pages implied
+                three times the assignments the registry holds. */}
+            <button className="size-7 rounded border bg-background text-foreground">1</button>
             <button className="flex items-center gap-1 hover:text-foreground">Next <ChevronRight className="size-4" /></button>
           </div>
           <div className="flex items-center gap-2">
             Rows per page
-            <span className="flex items-center gap-1 rounded-md border bg-background px-2 py-1 text-foreground">10 <ChevronDown className="size-3.5" /></span>
+            {/* Matches what the table actually renders: every row fits one page. */}
+            <span className="flex items-center gap-1 rounded-md border bg-background px-2 py-1 text-foreground">25 <ChevronDown className="size-3.5" /></span>
           </div>
         </div>
       </div>

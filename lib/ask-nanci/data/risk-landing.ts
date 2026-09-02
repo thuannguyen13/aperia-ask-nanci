@@ -4,11 +4,20 @@ import {
   Store, Target, RefreshCw, Flame, BarChartBig, Repeat2, LineChart, TriangleAlert,
   type LucideIcon,
 } from "lucide-react"
+import { DETECTION_QUEUES } from "./risk-detection-queue"
 
-// Blue stat line under the greeting.
+/** Ready items across every queue the console renders — see DASH_KPIS. */
+const READY_TOTAL = DETECTION_QUEUES.reduce(
+  (n, q) => n + (q.statuses.find((s) => s.key === "ready")?.count ?? 0),
+  0,
+)
+
+// Blue stat line under the greeting. The two counts come from the same places the
+// dashboard KPIs read, so the greeting cannot quote a figure the dashboard contradicts
+// one click later.
 export const RISK_HEADLINE_STATS = [
   "364 merchants alerted today",
-  "298 ready to work",
+  `${READY_TOTAL.toLocaleString()} ready to work`,
   "3 things need your attention",
 ]
 

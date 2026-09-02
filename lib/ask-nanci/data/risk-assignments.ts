@@ -93,4 +93,5 @@ export const ASSIGNMENTS: Assignment[] = [
 
 export const findAssignment = (id: string) => ASSIGNMENTS.find((a) => a.id === id)
 
-export const AM_TOTAL = 28 // "Showing N of 28"
+/** What "Showing N of M" counts. The registry is the list, so it is also the total. */
+export const AM_TOTAL = ASSIGNMENTS.length
