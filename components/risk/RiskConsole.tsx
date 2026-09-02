@@ -139,7 +139,7 @@ export function RiskConsole({ assistant = true }: { assistant?: boolean }) {
             ) : view === "chat" ? (
               <div className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
                 <ChatView />
-                <div className="shrink-0 px-3 pb-3 md:px-4 md:pb-4">
+                <div className="shrink-0 px-2 pb-2 md:px-4 md:pb-4">
                   <div className="mx-auto w-full max-w-[768px]">
                     <ChatInput />
                   </div>

@@ -130,7 +130,7 @@ export default function AskNanciPage() {
         <div
           ref={composerRef}
           data-composer
-          className="relative z-30 shrink-0 px-3 pb-3 md:px-4 md:pb-4"
+          className="relative z-30 shrink-0 px-2 pb-2 md:px-4 md:pb-4"
         >
           <div className="mx-auto w-full max-w-[800px]">
             <ChatInput />
