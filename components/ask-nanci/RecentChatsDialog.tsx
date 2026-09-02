@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Search } from "lucide-react"
 import { InputGroup, InputGroupAddon, InputGroupInput } from "aperia-ds5"
-import { ResponsiveDialog, ResponsiveDialogContent, ResponsiveDialogHeader, ResponsiveDialogTitle, ResponsiveDialogDescription } from "@/components/shared"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 
@@ -28,12 +28,12 @@ export function RecentChatsDialog({ open, onOpenChange, onResume }: {
   const results = sessions.filter((s) => s.title.toLowerCase().includes(query.trim().toLowerCase()))
 
   return (
-    <ResponsiveDialog open={open} onOpenChange={onOpenChange}>
-      <ResponsiveDialogContent showCloseButton className="sm:max-w-[624px]">
-        <ResponsiveDialogHeader>
-          <ResponsiveDialogTitle>Recent Chats</ResponsiveDialogTitle>
-          <ResponsiveDialogDescription>Continue a previous conversation.</ResponsiveDialogDescription>
-        </ResponsiveDialogHeader>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent showCloseButton className="sm:max-w-[624px]">
+        <DialogHeader>
+          <DialogTitle>Recent Chats</DialogTitle>
+          <DialogDescription>Continue a previous conversation.</DialogDescription>
+        </DialogHeader>
 
         <InputGroup>
           <InputGroupAddon>
@@ -61,7 +61,7 @@ export function RecentChatsDialog({ open, onOpenChange, onResume }: {
             <p className="px-3 py-6 text-center text-sm text-muted-foreground">No chats found.</p>
           )}
         </div>
-      </ResponsiveDialogContent>
-    </ResponsiveDialog>
+      </DialogContent>
+    </Dialog>
   )
 }

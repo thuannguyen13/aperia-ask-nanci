@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { X } from "lucide-react"
 import { Button, Progress } from "aperia-ds5"
-import { ResponsiveDialog, ResponsiveDialogContent, ResponsiveDialogDescription, ResponsiveDialogHeader, ResponsiveDialogTitle, ResponsiveDialogTrigger } from "@/components/shared"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import {
   formatContextTokens, getContextUsage,
@@ -29,17 +29,17 @@ const BANNER_COPY: Record<Exclude<ContextUsageState, "ok">, string> = {
 
 function ContextUsageDialog({ usage }: { usage: ContextUsage }) {
   return (
-    <ResponsiveDialog>
-      <ResponsiveDialogTrigger asChild>
+    <Dialog>
+      <DialogTrigger asChild>
         <button className="underline underline-offset-2 hover:no-underline">Learn more</button>
-      </ResponsiveDialogTrigger>
-      <ResponsiveDialogContent className="sm:max-w-[400px]">
-        <ResponsiveDialogHeader>
-          <ResponsiveDialogTitle>Context Usage</ResponsiveDialogTitle>
-          <ResponsiveDialogDescription>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[400px]">
+        <DialogHeader>
+          <DialogTitle>Context Usage</DialogTitle>
+          <DialogDescription>
             {"How much of this conversation's memory Nanci is currently using."}
-          </ResponsiveDialogDescription>
-        </ResponsiveDialogHeader>
+          </DialogDescription>
+        </DialogHeader>
         <div className="flex flex-col gap-1">
           <div className="flex items-center justify-between text-xs font-medium leading-none text-muted-foreground">
             <span>Context window</span>
@@ -53,8 +53,8 @@ function ContextUsageDialog({ usage }: { usage: ContextUsage }) {
             className={usage.state === "full" ? "[&>[data-slot=progress-indicator]]:bg-destructive" : undefined}
           />
         </div>
-      </ResponsiveDialogContent>
-    </ResponsiveDialog>
+      </DialogContent>
+    </Dialog>
   )
 }
 

@@ -6,7 +6,7 @@ import { MoreHorizontal, FileText, FolderPlus, Loader, CircleCheckBig, TriangleA
 import {
   Badge, Button, Alert, AlertTitle, AlertDescription, Tabs, TabsList, TabsTrigger, TabsContent, Avatar, AvatarFallback, Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator, TableBody, TableRow, Textarea,
 } from "aperia-ds5"
-import { ResponsiveDialog, ResponsiveDialogTrigger, ResponsiveDialogContent, ResponsiveDialogHeader, ResponsiveDialogTitle, ResponsiveDialogDescription, ResponsiveDialogFooter, ResponsiveDialogClose } from "@/components/shared"
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { PanelShell, PanelHeader, PanelBody, PanelTable, Thead, Th, Td, formatCurrency, formatPercent } from "@/components/shared"
 import { MarkWorkPopover } from "./MarkWorkPopover"
@@ -38,19 +38,19 @@ const VIOLATION_COLS: { key: keyof ViolationRow; label: string; blue?: boolean; 
 function ViolationsPill({ count, m, d }: { count: number; m: RiskMerchant; d: RiskReportDetail }) {
   const rows = violationRows(m, d)
   return (
-    <ResponsiveDialog>
-      <ResponsiveDialogTrigger asChild>
+    <Dialog>
+      <DialogTrigger asChild>
         <Badge asChild className="cursor-pointer bg-red-500 text-white hover:bg-red-600">
           <button type="button"><TriangleAlert /> {count} Violations</button>
         </Badge>
-      </ResponsiveDialogTrigger>
-      <ResponsiveDialogContent showCloseButton className="w-[92vw] gap-0 overflow-hidden p-0 sm:max-w-[1400px]">
-        <ResponsiveDialogHeader className="px-6 pb-0 pt-6">
-          <ResponsiveDialogTitle>Parameter Violation Details</ResponsiveDialogTitle>
-          <ResponsiveDialogDescription className="sr-only">Parameter violations for this merchant.</ResponsiveDialogDescription>
-        </ResponsiveDialogHeader>
+      </DialogTrigger>
+      <DialogContent showCloseButton className="flex max-h-[calc(100dvh-2rem)] w-[92vw] flex-col gap-0 overflow-hidden p-0 sm:max-w-[1400px]">
+        <DialogHeader className="px-6 pb-0 pt-6">
+          <DialogTitle>Parameter Violation Details</DialogTitle>
+          <DialogDescription className="sr-only">Parameter violations for this merchant.</DialogDescription>
+        </DialogHeader>
 
-        <div className="flex min-w-0 flex-col gap-4 px-6 py-4">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-6 py-4">
           <div className="flex items-center justify-between gap-2">
             <p className="text-base">
               <span className="font-semibold text-foreground">Alert by Risk Cycle</span>{" "}
@@ -81,13 +81,13 @@ function ViolationsPill({ count, m, d }: { count: number; m: RiskMerchant; d: Ri
           </div>
         </div>
 
-        <ResponsiveDialogFooter className="m-0 border-t bg-muted/40 px-6 py-4">
-          <ResponsiveDialogClose asChild>
+        <DialogFooter className="m-0 border-t bg-muted/40 px-6 py-4">
+          <DialogClose asChild>
             <Button variant="outline" size="sm">Close</Button>
-          </ResponsiveDialogClose>
-        </ResponsiveDialogFooter>
-      </ResponsiveDialogContent>
-    </ResponsiveDialog>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 
@@ -176,17 +176,17 @@ function DrivingParameters({ mid, count, model }: { mid: string; count: number; 
   const vwRows = model === "VW" ? pick(VW_PARAMETERS) : []
 
   return (
-    <ResponsiveDialog>
-      <ResponsiveDialogTrigger asChild>
+    <Dialog>
+      <DialogTrigger asChild>
         <button type="button" className="text-left hover:underline">{count} parameters</button>
-      </ResponsiveDialogTrigger>
-      <ResponsiveDialogContent showCloseButton className="sm:max-w-[760px]">
-        <ResponsiveDialogHeader>
-          <ResponsiveDialogTitle>{model === "MC" ? "Mastercard" : "VisionWeb"} driving parameters</ResponsiveDialogTitle>
-          <ResponsiveDialogDescription>
+      </DialogTrigger>
+      <DialogContent showCloseButton className="sm:max-w-[760px]">
+        <DialogHeader>
+          <DialogTitle>{model === "MC" ? "Mastercard" : "VisionWeb"} driving parameters</DialogTitle>
+          <DialogDescription>
             The {count} {count === 1 ? "measure" : "measures"} behind this merchant&apos;s score.
-          </ResponsiveDialogDescription>
-        </ResponsiveDialogHeader>
+          </DialogDescription>
+        </DialogHeader>
         <PanelTable density="comfortable">
           <Thead>
             <Th className="w-24">P#</Th>
@@ -218,29 +218,29 @@ function DrivingParameters({ mid, count, model }: { mid: string; count: number; 
             })}
           </TableBody>
         </PanelTable>
-      </ResponsiveDialogContent>
-    </ResponsiveDialog>
+      </DialogContent>
+    </Dialog>
   )
 }
 
 // "In N Queues" badge → this modal. Shows every queue the merchant currently alerts in.
 function QueuesPill({ count }: { count: number }) {
   return (
-    <ResponsiveDialog>
-      <ResponsiveDialogTrigger asChild>
+    <Dialog>
+      <DialogTrigger asChild>
         <Badge asChild className="cursor-pointer bg-yellow-500 text-white hover:bg-yellow-600">
           <button type="button"><List /> In {count} Queues</button>
         </Badge>
-      </ResponsiveDialogTrigger>
-      <ResponsiveDialogContent showCloseButton className="w-[92vw] gap-0 overflow-hidden p-0 sm:max-w-[600px]">
-        <ResponsiveDialogHeader className="px-6 pb-0 pt-6">
-          <ResponsiveDialogTitle>Cross-Queue Presence</ResponsiveDialogTitle>
-          <ResponsiveDialogDescription className="sr-only">
+      </DialogTrigger>
+      <DialogContent showCloseButton className="flex max-h-[calc(100dvh-2rem)] w-[92vw] flex-col gap-0 overflow-hidden p-0 sm:max-w-[600px]">
+        <DialogHeader className="px-6 pb-0 pt-6">
+          <DialogTitle>Cross-Queue Presence</DialogTitle>
+          <DialogDescription className="sr-only">
             This action updates all queues, removes the merchant from Ready-to-Work counts, and records the source queue in the audit trail.
-          </ResponsiveDialogDescription>
-        </ResponsiveDialogHeader>
+          </DialogDescription>
+        </DialogHeader>
 
-        <div className="flex min-w-0 flex-col gap-4 px-6 py-4">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-6 py-4">
           <Alert className="border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-100">
             <TriangleAlert className="text-amber-600 dark:text-amber-400" />
             <AlertTitle>Queue Assignment Alert</AlertTitle>
@@ -267,13 +267,13 @@ function QueuesPill({ count }: { count: number }) {
           </PanelTable>
         </div>
 
-        <ResponsiveDialogFooter className="m-0 border-t bg-muted/40 px-6 py-4">
-          <ResponsiveDialogClose asChild>
+        <DialogFooter className="m-0 border-t bg-muted/40 px-6 py-4">
+          <DialogClose asChild>
             <Button variant="outline" size="sm">Close</Button>
-          </ResponsiveDialogClose>
-        </ResponsiveDialogFooter>
-      </ResponsiveDialogContent>
-    </ResponsiveDialog>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 

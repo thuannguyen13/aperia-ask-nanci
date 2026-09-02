@@ -1,0 +1,2003 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile Foundation: What Shipped, What Is Left</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --aperia-blue: #002F67;
+      --dark-blue: #004785;
+      --sapphire: #2563EB;
+      --sky-blue: #7ED3F7;
+      --light-blue: #C8EAF5;
+      --black: #000000;
+      --white: #FFFFFF;
+      --dark-gray: #58595B;
+      --med-gray: #A7A9AC;
+      --light-gray: #F1F2F2;
+      --bg: #ffffff;
+      --fg: #14181f;
+      --muted: #F1F2F2;
+      --muted-fg: #4b4f57;
+      --border: #e3e6ea;
+      --primary: var(--aperia-blue);
+      --success: #16a34a;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --sans: 'Inter', sans-serif;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html {
+      scroll-behavior: smooth
+    }
+
+    body {
+      overflow-x: hidden
+    }
+
+    body {
+      font-family: var(--sans);
+      font-weight: 400;
+      background: var(--bg);
+      color: var(--fg);
+      font-size: 19px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased
+    }
+
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 40px
+    }
+
+    section {
+      padding: 108px 0;
+      border-bottom: 1px solid var(--border)
+    }
+
+    section:last-of-type {
+      border-bottom: none
+    }
+
+    h2 {
+      font-size: clamp(34px, 5.4vw, 58px);
+      font-weight: 800;
+      line-height: 1.06;
+      letter-spacing: -.025em;
+      margin-bottom: 22px
+    }
+
+    h3 {
+      font-weight: 700
+    }
+
+    em {
+      font-style: normal
+    }
+
+    /* ── Chapter opener ── */
+    .chapter {
+      display: flex;
+      gap: 36px;
+      align-items: flex-start;
+      margin-bottom: 44px
+    }
+
+    .chapter-head {
+      flex: 1;
+      min-width: 0;
+      padding-top: 10px
+    }
+
+    .sec-label {
+      font-size: 13.5px;
+      color: var(--sapphire);
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      font-weight: 600
+    }
+
+    .block-label {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--fg);
+      margin: 34px 0 10px
+    }
+
+    .block-label:first-of-type {
+      margin-top: 0
+    }
+
+    .lede {
+      font-size: clamp(20px, 2.4vw, 24px);
+      color: var(--muted-fg);
+      line-height: 1.5;
+      letter-spacing: -.015em;
+      font-weight: 400
+    }
+
+    .lede+.body-p {
+      margin-top: 20px
+    }
+
+    .lede strong {
+      color: var(--fg);
+      font-weight: 700
+    }
+
+    /* ── Sub-headings and body prose ── */
+    .sub-h3 {
+      font-size: clamp(20px, 2.4vw, 25px);
+      font-weight: 700;
+      letter-spacing: -.01em;
+      margin: 56px 0 14px
+    }
+
+    .body-p {
+      font-size: 18px;
+      color: var(--muted-fg);
+      line-height: 1.75
+    }
+
+    .body-p strong {
+      color: var(--fg)
+    }
+
+    .body-p+.body-p {
+      margin-top: 18px
+    }
+
+    /* ── Approach comparison boxes ── */
+    .approach-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin: 48px 0 0
+    }
+
+    .approach-card {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 30px 32px;
+      background: #fff
+    }
+
+    .approach-card--selected {
+      border-color: var(--aperia-blue);
+      background: #f0f5fb
+    }
+
+    .approach-card-label {
+      font-size: 12.5px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted-fg);
+      margin-bottom: 12px;
+      font-weight: 600
+    }
+
+    .approach-card--selected .approach-card-label {
+      color: var(--sapphire)
+    }
+
+    .approach-card-title {
+      font-size: clamp(19px, 2.2vw, 23px);
+      font-weight: 700;
+      line-height: 1.3;
+      min-height: 2.6em;
+      margin-bottom: 18px;
+      color: var(--fg)
+    }
+
+    .approach-card--selected .approach-card-title {
+      color: var(--aperia-blue)
+    }
+
+    .approach-items {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      font-size: 18px;
+      color: var(--muted-fg);
+      line-height: 1.5
+    }
+
+    .approach-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start
+    }
+
+    .ai-icon {
+      flex: 0 0 18px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      margin-top: 3px
+    }
+
+    .ai-icon svg {
+      display: block;
+      width: 10px;
+      height: 10px
+    }
+
+    .ai-icon--yes {
+      background: var(--success)
+    }
+
+    .ai-icon--no {
+      background: var(--danger)
+    }
+
+    #screens .approach-card-title {
+      color: var(--muted-fg);
+      min-height: 0
+    }
+
+    #screens .approach-card--selected .approach-card-title {
+      color: var(--aperia-blue)
+    }
+
+    .sub-h3+.approach-grid {
+      margin-top: 22px
+    }
+
+    @media(max-width:700px) {
+      .approach-grid {
+        grid-template-columns: 1fr
+      }
+
+      .approach-card {
+        padding: 24px 22px
+      }
+    }
+
+    /* ── "What to prepare" callout, one per aspect ── */
+    .prep {
+      margin-top: 26px
+    }
+
+    .prep .approach-card-title {
+      min-height: 0;
+      margin-bottom: 16px
+    }
+
+    .prep .approach-card-label a {
+      color: inherit;
+      text-decoration: none;
+      border-bottom: 1px solid currentColor
+    }
+
+    .ai-icon--do {
+      background: var(--sapphire)
+    }
+
+    /* ── Paired comparison ── */
+    .cmp {
+      display: grid;
+      grid-template-columns: 190px 1fr 1fr;
+      margin: 48px 0 0;
+      font-size: 16px
+    }
+
+    .cmp>div {
+      padding: 18px 22px
+    }
+
+    .cmp>div:nth-child(n+4) {
+      border-top: 1px solid var(--border)
+    }
+
+    .cmp>.cmp-dim {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--fg);
+      line-height: 1.45;
+      padding-left: 0
+    }
+
+    .cmp-cell {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      min-width: 0;
+      overflow-wrap: break-word;
+      color: var(--muted-fg);
+      line-height: 1.5
+    }
+
+    .cmp-h-label {
+      font-size: 12.5px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted-fg);
+      font-weight: 600;
+      margin-bottom: 6px
+    }
+
+    .cmp-h-title {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--fg);
+      line-height: 1.3
+    }
+
+    .cmp-h--win {
+      background: #f0f5fb;
+      border-radius: 12px 12px 0 0
+    }
+
+    .cmp-h--win .cmp-h-label {
+      color: var(--sapphire)
+    }
+
+    .cmp-h--win .cmp-h-title {
+      color: var(--aperia-blue)
+    }
+
+    .cmp-cell--win {
+      background: #f0f5fb
+    }
+
+    .cmp>div:last-child {
+      border-radius: 0 0 12px 12px
+    }
+
+    /* mobile: one frame, title band above its two cells, radius on the frame only */
+    @media(max-width:700px) {
+      .cmp {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        overflow: hidden
+      }
+
+      .cmp-dim--head {
+        display: none
+      }
+
+      .cmp>div,
+      .cmp>div:last-child {
+        padding: 14px;
+        border-radius: 0
+      }
+
+      .cmp>div:nth-child(n+4) {
+        border-top: none
+      }
+
+      /* the band carries the winner tint and the column rule straight through */
+      .cmp>div.cmp-dim {
+        grid-column: 1 / -1;
+        padding: 14px 14px 0;
+        background: linear-gradient(to right,
+            transparent 50%,
+            var(--border) 50%,
+            var(--border) calc(50% + 1px),
+            #f0f5fb calc(50% + 1px));
+        border-top: 1px solid var(--border)
+      }
+
+      .cmp-cell--win,
+      .cmp-h--win {
+        border-left: 1px solid var(--border)
+      }
+    }
+
+    /* ── Full-bleed imagery ── */
+    .bleed {
+      width: 100vw;
+      position: relative;
+      left: 50%;
+      margin: 52px 0 52px -50vw
+    }
+
+    .bleed img {
+      display: block;
+      width: 100%;
+      max-width: 1120px;
+      height: auto;
+      margin: 0 auto
+    }
+
+    .img-ph {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 300px;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 40px;
+      background: var(--muted);
+      border: 1px dashed var(--border);
+      border-radius: 12px
+    }
+
+    .img-ph-name {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--muted-fg)
+    }
+
+    .img-ph-hint {
+      font-size: 14px;
+      color: var(--med-gray)
+    }
+
+    .cap {
+      font-size: 13.5px;
+      letter-spacing: .02em;
+      color: var(--muted-fg);
+      text-align: center;
+      margin-top: 18px;
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.6
+    }
+
+    .cap strong {
+      color: var(--fg)
+    }
+
+    /* ── Key numbers ── */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin: 22px 0 0
+    }
+
+    .stat-card {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 26px 28px;
+      background: #fff
+    }
+
+    .stat-val {
+      font-size: 46px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -.025em;
+      color: var(--aperia-blue);
+      height: 46px;
+      margin-bottom: 14px
+    }
+
+    .stat-val.sm {
+      font-size: 32px;
+      padding-top: 12px
+    }
+
+    .stat-lbl {
+      font-size: 16px;
+      color: var(--muted-fg);
+      line-height: 1.55
+    }
+
+    .stat-row+.body-p {
+      margin-top: 22px
+    }
+
+    @media(max-width:700px) {
+      .stat-row {
+        grid-template-columns: 1fr
+      }
+    }
+
+    /* ── Screen anatomy ── */
+    .anatomy {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      background: #fff;
+      margin: 22px 0 0
+    }
+
+    .anat-row {
+      display: flex;
+      gap: 24px;
+      padding: 22px 28px;
+      align-items: flex-start
+    }
+
+    .anat-row+.anat-row {
+      border-top: 1px solid var(--border)
+    }
+
+    .anat-label {
+      flex: 0 0 220px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.6;
+      color: var(--aperia-blue)
+    }
+
+    .anat-num {
+      flex: 0 0 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--sapphire);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1;
+      margin-top: 2px
+    }
+
+    .anat-desc {
+      flex: 1;
+      font-size: 17px;
+      color: var(--muted-fg);
+      line-height: 1.6
+    }
+
+    @media(max-width:700px) {
+      .anat-row {
+        flex-direction: column;
+        gap: 8px;
+        padding: 20px 22px
+      }
+
+      .anat-label {
+        flex: none
+      }
+    }
+
+    /* ── Editorial step flow ── */
+    .estep {
+      display: flex;
+      gap: 22px;
+      padding: 16px 0;
+      position: relative
+    }
+
+    /* connector rail: badge centre is 16px padding + 19px radius from the row top */
+    .estep:has(+ .estep)::after,
+    .estep+.estep::before {
+      content: '';
+      position: absolute;
+      left: 18px;
+      width: 2px;
+      background: var(--border)
+    }
+
+    .estep:has(+ .estep)::after {
+      top: 35px;
+      bottom: 0
+    }
+
+    .estep+.estep::before {
+      top: 0;
+      height: 35px
+    }
+
+    .estep:first-child {
+      padding-top: 0
+    }
+
+    .body-p+.estep {
+      margin-top: 26px
+    }
+
+    .estep-num {
+      position: relative;
+      z-index: 1;
+      flex: 0 0 38px;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--sapphire);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700
+    }
+
+    .estep-body {
+      flex: 1;
+      min-width: 0
+    }
+
+    .estep-title {
+      font-size: clamp(20px, 2.4vw, 25px);
+      font-weight: 400;
+      margin-bottom: 8px;
+      letter-spacing: -.01em;
+      line-height: 1.3;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      min-height: 38px
+    }
+
+    .estep-desc {
+      font-size: 18px;
+      color: var(--muted-fg);
+      line-height: 1.7
+    }
+
+    .estep-desc strong {
+      color: var(--fg)
+    }
+
+    .estep-own {
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted-fg);
+      background: var(--muted);
+      border-radius: 999px;
+      padding: 5px 11px;
+      white-space: nowrap
+    }
+
+    .estep-own--ds {
+      color: var(--aperia-blue);
+      background: var(--light-blue)
+    }
+
+    /* ── Prototype button ── */
+    .btn-proto {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 28px;
+      padding: 14px 28px;
+      background: var(--aperia-blue);
+      color: #fff;
+      border-radius: 100px;
+      text-decoration: none;
+      font-size: 14.5px;
+      font-weight: 600;
+      font-family: var(--sans);
+      box-shadow: 0 2px 8px rgba(0, 47, 103, .2)
+    }
+
+    .btn-proto svg {
+      display: block;
+      width: 17px;
+      height: 17px
+    }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, .95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border)
+    }
+
+    .nav-inner {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 0 40px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0 16px
+    }
+
+    .nav-brand {
+      display: inline-flex;
+      align-items: center;
+      line-height: 0;
+      flex-shrink: 0;
+      height: 60px
+    }
+
+    .nav-brand svg {
+      display: block;
+      height: 26px;
+      width: auto
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 4px;
+      list-style: none;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      min-width: 0;
+      scrollbar-width: none;
+      /* own row under the brand, so seven links have space to breathe */
+      order: 3;
+      width: 100%;
+      margin-left: -11px;
+      padding-bottom: 12px
+    }
+
+    .nav-links::-webkit-scrollbar {
+      display: none
+    }
+
+    .nav-links a {
+      font-size: 13px;
+      color: var(--muted-fg);
+      text-decoration: none;
+      padding: 6px 11px;
+      border-radius: 6px;
+      transition: all .15s;
+      white-space: nowrap;
+      font-weight: 500
+    }
+
+    .nav-links a:hover {
+      color: var(--aperia-blue);
+      background: var(--muted)
+    }
+
+    .nav-burger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 6px;
+      border: none;
+      background: transparent;
+      flex-shrink: 0
+    }
+
+    .nav-burger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--aperia-blue);
+      border-radius: 2px;
+      transition: all .25s
+    }
+
+    .nav-burger.open span:nth-child(1) {
+      transform: translateY(7px) rotate(45deg)
+    }
+
+    .nav-burger.open span:nth-child(2) {
+      opacity: 0
+    }
+
+    .nav-burger.open span:nth-child(3) {
+      transform: translateY(-7px) rotate(-45deg)
+    }
+
+    .nav-drawer {
+      display: none;
+      position: fixed;
+      top: 60px;
+      left: 0;
+      right: 0;
+      background: #fff;
+      border-bottom: 1px solid var(--border);
+      z-index: 99;
+      box-shadow: 0 8px 24px rgba(0, 47, 103, .1)
+    }
+
+    .nav-drawer.open {
+      display: block
+    }
+
+    .nav-drawer ul {
+      list-style: none;
+      padding: 14px 22px 18px
+    }
+
+    .nav-drawer ul li a {
+      display: block;
+      padding: 12px;
+      font-size: 16px;
+      color: var(--fg);
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 600
+    }
+
+    .nav-drawer ul li a:hover {
+      background: var(--muted);
+      color: var(--aperia-blue)
+    }
+
+    @media(max-width:700px) {
+      .nav-links {
+        display: none
+      }
+
+      .nav-burger {
+        display: flex
+      }
+    }
+
+    /* ── Hero ── */
+    .hero {
+      padding: 0;
+      background: linear-gradient(120deg, var(--aperia-blue) 0%, var(--dark-blue) 55%, var(--sapphire) 130%);
+      position: relative;
+      overflow: hidden
+    }
+
+    .hero-inner {
+      padding: 150px 0 130px;
+      position: relative;
+      z-index: 1
+    }
+
+    .hero .eyebrow {
+      font-size: 13.5px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--sky-blue);
+      margin-bottom: 28px;
+      font-weight: 600
+    }
+
+    .hero h1 {
+      font-size: clamp(40px, 7.5vw, 92px);
+      font-weight: 800;
+      line-height: 1.02;
+      letter-spacing: -.03em;
+      max-width: 920px;
+      margin-bottom: 28px;
+      color: #fff
+    }
+
+    .hero h1 span {
+      color: var(--sky-blue);
+      font-weight: 400;
+      font-size: clamp(19px, 2.4vw, 28px);
+      line-height: 1.45;
+      display: block;
+      margin-top: 14px;
+      letter-spacing: -.005em
+    }
+
+    .hero-sub {
+      font-size: clamp(19px, 2vw, 22px);
+      color: #cfe0f0;
+      max-width: 640px;
+      line-height: 1.7;
+      font-weight: 300
+    }
+
+    .hero-note {
+      font-size: 15px;
+      color: #9fb8d0;
+      max-width: 640px;
+      line-height: 1.65;
+      margin-top: 18px;
+      padding-left: 14px;
+      border-left: 2px solid rgba(255, 255, 255, .22)
+    }
+
+    .hero-shape {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+      width: auto;
+      z-index: 0;
+      opacity: 1
+    }
+
+    @media(max-width:700px) {
+      .hero-inner {
+        padding: 96px 0
+      }
+    }
+
+    /* ── Footer ── */
+    footer {
+      padding: 56px 0;
+      background: var(--aperia-blue)
+    }
+
+    footer .fbrand {
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 16px;
+      line-height: 0
+    }
+
+    footer .fbrand svg {
+      display: block;
+      height: 30px;
+      width: auto
+    }
+
+    footer p {
+      font-size: 13px;
+      color: #9fbedb
+    }
+
+    @media(max-width:700px) {
+      .wrap {
+        padding: 0 20px
+      }
+
+      .nav-inner {
+        padding: 0 20px
+      }
+
+      /* keep full-bleed images on the content gutter, not the screen edge */
+      .bleed {
+        padding: 0 20px;
+        margin: 40px 0 40px -50vw
+      }
+
+      body {
+        font-size: 17px
+      }
+    }
+
+    @media print {
+      nav {
+        display: none
+      }
+
+      section {
+        page-break-inside: avoid
+      }
+
+      .hero-shape {
+        display: none
+      }
+
+      .bleed {
+        width: 100%;
+        left: 0;
+        margin-left: 0
+      }
+    }
+
+    /* ── Live demo ── */
+    .demo {
+      display: flex;
+      gap: 48px;
+      align-items: center;
+      margin: 26px 0 0;
+      flex-wrap: wrap
+    }
+
+    .demo-phone {
+      flex: 0 0 330px;
+      max-width: 330px;
+      width: 100%;
+      aspect-ratio: 390/800;
+      border: 9px solid var(--black);
+      border-radius: 40px;
+      overflow: hidden;
+      background: var(--black);
+      box-shadow: 0 18px 50px rgba(0, 47, 103, .18)
+    }
+
+    .demo-frame {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      background: #fff
+    }
+
+    .demo-note {
+      flex: 1;
+      min-width: 300px
+    }
+
+    .demo-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--sapphire);
+      text-decoration: none
+    }
+
+    /* ── Have / missing ── */
+    .gap {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin: 26px 0 0;
+      align-items: start
+    }
+
+    .gap-card {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 24px;
+      background: #fff
+    }
+
+    .gap-card--miss {
+      border-color: #f0d9b8;
+      background: #fffcf6
+    }
+
+    .gap-card--prep {
+      border-color: var(--aperia-blue);
+      background: #f0f5fb
+    }
+
+    .gap-label {
+      font-size: 12.5px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-weight: 600;
+      color: var(--success);
+      margin-bottom: 12px
+    }
+
+    .gap-card--miss .gap-label {
+      color: var(--warning)
+    }
+
+    .gap-card--prep .gap-label {
+      color: var(--sapphire)
+    }
+
+    .gap-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 16px;
+      color: var(--muted-fg);
+      line-height: 1.5
+    }
+
+    /* Not flex: the items contain inline <strong>, which flex would blow apart into
+       separate columns. Relative + absolute bullet keeps the text as one run. */
+    .gap-list div {
+      position: relative;
+      padding-left: 16px
+    }
+
+    .gap-list div::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 8px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--success)
+    }
+
+    .gap-card--miss .gap-list div::before {
+      background: var(--warning)
+    }
+
+    .gap-card--prep .gap-list div::before {
+      background: var(--sapphire)
+    }
+
+    .gap-list strong {
+      color: var(--fg);
+      font-weight: 600
+    }
+
+    .mono {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: .88em
+    }
+
+    @media(max-width:700px) {
+      .gap {
+        grid-template-columns: 1fr
+      }
+
+      .demo-phone {
+        flex: 0 0 auto;
+        margin: 0 auto
+      }
+    }
+
+    /* ── Side-by-side panes ── */
+    /* Stacked, not side by side: the wide pane has to be genuinely wide or it
+       clips too, and then the comparison shows nothing. */
+    .sxs {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin: 0
+    }
+
+    .sxs-pane--phone {
+      width: 390px;
+      max-width: 100%;
+      position: relative
+    }
+
+    .sxs-pane {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+      overflow: hidden;
+      min-width: 0
+    }
+
+    .sxs-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--muted)
+    }
+
+    .sxs-name {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted-fg)
+    }
+
+    .sxs-ic {
+      width: 14px;
+      height: 14px;
+      display: block
+    }
+
+    .sxs-w {
+      font-size: 12px;
+      color: var(--med-gray)
+    }
+
+    .sxs-body {
+      padding: 16px
+    }
+
+    /* The cut-off edge is the point of the phone pane, so mark it. */
+    .sxs-pane--phone .sxs-body::after {
+      content: '';
+      position: absolute;
+      top: 45px;
+      right: 0;
+      bottom: 0;
+      width: 34px;
+      pointer-events: none;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0), #fff 78%)
+    }
+
+    .sxs-note {
+      font-size: 13.5px;
+      color: var(--muted-fg);
+      margin-top: 12px;
+      line-height: 1.6
+    }
+
+    .sxs-note strong {
+      color: var(--fg)
+    }
+
+    @media(max-width:980px) {
+      .gap {
+        grid-template-columns: 1fr
+      }
+    }
+
+
+    /* ── Status column in the decision table ── */
+    .tt-state {
+      width: 1%;
+      white-space: nowrap
+    }
+
+    .tt-link {
+      color: var(--aperia-blue);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(0, 47, 103, .25)
+    }
+
+    .tt-link:hover {
+      border-bottom-color: var(--aperia-blue)
+    }
+
+    .type-table td:last-child .estep-own {
+      float: right
+    }
+
+    .tt-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 3px 8px 3px 6px;
+      border-radius: 999px
+    }
+
+    .tt-pill svg {
+      width: 9px;
+      height: 9px;
+      display: block
+    }
+
+    .tt-pill--in {
+      color: #fff;
+      background: var(--success)
+    }
+
+    .tt-pill--do {
+      color: #fff;
+      background: var(--warning)
+    }
+
+    .tt-pill--check {
+      color: #fff;
+      background: var(--med-gray)
+    }
+
+    .tt-pill--practice {
+      color: #fff;
+      background: var(--sapphire)
+    }
+
+    /* ── Type specimen table ── */
+    .type-table-wrap {
+      margin-top: 0;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden
+    }
+
+    .type-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff
+    }
+
+    .type-table th {
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted-fg);
+      background: var(--muted);
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap
+    }
+
+    .type-table td {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted-fg);
+      font-size: 14px;
+      vertical-align: middle
+    }
+
+    .type-table tr:last-child td {
+      border-bottom: 0
+    }
+
+    .type-table strong {
+      color: var(--fg);
+      font-weight: 600
+    }
+
+    .tt-what {
+      width: 42%
+    }
+
+    .tt-none {
+      color: var(--med-gray)
+    }
+
+    .type-table .tt-spec {
+      color: var(--fg);
+      width: 34%;
+      white-space: nowrap;
+      font-weight: 500;
+      letter-spacing: -.01em
+    }
+
+    .type-table .tt-size {
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      color: var(--fg);
+      font-weight: 600
+    }
+
+    .tt-from {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12.5px;
+      white-space: nowrap
+    }
+
+    .tt-row--gap td {
+      background: #fff8ef;
+      color: var(--fg)
+    }
+
+    .tt-from--off {
+      color: var(--warning);
+      font-weight: 600
+    }
+
+    @media(max-width:760px) {
+      .type-table-wrap {
+        overflow-x: auto
+      }
+
+      .type-table {
+        min-width: 620px
+      }
+    }
+
+    /* ── Demo internals ── */
+    .d-scroll {
+      overflow-x: auto
+    }
+
+    .d-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      white-space: nowrap
+    }
+
+    .d-table th {
+      text-align: left;
+      font-weight: 600;
+      color: var(--fg);
+      padding: 7px 10px;
+      border-bottom: 1px solid var(--border);
+      background: var(--muted)
+    }
+
+    .d-table td {
+      padding: 7px 10px;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted-fg);
+      font-variant-numeric: tabular-nums
+    }
+
+    .d-table tr:last-child td {
+      border-bottom: none
+    }
+
+    .d-table .num {
+      text-align: right
+    }
+
+    .d-tabs {
+      display: inline-flex;
+      gap: 2px;
+      padding: 3px;
+      background: var(--muted);
+      border-radius: 10px;
+      white-space: nowrap
+    }
+
+    .d-tab {
+      padding: 5px 12px;
+      border-radius: 7px;
+      font-size: 13px;
+      color: var(--muted-fg);
+      white-space: nowrap
+    }
+
+    .d-tab[aria-selected="true"] {
+      background: #fff;
+      color: var(--fg);
+      font-weight: 600;
+      box-shadow: 0 1px 2px rgba(0, 47, 103, .12)
+    }
+
+    .d-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted-fg)
+    }
+
+    .d-value {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--fg);
+      margin-top: 3px
+    }
+
+    .d-body {
+      font-size: 14px;
+      color: var(--muted-fg);
+      line-height: 1.6;
+      margin-top: 12px
+    }
+
+    .d-btns {
+      display: flex;
+      align-items: flex-end;
+      gap: 14px;
+      flex-wrap: wrap
+    }
+
+    .d-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 9px;
+      background: var(--aperia-blue);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600
+    }
+
+    .d-btn-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px
+    }
+
+    .d-btn-cap {
+      font-size: 10.5px;
+      color: var(--muted-fg);
+      white-space: nowrap
+    }
+
+    .d-ref {
+      width: 44px;
+      height: 44px;
+      border: 1px dashed var(--med-gray);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      color: var(--med-gray)
+    }
+
+    .d-legend {
+      margin-top: 10px;
+      line-height: 1.9
+    }
+
+    .d-key {
+      display: inline-block;
+      margin-right: 14px;
+      font-size: 12px;
+      color: var(--muted-fg);
+      white-space: nowrap
+    }
+
+    .d-key i {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 2px;
+      margin-right: 6px
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="ic-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+      stroke-linejoin="round">
+      <path d="M20 6 9 17l-5-5" />
+    </symbol>
+    <symbol id="ic-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"
+      stroke-linejoin="round">
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </symbol>
+    <symbol id="ic-monitor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+      stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="3.5" width="20" height="13" rx="1.6" />
+      <path d="M8.5 20.5h7M12 16.5v4" />
+    </symbol>
+    <symbol id="ic-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+      stroke-linecap="round" stroke-linejoin="round">
+      <rect x="6.5" y="2.5" width="11" height="19" rx="2.2" />
+      <path d="M11 18.6h2" />
+    </symbol>
+    <symbol id="ic-q" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9.2 9.2a3 3 0 1 1 3.8 3.3c-.7.3-1 .9-1 1.6v.4" />
+      <path d="M12 18.2v.01" />
+    </symbol>
+    <symbol id="ic-arrow-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25"
+      stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 12h14" />
+      <path d="m12 5 7 7-7 7" />
+    </symbol>
+  </svg>
+
+  <nav>
+    <div class="nav-inner">
+      <a href="#" class="nav-brand" aria-label="Aperia home">
+        <svg width="108" height="32" viewBox="0 0 135 40" fill="none" xmlns="http://www.w3.org/2000/svg" role="img"
+          aria-label="Aperia">
+          <g clip-path="url(#clip0_nav)">
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M22.9449 25.9157L25.7618 32.8812H32.9321L19.6159 1.63916H13.3163L0 32.8812H7.01664L9.83355 25.9157H22.9449ZM12.292 19.9234L16.3893 9.83377L20.5378 19.9234H12.292Z"
+              fill="#002F67" />
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M41.4854 29.8082C43.1243 31.7032 45.3266 33.3421 48.9118 33.3421C54.5456 33.3421 59.7184 28.9887 59.7184 21.1014V20.999C59.7184 13.0604 54.4432 8.70703 48.9118 8.70703C45.3779 8.70703 43.1243 10.346 41.4854 12.5483V9.11676H34.7249V40.0002H41.4854V29.8082ZM47.2216 14.392C50.3458 14.392 53.0091 17.0041 53.0091 20.9477V21.0502C53.0091 25.045 50.3458 27.6059 47.2216 27.6059C44.0462 27.6059 41.4342 24.9938 41.4342 21.0502V20.9477C41.4342 17.0041 44.0974 14.392 47.2216 14.392Z"
+              fill="#002F67" />
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M68.0154 23.3549H84.5583C84.6096 22.7403 84.6096 22.3305 84.5583 21.6647V21.5623C84.5583 14.8017 80.922 8.65576 72.9834 8.65576C66.0692 8.65576 61.2549 14.2896 61.2549 21.0501V21.1526C61.2549 28.4253 66.5302 33.4445 73.6493 33.4445C77.9514 33.4445 81.1781 31.7544 83.3804 28.9887L79.5391 25.5572C77.6953 27.2985 76.0564 28.0156 73.8029 28.0156C70.8323 28.0156 68.6813 26.4278 68.0154 23.3549ZM67.9643 19.1551C68.4764 16.0821 70.269 14.0847 73.0859 14.0847C75.9028 14.0847 77.6954 16.1333 78.1051 19.1551H67.9643Z"
+              fill="#002F67" />
+            <path
+              d="M101.357 15.7234C96.9015 15.7234 94.1358 18.4379 94.1358 24.1229V32.8809H87.3752V9.1165H94.1358V13.8796C95.5186 10.6018 97.721 8.45069 101.716 8.65555V15.7234H101.357Z"
+              fill="#002F67" />
+            <path d="M104.021 32.8811V9.1167H110.781V32.8811H104.021Z" fill="#002F67" />
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M128.809 30.32V32.8808H135.314V19.1036C135.314 12.6504 132.087 8.86035 124.712 8.86035C120.666 8.86035 118.105 9.6286 115.493 10.7554L117.183 15.877C119.334 15.1088 121.178 14.5966 123.739 14.5966C127.119 14.5966 128.861 16.1331 128.861 18.95V19.3597C127.17 18.7963 125.48 18.3866 123.073 18.3866C117.439 18.3866 113.496 20.7938 113.496 25.9666V26.0691C113.496 30.781 117.183 33.3418 121.639 33.3418C124.917 33.3418 127.17 32.1126 128.809 30.32ZM124.661 22.4327C126.3 22.4327 127.785 22.7912 128.963 23.3034V24.5326C128.963 26.9398 126.812 28.6811 123.688 28.6811C121.485 28.6811 120 27.6056 120 25.813V25.7106C120 23.6107 121.793 22.4327 124.661 22.4327Z"
+              fill="#002F67" />
+            <ellipse cx="107.401" cy="3.53393" rx="3.53393" ry="3.53393" fill="#002F67" />
+          </g>
+          <defs><clipPath id="clip0_nav"><rect width="135" height="40" fill="white" /></clipPath></defs>
+        </svg>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#foundation">Overview</a></li>
+        <li><a href="#typography">Typography</a></li>
+        <li><a href="#sizing">Sizing</a></li>
+        <li><a href="#behaviors">Mobile-Specific Behaviors</a></li>
+        <li><a href="#charts">Charts</a></li>
+        <li><a href="#table">Table</a></li>
+        <li><a href="#tabs">Tab and Segmented Controls</a></li>
+        <li><a href="#live">The App on a Phone</a></li>
+      </ul>
+      <button class="nav-burger" id="burger" aria-label="Menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+  <div class="nav-drawer" id="drawer">
+    <ul>
+      <li><a href="#foundation">00 · Overview</a></li>
+      <li><a href="#typography">01 · Typography</a></li>
+      <li><a href="#sizing">02 · Sizing</a></li>
+      <li><a href="#behaviors">03 · Mobile-Specific Behaviors</a></li>
+      <li><a href="#charts">04 · Charts</a></li>
+      <li><a href="#table">05 · Table</a></li>
+      <li><a href="#tabs">06 · Tab and Segmented Controls</a></li>
+      <li><a href="#live">07 · The App on a Phone</a></li>
+    </ul>
+  </div>
+
+  <header class="hero">
+    <svg class="hero-shape" viewBox="0 0 406.1 283.3" preserveAspectRatio="xMaxYMin meet" aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="heroGradA" x1="279.9" y1="319.7" x2="397.4" y2="-3.1" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#002f67" />
+          <stop offset="1" stop-color="#004583" />
+        </linearGradient>
+        <linearGradient id="heroGradB" x1="174.1" y1="306.1" x2="252.7" y2="90.3" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#002f67" />
+          <stop offset="1" stop-color="#0072bc" />
+        </linearGradient>
+      </defs>
+      <path fill="url(#heroGradA)" d="M406.6,283.3h-226.8l84.9-212.2C281.9,28.1,323.6-.2,369.9-.2L406.1,0l.5,283.3Z" />
+      <path fill="url(#heroGradB)" d="M247.4,283.3H111.3l50.9-127.3c10.3-25.8,35.3-42.8,63.2-42.8h90l-68,170.1Z" />
+    </svg>
+    <div class="wrap">
+      <div class="hero-inner">
+        <p class="eyebrow">Ask Nanci · Mobile Adaptation · 2 September 2026</p>
+        <h1>Mobile foundation<span>Practices for adapting the platform to a phone</span></h1>
+        <p class="hero-sub">What the platform does today, and what to do next.</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- 00 · FOUNDATION -->
+  <section id="foundation">
+    <div class="wrap">
+      <div class="chapter">
+        <div class="chapter-head">
+          <h2>Overview</h2>
+          <p class="lede">A phone is not a small desktop. Most of what breaks on one is a decision nobody made.</p>
+        <p class="body-p">Judged at phone width. <strong>In place</strong> is how the product behaves today; <strong>Recommended</strong> is what to do next. A rule set once beats the same rule remembered at every screen.</p>
+          <p class="body-p">A phone is not a narrow desktop. The input is a thumb, not a pointer, so targets need more room and anything that depends on hover has nowhere to go. The screen is roughly a third the width, so a layout built in columns has to scroll, stack or drop. And the reader is usually one-handed and moving, not seated in front of it.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 01 · TYPOGRAPHY -->
+  <section id="typography">
+    <div class="wrap">
+      <div class="chapter">
+        <div class="chapter-head">
+          <h2>Typography</h2>
+          <p class="lede">One scale serves both screens. What is still unsettled is who owns how a block of text reads.</p>
+        </div>
+      </div>
+
+      <div class="block-label">Recommendation</div>
+      <div class="type-table-wrap">
+        <table class="type-table">
+          <thead>
+            <tr><th>State</th><th>What it is</th><th>What to do</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>One scale.</strong> Interface text shares it across desktop and mobile, and it stays readable at phone width</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>Inputs never zoom the page.</strong> Every field a reader types into is at least 16px</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--practice"><svg><use href="#ic-arrow"/></svg>Recommended</span></td><td class="tt-what"><strong>No shared answer style.</strong> Every part of an answer is styled on its own</td><td><strong>Own how an answer reads</strong> in one place, not element by element</td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--practice"><svg><use href="#ic-arrow"/></svg>Recommended</span></td><td class="tt-what"><strong>The smallest labels ignore the reader.</strong> They are fixed in px, so a larger browser font does nothing</td><td><strong>Decide which small sizes should exist,</strong> then put them on the scale</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="block-label">Preview</div>
+      <div class="type-table-wrap">
+        <table class="type-table">
+          <thead>
+            <tr><th>Specimen</th><th>Size / line height</th><th>Used for</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="tt-spec"><span style="font-size:36px">text-4xl</span></td><td class="tt-size">36 / 40</td><td>The 404 numeral</td></tr>
+            <tr><td class="tt-spec"><span style="font-size:30px">text-3xl</span></td><td class="tt-size">30 / 36</td><td>Page titles, largest metrics</td></tr>
+            <tr><td class="tt-spec"><span style="font-size:24px">text-2xl</span></td><td class="tt-size">24 / 32</td><td>Welcome and dialog headlines, large metrics</td></tr>
+            <tr><td class="tt-spec"><span style="font-size:20px">text-xl</span></td><td class="tt-size">20 / 28</td><td>Panel page titles, error titles, stat values</td></tr>
+            <tr><td class="tt-spec"><span style="font-size:18px">text-lg</span></td><td class="tt-size">18 / 28</td><td>Section headings, smaller stat values</td></tr>
+            <tr><td class="tt-spec"><span style="font-size:16px">text-base</span></td><td class="tt-size">16 / 24</td><td>Chat input on phones, card and panel titles</td></tr>
+            <tr><td class="tt-spec"><span style="font-size:14px">text-sm</span></td><td class="tt-size">14 / 20</td><td>Default interface text, chat and answer text</td></tr>
+            <tr><td class="tt-spec"><span style="font-size:12px">text-xs</span></td><td class="tt-size">12 / 16</td><td>Secondary and meta text</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="sxs-note">The design system uses three steps: <span class="mono">text-xs</span>, <span class="mono">text-sm</span>, <span class="mono">text-base</span>. <strong>Everything above 16px and below 12px is the app's own choice.</strong></p>
+
+    </div>
+  </section>
+
+  <!-- 02 · SIZING -->
+  <section id="sizing">
+    <div class="wrap">
+      <div class="chapter">
+        <div class="chapter-head">
+          <h2>Sizing</h2>
+          <p class="lede">Controls are drawn for a pointer and touched by a thumb. The two can be reconciled without redrawing anything.</p>
+        </div>
+      </div>
+
+      <div class="block-label">Recommendation</div>
+      <div class="type-table-wrap">
+        <table class="type-table">
+          <thead>
+            <tr><th>State</th><th>What it is</th><th>What to do</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>Four control sizes.</strong> 24, 28, 32 and 36px, applied consistently</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>Tap areas are 44px.</strong> The area that answers a thumb grows; the control still looks its own size</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>Set once, and for touch.</strong> A touchscreen laptop earns the bigger target, a mouse-driven phone does not</td><td><span class="tt-none">&mdash;</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="block-label">Preview</div>
+      <div class="sxs">
+        <div class="sxs-pane">
+          <div class="sxs-head"><span class="sxs-name"><svg class="sxs-ic"><use href="#ic-monitor"/></svg>Wide screen</span><span class="sxs-w">900px</span></div>
+          <div class="sxs-body"><div class="d-btns"><div class="d-btn-wrap"><span class="d-btn" style="width:24px;height:24px">Ok</span><span class="d-btn-cap">xs &middot; 24px</span></div><div class="d-btn-wrap"><span class="d-btn" style="width:28px;height:28px">Ok</span><span class="d-btn-cap">sm &middot; 28px</span></div><div class="d-btn-wrap"><span class="d-btn" style="width:32px;height:32px">Ok</span><span class="d-btn-cap">default &middot; 32px</span></div><div class="d-btn-wrap"><span class="d-btn" style="width:36px;height:36px">Ok</span><span class="d-btn-cap">lg &middot; 36px</span></div>
+            <div class="d-btn-wrap"><span class="d-ref">44</span><span class="d-btn-cap">minimum</span></div>
+          </div></div>
+        </div>
+        <div class="sxs-pane sxs-pane--phone">
+          <div class="sxs-head"><span class="sxs-name"><svg class="sxs-ic"><use href="#ic-phone"/></svg>Phone</span><span class="sxs-w">390px</span></div>
+          <div class="sxs-body"><div class="d-btns"><div class="d-btn-wrap"><span class="d-btn" style="width:24px;height:24px">Ok</span><span class="d-btn-cap">xs &middot; 24px</span></div><div class="d-btn-wrap"><span class="d-btn" style="width:28px;height:28px">Ok</span><span class="d-btn-cap">sm &middot; 28px</span></div><div class="d-btn-wrap"><span class="d-btn" style="width:32px;height:32px">Ok</span><span class="d-btn-cap">default &middot; 32px</span></div><div class="d-btn-wrap"><span class="d-btn" style="width:36px;height:36px">Ok</span><span class="d-btn-cap">lg &middot; 36px</span></div>
+            <div class="d-btn-wrap"><span class="d-ref">44</span><span class="d-btn-cap">minimum</span></div>
+          </div></div>
+        </div>
+      </div>
+      <p class="sxs-note">The dashed box is the 44px reference. <strong>Every control now fills it to a thumb while still being drawn at its own size.</strong></p>
+    </div>
+  </section>
+
+  <!-- 03 · MOBILE-SPECIFIC BEHAVIORS -->
+  <section id="behaviors">
+    <div class="wrap">
+      <div class="chapter">
+        <div class="chapter-head">
+          <h2>Mobile-Specific Behaviors</h2>
+          <p class="lede">Two surfaces change shape on a phone. A third was changed and changed back, which is the more useful lesson.</p>
+        </div>
+      </div>
+
+      <div class="block-label">Recommendation</div>
+      <div class="type-table-wrap">
+        <table class="type-table">
+          <thead>
+            <tr><th>State</th><th>What it is</th><th>What to do</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>Sidebar becomes a sheet.</strong> There is no room for a rail beside the conversation, so it slides over it</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>A panel becomes a card.</strong> Dragged down out of the way, pulled back up by its handle</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>One panel at a time.</strong> A chooser for a single card is friction; a second waits behind a pager</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>An assistant-opened panel arrives resting.</strong> Covering the answer that just described it is the wrong trade</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>The handle announces itself.</strong> It lights up twice and stops; a cue that keeps asking is a notification</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>The conversation recedes, not disappears.</strong> It scales back and dims while the composer stays sharp above it</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>Safe areas are read.</strong> Nothing against the screen edge sits under the home indicator</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>Dialogs stay dialogs.</strong> Swapping them for bottom sheets was tried and reversed: dragging to dismiss loses the close button a confirmation needs</td><td><strong>Adapt the content,</strong> not the component</td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--practice"><svg><use href="#ic-arrow"/></svg>Recommended</span></td><td class="tt-what"><strong>Dialog content does not shrink.</strong> A dialog lays its contents out wider than itself and cuts them off</td><td><strong>Tell it its content may get smaller,</strong> in the system rather than per dialog</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="bleed">
+        <img
+          src="https://www.dl.dropboxusercontent.com/scl/fi/x3r7k01nhe5219s02bllb/image-2.jpg?rlkey=5fgcvxg1phly5cjf5j10px167&amp;st=efiugj01&amp;dl=0"
+          alt="A phone with the sidebar closed, and the same phone with the sidebar open as a drawer"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="img-ph"><span class="img-ph-name">Sidebar</span><span class="img-ph-hint">Screenshot unavailable</span></div>
+        <p class="cap"><strong>Sidebar</strong>, closed and open. Open, it covers the conversation.</p>
+      </div>
+
+      <div class="bleed">
+        <img
+          src="https://www.dl.dropboxusercontent.com/scl/fi/5bmi8disghngaq6ldnuci/image-3.jpg?rlkey=nzkooqxs5m6r1nwwve0r9bnf1&amp;st=mksvcatc&amp;dl=0"
+          alt="A phone with the panel open, and the same phone with the panel resting as a handle"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="img-ph"><span class="img-ph-name">Panel</span><span class="img-ph-hint">Screenshot unavailable</span></div>
+        <p class="cap"><strong>Panel</strong>, open and at rest. The handle keeps the composer usable.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 04 · CHARTS -->
+  <section id="charts">
+    <div class="wrap">
+      <div class="chapter">
+        <div class="chapter-head">
+          <h2>Charts</h2>
+          <p class="lede">A chart resizes itself. What it does not do is decide what to drop, and that decision now lives in one place rather than in every chart.</p>
+        </div>
+      </div>
+
+      <div class="block-label">Recommendation</div>
+      <div class="type-table-wrap">
+        <table class="type-table">
+          <thead>
+            <tr><th>State</th><th>What it is</th><th>What to do</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>Fits any width.</strong> A chart redraws at its parent&rsquo;s size</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>Ticks thin out.</strong> Labels drop on their own when they would collide</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>Touch works.</strong> Tooltips answer a tap, ranges drag</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>One mobile mode, set once.</strong> Margins, label thinning and legend placement live in one shared wrapper</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>Long labels have room.</strong> The 5px default is enough for numbers and not for a turned month name</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>The legend takes its own space.</strong> Below the chart as ordinary content, it never eats into the plot</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>Nothing forces every label.</strong> Forcing them reads fine on a laptop and unreadable on a phone</td><td><span class="tt-none">&mdash;</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="block-label">Preview</div>
+      <div class="sxs">
+        <div class="sxs-pane">
+          <div class="sxs-head"><span class="sxs-name"><svg class="sxs-ic"><use href="#ic-monitor"/></svg>Wide screen</span><span class="sxs-w">900px</span></div>
+          <div class="sxs-body"><svg width="100%" height="150" role="img" aria-label="Monthly volume by channel"><line x1="0" x2="100%" y1="8.0" y2="8.0" stroke="#e3e6ea" stroke-width="1" /><line x1="0" x2="100%" y1="46.7" y2="46.7" stroke="#e3e6ea" stroke-width="1" /><line x1="0" x2="100%" y1="85.3" y2="85.3" stroke="#e3e6ea" stroke-width="1" /><line x1="0" x2="100%" y1="124.0" y2="124.0" stroke="#e3e6ea" stroke-width="1" /><rect x="2.25%" y="33.5" width="2.50%" height="90.5" fill="#002F67" rx="1" /><rect x="5.00%" y="75.3" width="2.50%" height="48.7" fill="#0072BC" rx="1" /><rect x="7.75%" y="103.1" width="2.50%" height="20.9" fill="#7ED3F7" rx="1" /><rect x="14.75%" y="26.6" width="2.50%" height="97.4" fill="#002F67" rx="1" /><rect x="17.50%" y="70.6" width="2.50%" height="53.4" fill="#0072BC" rx="1" /><rect x="20.25%" y="100.8" width="2.50%" height="23.2" fill="#7ED3F7" rx="1" /><rect x="27.25%" y="40.5" width="2.50%" height="83.5" fill="#002F67" rx="1" /><rect x="30.00%" y="77.6" width="2.50%" height="46.4" fill="#0072BC" rx="1" /><rect x="32.75%" y="105.4" width="2.50%" height="18.6" fill="#7ED3F7" rx="1" /><rect x="39.75%" y="21.9" width="2.50%" height="102.1" fill="#002F67" rx="1" /><rect x="42.50%" y="66.0" width="2.50%" height="58.0" fill="#0072BC" rx="1" /><rect x="45.25%" y="98.5" width="2.50%" height="25.5" fill="#7ED3F7" rx="1" /><rect x="52.25%" y="13.8" width="2.50%" height="110.2" fill="#002F67" rx="1" /><rect x="55.00%" y="60.2" width="2.50%" height="63.8" fill="#0072BC" rx="1" /><rect x="57.75%" y="96.2" width="2.50%" height="27.8" fill="#7ED3F7" rx="1" /><rect x="64.75%" y="8.0" width="2.50%" height="116.0" fill="#002F67" rx="1" /><rect x="67.50%" y="56.7" width="2.50%" height="67.3" fill="#0072BC" rx="1" /><rect x="70.25%" y="93.8" width="2.50%" height="30.2" fill="#7ED3F7" rx="1" /><rect x="77.25%" y="18.4" width="2.50%" height="105.6" fill="#002F67" rx="1" /><rect x="80.00%" y="63.7" width="2.50%" height="60.3" fill="#0072BC" rx="1" /><rect x="82.75%" y="99.6" width="2.50%" height="24.4" fill="#7ED3F7" rx="1" /><rect x="89.75%" y="11.5" width="2.50%" height="112.5" fill="#002F67" rx="1" /><rect x="92.50%" y="53.2" width="2.50%" height="70.8" fill="#0072BC" rx="1" /><rect x="95.25%" y="91.5" width="2.50%" height="32.5" fill="#7ED3F7" rx="1" /><text x="6.25%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">January</text><text x="18.75%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">February</text><text x="31.25%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">March</text><text x="43.75%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">April</text><text x="56.25%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">May</text><text x="68.75%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">June</text><text x="81.25%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">July</text><text x="93.75%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">August</text></svg><div class="d-legend"><span class="d-key"><i style="background:#002F67"></i>Card present</span><span class="d-key"><i style="background:#0072BC"></i>E-commerce</span><span class="d-key"><i style="background:#7ED3F7"></i>Keyed</span></div></div>
+        </div>
+        <div class="sxs-pane sxs-pane--phone">
+          <div class="sxs-head"><span class="sxs-name"><svg class="sxs-ic"><use href="#ic-phone"/></svg>Phone</span><span class="sxs-w">390px</span></div>
+          <div class="sxs-body"><svg width="100%" height="150" role="img" aria-label="Monthly volume by channel"><line x1="0" x2="100%" y1="8.0" y2="8.0" stroke="#e3e6ea" stroke-width="1" /><line x1="0" x2="100%" y1="46.7" y2="46.7" stroke="#e3e6ea" stroke-width="1" /><line x1="0" x2="100%" y1="85.3" y2="85.3" stroke="#e3e6ea" stroke-width="1" /><line x1="0" x2="100%" y1="124.0" y2="124.0" stroke="#e3e6ea" stroke-width="1" /><rect x="2.25%" y="33.5" width="2.50%" height="90.5" fill="#002F67" rx="1" /><rect x="5.00%" y="75.3" width="2.50%" height="48.7" fill="#0072BC" rx="1" /><rect x="7.75%" y="103.1" width="2.50%" height="20.9" fill="#7ED3F7" rx="1" /><rect x="14.75%" y="26.6" width="2.50%" height="97.4" fill="#002F67" rx="1" /><rect x="17.50%" y="70.6" width="2.50%" height="53.4" fill="#0072BC" rx="1" /><rect x="20.25%" y="100.8" width="2.50%" height="23.2" fill="#7ED3F7" rx="1" /><rect x="27.25%" y="40.5" width="2.50%" height="83.5" fill="#002F67" rx="1" /><rect x="30.00%" y="77.6" width="2.50%" height="46.4" fill="#0072BC" rx="1" /><rect x="32.75%" y="105.4" width="2.50%" height="18.6" fill="#7ED3F7" rx="1" /><rect x="39.75%" y="21.9" width="2.50%" height="102.1" fill="#002F67" rx="1" /><rect x="42.50%" y="66.0" width="2.50%" height="58.0" fill="#0072BC" rx="1" /><rect x="45.25%" y="98.5" width="2.50%" height="25.5" fill="#7ED3F7" rx="1" /><rect x="52.25%" y="13.8" width="2.50%" height="110.2" fill="#002F67" rx="1" /><rect x="55.00%" y="60.2" width="2.50%" height="63.8" fill="#0072BC" rx="1" /><rect x="57.75%" y="96.2" width="2.50%" height="27.8" fill="#7ED3F7" rx="1" /><rect x="64.75%" y="8.0" width="2.50%" height="116.0" fill="#002F67" rx="1" /><rect x="67.50%" y="56.7" width="2.50%" height="67.3" fill="#0072BC" rx="1" /><rect x="70.25%" y="93.8" width="2.50%" height="30.2" fill="#7ED3F7" rx="1" /><rect x="77.25%" y="18.4" width="2.50%" height="105.6" fill="#002F67" rx="1" /><rect x="80.00%" y="63.7" width="2.50%" height="60.3" fill="#0072BC" rx="1" /><rect x="82.75%" y="99.6" width="2.50%" height="24.4" fill="#7ED3F7" rx="1" /><rect x="89.75%" y="11.5" width="2.50%" height="112.5" fill="#002F67" rx="1" /><rect x="92.50%" y="53.2" width="2.50%" height="70.8" fill="#0072BC" rx="1" /><rect x="95.25%" y="91.5" width="2.50%" height="32.5" fill="#7ED3F7" rx="1" /><text x="6.25%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">January</text><text x="18.75%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">February</text><text x="31.25%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">March</text><text x="43.75%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">April</text><text x="56.25%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">May</text><text x="68.75%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">June</text><text x="81.25%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">July</text><text x="93.75%" y="142" font-size="11" fill="#4b4f57" text-anchor="middle" font-family="Inter, sans-serif">August</text></svg><div class="d-legend"><span class="d-key"><i style="background:#002F67"></i>Card present</span><span class="d-key"><i style="background:#0072BC"></i>E-commerce</span><span class="d-key"><i style="background:#7ED3F7"></i>Keyed</span></div></div>
+        </div>
+      </div>
+      <p class="sxs-note">The same chart in a narrower box, at the same text size. <strong>On a phone the month labels collide</strong>, which is what label thinning prevents &mdash; and what forcing every label to show switches off.</p>
+      <div class="block-label">Preview</div>
+      <div class="sxs">
+        <div class="sxs-pane">
+          <div class="sxs-head"><span class="sxs-name"><svg class="sxs-ic"><use href="#ic-monitor"/></svg>Wide screen</span><span class="sxs-w">900px</span></div>
+          <div class="sxs-body"><div class="d-legend"><span class="d-key"><i style="background:#002F67"></i>Card present</span><span class="d-key"><i style="background:#004785"></i>E-commerce</span><span class="d-key"><i style="background:#0072BC"></i>Keyed</span><span class="d-key"><i style="background:#7ED3F7"></i>Wallet</span><span class="d-key"><i style="background:#C8EAF5"></i>ACH</span></div></div>
+        </div>
+        <div class="sxs-pane sxs-pane--phone">
+          <div class="sxs-head"><span class="sxs-name"><svg class="sxs-ic"><use href="#ic-phone"/></svg>Phone</span><span class="sxs-w">390px</span></div>
+          <div class="sxs-body"><div class="d-legend"><span class="d-key"><i style="background:#002F67"></i>Card present</span><span class="d-key"><i style="background:#004785"></i>E-commerce</span><span class="d-key"><i style="background:#0072BC"></i>Keyed</span><span class="d-key"><i style="background:#7ED3F7"></i>Wallet</span><span class="d-key"><i style="background:#C8EAF5"></i>ACH</span></div></div>
+        </div>
+      </div>
+      <p class="sxs-note">The legend entries fit one line on a wide screen. <strong>At 390px they wrap and the block grows taller</strong>, and that height is never reported back to the chart.</p>
+    </div>
+  </section>
+
+  <!-- 05 · TABLE -->
+  <section id="table">
+    <div class="wrap">
+      <div class="chapter">
+        <div class="chapter-head">
+          <h2>Table</h2>
+          <p class="lede">A wide table on a phone always scrolls. The question is whether a reader can tell, and whether they can still see which row they are reading.</p>
+        </div>
+      </div>
+
+      <div class="block-label">Recommendation</div>
+      <div class="type-table-wrap">
+        <table class="type-table">
+          <thead>
+            <tr><th>State</th><th>What it is</th><th>What to do</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>Scrolls sideways.</strong> Columns keep a readable width and the table moves under them</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>An edge fade says columns continue.</strong> A table cut off cleanly at the screen edge looks finished</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>One shared table, one density.</strong> Built individually, they drifted individually</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--practice"><svg><use href="#ic-arrow"/></svg>Recommended</span></td><td class="tt-what"><strong>No pinned column.</strong> Scroll sideways and the name leaves the screen, so the figures belong to nobody</td><td><strong>Pin the column that identifies the row,</strong> never an index or a checkbox</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="block-label">Preview</div>
+      <div class="sxs">
+        <div class="sxs-pane">
+          <div class="sxs-head"><span class="sxs-name"><svg class="sxs-ic"><use href="#ic-monitor"/></svg>Wide screen</span><span class="sxs-w">900px</span></div>
+          <div class="sxs-body"><div class="d-scroll">
+            <table class="d-table">
+              <thead><tr><th>#</th><th>Merchant</th><th class="num">Volume</th><th class="num">Txns</th><th class="num">Avg ticket</th></tr></thead>
+              <tbody><tr><td>1</td><td>Harbor View Hotel</td><td class="num">$3,241,880</td><td class="num">14,312</td><td class="num">$226.50</td></tr><tr><td>2</td><td>Summit Auto Group</td><td class="num">$2,918,440</td><td class="num">1,047</td><td class="num">$2,787.00</td></tr><tr><td>3</td><td>Coastal Fresh Market</td><td class="num">$2,104,320</td><td class="num">41,208</td><td class="num">$51.06</td></tr><tr><td>4</td><td>Pinnacle Dental Group</td><td class="num">$1,876,200</td><td class="num">3,881</td><td class="num">$483.40</td></tr></tbody>
+            </table>
+          </div></div>
+        </div>
+        <div class="sxs-pane sxs-pane--phone">
+          <div class="sxs-head"><span class="sxs-name"><svg class="sxs-ic"><use href="#ic-phone"/></svg>Phone</span><span class="sxs-w">390px</span></div>
+          <div class="sxs-body"><div class="d-scroll">
+            <table class="d-table">
+              <thead><tr><th>#</th><th>Merchant</th><th class="num">Volume</th><th class="num">Txns</th><th class="num">Avg ticket</th></tr></thead>
+              <tbody><tr><td>1</td><td>Harbor View Hotel</td><td class="num">$3,241,880</td><td class="num">14,312</td><td class="num">$226.50</td></tr><tr><td>2</td><td>Summit Auto Group</td><td class="num">$2,918,440</td><td class="num">1,047</td><td class="num">$2,787.00</td></tr><tr><td>3</td><td>Coastal Fresh Market</td><td class="num">$2,104,320</td><td class="num">41,208</td><td class="num">$51.06</td></tr><tr><td>4</td><td>Pinnacle Dental Group</td><td class="num">$1,876,200</td><td class="num">3,881</td><td class="num">$483.40</td></tr></tbody>
+            </table>
+          </div></div>
+        </div>
+      </div>
+      <p class="sxs-note">Drag either table sideways. <strong>The wide one fits, the phone one scrolls</strong>, which is the shipped behavior.</p>
+    </div>
+  </section>
+
+  <!-- 06 · TAB AND SEGMENTED CONTROLS -->
+  <section id="tabs">
+    <div class="wrap">
+      <div class="chapter">
+        <div class="chapter-head">
+          <h2>Tab and Segmented Controls</h2>
+          <p class="lede">A row of tabs is the one control that silently loses things. It fits on a laptop, and on a phone the last two simply are not there.</p>
+        </div>
+      </div>
+
+      <div class="block-label">Recommendation</div>
+      <div class="type-table-wrap">
+        <table class="type-table">
+          <thead>
+            <tr><th>State</th><th>What it is</th><th>What to do</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--in"><svg><use href="#ic-check"/></svg>In place</span></td><td class="tt-what"><strong>Wide strips scroll rather than clip.</strong> A tab row wider than the screen slides sideways, so nothing is unreachable</td><td><span class="tt-none">&mdash;</span></td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--practice"><svg><use href="#ic-arrow"/></svg>Recommended</span></td><td class="tt-what"><strong>No edge cue.</strong> Nothing shows that the strip continues past the right edge</td><td><strong>Use the fade</strong> the tables already use</td></tr>
+            <tr><td class="tt-state"><span class="tt-pill tt-pill--practice"><svg><use href="#ic-arrow"/></svg>Recommended</span></td><td class="tt-what"><strong>Scrolling is per screen, not built in.</strong> A strip nobody told to scroll goes back to cutting off</td><td><strong>Put the behaviour in the control,</strong> so forgetting is not an option</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="block-label">Preview</div>
+      <div class="sxs">
+        <div class="sxs-pane">
+          <div class="sxs-head"><span class="sxs-name"><svg class="sxs-ic"><use href="#ic-monitor"/></svg>Wide screen</span><span class="sxs-w">900px</span></div>
+          <div class="sxs-body"><div class="d-scroll"><div class="d-tabs"><span class="d-tab">This week</span><span class="d-tab" aria-selected="true">This month</span><span class="d-tab">This quarter</span><span class="d-tab">This year</span><span class="d-tab">All time</span></div></div></div>
+        </div>
+        <div class="sxs-pane sxs-pane--phone">
+          <div class="sxs-head"><span class="sxs-name"><svg class="sxs-ic"><use href="#ic-phone"/></svg>Phone</span><span class="sxs-w">390px</span></div>
+          <div class="sxs-body"><div style="display:inline-flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:14px;font-weight:600">This month <span style="opacity:.5">&#9662;</span></div></div>
+        </div>
+      </div>
+      <p class="sxs-note">Every period fits a wide screen. <strong>On a phone a little over half the strip is visible</strong> and the rest is a swipe away, with nothing to say so.</p>
+    </div>
+  </section>
+
+  <!-- 07 · LIVE -->
+  <section id="live">
+    <div class="wrap">
+      <div class="chapter">
+        <div class="chapter-head">
+          <h2>The App on a Phone</h2>
+          <p class="lede">The panel, running at phone size. Everything above is easier to judge by using it than by reading about it.</p>
+        </div>
+      </div>
+      <div class="demo">
+        <div class="demo-phone">
+          <iframe class="demo-frame" src="https://ask-nanci.vercel.app/?mode=concept&amp;flow=2&amp;panelui=swipe&amp;autoplay" title="The running app at phone size" loading="lazy"></iframe>
+        </div>
+        <div class="demo-note">
+          <p class="sxs-note" style="margin-top:0"><strong>A mouse works the same way a thumb does.</strong> Drag the card down by its top edge, then drag the handle back up.</p>
+          <a class="demo-link" style="margin-top:14px" href="https://ask-nanci.vercel.app/?mode=concept&amp;flow=2&amp;panelui=swipe&amp;autoplay" target="_blank" rel="noopener noreferrer">Open it full size <svg>
+              <use href="#ic-arrow-r" />
+            </svg></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+  <footer>
+    <div class="wrap">
+      <div class="fbrand">
+        <svg width="135" height="40" viewBox="0 0 135 40" fill="none" xmlns="http://www.w3.org/2000/svg" role="img"
+          aria-label="Aperia">
+          <g clip-path="url(#clip0_ftr)">
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M22.9449 25.9157L25.7618 32.8812H32.9321L19.6159 1.63916H13.3163L0 32.8812H7.01664L9.83355 25.9157H22.9449ZM12.292 19.9234L16.3893 9.83377L20.5378 19.9234H12.292Z"
+              fill="#FFFFFF" />
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M41.4854 29.8082C43.1243 31.7032 45.3266 33.3421 48.9118 33.3421C54.5456 33.3421 59.7184 28.9887 59.7184 21.1014V20.999C59.7184 13.0604 54.4432 8.70703 48.9118 8.70703C45.3779 8.70703 43.1243 10.346 41.4854 12.5483V9.11676H34.7249V40.0002H41.4854V29.8082ZM47.2216 14.392C50.3458 14.392 53.0091 17.0041 53.0091 20.9477V21.0502C53.0091 25.045 50.3458 27.6059 47.2216 27.6059C44.0462 27.6059 41.4342 24.9938 41.4342 21.0502V20.9477C41.4342 17.0041 44.0974 14.392 47.2216 14.392Z"
+              fill="#FFFFFF" />
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M68.0154 23.3549H84.5583C84.6096 22.7403 84.6096 22.3305 84.5583 21.6647V21.5623C84.5583 14.8017 80.922 8.65576 72.9834 8.65576C66.0692 8.65576 61.2549 14.2896 61.2549 21.0501V21.1526C61.2549 28.4253 66.5302 33.4445 73.6493 33.4445C77.9514 33.4445 81.1781 31.7544 83.3804 28.9887L79.5391 25.5572C77.6953 27.2985 76.0564 28.0156 73.8029 28.0156C70.8323 28.0156 68.6813 26.4278 68.0154 23.3549ZM67.9643 19.1551C68.4764 16.0821 70.269 14.0847 73.0859 14.0847C75.9028 14.0847 77.6954 16.1333 78.1051 19.1551H67.9643Z"
+              fill="#FFFFFF" />
+            <path
+              d="M101.357 15.7234C96.9015 15.7234 94.1358 18.4379 94.1358 24.1229V32.8809H87.3752V9.1165H94.1358V13.8796C95.5186 10.6018 97.721 8.45069 101.716 8.65555V15.7234H101.357Z"
+              fill="#FFFFFF" />
+            <path d="M104.021 32.8811V9.1167H110.781V32.8811H104.021Z" fill="#FFFFFF" />
+            <path fill-rule="evenodd" clip-rule="evenodd"
+              d="M128.809 30.32V32.8808H135.314V19.1036C135.314 12.6504 132.087 8.86035 124.712 8.86035C120.666 8.86035 118.105 9.6286 115.493 10.7554L117.183 15.877C119.334 15.1088 121.178 14.5966 123.739 14.5966C127.119 14.5966 128.861 16.1331 128.861 18.95V19.3597C127.17 18.7963 125.48 18.3866 123.073 18.3866C117.439 18.3866 113.496 20.7938 113.496 25.9666V26.0691C113.496 30.781 117.183 33.3418 121.639 33.3418C124.917 33.3418 127.17 32.1126 128.809 30.32ZM124.661 22.4327C126.3 22.4327 127.785 22.7912 128.963 23.3034V24.5326C128.963 26.9398 126.812 28.6811 123.688 28.6811C121.485 28.6811 120 27.6056 120 25.813V25.7106C120 23.6107 121.793 22.4327 124.661 22.4327Z"
+              fill="#FFFFFF" />
+            <ellipse cx="107.401" cy="3.53393" rx="3.53393" ry="3.53393" fill="#FFFFFF" />
+          </g>
+          <defs><clipPath id="clip0_ftr"><rect width="135" height="40" fill="white" /></clipPath></defs>
+        </svg>
+      </div>
+      <p>Mobile Adaptation · Ask Nanci · August 2026</p>
+    </div>
+  </footer>
+
+  <script>
+    const burger = document.getElementById('burger');
+    const drawer = document.getElementById('drawer');
+    burger.addEventListener('click', () => {
+      const open = drawer.classList.toggle('open');
+      burger.classList.toggle('open', open);
+      burger.setAttribute('aria-expanded', open);
+    });
+    drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+      drawer.classList.remove('open');
+      burger.classList.remove('open');
+      burger.setAttribute('aria-expanded', false);
+    }));
+  </script>
+</body>
+
+</html>

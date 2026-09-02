@@ -348,6 +348,51 @@ html.dark [data-logo="ask-nanci"] { filter: invert(1) hue-rotate(180deg); }
   --spacing-safe-r: env(safe-area-inset-right, 0px);
 }
 
+/* A dialog stays a dialog on a phone. It was briefly swapped for a bottom sheet
+   below `sm`, which is the wrong trade here: half these dialogs are confirmations
+   and wizards whose own `max-sm:` full-screen treatment was already written and was
+   simply never reached, and a drag-to-dismiss sheet loses the close button that a
+   confirm dialog needs. What a phone actually changes is the height: a centred
+   dialog with no cap grows past the top and bottom of the screen and takes its own
+   footer with it.
+
+   So: cap it to the viewport less a 1rem margin and the safe areas, and let it
+   scroll. In `@layer base` on purpose — utilities win over base, so any call site
+   that has already decided its own height (SettingsDialog and ConnectWizard both go
+   full-screen under `max-sm:`) keeps that decision untouched.
+
+   Matched by slot rather than at each call site, the same reasoning as the touch
+   targets below: it reaches every dialog in every demo, including ones not written
+   yet. `sm` rather than `md` because `sm` is where ds5's own DialogContent switches
+   its width. */
+@layer base {
+  /* ds5's DialogContent is a grid, and a grid item's `min-width` defaults to `auto`,
+     which means "never shrink below your min-content width". Any child with a wide
+     min-content — a nowrap tab row, a table, a flex row of cards — therefore sizes
+     itself past the dialog and spills out of it. The Common Questions dialog laid its
+     content out at 633px inside a 358px box. `minmax(0, 1fr)` is the column that lets
+     a child shrink, and it is what the responsive classes those children already carry
+     (`overflow-x-auto` on the tab row, `grid-cols-1` on the prompts) need in order to
+     mean anything.
+
+     Not scoped to a width: a child overflowing its own dialog is a bug at every size.
+     It only shows up on a phone because that is where the box first gets narrower than
+     the content. */
+  [data-slot="dialog-content"],
+  [data-slot="alert-dialog-content"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  @media (max-width: 39.99rem) {
+    [data-slot="dialog-content"],
+    [data-slot="alert-dialog-content"] {
+      max-height: calc(100dvh - 2rem - var(--spacing-safe-t) - var(--spacing-safe-b));
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+  }
+}
+
 /* Grows the hit area to 44px (Apple's minimum; Google asks 48dp) without moving
    a pixel of the control itself, which is the whole point — the design system's
    sizes are 24/28/32/36px and they are meant to look that way. The overlay is
