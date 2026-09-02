@@ -18,6 +18,8 @@ export interface RiskParameter {
   id: string
   name: string
   model: ParamModel
+  /** What trips it, for screens that explain a parameter rather than just name it. */
+  blurb: string
 }
 
 /**
@@ -25,14 +27,14 @@ export interface RiskParameter {
  * VW portfolio has parameters switched off, and a gap-free P1…P7 list reads as
  * invented. These seven are the ones the demo screens reference.
  */
-const VW_PARAMETERS: RiskParameter[] = [
-  { id: "P11", name: "Chargeback Ratio",       model: "vw" },
-  { id: "P12", name: "Chargeback Count",       model: "vw" },
-  { id: "P14", name: "Daily Volume Spike",     model: "vw" },
-  { id: "P26", name: "Credit Ratio",           model: "vw" },
-  { id: "P38", name: "ACH Return Rate",        model: "vw" },
-  { id: "P39", name: "Average Ticket Change",  model: "vw" },
-  { id: "P41", name: "Deposit Velocity",       model: "vw" },
+export const VW_PARAMETERS: RiskParameter[] = [
+  { id: "P11", name: "Chargeback Ratio",      model: "vw", blurb: "Chargebacks as a share of transaction count" },
+  { id: "P12", name: "Chargeback Count",      model: "vw", blurb: "Chargeback volume against the merchant's own baseline" },
+  { id: "P14", name: "Daily Volume Spike",    model: "vw", blurb: "A day's volume jumps against the 30-day average" },
+  { id: "P26", name: "Credit Ratio",          model: "vw", blurb: "Credits and refunds against gross sales" },
+  { id: "P38", name: "ACH Return Rate",       model: "vw", blurb: "Returned ACH items as a share of settlement" },
+  { id: "P39", name: "Average Ticket Change", model: "vw", blurb: "Average ticket departs from the merchant's history" },
+  { id: "P41", name: "Deposit Velocity",      model: "vw", blurb: "Deposits arrive faster than the account's pattern" },
 ]
 
 /**
@@ -42,7 +44,7 @@ const VW_PARAMETERS: RiskParameter[] = [
  */
 export const PARAMETERS: RiskParameter[] = [
   ...VW_PARAMETERS,
-  ...MC_PARAMETERS.map((p) => ({ id: p.id, name: p.name, model: "mc" as const })),
+  ...MC_PARAMETERS.map((p) => ({ id: p.id, name: p.name, model: "mc" as const, blurb: p.blurb })),
 ]
 
 export const findParameter = (id: string) => PARAMETERS.find((p) => p.id === id)

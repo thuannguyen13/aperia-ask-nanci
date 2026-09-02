@@ -194,28 +194,3 @@ export const DASH_ANALYSTS = [
 
 /** What "+ Add filter" offers. Named here so the row stays data, not markup. */
 export const DASH_MORE_FILTERS = ["Risk level", "MCC", "Card network", "Alert reason"]
-
-// ── VisionWeb parameters ─────────────────────────────────────────────────────
-// The legacy side of the two-model story. PARAM_HEAT plots these IDs beside the
-// Mastercard ones, and the Risk Report lists them as a merchant's driving
-// parameters, so they need names — a chart bar labelled "P14" with nothing behind
-// it tells a reader nothing.
-//
-// ponytail: illustrative. The real data carries VW scores, not the parameter
-// definitions behind them; these are the classic acquirer-monitoring measures,
-// named to match what an analyst would expect under each ID.
-export interface VwParameter {
-  id: string
-  name: string
-  blurb: string
-}
-
-export const VW_PARAMETERS: VwParameter[] = [
-  { id: "P11", name: "Chargeback Ratio",     blurb: "Chargebacks as a share of transaction count" },
-  { id: "P12", name: "Chargeback Volume",    blurb: "Chargeback dollars against monthly volume" },
-  { id: "P14", name: "Excessive Refunds",    blurb: "Refund rate above the MCC's normal band" },
-  { id: "P26", name: "Deposit Variance",     blurb: "Daily deposits swing against the contract" },
-  { id: "P38", name: "Ticket Size Anomaly",  blurb: "Average ticket departs from the merchant's own history" },
-  { id: "P39", name: "Velocity Spike",       blurb: "Transaction count jumps against its baseline" },
-  { id: "P41", name: "Offline Auth Rate",    blurb: "Share of authorizations taken offline" },
-]

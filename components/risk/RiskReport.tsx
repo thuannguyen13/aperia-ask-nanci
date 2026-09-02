@@ -13,7 +13,7 @@ import { MarkWorkPopover } from "./MarkWorkPopover"
 import { useRiskNav } from "./RiskNavContext"
 import { findMerchant, getVwLevel, getMcLevel, getRiskLevel, formatMcScore, formatMerchantName, formatTxnConfidence, RISK_REPORT_DETAILS, getDefaultRiskDetail, getMerchantProfile, getTxnVolume, VOLUME_PERIODS, netVolume, chargebackPct, type VolumePeriod, RECENT_AUTHS, AUTH_TOTAL, AUTH_SCORE_ALERT, RISK_VIOLATION_CYCLE, VIOLATION_ROWS, CROSS_QUEUE_ROWS, MERCHANT_NOTES_SEED, DEFAULT_MERCHANT_NOTES, statusForDisposition, type WorkStatus, type ViolationRow, type NoteEntry, type RiskLevel, type RiskReportDetail, type TxnVolumeRow } from "@/lib/ask-nanci/data/risk-merchants"
 import { MC_PARAMETERS } from "@/lib/ask-nanci/data/risk-create-assignment"
-import { VW_PARAMETERS } from "@/lib/ask-nanci/data/risk-dashboard"
+import { VW_PARAMETERS } from "@/lib/ask-nanci/data/risk-parameters"
 import { getRiskLevelStyles } from "./risk-level"
 
 // Parameter Violation Details modal columns (Figma order + widths).
@@ -405,9 +405,11 @@ export function RiskReport() {
 
   if (!m || !d) return null
 
-  // A closed account settles nothing. Both transaction views read module-level demo
-  // data shared by every merchant, so without this the two bust-out case studies
-  // print this month's sales under a Terminated status and a last batch in 2025.
+  // A closed account settles nothing. All three transaction views read demo data
+  // that is not keyed to the account's own state, so without this the two bust-out
+  // case studies print this month's figures under a Terminated status and a last
+  // batch in 2025. Every branch below is gated, not just the two that showed it
+  // first — that omission is exactly how Transaction History kept reporting.
   const closed = d.merchant.accountStatus === "Terminated"
   const noActivity = (
     <p className="py-10 text-center text-sm text-muted-foreground">
@@ -664,6 +666,7 @@ export function RiskReport() {
           </div>
 
           <div className="mt-3">
+            {closed ? noActivity : (
             <PanelTable density="comfortable">
               <Thead>
                 <Th sortable>Time</Th>
@@ -689,6 +692,7 @@ export function RiskReport() {
                 </TableRow>
               </TableBody>
             </PanelTable>
+            )}
           </div>
           </>
           ) : (
