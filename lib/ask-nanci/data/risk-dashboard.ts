@@ -130,6 +130,9 @@ export const HIGH_RISK_MERCHANTS: { id: string; name: string; from: number; to: 
   { id: "meridian",    name: "MERIDIAN DENTAL GROUP",          from: 0,      to: 95.99,  delta: 96 },
 ]
 
+/** The 30-day delta this table prints, for a merchant that appears in it. */
+export const mcMoverDelta = (id: string) => HIGH_RISK_MERCHANTS.find((h) => h.id === id)?.delta ?? null
+
 // ── Top 10 Parameters Heat (bars = Fires count, line = Case Rate %) ───────────
 export const PARAM_HEAT: { param: string; fires: number; caseRate: number }[] = [
   { param: "P14",   fires: 210, caseRate: 20 },

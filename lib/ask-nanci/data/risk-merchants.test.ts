@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest"
 import {
-  RISK_MERCHANTS, RISK_REPORT_DETAILS, VIOLATION_ROWS, CROSS_QUEUE_ROWS,
+  RISK_MERCHANTS, RISK_REPORT_DETAILS, VIOLATION_COUNT, CROSS_QUEUE_ROWS,
   getDefaultRiskDetail, getMerchantProfile, getTxnVolume, merchantUrl,
 } from "./risk-merchants"
 
@@ -53,7 +53,7 @@ describe("getDefaultRiskDetail", () => {
   it.each(cases)("%s keeps both pills inside the tables behind them", (_, m) => {
     const d = detailFor(m)
     expect(d.violations).toBeGreaterThan(0)
-    expect(d.violations).toBeLessThanOrEqual(VIOLATION_ROWS.length)
+    expect(d.violations).toBeLessThanOrEqual(VIOLATION_COUNT)
     expect(d.inQueues).toBeGreaterThan(0)
     expect(d.inQueues).toBeLessThanOrEqual(CROSS_QUEUE_ROWS.length)
   })

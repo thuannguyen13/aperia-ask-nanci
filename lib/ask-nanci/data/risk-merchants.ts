@@ -16,6 +16,8 @@
 export const REAL_DATA_NOTICE =
   "Real merchant IDs from the Clearent and ESQR portfolios (Sept–Dec 2025). Anonymize before external use."
 
+import { mcMoverDelta } from "./risk-dashboard"
+
 export type RiskLevel = "High" | "Medium" | "Low"
 export type WorkStatus = "mark-work" | "wip" | "worked"
 
@@ -550,7 +552,10 @@ const ISO_AGENTS = ["North Central Group", "Lone Star Payments", "Heartland Merc
 const BOARDED_DATES = ["12/14/2024", "03/09/2025", "06/21/2025", "08/02/2025", "10/17/2025"]
 
 export const getDefaultRiskDetail = (m: RiskMerchant): RiskReportDetail => {
-  const delta30 = Math.round(m.mc * 0.35)
+  // The dashboard's High Risk Merchants table prints a 30-day delta for ten of these
+  // merchants; where it does, that is the figure, because both render on screens one
+  // click apart. Everything else falls back to a share of the score.
+  const delta30 = mcMoverDelta(m.id) ?? Math.round(m.mc * 0.35)
   const level = getMcLevel(m.mc)
   const contract = 2500 + (Number(m.mid.slice(-3)) % 40) * 250
   const seed = seedOf(m)
@@ -559,7 +564,7 @@ export const getDefaultRiskDetail = (m: RiskMerchant): RiskReportDetail => {
     // Both pills slice the tables behind them, so neither can exceed what those
     // tables hold. Tying them to the merchant's own tags keeps each pill agreeing
     // with the red and amber badges the Barometer list shows on the same row.
-    violations: Math.min(VIOLATION_ROWS.length, Math.max(1, Math.round(m.alertTag / 2))),
+    violations: Math.min(VIOLATION_COUNT, Math.max(1, Math.round(m.alertTag / 2))),
     inQueues: Math.min(CROSS_QUEUE_ROWS.length, Math.max(1, m.listTag)),
     // VW climbs with the score: a merchant at the top of this list is there because
     // it moved, not because it has always sat there.
@@ -642,12 +647,31 @@ const ASSIGNMENT = "Phase 2 Parameters - Auths - Detect Q"
  * has been worked — that is the queue card's headline, and a name in this column
  * would contradict the 0.00% printed two screens back.
  */
-export const VIOLATION_ROWS: ViolationRow[] = [
-  { pNum: "P-MC1", wk: "Ready to Work", alertOn: "05/03/2026 10:10:00 AM", assignment: ASSIGNMENT, parameter: "Score Threshold",      reAlert: "No", paramIndicator: "700", actualIndicator: "737", paramThreshold: "N/A",    actualThreshold: "N/A",    disposition: "-", workedOn: "-", userName: "-", fileType: "Transaction" },
-  { pNum: "P-MC2", wk: "Ready to Work", alertOn: "05/03/2026 06:25:30 AM", assignment: ASSIGNMENT, parameter: "Score Velocity",       reAlert: "No", paramIndicator: "40",  actualIndicator: "68",  paramThreshold: "N/A",    actualThreshold: "N/A",    disposition: "-", workedOn: "-", userName: "-", fileType: "Transaction" },
-  { pNum: "P-MC3", wk: "Ready to Work", alertOn: "05/03/2026 07:14:30 AM", assignment: ASSIGNMENT, parameter: "High-MC Txn %",        reAlert: "No", paramIndicator: "15",  actualIndicator: "23",  paramThreshold: "$1,000", actualThreshold: "$2,418", disposition: "-", workedOn: "-", userName: "-", fileType: "Transaction" },
-  { pNum: "P-MC4", wk: "Ready to Work", alertOn: "05/03/2026 05:52:10 AM", assignment: ASSIGNMENT, parameter: "Dollar Exposure",      reAlert: "No", paramIndicator: "10",  actualIndicator: "14",  paramThreshold: "$5,000", actualThreshold: "$7,640", disposition: "-", workedOn: "-", userName: "-", fileType: "Transaction" },
-]
+export const violationRows = (m: RiskMerchant, d: RiskReportDetail): ViolationRow[] => {
+  // The actual columns are this merchant's own figures. A fixed list printed
+  // "Actual Indicator 737" on every merchant, which on Meridian claimed it crossed
+  // the MC 700 threshold at 737 while its own score card read 95.99 — the exact
+  // opposite of the case study that merchant exists to tell.
+  const mc = m.mc
+  const velocity = Math.abs(Number(d.mcDelta7.replace(/[^0-9.-]/g, ""))) || 0
+  const { ticket } = activityFor(m.mcc)
+  const highTxnPct = Math.min(60, Math.round(5 + mc / 20))
+  const exposure = Math.round(ticket * (3 + (mc / 100)))
+  const base = { wk: "Ready to Work", assignment: ASSIGNMENT, reAlert: "No", disposition: "-", workedOn: "-", userName: "-", fileType: "Transaction" }
+  return [
+    { ...base, pNum: "P-MC1", alertOn: `${RISK_TODAY} 10:10:00 AM`, parameter: "Score Threshold", paramIndicator: "700", actualIndicator: formatMcScore(mc), paramThreshold: "N/A", actualThreshold: "N/A" },
+    { ...base, pNum: "P-MC2", alertOn: `${RISK_TODAY} 06:25:30 AM`, parameter: "Score Velocity", paramIndicator: "40", actualIndicator: String(velocity), paramThreshold: "N/A", actualThreshold: "N/A" },
+    { ...base, pNum: "P-MC3", alertOn: `${RISK_TODAY} 07:14:30 AM`, parameter: "High-MC Txn %", paramIndicator: "15", actualIndicator: String(highTxnPct), paramThreshold: "$1,000", actualThreshold: formatWholeDollars(exposure) },
+    { ...base, pNum: "P-MC4", alertOn: `${RISK_TODAY} 05:52:10 AM`, parameter: "Dollar Exposure", paramIndicator: "10", actualIndicator: String(Math.round(highTxnPct * 0.6)), paramThreshold: "$5,000", actualThreshold: formatWholeDollars(exposure * 3) },
+  ]
+}
+
+/** How many rows violationRows builds — the ceiling the pill slices against. */
+export const VIOLATION_COUNT = 4
+
+/** Plain dollar text for a table cell that is not a currency-formatted figure. */
+const formatWholeDollars = (n: number) => "$" + Math.round(n).toLocaleString("en-US")
+
 
 // Merchant Notes — shown in the Risk Report's "Notes and Case History" tab.
 // Keyed by merchant so the two bust-out case studies carry their own history; the
@@ -712,8 +736,12 @@ export interface AuthRow {
 /** Above this an authorization reads as scored, not merely observed. */
 export const AUTH_SCORE_ALERT = 700
 
-/** How many the merchant has in the period, against the ten the table shows. */
-export const AUTH_TOTAL = 156
+/**
+ * How many authorizations the merchant has this month, against the ten the table
+ * shows. Derived from the same open-month figure the volume view reports, so
+ * "View all N" and the MTD transaction count are one number.
+ */
+export const authTotal = (m: RiskMerchant, txns30: number) => getVolumePeriods(m, txns30)[0].transactions
 
 export const RECENT_AUTHS: AuthRow[] = [
   { at: "05/03/2026 06:11:42", card: "4889", amount: 420, type: "Sale", result: "Approved", mcScore: 960, mcReason: "Velocity, novel card" },
@@ -746,11 +774,31 @@ export interface VolumePeriod {
   chargebacks: number
 }
 
-export const VOLUME_PERIODS: VolumePeriod[] = [
-  { label: "MTD",           grossSales: 21_981,    transactions: AUTH_TOTAL, returns: 0,     chargebacks: 0 },
-  { label: "YTD",           grossSales: 284_310,   transactions: 2_114,      returns: 1_250, chargebacks: 2_840 },
-  { label: "Previous Year", grossSales: 1_142_809, transactions: 9_830,      returns: 8_914, chargebacks: 11_720 },
-]
+export const getVolumePeriods = (m: RiskMerchant, txns30: number): VolumePeriod[] => {
+  const { ticket } = activityFor(m.mcc)
+  // MTD is the open month getTxnVolume also plots, so the two views describe one
+  // month rather than two. YTD and last year scale off it at the same rate the
+  // period rows use, which is what stops a year reading smaller than a month.
+  // Rounded in the same order getTxnVolume rounds its open month, or the two
+  // views land a transaction apart on some merchants.
+  const mtd = Math.round(Math.round(txns30 / 1.14) * 1.15)
+  const ytd = Math.round(mtd * 13.5)
+  const prior = Math.round(mtd * 52)
+  const period = (label: string, transactions: number, returnRate: number, cbRate: number): VolumePeriod => ({
+    label,
+    transactions,
+    grossSales: Math.round(transactions * ticket),
+    returns: Math.round(transactions * ticket * returnRate),
+    chargebacks: Math.round(transactions * ticket * cbRate),
+  })
+  return [
+    // Nothing has been returned or charged back this month yet: the cycle is open,
+    // which is also why the queue reports 0.00% worked.
+    period("MTD", mtd, 0, 0),
+    period("YTD", ytd, 0.0044, 0.0100),
+    period("Previous Year", prior, 0.0078, 0.0103),
+  ]
+}
 
 export const netVolume = (p: VolumePeriod) => p.grossSales - p.returns
 /** Chargebacks as a share of gross sales — the ratio the card networks watch. */

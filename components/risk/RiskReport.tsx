@@ -11,7 +11,7 @@ import { cn } from "aperia-ds5/utils"
 import { PanelShell, PanelHeader, PanelBody, PanelTable, Thead, Th, Td, formatCurrency, formatPercent } from "@/components/shared"
 import { MarkWorkPopover } from "./MarkWorkPopover"
 import { useRiskNav } from "./RiskNavContext"
-import { findMerchant, getVwLevel, getMcLevel, getRiskLevel, formatMcScore, formatMerchantName, formatTxnConfidence, RISK_REPORT_DETAILS, getDefaultRiskDetail, getMerchantProfile, getTxnVolume, VOLUME_PERIODS, netVolume, chargebackPct, type VolumePeriod, RECENT_AUTHS, AUTH_TOTAL, AUTH_SCORE_ALERT, RISK_VIOLATION_CYCLE, VIOLATION_ROWS, CROSS_QUEUE_ROWS, MERCHANT_NOTES_SEED, DEFAULT_MERCHANT_NOTES, statusForDisposition, type WorkStatus, type ViolationRow, type NoteEntry, type RiskLevel, type RiskReportDetail, type TxnVolumeRow } from "@/lib/ask-nanci/data/risk-merchants"
+import { findMerchant, getVwLevel, getMcLevel, getRiskLevel, formatMcScore, formatMerchantName, formatTxnConfidence, RISK_REPORT_DETAILS, getDefaultRiskDetail, getMerchantProfile, getTxnVolume, getVolumePeriods, netVolume, chargebackPct, type VolumePeriod, RECENT_AUTHS, authTotal, AUTH_SCORE_ALERT, RISK_VIOLATION_CYCLE, violationRows, CROSS_QUEUE_ROWS, MERCHANT_NOTES_SEED, DEFAULT_MERCHANT_NOTES, statusForDisposition, type WorkStatus, type ViolationRow, type NoteEntry, type RiskLevel, type RiskMerchant, type RiskReportDetail, type TxnVolumeRow } from "@/lib/ask-nanci/data/risk-merchants"
 import { MC_PARAMETERS } from "@/lib/ask-nanci/data/risk-create-assignment"
 import { VW_PARAMETERS } from "@/lib/ask-nanci/data/risk-parameters"
 import { getRiskLevelStyles } from "./risk-level"
@@ -35,7 +35,8 @@ const VIOLATION_COLS: { key: keyof ViolationRow; label: string; blue?: boolean; 
 ]
 
 // "N Violations" pill → this modal. Table scrolls horizontally over all 14 columns.
-function ViolationsPill({ count }: { count: number }) {
+function ViolationsPill({ count, m, d }: { count: number; m: RiskMerchant; d: RiskReportDetail }) {
+  const rows = violationRows(m, d)
   return (
     <ResponsiveDialog>
       <ResponsiveDialogTrigger asChild>
@@ -66,7 +67,7 @@ function ViolationsPill({ count }: { count: number }) {
                 ))}
               </Thead>
               <TableBody>
-                {VIOLATION_ROWS.slice(0, count).map((r, i) => (
+                {rows.slice(0, count).map((r, i) => (
                   <TableRow key={i}>
                     {VIOLATION_COLS.map((c) => (
                       // explicit blue: this Dialog portals outside the risk theme, so
@@ -421,6 +422,9 @@ export function RiskReport() {
   // profile follows the live work state, so marking Worked moves the counts with it.
   const p = getMerchantProfile(m, d, workState)
   const volume = getTxnVolume(m, d.txns30)
+  // Both transaction views read the same two inputs, so the month they report
+  // cannot differ between them.
+  const periods = getVolumePeriods(m, d.txns30)
 
   return (
     <PanelShell className="min-w-0 flex-1">
@@ -444,7 +448,7 @@ export function RiskReport() {
         title={
           <span className="flex flex-wrap items-center gap-2">
             {formatMerchantName(m.name)}
-            <ViolationsPill count={d.violations} />
+            <ViolationsPill count={d.violations} m={m} d={d} />
             <QueuesPill count={d.inQueues} />
           </span>
         }
@@ -636,7 +640,7 @@ export function RiskReport() {
             <PanelTable density="comfortable">
               <Thead>
                 <Th>{""}</Th>
-                {VOLUME_PERIODS.map((p) => (
+                {periods.map((p) => (
                   <Th key={p.label} align="right">{p.label}</Th>
                 ))}
               </Thead>
@@ -644,7 +648,7 @@ export function RiskReport() {
                 {VOLUME_MEASURES.map((measure) => (
                   <TableRow key={measure.label}>
                     <Td className="font-medium">{measure.label}</Td>
-                    {VOLUME_PERIODS.map((p) => (
+                    {periods.map((p) => (
                       <Td key={p.label} mono align="right">{measure.value(p)}</Td>
                     ))}
                   </TableRow>
@@ -660,8 +664,10 @@ export function RiskReport() {
           <div className="mt-4 flex items-center justify-between">
             <h3 className="text-base font-semibold text-foreground">Transaction History</h3>
             <div className="flex items-center gap-2">
-              <Button variant="secondary" size="sm"><Filter className="size-4" /> Filter</Button>
-              <Button variant="secondary" size="sm"><Download className="size-4" /> Export</Button>
+              {/* outline, matching the Export on the two sibling sub-views: three tabs
+                  one click apart should not offer the same action in two shapes. */}
+              <Button variant="outline" size="sm"><Filter className="size-4" /> Filter</Button>
+              <Button variant="outline" size="sm"><Download className="size-4" /> Export</Button>
             </div>
           </div>
 
@@ -703,7 +709,7 @@ export function RiskReport() {
             <h3 className="text-base font-semibold text-foreground">Recent Authorizations</h3>
             <p className="text-sm text-muted-foreground">Last {RECENT_AUTHS.length} with MC scoring</p>
           </div>
-          <Button variant="outline" size="sm">View all {AUTH_TOTAL}</Button>
+          <Button variant="outline" size="sm">View all {authTotal(m, d.txns30).toLocaleString()}</Button>
         </div>
 
         <div className="mt-3">
