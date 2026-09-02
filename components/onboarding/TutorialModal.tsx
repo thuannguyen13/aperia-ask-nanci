@@ -32,9 +32,13 @@ export const TutorialModal = ({
 }: TutorialModalProps) => {
   return (
     <div
-      className={`flex h-[22.75rem] w-full overflow-hidden rounded-2xl border bg-popover shadow-lg ${className ?? ""}`}
+      // Side by side on a desktop, stacked on a phone with the art on top — the same
+      // shape (and the same `flex-col-reverse`) OnboardingDialog's first step uses, so
+      // the two first-run cards behave alike. The fixed height goes with the row: a
+      // stacked card is as tall as its own content.
+      className={`flex w-full overflow-hidden rounded-2xl border bg-popover shadow-lg max-sm:flex-col-reverse sm:h-[22.75rem] ${className ?? ""}`}
     >
-      <div className="flex flex-1 flex-col justify-between p-6">
+      <div className="flex flex-1 flex-col justify-between gap-6 p-6 max-sm:w-full">
         <div className="flex flex-col gap-6">
           <div className="flex items-center gap-2">
             <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={32} height={32} />
@@ -54,7 +58,7 @@ export const TutorialModal = ({
           </Button>
         </div>
       </div>
-      <div className="relative h-full max-w-[300px] flex-1">
+      <div className="relative h-full max-w-[300px] flex-1 max-sm:h-36 max-sm:max-w-full max-sm:flex-none">
         <Image src={imageSrc} alt={imageAlt} fill className="object-cover" />
       </div>
     </div>
