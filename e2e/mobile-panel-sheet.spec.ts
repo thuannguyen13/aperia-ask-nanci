@@ -306,3 +306,46 @@ test("the artifact card reopens a panel that was closed outright", async ({ page
 
   await expect(page.getByRole("dialog", { name: PANEL })).toBeVisible({ timeout: PANEL_TIMEOUT })
 })
+
+// The arrival cue (data-pulse on the grabber pill, keyframes in globals.css). Asserted
+// on the attribute and the animation it resolves to rather than on pixels: a two-cycle
+// pulse measured by sampling frames is a flaky test, and what has to hold is that the
+// cue plays on arrival, is finite, and is never replayed by the reader's own swipe.
+test("a panel arriving resting pulses its grabber, and minimising it does not", async ({ page }) => {
+  await gotoFlow(page, "flow=2")
+
+  const grabber = handle(page).locator("span")
+  await expect(grabber).toHaveAttribute("data-pulse", "", { timeout: PANEL_TIMEOUT })
+  const anim = await grabber.evaluate((el) => {
+    const style = getComputedStyle(el)
+    return { name: style.animationName, iterations: style.animationIterationCount }
+  })
+  expect(anim.name).toBe("grabber-pulse")
+  // Finite: a cue that loops is a nag, and the panel is not urgent.
+  expect(anim.iterations).toBe("2")
+
+  // Opening the panel is the answer to the cue, so it comes off.
+  await page.getByRole("button", { name: `Bring ${PANEL} to the front` }).click()
+  await expect(page.getByRole("dialog", { name: PANEL })).toBeVisible({ timeout: PANEL_TIMEOUT })
+  await page.waitForTimeout(SETTLE_MS)
+  await expect(handle(page).locator("span")).not.toHaveAttribute("data-pulse", /.*/)
+
+  // And swiping it back down is the reader's own doing: the same panel resting again
+  // needs no announcement.
+  await dragHandle(page, handle(page), "y", DRAG_PX)
+  await expect(handle(page).locator("span")).not.toHaveAttribute("data-pulse", /.*/)
+})
+
+test("prefers-reduced-motion: the arrival cue drops the swell and keeps the colour", async ({ page }) => {
+  // Emulated on the page rather than declared with test.use, which would need a
+  // describe block and a contextOptions detour for one assertion.
+  await page.emulateMedia({ reducedMotion: "reduce" })
+  await gotoFlow(page, "flow=2")
+
+  // The first reduced-motion handling in the app: the attribute and its timing are
+  // unchanged, only the keyframes it resolves to.
+  const grabber = handle(page).locator("span")
+  await expect(grabber).toHaveAttribute("data-pulse", "", { timeout: PANEL_TIMEOUT })
+  const name = await grabber.evaluate((el) => getComputedStyle(el).animationName)
+  expect(name).toBe("grabber-pulse-still")
+})

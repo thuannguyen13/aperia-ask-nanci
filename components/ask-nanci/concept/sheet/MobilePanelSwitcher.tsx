@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { ChevronRight } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { useIsMobile } from "@/hooks/use-is-mobile"
@@ -38,6 +38,9 @@ import type { PanelSheetConfig } from "@/lib/ask-nanci/data/panel-ui"
 //   [data-nest]        set in ChatView.tsx on the conversation, styled by globals.css
 //                      off --sheet-progress, and given aria-hidden by use-sheet-focus
 //                      while the sheet is open.
+//   data-pulse         written here on the grabber when a panel arrives resting, read
+//                      by globals.css for the arrival cue. Valueless: the cue swells
+//                      in place, so it is the same on all four presentations.
 
 /**
  * A sheet is a card floating on the dimmed page: inset by the same 12px the composer
@@ -63,9 +66,11 @@ const CARD_INSET = 12
 /** How far past its own edge a non-peeking sheet goes, so its shadow clears too. */
 const OFF_SCREEN = 48
 
-function PanelSheet({ config, present, open, label, pager, onOpen, onClose, children }: {
+function PanelSheet({ config, panelId, present, open, label, pager, onOpen, onClose, children }: {
   /** Which presentation to draw. See lib/ask-nanci/data/panel-ui.ts. */
   config: PanelSheetConfig
+  /** Which panel the card is carrying: what an arrival is measured against. */
+  panelId: PanelId | null
   /** Whether a panel exists at all: without one there is nothing to rest as a lip. */
   present: boolean
   open: boolean
@@ -106,6 +111,36 @@ function PanelSheet({ config, present, open, label, pager, onOpen, onClose, chil
     observer.observe(el)
     return () => observer.disconnect()
   }, [cardRef, vertical])
+
+  // A panel that arrives resting has nothing to announce it: the reader is looking at
+  // the answer, and the handle appears at the bottom edge, below where anyone is
+  // looking. The cue is an arrival, so it keys off which panel the card carries rather
+  // than off data-resting, which is a state the reader reaches themselves every time
+  // they swipe one down.
+  //
+  // Written to the DOM rather than rendered, the same as data-resting: an animation is
+  // not state React has any use for, and replaying one means taking the attribute off
+  // and putting it back, which a render cannot express.
+  const grabberRef = useRef<HTMLSpanElement | null>(null)
+  const arrived = useRef<PanelId | null>(null)
+  useEffect(() => {
+    const el = grabberRef.current
+    if (!el) return
+    const arriving = panelId !== arrived.current
+    arrived.current = panelId
+    // Opening it answers the cue. Cleared rather than left to finish, so a sheet swiped
+    // back down does not find the rest of the animation waiting for it.
+    if (open || !panelId) {
+      delete el.dataset.pulse
+      return
+    }
+    if (!arriving) return
+    // A second arrival sets the same value, and an animation only replays for a new
+    // element or a new name. Off, flushed, on.
+    delete el.dataset.pulse
+    void el.offsetWidth
+    el.dataset.pulse = ""
+  }, [panelId, open])
 
   useSheetDismissal(open, onClose)
   useSheetFocus(cardRef, open)
@@ -181,6 +216,7 @@ function PanelSheet({ config, present, open, label, pager, onOpen, onClose, chil
               is there and can be pulled back up — so it is longer, thicker and darker,
               with nothing else around it. */}
           <span
+            ref={grabberRef}
             className={`rounded-full bg-muted-foreground/30 group-data-[resting]:bg-muted-foreground/70 ${
               vertical
                 ? "h-1 w-10 group-data-[resting]:h-1.5 group-data-[resting]:w-16"
@@ -246,6 +282,7 @@ export function MobilePanelSwitcher() {
   return (
     <PanelSheet
       config={sheet}
+      panelId={sheetId}
       present={!!sheetId}
       open={!!sheetId && !panelSheetDismissed}
       label={sheetPanel?.label}
