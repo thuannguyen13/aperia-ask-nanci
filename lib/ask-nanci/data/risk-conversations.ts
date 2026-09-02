@@ -71,10 +71,10 @@ export const RISK_LANDING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> =
     {
       role: "assistant",
       content:
-        "Portfolio re-alert rate is **20.1%** today — about 1 in 5 alerts is a repeat. By assignment, **MC Velocity is the outlier at 45.6%**: only 18 alerts but very noisy, which usually means the threshold is set too tight. The Auths - Detect Q assignment is healthier at ~16%.\n\nRaising MC Velocity from 15 → 20 points would cut most of the repeat noise. Want me to review that one?",
+        "Portfolio re-alert rate is **18.4%** today — 685 repeats across 3,724 worked, so about 1 in 5. The two queues split it unevenly: **Phase 2 - Auths runs 20.1%** on 2,184 worked, while Authorizations sits at **16.0%**.\n\nTightening the re-alert delta on P11/P12 would cut most of the repeat noise on the noisier one. Want me to review that?",
       source: "Detection Queue analytics",
       dashChart: "realert",
-      suggestions: ["Review MC Velocity re-alert rate", "Why is alert volume running hot today?"],
+      suggestions: ["Review the Phase 2 - Auths re-alert rate", "Why is alert volume running hot today?"],
     },
   ],
 
@@ -95,19 +95,19 @@ export const RISK_LANDING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> =
     {
       role: "assistant",
       content:
-        "**357 alerts today — 63 more than yesterday.** The jump is concentrated, not broad: MC Velocity alone accounts for most of the delta, and its **45.6% re-alert rate** says a lot of that is the same merchants tripping the same threshold repeatedly.\n\nSo this reads as a **threshold-tuning issue, not a real risk spike**. Tightening MC Velocity (15 → 20 pts) would bring volume back in line. The genuine risk is still concentrated in the 13 High-risk accounts.",
+        "**357 alerts today — 63 more than yesterday.** The jump is concentrated, not broad: Phase 2 - Auths accounts for the whole delta, and its **20.1% re-alert rate** says a lot of that is the same merchants tripping the same threshold repeatedly.\n\nSo this reads as a **threshold-tuning issue, not a real risk spike**. Tightening the re-alert delta on P11/P12 would bring volume back in line. The genuine risk is still concentrated in the 13 High-risk accounts.",
       source: "Detection Queue · today vs. yesterday",
       dashChart: "alert-volume",
-      suggestions: ["Review MC Velocity re-alert rate", "Show me today's high risk merchants", "Open Detection Queue"],
+      suggestions: ["Review the Phase 2 - Auths re-alert rate", "Show me today's high risk merchants", "Open Detection Queue"],
     },
   ],
 
-  "Review MC Velocity re-alert rate": [
-    { role: "user", content: "Review MC Velocity re-alert rate" },
+  "Review the Phase 2 - Auths re-alert rate": [
+    { role: "user", content: "Review the Phase 2 - Auths re-alert rate" },
     {
       role: "assistant",
       content:
-        "**MC Velocity is your noisiest parameter: 45.6% re-alert rate, the highest today.** Only 18 alerts, but nearly half are repeats on merchants already surfaced — that's threshold noise, not new risk.\n\nSuggested action: **raise the velocity threshold from 15 → 20 points.** That trims the repeats without touching the merchants that matter (none of your 13 High-risk accounts depend on this parameter alone). It's a low-risk tuning change you can make from Assignment Management.",
+        "**Phase 2 - Auths is your noisiest queue: a 20.1% re-alert rate, the highest today.** 438 of 2,184 worked came back — one in five is a repeat on a merchant already surfaced, which is threshold noise rather than new risk.\n\nSuggested action: **tighten the re-alert delta on P11/P12.** That trims the repeats without touching the merchants that matter (none of your 13 High-risk accounts depend on those two parameters alone). It's a low-risk tuning change you can make from Assignment Management.",
       source: "Parameter analytics · MC Velocity",
       dashChart: "realert",
       suggestions: ["What are the re-alert rates by assignment?", "Why is alert volume running hot today?", "Open Detection Queue"],

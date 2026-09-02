@@ -53,12 +53,13 @@ export const RISK_NANCI_TAKES: RiskTake[] = [
   },
   {
     dot: "bg-amber-500",
-    // 45.6%, the suggested action and the 18 alerts are all REALERT_ROWS /
-    // ALERT_VOLUME rows for MC Velocity (system).
-    title: "MC Velocity re-alert rate is 45.6% — highest today",
-    body: "Suggested action: raise velocity threshold 15 → 20 pts. Only 18 alerts but very noisy.",
+    // 20.1%, the suggested action and the 2,184 worked are the REALERT_ROWS row for
+    // this assignment. The take names the higher of the two queues the chart plots;
+    // it used to name MC Velocity, which that chart no longer carries.
+    title: "Phase 2 - Auths re-alert rate is 20.1% — highest today",
+    body: "Suggested action: tighten the re-alert delta on P11/P12. 438 repeats on 2,184 worked.",
     badges: [{ label: "Re-Alert Rate", icon: Repeat2 }],
-    prompt: "Review MC Velocity re-alert rate",
+    prompt: "Review the Phase 2 - Auths re-alert rate",
   },
   {
     dot: "bg-violet-500",

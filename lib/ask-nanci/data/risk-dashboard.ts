@@ -148,7 +148,7 @@ export const REALERT_ROWS: { assignmentId: string; worked: number; realerted: nu
 // offers and what lights up behind it cannot drift apart.
 export const DASH_HIGHLIGHTS: Record<string, DashChartId[]> = {
   "Alert Volume requires attention": ["alert-volume", "realert"],
-  "MC Velocity re-alert rate is 45.6% — highest today": ["realert"],
+  "Phase 2 - Auths re-alert rate is 20.1% — highest today": ["realert"],
   "5 merchants are both VW critical and MC critical": ["scatter", "high-risk"],
 }
 
@@ -159,7 +159,7 @@ export const DASH_HIGHLIGHTS: Record<string, DashChartId[]> = {
 // at an unrelated take would dim the very chart the user asked from.
 export const CHART_TAKE: Partial<Record<DashChartId, string>> = {
   "alert-volume": "Alert Volume requires attention",
-  realert:        "MC Velocity re-alert rate is 45.6% — highest today",
+  realert:        "Phase 2 - Auths re-alert rate is 20.1% — highest today",
   scatter:        "5 merchants are both VW critical and MC critical",
   "high-risk":    "5 merchants are both VW critical and MC critical",
 }
