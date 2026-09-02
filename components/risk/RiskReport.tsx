@@ -471,7 +471,6 @@ export function RiskReport() {
         </div>
         <div className="rounded-xl border bg-card p-4">
           <p className="mb-1 text-sm font-semibold text-foreground">Risk Profile Summary</p>
-          <Row label="Watch" value="No" />
           <Row label="Status" value={d.profile.status} badgeClass="bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300" />
           <Row label="Profile" value={d.profile.profile} />
           <Row label="Multi-Watch" value={d.profile.multiWatch} />
@@ -561,7 +560,7 @@ export function RiskReport() {
           <>
           {/* Table heading + actions */}
           <div className="mt-4 flex items-center justify-between">
-            <h3 className="text-base font-semibold text-foreground">Transaction Volume Analysis</h3>
+            <h3 className="text-base font-semibold text-foreground">Transaction History</h3>
             <div className="flex items-center gap-2">
               <Button variant="secondary" size="sm"><Filter className="size-4" /> Filter</Button>
               <Button variant="secondary" size="sm"><Download className="size-4" /> Export</Button>

@@ -2,18 +2,16 @@
 
 import { ALERT_VOLUME, alertsForRange } from "@/lib/ask-nanci/data/risk-dashboard"
 import { findAssignment } from "@/lib/ask-nanci/data/risk-assignments"
-import { useRiskNav } from "../RiskNavContext"
 import { useDashboardScope } from "./DashboardScope"
 
 // Horizontal bar list (assignment → alert count), per the Figma card (734:28526):
 // the top row is emphasized; the rest sit at 40% opacity. Bars are orange #ea580c,
 // length proportional to count, with the value at the end.
 //
-// Each label drills into that assignment in Assignment Management. The label text is
-// the registry's `short` name rather than a string stored on the chart row, so the
-// bar and the queue card can no longer disagree about what an assignment is called.
+// The label text is the registry's `short` name rather than a string stored on the
+// chart row, so the bar and the queue card can no longer disagree about what an
+// assignment is called.
 export function AlertVolumeBars() {
-  const nav = useRiskNav()
   const { range, assignmentIds } = useDashboardScope()
   // Sorted after filtering, so the longest bar is the longest bar in what is shown
   // rather than a leftover from the unfiltered order.
@@ -33,13 +31,15 @@ export function AlertVolumeBars() {
         const assignment = findAssignment(a.assignmentId)
         return (
           <div key={a.assignmentId} className="flex items-center gap-2 text-xs">
-            <button
-              onClick={() => nav.openAssignment(a.assignmentId)}
+            {/* A label, not a link: the bar answers "which queue is loudest today",
+                and sending that click to the assignment's settings answers a
+                different question. The re-alert table is where a name drills in. */}
+            <span
               title={assignment?.name}
-              className="w-52 shrink-0 truncate text-right font-medium text-primary hover:underline"
+              className="w-52 shrink-0 truncate text-right font-medium text-foreground"
             >
               {assignment?.short ?? a.assignmentId}
-            </button>
+            </span>
             <div className="flex min-w-0 flex-1 items-center gap-2">
               <div className="h-4 rounded-[2px] bg-[#ea580c]" style={{ width: `${Math.max((a.value / max) * 100, 2)}%` }} />
               <span className="shrink-0 text-sm tabular-nums text-foreground">{a.value.toLocaleString()}</span>
