@@ -214,7 +214,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {isConceptVersion ? (
           <ConceptContentArea>{children}</ConceptContentArea>
         ) : (
-          <div className="flex min-w-0 flex-1 py-1 pr-1">
+          <div className="flex min-w-0 flex-1 md:py-1 md:pr-1">
             <TeachNanciPanel />
             <ChatArea>{children}</ChatArea>
           </div>
