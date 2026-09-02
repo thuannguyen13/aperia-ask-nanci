@@ -12,6 +12,8 @@ import { PanelShell, PanelHeader, PanelBody, PanelTable, Thead, Th, Td, formatCu
 import { MarkWorkPopover } from "./MarkWorkPopover"
 import { useRiskNav } from "./RiskNavContext"
 import { findMerchant, getVwLevel, getMcLevel, getRiskLevel, formatMcScore, formatMerchantName, RISK_REPORT_DETAILS, getDefaultRiskDetail, TXN_VOLUME_ROWS, VOLUME_PERIODS, netVolume, chargebackPct, type VolumePeriod, RECENT_AUTHS, AUTH_TOTAL, AUTH_SCORE_ALERT, RISK_VIOLATION_CYCLE, VIOLATION_ROWS, CROSS_QUEUE_ROWS, MERCHANT_NOTES_SEED, DEFAULT_MERCHANT_NOTES, statusForDisposition, type WorkStatus, type ViolationRow, type NoteEntry, type RiskLevel, type RiskReportDetail } from "@/lib/ask-nanci/data/risk-merchants"
+import { MC_PARAMETERS } from "@/lib/ask-nanci/data/risk-create-assignment"
+import { VW_PARAMETERS } from "@/lib/ask-nanci/data/risk-dashboard"
 import { getRiskLevelStyles } from "./risk-level"
 
 // Parameter Violation Details modal columns (Figma order + widths).
@@ -113,7 +115,7 @@ function Row({ label, value, badgeClass }: { label: string; value: string; badge
 // oversized ellipses bleeding past the edges. Exact hexes from the design — they
 // are a fixed brand surface, not theme tokens, so they don't flip in dark mode.
 function ScoreCard({ brand, logo, score, max, level, deltas, params, extra, dark }: {
-  brand: string; logo?: React.ReactNode; score: string; max: number; level: RiskLevel; deltas: React.ReactNode; params: string; extra?: { label: string; value: string }[]; dark?: boolean
+  brand: string; logo?: React.ReactNode; score: string; max: number; level: RiskLevel; deltas: React.ReactNode; params: React.ReactNode; extra?: { label: string; value: string }[]; dark?: boolean
 }) {
   const style = getRiskLevelStyles(level, dark)
   return (
@@ -153,6 +155,70 @@ function ScoreCard({ brand, logo, score, max, level, deltas, params, extra, dark
         ))}
       </div>
     </div>
+  )
+}
+
+/**
+ * "N parameters" → this modal. Which measures actually drove the score, so the
+ * count on the card is something you can open rather than a number to take on
+ * trust. Picked deterministically from the merchant's MID so the list is stable
+ * across renders and its length always matches the count beside it.
+ */
+function DrivingParameters({ mid, count, model }: { mid: string; count: number; model: "VW" | "MC" }) {
+  // `pick` keeps the two catalogs' types apart: only the Mastercard rows carry
+  // thresholds, and a union here loses that.
+  const pick = <T,>(all: T[]) => {
+    const offset = Number(mid.slice(-2)) % all.length
+    return Array.from({ length: count }, (_, i) => all[(offset + i) % all.length])
+  }
+  const mcRows = model === "MC" ? pick(MC_PARAMETERS) : []
+  const vwRows = model === "VW" ? pick(VW_PARAMETERS) : []
+
+  return (
+    <ResponsiveDialog>
+      <ResponsiveDialogTrigger asChild>
+        <button type="button" className="text-left hover:underline">{count} parameters</button>
+      </ResponsiveDialogTrigger>
+      <ResponsiveDialogContent showCloseButton className="sm:max-w-[760px]">
+        <ResponsiveDialogHeader>
+          <ResponsiveDialogTitle>{model === "MC" ? "Mastercard" : "VisionWeb"} driving parameters</ResponsiveDialogTitle>
+          <ResponsiveDialogDescription>
+            The {count} {count === 1 ? "measure" : "measures"} behind this merchant&apos;s score.
+          </ResponsiveDialogDescription>
+        </ResponsiveDialogHeader>
+        <PanelTable density="comfortable">
+          <Thead>
+            <Th className="w-24">P#</Th>
+            <Th>Parameter</Th>
+            <Th>What fires it</Th>
+            {model === "MC" && <Th align="right">Alert / re-alert</Th>}
+          </Thead>
+          <TableBody>
+            {/* explicit blue on the P#: this Dialog portals outside the risk theme */}
+            {vwRows.map((r, i) => (
+              <TableRow key={`${r.id}-${i}`}>
+                <Td className="font-medium text-blue-500">{r.id}</Td>
+                <Td className="font-medium">{r.name}</Td>
+                <Td className="text-muted-foreground">{r.blurb}</Td>
+              </TableRow>
+            ))}
+            {mcRows.map((r, i) => {
+              const suffix = r.unit === "%" ? "%" : ""
+              return (
+                <TableRow key={`${r.id}-${i}`}>
+                  <Td className="font-medium text-blue-500">{r.id}</Td>
+                  <Td className="font-medium">{r.name}</Td>
+                  <Td className="text-muted-foreground">{r.blurb}</Td>
+                  <Td mono align="right" className="whitespace-nowrap">
+                    {r.firstAlert}{suffix} / {r.reAlert}{suffix}
+                  </Td>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </PanelTable>
+      </ResponsiveDialogContent>
+    </ResponsiveDialog>
   )
 }
 
@@ -414,14 +480,14 @@ export function RiskReport() {
         <ScoreCard
           brand="VW Score" score={String(m.vw)} max={100} level={getVwLevel(m.vw)}
           deltas={<><span className="font-medium text-rose-600 dark:text-rose-400">{d.vwDelta30}</span> last 30 days</>}
-          params={`${d.vwParams} parameters`}
+          params={<DrivingParameters mid={m.mid} count={d.vwParams} model="VW" />}
           extra={[{ label: "Last Update", value: d.lastUpdate }]}
         />
         <ScoreCard
           brand="MC Score" logo={<Image src="/logos/mastercard-logomark.svg" alt="Mastercard" width={34} height={20} className="h-5 w-auto" />}
           score={formatMcScore(m.mc)} max={1000} level={getMcLevel(m.mc)} dark
           deltas={<><span className="font-medium text-rose-600 dark:text-rose-400">{d.mcDelta7}</span> last 7 days · <span className="font-medium text-rose-600 dark:text-rose-400">{d.mcDelta30}</span> last 30 days</>}
-          params={`${d.mcParams} parameters`}
+          params={<DrivingParameters mid={m.mid} count={d.mcParams} model="MC" />}
           extra={[
             { label: "Confidence", value: d.mcTxns },
             { label: "Score Peer Percentile", value: `MCC ${m.mcc} · ${d.mccPercentile}` },
