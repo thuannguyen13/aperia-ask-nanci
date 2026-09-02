@@ -27,6 +27,12 @@ const TAP_SLOP = 6
 const HANDOFF_SLOP = 8
 /** Progress below which the sheet reads as resting rather than open. */
 const RESTING = 0.02
+/**
+ * The gap a lifted card leaves above the composer (see `liftAtRest`). Lifting by the
+ * composer's height alone lands the lip flush on its top edge; this is the air the
+ * other presentations get for free from the card's own 12px inset.
+ */
+const REST_GAP = 12
 
 export interface SheetGestureOptions {
   /** The edge the card is anchored to, and the axis a gesture is measured along. */
@@ -36,6 +42,20 @@ export interface SheetGestureOptions {
   peek: boolean
   /** Distance between the resting position and the open one, in px. */
   travel: number
+  /**
+   * Lift the card by the composer's height as it settles, and put it back as it opens.
+   *
+   * For the presentation that covers the composer while open but rests above it
+   * (?panelui=over-bottom). Its frame ends at the screen, which is what lets an open
+   * card cover the composer; without this the resting lip would end at the screen too,
+   * on top of the composer rather than above it.
+   *
+   * Scaled by how far the card is from open rather than switched at the ends, so it
+   * follows a finger mid-drag instead of stepping. And expressed as a calc against
+   * --composer-inset rather than a number, so the height the composer publishes is the
+   * height the card lifts, with nothing here having to measure it.
+   */
+  liftAtRest?: boolean
   onOpen: () => void
   onClose: () => void
 }
@@ -79,7 +99,7 @@ function scrollerAt(from: HTMLElement, stop: HTMLElement, axis: "y" | "x"): HTML
   return null
 }
 
-export function useSheetGesture({ axis, open, peek, travel, onOpen, onClose }: SheetGestureOptions) {
+export function useSheetGesture({ axis, open, peek, travel, liftAtRest = false, onOpen, onClose }: SheetGestureOptions) {
   const vertical = axis === "y"
   const cardRef = useRef<HTMLDivElement | null>(null)
   const drag = useRef<DragState | null>(null)
@@ -120,14 +140,21 @@ export function useSheetGesture({ axis, open, peek, travel, onOpen, onClose }: S
       const el = cardRef.current
       if (!el) return
       if (duration !== null) el.style.transitionDuration = `${duration}ms`
-      el.style.transform = vertical ? `translateY(${shift}px)` : `translateX(${shift}px)`
+      // 1 at rest, 0 open, and every value between while a finger is down — the same
+      // number `progress` carries, the other way up.
+      const settled = travel > 0 ? shift / travel : 0
+      el.style.transform = vertical
+        ? liftAtRest
+          ? `translateY(calc(${shift}px - ${settled.toFixed(4)} * (var(--composer-inset, 0px) + ${REST_GAP}px)))`
+          : `translateY(${shift}px)`
+        : `translateX(${shift}px)`
       // Minimised, the card gets out of the way: surface, border and shadow fade out
       // and the handle is the only thing left. Mid-drag that has to follow the finger,
       // so it rides a data attribute rather than a render.
       if (peek && progress < RESTING) el.dataset.resting = ""
       else delete el.dataset.resting
     },
-    [open, peek, travel, vertical],
+    [open, peek, travel, vertical, liftAtRest],
   )
 
   // React never renders the transform: the DOM owns it, and a re-render arriving

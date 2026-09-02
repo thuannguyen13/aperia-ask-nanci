@@ -116,6 +116,10 @@ function PanelSheet({ config, panelId, present, open, label, pager, onOpen, onCl
     open,
     peek,
     travel,
+    // A bottom sheet that covers the composer when open still rests above it, the way
+    // every other presentation does. Only the vertical one needs it: resting against
+    // the right edge has nothing to do with the composer's height.
+    liftAtRest: overComposer && vertical,
     onOpen,
     onClose,
   })
@@ -225,7 +229,7 @@ function PanelSheet({ config, panelId, present, open, label, pager, onOpen, onCl
           open || peek ? "pointer-events-auto" : ""
         } ${
           vertical ? "flex-col" : "flex-row"
-        } border-border bg-background shadow-2xl data-[resting]:border-transparent data-[resting]:bg-transparent data-[resting]:shadow-none transition-[transform,background-color,border-color,box-shadow] duration-300 ease-out`}
+        } border-border bg-background shadow-2xl data-[resting]:pointer-events-none data-[resting]:border-transparent data-[resting]:bg-transparent data-[resting]:shadow-none transition-[transform,background-color,border-color,box-shadow] duration-300 ease-out`}
       >
         {/* The grab strip runs along the anchored edge: across the top for a bottom
             sheet, down the left for a right-side one. While peeking it is the whole
@@ -239,7 +243,11 @@ function PanelSheet({ config, panelId, present, open, label, pager, onOpen, onCl
             else onOpen()
           }}
           aria-label={`${open ? "Hide" : "Show"} ${label ?? "panel"}`}
-          className={`relative flex shrink-0 cursor-grab touch-none justify-center active:cursor-grabbing ${
+          // Resting, the card gives up pointer events and the strip takes them back:
+          // the card's box stays full size wherever it is translated to, and a lifted
+          // bottom sheet parks that box straight over the composer. Without this the
+          // composer sits under a transparent card and stops answering taps.
+          className={`relative flex shrink-0 cursor-grab touch-none justify-center group-data-[resting]:pointer-events-auto active:cursor-grabbing ${
             vertical
               // Resting, the handle sits at the strip's bottom edge, a few px above the
               // composer, while the rest of the strip stays a comfortable target.
