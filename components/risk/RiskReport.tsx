@@ -11,7 +11,7 @@ import { cn } from "aperia-ds5/utils"
 import { PanelShell, PanelHeader, PanelBody, PanelTable, Thead, Th, Td, formatCurrency, formatPercent } from "@/components/shared"
 import { MarkWorkPopover } from "./MarkWorkPopover"
 import { useRiskNav } from "./RiskNavContext"
-import { findMerchant, getVwLevel, getMcLevel, getRiskLevel, formatMcScore, formatMerchantName, RISK_REPORT_DETAILS, getDefaultRiskDetail, TXN_VOLUME_ROWS, VOLUME_PERIODS, netVolume, chargebackPct, type VolumePeriod, RECENT_AUTHS, AUTH_TOTAL, AUTH_SCORE_ALERT, RISK_VIOLATION_CYCLE, VIOLATION_ROWS, CROSS_QUEUE_ROWS, MERCHANT_NOTES_SEED, DEFAULT_MERCHANT_NOTES, statusForDisposition, type WorkStatus, type ViolationRow, type NoteEntry, type RiskLevel, type RiskReportDetail } from "@/lib/ask-nanci/data/risk-merchants"
+import { findMerchant, getVwLevel, getMcLevel, getRiskLevel, formatMcScore, formatMerchantName, formatTxnConfidence, RISK_REPORT_DETAILS, getDefaultRiskDetail, getMerchantProfile, getTxnVolume, VOLUME_PERIODS, netVolume, chargebackPct, type VolumePeriod, RECENT_AUTHS, AUTH_TOTAL, AUTH_SCORE_ALERT, RISK_VIOLATION_CYCLE, VIOLATION_ROWS, CROSS_QUEUE_ROWS, MERCHANT_NOTES_SEED, DEFAULT_MERCHANT_NOTES, statusForDisposition, type WorkStatus, type ViolationRow, type NoteEntry, type RiskLevel, type RiskReportDetail, type TxnVolumeRow } from "@/lib/ask-nanci/data/risk-merchants"
 import { MC_PARAMETERS } from "@/lib/ask-nanci/data/risk-create-assignment"
 import { VW_PARAMETERS } from "@/lib/ask-nanci/data/risk-dashboard"
 import { getRiskLevelStyles } from "./risk-level"
@@ -305,6 +305,18 @@ const VOLUME_MEASURES: { label: string; value: (p: VolumePeriod) => string }[] =
  */
 const TXN_VIEWS = ["Recent Authorizations", "Transaction Volume Analysis", "Transaction History"]
 
+// One period's six cells, in TXN_COLS order. A null field means the period carries
+// no figure for that column — the contract row states a ratio, not a volume.
+const txnCells = (r: TxnVolumeRow) =>
+  [
+    r.cbCount?.toLocaleString(),
+    r.cbPctByCount === null ? null : formatPercent(r.cbPctByCount, 2),
+    r.cbAmount === null ? null : formatCurrency(r.cbAmount),
+    r.cbPctByAmount === null ? null : formatPercent(r.cbPctByAmount, 2),
+    r.rdrCount?.toLocaleString(),
+    r.rdrAmount === null ? null : formatCurrency(r.rdrAmount),
+  ].map((v) => v ?? "N/A")
+
 // A section header ("Merchant Notes" / "Case History") with its right-aligned actions.
 function NotesSectionHeader({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -403,6 +415,11 @@ export function RiskReport() {
     </p>
   )
 
+  // Both cards below read off these rather than carrying figures of their own — the
+  // profile follows the live work state, so marking Worked moves the counts with it.
+  const p = getMerchantProfile(m, d, workState)
+  const volume = getTxnVolume(m, d.txns30)
+
   return (
     <PanelShell className="min-w-0 flex-1">
       <PanelHeader
@@ -499,7 +516,7 @@ export function RiskReport() {
           deltas={<><span className="font-medium text-rose-600 dark:text-rose-400">{d.mcDelta7}</span> last 7 days · <span className="font-medium text-rose-600 dark:text-rose-400">{d.mcDelta30}</span> last 30 days</>}
           params={<DrivingParameters mid={m.mid} count={d.mcParams} model="MC" />}
           extra={[
-            { label: "Confidence", value: d.mcTxns },
+            { label: "Confidence", value: formatTxnConfidence(d.txns30) },
             { label: "Score Peer Percentile", value: `MCC ${m.mcc} · ${d.mccPercentile}` },
             { label: "Last Sync", value: d.lastUpdate },
           ]}
@@ -538,23 +555,24 @@ export function RiskReport() {
           />
           {/* Who the merchant is, rather than how the account has behaved — so these
               sit here and not in the details card, which is now batches and terms. */}
-          <Row label="Owner" value="—" />
+          <Row label="Owner" value={p.owner} />
           <Row label="Phone" value={d.account.phone} />
           <Row label="Address" value={d.account.address} />
-          <Row label="URL" value="—" />
+          <Row label="URL" value={p.url} />
           <Row label="Last Batch" value={d.account.lastBatch} />
           <Row label="Last Statement" value={d.account.lastStatement} />
         </div>
         <div className="rounded-xl border bg-card p-4">
           <p className="mb-1 text-sm font-semibold text-foreground">Risk Profile Summary</p>
+          <Row label="Watch" value={p.watch} />
           <Row label="Status" value={d.profile.status} badgeClass="bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300" />
           <Row label="Profile" value={d.profile.profile} />
           <Row label="Multi-Watch" value={d.profile.multiWatch} />
-          <Row label="# Worked" value="0" />
-          <Row label="# Parameter Worked" value="0" />
-          <Row label="Worked in 30 Days" value="—" />
+          <Row label="# Worked" value={String(p.workedTotal)} />
+          <Row label="# Parameter Worked" value={String(p.paramsWorked)} />
+          <Row label="Worked in 30 Days" value={p.workedIn30} />
           <Row label="Classification" value={d.profile.classification} />
-          <Row label="Multiplier" value="—" />
+          <Row label="Multiplier" value={p.multiplier} />
           <Row label="Risk Level" value={getRiskLevel(m)} />
           <Row label="Risk Score" value={String(m.vw)} />
         </div>
@@ -654,24 +672,18 @@ export function RiskReport() {
                 ))}
               </Thead>
               <TableBody>
-                {TXN_VOLUME_ROWS.map((t) => {
-                  const na = t === "Contract Expected"
-                  const cells = na
-                    ? ["N/A", "N/A", "N/A", "N/A", "N/A", "N/A"]
-                    : ["0", "0.00%", "$0.00", "0.00%", "0", "$0.00"]
-                  return (
-                    <TableRow key={t} className={cn(na && "bg-muted/40")}>
-                      <Td className="font-medium">{t}</Td>
-                      {cells.map((v, i) => (
-                        <Td key={i} mono align="right" className="text-muted-foreground">{v}</Td>
-                      ))}
-                    </TableRow>
-                  )
-                })}
+                {volume.rows.map((r) => (
+                  <TableRow key={r.period} className={cn(r.muted && "bg-muted/40")}>
+                    <Td className="font-medium">{r.period}</Td>
+                    {txnCells(r).map((v, i) => (
+                      <Td key={i} mono align="right" className="text-muted-foreground">{v}</Td>
+                    ))}
+                  </TableRow>
+                ))}
                 {/* Total */}
                 <TableRow className="bg-muted/40 font-semibold text-foreground">
                   <Td>Total</Td>
-                  {["0", "N/A", "$0.00", "N/A", "0", "$0.00"].map((v, i) => (
+                  {txnCells(volume.total).map((v, i) => (
                     <Td key={i} mono align="right">{v}</Td>
                   ))}
                 </TableRow>
