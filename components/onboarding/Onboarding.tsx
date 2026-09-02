@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import { InfoIcon } from "lucide-react"
 import { Joyride, EVENTS, STATUS, type Step, type EventData } from "react-joyride"
-import { ResponsiveDialog, ResponsiveDialogContent, ResponsiveDialogTitle } from "@/components/shared"
+import { Dialog, DialogContent, DialogTitle } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { ONBOARDING_KEY, TOUR_DONE_KEY, TOUR_STEP_KEY } from "@/lib/ask-nanci/storage-keys"
 import { TutorialModal } from "./TutorialModal"
@@ -214,16 +214,16 @@ export function Onboarding() {
 
   if (showIntro) {
     return (
-      <ResponsiveDialog open onOpenChange={(open) => { if (!open) skipIntro() }}>
-        <ResponsiveDialogContent
+      <Dialog open onOpenChange={(open) => { if (!open) skipIntro() }}>
+        <DialogContent
           showCloseButton={false}
           onInteractOutside={(e) => e.preventDefault()}
           className="overflow-hidden border-0 bg-transparent p-0 shadow-none sm:max-w-[760px]"
         >
-          <ResponsiveDialogTitle className="sr-only">Meet your new assistant</ResponsiveDialogTitle>
+          <DialogTitle className="sr-only">Meet your new assistant</DialogTitle>
           <TutorialModal onSkipClick={skipIntro} onStartTourClick={startTour} />
-        </ResponsiveDialogContent>
-      </ResponsiveDialog>
+        </DialogContent>
+      </Dialog>
     )
   }
 

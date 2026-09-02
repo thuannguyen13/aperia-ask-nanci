@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { ArrowUp, Square, Bell, MessageCircleQuestion, Clock5 } from "lucide-react"
 import { Button, Textarea, Popover, PopoverTrigger, PopoverContent, Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "aperia-ds5"
-import { ResponsiveDialog, ResponsiveDialogContent, ResponsiveDialogHeader, ResponsiveDialogTitle } from "@/components/shared"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY } from "@/lib/ask-nanci/data/flows.concept"
 import { SlashCommandPopover, type SlashAction } from "./SlashCommandPopover"
@@ -189,18 +189,18 @@ export function ChatInput() {
         </div>
       </div>
 
-      <ResponsiveDialog open={commonQOpen} onOpenChange={setCommonQOpen}>
-        <ResponsiveDialogContent className="sm:max-w-[750px]">
-          <ResponsiveDialogHeader>
-            <ResponsiveDialogTitle className="sr-only">Common Questions</ResponsiveDialogTitle>
-          </ResponsiveDialogHeader>
+      <Dialog open={commonQOpen} onOpenChange={setCommonQOpen}>
+        <DialogContent className="sm:max-w-[750px]">
+          <DialogHeader>
+            <DialogTitle className="sr-only">Common Questions</DialogTitle>
+          </DialogHeader>
           <ExplorePrompts onPromptClick={(prompt) => {
             setCommonQOpen(false)
             if (!isDetect) startNewChat()
             handlePrompt(prompt)
           }} />
-        </ResponsiveDialogContent>
-      </ResponsiveDialog>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
