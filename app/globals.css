@@ -366,6 +366,23 @@ html.dark [data-logo="ask-nanci"] { filter: invert(1) hue-rotate(180deg); }
    yet. `sm` rather than `md` because `sm` is where ds5's own DialogContent switches
    its width. */
 @layer base {
+  /* ds5's DialogContent is a grid, and a grid item's `min-width` defaults to `auto`,
+     which means "never shrink below your min-content width". Any child with a wide
+     min-content — a nowrap tab row, a table, a flex row of cards — therefore sizes
+     itself past the dialog and spills out of it. The Common Questions dialog laid its
+     content out at 633px inside a 358px box. `minmax(0, 1fr)` is the column that lets
+     a child shrink, and it is what the responsive classes those children already carry
+     (`overflow-x-auto` on the tab row, `grid-cols-1` on the prompts) need in order to
+     mean anything.
+
+     Not scoped to a width: a child overflowing its own dialog is a bug at every size.
+     It only shows up on a phone because that is where the box first gets narrower than
+     the content. */
+  [data-slot="dialog-content"],
+  [data-slot="alert-dialog-content"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   @media (max-width: 39.99rem) {
     [data-slot="dialog-content"],
     [data-slot="alert-dialog-content"] {
