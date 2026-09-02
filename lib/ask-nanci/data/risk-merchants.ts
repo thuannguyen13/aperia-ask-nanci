@@ -198,7 +198,7 @@ export const RISK_REPORT_DETAILS: Record<string, RiskReportDetail> = {
     mccPercentile: "Top 2% of peers",
     lastUpdate: "05/03/2026 06:14 AM",
     profile: { status: "In Review", profile: "No-Profile", multiWatch: "ISO", classification: "Elevated Monitoring" },
-    account: { lastBatch: "05/12/2026", lastStatement: "05/12/2026", phone: "(972) 392-2882", address: "PAPILLION, FL 010853016" },
+    account: { lastBatch: "05/02/2026", lastStatement: "04/30/2026", phone: "(972) 392-2882", address: "PAPILLION, FL 010853016" },
     merchant: { dba: "0553 OH TOLEDO - CENTRAL", iso: "North Central Group", approved: "12/14/2024", businessAge: "91+ days", watchStatus: "On Watch — Phase 2 Review", contractDailyNet: 8500, todayNet: 21930, accountStatus: "Active" },
   },
   // The two bust-out case studies. Their score shapes are the point: Meridian is
@@ -412,10 +412,10 @@ export const getTxnVolume = (m: RiskMerchant, txns30: number): { rows: TxnVolume
     row("30-Day", txns30),
     row("Monthly Average", monthlyAvg),
     contractRow(),
-    // June is the open month and the one that climbed; April and May have settled.
-    row("June 2026", Math.round(monthlyAvg * 1.15)),
-    row("May 2026", Math.round(monthlyAvg * 0.97)),
-    row("April 2026", Math.round(monthlyAvg * 0.88)),
+    // May is the open month and the one that climbed; March and April have settled.
+    row("May 2026", Math.round(monthlyAvg * 1.15)),
+    row("April 2026", Math.round(monthlyAvg * 0.97)),
+    row("March 2026", Math.round(monthlyAvg * 0.88)),
   ]
   return { rows, total: totalRow(rows.slice(-3), ticket) }
 }
@@ -482,6 +482,13 @@ export interface MerchantProfileFigures {
   reserveTarget: number | null
 }
 
+/** MM/DD/YYYY plus n days, back out in the same format. */
+const daysAfter = (date: string, n: number) => {
+  const [mm, dd, yyyy] = date.split("/").map(Number)
+  const d = new Date(yyyy, mm - 1, dd + n)
+  return `${pad(d.getMonth() + 1)}/${pad(d.getDate())}/${d.getFullYear()}`
+}
+
 export const getMerchantProfile = (m: RiskMerchant, d: RiskReportDetail, work: WorkStatus): MerchantProfileFigures => {
   const seed = seedOf(m)
   const level = getRiskLevel(m)
@@ -511,7 +518,9 @@ export const getMerchantProfile = (m: RiskMerchant, d: RiskReportDetail, work: W
     firstBatchAmount: round2(ticket * (2 + (seed % 7))),
     // Boarded 2019–2024, old enough that the 30-day figures above are a change in
     // behaviour rather than a new account's opening months.
-    firstBatchDate: `${pad(1 + ((seed >> 3) % 12))}/${pad(1 + ((seed >> 5) % 28))}/${2019 + (seed % 6)}`,
+    // Days after the account boarded, not years before it: a merchant cannot settle
+    // a batch on an account that does not exist yet.
+    firstBatchDate: daysAfter(d.merchant.approved, 3 + (seed % 25)),
     // Shifted before the modulo: the city list is the same length, and indexing both
     // off `seed % 12` would give every merchant in Salem the same signer.
     owner: OWNER_NAMES[(seed >> 4) % OWNER_NAMES.length],
@@ -585,9 +594,11 @@ export const getDefaultRiskDetail = (m: RiskMerchant): RiskReportDetail => {
       classification: getRiskLevel(m) === "High" ? "Elevated Monitoring" : getRiskLevel(m) === "Medium" ? "Standard Monitoring" : "Standard",
     },
     account: {
-      lastBatch: `06/${pad(8 + (seed % 14))}/2026`,
-      // Statements cut on a cycle, so this one date is right for the whole portfolio.
-      lastStatement: "05/31/2026",
+      // 04/19–05/02: the fortnight before today, so a batch never postdates the
+      // day the report is stamped.
+      lastBatch: `04/${pad(19 + (seed % 14))}/2026`,
+      // Statements cut at month end, so the last completed one is April's.
+      lastStatement: "04/30/2026",
       // 555-01xx is the reserved fictional exchange — no number invented here can
       // ring a real line, however the demo is shared.
       phone: `(${AREA_CODES[city]}) 555-0${100 + (seed % 100)}`,
@@ -604,7 +615,15 @@ export interface ViolationRow {
   workedOn: string; userName: string; fileType: string
 }
 
-export const RISK_VIOLATION_CYCLE = "06/25/2026"
+/**
+ * The day the whole console is reporting on. Every other date in this demo is on or
+ * before it: a screen that stamps "Last Update 05/03" and then lists a batch in June
+ * reads as stale data rather than as a snapshot.
+ */
+export const RISK_TODAY = "05/03/2026"
+
+/** The open cycle. Its own alert rows are dated today, so it is dated today. */
+export const RISK_VIOLATION_CYCLE = RISK_TODAY
 
 const ASSIGNMENT = "Phase 2 Parameters - Auths - Detect Q"
 
@@ -639,18 +658,18 @@ const TW = { author: "Teresa Walker", initials: "TW", source: "Aperia Risk" }
 
 export const MERCHANT_NOTES_SEED: Record<string, NoteEntry[]> = {
   regency: [
-    { ...TW, timestamp: "06/22/2026 02:12:29 PM", body: "MC Score 737.33/1000 (High), +410 (30d), top 2% for MCC 5712 across 1,247 txns. Holding funds pending review given velocity and peer-percentile severity. Exposure $14,896.06." },
+    { ...TW, timestamp: "05/02/2026 02:12:29 PM", body: "MC Score 737.33/1000 (High), +410 (30d), top 2% for MCC 5712 across 1,247 txns. Holding funds pending review given velocity and peer-percentile severity. Exposure $14,896.06." },
   ],
   meridian: [
-    { ...TW, timestamp: "06/22/2026 11:04:51 AM", body: "Retro review (Sept–Dec 2025 analysis): VisionWeb alerted this merchant 98 days before it closed. Mastercard only scored it on the day of closure, so the MC score here reads 95.99 — near the bottom of its MCC. A Mastercard-only detection strategy would have missed this bust-out entirely." },
+    { ...TW, timestamp: "05/02/2026 11:04:51 AM", body: "Retro review (Sept–Dec 2025 analysis): VisionWeb alerted this merchant 98 days before it closed. Mastercard only scored it on the day of closure, so the MC score here reads 95.99 — near the bottom of its MCC. A Mastercard-only detection strategy would have missed this bust-out entirely." },
   ],
   cascade: [
-    { ...TW, timestamp: "06/22/2026 10:47:16 AM", body: "Retro review (Sept–Dec 2025 analysis): Mastercard flagged this merchant 5 days before VisionWeb did, at MC 711.08 while VW still had it at 62. The inverse of Meridian — neither system consistently leads, which is why both scores sit side by side on this report." },
+    { ...TW, timestamp: "05/02/2026 10:47:16 AM", body: "Retro review (Sept–Dec 2025 analysis): Mastercard flagged this merchant 5 days before VisionWeb did, at MC 711.08 while VW still had it at 62. The inverse of Meridian — neither system consistently leads, which is why both scores sit side by side on this report." },
   ],
 }
 
 export const DEFAULT_MERCHANT_NOTES: NoteEntry[] = [
-  { ...TW, timestamp: "06/22/2026 09:31:02 AM", body: "Reviewed against MC and VW scores. No disposition set yet." },
+  { ...TW, timestamp: "05/02/2026 09:31:02 AM", body: "Reviewed against MC and VW scores. No disposition set yet." },
 ]
 
 // Cross-Queue Presence — opened from the "In N Queues" badge on the Risk Report.

@@ -71,24 +71,24 @@ export interface Assignment {
 }
 
 export const ASSIGNMENTS: Assignment[] = [
-  { id: "mc-watch",          name: "MC Watch",                                        short: "MC Watch (system)",        system: true, owner: "Marcus Bell", type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
+  { id: "mc-watch",          name: "MC Watch",                                        short: "MC Watch (system)",        system: true, owner: "Marcus Bell", type: "DQ", status: "Active",  lastProcessed: "05/03/2026" },
   // Adopted from the dashboard charts, which plotted both of these with no assignment
   // behind them. MC Velocity in particular drives one of Nanci's three takes.
-  { id: "mc-velocity",       name: "MC Velocity",                                     short: "MC Velocity (system)",     system: true, owner: "Marcus Bell", type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
-  { id: "mc-divergence",     name: "MC Divergence",                                   short: "MC Divergence (system)",   system: true, owner: "Marcus Bell", type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
-  { id: "esqr-phase2-auths", name: "Phase 2 Parameters - Auths - Detect Q",           short: "Phase 2 - Auths",          owner: "Teresa Walker", type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
+  { id: "mc-velocity",       name: "MC Velocity",                                     short: "MC Velocity (system)",     system: true, owner: "Marcus Bell", type: "DQ", status: "Active",  lastProcessed: "05/03/2026" },
+  { id: "mc-divergence",     name: "MC Divergence",                                   short: "MC Divergence (system)",   system: true, owner: "Marcus Bell", type: "DQ", status: "Active",  lastProcessed: "05/03/2026" },
+  { id: "esqr-phase2-auths", name: "Phase 2 Parameters - Auths - Detect Q",           short: "Phase 2 - Auths",          owner: "Teresa Walker", type: "DQ", status: "Active",  lastProcessed: "05/03/2026" },
   // Was Expired while still carrying alerts on the dashboard's "Phase 2 - Auths
   // Detect Q" bar. A queue that alerted today is running, so it reads Active.
-  { id: "esqr-phase2",       name: "Phase 2 Parameters - Detect Q",                   short: "Phase 2",                  owner: "Teresa Walker", type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
-  { id: "high-risk",         name: "High Risk Detection Queue",                       short: "High Risk DQ",             owner: "Teresa Walker", type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
-  { id: "high-risk-mcc",     name: "High Risk Detection Queue - By MCC",              short: "High Risk DQ - By MCC",    owner: "Teresa Walker", type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
-  { id: "low-risk",          name: "Low Risk Detection Queue",                        short: "Low Risk DQ",              owner: "Unassigned", type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
-  { id: "low-risk-mcc",      name: "Low Risk Detection Queue - By MCC - Auths",       short: "Low Risk DQ - By MCC",     owner: "Unassigned", type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
-  { id: "moderate-risk",     name: "Moderate Risk Detection Queue",                   short: "Moderate Risk DQ",         owner: "Unassigned", type: "DQ", status: "Expired", lastProcessed: "05/06/2026" },
-  { id: "moderate-risk-mcc", name: "Moderate Risk Detection Queue - By MCC - Auths",  short: "Moderate Risk DQ - By MCC", owner: "Unassigned", type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
-  { id: "unacceptable-risk", name: "Unacceptable Risk Detection Queue",               short: "Unacceptable Risk DQ",     owner: "Unassigned", type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
+  { id: "esqr-phase2",       name: "Phase 2 Parameters - Detect Q",                   short: "Phase 2",                  owner: "Teresa Walker", type: "DQ", status: "Active",  lastProcessed: "05/03/2026" },
+  { id: "high-risk",         name: "High Risk Detection Queue",                       short: "High Risk DQ",             owner: "Teresa Walker", type: "DQ", status: "Active",  lastProcessed: "05/03/2026" },
+  { id: "high-risk-mcc",     name: "High Risk Detection Queue - By MCC",              short: "High Risk DQ - By MCC",    owner: "Teresa Walker", type: "DQ", status: "Active",  lastProcessed: "05/03/2026" },
+  { id: "low-risk",          name: "Low Risk Detection Queue",                        short: "Low Risk DQ",              owner: "Unassigned", type: "DQ", status: "Active",  lastProcessed: "05/03/2026" },
+  { id: "low-risk-mcc",      name: "Low Risk Detection Queue - By MCC - Auths",       short: "Low Risk DQ - By MCC",     owner: "Unassigned", type: "DQ", status: "Active",  lastProcessed: "05/03/2026" },
+  { id: "moderate-risk",     name: "Moderate Risk Detection Queue",                   short: "Moderate Risk DQ",         owner: "Unassigned", type: "DQ", status: "Expired", lastProcessed: "05/03/2026" },
+  { id: "moderate-risk-mcc", name: "Moderate Risk Detection Queue - By MCC - Auths",  short: "Moderate Risk DQ - By MCC", owner: "Unassigned", type: "DQ", status: "Active",  lastProcessed: "05/03/2026" },
+  { id: "unacceptable-risk", name: "Unacceptable Risk Detection Queue",               short: "Unacceptable Risk DQ",     owner: "Unassigned", type: "DQ", status: "Active",  lastProcessed: "05/03/2026" },
   // Adopted from DETECTION_QUEUES, which rendered a card for it with no registry row.
-  { id: "authorizations",    name: "Authorizations Assignment",                       short: "Authorizations",           owner: "Unassigned", type: "DQ", status: "Active",  lastProcessed: "05/06/2026" },
+  { id: "authorizations",    name: "Authorizations Assignment",                       short: "Authorizations",           owner: "Unassigned", type: "DQ", status: "Active",  lastProcessed: "05/03/2026" },
 ]
 
 export const findAssignment = (id: string) => ASSIGNMENTS.find((a) => a.id === id)

@@ -9,6 +9,7 @@ import { PanelShell, PanelHeader, PanelBody, PanelTable, Thead, Th, Td } from "@
 import { CreateAssignment } from "./CreateAssignment"
 import { AM_INTEGRATION, AM_SUMMARY, ASSIGNMENTS, AM_TOTAL, type Assignment, type AssignmentStatus } from "@/lib/ask-nanci/data/risk-assignments"
 import { alertsToday } from "@/lib/ask-nanci/data/risk-dashboard"
+import { RISK_TODAY } from "@/lib/ask-nanci/data/risk-merchants"
 import { EXAMPLE_ASSIGNMENT_NAME } from "@/lib/ask-nanci/data/risk-create-assignment"
 import { useRiskNav } from "./RiskNavContext"
 
@@ -40,7 +41,7 @@ export function AssignmentManagement() {
     const title = name.trim() || EXAMPLE_ASSIGNMENT_NAME
     // A queue you just made is yours, which is also what puts it inside the
     // dashboard's Analyst filter straight away.
-    setCreated({ id: "created", name: title, short: title, owner: "Teresa Walker", type: "DQ", status: "Active", lastProcessed: "06/18/2026", neverRun: true })
+    setCreated({ id: "created", name: title, short: title, owner: "Teresa Walker", type: "DQ", status: "Active", lastProcessed: RISK_TODAY, neverRun: true })
     setCreating(false)
     setToast(true)
   }

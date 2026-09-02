@@ -13,7 +13,7 @@ import { MarkWorkPopover } from "./MarkWorkPopover"
 import { QueueSummaryCard, QueueTitle } from "./QueueSummaryCard"
 import { DETECTION_QUEUE } from "@/lib/ask-nanci/data/risk-detection-queue"
 import { useRiskNav } from "./RiskNavContext"
-import { RISK_MERCHANTS, RISK_MERCHANTS_TOTAL, getRiskLevel, formatMcScore, formatMerchantName, statusForDisposition } from "@/lib/ask-nanci/data/risk-merchants"
+import { RISK_TODAY, RISK_MERCHANTS, RISK_MERCHANTS_TOTAL, getRiskLevel, formatMcScore, formatMerchantName, statusForDisposition } from "@/lib/ask-nanci/data/risk-merchants"
 import { RISK_PILL } from "./risk-level"
 
 function TagBadges({ alert, list }: { alert: number; list: number }) {
@@ -56,7 +56,7 @@ export function BarometerReport() {
           title and its tags sit beside it. */}
       <PanelHeader
         title={<QueueTitle queue={DETECTION_QUEUE} />}
-        subtitle="04/23/2026"
+        subtitle={RISK_TODAY}
         size="page"
         breadcrumb={
           <Breadcrumb>
