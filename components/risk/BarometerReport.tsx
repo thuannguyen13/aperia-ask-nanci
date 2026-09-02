@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { RefreshCw, SlidersHorizontal, Download, Search, ChevronDown, ChevronLeft, ChevronRight, AlertTriangle, ListChecks } from "lucide-react"
 import {
-  Button, Input,
+  Badge, Button, Input,
   Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator,
   TableBody, TableRow,
 } from "aperia-ds5"
@@ -135,7 +135,7 @@ export function BarometerReport() {
                 <Td mono>{m.vw}</Td>
                 <Td mono>{formatMcScore(m.mc)}</Td>
                 <Td>
-                  <span className={cn("rounded px-2 py-0.5 text-xs font-medium", RISK_PILL[getRiskLevel(m)])}>{getRiskLevel(m)}</span>
+                  <Badge className={RISK_PILL[getRiskLevel(m)]}>{getRiskLevel(m)}</Badge>
                 </Td>
                 <Td align="right">
                   {/* Same control as the merchant detail: disposition first, then
