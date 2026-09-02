@@ -71,7 +71,7 @@ export function DashboardFilters({ range, scope, analyst, onRange, onScope, onAn
     <div className="flex flex-wrap items-center gap-2">
       <FilterSelect value={range} options={DASH_DATE_RANGES} onChange={onRange} />
       <FilterSelect label="Assignment scope" value={scope} options={scopes} onChange={onScope} />
-      <FilterSelect label="Analyst" value={analyst} options={DASH_ANALYSTS} onChange={onAnalyst} />
+      <FilterSelect label="Owner" value={analyst} options={DASH_ANALYSTS} onChange={onAnalyst} />
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

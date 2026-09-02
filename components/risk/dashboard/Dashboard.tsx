@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { Download, Sparkles, MoreHorizontal, BarChartBig } from "lucide-react"
 import { Button } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
@@ -63,7 +63,9 @@ export function Dashboard() {
   const [range, setRange] = useState(DASH_TODAY)
   const [scope, setScope] = useState(DASH_SCOPE_ALL)
   const [analyst, setAnalyst] = useState(DASH_ANALYST_EVERYONE)
-  const dashScope = resolveScope(range, scope, analyst)
+  // Memoised: the value goes into a context, so a fresh object on every render
+  // invalidates it and re-renders both charts whenever anything else here changes.
+  const dashScope = useMemo(() => resolveScope(range, scope, analyst), [range, scope, analyst])
 
   // Clicking a take opens/updates the registered insight panel (or closes it if
   // it's already showing that take).

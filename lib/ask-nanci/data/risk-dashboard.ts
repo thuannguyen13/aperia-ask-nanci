@@ -18,7 +18,7 @@ export type DashChartId = "scatter" | "alert-volume" | "high-risk" | "param-heat
 // would drill to are all one click away on the rail, and a card that navigates on
 // the same tap that reads its number makes the number feel like a control.
 export const DASH_KPIS: { label: string; value: string; delta: string; deltaCls: string; sub: string; icon: LucideIcon }[] = [
-  { label: "Alerted Today",     value: "364", delta: "+12%", deltaCls: "text-rose-600 dark:text-rose-400",    sub: "across 23 assignments",     icon: AlertTriangle },
+  { label: "Alerted Today",     value: "364", delta: "+12%", deltaCls: "text-rose-600 dark:text-rose-400",    sub: `across ${ASSIGNMENTS.length} assignments`,     icon: AlertTriangle },
   { label: "Ready to Work",     value: "298", delta: "+8%",  deltaCls: "text-rose-600 dark:text-rose-400",    sub: "66 oldest > 24h",           icon: Inbox },
   // The standing finding, not a today number — hence the explicit period in `sub`.
   { label: "MC >700, No Alert", value: "3,556", delta: "", deltaCls: "text-muted-foreground",                sub: "Sept–Dec 2025 · 317 confirmed fraud", icon: BarChart3 },
