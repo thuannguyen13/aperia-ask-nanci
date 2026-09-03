@@ -15,8 +15,8 @@ import { useAskNanci } from "@/contexts/AskNanciContext"
  * It stays in place whether the panel is open or not; only the trailing state changes,
  * because a card that appeared and vanished would be a second thing to keep track of.
  *
- * The block itself is Read-when **the artifact block**: this file supplies the panel's
- * copy and click behaviour and nothing about how it looks.
+ * Layout and styling live in ArtifactCard; this file supplies the panel's copy and
+ * click behaviour and nothing about how it looks.
  */
 export function PanelArtifactCard({ id }: { id: PanelId }) {
   const { dynamicPanels, shownPanelId, panelSheetDismissed, openDynamic, setShownPanelId, reopenPanelSheet } = useAskNanci()
