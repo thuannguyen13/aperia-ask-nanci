@@ -28,7 +28,7 @@ function WelcomeView() {
           </div>
         </div>
 
-        {/* Teach Nanci card. Stacks below `sm`: at phone width the illustration, the
+        {/* Personalize Ask Nanci card. Stacks below `sm`: at phone width the illustration, the
             copy and the button cannot share a row without squeezing the copy into a
             column a few words wide. */}
         {!isEmbed && sources.length < 3 && <Card size="sm">
@@ -36,7 +36,7 @@ function WelcomeView() {
             <Image src="/ask-nanci/img_kb-illustration.png" alt="" width={72} height={72} className="size-18 shrink-0 object-contain" />
             <div className="flex min-w-0 flex-1 flex-col gap-0.5">
               <div className="flex flex-wrap items-center gap-2">
-                <CardTitle>Teach Nanci</CardTitle>
+                <CardTitle>Personalize Ask Nanci</CardTitle>
                 <span className={cn(
                   "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold",
                   sources.length > 1

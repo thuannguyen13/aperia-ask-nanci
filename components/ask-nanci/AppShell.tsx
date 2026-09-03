@@ -12,7 +12,7 @@ import { parseMode, CONCEPT_FLOW_SLUGS, CONCEPT_EMBED_FLOW_LAYOUTS } from "@/lib
 import { AppFrame, useAppTheme } from "./AppFrame"
 import { getThemeLogos } from "@/lib/ask-nanci/data/theme-logos"
 import { Sidebar } from "./Sidebar"
-import { TeachNanciPanel } from "./TeachNanciPanel"
+import { PersonalizePanel } from "./PersonalizePanel"
 import { ServiceMarketplacePanel } from "./ServiceMarketplacePanel"
 import { ConceptPanelArea } from "./concept/ConceptPanelArea"
 import { MobilePanelSwitcher } from "./concept/sheet/MobilePanelSwitcher"
@@ -81,7 +81,7 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
 
   return (
     <div className={`flex min-w-0 flex-1 md:py-1 md:pr-1${noSidebar ? " md:pl-1" : ""}`}>
-      <TeachNanciPanel />
+      <PersonalizePanel />
       {/* Marketplace panel only where a sidebar can open it (not the compact widget). */}
       {!noSidebar && <ServiceMarketplacePanel />}
       {/* Chat is always mounted at this position so React never remounts it.
@@ -181,7 +181,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     marketplace story is visible instead of collapsed to icons. */}
                 <Sidebar initialPinned={autoPlay} />
                 <div className="flex min-w-0 flex-1 md:py-1 md:pr-1 md:pl-1">
-                  <TeachNanciPanel />
+                  <PersonalizePanel />
                   <ChatArea>{children}</ChatArea>
                 </div>
               </>
@@ -223,7 +223,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <ConceptContentArea>{children}</ConceptContentArea>
         ) : (
           <div className="flex min-w-0 flex-1 md:py-1 md:pr-1">
-            <TeachNanciPanel />
+            <PersonalizePanel />
             <ChatArea>{children}</ChatArea>
           </div>
         )}

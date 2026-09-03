@@ -72,7 +72,7 @@ function SourceRow({ source, onToggle, onRemove }: { source: Source; onToggle: (
 
 // ─── Main panel ──────────────────────────────────────────────────────────────
 
-export function TeachNanciPanel() {
+export function PersonalizePanel() {
   const { kbOpen, setKbOpen, sources, setSources } = useAskNanci()
   const fileRef = useRef<HTMLInputElement>(null)
   const [wizardOpen, setWizardOpen] = useState(false)
@@ -97,7 +97,7 @@ export function TeachNanciPanel() {
     <>
       {/* Header */}
       <div className="flex shrink-0 items-center justify-between px-4 py-3">
-        <h2 className="text-base font-semibold text-foreground">Teach Nanci</h2>
+        <h2 className="text-base font-semibold text-foreground">Personalize Ask Nanci</h2>
         <Button variant="ghost" size="icon-sm" onClick={() => setKbOpen(false)}>
           <X className="size-4" />
         </Button>
@@ -186,11 +186,12 @@ export function TeachNanciPanel() {
         />
       )}
 
-      {/* Mobile: full-screen slide-in from right */}
+      {/* Mobile: full-screen slide-in from the left, the same edge the sidebar comes
+          from, since both are reached from the sidebar's side of the screen. */}
       <div
         className={cn(
           "fixed inset-0 z-50 flex flex-col bg-background transition-transform duration-200 ease-in-out md:hidden",
-          kbOpen ? "translate-x-0" : "translate-x-full",
+          kbOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
         {panelContent}

@@ -53,7 +53,7 @@ function SidebarItem({
 }
 
 // When `menu` is provided the rail renders a fixed nav list (e.g. the Aperia Risk
-// theme) instead of New Chat + Marketplace, and hides the Teach Nanci / Usage cards.
+// theme) instead of New Chat + Marketplace, and hides the Personalize Ask Nanci / Usage cards.
 // `logos` supplies the theme's rail branding (see data/theme-logos.ts); its `sidebar` and
 // `sidebarCollapsed` slots are optional and fall back to the Ask Nanci wordmark and
 // logomark. Both props optional — default behavior is unchanged. Dark-mode treatment
@@ -252,7 +252,7 @@ export function Sidebar({ menu, search, logos, hoverNav = true, initialPinned = 
                   <Image src="/ask-nanci/img_kb-illustration.png" alt="" width={72} height={72} className="size-20 object-contain" />
                 </div>
                 <div className="pr-12 flex flex-col items-start gap-1">
-                  <p className="text-sm font-semibold text-foreground">Personalize Nanci</p>
+                  <p className="text-sm font-semibold text-foreground">Personalize Ask Nanci</p>
                   <p className="text-sm text-muted-foreground">
                     Add your financial and bookkeeping accounts to improve Nanci.
                   </p>

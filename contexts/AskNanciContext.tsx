@@ -188,7 +188,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       EMBED_DEMO_SOURCES) : []
   )
   const [thinking, setThinking] = useState<{ source: Source | null; label: string }>({ source: null, label: "Thinking…" })
-  // Teach Nanci and Service Marketplace are mutually exclusive — opening one
+  // Personalize Ask Nanci and Service Marketplace are mutually exclusive — opening one
   // closes the other (one panel per user action). Enforced in the setters so
   // every call site (sidebar, welcome page) gets the behavior for free.
   const [kbOpen, setKbOpenState] = useState(false)
