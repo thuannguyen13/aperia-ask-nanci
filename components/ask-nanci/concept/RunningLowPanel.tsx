@@ -30,7 +30,10 @@ export function RunningLowPanel() {
       />
 
       <PanelBody>
-        <div className="grid grid-cols-3 gap-3">
+        {/* Two across on a phone, three once there is room — the same shape
+            PendingDepositsPanel's stat grid uses, for the same reason: three
+            columns at 390px leaves too little room per card. */}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {STOCK_SUMMARY.map((s) => (
             <StatCard key={s.label} label={s.label} value={s.count} sublabel={s.sub} tone={s.warn ? "amber" : undefined} />
           ))}
