@@ -93,15 +93,18 @@ export function ChangeAuditSheet({ open, onOpenChange, data }: Props) {
           </div>
 
           {showChangeCards && (
-            <div className="w-full space-y-2">
-              <div className="flex items-center gap-3">
-                <p className="flex-1 text-base font-medium text-foreground">Current</p>
-                <span className="size-4 shrink-0" />
-                <p className="flex-1 text-base font-medium text-foreground">New</p>
-              </div>
-              <div className="flex items-center gap-3">
+            // Below `sm` the sheet itself is 92vw (see the SheetContent width above), too
+            // narrow for two value cards side by side without wrapping their text — so
+            // this stacks at the same breakpoint the sheet's own width already switches on,
+            // label above each card instead of a shared header row.
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="flex flex-1 flex-col gap-1.5">
+                <p className="text-base font-medium text-foreground">Current</p>
                 <ValueCard value={data.fromValue ?? ""} sublabel={data.field} iconKind={data.iconKind} />
-                <ArrowRight className="size-4 shrink-0 text-muted-foreground" />
+              </div>
+              <ArrowRight className="size-4 shrink-0 rotate-90 self-center text-muted-foreground sm:rotate-0" />
+              <div className="flex flex-1 flex-col gap-1.5">
+                <p className="text-base font-medium text-foreground">New</p>
                 <ValueCard value={data.toValue ?? ""} sublabel={data.field} iconKind={data.iconKind} highlight />
               </div>
             </div>
