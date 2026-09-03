@@ -141,8 +141,8 @@ export function TeachNanciPanel() {
               </p>
             </div>
 
-            <div className="flex items-center justify-center gap-2 rounded-md border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950/20 px-3 py-2">
-              <Image src={builtIn.logo!} alt={builtIn.name} width={16} height={16} className="size-4 shrink-0" />
+            <div className="flex items-center justify-center gap-2 rounded-md border border-primary/30 bg-primary/5 px-3 py-2">
+              <SourceIcon source={builtIn} size="sm" />
               <span className="text-sm font-medium text-foreground">{builtIn.institution} Added</span>
             </div>
 

@@ -11,12 +11,15 @@ export const FOUNDATION_SOURCE_ID = "foundation-built-in"
 // merchant's own added accounts layer on top of). Its value is per-host/theme —
 // the Titan theme (localhost:3000, non-embed) foundation is VisionWeb. Embed
 // variants swap this slot via data/sources.ts (keyed off FOUNDATION_SOURCE_ID).
+// No logo: the only ABC Bank asset is a 128x24 white wordmark for the dark top bar,
+// which is neither square nor visible on a light surface. SourceIcon falls back to the
+// initials chip, so the slot stays filled until a square mark exists.
 export const FOUNDATION_SOURCE: Source = {
   id: FOUNDATION_SOURCE_ID,
-  name: "VisionWeb",
+  name: "ABC Bank",
   kind: "bank",
-  institution: "VisionWeb Data",
-  logo: "/logos/vision-web-source-logo.svg",
+  institution: "ABC Bank Data",
+  initials: "AB",
   active: true,
   addedAt: 0,
 }
