@@ -1,6 +1,6 @@
 "use client"
 
-import { PanelLeft } from "lucide-react"
+import { Menu } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 
 export function MobileSidebarToggle() {
@@ -12,7 +12,7 @@ export function MobileSidebarToggle() {
       className="flex size-10 items-center justify-center text-white"
       aria-label="Open sidebar"
     >
-      <PanelLeft className="size-5" />
+      <Menu className="size-5" />
     </button>
   )
 }

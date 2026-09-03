@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { Blocks, MessageCirclePlus, PanelLeft, Pin, PinOff, Settings, Moon } from "lucide-react"
+import { Blocks, MessageCirclePlus, PanelLeft, Pin, PinOff, Settings, Moon, X } from "lucide-react"
 import Image from "next/image"
 import { useTheme } from "next-themes"
 import {
@@ -160,8 +160,9 @@ export function Sidebar({ menu, search, logos, hoverNav = true, initialPinned = 
           <button
             onClick={() => setMobileSidebarOpen(false)}
             className="flex size-6 items-center justify-center rounded text-foreground hover:bg-muted transition-colors"
+            aria-label="Close sidebar"
           >
-            <PanelLeft className="size-4" />
+            <X className="size-4" />
           </button>
         ) : (
           <Tooltip>
