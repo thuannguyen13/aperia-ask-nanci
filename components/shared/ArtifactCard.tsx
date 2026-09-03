@@ -23,7 +23,6 @@ export function ArtifactCard({
   icon: Icon,
   title,
   subtitle,
-  badge,
   action,
   actionIcon,
   onClick,
@@ -34,11 +33,9 @@ export function ArtifactCard({
   icon: LucideIcon
   title: string
   subtitle: string
-  /** The pip on the thumbnail's bottom-right corner. Omit it to turn it off. */
-  badge?: { icon: LucideIcon; className?: string }
   action: string
-  /** Defaults to the panel icon for the current width: right on desktop, bottom on a phone. */
-  actionIcon?: LucideIcon
+  /** Defaults to the panel icon for the current width: right on desktop, bottom on a phone. `null` shows none. */
+  actionIcon?: LucideIcon | null
   onClick: () => void
   ariaLabel?: string
   className?: string
@@ -46,8 +43,7 @@ export function ArtifactCard({
   const isMobile = useIsMobile()
   // Which edge the panel arrives from is the one thing the icon is saying, so it follows
   // the width rather than being fixed at author time.
-  const ActionIcon = actionIcon ?? (isMobile ? PanelBottomOpen : PanelRightOpen)
-  const BadgeIcon = badge?.icon
+  const ActionIcon = actionIcon === null ? null : actionIcon ?? (isMobile ? PanelBottomOpen : PanelRightOpen)
 
   return (
     <button
@@ -63,16 +59,6 @@ export function ArtifactCard({
       <span className="flex min-w-0 flex-1 items-center gap-2">
         <span className="relative flex size-10 shrink-0 items-center justify-center rounded-lg border bg-card">
           <Icon className="size-5 text-muted-foreground" />
-          {BadgeIcon && (
-            <span
-              className={cn(
-                "absolute -right-1 -bottom-1 flex items-center justify-center rounded-full border border-background bg-amber-400 p-1",
-                badge?.className,
-              )}
-            >
-              <BadgeIcon className="size-2.5" />
-            </span>
-          )}
         </span>
 
         <span className="flex min-w-0 flex-1 flex-col">
@@ -85,7 +71,7 @@ export function ArtifactCard({
           height, radius, padding and icon size the design asks for. */}
       <span className={cn(buttonVariants({ variant: "outline", size: "default" }), "shrink-0")}>
         {action}
-        <ActionIcon />
+        {ActionIcon && <ActionIcon />}
       </span>
     </button>
   )

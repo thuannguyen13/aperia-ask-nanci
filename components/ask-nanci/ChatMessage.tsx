@@ -1,14 +1,14 @@
 "use client"
 
 import { memo, useState } from "react"
-import { FileText, Clock, Check } from "lucide-react"
+import { FileText } from "lucide-react"
 import type { Message, SheetActionData } from "@/lib/ask-nanci/types"
 import { ChatCitedSources } from "./ChatCitedSources"
 import { SuggestedQuestions } from "./SuggestedQuestions"
 import { MessageChart } from "./MessageChart"
 import { PanelArtifactCard } from "./PanelArtifactCard"
 import { MessageMap } from "./MessageMap"
-import { ChangeAuditSheet } from "./concept/ChangeAuditSheet"
+import { ChangeAuditDialog } from "./concept/ChangeAuditDialog"
 import { AiTriageSummaryWidget } from "./AiTriageSummaryWidget"
 import { ArtifactCard } from "@/components/shared"
 import { DashChartCard } from "@/components/risk/dashboard/DashChartCard"
@@ -33,11 +33,10 @@ function ChangeRequestCard({ data, onClick }: { data: SheetActionData; onClick: 
       icon={FileText}
       title={title}
       subtitle={subtitle}
-      // Amber while it is still pending, green once it has gone through.
-      badge={submitted
-        ? { icon: Clock, className: "bg-amber-400 text-amber-950" }
-        : { icon: Check, className: "bg-emerald-500 text-white" }}
       action={submitted ? "View request" : "View change"}
+      // This one opens a dialog, not a panel, so the panel-edge icon would point at the
+      // wrong place. No icon until there is one that reads as "opens a dialog".
+      actionIcon={null}
       onClick={onClick}
     />
   )
@@ -193,7 +192,7 @@ function BotMessageBase({
         {showExtras && message.sheetAction && (
           <>
             <ChangeRequestCard data={message.sheetAction} onClick={() => setSheetOpen(true)} />
-            <ChangeAuditSheet open={sheetOpen} onOpenChange={setSheetOpen} data={message.sheetAction} />
+            <ChangeAuditDialog open={sheetOpen} onOpenChange={setSheetOpen} data={message.sheetAction} />
           </>
         )}
         {showExtras && (

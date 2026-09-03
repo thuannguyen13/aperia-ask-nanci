@@ -5,7 +5,7 @@ const CONFIRMED_AT = "3:40 PM"
 const REQUEST_REFERENCE = "DA-2201"
 const SENT_TO = "Deposit Operations team"
 
-// Submission drawer (ChangeAuditSheet) shown after the account change is confirmed.
+// Submission summary (ChangeAuditDialog) shown after the account change is confirmed.
 export const ACCOUNT_CHANGE_SHEET: import("@/lib/ask-nanci/types").SheetActionData = {
   field: "Deposit Account",
   fromValue: `************${CURRENT_ACCOUNT.last4}`,

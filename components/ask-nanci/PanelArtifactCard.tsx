@@ -1,9 +1,10 @@
 "use client"
 
-import { Check, FileText } from "lucide-react"
+import { FileText } from "lucide-react"
 import { ArtifactCard } from "@/components/shared"
 import { PANELS, type PanelId } from "@/components/panel-registry"
 import { useAskNanci } from "@/contexts/AskNanciContext"
+import { useIsMobile } from "@/hooks/use-is-mobile"
 
 /**
  * The card an answer leaves behind for the panel it opened.
@@ -20,6 +21,7 @@ import { useAskNanci } from "@/contexts/AskNanciContext"
  */
 export function PanelArtifactCard({ id }: { id: PanelId }) {
   const { dynamicPanels, shownPanelId, panelSheetDismissed, openDynamic, setShownPanelId, reopenPanelSheet } = useAskNanci()
+  const isMobile = useIsMobile()
 
   const panel = PANELS[id]
   if (!panel) return null
@@ -27,7 +29,10 @@ export function PanelArtifactCard({ id }: { id: PanelId }) {
   // Three states, because "in the stack" and "on screen" stopped being the same thing
   // once a panel could be minimised: a minimised panel is still open, just parked.
   const inStack = dynamicPanels.includes(id)
-  const showing = inStack && !panelSheetDismissed && (shownPanelId === id || dynamicPanels[dynamicPanels.length - 1] === id)
+  // On desktop every panel in the stack is on screen in its column, so "in the stack"
+  // is "showing". The dismissed flag and the shown id only describe the phone's sheet,
+  // where one panel at a time is up and a scripted one arrives resting.
+  const showing = inStack && (!isMobile || (!panelSheetDismissed && (shownPanelId === id || dynamicPanels[dynamicPanels.length - 1] === id)))
   // "Minimised" no longer fits the middle state: a scripted panel arrives resting
   // without ever having been open, so the copy says what a tap does rather than
   // claiming a history the panel may not have.
@@ -51,9 +56,6 @@ export function PanelArtifactCard({ id }: { id: PanelId }) {
       icon={FileText}
       title={panel.label}
       subtitle={status}
-      // Only the on-screen state gets a mark. Closed is the resting case, and marking it
-      // on every past answer would turn the conversation into a list of dismissals.
-      badge={showing ? { icon: Check, className: "bg-emerald-500 text-white" } : undefined}
       action="Open"
       onClick={handleClick}
       // Deliberately not "Show X": that is the sheet handle's name, and two controls

@@ -2,7 +2,7 @@
 
 import { Check, Clock, MapPin, Landmark, Store, Phone, ArrowRight } from "lucide-react"
 import {
-  Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetFooter,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
   Button, Separator,
 } from "aperia-ds5"
 import type { SheetActionData } from "@/lib/ask-nanci/types"
@@ -49,7 +49,7 @@ function ValueCard({ value, sublabel, iconKind, highlight }: { value: string; su
   )
 }
 
-export function ChangeAuditSheet({ open, onOpenChange, data }: Props) {
+export function ChangeAuditDialog({ open, onOpenChange, data }: Props) {
   const submitted = data.status === "submitted"
   // Offer-request variant: no from→to change to show, "Field" reads as "File".
   const isRequest = !!data.requestLabel
@@ -70,18 +70,20 @@ export function ChangeAuditSheet({ open, onOpenChange, data }: Props) {
         sub: `Applied ${data.timestamp}`,
       }
   return (
-    <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" showCloseButton className={`flex flex-col ${submitted || showChangeCards ? "w-[92vw] sm:w-[680px] sm:!max-w-[680px]" : "w-[400px] sm:w-[480px]"}`}>
-        <SheetHeader>
-          <SheetTitle>{isRequest ? (data.submittedTitle ?? "Request Submitted") : submitted ? "Change Request Submitted" : "Change Confirmation"}</SheetTitle>
+    // A dialog, not a side sheet: this is a summary the reader glances at and closes, and
+    // a full-height sheet left it as a short block of content over a tall empty column.
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent showCloseButton className={submitted || showChangeCards ? "sm:max-w-[680px]" : "sm:max-w-[480px]"}>
+        <DialogHeader>
+          <DialogTitle>{isRequest ? (data.submittedTitle ?? "Request Submitted") : submitted ? "Change Request Submitted" : "Change Confirmation"}</DialogTitle>
           {/* sr-only, not removed: Radix needs a description, but the hero below already
               says what this is, so showing it twice is just noise. */}
-          <SheetDescription className="sr-only">
+          <DialogDescription className="sr-only">
             {submitted ? "Record of this change request." : "Audit record for this account update."}
-          </SheetDescription>
-        </SheetHeader>
+          </DialogDescription>
+        </DialogHeader>
 
-        <div className="flex flex-col gap-4 px-6 py-4 flex-1">
+        <div className="flex flex-col gap-4">
           <div className="flex flex-col items-center gap-3 py-2">
             <div className={`flex size-14 items-center justify-center rounded-full ${hero.swatch}`}>
               <hero.Icon className={`size-7 ${hero.ink}`} />
@@ -93,10 +95,9 @@ export function ChangeAuditSheet({ open, onOpenChange, data }: Props) {
           </div>
 
           {showChangeCards && (
-            // Below `sm` the sheet itself is 92vw (see the SheetContent width above), too
-            // narrow for two value cards side by side without wrapping their text — so
-            // this stacks at the same breakpoint the sheet's own width already switches on,
-            // label above each card instead of a shared header row.
+            // Below `sm` the dialog is the screen minus its margin, too narrow for two
+            // value cards side by side without wrapping their text, so this stacks at the
+            // same breakpoint, label above each card instead of a shared header row.
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <div className="flex flex-1 flex-col gap-1.5">
                 <p className="text-base font-medium text-foreground">Current</p>
@@ -138,12 +139,12 @@ export function ChangeAuditSheet({ open, onOpenChange, data }: Props) {
           </div>
         </div>
 
-        <SheetFooter className="px-6 pb-6">
+        <DialogFooter>
           <Button variant="secondary" onClick={() => onOpenChange(false)} className="w-full">
             Close
           </Button>
-        </SheetFooter>
-      </SheetContent>
-    </Sheet>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

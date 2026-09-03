@@ -81,7 +81,7 @@ function Step2({ onBack, onConfirm }: { onBack: () => void; onConfirm: () => voi
       <div>
         <p className="mb-2 text-base font-bold text-foreground">What Will Change</p>
         {/* This panel sits in a narrow column even on desktop (50% of the split panel
-            area), so it stacks below `sm` the same way ChangeAuditSheet's identical
+            area), so it stacks below `sm` the same way ChangeAuditDialog's identical
             current/new row does, rather than squeezing two cards into panel width. */}
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <AccountRow last4={CURRENT_ACCOUNT.last4} />
