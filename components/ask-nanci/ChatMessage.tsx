@@ -1,7 +1,7 @@
 "use client"
 
 import { memo, useState } from "react"
-import { FileText, ArrowUpRight, Clock, Check } from "lucide-react"
+import { FileText, Clock, Check } from "lucide-react"
 import type { Message, SheetActionData } from "@/lib/ask-nanci/types"
 import { ChatCitedSources } from "./ChatCitedSources"
 import { SuggestedQuestions } from "./SuggestedQuestions"
@@ -10,10 +10,11 @@ import { PanelArtifactCard } from "./PanelArtifactCard"
 import { MessageMap } from "./MessageMap"
 import { ChangeAuditSheet } from "./concept/ChangeAuditSheet"
 import { AiTriageSummaryWidget } from "./AiTriageSummaryWidget"
+import { ArtifactCard } from "@/components/shared"
 import { DashChartCard } from "@/components/risk/dashboard/DashChartCard"
 
-// Attachment-style card that opens the change-request/confirmation drawer — more
-// noticeable than a plain text link.
+// The change-request block. Layout and styling live in ArtifactCard; this only supplies
+// the copy and which pip the request's state earns.
 function ChangeRequestCard({ data, onClick }: { data: SheetActionData; onClick: () => void }) {
   const submitted = data.status === "submitted"
   // Offer-request variant (credit-card/loan): "<X> request submitted" + the offer name.
@@ -27,26 +28,18 @@ function ChangeRequestCard({ data, onClick }: { data: SheetActionData; onClick: 
       ? `${data.field}${data.reference ? ` · Ref ${data.reference}` : ""}`
       : `${data.field} · Completed`
   return (
-    <button
+    <ArtifactCard
+      className="mt-2"
+      icon={FileText}
+      title={title}
+      subtitle={subtitle}
+      // Amber while it is still pending, green once it has gone through.
+      badge={submitted
+        ? { icon: Clock, className: "bg-amber-400 text-amber-950" }
+        : { icon: Check, className: "bg-emerald-500 text-white" }}
+      action={submitted ? "View request" : "View change"}
       onClick={onClick}
-      className="mt-2 flex w-full items-center gap-3 rounded-xl border bg-gray-100 px-3 py-2.5 text-left transition-colors hover:border-ring hover:bg-gray-200 dark:bg-gray-800/50 dark:hover:bg-gray-800/80"
-    >
-      <div className="relative flex size-10 shrink-0 items-center justify-center rounded-lg border bg-background">
-        <FileText className="size-5 text-muted-foreground" />
-        {/* Status pip — quick-look request state on the thumbnail. */}
-        <span className={`absolute -bottom-1 -right-1 flex size-4 items-center justify-center rounded-full ring-2 ring-background ${submitted ? "bg-amber-400" : "bg-green-500"}`}>
-          {submitted ? <Clock className="size-2.5 text-amber-950" /> : <Check className="size-2.5 text-white" />}
-        </span>
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-semibold text-foreground">{title}</p>
-        <p className="truncate text-xs text-muted-foreground">{subtitle}</p>
-      </div>
-      <span className="flex shrink-0 items-center gap-1.5 rounded-lg border bg-background px-3 py-1.5 text-xs font-medium text-foreground">
-        {submitted ? "View request" : "View change"}
-        <ArrowUpRight className="size-3.5" />
-      </span>
-    </button>
+    />
   )
 }
 
