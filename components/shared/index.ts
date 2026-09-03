@@ -1,3 +1,5 @@
+export { ArtifactCard } from "./ArtifactCard"
+export { ResponsiveTabsList } from "./ResponsiveTabsList"
 export { PanelShell } from "./PanelShell"
 export { PanelHeader } from "./PanelHeader"
 export { PanelBody } from "./PanelBody"

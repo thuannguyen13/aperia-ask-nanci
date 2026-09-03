@@ -2,7 +2,7 @@
 
 import { Clock } from "lucide-react"
 import Image from "next/image"
-import { Button } from "aperia-ds5"
+import { Button, Card, CardContent, CardDescription, CardTitle } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { ChatInput } from "@/components/ask-nanci/ChatInput"
 import { ChatView } from "@/components/ask-nanci/ChatView"
@@ -28,29 +28,34 @@ function WelcomeView() {
           </div>
         </div>
 
-        {/* KB banner */}
-        {!isEmbed && sources.length < 3 && <div className="flex items-center gap-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 dark:border-green-800 dark:bg-green-950/20">
-          <Image src="/ask-nanci/img_kb-illustration.png" alt="" width={72} height={72} className="size-18 shrink-0 object-contain" />
-          <div className="min-w-0 flex-1">
-            <div className="mb-0.5 flex items-center gap-2">
-              <p className="text-sm font-semibold text-foreground">Teach Nanci</p>
-              <span className={cn(
-                "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold",
-                sources.length > 1
-                  ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                  : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-              )}>
-                {sources.length} {sources.length === 1 ? "Account Added" : "Accounts Added"}
-              </span>
+        {/* Teach Nanci card. Stacks below `sm`: at phone width the illustration, the
+            copy and the button cannot share a row without squeezing the copy into a
+            column a few words wide. */}
+        {!isEmbed && sources.length < 3 && <Card size="sm">
+          <CardContent className="flex items-center gap-4 max-sm:flex-col max-sm:items-start">
+            <Image src="/ask-nanci/img_kb-illustration.png" alt="" width={72} height={72} className="size-18 shrink-0 object-contain" />
+            <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <CardTitle>Teach Nanci</CardTitle>
+                <span className={cn(
+                  "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                  sources.length > 1
+                    ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                    : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                )}>
+                  {sources.length} {sources.length === 1 ? "Account Added" : "Accounts Added"}
+                </span>
+              </div>
+              {/* text-xs keeps the density the banner had; CardDescription is text-sm. */}
+              <CardDescription className="text-xs">
+                Your payment data is already connected. Add your financial and bookkeeping accounts to give Nanci a complete picture of your business.
+              </CardDescription>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Your payment data is already connected. Add your financial and bookkeeping accounts to give Nanci a complete picture of your business.
-            </p>
-          </div>
-          <Button size="sm" className="shrink-0" onClick={() => setKbOpen(true)}>
-            Link Accounts
-          </Button>
-        </div>}
+            <Button size="sm" className="shrink-0 max-sm:w-full" onClick={() => setKbOpen(true)}>
+              Link Accounts
+            </Button>
+          </CardContent>
+        </Card>}
 
         {/* Chat input */}
         <ChatInput />
@@ -100,7 +105,7 @@ function WelcomeView() {
 }
 
 export default function AskNanciPage() {
-  const { view, startNewChat, isEmbed, isConceptVersion, embedVariant } = useAskNanci()
+  const { view, startNewChat, isEmbed, catalog, embedVariant } = useAskNanci()
   const composerRef = useComposerInset()
 
   if (view === "chat") {
@@ -140,6 +145,6 @@ export default function AskNanciPage() {
     )
   }
 
-  if (isConceptVersion) return <ConceptWelcomeView />
+  if (catalog) return <ConceptWelcomeView />
   return <WelcomeView />
 }

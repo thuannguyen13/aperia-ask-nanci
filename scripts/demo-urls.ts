@@ -122,6 +122,11 @@ p("identical either way — the brand changes, the offer does not. Opt-in and mo
 p("like `autoplay`, so a partner-facing site and a sales site can share one set of URLs")
 p("with one param between them. Flows other than 20 and 21 ignore it.")
 p()
+p("Add `&onboarded` to skip the welcome dialog. An iframe is a fresh browser for every")
+p("viewer, so an embedded demo would otherwise open onboarding over itself. Opt-in and")
+p("mode-agnostic like the other two; `?mode=onboarding` still forces the dialog, since")
+p("showing it is that mode's whole point. `&onboarded=0` turns it off.")
+p()
 p("| URL | Card | Flow | Layout |")
 p("|---|---|---|---|")
 for (const { slug, flow, alt } of entries) {

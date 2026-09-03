@@ -28,38 +28,46 @@ interface ParsedMode {
    * reads the same way as every other surface here.
    */
   forceOnboarding: boolean
+  /**
+   * Show the 22-card flow catalog as the welcome screen instead of the standard one.
+   * Split from isConceptVersion because the default app now runs the concept engine
+   * too (so a demo prompt on `/` plays with its panels) but keeps its own welcome.
+   */
+  catalog: boolean
 }
 
 export function parseMode(mode: string | null): ParsedMode {
   // Every mode is the default shape plus whatever it changes, so adding a field to
   // ParsedMode does not mean editing thirteen rows.
-  const base = { isEmbed: false, embedVariant: null, isConceptVersion: false, theme: "aperia" as ThemeId, forceOnboarding: false }
+  const base = { isEmbed: false, embedVariant: null, isConceptVersion: false, theme: "aperia" as ThemeId, forceOnboarding: false, catalog: false }
   switch (mode) {
     case "clover":          return { ...base, isEmbed: true,  embedVariant: "clover",         theme: "clover"      }
     case "business-owner":  return { ...base, isEmbed: true,  embedVariant: "business-owner", theme: "access-one"  }
     case "iso":             return { ...base, isEmbed: true,  embedVariant: "iso"                                  }
-    case "concept-embed":   return { ...base, isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true }
+    case "concept-embed":   return { ...base, isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true, catalog: true }
     case "vw":              return { ...base, isEmbed: true,  embedVariant: "vw",             theme: "vision-web"  }
     // Same shape as vw — chat-only embed, Clover content underneath — but keeps the
     // default aperia (ABC Bank) theme instead of switching brand.
     case "abc":             return { ...base, isEmbed: true,  embedVariant: "abc"                                  }
-    case "concept":         return { ...base, isConceptVersion: true }
+    case "concept":         return { ...base, isConceptVersion: true, catalog: true }
     // Alias of `concept`, kept because the URL is already out with reviewers — the
     // hover rail it used to opt into is now how every Ask Nanci sidebar behaves.
-    case "concept-nav":     return { ...base, isConceptVersion: true }
+    case "concept-nav":     return { ...base, isConceptVersion: true, catalog: true }
     // Duplicate of concept — same welcome card catalog, panel demo, everything —
     // wearing the Titan brand instead of the default aperia (ABC Bank) theme.
-    case "titan":           return { ...base, isConceptVersion: true, theme: "titan" }
+    case "titan":           return { ...base, isConceptVersion: true, catalog: true, theme: "titan" }
     // Embeddable counterpart to `titan`, same as concept-embed is to concept — same
     // embedVariant so &flow=<slug>&autoplay behaves identically, compact widget layout
     // included. Only the theme differs.
-    case "titan-embed":     return { ...base, isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true, theme: "titan" }
+    case "titan-embed":     return { ...base, isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true, catalog: true, theme: "titan" }
     case "tib":             return { ...base, theme: "tib"         }
     case "woodforest":      return { ...base, theme: "woodforest"  }
     case "placeholder":     return { ...base, theme: "placeholder" }
     // The default app, but onboarding opens every time and never records that it ran.
     case "onboarding":      return { ...base, forceOnboarding: true }
-    default:                return base
+    // The default app plays scripted flows with their panels, so the Demos tab on the
+    // welcome screen works in place. Not the catalog: the welcome stays the standard one.
+    default:                return { ...base, isConceptVersion: true }
   }
 }
 

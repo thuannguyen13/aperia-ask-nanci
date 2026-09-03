@@ -126,6 +126,8 @@ interface AskNanciCtx {
    */
   leavesCurrentFlow: (prompt: string) => boolean
   isConceptVersion: boolean
+  /** The welcome screen is the flow catalog rather than the standard one. */
+  catalog: boolean
   submitFormPanel: () => void
   submitOfferApplication: (panelId: PanelId, message: string, sheetAction: SheetActionData) => void
   submitStepUpPanel: () => void
@@ -169,7 +171,7 @@ export function usePanelView(id: PanelId, fallback: string): string {
   return useAskNanci().panelViews[id] ?? fallback
 }
 
-export function AskNanciProvider({ children, isEmbed = false, embedVariant = null, isConceptVersion = false, autoPlayFlow = null, autoPlay = false, initialView, initialMarketplaceOpen = false, forceOnboarding = false, genericBrand = false }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null; isConceptVersion?: boolean; autoPlayFlow?: string | null; autoPlay?: boolean; initialView?: ChatView; initialMarketplaceOpen?: boolean; forceOnboarding?: boolean; genericBrand?: boolean }) {
+export function AskNanciProvider({ children, isEmbed = false, embedVariant = null, isConceptVersion = false, catalog = false, autoPlayFlow = null, autoPlay = false, initialView, initialMarketplaceOpen = false, forceOnboarding = false, skipOnboarding = false, genericBrand = false }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null; isConceptVersion?: boolean; catalog?: boolean; autoPlayFlow?: string | null; autoPlay?: boolean; initialView?: ChatView; initialMarketplaceOpen?: boolean; forceOnboarding?: boolean; skipOnboarding?: boolean; genericBrand?: boolean }) {
   const [view, setView] = useState<ChatView>(initialView ?? (embedVariant === "concept-embed" ? "chat" : "welcome"))
   const [messages, setMessages] = useState<Message[]>([])
   const [chatState, setChatState] = useState<ChatState>("idle")
@@ -271,8 +273,8 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     // ponytail: must stay in the effect — a lazy useState initializer would read
     // localStorage on the client but not the server, mismatching Dialog's `open` on hydrate.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (forceOnboarding || !localStorage.getItem(ONBOARDING_KEY)) setOnboardingOpen(true)
-  }, [isEmbed, forceOnboarding])
+    if (forceOnboarding || (!skipOnboarding && !localStorage.getItem(ONBOARDING_KEY))) setOnboardingOpen(true)
+  }, [isEmbed, forceOnboarding, skipOnboarding])
 
 
   const persistAndReload = useCallback(async (msgs: Message[]) => {
@@ -881,7 +883,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       mobileSidebarOpen, setMobileSidebarOpen,
       shownPanelId, setShownPanelId, panelSheetDismissed, dismissPanelSheet, reopenPanelSheet, panelSheetOpen,
       onboardingOpen, setOnboardingOpen, forceOnboarding, genericBrand, tourActive, setTourActive, tourRequest, requestTour, flowFinished, leavesCurrentFlow,
-      isConceptVersion,
+      isConceptVersion, catalog,
       submitFormPanel, submitOfferApplication, submitStepUpPanel,
       triggerProactiveFlow, proactiveNotificationActive, activateProactiveNotification,
       closingPanels, closePanel, closeAllNewPanels, submitDisputeDraft,

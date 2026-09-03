@@ -113,7 +113,7 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams()
-  const { isEmbed, embedVariant, isConceptVersion, theme, forceOnboarding } = parseMode(searchParams.get("mode"))
+  const { isEmbed, embedVariant, isConceptVersion, catalog, theme, forceOnboarding } = parseMode(searchParams.get("mode"))
   const rawFlow = searchParams.get("flow")
   const autoPlayFlow = (rawFlow && CONCEPT_FLOW_SLUGS[rawFlow]) ?? null
   // `?autoplay` plays ?flow= on load rather than waiting for the Ask button. Opt-in and
@@ -126,6 +126,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // surface you are on, so every existing embed URL keeps working untouched and a sales
   // site adds one param instead of being reissued a whole new set of links.
   const genericBrand = searchParams.get("brand") === "generic"
+  // `?onboarded` treats the browser as having already seen the welcome. An iframe is a
+  // fresh browser for every viewer, so an embedded demo would otherwise open onboarding
+  // over itself and never reach the thing it is demonstrating. Opt-in and mode-agnostic
+  // like autoplay and brand, so no existing URL changes. `?mode=onboarding` still wins:
+  // forcing onboarding is the entire point of that mode.
+  const rawOnboarded = searchParams.get("onboarded")
+  const skipOnboarding = rawOnboarded !== null && rawOnboarded !== "0" && rawOnboarded !== "false"
   // Per-flow embed layout: some flows (e.g. 22, Service Marketplace) render the full
   // app shell (sidebar + standard welcome) instead of the compact concept-embed widget.
   const embedLayout = (rawFlow && CONCEPT_EMBED_FLOW_LAYOUTS[rawFlow]) || null
@@ -151,6 +158,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         isEmbed
         embedVariant={embedVariant}
         isConceptVersion={fullApp ? false : isConceptVersion}
+        catalog={fullApp ? false : catalog}
         autoPlayFlow={autoPlayFlow}
         autoPlay={autoPlay} genericBrand={genericBrand}
         initialView={fullApp ? "welcome" : undefined}
@@ -198,7 +206,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <ChatStreamProvider>
     {/* autoPlayFlow reaches the non-embed modes too, so ?autoplay composes with
         concept / tib / woodforest, not just the embed */}
-    <AskNanciProvider isConceptVersion={isConceptVersion} autoPlayFlow={autoPlayFlow} autoPlay={autoPlay} genericBrand={genericBrand} forceOnboarding={forceOnboarding}>
+    <AskNanciProvider isConceptVersion={isConceptVersion} catalog={catalog} autoPlayFlow={autoPlayFlow} autoPlay={autoPlay} genericBrand={genericBrand} forceOnboarding={forceOnboarding} skipOnboarding={skipOnboarding}>
       <AppFrame
         theme={theme}
         topBar={
