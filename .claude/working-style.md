@@ -2,12 +2,12 @@
 
 **Read when:** any multi-step task, staging, subagents, git actions, or visual direction
 
-- **Never `git push` without an explicit go-ahead.** Pushing `main` ships to production, via the `ask-nanci` Vercel project.
-- **Skip the code-quality review round.** When running subagent-driven development here, do spec-compliance verification only: does the diff match what was asked, nothing missing or extra. They said plainly: "i don't care about code quality review, the demo is missing panels." Getting to a demonstrable state beats review ceremony.
-- **The working tree carries pre-existing uncommitted WIP in almost every file.** Before staging, `git diff <file>` against HEAD and stage only the hunks belonging to the current task. Warn implementer subagents explicitly; never assume a file is clean because your task touches two lines of it.
-- **Take spatial instructions literally.** "Down below and share half of Pending Deposits" meant vertical stacking; the existing horizontal-split precedent in the codebase was allowed to override their actual words, and the layout had to be rebuilt. Re-read what they said before defaulting to what the code already does.
-- **Don't abandon a CSS approach on an ambiguous screenshot.** A cut-off "Change" column looked like `table-fixed` was broken; it was a ~758px test viewport, and the same code was perfect at ~2000px. Check viewport width or reproduce it before concluding which mechanism is at fault.
-- **After building from Figma screenshots, re-diff element by element before saying done.** On Account Change (Flow 16) an Export button was copied in reflexively, the header title was hardcoded across steps that show different titles, and an icon-in-circle became a bare icon, all visible in screenshots already saved locally, never re-opened.
+- **Ask before every push, and never touch `main`.** It deploys to production via the `ask-nanci` Vercel project. Staging is `embed`; branch new work off it. A past yes is not standing permission.
+- **Skip code-quality review.** Verify spec compliance only: does the diff match what was asked, nothing missing, nothing extra. A demonstrable state beats review ceremony.
+- **Almost every file has uncommitted WIP.** Before staging, `git diff <file>` and stage only the hunks for the current task. A file is not clean because your task touches two lines of it. Tell implementer subagents this explicitly.
+- **Take spatial instructions literally.** "Down below" means vertical stacking, even if the codebase already splits horizontally. Re-read the words before defaulting to the existing pattern.
+- **Don't switch CSS approach on an ambiguous screenshot.** A cut-off column is not proof the CSS is broken. Check the viewport width or reproduce it first.
+- **After building from Figma screenshots, re-open them and compare element by element before saying done.** Past misses: a copied Export button, a hardcoded header title, an icon-in-circle rendered as a bare icon.
 
 ## Helping them decide on visuals
 
