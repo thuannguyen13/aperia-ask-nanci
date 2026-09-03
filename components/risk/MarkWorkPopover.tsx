@@ -73,7 +73,12 @@ export function MarkWorkPopover({ status, size = "sm", onSubmit }: {
           </Button>
         </PopoverTrigger>
       </div>
-      <PopoverContent align="end" className="w-[440px] p-0">
+      {/* 440px runs past the right edge of any phone viewport when end-aligned — the
+          trigger row itself wraps below `sm` (RiskReport's own actions row), but this
+          content never got the same treatment, so opening it still clipped the Submit
+          button off-screen. 92vw below `sm` matches the width ChangeAuditSheet uses for
+          the same problem. */}
+      <PopoverContent align="end" className="w-[92vw] max-w-[440px] p-0">
         <div className="border-b px-4 py-3">
           <p className="text-sm font-semibold text-foreground">Mark Work and Disposition</p>
         </div>
