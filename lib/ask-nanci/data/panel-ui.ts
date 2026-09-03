@@ -83,9 +83,8 @@ export const PANEL_UI_OPTIONS: PanelUiOption[] = [
   {
     id: "c",
     name: "Swipe to open",
-    param: "",
+    param: "swipe",
     sheet: { axis: "y", lip: 40 },
-    current: true,
     blurb: "The panel never fully leaves: it rests as a handle above the composer and is swiped up to full height, swiped down to rest.",
     taps: "0 taps, one swipe",
     pros: [
@@ -138,17 +137,18 @@ export const PANEL_UI_OPTIONS: PanelUiOption[] = [
   {
     id: "f",
     name: "Bottom sheet, over the composer",
-    param: "over-bottom",
+    param: "",
     sheet: { axis: "y", lip: 32, coversComposer: true },
-    blurb: "The shipped swipe-to-open sheet taken to the bottom of the screen: full height over the composer when open, resting as a handle on top of it when not.",
+    current: true,
+    blurb: "Option C taken to the bottom of the screen: full height over the composer when open, resting as a handle on top of it when not.",
     taps: "0 taps, one swipe",
     pros: [
       "The panel gets the whole screen, not the screen minus the composer",
       "The handle sits at the bottom edge, where the thumb already is",
-      "Swiping up to open is the same gesture the shipped option uses",
+      "Swiping up to open is the same gesture option C uses",
     ],
     cons: [
-      "Two heights to design for, like the shipped option, plus a covered composer",
+      "Two heights to design for, like option C, plus a covered composer",
       "The composer cannot be reached while the panel is open",
       "Swiping up competes with scrolling the conversation",
     ],

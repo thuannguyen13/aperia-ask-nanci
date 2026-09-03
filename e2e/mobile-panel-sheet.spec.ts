@@ -33,7 +33,7 @@ const SETTLE_MS = 700
 // does not depend on how fast Playwright happened to move the pointer.
 const DRAG_PX = 260
 
-// The air ?panelui=over-bottom leaves above the composer when it rests (REST_GAP in
+// The air the shipped bottom-over-composer sheet leaves above the composer when it rests (REST_GAP in
 // use-sheet-gesture.ts). Every other presentation gets the same from the card's own
 // 12px inset; this one is lifted by a calc and has to add it back.
 const REST_GAP = 12
@@ -48,15 +48,15 @@ const PRESENTATIONS = [
   // 4px bottom inset moved it once, a 4px taller send button moved it again. Neither
   // was a regression, and both failed the suite.
   // `param: ""` is whichever option is marked current in panel-ui.ts, not whichever is
-  // listed first: the swipe presentation ships, so a minimised panel leaves its handle.
-  { name: "swipe to open", param: "", axis: "y", lip: 40 },
-  { name: "bottom sheet", param: "away", axis: "y", lip: 0 },
-  { name: "right-side drawer", param: "right", axis: "x", lip: 0 },
-  { name: "swipe from the edge", param: "edge", axis: "x", lip: 40 },
+  // listed first: the bottom sheet over the composer ships, so a minimised panel leaves its handle.
+  { name: "swipe to open", param: "swipe", axis: "y", lip: 40, covers: false },
+  { name: "bottom sheet", param: "away", axis: "y", lip: 0, covers: false },
+  { name: "right-side drawer", param: "right", axis: "x", lip: 0, covers: false },
+  { name: "swipe from the edge", param: "edge", axis: "x", lip: 40, covers: false },
   // Same card and same axis as the edge strip; the difference is that its frame runs
   // past the composer instead of stopping at it, which the test below asserts.
-  { name: "edge strip over the composer", param: "over-right", axis: "x", lip: 32 },
-  { name: "bottom sheet over the composer", param: "over-bottom", axis: "y", lip: 32 },
+  { name: "edge strip over the composer", param: "over-right", axis: "x", lip: 32, covers: true },
+  { name: "bottom sheet over the composer", param: "", axis: "y", lip: 32, covers: true },
 ] as const
 
 type Presentation = (typeof PRESENTATIONS)[number]
@@ -203,7 +203,7 @@ for (const p of PRESENTATIONS) {
       const past = p.axis === "y" ? rest.y - (frame.y + frame.height) : rest.x - PHONE.width
       expect(past, `card rests ${past}px past the clip line`).toBeGreaterThanOrEqual(40)
       expect(past, `card rests ${past}px past the clip line`).toBeLessThanOrEqual(frame.height)
-    } else if (p.param === "over-bottom") {
+    } else if (p.axis === "y" && p.covers) {
       // This one's frame ends at the screen so an open card can cover the composer, and
       // the card is lifted back above it to rest. So the lip is measured from where it
       // actually lands — the composer's top edge — rather than from the frame.
@@ -225,7 +225,7 @@ for (const p of PRESENTATIONS) {
 // deliberately ends at the screen rather than at the composer, so "the handle sits just
 // clear of the composer" is not a claim it makes. It still gets the open-position, the
 // dismiss-to-a-lip and the tap-to-reopen tests.
-for (const p of PRESENTATIONS.filter((option) => option.lip > 0 && option.param !== "over-right" && option.param !== "over-bottom")) {
+for (const p of PRESENTATIONS.filter((option) => option.lip > 0 && !option.covers)) {
   test(`${p.name}: the resting handle clears the composer and swipes back open`, async ({ page }) => {
     await gotoFlow(page, `flow=2&panelui=${p.param}`)
     await waitForOpenSheet(page)
