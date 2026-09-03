@@ -38,6 +38,8 @@ export function ChatView() {
   const pendingBot = usePendingBot()
   const { containerRef, spacerRef, lastUserMsgRef, isPinnedToBottom, scrollToBottom } =
     useChatScroll({ phase: chatState === "thinking" ? "awaiting" : chatState })
+  const pending = chatState === "streaming" && pendingBot ? pendingBot : null
+  const rendered = pending ? [...messages, pending] : messages
 
   return (
     // data-nest: the conversation is what recedes when a mobile panel sheet opens.
@@ -50,9 +52,14 @@ export function ChatView() {
       <div className="relative min-h-0 flex-1">
       <div ref={containerRef} className="h-full overflow-y-auto">
       <div className="mx-auto w-full max-w-[800px] flex flex-col gap-0 pt-4">
-        {messages.map((msg, i) => {
-          const isLastMsg = i === messages.length - 1
-          const isLastUser = isLastMsg && msg.role === "user"
+        {/* The streaming bubble is rendered inside the same list as the committed
+            messages, not after it. Its id is the id it commits under, but React only
+            matches keys within one sibling list: as a separate child after the map it
+            was torn down and rebuilt on commit, which flashed every answer once and
+            reloaded the map iframe. In the list, the node survives the handoff. */}
+        {rendered.map((msg, i) => {
+          const isPending = msg === pending
+          const isLastUser = !isPending && i === messages.length - 1 && msg.role === "user"
           return msg.role === "user" ? (
             <div key={msg.id} ref={isLastUser ? lastUserMsgRef : undefined}>
               <UserMessage message={msg} />
@@ -62,26 +69,13 @@ export function ChatView() {
               <BotMessage
                 message={msg}
                 displayedContent={msg.content}
-                showExtras={true}
+                showExtras={!isPending}
               />
             </div>
           )
         })}
 
         {chatState === "thinking" && <ThinkingIndicator />}
-
-        {/* Same wrapper + key as committed messages: pendingBot.id equals the
-            id it commits under, so React reconciles the two instead of remounting
-            (which reloaded the map iframe — a flash between turns). */}
-        {chatState === "streaming" && pendingBot && (
-          <div key={pendingBot.id}>
-            <BotMessage
-              message={pendingBot}
-              displayedContent={pendingBot.content}
-              showExtras={false}
-            />
-          </div>
-        )}
 
         <RestartDemoButton />
 
