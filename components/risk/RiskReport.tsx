@@ -56,7 +56,7 @@ function ViolationsPill({ count, m, d }: { count: number; m: RiskMerchant; d: Ri
               <span className="font-semibold text-foreground">Alert by Risk Cycle</span>{" "}
               <span className="text-muted-foreground">({RISK_VIOLATION_CYCLE})</span>
             </p>
-            <Button variant="outline" size="sm"><Download className="size-4" /> Export</Button>
+            <Button variant="outline"><Download className="size-4" /> Export</Button>
           </div>
 
           <div className="min-w-0 overflow-x-auto">
@@ -83,7 +83,7 @@ function ViolationsPill({ count, m, d }: { count: number; m: RiskMerchant; d: Ri
 
         <DialogFooter className="m-0 border-t bg-muted/40 px-6 py-4">
           <DialogClose asChild>
-            <Button variant="outline" size="sm">Close</Button>
+            <Button variant="outline">Close</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>
@@ -269,7 +269,7 @@ function QueuesPill({ count }: { count: number }) {
 
         <DialogFooter className="m-0 border-t bg-muted/40 px-6 py-4">
           <DialogClose asChild>
-            <Button variant="outline" size="sm">Close</Button>
+            <Button variant="outline">Close</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>
@@ -335,9 +335,9 @@ function NotesTab({ notes, onDelete }: { notes: NoteEntry[]; onDelete: (i: numbe
       {/* Merchant Notes */}
       <div>
         <NotesSectionHeader title="Merchant Notes">
-          <Button variant="outline" size="sm"><Settings className="size-4" /> Default Setting</Button>
-          <Button variant="outline" size="sm"><Filter className="size-4" /> Filter</Button>
-          <Button variant="outline" size="sm"><Download className="size-4" /> Export</Button>
+          <Button variant="outline"><Settings className="size-4" /> Default Setting</Button>
+          <Button variant="outline"><Filter className="size-4" /> Filter</Button>
+          <Button variant="outline"><Download className="size-4" /> Export</Button>
         </NotesSectionHeader>
 
         {notes.length ? (
@@ -355,8 +355,8 @@ function NotesTab({ notes, onDelete }: { notes: NoteEntry[]; onDelete: (i: numbe
                     <p className="mt-1 text-sm text-foreground">{n.body}</p>
                   </div>
                   <div className="flex shrink-0 gap-2">
-                    <Button variant="outline" size="icon-sm"><Pencil className="size-3.5" /></Button>
-                    <Button variant="destructive" size="icon-sm" onClick={() => onDelete(i)}><Trash2 className="size-3.5" /></Button>
+                    <Button variant="outline" size="icon"><Pencil className="size-3.5" /></Button>
+                    <Button variant="destructive" size="icon" onClick={() => onDelete(i)}><Trash2 className="size-3.5" /></Button>
                   </div>
                 </div>
               </div>
@@ -370,8 +370,8 @@ function NotesTab({ notes, onDelete }: { notes: NoteEntry[]; onDelete: (i: numbe
       {/* Case History */}
       <div>
         <NotesSectionHeader title="Case History">
-          <Button variant="outline" size="sm"><Settings className="size-4" /> Default Setting</Button>
-          <Button variant="outline" size="sm"><Filter className="size-4" /> Filter</Button>
+          <Button variant="outline"><Settings className="size-4" /> Default Setting</Button>
+          <Button variant="outline"><Filter className="size-4" /> Filter</Button>
         </NotesSectionHeader>
         <div className="rounded-lg border px-3 py-2.5 text-sm text-muted-foreground">No data to display.</div>
       </div>
@@ -483,8 +483,8 @@ export function RiskReport() {
                   <span className="text-xs text-muted-foreground">{note.length}/7,000 characters</span>
                 </div>
                 <div className="mt-2 flex justify-end gap-2">
-                  <Button variant="secondary" size="sm" onClick={() => { setNote(""); setNoteOpen(false) }}>Cancel</Button>
-                  <Button size="sm" disabled={!note.trim()} onClick={() => { addNote(note.trim()); setNote(""); setNoteOpen(false) }}>Submit</Button>
+                  <Button variant="secondary" onClick={() => { setNote(""); setNoteOpen(false) }}>Cancel</Button>
+                  <Button disabled={!note.trim()} onClick={() => { addNote(note.trim()); setNote(""); setNoteOpen(false) }}>Submit</Button>
                 </div>
               </div>
             )}
@@ -633,7 +633,7 @@ export function RiskReport() {
           <>
           <div className="mt-4 flex items-center justify-between gap-3">
             <h3 className="text-base font-semibold text-foreground">Transaction Volume Analysis</h3>
-            <Button variant="outline" size="sm"><Download className="size-4" /> Export</Button>
+            <Button variant="outline"><Download className="size-4" /> Export</Button>
           </div>
           <div className="mt-3">
             {closed ? noActivity : (
@@ -666,8 +666,8 @@ export function RiskReport() {
             <div className="flex items-center gap-2">
               {/* outline, matching the Export on the two sibling sub-views: three tabs
                   one click apart should not offer the same action in two shapes. */}
-              <Button variant="outline" size="sm"><Filter className="size-4" /> Filter</Button>
-              <Button variant="outline" size="sm"><Download className="size-4" /> Export</Button>
+              <Button variant="outline"><Filter className="size-4" /> Filter</Button>
+              <Button variant="outline"><Download className="size-4" /> Export</Button>
             </div>
           </div>
 
@@ -709,7 +709,7 @@ export function RiskReport() {
             <h3 className="text-base font-semibold text-foreground">Recent Authorizations</h3>
             <p className="text-sm text-muted-foreground">Last {RECENT_AUTHS.length} with MC scoring</p>
           </div>
-          <Button variant="outline" size="sm">View all {authTotal(m, d.txns30).toLocaleString()}</Button>
+          <Button variant="outline">View all {authTotal(m, d.txns30).toLocaleString()}</Button>
         </div>
 
         <div className="mt-3">

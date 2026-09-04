@@ -31,11 +31,11 @@ function ChartPanel({ id, title, active, dim, onAsk, children }: { id: DashChart
         <div className="flex shrink-0 items-center gap-0.5">
           {/* Second entry point to the same insight panel the takes above open. */}
           {onAsk && (
-            <Button variant="ghost" size="icon-sm" aria-label={`Ask Nanci about ${title}`} onClick={onAsk}>
+            <Button variant="ghost" size="icon" aria-label={`Ask Nanci about ${title}`} onClick={onAsk}>
               <Sparkles className="size-4 text-primary" />
             </Button>
           )}
-          <Button variant="ghost" size="icon-sm" aria-label={`More options for ${title}`}>
+          <Button variant="ghost" size="icon" aria-label={`More options for ${title}`}>
             <MoreHorizontal className="size-4 text-muted-foreground" />
           </Button>
         </div>

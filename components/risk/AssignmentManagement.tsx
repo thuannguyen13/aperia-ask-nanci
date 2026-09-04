@@ -90,7 +90,7 @@ export function AssignmentManagement() {
         <div className="ml-auto flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
           <span>Last score sync: <span className="font-medium text-foreground">{AM_INTEGRATION.lastSync}</span></span>
           <span>{AM_INTEGRATION.scored}</span>
-          <Button variant="secondary" size="sm"><SlidersVertical className="size-4" /> Configure Risk Score Band</Button>
+          <Button variant="secondary"><SlidersVertical className="size-4" /> Configure Risk Score Band</Button>
         </div>
       </div>
 
@@ -135,8 +135,8 @@ export function AssignmentManagement() {
         <div className="mb-3 flex items-center justify-between">
           <h3 className="text-base font-semibold text-foreground">Assignment List</h3>
           <div className="flex items-center gap-2">
-            <Button variant="secondary" size="sm"><SlidersHorizontal className="size-4" /> Filter</Button>
-            <Button variant="secondary" size="sm"><Download className="size-4" /> Export</Button>
+            <Button variant="secondary"><SlidersHorizontal className="size-4" /> Filter</Button>
+            <Button variant="secondary"><Download className="size-4" /> Export</Button>
           </div>
         </div>
 
@@ -167,11 +167,11 @@ export function AssignmentManagement() {
                       destructive variant: three solid red rows down a table reads as an
                       error state, not as an action you may take. */}
                   <div className="flex items-center justify-end gap-1">
-                    <Button variant="outline" size="icon-sm" aria-label={`Edit ${a.name}`}><Pencil /></Button>
-                    <Button variant="outline" size="icon-sm" aria-label={`Duplicate ${a.name}`}><Copy /></Button>
+                    <Button variant="outline" size="icon" aria-label={`Edit ${a.name}`}><Pencil /></Button>
+                    <Button variant="outline" size="icon" aria-label={`Duplicate ${a.name}`}><Copy /></Button>
                     <Button
                       variant="outline"
-                      size="icon-sm"
+                      size="icon"
                       aria-label={`Delete ${a.name}`}
                       className="border-rose-200 bg-rose-50 text-rose-500 hover:bg-rose-100 hover:text-rose-600 dark:border-rose-900 dark:bg-rose-950/30"
                     >

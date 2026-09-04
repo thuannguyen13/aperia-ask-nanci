@@ -21,7 +21,7 @@ function RestartDemoButton() {
   if (!replayFlow || !flowFinished) return null
   return (
     <div className="mt-6 flex justify-center">
-      <Button variant="secondary" size="sm" onClick={replayFlow} className="gap-1.5">
+      <Button variant="secondary" onClick={replayFlow} className="gap-1.5">
         <RotateCcw className="size-3.5" />
         Restart demo
       </Button>

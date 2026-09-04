@@ -12,7 +12,7 @@ export function DashChartCard({ id }: { id: DashChartId }) {
     <div className="mt-3 rounded-lg border bg-card">
       <div className="flex items-center gap-2.5 px-4 py-3">
         <p className="flex-1 text-sm font-semibold text-foreground">{CHART_TITLES[id]}</p>
-        <Button variant="secondary" size="sm"><Download className="size-4" /> Export</Button>
+        <Button variant="secondary"><Download className="size-4" /> Export</Button>
       </div>
       <div className="px-4 pb-4">
         <DashChart id={id} />

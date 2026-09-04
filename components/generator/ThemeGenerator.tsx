@@ -289,7 +289,7 @@ function Wall({ vars }: { vars: React.CSSProperties }) {
               <div className="flex h-8 flex-1 items-center rounded-lg border border-ring px-2.5 ring-3 ring-ring/50">
                 <span className="text-xs text-muted-foreground">Ask anything…</span>
               </div>
-              <Button size="sm">Ask</Button>
+              <Button>Ask</Button>
             </div>
             <div className="flex w-full max-w-md flex-col gap-2">
               <span className="text-[9px] font-bold uppercase tracking-[0.1em] text-muted-foreground">
@@ -347,11 +347,11 @@ function Wall({ vars }: { vars: React.CSSProperties }) {
           <CardContent>
             <div style={vars} className="flex flex-col gap-4">
             <div className="flex flex-wrap items-center gap-2">
-              <Button size="sm">Primary</Button>
-              <Button size="sm" variant="secondary">Secondary</Button>
-              <Button size="sm" variant="outline">Outline</Button>
-              <Button size="sm" disabled>Disabled</Button>
-              <Button size="sm" variant="destructive">Delete</Button>
+              <Button>Primary</Button>
+              <Button variant="secondary">Secondary</Button>
+              <Button variant="outline">Outline</Button>
+              <Button disabled>Disabled</Button>
+              <Button variant="destructive">Delete</Button>
             </div>
             <div className="flex flex-wrap items-center gap-3">
               <Badge>Badge</Badge>
@@ -730,7 +730,7 @@ export function ThemeGenerator() {
             <div className="ml-auto flex items-center gap-2">
               {/* Discards every edit by re-seeding the same preset; inert while clean. */}
               <Button
-                size="sm"
+               
                 variant="outline"
                 disabled={!dirty}
                 onClick={() => setSeedNonce((n) => n + 1)}
@@ -741,7 +741,7 @@ export function ThemeGenerator() {
               </Button>
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button size="sm" variant="outline" className="focus-visible:border-foreground focus-visible:ring-foreground/20">
+                  <Button variant="outline" className="focus-visible:border-foreground focus-visible:ring-foreground/20">
                     <Code className="size-3.5" />
                     View CSS
                   </Button>
@@ -757,14 +757,14 @@ export function ThemeGenerator() {
                     {css}
                   </pre>
                   <DialogFooter>
-                    <Button size="sm" onClick={copy} className="bg-foreground text-background hover:bg-foreground/90">
+                    <Button onClick={copy} className="bg-foreground text-background hover:bg-foreground/90">
                       {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
                       {copied ? "Copied" : "Copy CSS"}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
-              <Button size="sm" onClick={copy} className="bg-foreground text-background hover:bg-foreground/90">
+              <Button onClick={copy} className="bg-foreground text-background hover:bg-foreground/90">
                 {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
                 {copied ? "Copied" : "Copy CSS"}
               </Button>

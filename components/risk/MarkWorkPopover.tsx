@@ -117,8 +117,8 @@ export function MarkWorkPopover({ status, size = "sm", onSubmit }: {
         </RadioGroup>
 
         <div className="flex justify-end gap-2 px-4 pb-3">
-          <Button variant="secondary" size="sm" onClick={() => setOpen(false)}>Cancel</Button>
-          <Button size="sm" disabled={!choice} onClick={() => { onSubmit(choice, note); setOpen(false) }}>Submit</Button>
+          <Button variant="secondary" onClick={() => setOpen(false)}>Cancel</Button>
+          <Button disabled={!choice} onClick={() => { onSubmit(choice, note); setOpen(false) }}>Submit</Button>
         </div>
       </PopoverContent>
     </Popover>

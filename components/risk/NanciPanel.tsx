@@ -164,7 +164,7 @@ export function NanciPanel({ panelId, prompt }: { panelId: string; prompt: strin
           />
           <div className="flex items-center justify-between px-2 pb-2">
             <ChatActiveSources sources={sources.filter((s) => s.active)} />
-            <Button size="icon-sm" disabled={!value.trim() || busy} onClick={() => ask(value)} aria-label="Send">
+            <Button size="icon" disabled={!value.trim() || busy} onClick={() => ask(value)} aria-label="Send">
               <ArrowUp />
             </Button>
           </div>

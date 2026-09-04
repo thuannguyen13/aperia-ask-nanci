@@ -86,8 +86,8 @@ export function BarometerReport() {
           {/* The 224px search box plus both buttons is wider than a phone, so the
               row wraps and the box takes the full width it lands on. */}
           <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
-            <Button variant="secondary" size="sm"><SlidersHorizontal className="size-4" /> Filter</Button>
-            <Button variant="secondary" size="sm"><Download className="size-4" /> Export</Button>
+            <Button variant="secondary"><SlidersHorizontal className="size-4" /> Filter</Button>
+            <Button variant="secondary"><Download className="size-4" /> Export</Button>
             <div className="relative w-full sm:w-auto">
               <Search className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
               <Input

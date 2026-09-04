@@ -126,11 +126,11 @@ export function ResponsiveLab() {
                     {o.current && <Badge>Ships today</Badge>}
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
-                    <Button size="sm" variant="outline" onClick={() => copy(o)}>
+                    <Button variant="outline" onClick={() => copy(o)}>
                       {copied === o.id ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
                       {copied === o.id ? "Copied" : "Copy link"}
                     </Button>
-                    <Button size="sm" asChild>
+                    <Button asChild>
                       <a href={url(o.param)} target="_blank" rel="noreferrer">
                         Launch
                         <ArrowUpRight className="size-3.5" />
@@ -312,7 +312,7 @@ function ChartsOnMobile() {
       <CardHeader>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <CardTitle className="text-base">Charts</CardTitle>
-          <Button size="sm" variant="outline" asChild>
+          <Button variant="outline" asChild>
             <a href="/charts" target="_blank" rel="noreferrer">
               View all chart specimens
               <ArrowUpRight className="size-3.5" />

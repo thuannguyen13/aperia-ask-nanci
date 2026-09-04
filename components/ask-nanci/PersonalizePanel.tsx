@@ -50,7 +50,7 @@ function SourceRow({ source, onToggle, onRemove }: { source: Source; onToggle: (
     <div className={`flex items-center gap-3 py-2.5 ${!source.active ? "opacity-50" : ""}`}>
       {isBuiltIn
         ? <div className="size-6 shrink-0" />
-        : <Switch size="sm" checked={source.active} onCheckedChange={onToggle} />
+        : <Switch checked={source.active} onCheckedChange={onToggle} />
       }
       <div className="flex flex-1 items-center gap-2 min-w-0">
         {source.kind === "file" ? <FileTypeIcon name={source.name} /> : <SourceIcon source={source} size="lg" />}
@@ -62,7 +62,7 @@ function SourceRow({ source, onToggle, onRemove }: { source: Source; onToggle: (
         </div>
       </div>
       {!isBuiltIn && (
-        <Button variant="ghost" size="icon-sm" onClick={onRemove}>
+        <Button variant="ghost" size="icon" onClick={onRemove}>
           <X className="size-4" />
         </Button>
       )}
@@ -98,7 +98,7 @@ export function PersonalizePanel() {
       {/* Header */}
       <div className="flex shrink-0 items-center justify-between px-4 py-3">
         <h2 className="text-base font-semibold text-foreground">Personalize Ask Nanci</h2>
-        <Button variant="ghost" size="icon-sm" onClick={() => setKbOpen(false)}>
+        <Button variant="ghost" size="icon" onClick={() => setKbOpen(false)}>
           <X className="size-4" />
         </Button>
       </div>
@@ -121,10 +121,10 @@ export function PersonalizePanel() {
                     </p>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" className="flex-1" onClick={() => setWizardOpen(true)}>
+                    <Button className="flex-1" onClick={() => setWizardOpen(true)}>
                       Link Accounts
                     </Button>
-                    {/* <Button size="sm" variant="secondary" className="flex-1" onClick={() => fileRef.current?.click()}>
+                    {/* <Button variant="secondary" className="flex-1" onClick={() => fileRef.current?.click()}>
                       Upload File
                     </Button> */}
                   </div>

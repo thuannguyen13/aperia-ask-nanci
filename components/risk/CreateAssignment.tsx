@@ -300,13 +300,13 @@ export function CreateAssignment({ onCancel, onSubmit }: { onCancel: () => void;
         <Separator />
         <div className={cn("flex shrink-0 items-center gap-2 px-4 py-3", assistant ? "justify-between" : "justify-end")}>
           {assistant && (
-            <Button variant="outline" size="sm" className="text-primary" onClick={() => setReview(true)}>
+            <Button variant="outline" className="text-primary" onClick={() => setReview(true)}>
               <Sparkles className="size-4" /> Review with Ask Nanci
             </Button>
           )}
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" onClick={onCancel}>Cancel</Button>
-            <Button size="sm" onClick={() => onSubmit(name)}>Submit</Button>
+            <Button variant="ghost" onClick={onCancel}>Cancel</Button>
+            <Button onClick={() => onSubmit(name)}>Submit</Button>
           </div>
         </div>
       </div>

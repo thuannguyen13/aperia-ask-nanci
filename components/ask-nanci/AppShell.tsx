@@ -31,7 +31,7 @@ function ReplayButton() {
   // stays hidden while the script is thinking/streaming.
   if (!replayFlow || chatState !== "idle") return null
   return (
-    <Button variant="secondary" size="xs" onClick={replayFlow} className="absolute right-3 gap-1.5">
+    <Button variant="secondary" onClick={replayFlow} className="absolute right-3 gap-1.5">
       <RotateCcw className="size-3" />
       Ask
     </Button>

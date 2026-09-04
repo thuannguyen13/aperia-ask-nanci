@@ -121,9 +121,9 @@ export function QueueSummaryCard({ queue = DETECTION_QUEUE, onBarometer, live = 
           {/* Only a queue with a drill-in handler is actionable. The others keep the
               same chrome but are inert — nothing behind them in the demo. */}
           <div className={cn("flex items-center gap-2", !onBarometer && "pointer-events-none")} aria-hidden={!onBarometer}>
-            <Button variant="outline" size="sm" tabIndex={onBarometer ? undefined : -1}>Security Report</Button>
-            <Button variant="default" size="sm" onClick={onBarometer} tabIndex={onBarometer ? undefined : -1}>Barometer Report</Button>
-            <Button variant="outline" size="icon-sm" tabIndex={onBarometer ? undefined : -1}><Settings className="size-4" /></Button>
+            <Button variant="outline" tabIndex={onBarometer ? undefined : -1}>Security Report</Button>
+            <Button variant="default" onClick={onBarometer} tabIndex={onBarometer ? undefined : -1}>Barometer Report</Button>
+            <Button variant="outline" size="icon" tabIndex={onBarometer ? undefined : -1}><Settings className="size-4" /></Button>
           </div>
         </div>
       )}

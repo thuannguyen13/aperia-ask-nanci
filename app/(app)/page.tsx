@@ -54,7 +54,7 @@ function WelcomeView() {
                 </CardDescription>
               </div>
             </div>
-            <Button size="sm" className="shrink-0 max-sm:w-full" onClick={() => setKbOpen(true)}>
+            <Button className="shrink-0 max-sm:w-full" onClick={() => setKbOpen(true)}>
               Link Accounts
             </Button>
           </CardContent>
@@ -78,7 +78,7 @@ function WelcomeView() {
                     <p className="text-sm text-muted-foreground">Continue a previous conversation.</p>
                   </div>
                 </div>
-                <Button variant="secondary" size="sm">View All</Button>
+                <Button variant="secondary">View All</Button>
               </div>
 
               <div className="overflow-hidden rounded-[14px] border">

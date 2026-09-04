@@ -258,10 +258,10 @@ export function Sidebar({ menu, search, logos, hoverNav = true, initialPinned = 
                   </p>
                 </div>
                 <div className="flex gap-1">
-                  <Button data-tour="link-accounts" className="flex-1 mt-3" size="sm" onClick={() => setWizardOpen(true)}>
+                  <Button data-tour="link-accounts" className="flex-1 mt-3" onClick={() => setWizardOpen(true)}>
                   Link Accounts
                 </Button>
-                <Button className=" mt-3" variant="secondary" size="icon-sm" onClick={() => setKbOpen(true)}>
+                <Button className=" mt-3" variant="secondary" size="icon" onClick={() => setKbOpen(true)}>
                   <Settings />
                 </Button>
                 </div>

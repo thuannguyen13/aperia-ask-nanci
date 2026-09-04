@@ -69,7 +69,7 @@ export function PlanUsageChip({ demo }: { demo?: PlanUsageDemo }) {
         </div>
         <Button
           variant="ghost"
-          size="icon-xs"
+          size="icon"
           aria-label="Close"
           className="absolute top-2 right-2"
           onClick={() => setOpen(false)}
