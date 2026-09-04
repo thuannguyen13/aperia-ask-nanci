@@ -31,8 +31,25 @@ export function useAppTheme(theme: ThemeId) {
     const previous = meta.content
     if (tint) meta.content = tint
 
+    // Safari's other source for the tint, and on a phone the only one: iOS Safari
+    // paints the status bar area with the document background colour, which WebKit
+    // computes as the body's background over the root's. The design system paints the
+    // body opaque white, so the root alone changes nothing; both have to carry the
+    // tint. The frame covers the whole viewport, so nothing on the page changes; only
+    // what Safari samples does.
+    const root = document.documentElement.style
+    const body = document.body.style
+    const previousRootBackground = root.backgroundColor
+    const previousBodyBackground = body.backgroundColor
+    if (tint) {
+      root.backgroundColor = tint
+      body.backgroundColor = tint
+    }
+
     return () => {
       delete document.documentElement.dataset.theme
+      root.backgroundColor = previousRootBackground
+      body.backgroundColor = previousBodyBackground
       if (owned) meta.remove()
       else meta.content = previous
     }
