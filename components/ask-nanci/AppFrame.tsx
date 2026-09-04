@@ -11,11 +11,12 @@ export function useAppTheme(theme: ThemeId) {
   useEffect(() => {
     document.documentElement.dataset.theme = theme
 
-    // iOS Safari tints its toolbars from <meta name="theme-color">, and with no tag
-    // it samples the page background — white — so the browser chrome reads as a
-    // broken band above the brand bar. Take the colour from the gradient stop the
-    // frame actually paints (same shape every block in globals.css uses) so the two
-    // can never drift; --primary covers a theme that ships no gradient.
+    // Safari tints its toolbars from <meta name="theme-color">. The root layout renders
+    // the tag with the default theme so the first paint already carries it (iOS reads
+    // it then and not later); this re-tints it for the theme the mode actually picked.
+    // Take the colour from the gradient stop the frame actually paints (same shape
+    // every block in globals.css uses) so the two can never drift; --primary covers a
+    // theme that ships no gradient.
     const cs = getComputedStyle(document.documentElement)
     const start = cs.getPropertyValue("--app-gradient").match(/linear-gradient\(180deg,\s*(.+?)\s+0%/)
     const tint = (start?.[1] ?? cs.getPropertyValue("--primary")).trim()
