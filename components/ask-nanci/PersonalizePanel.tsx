@@ -104,7 +104,8 @@ export function PersonalizePanel() {
       </div>
 
       {/* Body */}
-      <ScrollArea className="flex-1">
+      {/* min-h-0: see the grid's ScrollArea in ServiceMarketplacePanel. */}
+      <ScrollArea className="min-h-0 flex-1">
         <div className="flex flex-col gap-5 p-4 pt-0 pt-[1px]">
 
           {/* Add Sources card */}

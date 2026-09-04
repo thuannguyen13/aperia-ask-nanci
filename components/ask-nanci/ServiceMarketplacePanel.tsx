@@ -73,11 +73,19 @@ export function ServiceMarketplacePanel() {
   return (
     <div className={cn("min-w-0 flex-1 gap-1", marketplaceOpen ? "flex" : "hidden")}>
     <div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-xl border bg-background md:rounded-2xl">
-      {/* Empty 48px header bar, as in the design — the view is left via the sidebar. */}
-      <div className="h-12 shrink-0" />
+      {/* md:pt-12 is the empty 48px header bar of the design, where the view is left via
+          the sidebar. Padding on the scroll area's root rather than a spacer element:
+          the root does not scroll, so the gap holds still like a header would. On a
+          phone the brand bar sits directly above and a blank 48px bar reads as a gap,
+          so the content carries an ordinary 24px top inset instead, the same as the
+          chat view's phone padding, and it scrolls away with the page.
 
-      <ScrollArea className="flex-1">
-        <div className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-6 pb-12">
+          min-h-0: a flex child defaults to min-height auto and grows to its content, so
+          without it the grid ran past the column and the clipped overflow had nothing
+          to scroll. Fits on desktop, where three columns are short; a phone's single
+          column is not. */}
+      <ScrollArea className="min-h-0 flex-1 md:pt-12">
+        <div className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-6 pt-6 pb-12 md:pt-0">
           <div className="flex flex-col gap-2">
             <h1 className="text-2xl font-medium text-foreground">{MARKETPLACE_TITLE}</h1>
             <p className="text-sm text-muted-foreground">{MARKETPLACE_INTRO}</p>
