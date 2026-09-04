@@ -1784,7 +1784,7 @@
     </svg>
     <div class="wrap">
       <div class="hero-inner">
-        <p class="eyebrow">Ask Nanci · 3 September 2026</p>
+        <p class="eyebrow">Ask Nanci · 4 September 2026</p>
         <h1>Mobile adaptation checklist</h1>
         <p class="hero-sub">Guidance for adapting Ask Nanci to mobile. Every item is for both design and
           development.</p>
@@ -1970,10 +1970,33 @@
             <tr>
               <td class="tt-num">4</td>
               <td class="tt-prio"><span class="tt-pill tt-pill--opt">Optional</span></td>
-              <td class="tt-what"><strong>Controls are at least 32px on a phone.</strong> Set it in the size variant so
-                the control itself grows on touch and not only its tap area</td>
-              <td>The 44px rule fixes the tap area but not what the user sees. A 24px control is hard to aim at even
-                when its tap area is bigger</td>
+              <td class="tt-what"><strong>Controls are at least 32px.</strong> Use the default size or larger on both
+                screens rather than the two smallest</td>
+              <td>The 44px rule fixes the tap area but not what the user sees, and a 24px control is hard to aim at even
+                when its tap area is bigger. One size for both screens also means nothing has to grow on touch</td>
+            </tr>
+            <tr>
+              <td class="tt-num">5</td>
+              <td class="tt-prio"><span class="tt-pill tt-pill--opt">Optional</span></td>
+              <td class="tt-what"><strong>Return inserts a line break on a phone.</strong> Send from the button rather than from the keyboard
+                return key</td>
+              <td>A phone keyboard has no Shift. A return that sends makes a two-line question impossible to type</td>
+            </tr>
+            <tr>
+              <td class="tt-num">6</td>
+              <td class="tt-prio"><span class="tt-pill tt-pill--opt">Optional</span></td>
+              <td class="tt-what"><strong>A tap shows it landed.</strong> Give every control a pressed state rather than relying on its hover
+                state</td>
+              <td>Hover never fires on a touch screen. A control with no pressed state gives no sign the tap was received and the
+                user taps again</td>
+            </tr>
+            <tr>
+              <td class="tt-num">7</td>
+              <td class="tt-prio"><span class="tt-pill tt-pill--opt">Optional</span></td>
+              <td class="tt-what"><strong>A double tap on a control does not zoom.</strong> Turn off double-tap zoom on the controls rather than
+                on the whole page</td>
+              <td>A fast second tap on a button or a tab is read as a zoom gesture. The page jumps in and the user has to pinch
+                back out</td>
             </tr>
           </tbody>
         </table>
@@ -2146,6 +2169,14 @@
             </tr>
             <tr>
               <td class="tt-num">4</td>
+              <td class="tt-prio"><span class="tt-pill tt-pill--req">Required</span></td>
+              <td class="tt-what"><strong>The chat input rises with the keyboard.</strong> Lift the input and the conversation above the keyboard
+                rather than letting the browser pan to the field</td>
+              <td>A phone keyboard covers the bottom third of the screen. The browser pans to keep the caret visible and the
+                answer being read slides off the top</td>
+            </tr>
+            <tr>
+              <td class="tt-num">5</td>
               <td class="tt-prio"><span class="tt-pill tt-pill--opt">Optional</span></td>
               <td class="tt-what"><strong>A long list can be searched.</strong> Give the user a way to find one row
                 rather than paging to it</td>
@@ -2569,7 +2600,7 @@
           </defs>
         </svg>
       </div>
-      <p>Mobile Adaptation · Ask Nanci · 3 September 2026</p>
+      <p>Mobile Adaptation · Ask Nanci · 4 September 2026</p>
     </div>
   </footer>
 
