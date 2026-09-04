@@ -10,6 +10,7 @@ import { ExplorePrompts } from "@/components/ask-nanci/ExplorePrompts"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { ConceptWelcomeView } from "@/components/ask-nanci/concept/ConceptWelcomeView"
 import { useComposerInset } from "@/components/ask-nanci/use-composer-inset"
+import { useKeyboardInset } from "@/components/ask-nanci/use-keyboard-inset"
 
 function WelcomeView() {
   const { sessions, resumeSession, setKbOpen, sources, isEmbed } = useAskNanci()
@@ -109,6 +110,9 @@ function WelcomeView() {
 export default function AskNanciPage() {
   const { view, startNewChat, isEmbed, catalog, embedVariant } = useAskNanci()
   const composerRef = useComposerInset()
+  // Mounted here rather than in the sheet: the composer is what has to clear the
+  // keyboard, and it exists in every mode, sheet or no sheet.
+  useKeyboardInset()
 
   if (view === "chat") {
     return (
@@ -133,11 +137,18 @@ export default function AskNanciPage() {
             dim reaches the bottom of the screen. CSS rather than a React flag, so
             mid-drag and the settle the card reads as tucking under a fill that is
             still there, instead of being sliced at an invisible line the frame clips
-            at while the fill has already snapped solid. */}
+            at while the fill has already snapped solid.
+
+            The bottom padding grows by the keyboard (--keyboard-h, use-keyboard-inset).
+            The shell is a fixed 100dvh, and a phone keyboard does not shrink it: the
+            browser pans to the focused field instead and the answer being read slides
+            off the top. Padding rather than margin, because padding changes the
+            composer's box and that is what use-composer-inset observes: the sheet's
+            resting handle follows the composer up without a second channel. */}
         <div
           ref={composerRef}
           data-composer
-          className="relative z-30 shrink-0 px-2 pb-2 md:px-4 md:pb-4"
+          className="relative z-30 shrink-0 px-2 pb-[calc(var(--spacing)*2+var(--keyboard-h,0px))] md:px-4 md:pb-[calc(var(--spacing)*4+var(--keyboard-h,0px))]"
         >
           <div className="mx-auto w-full max-w-[800px]">
             <ChatInput />

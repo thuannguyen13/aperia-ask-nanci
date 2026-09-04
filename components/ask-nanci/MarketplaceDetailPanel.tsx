@@ -18,7 +18,7 @@ export function VendorLogo({ className = "h-4 w-auto" }: { className?: string })
   const [errored, setErrored] = useState(false)
   if (errored) return <span className="text-sm font-medium text-foreground">{MARKETPLACE_VENDOR.name}</span>
   return (
-    <img src={MARKETPLACE_VENDOR.logo} alt={MARKETPLACE_VENDOR.name} className={className} onError={() => setErrored(true)} />
+    <img src={MARKETPLACE_VENDOR.logo} alt={MARKETPLACE_VENDOR.name} width={34} height={20} className={className} onError={() => setErrored(true)} />
   )
 }
 

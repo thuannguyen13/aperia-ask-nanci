@@ -1337,6 +1337,8 @@
       color: var(--med-gray)
     }
 
+
+
     .tt-link {
       color: var(--aperia-blue);
       text-decoration: none;
@@ -1735,7 +1737,7 @@
       <ul class="nav-links">
         <li><a href="#why">Principles</a></li>
         <li><a href="#typography">Typography</a></li>
-        <li><a href="#sizing">Sizing</a></li>
+        <li><a href="#sizing">Controls</a></li>
         <li><a href="#overlays">Overlays</a></li>
         <li><a href="#screens">Screens</a></li>
         <li><a href="#charts">Charts</a></li>
@@ -1753,7 +1755,7 @@
     <ul>
       <li><a href="#why">01 · Principles</a></li>
       <li><a href="#typography">02 · Typography</a></li>
-      <li><a href="#sizing">03 · Sizing</a></li>
+      <li><a href="#sizing">03 · Controls</a></li>
       <li><a href="#overlays">04 · Overlays</a></li>
       <li><a href="#screens">05 · Screens</a></li>
       <li><a href="#charts">06 · Charts</a></li>
@@ -1784,8 +1786,8 @@
       <div class="hero-inner">
         <p class="eyebrow">Ask Nanci · 3 September 2026</p>
         <h1>Mobile adaptation checklist</h1>
-        <p class="hero-sub">Guidance for adapting Ask Nanci to mobile. Every item is for both design and development. The demo is a
-          preview of the app once every item is applied.</p>
+        <p class="hero-sub">Guidance for adapting Ask Nanci to mobile. Every item is for both design and
+          development.</p>
       </div>
     </div>
   </header>
@@ -1919,13 +1921,13 @@
     </div>
   </section>
 
-  <!-- 03 · SIZING -->
+  <!-- 03 · CONTROLS -->
   <section id="sizing">
     <div class="wrap">
       <div class="chapter">
         <div class="chapter-head">
-          <h2>Sizing</h2>
-          <p class="lede">How big controls are drawn and how much of them answers a touch.</p>
+          <h2>Controls</h2>
+          <p class="lede">How controls are drawn and how they answer a touch.</p>
         </div>
       </div>
 
@@ -1953,12 +1955,20 @@
               <td class="tt-num">2</td>
               <td class="tt-prio"><span class="tt-pill tt-pill--req">Required</span></td>
               <td class="tt-what"><strong>Detect touch instead of screen width.</strong> Use Tailwind's <span
-                  class="mono">pointer-coarse:</span> variant to apply the 44px rule</td>
-              <td>A touchscreen laptop needs the bigger target and a mouse-driven phone does not. Width cannot tell
-                them apart but <span class="mono">pointer-coarse:</span> asks the device directly</td>
+                  class="mono">any-pointer-coarse:</span> variant to apply the 44px rule</td>
+              <td>A touchscreen laptop needs the bigger target and width cannot tell it apart from a laptop without one.
+                <span class="mono">any-pointer-coarse:</span> asks the device whether it has a touchscreen at all</td>
             </tr>
             <tr>
               <td class="tt-num">3</td>
+              <td class="tt-prio"><span class="tt-pill tt-pill--req">Required</span></td>
+              <td class="tt-what"><strong>Nothing is hover only.</strong> Whatever a hover reveals answers a tap as
+                well</td>
+              <td>A phone has no hover, so a label or a value behind one cannot be reached at all. Tailwind hides every
+                <span class="mono">hover:</span> style on a touch device rather than firing it on tap</td>
+            </tr>
+            <tr>
+              <td class="tt-num">4</td>
               <td class="tt-prio"><span class="tt-pill tt-pill--opt">Optional</span></td>
               <td class="tt-what"><strong>Controls are at least 32px on a phone.</strong> Set it in the size variant so
                 the control itself grows on touch and not only its tap area</td>
@@ -2043,17 +2053,18 @@
             <tr>
               <td class="tt-num">1</td>
               <td class="tt-prio"><span class="tt-pill tt-pill--req">Required</span></td>
-              <td class="tt-what"><strong>An open overlay hides what is behind it.</strong> Mark everything behind it
-                inert and not only visually covered</td>
-              <td>A screen reader reads through a visual overlay and the user hears two screens at once</td>
+              <td class="tt-what"><strong>An open overlay hides the content behind it.</strong> Mark it inert and not only
+                visually covered. The bar that holds the navigation toggle stays live</td>
+              <td>A screen reader reads through a visual overlay and reaches content the user cannot see. The toggle has
+                to stay reachable or the overlay traps them</td>
             </tr>
             <tr>
               <td class="tt-num">2</td>
               <td class="tt-prio"><span class="tt-pill tt-pill--req">Required</span></td>
               <td class="tt-what"><strong>New content announces itself instead of taking the screen.</strong> Show a
-                signal the user can act on. Signal once and then stop</td>
-              <td>The user is usually reading when it arrives. Opening over them loses the place they were in, and a
-                signal that repeats becomes a notification</td>
+                signal the user can act on</td>
+              <td>The user is usually reading when it arrives and opening over them loses their place. Keep the signal
+                brief so it does not interrupt what they are doing</td>
             </tr>
             <tr>
               <td class="tt-num">3</td>
@@ -2118,20 +2129,20 @@
             <tr>
               <td class="tt-num">2</td>
               <td class="tt-prio"><span class="tt-pill tt-pill--req">Required</span></td>
-              <td class="tt-what"><strong>Every screen can be reached on a phone.</strong> Give the navbar a phone form
+              <td class="tt-what"><strong>Every screen can be reached on a phone.</strong> Give the sidebar a phone form
                 rather than leaving it as it is on desktop</td>
-              <td>A desktop navbar does not fit at phone width and any screen linked only from it becomes
-                unreachable. It is the main navigation so its phone form has to be within reach from every screen and
-                not only from the first one</td>
+              <td>A desktop sidebar does not fit at phone width and any screen linked only from it becomes unreachable.
+                It is the main navigation so its phone form has to be within reach from every screen and not only from
+                the first one</td>
             </tr>
             <tr>
               <td class="tt-num">3</td>
               <td class="tt-prio"><span class="tt-pill tt-pill--req">Required</span></td>
-              <td class="tt-what"><strong>No screen scrolls sideways as a page.</strong> Let the layout stack and keep
-                sideways scrolling inside a table frame</td>
-              <td>A page wider than the screen hides content off the right edge with nothing to show it is there. It
-                usually comes from a fixed width or an element that cannot wrap, so the fix belongs in the layout and
-                not in a scroll container</td>
+              <td class="tt-what"><strong>Nothing is clipped at the narrowest screen.</strong> Let the layout stack and
+                keep sideways scrolling inside a table frame</td>
+              <td>The app never scrolls as a page, so anything wider than the screen is cut off at the edge with no
+                scrollbar to find it. It usually comes from a fixed width or an element that cannot wrap, so the fix
+                belongs in the layout and not in a scroll container</td>
             </tr>
             <tr>
               <td class="tt-num">4</td>
@@ -2186,28 +2197,6 @@
             </tr>
             <tr>
               <td class="tt-num">3</td>
-              <td class="tt-prio"><span class="tt-pill tt-pill--req">Required</span></td>
-              <td class="tt-what"><strong>Nothing is hover only.</strong> Whatever a hover reveals answers a tap as
-                well</td>
-              <td>A phone has no hover so a hover-only value cannot be read at all</td>
-            </tr>
-            <tr>
-              <td class="tt-num">4</td>
-              <td class="tt-prio"><span class="tt-pill tt-pill--req">Required</span></td>
-              <td class="tt-what"><strong>A long label is not cut off at the chart edge.</strong> Add margin where labels
-                are long or turned</td>
-              <td>The default margin fits a number and not a word so a turned month name runs past the edge and is
-                clipped</td>
-            </tr>
-            <tr>
-              <td class="tt-num">5</td>
-              <td class="tt-prio"><span class="tt-pill tt-pill--opt">Optional</span></td>
-              <td class="tt-what"><strong>Every chart behaves the same way on a phone.</strong> Set margins and legend
-                placement in the shared chart container and not on each chart</td>
-              <td>Values retyped in each chart drift apart as they are edited. A new chart starts with none of them</td>
-            </tr>
-            <tr>
-              <td class="tt-num">6</td>
               <td class="tt-prio"><span class="tt-pill tt-pill--opt">Optional</span></td>
               <td class="tt-what"><strong>The legend sits below the chart.</strong> Keep it outside the plot rather than
                 floating it inside</td>
@@ -2215,7 +2204,7 @@
                 the plot</td>
             </tr>
             <tr>
-              <td class="tt-num">7</td>
+              <td class="tt-num">4</td>
               <td class="tt-prio"><span class="tt-pill tt-pill--opt">Optional</span></td>
               <td class="tt-what"><strong>A dense chart can be opened full screen.</strong> Give the user a way to expand
                 it instead of shrinking the data to fit</td>
@@ -2491,10 +2480,11 @@
       <div class="chapter">
         <div class="chapter-head">
           <h2>Resources</h2>
-          <p class="lede">Published guidance behind the three principles.</p>
+          <p class="lede">Where the principles come from and what the build is made of.</p>
         </div>
       </div>
 
+      <div class="block-label">Behind the principles</div>
       <div class="gap-list">
         <div><a class="tt-link" href="https://www.nngroup.com/articles/touch-target-size/">Touch Targets on
             Touchscreens</a>, Nielsen Norman Group. A target of at least 1cm, because a thumb covers about 2.5cm, and
@@ -2514,6 +2504,37 @@
         <div><a class="tt-link" href="https://www.w3.org/WAI/WCAG21/Understanding/reflow.html">Reflow, Success Criterion
             1.4.10</a>, Web Content Accessibility Guidelines. Content at 320px with no sideways scrolling and nothing
           lost.</div>
+      </div>
+
+      <div class="block-label">For the build</div>
+      <div class="gap-list">
+        <div><a class="tt-link" href="https://tailwindcss.com/docs/hover-focus-and-other-states">Hover, focus and other
+            states</a>, Tailwind. The <span class="mono">any-pointer-coarse</span> and <span
+            class="mono">pointer-coarse</span> variants, and why a <span class="mono">hover:</span> style does not fire
+          on a touch device.</div>
+        <div><a class="tt-link" href="https://tailwindcss.com/docs/responsive-design">Responsive design</a>, Tailwind.
+          Breakpoints are mobile first, so the bare class is the phone size and a prefix steps up from there.</div>
+        <div><a class="tt-link" href="https://developer.mozilla.org/en-US/docs/Web/CSS/@media/any-pointer">any-pointer</a>,
+          MDN. Matches a device that has a touchscreen at all, where <span class="mono">pointer</span> reports only the
+          primary input.</div>
+        <div><a class="tt-link" href="https://developer.mozilla.org/en-US/docs/Web/CSS/env">env()</a>, MDN. The
+          safe-area insets, which resolve to zero until the viewport sets <span class="mono">viewport-fit=cover</span>.
+        </div>
+        <div><a
+            href="https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Global_attributes/inert" class="tt-link">inert</a>,
+          MDN. Takes everything behind an overlay out of focus order and out of the accessibility tree.</div>
+        <div><a class="tt-link" href="https://ui.shadcn.com/docs/components/drawer">Drawer</a> and <a class="tt-link"
+            href="https://ui.shadcn.com/docs/components/tabs">Tabs</a>, shadcn. The components the design system builds
+          on, including the responsive Dialog and Drawer pattern.</div>
+        <div><a class="tt-link" href="https://vaul.emilkowal.ski/">Vaul</a>. The drawer behind the bottom sheet: drag to
+          dismiss, snap points and what it does with the page behind it.</div>
+        <div><a class="tt-link" href="https://recharts.org/">Recharts</a>. Axis tick behaviour, margins and the
+          responsive container the charts are drawn with.</div>
+        <div><a class="tt-link"
+            href="https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html">Target Size (Minimum), Success
+            Criterion 2.5.8</a>, Web Content Accessibility Guidelines. The 24px floor the 44px rule clears.</div>
+        <div><a class="tt-link" href="https://developer.apple.com/design/human-interface-guidelines/layout">Layout</a>,
+          Apple Human Interface Guidelines. Where the 44pt minimum comes from.</div>
       </div>
     </div>
   </section>

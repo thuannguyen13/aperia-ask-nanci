@@ -40,12 +40,16 @@ export function OfferVerifyStep({ body, email, onConfirm }: { body: string; emai
 // Brand logo with an icon fallback: shows the offer's `logo` image if it loads,
 // otherwise the provided monogram. Images are optional — the panels look complete
 // whether or not the art has been dropped into public/<flow>-offer/.
-export function OfferLogo({ src, alt, fallback, className }: { src?: string; alt: string; fallback: React.ReactNode; className?: string }) {
+// `width`/`height` are the box the call site draws, the same numbers as its size
+// classes: they let the browser lay the box out before the file arrives. The files
+// themselves are exported at about three times that box, enough for a 3x screen;
+// one of them used to be a 5MB print-resolution PNG decoded in full on every phone.
+export function OfferLogo({ src, alt, fallback, className, width, height }: { src?: string; alt: string; fallback: React.ReactNode; className?: string; width: number; height: number }) {
   const [errored, setErrored] = useState(false)
   return (
     <div className={cn("flex shrink-0 items-center justify-center overflow-hidden rounded-md border bg-white", className)}>
       {src && !errored
-        ? <img src={src} alt={alt} className="size-full object-contain p-1" onError={() => setErrored(true)} />
+        ? <img src={src} alt={alt} width={width} height={height} className="size-full object-contain p-1" onError={() => setErrored(true)} />
         : fallback}
     </div>
   )

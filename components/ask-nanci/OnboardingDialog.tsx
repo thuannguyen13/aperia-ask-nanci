@@ -123,7 +123,9 @@ export function OnboardingDialog() {
 
               {/* Right panel — illustration */}
               <div className="flex-1 overflow-hidden relative rounded-xl border-l border-y max-sm:h-36 max-sm:flex-none max-sm:rounded-none max-sm:border-x-0 max-sm:border-t-0">
-                <Image src="/onboarding/onboarding-thumbnail.png" alt="" fill className="object-cover object-center sm:object-left-top" />
+                {/* `sizes` is what `fill` needs to pick a candidate: without it the optimizer assumes
+                    the image spans the viewport and serves the largest one it has. */}
+                <Image src="/onboarding/onboarding-thumbnail.png" alt="" fill sizes="(max-width: 640px) 100vw, 320px" className="object-cover object-center sm:object-left-top" />
               </div>
             </div>
           ) : (

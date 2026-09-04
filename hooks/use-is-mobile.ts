@@ -26,3 +26,22 @@ export function useIsMobile() {
 
   return isMobile
 }
+
+// Whether the primary input is a finger, which is the only reliable proxy for "this
+// keyboard is a soft keyboard". `pointer` rather than `any-pointer` on purpose: a
+// laptop with a touchscreen still types on hardware keys, so it keeps the desktop
+// behaviour. The 44px tap rule makes the opposite choice for the opposite reason
+// (globals.css) — there, any touch input at all earns the bigger target.
+export function useSoftKeyboard() {
+  const [soft, setSoft] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia("(pointer: coarse)")
+    const sync = () => setSoft(mq.matches)
+    sync()
+    mq.addEventListener("change", sync)
+    return () => mq.removeEventListener("change", sync)
+  }, [])
+
+  return soft
+}

@@ -38,7 +38,7 @@ export function PlanUsageChip({ demo }: { demo?: PlanUsageDemo }) {
       <PopoverTrigger asChild>
         <button
           aria-label={`Plan usage: ${plan.percent}% used`}
-          className="flex items-center gap-1 rounded-lg p-2 transition-colors hover:bg-muted"
+          className="flex h-8 items-center gap-1 rounded-lg px-2 transition-colors hover:bg-muted"
         >
           <Progress
             value={plan.percent}

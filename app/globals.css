@@ -211,10 +211,29 @@ html.dark [data-logo="ask-nanci"] { filter: invert(1) hue-rotate(180deg); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* One petal of the thinking spinner (ThinkingIndicator.tsx). The stops are the
+   source animation's keyframes, twelve frames apart in a 108.54-frame loop: bright
+   and deep blue on the beat, cyan by the next one, then a long fade to nothing and
+   a one-beat rise back. Every petal runs this same curve on its own delay. */
+@keyframes thinking-petal {
+  0%     { opacity: 1;   fill: #0354ce; }
+  11.05% { opacity: .79; fill: #0a94e6; }
+  22.11% { opacity: .62; fill: #00dcf4; }
+  33.16% { opacity: .45; }
+  44.22% { opacity: .33; }
+  55.27% { opacity: .21; }
+  66.33% { opacity: .12; }
+  77.38% { opacity: .05; }
+  88.44% { opacity: .01; }
+  89.36% { opacity: 0;   fill: #00dcf4; }
+  100%   { opacity: 1;   fill: #0354ce; }
+}
+
 @theme {
   --animate-marquee-left: marquee-left 12s linear infinite;
   --animate-marquee-right: marquee-right 12s linear infinite;
   --animate-panel-in: panel-fade-in 0.28s ease-out;
+  --animate-thinking-petal: thinking-petal 1.809s linear infinite;
 }
 
 /* The arrival cue for a panel that reaches a phone resting. A scripted turn opens its
@@ -406,10 +425,12 @@ html.dark [data-logo="ask-nanci"] { filter: invert(1) hue-rotate(180deg); }
    sizes are 24/28/32/36px and they are meant to look that way. The overlay is
    centred on the control and paints nothing.
 
-   Keyed on pointer, not width: a touchscreen laptop earns the bigger target and
-   a phone driven by a mouse does not. */
+   Keyed on the input, not the width: any device with a touchscreen earns the bigger
+   target, including a laptop with one. any-pointer rather than pointer, because
+   pointer reports only the primary input and a touchscreen laptop's primary is its
+   trackpad. The cost is a phone with a mouse paired to it gets the bigger target too. */
 @utility touch-target {
-  @media (pointer: coarse) {
+  @media (any-pointer: coarse) {
     position: relative;
 
     &::after {
@@ -430,7 +451,7 @@ html.dark [data-logo="ask-nanci"] { filter: invert(1) hue-rotate(180deg); }
      primitive it ships, which is the only stable hook it gives us. Listed
      explicitly instead of matched with a wildcard: these are the slots whose
      controls are smaller than 44px. */
-  @media (pointer: coarse) {
+  @media (any-pointer: coarse) {
     [data-slot="button"],
     [data-slot="checkbox"],
     [data-slot="radio-group-item"],
@@ -465,6 +486,50 @@ html.dark [data-logo="ask-nanci"] { filter: invert(1) hue-rotate(180deg); }
       width: max(100%, 44px);
       height: max(100%, 44px);
       transform: translate(-50%, -50%);
+    }
+  }
+}
+
+@layer base {
+  /* A fast second tap on a control is otherwise read as double-tap-to-zoom: the page
+     jumps in and has to be pinched back out. `manipulation` keeps pan and pinch and
+     drops only that. The list is the cursor rule's above plus the fields and links,
+     and it is elements and roles rather than ds5 slots because the app's own plain
+     buttons (the sidebar toggle, the sheet pager, a recent chat row) have no slot;
+     every slot in the 44px rule renders as one of these. No media query: touch-action
+     is inert under a mouse. */
+  button, [role="button"], a, label[for], summary,
+  input, textarea, select,
+  [role="menuitem"], [role="option"], [role="menuitemcheckbox"], [role="menuitemradio"], [role="tab"] {
+    touch-action: manipulation;
+  }
+}
+
+@layer base {
+  /* Hover never fires on a touchscreen (Tailwind gates every hover: style behind
+     hover: hover) and ds5's Button carries no active: style, so a tap on a phone shows
+     nothing until the click lands. This is the pressed state: a state layer of the
+     control's own text colour at 12%, which lightens a filled button (its text is
+     light) and greys a ghost one (its text is dark), so one rule fits every variant
+     and every theme. Painted as a background image so the variant's background
+     colour stays underneath rather than being replaced. Same slots as the 44px rule,
+     and the same media query, because this only stands in for hover where hover is
+     missing. */
+  @media (any-pointer: coarse) {
+    [data-slot="button"]:active,
+    [data-slot="checkbox"]:active,
+    [data-slot="radio-group-item"]:active,
+    [data-slot="switch"]:active,
+    [data-slot="toggle"]:active,
+    [data-slot="toggle-group-item"]:active,
+    [data-slot="select-trigger"]:active,
+    [data-slot="tabs-trigger"]:active,
+    [data-slot="dialog-close"]:active,
+    [data-slot="sheet-close"]:active,
+    [data-slot="dropdown-menu-item"]:active,
+    [data-slot="pagination-link"]:active {
+      --pressed: color-mix(in oklab, currentColor 12%, transparent);
+      background-image: linear-gradient(var(--pressed), var(--pressed));
     }
   }
 }

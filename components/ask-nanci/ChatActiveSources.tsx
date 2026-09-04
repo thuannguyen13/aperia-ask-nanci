@@ -33,7 +33,8 @@ export function ChatActiveSources({ sources }: Props) {
   // Shared by both halves so the two hover identically. bg-secondary/80 and the
   // muted-to-foreground icon shift are the same treatment the Common Questions and
   // Recent Chats buttons beside them use — one hover language across the input row.
-  const half = "flex h-7 items-center text-muted-foreground transition-colors bg-secondary hover:bg-secondary/80 hover:text-foreground"
+  // h-8: every control in the composer row is 32px, the size of the send button.
+  const half = "flex h-8 items-center text-muted-foreground transition-colors bg-secondary hover:bg-secondary/80 hover:text-foreground"
 
   return (
     <TooltipProvider delayDuration={400}>

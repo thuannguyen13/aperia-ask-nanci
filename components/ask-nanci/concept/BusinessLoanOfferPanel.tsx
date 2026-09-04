@@ -74,7 +74,7 @@ export function BusinessLoanOfferPanel() {
             the generic variant can drop the name without rewriting the sentence. */}
         <div className="overflow-hidden rounded-xl border border-blue-500 dark:border-blue-700">
           <div className="flex items-start gap-3 bg-blue-50 p-4 dark:bg-blue-950/20">
-            <OfferLogo src={brand.logo} alt={brand.product} className="size-18" fallback={<BrandMonogram label={brand.mark} color={brand.color} />} />
+            <OfferLogo src={brand.logo} alt={brand.product} className="size-18" width={72} height={72} fallback={<BrandMonogram label={brand.mark} color={brand.color} />} />
             <div className="min-w-0 space-y-1">
               <p className="text-base font-semibold text-foreground">{brand.product}</p>
               <p className="text-sm text-muted-foreground">{brand.note}</p>

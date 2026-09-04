@@ -13,6 +13,7 @@ import { RecentChatsDialog } from "./RecentChatsDialog"
 import { ContextUsageBanner, type ContextUsageDemo } from "./ContextUsageBanner"
 import { PlanUsageChip, type PlanUsageDemo } from "./PlanUsageChip"
 import { getPlanUsage } from "@/lib/ask-nanci/plan-usage"
+import { useSoftKeyboard } from "@/hooks/use-is-mobile"
 
 const PROACTIVE_CONTENT = CONCEPT_SCRIPTED_CONVERSATIONS[CONCEPT_FLOW6_KEY][0].content
 
@@ -48,13 +49,18 @@ export function ChatInput() {
     if (draft) { setValue(draft); setDraft(""); textareaRef.current?.focus({ preventScroll: true }) }
   }, [draft, setDraft])
 
+  const softKeyboard = useSoftKeyboard()
+
   const isIdle = chatState === "idle"
   const isBusy = chatState === "thinking" || chatState === "streaming"
   const showSlash = value.startsWith("/")
   const slashQuery = showSlash ? value.slice(1) : ""
 
+  // On a soft keyboard Return breaks the line and only the button sends, because a
+  // phone keyboard has no Shift+Return and a two-line question would be impossible to
+  // type. Hardware keyboards keep Return-to-send.
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); submit() }
+    if (e.key === "Enter" && !e.shiftKey && !softKeyboard) { e.preventDefault(); submit() }
   }
 
   function submit() {
@@ -98,13 +104,19 @@ export function ChatInput() {
         <Textarea
           ref={textareaRef}
           placeholder="Ask anything"
+          // The soft keyboard's return key is a line break here, so label it as one
+          // rather than leaving it to say "go".
+          enterKeyHint="enter"
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
           // Per the design note, the spent-budget warning fires when they go to type,
           // not on arrival — it lands at the moment it actually blocks them.
           onFocus={() => { if (planSpent) setTokenLimitReached(true) }}
-          className="min-h-[72px] resize-none border-0 shadow-none focus-visible:ring-0 focus-visible:border-0 bg-transparent dark:bg-transparent"
+          // Capped and scrolling inside, the way ChatGPT and Claude do: the DS textarea sizes to
+          // its content, so a long pasted draft would otherwise take the whole phone screen.
+          // 8 lines on desktop; on a phone about a third of the screen, above the keyboard.
+          className="min-h-[72px] max-h-[30dvh] md:max-h-48 overflow-y-auto resize-none border-0 shadow-none focus-visible:ring-0 focus-visible:border-0 bg-transparent dark:bg-transparent"
         />
 
         <div className="flex items-center justify-between px-2 pb-2">
@@ -121,7 +133,7 @@ export function ChatInput() {
               <div className="flex overflow-hidden rounded-lg">
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <button data-tour="common-questions" onClick={() => setCommonQOpen(true)} className="flex h-7 w-7 items-center justify-center bg-secondary text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground">
+                    <button data-tour="common-questions" onClick={() => setCommonQOpen(true)} className="flex size-8 items-center justify-center bg-secondary text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground">
                       <MessageCircleQuestion className="size-3.5" />
                     </button>
                   </TooltipTrigger>
@@ -129,7 +141,7 @@ export function ChatInput() {
                 </Tooltip>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <button data-tour="recent-chats" onClick={() => setRecentOpen(true)} className="flex h-7 w-7 items-center justify-center bg-secondary text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground">
+                    <button data-tour="recent-chats" onClick={() => setRecentOpen(true)} className="flex size-8 items-center justify-center bg-secondary text-muted-foreground transition-colors hover:bg-secondary/80 hover:text-foreground">
                       <Clock5 className="size-3.5" />
                     </button>
                   </TooltipTrigger>
@@ -142,7 +154,7 @@ export function ChatInput() {
             {isConceptVersion && proactiveNotificationActive && (
               <Popover open={notifOpen} onOpenChange={handleNotifOpen}>
                 <PopoverTrigger asChild>
-                  <button className="relative flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+                  <button className="relative flex size-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
                     <Bell className="size-4" />
                     {!notifRead && (
                       <span className="absolute top-1 right-1 size-1.5 rounded-full bg-amber-500" />

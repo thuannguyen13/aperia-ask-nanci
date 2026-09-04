@@ -59,7 +59,7 @@ export const TutorialModal = ({
         </div>
       </div>
       <div className="relative h-full max-w-[300px] flex-1 max-sm:h-36 max-sm:max-w-full max-sm:flex-none">
-        <Image src={imageSrc} alt={imageAlt} fill className="object-cover" />
+        <Image src={imageSrc} alt={imageAlt} fill sizes="(max-width: 640px) 100vw, 300px" className="object-cover" />
       </div>
     </div>
   )

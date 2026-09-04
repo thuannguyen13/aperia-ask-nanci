@@ -5,9 +5,14 @@ import { useEffect } from "react"
 /**
  * Publishes how much of the screen the on-screen keyboard covers as `--keyboard-h`.
  *
- * iOS shrinks the visual viewport for the keyboard without touching the layout
- * viewport, so a fixed element keeps its full height and its bottom edge ends up
- * behind the keyboard. Anything anchored to the bottom subtracts this to stay above it.
+ * iOS and Android Chrome shrink the visual viewport for the keyboard without touching
+ * the layout viewport, so a fixed element keeps its full height and its bottom edge
+ * ends up behind the keyboard. Anything anchored to the bottom subtracts this to stay
+ * above it: the chat composer pads by it (app/(app)/page.tsx), and the panel sheet's
+ * over-composer frame anchors to it (MobilePanelSwitcher).
+ *
+ * Mounted once, by the page. The value lives on <html> like --composer-inset, so a
+ * second mount would only add a second cleanup that removes it too early.
  */
 export function useKeyboardInset() {
   useEffect(() => {

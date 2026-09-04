@@ -9,7 +9,6 @@ import { PANELS } from "@/components/panel-registry"
 import { usePanelUi } from "./use-panel-ui"
 import { useSheetDismissal } from "./use-sheet-dismissal"
 import { useSheetFocus } from "./use-sheet-focus"
-import { useKeyboardInset } from "../../use-keyboard-inset"
 import { useSheetGesture } from "./use-sheet-gesture"
 import type { PanelSheetConfig } from "@/lib/ask-nanci/data/panel-ui"
 
@@ -33,8 +32,11 @@ import type { PanelSheetConfig } from "@/lib/ask-nanci/data/panel-ui"
 //   --composer-inset   written by use-composer-inset (mounted in app/(app)/page.tsx),
 //                      read here: SHEET_FRAME ends exactly at the composer, whatever
 //                      padding the app frame leaves below it.
-//   --keyboard-h       written by use-keyboard-inset, read by the same SHEET_FRAME so
-//                      an open keyboard lifts the sheet instead of hiding it.
+//   --keyboard-h       written by use-keyboard-inset (mounted in app/(app)/page.tsx,
+//                      beside --composer-inset), read by SHEET_FRAME_OVER so an open
+//                      keyboard lifts the sheet instead of hiding it. SHEET_FRAME gets
+//                      it through --composer-inset: the composer pads itself by the
+//                      keyboard, so the inset it publishes already includes it.
 //   [data-nest]        set in ChatView.tsx on the conversation, styled by globals.css
 //                      off --sheet-progress, and given aria-hidden by use-sheet-focus
 //                      while the sheet is open.
@@ -63,7 +65,7 @@ import type { PanelSheetConfig } from "@/lib/ask-nanci/data/panel-ui"
 // app frame leaves under it (AppFrame.tsx `pb-1`), which is outside the chat column
 // and so cannot be covered from there.
 const SHEET_FRAME =
-  "fixed inset-x-0 top-9 bottom-[calc(var(--composer-inset,0px)+var(--keyboard-h,0px))] z-20 [clip-path:inset(-60px_-60px_-48px_-60px)]"
+  "fixed inset-x-0 top-9 bottom-[var(--composer-inset,0px)] z-20 [clip-path:inset(-60px_-60px_-48px_-60px)]"
 /**
  * ?panelui=over. The same frame taken to the bottom of the screen and lifted over the
  * composer, which is the only thing that stops at it (z-30, app/(app)/page.tsx).
@@ -184,7 +186,6 @@ function PanelSheet({ config, panelId, present, open, label, pager, onOpen, onCl
 
   useSheetDismissal(open, onClose)
   useSheetFocus(cardRef, open)
-  useKeyboardInset()
 
   return (
     <>

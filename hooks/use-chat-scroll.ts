@@ -159,6 +159,8 @@ export function useChatScroll({
   // Container height when the budget was reserved — lets streaming recompute the
   // budget if the viewport resizes mid-answer (rotation, devtools, panel reflow).
   const reservedClientHeightRef = useRef(0)
+  // Container height at the last resize, so a shrink can be told from a grow.
+  const lastClientHeightRef = useRef(0)
 
   // Auto-follow tracking. `isPinnedRef` is the hot-path source of truth (read in
   // effects without re-subscribing); `isPinnedToBottom` mirrors it for React.
@@ -315,11 +317,20 @@ export function useChatScroll({
     const container = containerRef.current
     if (!container) return
     const rebudget = () => {
+      const ch = container.clientHeight
+      // A container that shrinks under a reader pinned to the bottom (the phone
+      // keyboard opening, the composer growing a banner) keeps its scrollTop, so the
+      // end of the conversation slides behind whatever took the room. Re-pin in the
+      // same frame and instantly: this is the layout catching up, not a scroll
+      // anyone asked for, and a smooth one would lag the keyboard.
+      if (ch < lastClientHeightRef.current && isPinnedRef.current) {
+        container.scrollTop = container.scrollHeight
+      }
+      lastClientHeightRef.current = ch
       if (!reservedThisTurnRef.current) return
       const spacer = spacerRef.current
       const anchor = spacer?.previousElementSibling as HTMLElement | null
       if (!spacer || !anchor) return
-      const ch = container.clientHeight
       if (ch !== reservedClientHeightRef.current) {
         availableHeightRef.current += ch - reservedClientHeightRef.current
         reservedClientHeightRef.current = ch

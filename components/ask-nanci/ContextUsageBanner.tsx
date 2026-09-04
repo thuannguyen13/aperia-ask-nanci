@@ -88,7 +88,7 @@ export function ContextUsageBanner({ demo }: { demo?: ContextUsageDemo }) {
       </p>
       <Button
         variant="ghost"
-        size="icon-xs"
+        size="icon"
         aria-label="Dismiss"
         className="text-orange-800 hover:bg-orange-100 dark:text-orange-300 dark:hover:bg-orange-900/40"
         onClick={() => setDismissed({ state: usage.state, n: demo?.n ?? 0 })}
