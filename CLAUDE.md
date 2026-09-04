@@ -28,3 +28,21 @@ Open with the answer. No preamble, no restating the request, no closing recap. S
 ## Writing here
 
 Never hard-wrap prose: one paragraph, list item or table row per line. Hard wraps reflow on every edit and bury the real change in the diff.
+
+### Prose style
+
+Applies to every document this repo produces, `docs/generated/` included.
+
+**Voice.** Plain and declarative. State what is true, not what is always true: "Controls are sized for touch", not "Every control is built for a thumb". No slogans, no absolutes used for emphasis, nothing that reads as selling a decision that has already been made.
+
+**Order.** The failure comes before the fix. A reader who does not yet know what goes wrong has no reason to care about the remedy.
+
+**Shape.** Two short sentences per item, the claim then its reason. Keep them roughly parallel in length across a list, because the longest one reads as the most important whether or not it is.
+
+**Sentences.** Straight ones. No opening subordinate clause hung off a comma, and no comma where a rewrite removes it: a comma interrupts the reading flow of an instruction. A thought that needs two parts needs two sentences.
+
+**Address.** Where there is something to do, write it as an instruction rather than a description of what the thing does.
+
+**Scope.** General statements stay general. A principle does not name the specific mechanism that answers it; that belongs to the section that owns it.
+
+**Economy.** Nothing is said twice. A word in a heading does not reappear in the line beneath it. Where two blocks overlap, merge them rather than trimming both. Where something is not earning its place, cut it rather than soften it.
