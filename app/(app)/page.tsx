@@ -28,28 +28,30 @@ function WelcomeView() {
           </div>
         </div>
 
-        {/* Personalize Ask Nanci card. Stacks below `sm`: at phone width the illustration, the
-            copy and the button cannot share a row without squeezing the copy into a
-            column a few words wide. */}
+        {/* Personalize Ask Nanci card. Below `sm` only the button drops to its own row: the
+            illustration stays beside the copy so the card keeps its shape, and it shrinks
+            so the copy is not squeezed into a column a few words wide. */}
         {!isEmbed && sources.length < 3 && <Card size="sm">
-          <CardContent className="flex items-center gap-4 max-sm:flex-col max-sm:items-start">
-            <Image src="/ask-nanci/img_kb-illustration.png" alt="" width={72} height={72} className="size-18 shrink-0 object-contain" />
-            <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-              <div className="flex flex-wrap items-center gap-2">
-                <CardTitle>Personalize Ask Nanci</CardTitle>
-                <span className={cn(
-                  "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold",
-                  sources.length > 1
-                    ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                    : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                )}>
-                  {sources.length} {sources.length === 1 ? "Account Added" : "Accounts Added"}
-                </span>
+          <CardContent className="flex items-center gap-4 max-sm:flex-col max-sm:items-stretch">
+            <div className="flex min-w-0 flex-1 items-center gap-4">
+              <Image src="/ask-nanci/img_kb-illustration.png" alt="" width={72} height={72} className="size-18 max-sm:size-12 shrink-0 object-contain" />
+              <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                <div className="flex flex-wrap items-center gap-2">
+                  <CardTitle>Personalize Ask Nanci</CardTitle>
+                  <span className={cn(
+                    "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold",
+                    sources.length > 1
+                      ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                      : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                  )}>
+                    {sources.length} {sources.length === 1 ? "Account Added" : "Accounts Added"}
+                  </span>
+                </div>
+                {/* text-xs keeps the density the banner had; CardDescription is text-sm. */}
+                <CardDescription className="text-xs">
+                  Your payment data is already connected. Add your financial and bookkeeping accounts to give Nanci a complete picture of your business.
+                </CardDescription>
               </div>
-              {/* text-xs keeps the density the banner had; CardDescription is text-sm. */}
-              <CardDescription className="text-xs">
-                Your payment data is already connected. Add your financial and bookkeeping accounts to give Nanci a complete picture of your business.
-              </CardDescription>
             </div>
             <Button size="sm" className="shrink-0 max-sm:w-full" onClick={() => setKbOpen(true)}>
               Link Accounts
