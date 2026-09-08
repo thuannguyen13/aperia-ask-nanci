@@ -30,6 +30,7 @@ import { CreditCardOfferPanel } from "./ask-nanci/concept/CreditCardOfferPanel"
 import { BusinessLoanOfferPanel } from "./ask-nanci/concept/BusinessLoanOfferPanel"
 import { BusiestTimesPanel } from "./ask-nanci/concept/BusiestTimesPanel"
 import { SlowestWindowsPanel } from "./ask-nanci/concept/SlowestWindowsPanel"
+import { LocationReviewPanel } from "./ask-nanci/concept/LocationReviewPanel"
 import { DashboardInsightPanel } from "@/components/risk/dashboard/DashboardInsightPanel"
 import { Dashboard as RiskDashboard } from "@/components/risk/dashboard/Dashboard"
 import { DetectionQueue as RiskDetectionQueue } from "@/components/risk/DetectionQueue"
@@ -80,6 +81,7 @@ export const PANELS = {
   "business-loan-offer": { component: BusinessLoanOfferPanel, label: "Business Loan Offer" },
   "busiest-times":       { component: BusiestTimesPanel,      label: "Busiest Times" },
   "slowest-windows":     { component: SlowestWindowsPanel,    label: "Slowest Windows" },
+  "location-review":     { component: LocationReviewPanel,    label: "Location Review" },
   "dashboard-insight":   { component: DashboardInsightPanel,  label: "Dashboard Insight" },
   "detection-queue-insight": { component: DetectionQueueInsightPanel, label: "Queue Insight" },
   // Aperia Risk destinations — every risk UI is a registered panel.

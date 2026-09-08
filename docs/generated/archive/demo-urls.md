@@ -11,7 +11,7 @@ Base: `https://ask-nanci.vercel.app` (override with `BASE=https://... npm run de
 
 | URL | Embed | Concept engine | Notes |
 |---|---|---|---|
-| `https://ask-nanci.vercel.app/` | no | no | Default app — sidebar, KB panel, sessions |
+| `https://ask-nanci.vercel.app/` | no | yes | Default app — sidebar, KB panel, sessions |
 | `https://ask-nanci.vercel.app/?mode=clover` **live** | yes | no | Chat-only embed |
 | `https://ask-nanci.vercel.app/?mode=business-owner` **live** | yes | no | Chat-only embed |
 | `https://ask-nanci.vercel.app/?mode=iso` | yes | no | Chat-only embed |
@@ -45,6 +45,11 @@ identical either way — the brand changes, the offer does not. Opt-in and mode-
 like `autoplay`, so a partner-facing site and a sales site can share one set of URLs
 with one param between them. Flows other than 20 and 21 ignore it.
 
+Add `&onboarded` to skip the welcome dialog. An iframe is a fresh browser for every
+viewer, so an embedded demo would otherwise open onboarding over itself. Opt-in and
+mode-agnostic like the other two; `?mode=onboarding` still forces the dialog, since
+showing it is that mode's whole point. `&onboarded=0` turns it off.
+
 | URL | Card | Flow | Layout |
 |---|---|---|---|
 | `https://ask-nanci.vercel.app/?mode=concept-embed&flow=1` | 1 | Simple Update | compact widget |
@@ -63,6 +68,7 @@ with one param between them. Flows other than 20 and 21 ignore it.
 | `https://ask-nanci.vercel.app/?mode=concept-embed&flow=20` **live** | 20 | Credit Card Offer | compact widget |
 | `https://ask-nanci.vercel.app/?mode=concept-embed&flow=21` **live** | 21 | Business Loan Offer | compact widget |
 | `https://ask-nanci.vercel.app/?mode=concept-embed&flow=23` **live** | 23 | Busiest Times | compact widget |
+| `https://ask-nanci.vercel.app/?mode=concept-embed&flow=24` | 24 | Mobile Adaptation | compact widget |
 
 ### Layout-only entries (no autoplay)
 
@@ -74,7 +80,7 @@ These have a layout override but no slug — they open a destination surface ins
 
 ## Flows with no embed URL
 
-6 of 22 flows have no slug — reachable only via the `?mode=concept` welcome cards.
+6 of 23 flows have no slug — reachable only via the `?mode=concept` welcome cards.
 
 - 3. Panel as Form — Chat + form
 - 4. Step-up Auth — Multi-step

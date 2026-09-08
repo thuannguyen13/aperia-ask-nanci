@@ -7,6 +7,9 @@ import { RISK_LANDING_CONVERSATIONS } from "./risk-conversations";
 // Read them from the panel's data rather than retyping, so the answer and the panel
 // the merchant opens seconds later can never disagree.
 import { CARD_FIGURES } from "./panels/credit-card-offer";
+// Flow 24 does the same with the location review figures.
+import { REVIEW_TOTAL_SALES, REVIEW_TOTAL_CHANGE_PCT, REVIEW_LEADER, REVIEW_WATCH, WATCH_TRANSACTIONS, averageTicket } from "./panels/location-review";
+import { formatWholeCurrency } from "@/components/shared/format";
 
 // ─── Flow-key constants ───────────────────────────────────────────────────────
 
@@ -39,6 +42,8 @@ const CONCEPT_CREDIT_CARD_PROMPT = "Who am I paying the most on food cost?";
 const CONCEPT_BUSINESS_LOAN_PROMPT = "Do I have enough money for payroll?";
 const CONCEPT_FLOW23_PROMPT = "When am I busiest?";
 export const CONCEPT_FLOW23_FOLLOWUP = "and when's it dead? I want to cut a shift";
+const CONCEPT_FLOW24_PROMPT = "How are my locations doing this quarter?";
+export const CONCEPT_FLOW24_FOLLOWUP = "what's going on at Midtown?";
 // Both offer flows share the same accept/decline pills (matched per-active-flow, so
 // reuse is safe). "No, ignore for now" is decorative — registered as a fake follow-up.
 const CONCEPT_OFFER_YES = "Yes, show me";
@@ -103,6 +108,8 @@ const CONCEPT_FLOW19_FOLLOWUPS = ["Update payment processor MID", "Update deposi
 
 const CONCEPT_FLOW23_FOLLOWUPS_FAKE = ["Check weekend deposit timing", "Compare this week vs last week", "Check what's running low", "how's the Italian combo doing this month?"];
 
+const CONCEPT_FLOW24_FOLLOWUPS_FAKE = ["Compare Midtown to last year", "Who's on shift at Midtown this week?", "Check what's running low"];
+
 // Every fake follow-up across flows — handlePrompt treats these as no-op decoration.
 // Add each flow's follow-up array here as the treatment rolls out.
 // Flow 6 (proactive auto-play): decorative "road not taken" pills on non-final turns.
@@ -121,6 +128,7 @@ export const CONCEPT_FAKE_FOLLOWUPS = new Set<string>([
   ...CONCEPT_FLOW18_FOLLOWUPS,
   ...CONCEPT_FLOW19_FOLLOWUPS,
   ...CONCEPT_FLOW23_FOLLOWUPS_FAKE,
+  ...CONCEPT_FLOW24_FOLLOWUPS_FAKE,
 ]);
 
 // ─── Flow registry — single source of truth for showcased flows ──────────────
@@ -232,6 +240,16 @@ export const FLOW_DEFS: FlowDef[] = [
     altEntries: [{ slug: "11", key: CONCEPT_DETECT_WELCOME_KEY }],
     followups: [CONCEPT_FLOW12_CONTINUE_KEY, CONCEPT_DQ_OPEN_KEY, CONCEPT_DQ_COASTAL_KEY, CONCEPT_DQ_ESCALATE_KEY],
     description: "Risk analyst works a Detection Queue assignment — Barometer Report, risk profile, and case escalation open side by side.",
+  },
+  {
+    num: 24,
+    section: "pattern",
+    title: "Mobile Adaptation",
+    badge: "Phone",
+    key: CONCEPT_FLOW24_PROMPT,
+    slug: "24",
+    followups: [CONCEPT_FLOW24_FOLLOWUP],
+    description: "One panel with every element the mobile checklist covers: period tabs that become a dropdown, a chart that drops labels, a table that scrolls under a fade, and a dialog with a text field. Open it at phone width.",
   },
 
   // ── Merchant money questions ──
@@ -961,6 +979,29 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
         "Tuesday and Wednesday, 2 to 4 in the afternoon, are your quietest windows all week. Sales there run about a third of your lunch peak, so that is the safest place to trim hours.",
       panel: "slowest-windows",
       suggestions: CONCEPT_FLOW23_FOLLOWUPS_FAKE,
+    },
+  ],
+
+  // ── Flow 24: Mobile Adaptation (Location Review) ──────────────────────────
+  // The numbers are quoted from data/panels/location-review.ts so the answer and the
+  // panel cannot disagree; the follow-up switches the same panel into its watch view.
+  [CONCEPT_FLOW24_PROMPT]: [
+    { role: "user", content: CONCEPT_FLOW24_PROMPT },
+    {
+      role: "assistant",
+      content: `Up ${REVIEW_TOTAL_CHANGE_PCT}% on last quarter, ${formatWholeCurrency(REVIEW_TOTAL_SALES)} across four locations. ${REVIEW_LEADER.name} leads at ${formatWholeCurrency(REVIEW_LEADER.sales)}. ${REVIEW_WATCH.name} is the one to watch: it fell ${Math.abs(REVIEW_WATCH.changePct)}% while the other three grew.`,
+      panel: "location-review",
+      suggestions: [CONCEPT_FLOW24_FOLLOWUP],
+    },
+  ],
+  [CONCEPT_FLOW24_FOLLOWUP]: [
+    { role: "user", content: CONCEPT_FLOW24_FOLLOWUP },
+    {
+      role: "assistant",
+      content: `Fewer lunch transactions. ${REVIEW_WATCH.name} ran ${WATCH_TRANSACTIONS.to.count.toLocaleString()} in ${WATCH_TRANSACTIONS.to.month} against ${WATCH_TRANSACTIONS.from.count.toLocaleString()} in ${WATCH_TRANSACTIONS.from.month}, while the average ticket held around ${formatWholeCurrency(averageTicket(REVIEW_WATCH))}. That points at foot traffic, not pricing. I can flag it for ${REVIEW_WATCH.manager} from the panel.`,
+      panel: "location-review",
+      view: "watch",
+      suggestions: CONCEPT_FLOW24_FOLLOWUPS_FAKE,
     },
   ],
 };
