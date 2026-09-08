@@ -7,7 +7,12 @@ import type { ConceptScriptedTurn, PanelAction } from "./types"
 export function turnToPanelActions(turn: ConceptScriptedTurn): PanelAction[] {
   const actions: PanelAction[] = []
   if (turn.panel) {
-    actions.push(turn.view ? { op: "open", id: turn.panel, view: turn.view } : { op: "open", id: turn.panel })
+    actions.push({
+      op: "open",
+      id: turn.panel,
+      ...(turn.view ? { view: turn.view } : {}),
+      ...(turn.revealPanel ? { reveal: true } : {}),
+    })
   }
   if (turn.closePanel) actions.push({ op: "close", id: turn.closePanel })
   if (turn.filterDeclineReport) actions.push({ op: "filterDeclineReport" })

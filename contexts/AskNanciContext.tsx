@@ -475,8 +475,9 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     switch (action.op) {
       case "open":
         // A scripted turn, or a backend "action" chunk: the reader did not ask for this
-        // panel, so it arrives resting rather than open. See openDynamic.
-        openDynamic(action.id, { reveal: false })
+        // panel, so it arrives resting rather than open unless the turn says otherwise.
+        // See openDynamic.
+        openDynamic(action.id, { reveal: action.reveal === true })
         // With a view, set it; without, reset the panel to its own default view.
         if (action.view) setPanelView(action.id, action.view)
         else clearPanelView(action.id)

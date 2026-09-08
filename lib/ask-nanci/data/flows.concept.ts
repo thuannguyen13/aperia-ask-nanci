@@ -1006,6 +1006,8 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       role: "assistant",
       content: "Here is every location side by side. Change the period at the top, and drag the table sideways for refunds, chargebacks and who runs each site.",
       panel: "location-review",
+      // The reader asked for the breakdown, so on a phone the sheet comes up with it.
+      revealPanel: true,
     },
     { role: "user", content: CONCEPT_FLOW24_WATCH },
     {

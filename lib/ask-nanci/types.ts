@@ -39,7 +39,7 @@ export interface ScriptedTurn {
 // single applyPanelAction handler. `closeAllPanels` stays a player-level animated
 // teardown, so it is intentionally not a discrete action here.
 export type PanelAction =
-  | { op: "open"; id: PanelId; view?: string }
+  | { op: "open"; id: PanelId; view?: string; reveal?: true }
   | { op: "close"; id: PanelId }
   | { op: "filterDeclineReport" }
 
@@ -53,6 +53,12 @@ export interface ConceptScriptedTurn extends ScriptedTurn {
   // open; add `view` to set its view; `closePanel` closes one panel (e.g. replace).
   panel?: PanelId
   view?: string
+  /**
+   * On a phone, bring the sheet up with the panel instead of leaving it resting as a
+   * handle. For a turn whose whole point is the panel arriving; the default keeps the
+   * answer readable. Desktop ignores it.
+   */
+  revealPanel?: true
   closePanel?: PanelId
   filterDeclineReport?: true
   closeAllPanels?: true

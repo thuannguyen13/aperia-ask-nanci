@@ -14,6 +14,10 @@ describe("turnToPanelActions", () => {
     ])
   })
 
+  it("carries revealPanel as reveal on the open action", () => {
+    expect(turnToPanelActions(turn({ panel: p("risk-flags"), revealPanel: true }))).toEqual([{ op: "open", id: "risk-flags", reveal: true }])
+  })
+
   it("maps panel without view to a viewless open (resets to default)", () => {
     expect(turnToPanelActions(turn({ panel: p("risk-flags") }))).toEqual([{ op: "open", id: "risk-flags" }])
   })
