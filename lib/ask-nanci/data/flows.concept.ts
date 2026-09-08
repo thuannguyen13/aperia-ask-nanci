@@ -1008,8 +1008,6 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       role: "assistant",
       content: "Here is every location side by side. Change the period at the top, and drag the table sideways for refunds, chargebacks and who runs each site.",
       panel: "location-review",
-      // The reader asked for the breakdown, so on a phone the sheet comes up with it.
-      revealPanel: true,
     },
     { role: "user", content: CONCEPT_FLOW24_WATCH, pauseBefore: CONCEPT_FLOW24_READ_MS },
     {
@@ -1017,6 +1015,8 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       content: `Fewer lunch transactions. ${REVIEW_WATCH.name} ran ${WATCH_TRANSACTIONS.to.count.toLocaleString()} in ${WATCH_TRANSACTIONS.to.month} against ${WATCH_TRANSACTIONS.from.count.toLocaleString()} in ${WATCH_TRANSACTIONS.from.month}, while the average ticket held around ${formatWholeCurrency(averageTicket(REVIEW_WATCH))}. That points at foot traffic, not pricing. I can flag it for ${REVIEW_WATCH.manager} from the panel.`,
       panel: "location-review",
       view: "watch",
+      // The last step: the sheet slides up on the flagged row, and stays.
+      revealPanel: true,
       suggestions: CONCEPT_FLOW24_FOLLOWUPS_FAKE,
     },
   ],

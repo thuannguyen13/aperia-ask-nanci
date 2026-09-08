@@ -23,7 +23,7 @@ The contract between a scripted flow and the panel stack. These are the real fie
 |---|---|
 | `panel: "panel-id"` | Ensures that panel is open. Idempotent push onto the `dynamicPanels` stack. |
 | `view: "view-name"` | Sets that panel's view. If omitted when `panel` is set, the panel resets to its own default view on open. Use together with `panel`. |
-| `revealPanel: true` | On a phone, brings the sheet up with the panel instead of leaving it resting as a handle. For a turn whose point is the panel arriving. Desktop ignores it. |
+| `revealPanel: true` | On a phone, brings the sheet up with the panel instead of leaving it resting as a handle, also when the panel is already open. For a turn whose point is the panel being seen. Desktop ignores it. |
 | `closePanel: "panel-id"` | Closes one panel, e.g. to replace it with another. |
 | `filterDeclineReport: true` | Switches the decline-report panel into its filtered view. |
 | `closeAllPanels: true` | Resets all open panels (staggered close animation), plus panel views and the decline-report filter. |

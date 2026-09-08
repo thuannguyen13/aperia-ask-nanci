@@ -24,7 +24,7 @@ test.use({ viewport: PHONE, isMobile: true, hasTouch: true, deviceScaleFactor: 3
 // A cold Turbopack compile on the first test can add a lot on top of that.
 const PANEL_TIMEOUT = 60_000
 
-// The sheet settles in at most SETTLE_MAX (400ms, use-sheet-gesture.ts); waiting past
+// The sheet settles in at most ARRIVE_MS (550ms, use-sheet-gesture.ts); waiting past
 // that is what makes a measurement the landing position rather than a frame of the
 // animation.
 const SETTLE_MS = 700

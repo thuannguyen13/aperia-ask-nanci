@@ -229,10 +229,14 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   // A turn that opens a panel should show it on a phone, not just park it behind the
   // brand-bar badge: the script says "I've opened the breakdown in the panel" and the
   // panel has to be there. Guarded the same way the stack itself is, so re-opening a
-  // panel that is already up is still a no-op and closing one never yanks another
-  // into view.
+  // panel that is already up changes nothing about the stack and closing one never
+  // yanks another into view. The one thing a repeat open may do is bring the sheet up
+  // when it asks to: a later turn that switches the panel's view and wants it seen.
   const openDynamic = useCallback((id: PanelId, opts?: { reveal?: boolean }) => {
-    if (dynamicPanelsRef.current.includes(id)) return
+    if (dynamicPanelsRef.current.includes(id)) {
+      if (opts?.reveal) setPanelSheetDismissed(false)
+      return
+    }
     pushPanel(id)
     setShownPanelId(id)
     // Only a panel the reader asked for takes over the phone's screen. One the script

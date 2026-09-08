@@ -21,6 +21,12 @@ const DISMISS_VELOCITY = 0.5
 const SETTLE_MS = 300
 const SETTLE_MIN = 120
 const SETTLE_MAX = 400
+/**
+ * The travel when nothing is touching the card: a tap on the handle or a script
+ * bringing the panel up. Slower than a released drag, which already carries the
+ * finger's speed; a card that appears from nowhere in 300ms reads as a cut.
+ */
+const ARRIVE_MS = 550
 /** Movement past which a pointerdown was a swipe, not a tap. */
 const TAP_SLOP = 6
 /** How far a pull on the panel body must run before it takes the gesture off the list. */
@@ -160,7 +166,7 @@ export function useSheetGesture({ axis, open, peek, travel, liftAtRest = false, 
   // React never renders the transform: the DOM owns it, and a re-render arriving
   // mid-drag would otherwise snap the card back out from under the finger.
   useLayoutEffect(() => {
-    const duration = settle.current ?? SETTLE_MS
+    const duration = settle.current ?? ARRIVE_MS
     settle.current = null
     paint(open ? 0 : travel, duration)
   }, [paint, open, travel])
