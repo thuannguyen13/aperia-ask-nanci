@@ -47,7 +47,7 @@ const CONCEPT_FLOW24_TREND = "how did that change over the quarter?";
 const CONCEPT_FLOW24_BREAKDOWN = "show me the full breakdown";
 const CONCEPT_FLOW24_WATCH = "what's going on at Midtown?";
 // Reading time after a chart or the panel lands, before the next question covers it.
-const CONCEPT_FLOW24_READ_MS = 4000;
+const CONCEPT_FLOW24_READ_MS = 2500;
 // Both offer flows share the same accept/decline pills (matched per-active-flow, so
 // reuse is safe). "No, ignore for now" is decorative — registered as a fake follow-up.
 const CONCEPT_OFFER_YES = "Yes, show me";
@@ -252,6 +252,7 @@ export const FLOW_DEFS: FlowDef[] = [
     badge: "Phone",
     key: CONCEPT_FLOW24_PROMPT,
     slug: "24",
+    followups: [CONCEPT_FLOW24_WATCH],
     description: "Two charts in the conversation, then one panel with every element the mobile checklist covers: period tabs that become a dropdown, a table that scrolls under a fade, and a dialog with a text field. Open it at phone width.",
   },
 
@@ -986,10 +987,10 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   ],
 
   // ── Flow 24: Mobile Adaptation (Location Review) ──────────────────────────
-  // One conversation, four exchanges, so it plays through on its own: two answers draw
-  // a chart in the conversation, the third opens the panel, the fourth switches it into
-  // its watch view. The numbers are quoted from data/panels/location-review.ts so the
-  // answers and the panel cannot disagree.
+  // Three exchanges play on their own: two answers draw a chart in the conversation and
+  // the third opens the panel, which is where the demo stops. The Midtown question is a
+  // pill from there, for a reader who wants the watch view. The numbers are quoted from
+  // data/panels/location-review.ts so the answers and the panel cannot disagree.
   [CONCEPT_FLOW24_PROMPT]: [
     { role: "user", content: CONCEPT_FLOW24_PROMPT },
     {
@@ -1008,14 +1009,18 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       role: "assistant",
       content: "Here is every location side by side. Change the period at the top, and drag the table sideways for refunds, chargebacks and who runs each site.",
       panel: "location-review",
+      // The last step: the sheet slides up on the breakdown, and the demo rests there.
+      revealPanel: true,
+      suggestions: [CONCEPT_FLOW24_WATCH],
     },
-    { role: "user", content: CONCEPT_FLOW24_WATCH, pauseBefore: CONCEPT_FLOW24_READ_MS },
+  ],
+  [CONCEPT_FLOW24_WATCH]: [
+    { role: "user", content: CONCEPT_FLOW24_WATCH },
     {
       role: "assistant",
       content: `Fewer lunch transactions. ${REVIEW_WATCH.name} ran ${WATCH_TRANSACTIONS.to.count.toLocaleString()} in ${WATCH_TRANSACTIONS.to.month} against ${WATCH_TRANSACTIONS.from.count.toLocaleString()} in ${WATCH_TRANSACTIONS.from.month}, while the average ticket held around ${formatWholeCurrency(averageTicket(REVIEW_WATCH))}. That points at foot traffic, not pricing. I can flag it for ${REVIEW_WATCH.manager} from the panel.`,
       panel: "location-review",
       view: "watch",
-      // The last step: the sheet slides up on the flagged row, and stays.
       revealPanel: true,
       suggestions: CONCEPT_FLOW24_FOLLOWUPS_FAKE,
     },
