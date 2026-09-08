@@ -18,16 +18,16 @@ const INDICATORS = ["dot", "line", "dashed"] as const
 
 // The exact chrome MessageChart.tsx puts around a chart in a chat answer, so a
 // specimen here looks the way it will look in the app — not a DS Card approximation.
-// (The risk dashboard's DashChartCard is the one variation: no border-b on the title.)
+// The risk dashboard's DashChartCard draws the same title row with an Export button.
 const SpecimenCard = memo(function SpecimenCard({
   specimen, opts,
 }: { specimen: Specimen; opts: GalleryOptions }) {
   return (
     <div id={specimen.id} className="scroll-mt-32 overflow-hidden rounded-xl border bg-background">
-      <div className="flex items-center border-b px-3 py-2">
-        <span className="text-xs font-semibold text-foreground">{specimen.name}</span>
+      <div className="flex items-center px-4 pt-3">
+        <span className="text-sm font-semibold text-foreground">{specimen.name}</span>
       </div>
-      <div className="px-3 py-4">{specimen.render(opts)}</div>
+      <div className="px-3 py-3">{specimen.render(opts)}</div>
     </div>
   )
 })

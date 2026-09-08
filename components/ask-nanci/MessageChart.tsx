@@ -37,10 +37,11 @@ export function MessageChart({ chart }: { chart: ChartWidget }) {
 
   return (
     <div className="mt-3 overflow-hidden rounded-xl border bg-background">
-      <div className="flex items-center border-b px-3 py-2">
-        <span className="text-xs font-semibold text-foreground">{chart.title}</span>
+      {/* Same title row as the Risk dashboard's DashChartCard: no rule under it. */}
+      <div className="flex items-center px-4 pt-3">
+        <span className="text-sm font-semibold text-foreground">{chart.title}</span>
       </div>
-      <div className="px-3 py-4">
+      <div className="px-3 py-3">
         {/* One series needs no key: the title already says what the bars are. */}
         <ResponsiveChart height={180} config={config} legend={chart.datasets.length > 1}>
           {(narrow) => chart.kind === "bar" ? (
