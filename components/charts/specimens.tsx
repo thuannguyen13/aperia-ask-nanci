@@ -2,7 +2,7 @@
 
 import {
   Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, ComposedChart, Funnel, FunnelChart,
-  Label, LabelList, Line, LineChart, Pie, PieChart, PolarAngleAxis, PolarGrid, Radar,
+  LabelList, Line, LineChart, Pie, PieChart, PolarAngleAxis, PolarGrid, Radar,
   RadarChart, RadialBar, RadialBarChart, ReferenceArea, ReferenceLine, Scatter, ScatterChart,
   Treemap, XAxis, YAxis, ZAxis,
 } from "recharts"
@@ -10,7 +10,7 @@ import {
   ChartContainer, ChartTooltip, ChartTooltipContent,
   type ChartConfig,
 } from "aperia-ds5"
-import { ChartGrid, ChartTip, CHART_AXIS, CHART_MARGIN } from "@/components/shared"
+import { ChartGrid, ChartTip, ChartCenterLabel, CHART_AXIS, CHART_MARGIN } from "@/components/shared"
 import { HEATMAP_HOURS, HEATMAP_ROWS } from "@/lib/ask-nanci/data/panels/busiest-times"
 import {
   GALLERY_ALERT_VOLUME, GALLERY_AUTH_FUNNEL, GALLERY_CHANNEL_MIX, GALLERY_DECLINE_REASONS,
@@ -439,23 +439,7 @@ function Slices({ opts, donut }: { opts: GalleryOptions; donut?: boolean }) {
             {GALLERY_DECLINE_REASONS.map((d) => (
               <Cell key={d.key} fill={`var(--color-${d.key})`} />
             ))}
-            {donut && (
-              <Label
-                position="center"
-                content={({ viewBox }) =>
-                  viewBox && "cx" in viewBox ? (
-                    <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle">
-                      <tspan x={viewBox.cx} dy="-2" className="fill-foreground text-xl font-semibold">
-                        8.4%
-                      </tspan>
-                      <tspan x={viewBox.cx} dy="18" className="fill-muted-foreground text-[10px]">
-                        decline rate
-                      </tspan>
-                    </text>
-                  ) : null
-                }
-              />
-            )}
+            {donut && <ChartCenterLabel value="8.4%" caption="decline rate" />}
           </Pie>
         </PieChart>
       </ChartContainer>

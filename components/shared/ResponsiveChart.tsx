@@ -2,7 +2,7 @@
 
 import { cloneElement, isValidElement, useEffect, useId, useRef, useState } from "react"
 import type { ReactElement } from "react"
-import { CartesianGrid } from "recharts"
+import { CartesianGrid, Label } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 
@@ -58,6 +58,32 @@ export function ChartGrid({ vertical = false }: { vertical?: boolean }) {
 // min-w widens the card and the row is justify-between, so the label and its value
 // get real air between them instead of nearly touching at the DS min-w-32.
 const TOOLTIP_SPACING = "min-w-44 [&_.justify-between]:gap-6"
+
+/**
+ * The figure in the middle of a donut, with a caption under it.
+ *
+ * recharts 3 resolves a `position="center"` label against the cartesian box (x, y,
+ * width, height) even inside a Pie, so the shadcn pattern that reads `cx` off the
+ * viewBox renders nothing. The centre is taken from whichever box arrives.
+ */
+export function ChartCenterLabel({ value, caption, className }: { value: React.ReactNode; caption?: React.ReactNode; className?: string }) {
+  return (
+    <Label
+      position="center"
+      content={({ viewBox }) => {
+        if (!viewBox) return null
+        const cx = "cx" in viewBox ? viewBox.cx : (viewBox.x ?? 0) + (viewBox.width ?? 0) / 2
+        const cy = "cy" in viewBox ? viewBox.cy : (viewBox.y ?? 0) + (viewBox.height ?? 0) / 2
+        return (
+          <text x={cx} y={cy} textAnchor="middle">
+            <tspan x={cx} dy={caption ? "-2" : "6"} className={cn("fill-foreground text-xl font-semibold", className)}>{value}</tspan>
+            {caption && <tspan x={cx} dy="18" className="fill-muted-foreground text-[10px]">{caption}</tspan>}
+          </text>
+        )
+      }}
+    />
+  )
+}
 
 /** ds5's tooltip with the house spacing. Takes whatever `ChartTooltipContent` takes. */
 export function ChartTip({ className, indicator = "dot", ...props }: React.ComponentProps<typeof ChartTooltipContent>) {

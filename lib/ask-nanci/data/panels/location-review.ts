@@ -84,6 +84,14 @@ export function averageTicket(l: ReviewLocation) {
   return l.sales / l.transactions
 }
 
+/** Transactions per point across all locations, from each location's sales and ticket. */
+export function transactionsFor(period: ReviewPeriod) {
+  return trendFor(period).map((row) => ({
+    label: row.label,
+    transactions: Math.round(REVIEW_LOCATIONS.reduce((sum, l) => sum + Number(row[l.id]) / averageTicket(l), 0)),
+  }))
+}
+
 /** One trend point per label, every location as a series. */
 export function trendFor(period: ReviewPeriod) {
   const n = period.points.length

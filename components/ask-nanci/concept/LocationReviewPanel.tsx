@@ -1,7 +1,7 @@
 "use client"
 
-import { useState } from "react"
-import { BarChart, Bar, XAxis, YAxis } from "recharts"
+import { useId, useState } from "react"
+import { AreaChart, Area, BarChart, Bar, Cell, LabelList, PieChart, Pie, XAxis, YAxis } from "recharts"
 import {
   Tabs, Button, Input, Label, type ChartConfig,
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
@@ -10,11 +10,11 @@ import { cn } from "aperia-ds5/utils"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import {
   REVIEW_PERIODS, DEFAULT_REVIEW_PERIOD, REVIEW_LOCATIONS, REVIEW_TOTAL_SALES, REVIEW_TOTAL_CHANGE_PCT,
-  REVIEW_LEADER, REVIEW_WATCH, WATCH_TRANSACTIONS, averageTicket, trendFor,
+  REVIEW_LEADER, REVIEW_WATCH, WATCH_TRANSACTIONS, averageTicket, trendFor, transactionsFor,
 } from "@/lib/ask-nanci/data/panels/location-review"
 import {
   PanelShell, PanelHeader, PanelBody, PanelExportButton, NanciInsight, StatCard, Callout,
-  ResponsiveTabsList, ResponsiveChart, ChartGrid, ChartTip, chartAxisProps, PanelTable, Thead, Th, Td,
+  ResponsiveTabsList, ResponsiveChart, ChartGrid, ChartTip, ChartCenterLabel, chartAxisProps, PanelTable, Thead, Th, Td,
   formatCurrency, formatWholeCurrency,
 } from "@/components/shared"
 
@@ -29,6 +29,18 @@ const SERIES_COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "va
 // from here, and the bars draw with the colour variable the frame writes for the key.
 const CHART_CONFIG: ChartConfig = Object.fromEntries(
   REVIEW_LOCATIONS.map((l, i) => [l.id, { label: l.name, color: SERIES_COLORS[i] }]),
+)
+
+// The single-series charts: one entry each, so the tooltip names the measure.
+const TICKET_CONFIG: ChartConfig = { ticket: { label: "Avg ticket", color: SERIES_COLORS[0] } }
+const TRANSACTIONS_CONFIG: ChartConfig = { transactions: { label: "Transactions", color: SERIES_COLORS[0] } }
+
+// The tooltip row every money chart shares: series name, then the figure in mono.
+const moneyRow = (config: ChartConfig) => (v: unknown, name: unknown) => (
+  <>
+    <span className="text-muted-foreground">{config[String(name)]?.label}</span>
+    <span className="ml-auto font-mono font-medium tabular-nums">{formatWholeCurrency(Number(v))}</span>
+  </>
 )
 
 const SIGNED_PCT = (pct: number) => `${pct > 0 ? "+" : ""}${pct}%`
@@ -46,6 +58,11 @@ export function LocationReviewPanel() {
   const [flagged, setFlagged] = useState(false)
 
   const trend = trendFor(period)
+  const transactions = transactionsFor(period)
+  const share = REVIEW_LOCATIONS.map((l) => ({ id: l.id, sales: l.sales * period.factor }))
+  const tickets = REVIEW_LOCATIONS.map((l) => ({ name: l.name, ticket: averageTicket(l) }))
+  // SVG gradient ids are document-global; two of this panel on one page would share one.
+  const gradientId = `${useId().replace(/:/g, "")}-fill`
 
   function sendFlag() {
     setFlagged(true)
@@ -99,11 +116,78 @@ export function LocationReviewPanel() {
                 <ChartGrid />
                 <XAxis dataKey="label" {...chartAxisProps(narrow)} />
                 <YAxis {...chartAxisProps(narrow)} width={narrow ? 36 : 44} tickFormatter={(v: number) => `${Math.round(v / 1000)}k`} />
-                <ChartTip formatter={(v, name) => <><span className="text-muted-foreground">{CHART_CONFIG[String(name)]?.label}</span><span className="ml-auto font-mono font-medium tabular-nums">{formatWholeCurrency(Number(v))}</span></>} />
+                <ChartTip formatter={moneyRow(CHART_CONFIG)} />
                 {REVIEW_LOCATIONS.map((l, i) => (
                   <Bar key={l.id} dataKey={l.id} stackId="sales" fill={`var(--color-${l.id})`} radius={i === REVIEW_LOCATIONS.length - 1 ? [4, 4, 0, 0] : 0} />
                 ))}
               </BarChart>
+            )}
+          </ResponsiveChart>
+        </div>
+
+        {/* Two charts side by side above the breakpoint, stacked on a phone. Each takes
+            its width from its own frame, so neither knows or cares which layout it is in. */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <p className="mb-2 text-base font-semibold text-foreground">Share of sales</p>
+            <ResponsiveChart height={200} config={CHART_CONFIG} legend>
+              {(narrow) => (
+                <PieChart>
+                  <ChartTip nameKey="id" hideLabel formatter={moneyRow(CHART_CONFIG)} />
+                  {/* The radii scale with the frame: a 200px box holds an 80px ring. */}
+                  <Pie data={share} dataKey="sales" nameKey="id" innerRadius={narrow ? 48 : 54} outerRadius={narrow ? 76 : 84} strokeWidth={3}>
+                    {share.map((s) => (
+                      <Cell key={s.id} fill={`var(--color-${s.id})`} />
+                    ))}
+                    <ChartCenterLabel value={formatWholeCurrency(REVIEW_TOTAL_SALES * period.factor)} caption={period.label.toLowerCase()} className="text-base" />
+                  </Pie>
+                </PieChart>
+              )}
+            </ResponsiveChart>
+          </div>
+
+          <div>
+            <p className="mb-2 text-base font-semibold text-foreground">Average ticket</p>
+            <ResponsiveChart height={200} config={TICKET_CONFIG}>
+              {(narrow) => (
+                <BarChart layout="vertical" data={tickets} margin={{ right: 40 }}>
+                  <ChartGrid vertical />
+                  <XAxis type="number" dataKey="ticket" {...chartAxisProps(narrow)} tickFormatter={(v: number) => `$${v}`} />
+                  {/* A phone has room for the first word of a name; a desktop for all of it. */}
+                  <YAxis type="category" dataKey="name" {...chartAxisProps(narrow)} width={narrow ? 64 : 120} tickFormatter={(v: string) => (narrow ? v.split(" ")[0] : v)} />
+                  <ChartTip formatter={(v, name) => (
+                    <>
+                      <span className="text-muted-foreground">{TICKET_CONFIG[String(name)]?.label}</span>
+                      <span className="ml-auto font-mono font-medium tabular-nums">{formatCurrency(Number(v))}</span>
+                    </>
+                  )} />
+                  <Bar dataKey="ticket" fill="var(--color-ticket)" radius={[0, 4, 4, 0]}>
+                    <LabelList dataKey="ticket" position="right" formatter={(v) => formatCurrency(Number(v))} className="fill-muted-foreground text-[10px]" />
+                  </Bar>
+                </BarChart>
+              )}
+            </ResponsiveChart>
+          </div>
+        </div>
+
+        <div>
+          <p className="mb-2 text-base font-semibold text-foreground">Transactions</p>
+          <ResponsiveChart height={160} config={TRANSACTIONS_CONFIG}>
+            {(narrow) => (
+              <AreaChart data={transactions}>
+                <defs>
+                  <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="var(--color-transactions)" stopOpacity={0.35} />
+                    <stop offset="100%" stopColor="var(--color-transactions)" stopOpacity={0.02} />
+                  </linearGradient>
+                </defs>
+                <ChartGrid />
+                <XAxis dataKey="label" {...chartAxisProps(narrow)} />
+                {/* "1,000" needs the wider column even on a phone, or its first digit is clipped. */}
+                <YAxis {...chartAxisProps(narrow)} width={narrow ? 44 : 48} tickFormatter={(v: number) => v.toLocaleString()} />
+                <ChartTip />
+                <Area dataKey="transactions" type="monotone" stroke="var(--color-transactions)" strokeWidth={2} fill={`url(#${gradientId})`} />
+              </AreaChart>
             )}
           </ResponsiveChart>
         </div>
