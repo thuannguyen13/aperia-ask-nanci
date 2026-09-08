@@ -981,6 +981,49 @@
       margin: 0 auto
     }
 
+    /* The same demo on a real phone: the URL to tap or copy, under the frames. */
+    .ld-open {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-top: 18px;
+      font-size: 14px;
+      color: var(--muted-fg)
+    }
+
+    .ld-open a {
+      color: var(--aperia-blue);
+      text-decoration: none;
+      min-width: 0
+    }
+
+    .ld-open code {
+      display: inline-block;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 12.5px;
+      padding: 6px 10px;
+      background: var(--light-gray);
+      border-radius: 8px;
+      word-break: break-all
+    }
+
+    .ld-open button {
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--aperia-blue);
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 6px 14px;
+      cursor: pointer
+    }
+
+    .ld-open button:hover {
+      border-color: var(--aperia-blue)
+    }
+
     @media(min-width:1280px) {
       .ld-wrap {
         --s: .7
@@ -2500,6 +2543,12 @@
             </div>
           </div>
 
+          <div class="ld-open">
+            <span>Open it on a phone:</span>
+            <a href="https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&amp;flow=24&amp;autoplay" target="_blank" rel="noreferrer"><code id="ld-url">https://aperia-ask-nanci-embed.vercel.app/?mode=concept-embed&amp;flow=24&amp;autoplay</code></a>
+            <button type="button" id="ld-copy">Copy link</button>
+          </div>
+
         </div>
       </div>
     </div>
@@ -2617,6 +2666,21 @@
       burger.classList.remove('open');
       burger.setAttribute('aria-expanded', false);
     }));
+
+    const copyBtn = document.getElementById('ld-copy');
+    copyBtn.addEventListener('click', async () => {
+      const url = document.getElementById('ld-url').textContent;
+      try {
+        await navigator.clipboard.writeText(url);
+        copyBtn.textContent = 'Copied';
+      } catch {
+        // No clipboard access (an http origin, or a denied permission): leave the URL
+        // selected so a manual copy is one keystroke away.
+        window.getSelection().selectAllChildren(document.getElementById('ld-url'));
+        copyBtn.textContent = 'Select and copy';
+      }
+      setTimeout(() => { copyBtn.textContent = 'Copy link'; }, 1600);
+    });
   </script>
 </body>
 
