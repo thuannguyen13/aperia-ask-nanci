@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { BarChart, Bar, XAxis, YAxis, Tooltip } from "recharts"
+import { BarChart, Bar, XAxis, YAxis } from "recharts"
 import {
-  Tabs, Button, Input, Label,
+  Tabs, Button, Input, Label, ChartTooltip, ChartTooltipContent, type ChartConfig,
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
@@ -25,6 +25,12 @@ import {
 
 const SERIES_COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)"]
 
+// One series per location, keyed by its id: the tooltip and the legend read the name
+// from here, and the bars draw with the colour variable the frame writes for the key.
+const CHART_CONFIG: ChartConfig = Object.fromEntries(
+  REVIEW_LOCATIONS.map((l, i) => [l.id, { label: l.name, color: SERIES_COLORS[i] }]),
+)
+
 const SIGNED_PCT = (pct: number) => `${pct > 0 ? "+" : ""}${pct}%`
 
 export function LocationReviewPanel() {
@@ -39,7 +45,6 @@ export function LocationReviewPanel() {
   const [note, setNote] = useState("")
   const [flagged, setFlagged] = useState(false)
 
-  const legend = REVIEW_LOCATIONS.map((l, i) => ({ label: l.name, color: SERIES_COLORS[i] }))
   const trend = trendFor(period)
 
   function sendFlag() {
@@ -88,14 +93,14 @@ export function LocationReviewPanel() {
 
         <div>
           <p className="mb-2 text-base font-semibold text-foreground">Sales by location</p>
-          <ResponsiveChart height={200} legend={legend}>
+          <ResponsiveChart height={200} config={CHART_CONFIG} legend>
             {(narrow) => (
               <BarChart data={trend}>
                 <XAxis dataKey="label" {...chartTickProps(narrow)} />
                 <YAxis tick={{ fontSize: narrow ? 10 : 11 }} width={narrow ? 36 : 44} tickFormatter={(v: number) => `${Math.round(v / 1000)}k`} />
-                <Tooltip formatter={(v) => formatWholeCurrency(Number(v))} />
+                <ChartTooltip content={<ChartTooltipContent formatter={(v, name) => <><span className="text-muted-foreground">{CHART_CONFIG[String(name)]?.label}</span><span className="ml-auto font-mono font-medium tabular-nums">{formatWholeCurrency(Number(v))}</span></>} />} />
                 {REVIEW_LOCATIONS.map((l, i) => (
-                  <Bar key={l.id} dataKey={l.id} name={l.name} stackId="sales" fill={SERIES_COLORS[i]} radius={i === REVIEW_LOCATIONS.length - 1 ? [4, 4, 0, 0] : 0} />
+                  <Bar key={l.id} dataKey={l.id} stackId="sales" fill={`var(--color-${l.id})`} radius={i === REVIEW_LOCATIONS.length - 1 ? [4, 4, 0, 0] : 0} />
                 ))}
               </BarChart>
             )}

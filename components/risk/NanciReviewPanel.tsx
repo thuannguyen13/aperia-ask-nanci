@@ -29,10 +29,11 @@ function Projection() {
     <div className="[&_*]:outline-none">
       <ResponsiveChart
         height={190}
-        legend={[
-          { label: "Current Setup", color: "var(--muted-foreground)" },
-          { label: "Ask Nanci Recommended", color: "var(--primary)" },
-        ]}
+        legend
+        config={{
+          current: { label: "Current Setup", color: "var(--muted-foreground)" },
+          recommended: { label: "Ask Nanci Recommended", color: "var(--primary)" },
+        }}
       >
         {(narrow) => (
         <LineChart data={NANCI_PROJECTION} margin={{ top: 20, right: 4, bottom: 0, left: 0 }}>
@@ -40,8 +41,8 @@ function Projection() {
           <XAxis dataKey="month" {...chartTickProps(narrow)} tick={{ fontSize: narrow ? 10 : 11, fill: "var(--muted-foreground)" }} tickLine={false} axisLine={false} />
           <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} tickLine={false} axisLine={false} ticks={[0, 20, 40, 60, 80, 100]} width={36} />
           <ReferenceLine x="Jun" stroke="var(--border)" label={{ value: "Today", position: "top", fontSize: 10, fill: "var(--muted-foreground)" }} />
-          <Line dataKey="current" stroke="var(--muted-foreground)" strokeWidth={1.5} dot={false} />
-          <Line dataKey="recommended" stroke="var(--primary)" strokeWidth={1.5} strokeDasharray="4 3" dot={false} connectNulls />
+          <Line dataKey="current" stroke="var(--color-current)" strokeWidth={1.5} dot={false} />
+          <Line dataKey="recommended" stroke="var(--color-recommended)" strokeWidth={1.5} strokeDasharray="4 3" dot={false} connectNulls />
         </LineChart>
         )}
       </ResponsiveChart>

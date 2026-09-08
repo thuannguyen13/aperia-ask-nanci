@@ -26,10 +26,11 @@ export function ParamHeatChart() {
   return (
     <ResponsiveChart
       height={240}
-      legend={[
-        { label: "Fires", color: "#facc15" },
-        { label: "Case rate", color: "#0d9488" },
-      ]}
+      legend
+      config={{
+        fires: { label: "Fires", color: "#facc15" },
+        caseRate: { label: "Case rate", color: "#0d9488" },
+      }}
     >
       {(narrow) => (
       <ComposedChart data={PARAM_HEAT} margin={{ top: 8, right: 8, bottom: 4, left: -8 }}>
@@ -37,8 +38,8 @@ export function ParamHeatChart() {
         <YAxis yAxisId="left" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} domain={[0, 250]} />
         <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} domain={[0, 100]} unit="%" />
         <Tooltip content={<ParamTooltip />} cursor={{ fill: "currentColor", fillOpacity: 0.06 }} />
-        <Bar yAxisId="left" dataKey="fires" fill="#facc15" radius={[3, 3, 0, 0]} />
-        <Line yAxisId="right" type="monotone" dataKey="caseRate" stroke="#0d9488" strokeWidth={2} dot={false} />
+        <Bar yAxisId="left" dataKey="fires" fill="var(--color-fires)" radius={[3, 3, 0, 0]} />
+        <Line yAxisId="right" type="monotone" dataKey="caseRate" stroke="var(--color-caseRate)" strokeWidth={2} dot={false} />
       </ComposedChart>
       )}
     </ResponsiveChart>
