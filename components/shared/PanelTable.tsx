@@ -103,15 +103,22 @@ export function PanelTable({
           The scrolling itself is ds5's; what this wrapper adds is the fade that says
           there is more to see, which a bare scroll container never tells you on a
           touchscreen where no scrollbar is drawn. */}
-      <div ref={ref} className="relative">
+      {/* The border and the rounded clip live on this frame, not on the <table>: an
+          overflow on the table makes it the containing block for a sticky cell, so a
+          pinned column scrolled away with the rest. Here the nearest scroller is ds5's
+          container and the pin holds. The frame also keeps the border on screen when
+          the table is wider than it, where a border on the table sits past the edge. */}
+      <div
+        ref={ref}
+        className={cn("relative overflow-hidden border", density === "comfortable" ? "rounded-xl" : "rounded-lg")}
+      >
         <Table
           className={cn(
-            // border-separate (not ds5's inherited collapse) so the rounded corners and
-            // overflow actually clip. Row borders do not paint in the separated model,
-            // so the dividers ride on the cells instead.
-            "border-separate border-spacing-0 overflow-hidden border",
+            // border-separate (not ds5's inherited collapse): row borders do not paint
+            // in the separated model, so the dividers ride on the cells instead.
+            "border-separate border-spacing-0",
             "[&_tr:not(:last-child)_td]:border-b",
-            density === "comfortable" ? "rounded-xl text-sm" : "rounded-lg text-xs",
+            density === "comfortable" ? "text-sm" : "text-xs",
             // The pinned column carries its own background, or the scrolling cells
             // would show through it, and a right border so the seam reads as deliberate.
             pinFirst && "[&_tr>*:first-child]:sticky [&_tr>*:first-child]:left-0 [&_tr>*:first-child]:z-10 [&_tr>*:first-child]:bg-background [&_tr>*:first-child]:border-r",
