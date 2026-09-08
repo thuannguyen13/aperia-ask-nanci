@@ -45,6 +45,8 @@ export type PanelAction =
 
 export interface ConceptScriptedTurn extends ScriptedTurn {
   sheetAction?: SheetActionData
+  /** An inline chart under the answer, drawn by MessageChart. */
+  chart?: ChartWidget
   source?: string
   suggestions?: string[]
   // Unified panel vocabulary (concept-flow pipeline): `panel` ensures a panel is

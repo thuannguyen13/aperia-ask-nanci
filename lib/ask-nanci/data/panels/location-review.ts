@@ -1,11 +1,13 @@
-// Data for Flow 24 — Location Review: the mobile adaptation showcase. One panel that
-// carries every element the mobile checklist (docs/generated/mobile-adaptation-handoff)
-// has a rule for: a tab strip that has to become a dropdown, a chart with a legend and
-// more x labels than a phone can draw, a table wider than any phone, stat tiles, a
-// callout with a default-size button, and a dialog with a text field.
+// Data for Flow 24 — Location Review: the mobile adaptation showcase. Two charts land in
+// the conversation first, then one panel carries every other element the mobile
+// checklist (docs/generated/mobile-adaptation-handoff) has a rule for: a tab strip that
+// has to become a dropdown, a donut and a bar, a table wider than any phone, stat tiles,
+// a callout with a default-size button, and a dialog with a text field.
 //
 // Every period derives from one set of base figures via a factor, so the six tabs each
 // show different numbers without six hand-typed tables that could drift apart.
+
+import type { ChartWidget } from "../../types"
 
 export interface ReviewPeriod {
   id: string
@@ -84,14 +86,6 @@ export function averageTicket(l: ReviewLocation) {
   return l.sales / l.transactions
 }
 
-/** Transactions per point across all locations, from each location's sales and ticket. */
-export function transactionsFor(period: ReviewPeriod) {
-  return trendFor(period).map((row) => ({
-    label: row.label,
-    transactions: Math.round(REVIEW_LOCATIONS.reduce((sum, l) => sum + Number(row[l.id]) / averageTicket(l), 0)),
-  }))
-}
-
 /** One trend point per label, every location as a series. */
 export function trendFor(period: ReviewPeriod) {
   const n = period.points.length
@@ -109,4 +103,29 @@ export function trendFor(period: ReviewPeriod) {
     }
     return row
   })
+}
+
+const QUARTER = REVIEW_PERIODS.find((p) => p.id === DEFAULT_REVIEW_PERIOD) ?? REVIEW_PERIODS[0]
+
+// The two charts the conversation shows before the panel opens. Same figures as the
+// panel, so what the answer draws and what the panel tabulates cannot disagree.
+
+/**
+ * One bar per location: the answer to the opening question. Labels are the first word
+ * of each name: four full names collide on a phone axis and two of them would drop,
+ * and a bar without its label is worse than a shorter label.
+ */
+export const REVIEW_SALES_CHART: ChartWidget = {
+  kind: "bar",
+  title: "Sales this quarter by location",
+  labels: REVIEW_LOCATIONS.map((l) => l.name.split(" ")[0]),
+  datasets: [{ label: "Sales", data: REVIEW_LOCATIONS.map((l) => l.sales) }],
+}
+
+/** A line per location across the quarter's weeks: thirteen labels, which a phone thins. */
+export const REVIEW_TREND_CHART: ChartWidget = {
+  kind: "line",
+  title: "Weekly sales by location",
+  labels: QUARTER.points,
+  datasets: REVIEW_LOCATIONS.map((l) => ({ label: l.name, data: trendFor(QUARTER).map((row) => Number(row[l.id])) })),
 }

@@ -8,7 +8,7 @@ import { RISK_LANDING_CONVERSATIONS } from "./risk-conversations";
 // the merchant opens seconds later can never disagree.
 import { CARD_FIGURES } from "./panels/credit-card-offer";
 // Flow 24 does the same with the location review figures.
-import { REVIEW_TOTAL_SALES, REVIEW_TOTAL_CHANGE_PCT, REVIEW_LEADER, REVIEW_WATCH, WATCH_TRANSACTIONS, averageTicket } from "./panels/location-review";
+import { REVIEW_TOTAL_SALES, REVIEW_TOTAL_CHANGE_PCT, REVIEW_LEADER, REVIEW_WATCH, REVIEW_LOCATIONS, WATCH_TRANSACTIONS, REVIEW_SALES_CHART, REVIEW_TREND_CHART, averageTicket } from "./panels/location-review";
 import { formatWholeCurrency } from "../../../components/shared/format";
 
 // ─── Flow-key constants ───────────────────────────────────────────────────────
@@ -43,6 +43,8 @@ const CONCEPT_BUSINESS_LOAN_PROMPT = "Do I have enough money for payroll?";
 const CONCEPT_FLOW23_PROMPT = "When am I busiest?";
 export const CONCEPT_FLOW23_FOLLOWUP = "and when's it dead? I want to cut a shift";
 const CONCEPT_FLOW24_PROMPT = "How are my locations doing this quarter?";
+const CONCEPT_FLOW24_TREND = "how did that change over the quarter?";
+const CONCEPT_FLOW24_BREAKDOWN = "show me the full breakdown";
 export const CONCEPT_FLOW24_FOLLOWUP = "what's going on at Midtown?";
 // Both offer flows share the same accept/decline pills (matched per-active-flow, so
 // reuse is safe). "No, ignore for now" is decorative — registered as a fake follow-up.
@@ -248,8 +250,8 @@ export const FLOW_DEFS: FlowDef[] = [
     badge: "Phone",
     key: CONCEPT_FLOW24_PROMPT,
     slug: "24",
-    followups: [CONCEPT_FLOW24_FOLLOWUP],
-    description: "One panel with every element the mobile checklist covers: period tabs that become a dropdown, a chart that drops labels, a table that scrolls under a fade, and a dialog with a text field. Open it at phone width.",
+    followups: [CONCEPT_FLOW24_TREND, CONCEPT_FLOW24_BREAKDOWN, CONCEPT_FLOW24_FOLLOWUP],
+    description: "Two charts in the conversation, then one panel with every element the mobile checklist covers: period tabs that become a dropdown, a table that scrolls under a fade, and a dialog with a text field. Open it at phone width.",
   },
 
   // ── Merchant money questions ──
@@ -983,13 +985,33 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   ],
 
   // ── Flow 24: Mobile Adaptation (Location Review) ──────────────────────────
-  // The numbers are quoted from data/panels/location-review.ts so the answer and the
-  // panel cannot disagree; the follow-up switches the same panel into its watch view.
+  // Two answers draw a chart in the conversation before the panel opens, so the reader
+  // sees an inline chart adapt and then the panel arrive. The numbers are quoted from
+  // data/panels/location-review.ts so the answers and the panel cannot disagree; the
+  // last follow-up switches the same panel into its watch view.
   [CONCEPT_FLOW24_PROMPT]: [
     { role: "user", content: CONCEPT_FLOW24_PROMPT },
     {
       role: "assistant",
       content: `Up ${REVIEW_TOTAL_CHANGE_PCT}% on last quarter, ${formatWholeCurrency(REVIEW_TOTAL_SALES)} across four locations. ${REVIEW_LEADER.name} leads at ${formatWholeCurrency(REVIEW_LEADER.sales)}. ${REVIEW_WATCH.name} is the one to watch: it fell ${Math.abs(REVIEW_WATCH.changePct)}% while the other three grew.`,
+      chart: REVIEW_SALES_CHART,
+      suggestions: [CONCEPT_FLOW24_TREND],
+    },
+  ],
+  [CONCEPT_FLOW24_TREND]: [
+    { role: "user", content: CONCEPT_FLOW24_TREND },
+    {
+      role: "assistant",
+      content: `${REVIEW_LOCATIONS[3].name} climbed every week and finished ${REVIEW_LOCATIONS[3].changePct}% up. ${REVIEW_WATCH.name} went the other way: it started April as your second-biggest location and ended June as the smallest. ${REVIEW_LEADER.name} and ${REVIEW_LOCATIONS[2].name} held steady.`,
+      chart: REVIEW_TREND_CHART,
+      suggestions: [CONCEPT_FLOW24_BREAKDOWN],
+    },
+  ],
+  [CONCEPT_FLOW24_BREAKDOWN]: [
+    { role: "user", content: CONCEPT_FLOW24_BREAKDOWN },
+    {
+      role: "assistant",
+      content: "Here is every location side by side. Change the period at the top, and drag the table sideways for refunds, chargebacks and who runs each site.",
       panel: "location-review",
       suggestions: [CONCEPT_FLOW24_FOLLOWUP],
     },

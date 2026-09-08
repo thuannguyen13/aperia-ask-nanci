@@ -501,7 +501,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const playAssistantTurn = useCallback(async (turn: ConceptScriptedTurn, suggestions: string[] | undefined) => {
     await streamWords(turn.content, { id: newSessionId(), shouldStop: () => scriptStopRef.current })
     if (turn.widgetDelay) await sleep(turn.widgetDelay)
-    if (turn.sheetAction || suggestions || turn.widget || turn.dashChart || turn.map || turn.source || turn.panel) {
+    if (turn.sheetAction || suggestions || turn.widget || turn.dashChart || turn.chart || turn.map || turn.source || turn.panel) {
       setMessages((prev) => {
         const next = [...prev]
         const last = next[next.length - 1]
@@ -512,6 +512,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
             ...(suggestions ? { suggestions } : {}),
             ...(turn.widget ? { widget: turn.widget } : {}),
             ...(turn.dashChart ? { dashChart: turn.dashChart } : {}),
+            ...(turn.chart ? { chart: turn.chart } : {}),
             ...(turn.map ? { map: turn.map } : {}),
             ...(turn.source ? { source: turn.source } : {}),
             ...(turn.panel ? { panel: turn.panel } : {}),

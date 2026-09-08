@@ -1,7 +1,7 @@
 "use client"
 
-import { useId, useState } from "react"
-import { AreaChart, Area, BarChart, Bar, Cell, LabelList, PieChart, Pie, XAxis, YAxis } from "recharts"
+import { useState } from "react"
+import { BarChart, Bar, Cell, LabelList, PieChart, Pie, XAxis, YAxis } from "recharts"
 import {
   Tabs, Button, Input, Label, type ChartConfig,
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
@@ -10,7 +10,7 @@ import { cn } from "aperia-ds5/utils"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import {
   REVIEW_PERIODS, DEFAULT_REVIEW_PERIOD, REVIEW_LOCATIONS, REVIEW_TOTAL_SALES, REVIEW_TOTAL_CHANGE_PCT,
-  REVIEW_LEADER, REVIEW_WATCH, WATCH_TRANSACTIONS, averageTicket, trendFor, transactionsFor,
+  REVIEW_LEADER, REVIEW_WATCH, WATCH_TRANSACTIONS, averageTicket,
 } from "@/lib/ask-nanci/data/panels/location-review"
 import {
   PanelShell, PanelHeader, PanelBody, PanelExportButton, NanciInsight, StatCard, Callout,
@@ -18,10 +18,12 @@ import {
   formatCurrency, formatWholeCurrency,
 } from "@/components/shared"
 
-// Flow 24, the mobile adaptation showcase. Nothing in here is mobile-only: every element
-// is the shared primitive the rest of the app uses, and what the phone does differently
-// (a dropdown instead of a tab strip, fewer axis labels, a table that scrolls under a
-// fade) is decided inside those primitives by measuring, not by a breakpoint here.
+// Flow 24, the mobile adaptation showcase. The conversation has already drawn the sales
+// bar and the weekly trend by the time this opens; the panel is the breakdown. Nothing
+// in here is mobile-only: every element is the shared primitive the rest of the app
+// uses, and what the phone does differently (a dropdown instead of a tab strip, a table
+// that scrolls under a fade) is decided inside those primitives by measuring, not by a
+// breakpoint here.
 
 const SERIES_COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)"]
 
@@ -31,9 +33,8 @@ const CHART_CONFIG: ChartConfig = Object.fromEntries(
   REVIEW_LOCATIONS.map((l, i) => [l.id, { label: l.name, color: SERIES_COLORS[i] }]),
 )
 
-// The single-series charts: one entry each, so the tooltip names the measure.
+// The single-series chart: one entry, so the tooltip names the measure.
 const TICKET_CONFIG: ChartConfig = { ticket: { label: "Avg ticket", color: SERIES_COLORS[0] } }
-const TRANSACTIONS_CONFIG: ChartConfig = { transactions: { label: "Transactions", color: SERIES_COLORS[0] } }
 
 // The tooltip row every money chart shares: series name, then the figure in mono.
 const moneyRow = (config: ChartConfig) => (v: unknown, name: unknown) => (
@@ -57,12 +58,8 @@ export function LocationReviewPanel() {
   const [note, setNote] = useState("")
   const [flagged, setFlagged] = useState(false)
 
-  const trend = trendFor(period)
-  const transactions = transactionsFor(period)
   const share = REVIEW_LOCATIONS.map((l) => ({ id: l.id, sales: l.sales * period.factor }))
   const tickets = REVIEW_LOCATIONS.map((l) => ({ name: l.name, ticket: averageTicket(l) }))
-  // SVG gradient ids are document-global; two of this panel on one page would share one.
-  const gradientId = `${useId().replace(/:/g, "")}-fill`
 
   function sendFlag() {
     setFlagged(true)
@@ -108,23 +105,6 @@ export function LocationReviewPanel() {
           <StatCard label="Leader" value={REVIEW_LEADER.name} sublabel={formatWholeCurrency(REVIEW_LEADER.sales * period.factor)} />
         </div>
 
-        <div>
-          <p className="mb-2 text-base font-semibold text-foreground">Sales by location</p>
-          <ResponsiveChart height={200} config={CHART_CONFIG} legend>
-            {(narrow) => (
-              <BarChart data={trend}>
-                <ChartGrid />
-                <XAxis dataKey="label" {...chartAxisProps(narrow)} />
-                <YAxis {...chartAxisProps(narrow)} width={narrow ? 36 : 44} tickFormatter={(v: number) => `${Math.round(v / 1000)}k`} />
-                <ChartTip formatter={moneyRow(CHART_CONFIG)} />
-                {REVIEW_LOCATIONS.map((l, i) => (
-                  <Bar key={l.id} dataKey={l.id} stackId="sales" fill={`var(--color-${l.id})`} radius={i === REVIEW_LOCATIONS.length - 1 ? [4, 4, 0, 0] : 0} />
-                ))}
-              </BarChart>
-            )}
-          </ResponsiveChart>
-        </div>
-
         {/* Two charts side by side above the breakpoint, stacked on a phone. Each takes
             its width from its own frame, so neither knows or cares which layout it is in. */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -168,28 +148,6 @@ export function LocationReviewPanel() {
               )}
             </ResponsiveChart>
           </div>
-        </div>
-
-        <div>
-          <p className="mb-2 text-base font-semibold text-foreground">Transactions</p>
-          <ResponsiveChart height={160} config={TRANSACTIONS_CONFIG}>
-            {(narrow) => (
-              <AreaChart data={transactions}>
-                <defs>
-                  <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="var(--color-transactions)" stopOpacity={0.35} />
-                    <stop offset="100%" stopColor="var(--color-transactions)" stopOpacity={0.02} />
-                  </linearGradient>
-                </defs>
-                <ChartGrid />
-                <XAxis dataKey="label" {...chartAxisProps(narrow)} />
-                {/* "1,000" needs the wider column even on a phone, or its first digit is clipped. */}
-                <YAxis {...chartAxisProps(narrow)} width={narrow ? 44 : 48} tickFormatter={(v: number) => v.toLocaleString()} />
-                <ChartTip />
-                <Area dataKey="transactions" type="monotone" stroke="var(--color-transactions)" strokeWidth={2} fill={`url(#${gradientId})`} />
-              </AreaChart>
-            )}
-          </ResponsiveChart>
         </div>
 
         <div>

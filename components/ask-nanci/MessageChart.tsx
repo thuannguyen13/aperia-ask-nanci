@@ -18,11 +18,18 @@ const CHART_COLORS = [
 // names the series in the tooltip and the legend through the config.
 const seriesKey = (i: number) => `s${i}`
 
+// "128k" fits the axis column; "128400" does not. The tooltip still shows the full figure.
+const compact = (v: number) => (Math.abs(v) >= 1000 ? `${Math.round(v / 1000)}k` : String(v))
+
 export function MessageChart({ chart }: { chart: ChartWidget }) {
   const data = chart.labels.map((label, i) => ({
     label,
     ...Object.fromEntries(chart.datasets.map((ds, s) => [seriesKey(s), ds.data[i]])),
   }))
+
+  // A handful of categories keeps every label: a bar with no name under it says
+  // nothing, and up to six short labels fit a phone. Past that the axis thins as usual.
+  const keepAllLabels = chart.labels.length <= 6 ? { interval: 0 as const } : {}
 
   const config: ChartConfig = Object.fromEntries(
     chart.datasets.map((ds, i) => [seriesKey(i), { label: ds.label, color: ds.color ?? CHART_COLORS[i % CHART_COLORS.length] }]),
@@ -39,8 +46,9 @@ export function MessageChart({ chart }: { chart: ChartWidget }) {
           {(narrow) => chart.kind === "bar" ? (
             <BarChart data={data}>
               <ChartGrid />
-              <XAxis dataKey="label" {...chartAxisProps(narrow)} />
-              <YAxis {...chartAxisProps(narrow)} width={narrow ? 32 : 40} />
+              <XAxis dataKey="label" {...chartAxisProps(narrow)} {...keepAllLabels} />
+              {/* Wide enough for "140k" on a phone: 32px clipped the leading digit. */}
+              <YAxis {...chartAxisProps(narrow)} width={narrow ? 40 : 44} tickFormatter={compact} />
               <ChartTip />
               {chart.datasets.map((_, i) => (
                 <Bar key={seriesKey(i)} dataKey={seriesKey(i)} fill={`var(--color-${seriesKey(i)})`} radius={[4, 4, 0, 0]} />
@@ -50,7 +58,7 @@ export function MessageChart({ chart }: { chart: ChartWidget }) {
             <LineChart data={data}>
               <ChartGrid />
               <XAxis dataKey="label" {...chartAxisProps(narrow)} />
-              <YAxis {...chartAxisProps(narrow)} width={narrow ? 32 : 40} />
+              <YAxis {...chartAxisProps(narrow)} width={narrow ? 40 : 44} tickFormatter={compact} />
               <ChartTip />
               {chart.datasets.map((_, i) => (
                 <Line key={seriesKey(i)} type="monotone" dataKey={seriesKey(i)} stroke={`var(--color-${seriesKey(i)})`} strokeWidth={2} dot={false} />
