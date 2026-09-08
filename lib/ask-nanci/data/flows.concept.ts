@@ -9,7 +9,7 @@ import { RISK_LANDING_CONVERSATIONS } from "./risk-conversations";
 import { CARD_FIGURES } from "./panels/credit-card-offer";
 // Flow 24 does the same with the location review figures.
 import { REVIEW_TOTAL_SALES, REVIEW_TOTAL_CHANGE_PCT, REVIEW_LEADER, REVIEW_WATCH, WATCH_TRANSACTIONS, averageTicket } from "./panels/location-review";
-import { formatWholeCurrency } from "@/components/shared/format";
+import { formatWholeCurrency } from "../../../components/shared/format";
 
 // ─── Flow-key constants ───────────────────────────────────────────────────────
 
