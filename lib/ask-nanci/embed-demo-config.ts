@@ -65,8 +65,8 @@ export function parseMode(mode: string | null): ParsedMode {
     case "placeholder":     return { ...base, theme: "placeholder" }
     // The default app, but onboarding opens every time and never records that it ran.
     case "onboarding":      return { ...base, forceOnboarding: true }
-    // The default app plays scripted flows with their panels, so the Demos tab on the
-    // welcome screen works in place. Not the catalog: the welcome stays the standard one.
+    // The default app plays scripted flows with their panels when a flow's prompt is
+    // typed. Not the catalog: the welcome stays the standard one.
     default:                return { ...base, isConceptVersion: true }
   }
 }
