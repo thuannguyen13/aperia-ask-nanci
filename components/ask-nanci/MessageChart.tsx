@@ -1,8 +1,8 @@
 "use client"
 
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis } from "recharts"
-import { ChartTooltip, ChartTooltipContent, type ChartConfig } from "aperia-ds5"
-import { ResponsiveChart, chartTickProps } from "@/components/shared/ResponsiveChart"
+import { type ChartConfig } from "aperia-ds5"
+import { ResponsiveChart, ChartGrid, ChartTip, chartAxisProps } from "@/components/shared/ResponsiveChart"
 import type { ChartWidget } from "@/lib/ask-nanci/types"
 
 const CHART_COLORS = [
@@ -38,18 +38,20 @@ export function MessageChart({ chart }: { chart: ChartWidget }) {
         <ResponsiveChart height={180} config={config} legend={chart.datasets.length > 1}>
           {(narrow) => chart.kind === "bar" ? (
             <BarChart data={data}>
-              <XAxis dataKey="label" {...chartTickProps(narrow)} />
-              <YAxis tick={{ fontSize: narrow ? 10 : 11 }} width={narrow ? 32 : 40} />
-              <ChartTooltip content={<ChartTooltipContent />} />
+              <ChartGrid />
+              <XAxis dataKey="label" {...chartAxisProps(narrow)} />
+              <YAxis {...chartAxisProps(narrow)} width={narrow ? 32 : 40} />
+              <ChartTip />
               {chart.datasets.map((_, i) => (
                 <Bar key={seriesKey(i)} dataKey={seriesKey(i)} fill={`var(--color-${seriesKey(i)})`} radius={[4, 4, 0, 0]} />
               ))}
             </BarChart>
           ) : (
             <LineChart data={data}>
-              <XAxis dataKey="label" {...chartTickProps(narrow)} />
-              <YAxis tick={{ fontSize: narrow ? 10 : 11 }} width={narrow ? 32 : 40} />
-              <ChartTooltip content={<ChartTooltipContent />} />
+              <ChartGrid />
+              <XAxis dataKey="label" {...chartAxisProps(narrow)} />
+              <YAxis {...chartAxisProps(narrow)} width={narrow ? 32 : 40} />
+              <ChartTip />
               {chart.datasets.map((_, i) => (
                 <Line key={seriesKey(i)} type="monotone" dataKey={seriesKey(i)} stroke={`var(--color-${seriesKey(i)})`} strokeWidth={2} dot={false} />
               ))}

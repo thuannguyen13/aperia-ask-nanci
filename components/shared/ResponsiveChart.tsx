@@ -2,7 +2,8 @@
 
 import { cloneElement, isValidElement, useEffect, useId, useRef, useState } from "react"
 import type { ReactElement } from "react"
-import { ChartContainer, type ChartConfig } from "aperia-ds5"
+import { CartesianGrid } from "recharts"
+import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 
 /**
@@ -14,15 +15,16 @@ import { cn } from "aperia-ds5/utils"
  * from. What the container does not decide is anything about its width being small, so
  * the three decisions below are made here once instead of chart by chart:
  *
- *  - **Margins.** The Recharts default is 5px on every side, which clips a long or turned
- *    label. The gaps here leave room for one line of tick text.
+ *  - **Chrome.** The axis, margin, grid and tooltip below are the gallery's (`/charts`),
+ *    exported so a panel and the reference page draw with the same parts. The margin is
+ *    injected into the chart element so no call site can forget it.
  *  - **The legend.** Recharts' own `<Legend>` (and ds5's `ChartLegend` over it) never
  *    reports its height, so the chart has to guess how much room to leave and gets it
  *    wrong the moment entries wrap onto a second line. `legend` renders the config's
  *    entries below the chart as ordinary markup, where its height is real layout the
  *    chart never has to account for. It carries the container's chart id so the same
  *    colour variables resolve on the swatches.
- *  - **Tick density.** `narrow` is handed back to the caller for `chartTickProps`, because
+ *  - **Tick density.** `narrow` is handed back to the caller for `chartAxisProps`, because
  *    Recharts measures collisions in pixels and a 390px axis has room for two or three
  *    dates, not eight.
  *
@@ -35,10 +37,32 @@ import { cn } from "aperia-ds5/utils"
 // it is also about where a concept side panel lands.
 const NARROW = 400
 
-// Wider than Recharts' 5px default, which exists to be overridden. Left stays 0 because
-// `<YAxis>` reserves its own width; the gap it needs is not margin.
-const MARGIN = { top: 8, right: 12, bottom: 8, left: 0 } as const
-const MARGIN_NARROW = { top: 8, right: 8, bottom: 8, left: 0 } as const
+// The chrome every chart shares with the /charts gallery, which is the reference for
+// how a chart here looks. A chart that draws its own axis lines or a solid grid is
+// drifting from it.
+
+/** Axis chrome: no axis line, no tick marks, and 8px between the line and its labels. */
+export const CHART_AXIS = { tickLine: false, axisLine: false, tickMargin: 8 } as const
+
+/**
+ * Left stays 0 because `<YAxis>` reserves its own width; the gap it needs is not
+ * margin. Bottom stays 0 because `tickMargin` already holds the x labels off the plot.
+ */
+export const CHART_MARGIN = { top: 4, right: 8, bottom: 0, left: 0 } as const
+
+/** The dashed grid, horizontal by default. */
+export function ChartGrid({ vertical = false }: { vertical?: boolean }) {
+  return <CartesianGrid vertical={vertical} horizontal={!vertical} strokeDasharray="3 3" />
+}
+
+// min-w widens the card and the row is justify-between, so the label and its value
+// get real air between them instead of nearly touching at the DS min-w-32.
+const TOOLTIP_SPACING = "min-w-44 [&_.justify-between]:gap-6"
+
+/** ds5's tooltip with the house spacing. Takes whatever `ChartTooltipContent` takes. */
+export function ChartTip({ className, indicator = "dot", ...props }: React.ComponentProps<typeof ChartTooltipContent>) {
+  return <ChartTooltip content={<ChartTooltipContent indicator={indicator} className={cn(TOOLTIP_SPACING, className)} {...props} />} />
+}
 
 export function ResponsiveChart({
   height = 200,
@@ -92,7 +116,7 @@ export function ResponsiveChart({
   // The margin is injected rather than asked for, so no call site can forget it. A chart
   // that genuinely needs its own still wins: its prop is spread last.
   const framed = isValidElement(chart)
-    ? cloneElement(chart, { margin: { ...(narrow ? MARGIN_NARROW : MARGIN), ...chart.props.margin } })
+    ? cloneElement(chart, { margin: { ...CHART_MARGIN, ...chart.props.margin } })
     : chart
 
   const entries = Object.entries(config)
@@ -108,14 +132,14 @@ export function ResponsiveChart({
         <ul
           data-chart={`chart-${id}`}
           className={cn(
-            "mt-2 flex list-none flex-wrap gap-x-3 gap-y-1 px-1",
+            "flex list-none flex-wrap gap-x-4 gap-y-2 pt-4",
             // Centred while the entries fit one line, left-aligned once they wrap, which
             // is the point at which a centred last row reads as a mistake.
             narrow ? "justify-start" : "justify-center",
           )}
         >
           {entries.map(([key, entry]) => (
-            <li key={key} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <li key={key} className="flex items-center gap-1.5 text-xs text-foreground">
               <span
                 aria-hidden
                 className="size-2 shrink-0 rounded-[2px]"
@@ -131,20 +155,24 @@ export function ResponsiveChart({
 }
 
 /**
- * The tick props an axis needs at a given width. Spread onto any `<XAxis>` whose labels
- * are long enough to collide:
+ * The axis chrome plus the tick density a given width allows. Spread onto every axis;
+ * on an `<XAxis>` it is also what lets long labels drop instead of colliding:
  *
  *     <ResponsiveChart height={180} config={{ sales: { label: "Sales", color: "var(--chart-1)" } }}>
  *       {(narrow) => (
  *         <BarChart data={data}>
- *           <XAxis dataKey="month" {...chartTickProps(narrow)} />
+ *           <ChartGrid />
+ *           <XAxis dataKey="month" {...chartAxisProps(narrow)} />
+ *           <YAxis {...chartAxisProps(narrow)} width={40} />
+ *           <ChartTip />
  *           <Bar dataKey="sales" fill="var(--color-sales)" />
  *         </BarChart>
  *       )}
  *     </ResponsiveChart>
  */
-export function chartTickProps(narrow: boolean) {
+export function chartAxisProps(narrow: boolean) {
   return {
+    ...CHART_AXIS,
     tick: { fontSize: narrow ? 10 : 11 },
     // "preserveStartEnd" keeps the first and last label whatever else drops, so a narrow
     // axis still says what range it covers. Never `interval={0}`, which forces every

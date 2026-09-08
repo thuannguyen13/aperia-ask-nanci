@@ -2,8 +2,8 @@
 
 import Image from "next/image"
 import { CornerDownRight } from "lucide-react"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ReferenceLine } from "recharts"
-import { ResponsiveChart, chartTickProps } from "@/components/shared/ResponsiveChart"
+import { LineChart, Line, XAxis, YAxis, ReferenceLine } from "recharts"
+import { ResponsiveChart, ChartGrid, chartAxisProps } from "@/components/shared/ResponsiveChart"
 import { PanelHeader } from "@/components/shared"
 import { ChatInput } from "@/components/ask-nanci/ChatInput"
 import { NANCI_REVIEW, NANCI_PROJECTION, EXAMPLE_ASSIGNMENT_NAME } from "@/lib/ask-nanci/data/risk-create-assignment"
@@ -36,10 +36,10 @@ function Projection() {
         }}
       >
         {(narrow) => (
-        <LineChart data={NANCI_PROJECTION} margin={{ top: 20, right: 4, bottom: 0, left: 0 }}>
-          <CartesianGrid vertical={false} stroke="var(--border)" />
-          <XAxis dataKey="month" {...chartTickProps(narrow)} tick={{ fontSize: narrow ? 10 : 11, fill: "var(--muted-foreground)" }} tickLine={false} axisLine={false} />
-          <YAxis tick={{ fontSize: 10, fill: "var(--muted-foreground)" }} tickLine={false} axisLine={false} ticks={[0, 20, 40, 60, 80, 100]} width={36} />
+        <LineChart data={NANCI_PROJECTION} margin={{ top: 20, right: 4 }}>
+          <ChartGrid />
+          <XAxis dataKey="month" {...chartAxisProps(narrow)} />
+          <YAxis {...chartAxisProps(narrow)} ticks={[0, 20, 40, 60, 80, 100]} width={36} />
           <ReferenceLine x="Jun" stroke="var(--border)" label={{ value: "Today", position: "top", fontSize: 10, fill: "var(--muted-foreground)" }} />
           <Line dataKey="current" stroke="var(--color-current)" strokeWidth={1.5} dot={false} />
           <Line dataKey="recommended" stroke="var(--color-recommended)" strokeWidth={1.5} strokeDasharray="4 3" dot={false} connectNulls />

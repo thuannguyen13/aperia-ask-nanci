@@ -1,7 +1,7 @@
 "use client"
 
 import { ComposedChart, Bar, Line, XAxis, YAxis, Tooltip } from "recharts"
-import { ResponsiveChart, chartTickProps } from "@/components/shared/ResponsiveChart"
+import { ResponsiveChart, ChartGrid, chartAxisProps } from "@/components/shared/ResponsiveChart"
 import { PARAM_HEAT } from "@/lib/ask-nanci/data/risk-dashboard"
 import { findParameter } from "@/lib/ask-nanci/data/risk-parameters"
 
@@ -33,10 +33,11 @@ export function ParamHeatChart() {
       }}
     >
       {(narrow) => (
-      <ComposedChart data={PARAM_HEAT} margin={{ top: 8, right: 8, bottom: 4, left: -8 }}>
-        <XAxis dataKey="param" {...chartTickProps(narrow)} tickLine={false} />
-        <YAxis yAxisId="left" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} domain={[0, 250]} />
-        <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} domain={[0, 100]} unit="%" />
+      <ComposedChart data={PARAM_HEAT} margin={{ left: -8 }}>
+        <ChartGrid />
+        <XAxis dataKey="param" {...chartAxisProps(narrow)} />
+        <YAxis yAxisId="left" {...chartAxisProps(narrow)} domain={[0, 250]} />
+        <YAxis yAxisId="right" orientation="right" {...chartAxisProps(narrow)} domain={[0, 100]} unit="%" />
         <Tooltip content={<ParamTooltip />} cursor={{ fill: "currentColor", fillOpacity: 0.06 }} />
         <Bar yAxisId="left" dataKey="fires" fill="var(--color-fires)" radius={[3, 3, 0, 0]} />
         <Line yAxisId="right" type="monotone" dataKey="caseRate" stroke="var(--color-caseRate)" strokeWidth={2} dot={false} />

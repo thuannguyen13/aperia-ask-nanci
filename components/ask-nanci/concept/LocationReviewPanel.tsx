@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { BarChart, Bar, XAxis, YAxis } from "recharts"
 import {
-  Tabs, Button, Input, Label, ChartTooltip, ChartTooltipContent, type ChartConfig,
+  Tabs, Button, Input, Label, type ChartConfig,
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
@@ -14,7 +14,7 @@ import {
 } from "@/lib/ask-nanci/data/panels/location-review"
 import {
   PanelShell, PanelHeader, PanelBody, PanelExportButton, NanciInsight, StatCard, Callout,
-  ResponsiveTabsList, ResponsiveChart, chartTickProps, PanelTable, Thead, Th, Td,
+  ResponsiveTabsList, ResponsiveChart, ChartGrid, ChartTip, chartAxisProps, PanelTable, Thead, Th, Td,
   formatCurrency, formatWholeCurrency,
 } from "@/components/shared"
 
@@ -96,9 +96,10 @@ export function LocationReviewPanel() {
           <ResponsiveChart height={200} config={CHART_CONFIG} legend>
             {(narrow) => (
               <BarChart data={trend}>
-                <XAxis dataKey="label" {...chartTickProps(narrow)} />
-                <YAxis tick={{ fontSize: narrow ? 10 : 11 }} width={narrow ? 36 : 44} tickFormatter={(v: number) => `${Math.round(v / 1000)}k`} />
-                <ChartTooltip content={<ChartTooltipContent formatter={(v, name) => <><span className="text-muted-foreground">{CHART_CONFIG[String(name)]?.label}</span><span className="ml-auto font-mono font-medium tabular-nums">{formatWholeCurrency(Number(v))}</span></>} />} />
+                <ChartGrid />
+                <XAxis dataKey="label" {...chartAxisProps(narrow)} />
+                <YAxis {...chartAxisProps(narrow)} width={narrow ? 36 : 44} tickFormatter={(v: number) => `${Math.round(v / 1000)}k`} />
+                <ChartTip formatter={(v, name) => <><span className="text-muted-foreground">{CHART_CONFIG[String(name)]?.label}</span><span className="ml-auto font-mono font-medium tabular-nums">{formatWholeCurrency(Number(v))}</span></>} />
                 {REVIEW_LOCATIONS.map((l, i) => (
                   <Bar key={l.id} dataKey={l.id} stackId="sales" fill={`var(--color-${l.id})`} radius={i === REVIEW_LOCATIONS.length - 1 ? [4, 4, 0, 0] : 0} />
                 ))}

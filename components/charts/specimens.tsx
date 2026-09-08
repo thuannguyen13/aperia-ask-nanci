@@ -10,6 +10,7 @@ import {
   ChartContainer, ChartTooltip, ChartTooltipContent,
   type ChartConfig,
 } from "aperia-ds5"
+import { ChartGrid, ChartTip, CHART_AXIS, CHART_MARGIN } from "@/components/shared"
 import { HEATMAP_HOURS, HEATMAP_ROWS } from "@/lib/ask-nanci/data/panels/busiest-times"
 import {
   GALLERY_ALERT_VOLUME, GALLERY_AUTH_FUNNEL, GALLERY_CHANNEL_MIX, GALLERY_DECLINE_REASONS,
@@ -64,15 +65,15 @@ export function buildChartConfig(
   )
 }
 
-// Axis chrome every cartesian specimen shares. ChartContainer already paints tick text
-// muted-foreground and the grid stroke border/50, so nothing here sets a color.
-const AXIS = { tickLine: false, axisLine: false, tickMargin: 8 } as const
-
+// The axis chrome, margin, grid and tooltip are the shared ones every app chart uses
+// (components/shared/ResponsiveChart.tsx): the gallery is the reference for how a chart
+// looks, so it has to draw with the same parts the panels do. ChartContainer already
+// paints tick text muted-foreground and the grid stroke border/50, so nothing here
+// sets a color.
+const AXIS = CHART_AXIS
 // Y-axis labels are currency, so they need real width and a left margin of zero. A
 // negative left inset (the usual trick for tightening a chart) clips them from the left.
-// One margin for every specimen now — legend charts no longer reserve extra
-// margin.bottom for recharts' own <Legend>, because they don't use it (see Legend below).
-const MARGIN = { top: 4, right: 8, left: 0, bottom: 0 } as const
+const MARGIN = CHART_MARGIN
 const MONEY_AXIS_WIDTH = 56
 
 // One height for every specimen, legend or not. A shorter box for no-legend charts
@@ -83,16 +84,16 @@ const MONEY_AXIS_WIDTH = 56
 const BOX = "aspect-auto h-[280px] w-full"
 
 function Grid({ opts, vertical = false }: { opts: GalleryOptions; vertical?: boolean }) {
-  return opts.grid ? <CartesianGrid vertical={vertical} horizontal={!vertical} strokeDasharray="3 3" /> : null
+  return opts.grid ? <ChartGrid vertical={vertical} /> : null
 }
-
-// min-w widens the card and the row is justify-between, so the label and its value
-// get real air between them instead of nearly touching at the DS min-w-32.
-const TOOLTIP_SPACING = "min-w-44 [&_.justify-between]:gap-6"
 
 function Tip({ opts }: { opts: GalleryOptions }) {
-  return <ChartTooltip content={<ChartTooltipContent indicator={opts.indicator} className={TOOLTIP_SPACING} />} />
+  return <ChartTip indicator={opts.indicator} />
 }
+
+// The polar specimens pass nameKey and hideLabel straight to ds5's content, so they
+// spell the tooltip out; the spacing class is the one ChartTip applies.
+const TOOLTIP_SPACING = "min-w-44 [&_.justify-between]:gap-6"
 
 // Not ds5's ChartLegend/ChartLegendContent (recharts' <Legend>) — that renders through
 // its own absolutely-positioned wrapper, sized off a worst-case guess (a fixed
