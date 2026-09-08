@@ -607,6 +607,8 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     for (let i = 0; i < script.length; i++) {
       if (scriptStopRef.current) break
       const turn = script[i]
+      if (turn.pauseBefore) await sleep(turn.pauseBefore)
+      if (scriptStopRef.current) break
       if (turn.role === "user") {
         await sleep(i === 0 ? 1000 : 1800)
         if (scriptStopRef.current) break

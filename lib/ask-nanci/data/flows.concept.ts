@@ -46,6 +46,8 @@ const CONCEPT_FLOW24_PROMPT = "How are my locations doing this quarter?";
 const CONCEPT_FLOW24_TREND = "how did that change over the quarter?";
 const CONCEPT_FLOW24_BREAKDOWN = "show me the full breakdown";
 const CONCEPT_FLOW24_WATCH = "what's going on at Midtown?";
+// Reading time after a chart or the panel lands, before the next question covers it.
+const CONCEPT_FLOW24_READ_MS = 4000;
 // Both offer flows share the same accept/decline pills (matched per-active-flow, so
 // reuse is safe). "No, ignore for now" is decorative — registered as a fake follow-up.
 const CONCEPT_OFFER_YES = "Yes, show me";
@@ -995,13 +997,13 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       content: `Up ${REVIEW_TOTAL_CHANGE_PCT}% on last quarter, ${formatWholeCurrency(REVIEW_TOTAL_SALES)} across four locations. ${REVIEW_LEADER.name} leads at ${formatWholeCurrency(REVIEW_LEADER.sales)}. ${REVIEW_WATCH.name} is the one to watch: it fell ${Math.abs(REVIEW_WATCH.changePct)}% while the other three grew.`,
       chart: REVIEW_SALES_CHART,
     },
-    { role: "user", content: CONCEPT_FLOW24_TREND },
+    { role: "user", content: CONCEPT_FLOW24_TREND, pauseBefore: CONCEPT_FLOW24_READ_MS },
     {
       role: "assistant",
       content: `${REVIEW_LOCATIONS[3].name} climbed every week and finished ${REVIEW_LOCATIONS[3].changePct}% up. ${REVIEW_WATCH.name} went the other way: it started April as your second-biggest location and ended June as the smallest. ${REVIEW_LEADER.name} and ${REVIEW_LOCATIONS[2].name} held steady.`,
       chart: REVIEW_TREND_CHART,
     },
-    { role: "user", content: CONCEPT_FLOW24_BREAKDOWN },
+    { role: "user", content: CONCEPT_FLOW24_BREAKDOWN, pauseBefore: CONCEPT_FLOW24_READ_MS },
     {
       role: "assistant",
       content: "Here is every location side by side. Change the period at the top, and drag the table sideways for refunds, chargebacks and who runs each site.",
@@ -1009,7 +1011,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       // The reader asked for the breakdown, so on a phone the sheet comes up with it.
       revealPanel: true,
     },
-    { role: "user", content: CONCEPT_FLOW24_WATCH },
+    { role: "user", content: CONCEPT_FLOW24_WATCH, pauseBefore: CONCEPT_FLOW24_READ_MS },
     {
       role: "assistant",
       content: `Fewer lunch transactions. ${REVIEW_WATCH.name} ran ${WATCH_TRANSACTIONS.to.count.toLocaleString()} in ${WATCH_TRANSACTIONS.to.month} against ${WATCH_TRANSACTIONS.from.count.toLocaleString()} in ${WATCH_TRANSACTIONS.from.month}, while the average ticket held around ${formatWholeCurrency(averageTicket(REVIEW_WATCH))}. That points at foot traffic, not pricing. I can flag it for ${REVIEW_WATCH.manager} from the panel.`,

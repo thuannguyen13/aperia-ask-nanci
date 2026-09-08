@@ -66,6 +66,12 @@ export interface ConceptScriptedTurn extends ScriptedTurn {
   dashChart?: DashChartId
   widgetDelay?: number
   pauseAfter?: number
+  /**
+   * Extra ms before this turn plays, on top of the auto player's own beat. For a user
+   * turn that follows a chart or a panel: the reader needs time with what just arrived
+   * before the next question covers it.
+   */
+  pauseBefore?: number
 }
 
 // ─── API / user types ──────────────────────────────────────────────────────────
