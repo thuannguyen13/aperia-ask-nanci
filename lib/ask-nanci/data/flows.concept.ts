@@ -154,6 +154,7 @@ export interface FlowDef {
   followups?: string[]; // continuation keys kept in-session (derive CONCEPT_NO_RESET_PROMPTS)
   keepSession?: boolean; // this flow's own key is reachable mid-session — don't reset on it
   manual?: boolean; // step one turn per pill click instead of auto-playing the script
+  loop?: boolean; // under ?autoplay, rewind the screen at the end and play again
   // A destination card opens a surface instead of playing a conversation. Its `key`
   // is an internal id, not a prompt, so it stays out of the trigger-prompt lists.
   destination?: "marketplace";
@@ -252,6 +253,7 @@ export const FLOW_DEFS: FlowDef[] = [
     badge: "Phone",
     key: CONCEPT_FLOW24_PROMPT,
     slug: "24",
+    loop: true,
     followups: [CONCEPT_FLOW24_WATCH],
     description: "Two charts in the conversation, then one panel with every element the mobile checklist covers: period tabs that become a dropdown, a table that scrolls under a fade, and a dialog with a text field. Open it at phone width.",
   },
@@ -416,6 +418,10 @@ export const CONCEPT_NO_RESET_PROMPTS = new Set<string>([...FLOW_DEFS.filter((f)
 export const CONCEPT_MANUAL_PROMPTS = new Set<string>(
   FLOW_DEFS.filter((f) => !f.destination && (f.manual ?? f.section === "merchant")).flatMap((f) => [f.key, ...(f.followups ?? []), ...(f.altEntries?.map((e) => e.key) ?? [])]),
 );
+
+// Flows that play again instead of stopping, for a demo left running on a screen.
+// Only under ?autoplay: a flow someone opened themselves ends where its script ends.
+export const CONCEPT_LOOP_PROMPTS = new Set<string>(FLOW_DEFS.filter((f) => f.loop).map((f) => f.key));
 
 // ─── Sheet action data (populated at module load) ─────────────────────────────
 
@@ -988,9 +994,13 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
 
   // ── Flow 24: Mobile Adaptation (Location Review) ──────────────────────────
   // Three exchanges play on their own: two answers draw a chart in the conversation and
-  // the third opens the panel, which is where the demo stops. The Midtown question is a
+  // the third opens the panel, which is where the demo rests. The Midtown question is a
   // pill from there, for a reader who wants the watch view. The numbers are quoted from
   // data/panels/location-review.ts so the answers and the panel cannot disagree.
+  //
+  // Under ?autoplay it runs on a loop (`loop` on the flow def): it holds on the panel,
+  // winds the screen back to empty, and starts again. Nothing here changes for it: the
+  // rewind is the player's, not the script's.
   [CONCEPT_FLOW24_PROMPT]: [
     { role: "user", content: CONCEPT_FLOW24_PROMPT },
     {

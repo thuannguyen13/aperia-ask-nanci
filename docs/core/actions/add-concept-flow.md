@@ -4,7 +4,7 @@
 
 The recurring work in this repo, and the task every architectural decision is scored against.
 
-1. Add a flow definition to `FLOW_DEFS` in `lib/ask-nanci/data/flows.concept.ts`. The prompt lists are all *derived* from it, so do not hand-edit them: `CONCEPT_ALL_PROMPTS` (from each flow's `key`), `CONCEPT_NO_RESET_PROMPTS` (from `keepSession` + `followups`), and `CONCEPT_MANUAL_PROMPTS` (from `manual`/`section` + `followups`).
+1. Add a flow definition to `FLOW_DEFS` in `lib/ask-nanci/data/flows.concept.ts`. The prompt lists are all *derived* from it, so do not hand-edit them: `CONCEPT_ALL_PROMPTS` (from each flow's `key`), `CONCEPT_NO_RESET_PROMPTS` (from `keepSession` + `followups`), `CONCEPT_MANUAL_PROMPTS` (from `manual`/`section` + `followups`), and `CONCEPT_LOOP_PROMPTS` (from `loop`).
 2. Add the full turn sequence to `CONCEPT_SCRIPTED_CONVERSATIONS`, keyed by the flow's `key`.
 3. Wire panel effects in the turn objects: `panel`, `view`, `closePanel`, `filterDeclineReport`, `closeAllPanels`. See "Turn effects" below.
 4. If the flow needs a new panel, do Read-when **adding a panel** first.
@@ -27,5 +27,13 @@ The contract between a scripted flow and the panel stack. These are the real fie
 | `closePanel: "panel-id"` | Closes one panel, e.g. to replace it with another. |
 | `filterDeclineReport: true` | Switches the decline-report panel into its filtered view. |
 | `closeAllPanels: true` | Resets all open panels (staggered close animation), plus panel views and the decline-report filter. |
+
+## Looping demos
+
+Set `loop: true` on the flow def for a demo that runs unattended on a screen. It changes nothing about the script: the auto player reaches the last turn, holds on it, then rewinds and plays again.
+
+The rewind is an animation, not a reset. The phone's sheet goes down to its handle, the panels stagger out, the conversation fades, and only then are the messages cleared, behind a screen that is already empty. `conversationFading` on the context is what the fade rides; `ChatView` is its only reader.
+
+Two limits. The loop runs only under `?autoplay`, so a flow someone opened from a card still ends where its script ends. A looping flow never sets `flowFinished`, so it shows no Restart button: it is about to restart itself.
 
 Adding a declarative field here is nearly always better than adding an imperative branch in `playConceptScripted`: the whole point is that a flow is data, not code.

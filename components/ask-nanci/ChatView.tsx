@@ -34,7 +34,7 @@ function RestartDemoButton() {
 const ENABLE_SCROLL_TO_BOTTOM_BUTTON = false
 
 export function ChatView() {
-  const { messages, chatState, chatTitle } = useAskNanci()
+  const { messages, chatState, chatTitle, conversationFading } = useAskNanci()
   const pendingBot = usePendingBot()
   const { containerRef, spacerRef, lastUserMsgRef, isPinnedToBottom, scrollToBottom } =
     useChatScroll({ phase: chatState === "thinking" ? "awaiting" : chatState })
@@ -51,7 +51,15 @@ export function ChatView() {
       {chatTitle && <PanelHeader title={chatTitle} size="lg" />}
       <div className="relative min-h-0 flex-1">
       <div ref={containerRef} className="h-full overflow-y-auto">
-      <div className="mx-auto w-full max-w-[800px] flex flex-col gap-0 pt-4">
+      {/* A looping demo fades the conversation out before it clears the messages, so
+          the screen empties instead of cutting (AskNanciContext, rewindForLoop). The
+          fade is on the list rather than on [data-nest], which the mobile sheet already
+          drives off --sheet-progress: two writers on one opacity would fight. */}
+      <div
+        className={`mx-auto w-full max-w-[800px] flex flex-col gap-0 pt-4 transition-opacity duration-500 ease-out ${
+          conversationFading ? "opacity-0" : "opacity-100"
+        }`}
+      >
         {/* The streaming bubble is rendered inside the same list as the committed
             messages, not after it. Its id is the id it commits under, but React only
             matches keys within one sibling list: as a separate child after the map it

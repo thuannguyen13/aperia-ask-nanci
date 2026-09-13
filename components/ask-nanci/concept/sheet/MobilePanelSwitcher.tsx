@@ -225,12 +225,15 @@ function PanelSheet({ config, panelId, present, open, label, pager, onOpen, onCl
         role={open ? "dialog" : undefined}
         aria-label={open ? label : undefined}
         tabIndex={-1}
+        // Faded rather than switched: a panel arriving and a panel taken away are both
+        // moments the reader is looking at, and a handle that blinks out of existence
+        // reads as a glitch. Transitioned with the transform below, over the same 300ms.
         style={{ opacity: peek || open ? 1 : 0 }}
         className={`${SHEET_CARD} group flex overflow-hidden outline-none ${
           open || peek ? "pointer-events-auto" : ""
         } ${
           vertical ? "flex-col" : "flex-row"
-        } border-border bg-background shadow-2xl data-[resting]:pointer-events-none data-[resting]:border-transparent data-[resting]:bg-transparent data-[resting]:shadow-none transition-[transform,background-color,border-color,box-shadow] duration-300 ease-out`}
+        } border-border bg-background shadow-2xl data-[resting]:pointer-events-none data-[resting]:border-transparent data-[resting]:bg-transparent data-[resting]:shadow-none transition-[transform,opacity,background-color,border-color,box-shadow] duration-300 ease-out`}
       >
         {/* The grab strip runs along the anchored edge: across the top for a bottom
             sheet, down the left for a right-side one. While peeking it is the whole

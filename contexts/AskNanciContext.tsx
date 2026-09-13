@@ -21,12 +21,22 @@ import type { CurrentUser, PromptCategory } from "@/lib/ask-nanci/api"
 import { MOCK_USAGE, DEFAULT_CURRENT_USER } from "@/lib/ask-nanci/mock-data"
 import { EMBED_DEMO_SOURCES, EMBED_BUSINESS_OWNER_DEMO_SOURCES, EMBED_ISO_DEMO_SOURCES, EMBED_VW_DEMO_SOURCES, SCRIPTED_CONVERSATIONS } from "@/lib/ask-nanci/embed-demo-config"
 import type { EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
-import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_ALL_PROMPTS, CONCEPT_PANEL_REPLIES, CONCEPT_NO_RESET_PROMPTS, CONCEPT_MANUAL_PROMPTS, CONCEPT_FLOW16_FOLLOWUPS, CONCEPT_FAKE_FOLLOWUPS, CONCEPT_CHAT_TITLES, CONCEPT_DECLINE_REPLIES, CONCEPT_OFFER_NO } from "@/lib/ask-nanci/data/flows.concept"
+import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_ALL_PROMPTS, CONCEPT_PANEL_REPLIES, CONCEPT_NO_RESET_PROMPTS, CONCEPT_MANUAL_PROMPTS, CONCEPT_LOOP_PROMPTS, CONCEPT_FLOW16_FOLLOWUPS, CONCEPT_FAKE_FOLLOWUPS, CONCEPT_CHAT_TITLES, CONCEPT_DECLINE_REPLIES, CONCEPT_OFFER_NO } from "@/lib/ask-nanci/data/flows.concept"
 import { ACCOUNT_CHANGE_SHEET } from "@/lib/ask-nanci/data/panels/account-change"
 import { FOUNDATION_SOURCE_ID } from "@/lib/ask-nanci/source-store"
 import { ONBOARDING_KEY } from "@/lib/ask-nanci/storage-keys"
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
+
+// A looping flow's rewind, in the order the beats play (see rewindForLoop). The hold
+// is the longest read in the demo: the last turn is the one with the panel in it.
+const LOOP_HOLD_MS = 6000
+/** The sheet's own settle, so the card is down before the stack empties under it. */
+const LOOP_SHEET_DOWN_MS = 300
+/** Matches the conversation's fade in ChatView. */
+const LOOP_FADE_MS = 500
+/** Empty screen between two runs, long enough to read as a break rather than a glitch. */
+const LOOP_BLANK_MS = 400
 
 // Once the conversation moves past an assistant message (a new user turn is sent),
 // drop that message's suggestion pills so a clicked pill doesn't linger.
@@ -120,6 +130,12 @@ interface AskNanciCtx {
    */
   flowFinished: boolean
   /**
+   * True while a looping demo is winding the screen back to empty between runs. The
+   * conversation fades on it, so the messages are gone before they are cleared.
+   * ChatView is the only reader.
+   */
+  conversationFading: boolean
+  /**
    * Would clicking this suggestion abandon the demo the URL pinned? Only ever true
    * in a `?flow=` embed, where the flow is the whole point of the page — elsewhere a
    * chip that starts another conversation is exactly what the user wants.
@@ -212,6 +228,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
   const [onboardingOpen, setOnboardingOpen] = useState(false)
   const [flowFinished, setFlowFinished] = useState(false)
+  const [conversationFading, setConversationFading] = useState(false)
   const [tourActive, setTourActive] = useState(false)
   const [tourRequest, setTourRequest] = useState(0)
   const requestTour = useCallback(() => setTourRequest((n) => n + 1), [])
@@ -267,6 +284,13 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   // only writes it back at the end, so a second pill click mid-step would replay the same
   // cursor and interleave two runs. While a step is in flight, further calls are no-ops.
   const isAdvancingRef = useRef<boolean>(false)
+  // Which auto-play run owns the screen. A looping flow spends most of its time
+  // asleep (the hold, the rewind), where scriptStopRef alone cannot protect it: a pill
+  // click starts the next flow by *lowering* that ref, so the sleeping run would wake
+  // up believing it is still live and clear the conversation out from under the new
+  // one. Every run keeps the number it started with and stops as soon as it is not
+  // the current one.
+  const autoRunRef = useRef(0)
   const sessionIdRef = useRef<string>(newSessionId())
 
   useEffect(() => {
@@ -499,12 +523,31 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     turnToPanelActions(turn).forEach(applyPanelAction)
   }, [applyPanelAction])
 
+  // Stagger the open panels closed, right column first and then left, and reset
+  // everything that hangs off the stack. Read the stack from its ref, not from a
+  // closed-over `dynamicPanels`: the players call this from an async loop that
+  // captured one version of this callback when the flow started, so any panel opened
+  // since would be missing from a closure value. Used by a `closeAllPanels` turn and
+  // by a looping flow's rewind.
+  const closeAllPanelsStaggered = useCallback(async () => {
+    const current = [...dynamicPanelsRef.current]
+    const rightFirst = ["coastal-risk", "transaction-receipt", "email-draft", "change-log"]
+    const first = current.find(p => rightFirst.includes(p))
+    const rest = current.filter(p => p !== first)
+    if (first) { setClosingPanels([first]); await sleep(350) }
+    if (rest.length) { setClosingPanels(current); await sleep(350) }
+    setClosingPanels([])
+    resetDynamic()
+    setDeclineReportFiltered(false)
+    resetPanelViews()
+  }, [resetDynamic, resetPanelViews, dynamicPanelsRef])
+
   // Shared assistant-turn playback for both players (manual runConceptStep + auto
   // runConceptAuto): stream the reply, attach any sheet/suggestions/widget/map,
   // apply panel effects, and stagger a closeAll if the turn asks for it. `suggestions`
   // differs per caller (manual falls back to the next question), so it's passed in.
-  const playAssistantTurn = useCallback(async (turn: ConceptScriptedTurn, suggestions: string[] | undefined) => {
-    await streamWords(turn.content, { id: newSessionId(), shouldStop: () => scriptStopRef.current })
+  const playAssistantTurn = useCallback(async (turn: ConceptScriptedTurn, suggestions: string[] | undefined, shouldStop: () => boolean = () => scriptStopRef.current) => {
+    await streamWords(turn.content, { id: newSessionId(), shouldStop })
     if (turn.widgetDelay) await sleep(turn.widgetDelay)
     if (turn.sheetAction || suggestions || turn.widget || turn.dashChart || turn.chart || turn.map || turn.source || turn.panel) {
       setMessages((prev) => {
@@ -530,22 +573,9 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     applyTurnEffects(turn)
     if (turn.closeAllPanels) {
       await sleep(600)
-      // Stagger panels closed — right column first, then left. Read the stack from
-      // its ref, not from a closed-over `dynamicPanels`: the players call this from
-      // an async loop that captured one version of this callback when the flow
-      // started, so any panel opened since would be missing from a closure value.
-      const current = [...dynamicPanelsRef.current]
-      const rightFirst = ["coastal-risk", "transaction-receipt", "email-draft", "change-log"]
-      const first = current.find(p => rightFirst.includes(p))
-      const rest = current.filter(p => p !== first)
-      if (first) { setClosingPanels([first]); await sleep(350) }
-      if (rest.length) { setClosingPanels(current); await sleep(350) }
-      setClosingPanels([])
-      resetDynamic()
-      setDeclineReportFiltered(false)
-      resetPanelViews()
+      await closeAllPanelsStaggered()
     }
-  }, [streamWords, applyTurnEffects])
+  }, [streamWords, applyTurnEffects, closeAllPanelsStaggered])
 
   // Play one manual step of the active flow: the pending user turn (if any) plus the
   // assistant turn(s) that follow, then stop and surface the next user question as a
@@ -607,32 +637,80 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   // Auto-play (non-manual flows): run the whole script start to finish, advancing
   // user turns on a timer. This is the original behavior for the interaction-pattern
   // flows; Merchant Money flows step manually via runConceptStep instead.
-  const runConceptAuto = useCallback(async (script: ConceptScriptedTurn[]) => {
+  //
+  // `loop` is a flow marked `loop` playing under ?autoplay: instead of resting on its
+  // last turn it rewinds the screen and runs again, for a demo left on a screen all
+  // day. The end of a run is a beat of the demo, not a reset, so it is played rather
+  // than cut: see rewindForLoop.
+  const runConceptTurns = useCallback(async (script: ConceptScriptedTurn[], loop: boolean, shouldStop: () => boolean) => {
     for (let i = 0; i < script.length; i++) {
-      if (scriptStopRef.current) break
+      if (shouldStop()) break
       const turn = script[i]
       if (turn.pauseBefore) await sleep(turn.pauseBefore)
-      if (scriptStopRef.current) break
+      if (shouldStop()) break
       if (turn.role === "user") {
         await sleep(i === 0 ? 1000 : 1800)
-        if (scriptStopRef.current) break
+        if (shouldStop()) break
         setMessages((prev) => [...withClearedSuggestions(prev), { id: newSessionId(), role: "user" as const, content: turn.content }])
         if (turn.pauseAfter) await sleep(turn.pauseAfter)
         applyTurnEffects(turn)
         setChatState("thinking")
       } else {
         await sleep(1800)
-        if (scriptStopRef.current) break
-        await playAssistantTurn(turn, turn.suggestions)
-        if (i === script.length - 1) { setChatState("idle"); setFlowFinished(true) }
+        if (shouldStop()) break
+        await playAssistantTurn(turn, turn.suggestions, shouldStop)
+        // A looping flow never finishes: the Restart button would offer, for a second,
+        // the one thing that is about to happen anyway.
+        if (i === script.length - 1) { setChatState("idle"); if (!loop) setFlowFinished(true) }
       }
     }
   }, [playAssistantTurn, applyTurnEffects])
+
+  // Hold on the last turn, then take the screen apart in the order it was built:
+  // the phone's sheet goes down, the panels stagger out, and the conversation fades
+  // while they go. Only then are the messages dropped, behind a screen that is
+  // already empty. Clearing them in view is the hard cut this exists to avoid.
+  const rewindForLoop = useCallback(async (shouldStop: () => boolean) => {
+    await sleep(LOOP_HOLD_MS)
+    if (shouldStop()) return
+    // Phone only: the sheet slides down to its handle before the card is taken away,
+    // so it leaves the way the reader would send it. Desktop has no sheet to move.
+    setPanelSheetDismissed(true)
+    await sleep(LOOP_SHEET_DOWN_MS)
+    if (shouldStop()) return
+    setConversationFading(true)
+    await Promise.all([closeAllPanelsStaggered(), sleep(LOOP_FADE_MS)])
+    if (shouldStop()) return
+    setMessages([])
+    setPendingBot(null)
+    setChatState("idle")
+    // A beat on the empty screen, then it comes back up ready for the first question.
+    await sleep(LOOP_BLANK_MS)
+    setConversationFading(false)
+  }, [closeAllPanelsStaggered, setPendingBot])
+
+  const runConceptAuto = useCallback(async (script: ConceptScriptedTurn[], loop = false) => {
+    const run = autoRunRef.current
+    const shouldStop = () => scriptStopRef.current || autoRunRef.current !== run
+    do {
+      await runConceptTurns(script, loop, shouldStop)
+      if (!loop || shouldStop()) break
+      await rewindForLoop(shouldStop)
+    } while (!shouldStop())
+    // A run cut short mid-rewind leaves the conversation faded out. Only the run that
+    // still owns the screen hands it back: a superseded one would fade the flow that
+    // replaced it back in over its own first turn.
+    if (autoRunRef.current === run) setConversationFading(false)
+  }, [runConceptTurns, rewindForLoop])
 
   const playConceptScripted = useCallback((prompt: string) => {
     const script = CONCEPT_SCRIPTED_CONVERSATIONS[prompt]
     if (!script) return
     scriptStopRef.current = false
+    // This run owns the screen from here: any auto-play still sleeping mid-loop sees
+    // the number move and stops.
+    autoRunRef.current++
+    setConversationFading(false)
     setFlowFinished(false)
     setThinking((prev) => ({ ...prev, label: "Thinking…" }))
     setView("chat")
@@ -651,9 +729,11 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     } else {
       // Everything else auto-plays as before.
       activeFlowRef.current = null
-      runConceptAuto(script)
+      // Looping is the ?autoplay reading of a flow marked `loop`. A flow someone opened
+      // themselves ends where its script ends.
+      runConceptAuto(script, autoPlay && CONCEPT_LOOP_PROMPTS.has(prompt))
     }
-  }, [runConceptStep, runConceptAuto])
+  }, [runConceptStep, runConceptAuto, autoPlay])
 
   // Advance the active flow one step when its next-question pill is clicked.
   const advanceConceptFlow = useCallback(() => {
@@ -890,7 +970,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       settingsOpen, openSettings, setSettingsOpen,
       mobileSidebarOpen, setMobileSidebarOpen,
       shownPanelId, setShownPanelId, panelSheetDismissed, dismissPanelSheet, reopenPanelSheet, panelSheetOpen,
-      onboardingOpen, setOnboardingOpen, forceOnboarding, genericBrand, tourActive, setTourActive, tourRequest, requestTour, flowFinished, leavesCurrentFlow,
+      onboardingOpen, setOnboardingOpen, forceOnboarding, genericBrand, tourActive, setTourActive, tourRequest, requestTour, flowFinished, conversationFading, leavesCurrentFlow,
       isConceptVersion, catalog,
       submitFormPanel, submitOfferApplication, submitStepUpPanel,
       triggerProactiveFlow, proactiveNotificationActive, activateProactiveNotification,
