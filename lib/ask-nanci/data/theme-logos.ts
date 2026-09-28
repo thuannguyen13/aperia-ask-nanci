@@ -47,7 +47,7 @@ const THEME_LOGOS = {
   },
   // Full-color artwork with navy ink, so the frame bar whitens it in globals.css.
   talus: {
-    frame: { src: "/logos/talus.png", alt: "Talus", width: 264, height: 64 },
+    frame: { src: "/logos/readypoint.png", alt: "ReadyPoint", width: 572, height: 128 },
   },
   woodforest: {
     frame: { src: "/logos/logo-woodforest.png", alt: "Woodforest National Bank", width: 278, height: 48 },
