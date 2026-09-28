@@ -38,6 +38,11 @@ const LOOP_FADE_MS = 500
 /** Empty screen between two runs, long enough to read as a break rather than a glitch. */
 const LOOP_BLANK_MS = 400
 
+// A mode's intro: the host's own app is on screen first, and Ask Nanci slides up over it.
+const INTRO_HOLD_MS = 3000
+/** Matches the slide in HostIntro (AppShell). */
+const INTRO_SLIDE_MS = 550
+
 // Once the conversation moves past an assistant message (a new user turn is sent),
 // drop that message's suggestion pills so a clicked pill doesn't linger.
 const withClearedSuggestions = (msgs: Message[]): Message[] =>
@@ -136,6 +141,11 @@ interface AskNanciCtx {
    */
   conversationFading: boolean
   /**
+   * True while a mode's intro has the host's app on screen, with Ask Nanci slid down
+   * out of view. Only the ?autoplay flow plays the intro. HostIntro is the only reader.
+   */
+  introShowing: boolean
+  /**
    * Would clicking this suggestion abandon the demo the URL pinned? Only ever true
    * in a `?flow=` embed, where the flow is the whole point of the page — elsewhere a
    * chip that starts another conversation is exactly what the user wants.
@@ -187,7 +197,7 @@ export function usePanelView(id: PanelId, fallback: string): string {
   return useAskNanci().panelViews[id] ?? fallback
 }
 
-export function AskNanciProvider({ children, isEmbed = false, embedVariant = null, isConceptVersion = false, catalog = false, autoPlayFlow = null, autoPlay = false, initialView, initialMarketplaceOpen = false, forceOnboarding = false, skipOnboarding = false, genericBrand = false }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null; isConceptVersion?: boolean; catalog?: boolean; autoPlayFlow?: string | null; autoPlay?: boolean; initialView?: ChatView; initialMarketplaceOpen?: boolean; forceOnboarding?: boolean; skipOnboarding?: boolean; genericBrand?: boolean }) {
+export function AskNanciProvider({ children, isEmbed = false, embedVariant = null, isConceptVersion = false, catalog = false, autoPlayFlow = null, autoPlay = false, initialView, initialMarketplaceOpen = false, forceOnboarding = false, skipOnboarding = false, genericBrand = false, intro = false }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null; isConceptVersion?: boolean; catalog?: boolean; autoPlayFlow?: string | null; autoPlay?: boolean; initialView?: ChatView; initialMarketplaceOpen?: boolean; forceOnboarding?: boolean; skipOnboarding?: boolean; genericBrand?: boolean; intro?: boolean }) {
   const [view, setView] = useState<ChatView>(initialView ?? (embedVariant === "concept-embed" ? "chat" : "welcome"))
   const [messages, setMessages] = useState<Message[]>([])
   const [chatState, setChatState] = useState<ChatState>("idle")
@@ -229,6 +239,8 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [onboardingOpen, setOnboardingOpen] = useState(false)
   const [flowFinished, setFlowFinished] = useState(false)
   const [conversationFading, setConversationFading] = useState(false)
+  // Up from the first paint, so the autoplay flow opens on the host's app, not a flash of chat.
+  const [introShowing, setIntroShowing] = useState(intro && autoPlay)
   const [tourActive, setTourActive] = useState(false)
   const [tourRequest, setTourRequest] = useState(0)
   const requestTour = useCallback(() => setTourRequest((n) => n + 1), [])
@@ -689,10 +701,22 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setConversationFading(false)
   }, [closeAllPanelsStaggered, setPendingBot])
 
-  const runConceptAuto = useCallback(async (script: ConceptScriptedTurn[], loop = false) => {
+  // Every run of an intro flow starts on the host's app, the looped ones included, so
+  // each pass shows Ask Nanci arriving from inside it.
+  const playIntro = useCallback(async (shouldStop: () => boolean) => {
+    setIntroShowing(true)
+    await sleep(INTRO_SLIDE_MS + INTRO_HOLD_MS)
+    if (shouldStop()) return
+    setIntroShowing(false)
+    await sleep(INTRO_SLIDE_MS)
+  }, [])
+
+  const runConceptAuto = useCallback(async (script: ConceptScriptedTurn[], loop = false, withIntro = false) => {
     const run = autoRunRef.current
     const shouldStop = () => scriptStopRef.current || autoRunRef.current !== run
     do {
+      if (withIntro) await playIntro(shouldStop)
+      if (shouldStop()) break
       await runConceptTurns(script, loop, shouldStop)
       if (!loop || shouldStop()) break
       await rewindForLoop(shouldStop)
@@ -700,8 +724,8 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     // A run cut short mid-rewind leaves the conversation faded out. Only the run that
     // still owns the screen hands it back: a superseded one would fade the flow that
     // replaced it back in over its own first turn.
-    if (autoRunRef.current === run) setConversationFading(false)
-  }, [runConceptTurns, rewindForLoop])
+    if (autoRunRef.current === run) { setConversationFading(false); setIntroShowing(false) }
+  }, [runConceptTurns, rewindForLoop, playIntro])
 
   const playConceptScripted = useCallback((prompt: string) => {
     const script = CONCEPT_SCRIPTED_CONVERSATIONS[prompt]
@@ -731,9 +755,9 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       activeFlowRef.current = null
       // Looping is the ?autoplay reading of a flow marked `loop`. A flow someone opened
       // themselves ends where its script ends.
-      runConceptAuto(script, autoPlay && CONCEPT_LOOP_PROMPTS.has(prompt))
+      runConceptAuto(script, autoPlay && CONCEPT_LOOP_PROMPTS.has(prompt), intro && autoPlay && prompt === autoPlayFlow)
     }
-  }, [runConceptStep, runConceptAuto, autoPlay])
+  }, [runConceptStep, runConceptAuto, autoPlay, intro, autoPlayFlow])
 
   // Advance the active flow one step when its next-question pill is clicked.
   const advanceConceptFlow = useCallback(() => {
@@ -970,7 +994,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       settingsOpen, openSettings, setSettingsOpen,
       mobileSidebarOpen, setMobileSidebarOpen,
       shownPanelId, setShownPanelId, panelSheetDismissed, dismissPanelSheet, reopenPanelSheet, panelSheetOpen,
-      onboardingOpen, setOnboardingOpen, forceOnboarding, genericBrand, tourActive, setTourActive, tourRequest, requestTour, flowFinished, conversationFading, leavesCurrentFlow,
+      onboardingOpen, setOnboardingOpen, forceOnboarding, genericBrand, tourActive, setTourActive, tourRequest, requestTour, flowFinished, conversationFading, introShowing, leavesCurrentFlow,
       isConceptVersion, catalog,
       submitFormPanel, submitOfferApplication, submitStepUpPanel,
       triggerProactiveFlow, proactiveNotificationActive, activateProactiveNotification,

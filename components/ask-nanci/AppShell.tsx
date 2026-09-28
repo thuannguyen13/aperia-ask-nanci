@@ -38,6 +38,24 @@ function ReplayButton() {
   )
 }
 
+// The host's app fills the screen on its own while the whole Ask Nanci frame, brand bar
+// included, is slid down out of view. The duration matches INTRO_SLIDE_MS in the
+// context, which waits on it. The upward shadow marks the rising edge. Parked 2.5rem
+// past the bottom, it does not bleed onto the host's screen, and at rest it is above
+// the viewport and clipped.
+function HostIntro({ src, children }: { src: string | null; children: React.ReactNode }) {
+  const { introShowing } = useAskNanci()
+  if (!src) return <>{children}</>
+  return (
+    <div className="relative h-[100dvh] overflow-hidden bg-white">
+      <Image src={src} alt="" fill priority sizes="100vw" className="object-contain object-top" />
+      <div className={`relative shadow-[0_-12px_32px_-8px_rgb(0_0_0/0.18)] transition-transform duration-[550ms] ease-out ${introShowing ? "translate-y-[calc(100%+2.5rem)]" : ""}`}>
+        {children}
+      </div>
+    </div>
+  )
+}
+
 // Chat column. The marketplace is a full content-area view, so the chat hides (stays
 // mounted — never remounted) while it's open.
 function ChatArea({ children }: { children: React.ReactNode }) {
@@ -113,7 +131,7 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams()
-  const { isEmbed, embedVariant, isConceptVersion, catalog, theme, forceOnboarding } = parseMode(searchParams.get("mode"))
+  const { isEmbed, embedVariant, isConceptVersion, catalog, theme, forceOnboarding, intro } = parseMode(searchParams.get("mode"))
   const rawFlow = searchParams.get("flow")
   const autoPlayFlow = (rawFlow && CONCEPT_FLOW_SLUGS[rawFlow]) ?? null
   // `?autoplay` plays ?flow= on load rather than waiting for the Ask button. Opt-in and
@@ -160,10 +178,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         isConceptVersion={fullApp ? false : isConceptVersion}
         catalog={fullApp ? false : catalog}
         autoPlayFlow={autoPlayFlow}
-        autoPlay={autoPlay} genericBrand={genericBrand}
+        autoPlay={autoPlay} genericBrand={genericBrand} intro={!!intro}
         initialView={fullApp ? "welcome" : undefined}
         initialMarketplaceOpen={autoPlay && !!embedLayout?.openMarketplace}
       >
+        <HostIntro src={intro}>
         <div
           data-embed={embedVariant}
           className="app-frame relative flex h-[100dvh] flex-col overscroll-contain px-1 pb-1 md:px-2 md:pb-2"
@@ -196,6 +215,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             )}
           </div>
         </div>
+        </HostIntro>
         <TokenLimitDialog />
       </AskNanciProvider>
       </ChatStreamProvider>

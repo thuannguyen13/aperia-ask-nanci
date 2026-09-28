@@ -34,12 +34,17 @@ interface ParsedMode {
    * too (so a demo prompt on `/` plays with its panels) but keeps its own welcome.
    */
   catalog: boolean
+  /**
+   * A screenshot of the host's own app, shown before an ?autoplay flow: Ask Nanci then
+   * slides up over it, on every loop. Embed shell only.
+   */
+  intro: string | null
 }
 
 export function parseMode(mode: string | null): ParsedMode {
   // Every mode is the default shape plus whatever it changes, so adding a field to
   // ParsedMode does not mean editing thirteen rows.
-  const base = { isEmbed: false, embedVariant: null, isConceptVersion: false, theme: "aperia" as ThemeId, forceOnboarding: false, catalog: false }
+  const base = { isEmbed: false, embedVariant: null, isConceptVersion: false, theme: "aperia" as ThemeId, forceOnboarding: false, catalog: false, intro: null }
   switch (mode) {
     case "clover":          return { ...base, isEmbed: true,  embedVariant: "clover",         theme: "clover"      }
     case "business-owner":  return { ...base, isEmbed: true,  embedVariant: "business-owner", theme: "access-one"  }
@@ -62,7 +67,7 @@ export function parseMode(mode: string | null): ParsedMode {
     case "titan-embed":     return { ...base, isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true, catalog: true, theme: "titan" }
     // Same pair as titan / titan-embed, wearing the Talus brand.
     case "talus":           return { ...base, isConceptVersion: true, catalog: true, theme: "talus" }
-    case "talus-embed":     return { ...base, isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true, catalog: true, theme: "talus" }
+    case "talus-embed":     return { ...base, isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true, catalog: true, theme: "talus", intro: "/intros/talus-accounts-overview.png" }
     case "tib":             return { ...base, theme: "tib"         }
     case "woodforest":      return { ...base, theme: "woodforest"  }
     case "placeholder":     return { ...base, theme: "placeholder" }
