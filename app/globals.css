@@ -57,6 +57,18 @@
   --app-gradient: linear-gradient(180deg, #002F67 0%, #c5d5ed 200px);
 }
 
+/* Talus. Primary is the wordmark's navy. The logo is full-color artwork with that
+   same navy ink, which vanishes on the bar, so the frame slot renders it white like
+   every other brand's frame logo. */
+[data-theme="talus"] {
+  --primary: #384A77;
+  --ring: #384A77;
+  --sidebar-primary: #384A77;
+  --app-gradient: linear-gradient(180deg, #384A77 0%, #cfe9ee 200px);
+}
+
+[data-theme="talus"] [data-logo="frame"] { filter: brightness(0) invert(1); }
+
 /* White-label placeholder. Same shape as Woodforest, and for the same reason: the brand
    color is light, so the frame gradient starts on a dark shade of it (the placeholder
    wordmark is white artwork) and --primary-foreground carries dark ink. To stand up a new

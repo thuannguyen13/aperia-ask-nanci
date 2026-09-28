@@ -45,6 +45,10 @@ const THEME_LOGOS = {
   tib: {
     frame: { src: "/logos/tib.png", alt: "TIB", width: 134, height: 48 },
   },
+  // Full-color artwork with navy ink, so the frame bar whitens it in globals.css.
+  talus: {
+    frame: { src: "/logos/talus.png", alt: "Talus", width: 264, height: 64 },
+  },
   woodforest: {
     frame: { src: "/logos/logo-woodforest.png", alt: "Woodforest National Bank", width: 278, height: 48 },
   },

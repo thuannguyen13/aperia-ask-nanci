@@ -60,6 +60,9 @@ export function parseMode(mode: string | null): ParsedMode {
     // embedVariant so &flow=<slug>&autoplay behaves identically, compact widget layout
     // included. Only the theme differs.
     case "titan-embed":     return { ...base, isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true, catalog: true, theme: "titan" }
+    // Same pair as titan / titan-embed, wearing the Talus brand.
+    case "talus":           return { ...base, isConceptVersion: true, catalog: true, theme: "talus" }
+    case "talus-embed":     return { ...base, isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true, catalog: true, theme: "talus" }
     case "tib":             return { ...base, theme: "tib"         }
     case "woodforest":      return { ...base, theme: "woodforest"  }
     case "placeholder":     return { ...base, theme: "placeholder" }
