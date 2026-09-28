@@ -154,6 +154,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // Per-flow embed layout: some flows (e.g. 22, Service Marketplace) render the full
   // app shell (sidebar + standard welcome) instead of the compact concept-embed widget.
   const embedLayout = (rawFlow && CONCEPT_EMBED_FLOW_LAYOUTS[rawFlow]) || null
+  const introSrc = intro && rawFlow === intro.flow ? intro.src : null
   const { setTheme } = useTheme()
 
   // The theme goes on <html> so portaled surfaces inherit it (see useAppTheme).
@@ -178,11 +179,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         isConceptVersion={fullApp ? false : isConceptVersion}
         catalog={fullApp ? false : catalog}
         autoPlayFlow={autoPlayFlow}
-        autoPlay={autoPlay} genericBrand={genericBrand} intro={!!intro}
+        autoPlay={autoPlay} genericBrand={genericBrand} intro={!!introSrc}
         initialView={fullApp ? "welcome" : undefined}
         initialMarketplaceOpen={autoPlay && !!embedLayout?.openMarketplace}
       >
-        <HostIntro src={intro}>
+        <HostIntro src={introSrc}>
         <div
           data-embed={embedVariant}
           className="app-frame relative flex h-[100dvh] flex-col overscroll-contain px-1 pb-1 md:px-2 md:pb-2"

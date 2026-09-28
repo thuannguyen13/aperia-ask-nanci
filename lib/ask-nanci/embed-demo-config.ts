@@ -35,10 +35,11 @@ interface ParsedMode {
    */
   catalog: boolean
   /**
-   * A screenshot of the host's own app, shown before an ?autoplay flow: Ask Nanci then
-   * slides up over it, on every loop. Embed shell only.
+   * A screenshot of the host's own app, shown before one ?autoplay flow: Ask Nanci then
+   * slides up over it, on every loop. Every other flow in the mode opens as usual.
+   * Embed shell only.
    */
-  intro: string | null
+  intro: { flow: string; src: string } | null
 }
 
 export function parseMode(mode: string | null): ParsedMode {
@@ -67,7 +68,7 @@ export function parseMode(mode: string | null): ParsedMode {
     case "titan-embed":     return { ...base, isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true, catalog: true, theme: "titan" }
     // Same pair as titan / titan-embed, wearing the Talus brand.
     case "talus":           return { ...base, isConceptVersion: true, catalog: true, theme: "talus" }
-    case "talus-embed":     return { ...base, isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true, catalog: true, theme: "talus", intro: "/intros/talus-accounts-overview.png" }
+    case "talus-embed":     return { ...base, isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true, catalog: true, theme: "talus", intro: { flow: "24", src: "/intros/talus-accounts-overview.png" } }
     case "tib":             return { ...base, theme: "tib"         }
     case "woodforest":      return { ...base, theme: "woodforest"  }
     case "placeholder":     return { ...base, theme: "placeholder" }
