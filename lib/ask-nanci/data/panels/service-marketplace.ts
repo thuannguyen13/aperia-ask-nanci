@@ -67,21 +67,20 @@ export const MARKETPLACE_SERVICES: MarketplaceService[] = [
     id: "resy",
     icon: CalendarCheck,
     title: "Resy",
-    description: "Connect your Resy account so Ask Nanci can read your book, guests and waitlist, and act in Resy from the chat.",
+    description: "Connect your Resy account so Ask Nanci can read your book and waitlist, and act in Resy when you confirm.",
     vendor: { name: "Resy", logo: null },
     scope: "resy",
     enableLabel: "Connect",
     overview:
-      "Resy runs your reservations, waitlist, guest profiles and guest texts. Connected to Ask Nanci, it sits beside your card sales, so one question can answer from both. Ask about tonight's book, fill a cancellation from the Notify list, or see what Resy guests spend per cover.",
+      "Resy runs your reservations, confirmations and waitlist. Connected to Ask Nanci, it sits beside your card sales, so one question can answer from both. Ask how tonight looks, who hasn't confirmed, or how long the wait is at the door.",
     highlights: [
-      "Tonight's covers, pacing and waitlist, on request",
-      "Guest profiles with tags, notes and card spend",
-      "Fill cancellations from Notify, and text guests through Resy",
-      "End-of-night reports that match Resy tables to card sales",
+      "Tonight's book, confirmations and waitlist, on request",
+      "What no-shows cost you, measured against your card sales",
+      "Resy's confirmation follow-up, sent with your OK",
     ],
     sections: [
-      { title: "What Nanci can read", body: "Reservations, covers, waitlist and Notify lists, guest profiles and the fees and deposits Resy charges." },
-      { title: "What Nanci can do", body: "Offer an open table to the Notify list, text a group of guests, and change deposit policies. Each action shows in Resy as done by Ask Nanci." },
+      { title: "What Nanci can read", body: "Reservations, confirmations, the waitlist and the no-show fees charged in Resy." },
+      { title: "What Nanci can do", body: "Send Resy's confirmation follow-up. Nanci asks before every change, and Resy records it as made through Ask Nanci." },
       { title: "About this demo", body: "A concept built on sample data. No connection to Resy exists." },
     ],
     connected: {
