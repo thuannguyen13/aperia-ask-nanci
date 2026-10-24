@@ -9,9 +9,14 @@ import {
   promptsInScope,
   CONCEPT_FLOW28_SEND,
   isAwaitingFlow28Send,
+  CONCEPT_FLOW29_MOVE,
+  CONCEPT_FLOW29_OPEN,
+  isAwaitingFlow29Move,
+  isAwaitingFlow29Open,
 } from "./flows.concept"
 import { CARD_PER_COVER, FEES_CHARGED, NO_SHOW_COST } from "./panels/resy-group"
 import { BOOK_COVERS, BOOK_PARTIES, BOOK_PEAK, UNCONFIRMED_COVERS, coversWithReply, WAITING_GUESTS, WAIT_SUMMARY, LEFT_QUOTES } from "./panels/resy-tonight"
+import { PACING_CHECK, NOTIFY_PARTIES, NOTIFY_GUESTS, REBOOK, FOUR_TOP_SEAT_HOUR, HELD_SEAT_HOUR, AVAILABILITY, POST_OPEN } from "./panels/resy-friday"
 import { MARKETPLACE_SERVICES } from "./panels/service-marketplace"
 import { formatWholeCurrency } from "../../../components/shared/format"
 import { RISK_QUICK_ACTIONS, RISK_NANCI_TAKES } from "./risk-landing"
@@ -210,6 +215,80 @@ describe("flow 28, tonight's service", () => {
       expect(text).not.toMatch(/\bholds?\b/i)
       expect(text).not.toMatch(/settled/)
     }
+  })
+})
+
+// ── Flow 29: Filling the book ──
+
+describe("flow 29, filling the book", () => {
+  const flow29 = FLOW_DEFS.find((f) => f.num === 29)!
+  const script = CONVERSATIONS[flow29.key]
+  const [move, moved, notify, open, opened] = answers(29)
+
+  it("is a manual merchant flow in resy scope, left out of the unscoped demo", () => {
+    expect(flow29).toMatchObject({ section: "merchant", scope: "resy", slug: "29", badge: "Resy", title: "Filling the book" })
+    expect(CONCEPT_MANUAL_PROMPTS.has(flow29.key)).toBe(true)
+    expect(promptsInScope(null, { followups: true })).not.toContain(flow29.key)
+  })
+
+  it("plays five questions and five answers, the second and fifth questions being the confirm steps", () => {
+    expect(script.map((t) => t.role)).toEqual(["user", "assistant", "user", "assistant", "user", "assistant", "user", "assistant", "user", "assistant"])
+    expect(script[0].content).toBe("The Marsh party of 6 on Friday wants 7:30 instead of 8. Can we do it?")
+    expect(script[2].content).toBe(CONCEPT_FLOW29_MOVE)
+    expect(script[4].content).toBe("Who's on Notify for Friday?")
+    expect(script[6].content).toBe("Open two more 8pm tables Friday.")
+    expect(script[8].content).toBe(CONCEPT_FLOW29_OPEN)
+    expect([CONCEPT_FLOW29_MOVE, CONCEPT_FLOW29_OPEN]).toEqual(["Do it.", "Go ahead."])
+  })
+
+  it("opens each panel without a view and flips it to done only on the answer to its confirm", () => {
+    expect(script[1]).toMatchObject({ panel: "resy-change", revealPanel: true, source: "Resy reservations" })
+    expect(script[3]).toMatchObject({ panel: "resy-change", view: "done", source: "Resy reservations" })
+    expect(script[5]).toMatchObject({ panel: "resy-notify", closePanel: "resy-change", revealPanel: true, source: "Resy Notify + card transactions" })
+    expect(script[7]).toMatchObject({ panel: "resy-availability", closePanel: "resy-notify", revealPanel: true, source: "Resy timing + card transactions" })
+    expect(script[9]).toMatchObject({ panel: "resy-availability", view: "done", source: "Resy reservations + card transactions" })
+    for (const i of [1, 5, 7]) expect(script[i].view).toBeUndefined()
+  })
+
+  it("quotes the figures the panels render", () => {
+    expect(move).toContain(`${PACING_CHECK.before} of ${PACING_CHECK.cap}`)
+    expect(PACING_CHECK.before).toBe(26)
+    for (const figure of [`${NOTIFY_PARTIES} parties`, `${NOTIFY_GUESTS} guests`, `${REBOOK.minutes} minutes`, formatWholeCurrency(REBOOK.value)]) expect(notify).toContain(figure)
+    for (const figure of ["37 parties", "105 guests", "11 minutes", "$440"]) expect(notify).toContain(figure)
+    for (const figure of [formatWholeCurrency(FOUR_TOP_SEAT_HOUR), formatWholeCurrency(Math.round(HELD_SEAT_HOUR)), `${AVAILABILITY.pacing.before} to ${AVAILABILITY.pacing.after}`]) expect(open).toContain(figure)
+    for (const figure of ["$44", "$27", "16 to 24"]) expect(open).toContain(figure)
+    expect(opened).toContain(formatWholeCurrency(POST_OPEN.value))
+    expect(opened).toContain("$320")
+    expect(moved).toContain("Resy will send them the updated booking")
+  })
+
+  it("names both changes after card fees and credits Resy for every Notify alert", () => {
+    for (const phrase of ["after card fees", "T21 and T22", "16 to 24"]) expect(open).toContain(phrase)
+    expect(opened).toContain("Notify alerted")
+    for (const text of answers(29)) expect(text).not.toMatch(/\bI offered\b/)
+  })
+
+  it("never says holds, settled or Card Members", () => {
+    for (const text of answers(29)) {
+      expect(text).not.toMatch(/Card Member/)
+      expect(text).not.toMatch(/\bholds?\b/i)
+      expect(text).not.toMatch(/settled/)
+    }
+  })
+
+  it("waits on each confirm only while idle with its own offer as the last message", () => {
+    const opening = [{ role: "user", content: flow29.key }]
+    const moveOffer = { role: "assistant", content: move }
+    const openOffer = { role: "assistant", content: open }
+    expect(isAwaitingFlow29Move([...opening, moveOffer], "idle")).toBe(true)
+    expect(isAwaitingFlow29Move([...opening, moveOffer], "streaming")).toBe(false)
+    expect(isAwaitingFlow29Move([...opening, moveOffer, { role: "user", content: CONCEPT_FLOW29_MOVE }, { role: "assistant", content: moved }], "idle")).toBe(false)
+    expect(isAwaitingFlow29Open([openOffer], "idle")).toBe(true)
+    expect(isAwaitingFlow29Open([openOffer, { role: "user", content: "what is the weather like" }, { role: "assistant", content: "Sunny." }], "idle")).toBe(false)
+    expect(isAwaitingFlow29Move([openOffer], "idle")).toBe(false)
+    expect(isAwaitingFlow29Open([...opening, moveOffer], "idle")).toBe(false)
+    expect(isAwaitingFlow28Send([openOffer], "idle")).toBe(false)
+    expect(notify).not.toBe(move)
   })
 })
 
