@@ -86,7 +86,7 @@ export const MARKETPLACE_SERVICES: MarketplaceService[] = [
     ],
     connected: {
       message: "Resy is connected. Your book and guests are now part of Ask Nanci.",
-      flowSlugs: [],
+      flowSlugs: ["28"],
     },
   },
   {

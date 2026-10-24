@@ -32,6 +32,8 @@ import { BusiestTimesPanel } from "./ask-nanci/concept/BusiestTimesPanel"
 import { SlowestWindowsPanel } from "./ask-nanci/concept/SlowestWindowsPanel"
 import { LocationReviewPanel } from "./ask-nanci/concept/LocationReviewPanel"
 import { ResyShiftPanel } from "./ask-nanci/concept/ResyShiftPanel"
+import { ResyConfirmPanel } from "./ask-nanci/concept/ResyConfirmPanel"
+import { ResyWaitlistPanel } from "./ask-nanci/concept/ResyWaitlistPanel"
 import { DashboardInsightPanel } from "@/components/risk/dashboard/DashboardInsightPanel"
 import { Dashboard as RiskDashboard } from "@/components/risk/dashboard/Dashboard"
 import { DetectionQueue as RiskDetectionQueue } from "@/components/risk/DetectionQueue"
@@ -84,6 +86,8 @@ export const PANELS = {
   "slowest-windows":     { component: SlowestWindowsPanel,    label: "Slowest Windows" },
   "location-review":     { component: LocationReviewPanel,    label: "Location Review" },
   "resy-shift":          { component: ResyShiftPanel,         label: "Tonight" },
+  "resy-confirm":        { component: ResyConfirmPanel,       label: "Confirmations" },
+  "resy-waitlist":       { component: ResyWaitlistPanel,      label: "Waitlist" },
   "dashboard-insight":   { component: DashboardInsightPanel,  label: "Dashboard Insight" },
   "detection-queue-insight": { component: DetectionQueueInsightPanel, label: "Queue Insight" },
   // Aperia Risk destinations — every risk UI is a registered panel.

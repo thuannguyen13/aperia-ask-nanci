@@ -9,6 +9,9 @@ import { RISK_LANDING_CONVERSATIONS } from "./risk-conversations";
 import { CARD_FIGURES } from "./panels/credit-card-offer";
 // Flow 24 does the same with the location review figures.
 import { REVIEW_TOTAL_SALES, REVIEW_TOTAL_CHANGE_PCT, REVIEW_LEADER, REVIEW_WATCH, REVIEW_LOCATIONS, WATCH_TRANSACTIONS, REVIEW_SALES_CHART, REVIEW_TREND_CHART, averageTicket } from "./panels/location-review";
+// Flow 28 does the same with the Tallis figures: tonight's book and October's no-shows.
+import { CARD_PER_COVER, FEES_CHARGED, NO_SHOW_COST, UNCONFIRMED_NO_SHOW_PCT, CONFIRMED_NO_SHOW_PCT } from "./panels/resy-group";
+import { BOOK_COVERS, BOOK_PARTIES, BOOK_PEAK, LARGE_PARTIES, TO_KNOW, CELEBRATIONS, UNCONFIRMED, UNCONFIRMED_COVERS, LARGEST_UNCONFIRMED, partiesWithReply, coversWithReply, WAITING, WAITING_GUESTS, WAIT_SUMMARY, LEFT_QUOTES, quoteFor } from "./panels/resy-tonight";
 import { formatWholeCurrency } from "../../../components/shared/format";
 import { inScope, type FlowScope } from "./flow-scopes";
 
@@ -49,6 +52,12 @@ const CONCEPT_FLOW24_BREAKDOWN = "show me the full breakdown";
 const CONCEPT_FLOW24_WATCH = "what's going on at Midtown?";
 // Reading time after a chart or the panel lands, before the next question covers it.
 const CONCEPT_FLOW24_READ_MS = 2500;
+const CONCEPT_FLOW28_PROMPT = "How does tonight look?";
+const CONCEPT_FLOW28_UNCONFIRMED = "Who hasn't confirmed?";
+// The confirm step. ResyConfirmPanel's Send button sends this same turn, so the button
+// and the chip advance the flow the same way.
+export const CONCEPT_FLOW28_SEND = "Send it";
+const CONCEPT_FLOW28_WAIT = "Door's packed. What's the wait right now?";
 // Both offer flows share the same accept/decline pills (matched per-active-flow, so
 // reuse is safe). "No, ignore for now" is decorative — registered as a fake follow-up.
 const CONCEPT_OFFER_YES = "Yes, show me";
@@ -374,6 +383,16 @@ export const FLOW_DEFS: FlowDef[] = [
     description: "A day-by-hour sales heatmap finds the peaks — the follow-up ranks the quietest window, the safe place to cut a shift.",
   },
   {
+    num: 28,
+    section: "merchant",
+    title: "Tonight's service",
+    badge: "Resy",
+    key: CONCEPT_FLOW28_PROMPT,
+    slug: "28",
+    scope: "resy",
+    description: "Saturday at the Tallis flagship: tonight's book, the parties who haven't confirmed and what no-shows cost, Resy's follow-up sent with your OK, then the walk-in wait at 7:40pm. A concept: no Resy connection exists.",
+  },
+  {
     num: 27,
     section: "merchant",
     title: "Connect Resy",
@@ -476,6 +495,13 @@ const FLOW19_SHEET: SheetActionData = {
 };
 
 // ─── Scripted conversations ───────────────────────────────────────────────────
+
+// Flow 28 speaks small counts as words, the way an owner would hear them.
+const NUMBER_WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"];
+const spellCount = (n: number) => NUMBER_WORDS[n] ?? String(n);
+const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
+const joinNames = (names: string[]) => (names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names.at(-1)}` : names.join(""));
+const FLOW28_CANCELLED = partiesWithReply("cancelled")[0];
 
 export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
   // Aperia Risk theme — landing quick-action / Nanci's-take chat answers.
@@ -1052,6 +1078,47 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       view: "watch",
       revealPanel: true,
       suggestions: CONCEPT_FLOW24_FOLLOWUPS_FAKE,
+    },
+  ],
+
+  // ── Flow 28: Tonight's service (Resy concept) ─────────────────────────────
+  // Saturday at the Tallis flagship, in three owner questions. The confirm step is a
+  // scripted user turn: the chip and the panel's Send button both send it, and the
+  // answer flips the confirm panel to its sent view. Figures are quoted from
+  // data/panels/resy-tonight.ts and resy-group.ts, so the chat and panels agree.
+  [CONCEPT_FLOW28_PROMPT]: [
+    { role: "user", content: CONCEPT_FLOW28_PROMPT },
+    {
+      role: "assistant",
+      content: `Full. ${BOOK_COVERS} covers across ${BOOK_PARTIES} parties, peaking at ${BOOK_PEAK.time} with ${BOOK_PEAK.covers}, right at your pacing. ${capitalize(spellCount(LARGE_PARTIES.length))} large parties, ${spellCount(TO_KNOW.allergies)} allergy notes and ${spellCount(CELEBRATIONS)} celebrations, ${spellCount(TO_KNOW.birthdays)} of them birthdays.`,
+      panel: "resy-shift",
+      source: "Resy reservations",
+    },
+    { role: "user", content: CONCEPT_FLOW28_UNCONFIRMED },
+    {
+      role: "assistant",
+      content: `${capitalize(spellCount(UNCONFIRMED.length))} parties, ${UNCONFIRMED_COVERS} covers, didn't answer yesterday's 4pm confirmation text, including the ${LARGEST_UNCONFIRMED.time} party of ${LARGEST_UNCONFIRMED.party}. It matters: in October, ${UNCONFIRMED_NO_SHOW_PCT}% of unconfirmed covers didn't show against ${CONFIRMED_NO_SHOW_PCT}% of confirmed ones, and no-shows have cost you ${formatWholeCurrency(NO_SHOW_COST)} at your ${formatWholeCurrency(CARD_PER_COVER)} a cover, with ${formatWholeCurrency(FEES_CHARGED)} back in fees. Want me to send Resy's confirmation follow-up to these ${spellCount(UNCONFIRMED.length)} now?`,
+      panel: "resy-confirm",
+      closePanel: "resy-shift",
+      revealPanel: true,
+      source: "Resy reservations + card transactions",
+    },
+    { role: "user", content: CONCEPT_FLOW28_SEND },
+    {
+      role: "assistant",
+      content: `${capitalize(spellCount(partiesWithReply("confirmed").length))} have confirmed, ${coversWithReply("confirmed")} covers. The ${FLOW28_CANCELLED.name} ${spellCount(FLOW28_CANCELLED.party)}-top at ${FLOW28_CANCELLED.time} cancelled, so Resy has alerted your Notify list for it. The ${joinNames(partiesWithReply("none").map((p) => `${p.name}s`))} haven't replied, so I've flagged them for a call from the host stand.`,
+      panel: "resy-confirm",
+      view: "sent",
+      source: "Resy reservations",
+    },
+    { role: "user", content: CONCEPT_FLOW28_WAIT },
+    {
+      role: "assistant",
+      content: `${capitalize(spellCount(WAITING.length))} parties, ${WAITING_GUESTS} guests, quoted ${quoteFor(2)} minutes for twos and ${quoteFor(4)} for fours. Your quotes are running long: the ${spellCount(WAIT_SUMMARY.seated)} parties seated tonight waited ${WAIT_SUMMARY.avgWaited} minutes against ${WAIT_SUMMARY.avgQuoted} quoted. ${capitalize(spellCount(WAIT_SUMMARY.left))} parties quoted ${LEFT_QUOTES.join(" and ")} minutes left before they were seated.`,
+      panel: "resy-waitlist",
+      closePanel: "resy-confirm",
+      revealPanel: true,
+      source: "Resy waitlist + card transactions",
     },
   ],
 };
