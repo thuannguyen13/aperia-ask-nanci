@@ -461,10 +461,10 @@ export function promptsInScope(scope: FlowScope | null, { followups = false } = 
     .flatMap((f) => [f.key, ...(followups ? f.followups ?? [] : [])]);
 }
 
-// Merchant-money group prompts, ascending. End-of-flow chips suggest sibling flows
-// in the same group — otherMerchantPrompts(self) drops the flow that just finished.
+// Unscoped merchant-money prompts, ascending. End-of-flow chips suggest sibling flows
+// in the same group. Flow 17 plays only unscoped, so a scoped flow is never a sibling.
 const CONCEPT_MERCHANT_PROMPTS = [...FLOW_DEFS]
-  .filter((f) => f.section === "merchant" && isTriggerFlow(f))
+  .filter((f) => f.section === "merchant" && isTriggerFlow(f) && inScope(null)(f))
   .sort((a, b) => a.num - b.num)
   .map((f) => f.key);
 
