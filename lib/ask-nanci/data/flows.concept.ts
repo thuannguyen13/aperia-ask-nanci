@@ -12,6 +12,8 @@ import { REVIEW_TOTAL_SALES, REVIEW_TOTAL_CHANGE_PCT, REVIEW_LEADER, REVIEW_WATC
 // Flow 28 does the same with the Tallis figures: tonight's book and October's no-shows.
 import { CARD_PER_COVER, FEES_CHARGED, NO_SHOW_COST, UNCONFIRMED_NO_SHOW_PCT, CONFIRMED_NO_SHOW_PCT } from "./panels/resy-group";
 import { BOOK_COVERS, BOOK_PARTIES, BOOK_PEAK, LARGE_PARTIES, TO_KNOW, CELEBRATIONS, UNCONFIRMED, UNCONFIRMED_COVERS, LARGEST_UNCONFIRMED, partiesWithReply, coversWithReply, WAITING, WAITING_GUESTS, WAIT_SUMMARY, LEFT_QUOTES, quoteFor } from "./panels/resy-tonight";
+// Flow 29 does the same with Friday's figures: the move, Notify and the open tables.
+import { MOVE, MOVE_TABLE, PACING_CHECK, REBOOK, NOTIFY_PARTIES, NOTIFY_GUESTS, PEAK_WINDOW, RELEASED_TABLES, AVAILABILITY, OPEN_INCREMENT, FOUR_TOP_SEAT_HOUR, HELD_EMPTY_PCT, HELD_SEAT_HOUR, POST_OPEN, STILL_OPEN } from "./panels/resy-friday";
 import { formatWholeCurrency } from "../../../components/shared/format";
 import { inScope, type FlowScope } from "./flow-scopes";
 import { isAwaitingTurn } from "../is-awaiting-turn";
@@ -59,6 +61,13 @@ const CONCEPT_FLOW28_UNCONFIRMED = "Who hasn't confirmed?";
 // and the chip advance the flow the same way.
 export const CONCEPT_FLOW28_SEND = "Send it";
 const CONCEPT_FLOW28_WAIT = "Door's packed. What's the wait right now?";
+const CONCEPT_FLOW29_PROMPT = "The Marsh party of 6 on Friday wants 7:30 instead of 8. Can we do it?";
+const CONCEPT_FLOW29_NOTIFY = "Who's on Notify for Friday?";
+const CONCEPT_FLOW29_OPEN_ASK = "Open two more 8pm tables Friday.";
+// Flow 29's two confirm steps. ResyChangePanel's and ResyAvailabilityPanel's buttons
+// send these same turns, so each button and its chip advance the flow the same way.
+export const CONCEPT_FLOW29_MOVE = "Do it.";
+export const CONCEPT_FLOW29_OPEN = "Go ahead.";
 // Both offer flows share the same accept/decline pills (matched per-active-flow, so
 // reuse is safe). "No, ignore for now" is decorative — registered as a fake follow-up.
 const CONCEPT_OFFER_YES = "Yes, show me";
@@ -394,6 +403,16 @@ export const FLOW_DEFS: FlowDef[] = [
     description: "Saturday at the Tallis flagship: tonight's book, the parties who haven't confirmed and what no-shows cost, Resy's follow-up sent with your OK, then the walk-in wait at 7:40pm. A concept: no Resy connection exists.",
   },
   {
+    num: 29,
+    section: "merchant",
+    title: "Filling the book",
+    badge: "Resy",
+    key: CONCEPT_FLOW29_PROMPT,
+    slug: "29",
+    scope: "resy",
+    description: "Next Friday at the Tallis flagship: a party moved with your OK frees a six-top, Resy's Notify refills it, and the demand left over makes the case for opening two held four-tops, priced per seat-hour after card fees. A concept: no Resy connection exists.",
+  },
+  {
     num: 27,
     section: "merchant",
     title: "Connect Resy",
@@ -509,6 +528,17 @@ const FLOW28_ASK_TO_SEND = `${capitalize(spellCount(UNCONFIRMED.length))} partie
 
 /** True while flow 28 is parked on its confirm step: idle, with the offer as the last message. */
 export const isAwaitingFlow28Send = (messages: { role: string; content: string }[], chatState: string) => isAwaitingTurn(messages, chatState, FLOW28_ASK_TO_SEND);
+
+const tableList = (tables: number[]) => joinNames(tables.map((t) => `T${t}`));
+// The answers that offer flow 29's two changes. Each confirm waits on its turn only
+// while its offer is the last thing in the chat.
+const FLOW29_ASK_TO_MOVE = `Yes. Table ${MOVE.to.table} frees at ${MOVE_TABLE.frees} when its ${MOVE_TABLE.earlier} party turns, and ${PACING_CHECK.time} has room in your pacing, ${PACING_CHECK.before} of ${PACING_CHECK.cap}. Moving them also frees their ${MOVE.from.time} ${spellCount(MOVE.party)}-top.`;
+const FLOW29_ASK_TO_OPEN = `I can release ${tableList(RELEASED_TABLES)}, the four-tops you keep back for walk-ins, and lift ${OPEN_INCREMENT} pacing from ${AVAILABILITY.pacing.before} to ${AVAILABILITY.pacing.after} covers. Booked, a Friday four-top earns you ${formatWholeCurrency(FOUR_TOP_SEAT_HOUR)} a seat-hour after card fees. Held for walk-ins at 8, those two sat empty ${HELD_EMPTY_PCT}% of the time, which works out to ${formatWholeCurrency(Math.round(HELD_SEAT_HOUR))}.`;
+
+/** True while flow 29 is parked on its move confirm, with the move offer as the last message. */
+export const isAwaitingFlow29Move = (messages: { role: string; content: string }[], chatState: string) => isAwaitingTurn(messages, chatState, FLOW29_ASK_TO_MOVE);
+/** True while flow 29 is parked on its open-tables confirm, with that offer as the last message. */
+export const isAwaitingFlow29Open = (messages: { role: string; content: string }[], chatState: string) => isAwaitingTurn(messages, chatState, FLOW29_ASK_TO_OPEN);
 
 export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
   // Aperia Risk theme — landing quick-action / Nanci's-take chat answers.
@@ -1126,6 +1156,56 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       closePanel: "resy-confirm",
       revealPanel: true,
       source: "Resy waitlist + card transactions",
+    },
+  ],
+
+  // ── Flow 29: Filling the book (Resy concept) ──────────────────────────────
+  // Next Friday at the Tallis flagship, where each step causes the next: the move
+  // frees a six-top, Notify refills it, and the demand left over justifies opening
+  // two held four-tops. Both changes are scripted confirm turns, sent by the chip or
+  // the panel's button. Figures are quoted from data/panels/resy-friday.ts.
+  [CONCEPT_FLOW29_PROMPT]: [
+    { role: "user", content: CONCEPT_FLOW29_PROMPT },
+    {
+      role: "assistant",
+      content: FLOW29_ASK_TO_MOVE,
+      panel: "resy-change",
+      revealPanel: true,
+      source: "Resy reservations",
+    },
+    { role: "user", content: CONCEPT_FLOW29_MOVE },
+    {
+      role: "assistant",
+      content: `Done in Resy. The ${MOVE.guest} party is now at ${MOVE.to.time} on Table ${MOVE.to.table}, and Resy will send them the updated booking. Their ${MOVE.from.time} ${spellCount(MOVE.party)}-top on Table ${MOVE.from.table} is open online.`,
+      panel: "resy-change",
+      view: "done",
+      source: "Resy reservations",
+    },
+    { role: "user", content: CONCEPT_FLOW29_NOTIFY },
+    {
+      role: "assistant",
+      content: `${NOTIFY_PARTIES} parties, ${NOTIFY_GUESTS} guests, and the ${spellCount(MOVE.party)}-top you just freed is already gone: a party of ${REBOOK.party} took it off Notify in ${REBOOK.minutes} minutes, ${formatWholeCurrency(REBOOK.value)} back on the book. Most of the rest want ${PEAK_WINDOW.label.replace("–", " to ")} for two or four, and you have nothing open there.`,
+      panel: "resy-notify",
+      closePanel: "resy-change",
+      revealPanel: true,
+      source: "Resy Notify + card transactions",
+    },
+    { role: "user", content: CONCEPT_FLOW29_OPEN_ASK },
+    {
+      role: "assistant",
+      content: FLOW29_ASK_TO_OPEN,
+      panel: "resy-availability",
+      closePanel: "resy-notify",
+      revealPanel: true,
+      source: "Resy timing + card transactions",
+    },
+    { role: "user", content: CONCEPT_FLOW29_OPEN },
+    {
+      role: "assistant",
+      content: `Done in Resy. Notify alerted the ${spellCount(PEAK_WINDOW.fours)} four-top parties waiting for that window. One booked T${POST_OPEN.table} for ${POST_OPEN.time} within ${POST_OPEN.minutes} minutes, ${formatWholeCurrency(POST_OPEN.value)} at Friday's four-top check, and ${tableList(STILL_OPEN)} is still open.`,
+      panel: "resy-availability",
+      view: "done",
+      source: "Resy reservations + card transactions",
     },
   ],
 };

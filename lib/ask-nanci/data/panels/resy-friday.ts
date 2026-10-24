@@ -31,8 +31,8 @@ export const MOVE = {
 // Table 31's earlier party: a 5:00 six-top on the 6+ turn.
 const T31_EARLIER = { time: "5:00", tier: "6+" as PartyTier }
 
-/** When Table 31 turns and is free for the Marsh party. */
-export const MOVE_TABLE_FREES = toTime(toMinutes(T31_EARLIER.time) + TURN_TIMES[T31_EARLIER.tier])
+/** Table 31's earlier party, and when it turns and frees the table for the Marsh party. */
+export const MOVE_TABLE = { earlier: T31_EARLIER.time, frees: toTime(toMinutes(T31_EARLIER.time) + TURN_TIMES[T31_EARLIER.tier]) }
 
 // Covers already booked in the 7:30 half hour.
 const BOOKED_AT_730 = 26

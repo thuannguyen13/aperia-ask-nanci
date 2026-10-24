@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 import { CARD_FEE_RATE, TURN_TIMES } from "./resy-group"
 import {
-  FRIDAY_DATE, FRIDAY_AS_OF, ONLINE_WINDOW, OPEN_INCREMENT, MOVE, MOVE_TABLE_FREES, PACING_CHECK, SEAT_HOURS, FOUR_TOP_SEAT_HOUR, formatTurn,
+  FRIDAY_DATE, FRIDAY_AS_OF, ONLINE_WINDOW, OPEN_INCREMENT, MOVE, MOVE_TABLE, PACING_CHECK, SEAT_HOURS, FOUR_TOP_SEAT_HOUR, formatTurn,
   REBOOK, NOTIFY_PARTIES, NOTIFY_GUESTS, NOTIFY_BY_SIZE, NOTIFY_HISTOGRAM, NOTIFY_SIZES, NOTIFY_TOP, PEAK_WINDOW,
   AVAILABILITY, RELEASED_TABLES, HELD_FILL_PCT, HELD_EMPTY_PCT, HELD_SEAT_HOUR, POST_OPEN, STILL_OPEN,
 } from "./resy-friday"
@@ -26,7 +26,7 @@ describe("the Marsh move", () => {
   it("frees T30 at 8:00 and lands on T31 once its 5:00 six-plus party turns at 7:15", () => {
     expect(MOVE.from).toEqual({ time: "8:00", table: 30 })
     expect(MOVE.to).toEqual({ time: "7:30", table: 31 })
-    expect(MOVE_TABLE_FREES).toBe("7:15")
+    expect(MOVE_TABLE).toEqual({ earlier: "5:00", frees: "7:15" })
   })
 
   it("fills 7:30 to its pacing, 26 + 6 = 32 of 32", () => {

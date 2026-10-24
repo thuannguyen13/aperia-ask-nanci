@@ -139,8 +139,8 @@ describe("promptsInScope", () => {
     for (const k of RESY_KEYS) expect(unscoped).not.toContain(k)
   })
 
-  it("is exactly flow 28 in resy mode", () => {
-    expect(promptsInScope("resy")).toEqual([flowKey(28)])
+  it("is exactly flows 28 and 29 in resy mode", () => {
+    expect(promptsInScope("resy")).toEqual([flowKey(28), flowKey(29)])
   })
 
   it("adds each flow's followups after its own prompt", () => {
