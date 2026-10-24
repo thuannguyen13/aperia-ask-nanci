@@ -1,24 +1,27 @@
 "use client"
 
 import { useState } from "react"
-import { Check, Plus } from "lucide-react"
+import { ArrowRight, Check, Plus } from "lucide-react"
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger, Badge, Button, ScrollArea,
 } from "aperia-ds5"
-import { PanelShell, PanelHeader } from "@/components/shared"
+import { PanelShell, PanelHeader, Callout } from "@/components/shared"
+import { useAskNanci } from "@/contexts/AskNanciContext"
+import { CONCEPT_FLOW_SLUGS } from "@/lib/ask-nanci/data/flows.concept"
 import {
   MARKETPLACE_DETAIL_LABELS as L,
   MARKETPLACE_VENDOR,
   type MarketplaceService,
+  type MarketplaceVendor,
 } from "@/lib/ask-nanci/data/panels/service-marketplace"
 
 // Vendor mark with a text fallback, matching the OfferLogo pattern. Lives here so the
 // grid and the detail panel share one mark (the grid imports it from this file).
-export function VendorLogo({ className = "h-4 w-auto" }: { className?: string }) {
+export function VendorLogo({ vendor = MARKETPLACE_VENDOR, className = "h-4 w-auto" }: { vendor?: MarketplaceVendor; className?: string }) {
   const [errored, setErrored] = useState(false)
-  if (errored) return <span className="text-sm font-medium text-foreground">{MARKETPLACE_VENDOR.name}</span>
+  if (errored || !vendor.logo) return <span className="text-sm font-medium text-foreground">{vendor.name}</span>
   return (
-    <img src={MARKETPLACE_VENDOR.logo} alt={MARKETPLACE_VENDOR.name} width={34} height={20} className={className} onError={() => setErrored(true)} />
+    <img src={vendor.logo} alt={vendor.name} width={34} height={20} className={className} onError={() => setErrored(true)} />
   )
 }
 
@@ -35,7 +38,7 @@ export function MarketplaceDetailPanel({
   onToggle: () => void
   onClose: () => void
 }) {
-  const { icon: Icon, title, description, overview, highlights, sections } = service
+  const { icon: Icon, title, description, overview, highlights, sections, vendor = MARKETPLACE_VENDOR, enableLabel = L.enable, connected } = service
 
   return (
     <PanelShell>
@@ -57,8 +60,8 @@ export function MarketplaceDetailPanel({
             <div className="flex min-w-0 flex-col gap-1">
               <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-muted-foreground">{L.builtBy}</p>
               <div className="flex items-center gap-1.5">
-                <VendorLogo className="h-5 w-auto" />
-                <span className="truncate text-sm font-medium text-foreground">{MARKETPLACE_VENDOR.name}</span>
+                {vendor.logo && <VendorLogo vendor={vendor} className="h-5 w-auto" />}
+                <span className="truncate text-sm font-medium text-foreground">{vendor.name}</span>
               </div>
             </div>
             {enabled ? (
@@ -67,10 +70,12 @@ export function MarketplaceDetailPanel({
               </Button>
             ) : (
               <Button className="shrink-0" onClick={onToggle}>
-                <Plus className="size-3.5" /> {L.enable}
+                <Plus className="size-3.5" /> {enableLabel}
               </Button>
             )}
           </div>
+
+          {enabled && <ConnectedCallout connected={connected} />}
 
           <div className="flex flex-col gap-2">
             <p className="text-base font-medium text-foreground">{L.overview}</p>
@@ -102,6 +107,29 @@ export function MarketplaceDetailPanel({
         </div>
       </ScrollArea>
     </PanelShell>
+  )
+}
+
+// What changed once an integration is on, with links that leave the marketplace and
+// start each flow, the same as its catalog card's Try it.
+function ConnectedCallout({ connected }: { connected: MarketplaceService["connected"] }) {
+  const { setMarketplaceOpen, handlePrompt } = useAskNanci()
+  if (!connected) return null
+  const tryFlow = (prompt: string) => {
+    setMarketplaceOpen(false)
+    handlePrompt(prompt)
+  }
+  return (
+    <Callout variant="green">
+      <p className="font-semibold">{connected.message}</p>
+      <div className="mt-2 flex flex-col items-start gap-1.5">
+        {connected.flowSlugs.map((slug) => CONCEPT_FLOW_SLUGS[slug]).filter(Boolean).map((prompt) => (
+          <button key={prompt} onClick={() => tryFlow(prompt)} className="flex items-center gap-1.5 font-medium underline-offset-2 hover:underline">
+            <ArrowRight className="size-3.5" /> {prompt}
+          </button>
+        ))}
+      </div>
+    </Callout>
   )
 }
 

@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useCallback, useRef, useEffect } from "react"
+import type { FlowScope } from "@/lib/ask-nanci/data/flow-scopes"
 import type { Message, Session, Source, UsageData, ConceptScriptedTurn, PanelId, PanelAction, SheetActionData } from "@/lib/ask-nanci/types"
 import { usePanelStack } from "@/lib/ask-nanci/use-panel-stack"
 import { turnToPanelActions } from "@/lib/ask-nanci/panel-actions"
@@ -154,6 +155,8 @@ interface AskNanciCtx {
   isConceptVersion: boolean
   /** The welcome screen is the flow catalog rather than the standard one. */
   catalog: boolean
+  /** The partner this mode is narrowed to, if any (see ParsedMode.scope). */
+  scope: FlowScope | null
   submitFormPanel: () => void
   submitOfferApplication: (panelId: PanelId, message: string, sheetAction: SheetActionData) => void
   submitStepUpPanel: () => void
@@ -197,7 +200,7 @@ export function usePanelView(id: PanelId, fallback: string): string {
   return useAskNanci().panelViews[id] ?? fallback
 }
 
-export function AskNanciProvider({ children, isEmbed = false, embedVariant = null, isConceptVersion = false, catalog = false, autoPlayFlow = null, autoPlay = false, initialView, initialMarketplaceOpen = false, forceOnboarding = false, skipOnboarding = false, genericBrand = false, intro = false }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null; isConceptVersion?: boolean; catalog?: boolean; autoPlayFlow?: string | null; autoPlay?: boolean; initialView?: ChatView; initialMarketplaceOpen?: boolean; forceOnboarding?: boolean; skipOnboarding?: boolean; genericBrand?: boolean; intro?: boolean }) {
+export function AskNanciProvider({ children, isEmbed = false, embedVariant = null, isConceptVersion = false, catalog = false, scope = null, autoPlayFlow = null, autoPlay = false, initialView, initialMarketplaceOpen = false, forceOnboarding = false, skipOnboarding = false, genericBrand = false, intro = false }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null; isConceptVersion?: boolean; catalog?: boolean; scope?: FlowScope | null; autoPlayFlow?: string | null; autoPlay?: boolean; initialView?: ChatView; initialMarketplaceOpen?: boolean; forceOnboarding?: boolean; skipOnboarding?: boolean; genericBrand?: boolean; intro?: boolean }) {
   const [view, setView] = useState<ChatView>(initialView ?? (embedVariant === "concept-embed" ? "chat" : "welcome"))
   const [messages, setMessages] = useState<Message[]>([])
   const [chatState, setChatState] = useState<ChatState>("idle")
@@ -995,7 +998,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       mobileSidebarOpen, setMobileSidebarOpen,
       shownPanelId, setShownPanelId, panelSheetDismissed, dismissPanelSheet, reopenPanelSheet, panelSheetOpen,
       onboardingOpen, setOnboardingOpen, forceOnboarding, genericBrand, tourActive, setTourActive, tourRequest, requestTour, flowFinished, conversationFading, introShowing, leavesCurrentFlow,
-      isConceptVersion, catalog,
+      isConceptVersion, catalog, scope,
       submitFormPanel, submitOfferApplication, submitStepUpPanel,
       triggerProactiveFlow, proactiveNotificationActive, activateProactiveNotification,
       closingPanels, closePanel, closeAllNewPanels, submitDisputeDraft,

@@ -45,7 +45,7 @@ export const ALERT_VOLUME: { assignmentId: string; count: number; prev: number; 
 ]
 
 /** Every alert raised today, across assignments. Distinct merchants is the KPI. */
-export const ALERT_TOTAL = ALERT_VOLUME.reduce((n, a) => n + a.count, 0)
+const ALERT_TOTAL = ALERT_VOLUME.reduce((n, a) => n + a.count, 0)
 
 /** Today's alert count for an assignment — 0 for one that did not fire. */
 export const alertsToday = (assignmentId: string) =>

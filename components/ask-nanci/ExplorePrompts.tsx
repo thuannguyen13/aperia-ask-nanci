@@ -6,6 +6,9 @@ import { Tabs, TabsContent } from "aperia-ds5"
 import { ResponsiveTabsList } from "@/components/shared"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { ISO_PROMPT_CATEGORIES, BUSINESS_OWNER_PROMPT_CATEGORIES } from "@/lib/ask-nanci/embed-demo-config"
+import { FLOW_DEFS } from "@/lib/ask-nanci/data/flows.concept"
+import { SCOPE_CATALOG } from "@/lib/ask-nanci/data/flow-scopes"
+import type { PromptCategory } from "@/lib/ask-nanci/types"
 
 interface ExplorePromptsProps {
   title?: string
@@ -14,14 +17,21 @@ interface ExplorePromptsProps {
 }
 
 export function ExplorePrompts({ title, description, onPromptClick }: ExplorePromptsProps) {
-  const { handlePrompt, embedVariant, promptCategories } = useAskNanci()
+  const { handlePrompt, embedVariant, promptCategories, scope } = useAskNanci()
   const handleClick = onPromptClick ?? handlePrompt
 
-  const visibleCategories = embedVariant === "iso"
+  // A scoped mode offers only its own flows' questions, as one category.
+  const scopedCategories: PromptCategory[] | null = scope && [{
+    id: scope,
+    label: SCOPE_CATALOG[scope].title,
+    prompts: FLOW_DEFS.filter((f) => f.scope === scope && !f.destination).flatMap((f) => [f.key, ...(f.followups ?? [])]),
+  }]
+
+  const visibleCategories = scopedCategories ?? (embedVariant === "iso"
     ? ISO_PROMPT_CATEGORIES
     : embedVariant === "business-owner"
       ? BUSINESS_OWNER_PROMPT_CATEGORIES
-      : promptCategories
+      : promptCategories)
 
   // Controlled, because the strip and the dropdown are two renderings of one selection:
   // swapping between them at a resize must not reset which category is open. Derived,
