@@ -7,7 +7,12 @@ import {
   CONCEPT_ALL_PROMPTS,
   CONCEPT_MANUAL_PROMPTS,
   promptsInScope,
+  CONCEPT_FLOW28_SEND,
 } from "./flows.concept"
+import { CARD_PER_COVER, FEES_CHARGED, NO_SHOW_COST } from "./panels/resy-group"
+import { BOOK_COVERS, BOOK_PARTIES, BOOK_PEAK, UNCONFIRMED_COVERS, coversWithReply, WAITING_GUESTS, WAIT_SUMMARY, LEFT_QUOTES } from "./panels/resy-tonight"
+import { MARKETPLACE_SERVICES } from "./panels/service-marketplace"
+import { formatWholeCurrency } from "../../../components/shared/format"
 import { RISK_QUICK_ACTIONS, RISK_NANCI_TAKES } from "./risk-landing"
 import { RISK_SUGGESTION_DESTS, DETECTION_QUEUE_PROMPT } from "./risk-conversations"
 import type { ConceptScriptedTurn } from "../types"
@@ -151,5 +156,60 @@ describe("flow 17 sibling chips", () => {
     const chips = script[script.length - 1].suggestions ?? []
     expect(chips.length).toBeGreaterThan(0)
     for (const k of RESY_KEYS) expect(chips).not.toContain(k)
+  })
+})
+
+// ── Flow 28: Tonight's service ──
+
+const answers = (num: number) => CONVERSATIONS[flowKey(num)].filter((t) => t.role === "assistant").map((t) => t.content)
+
+describe("flow 28, tonight's service", () => {
+  const flow28 = FLOW_DEFS.find((f) => f.num === 28)!
+  const script = CONVERSATIONS[flow28.key]
+
+  it("is a manual merchant flow in resy scope, left out of the unscoped demo", () => {
+    expect(flow28).toMatchObject({ section: "merchant", scope: "resy", slug: "28" })
+    expect(CONCEPT_MANUAL_PROMPTS.has(flow28.key)).toBe(true)
+    expect(promptsInScope(null, { followups: true })).not.toContain(flow28.key)
+  })
+
+  it("plays four questions and four answers, the third question being the confirm step", () => {
+    expect(script.map((t) => t.role)).toEqual(["user", "assistant", "user", "assistant", "user", "assistant", "user", "assistant"])
+    expect(script[4].content).toBe(CONCEPT_FLOW28_SEND)
+  })
+
+  it("flips the confirm panel to its sent view only on the answer to Send it", () => {
+    expect(script[3]).toMatchObject({ panel: "resy-confirm" })
+    expect(script[3].view).toBeUndefined()
+    expect(script[5]).toMatchObject({ panel: "resy-confirm", view: "sent" })
+  })
+
+  it("quotes the figures the panels render", () => {
+    const [book, unconfirmed, replies, wait] = answers(28)
+    for (const figure of [`${BOOK_COVERS} covers`, `${BOOK_PARTIES} parties`, `${BOOK_PEAK.time} with ${BOOK_PEAK.covers}`]) expect(book).toContain(figure)
+    for (const figure of [`${UNCONFIRMED_COVERS} covers`, formatWholeCurrency(NO_SHOW_COST), formatWholeCurrency(CARD_PER_COVER), formatWholeCurrency(FEES_CHARGED), "yesterday's 4pm confirmation text"]) expect(unconfirmed).toContain(figure)
+    for (const figure of ["Five have confirmed", `${coversWithReply("confirmed")} covers`, "Resy has alerted your Notify list"]) expect(replies).toContain(figure)
+    for (const figure of [`${WAITING_GUESTS} guests`, `${WAIT_SUMMARY.avgWaited} minutes against ${WAIT_SUMMARY.avgQuoted} quoted`, LEFT_QUOTES.join(" and ")]) expect(wait).toContain(figure)
+  })
+
+  it("never says holds, settled or Card Members", () => {
+    for (const text of answers(28)) {
+      expect(text).not.toMatch(/Card Member/)
+      expect(text).not.toMatch(/\bholds?\b/i)
+      expect(text).not.toMatch(/settled/)
+    }
+  })
+})
+
+describe("Resy Marketplace listing", () => {
+  const resy = MARKETPLACE_SERVICES.find((s) => s.id === "resy")!
+
+  it("links flow 28 alone", () => {
+    expect(resy.connected?.flowSlugs).toEqual(["28"])
+  })
+
+  it("promises nothing tonight's service does not show", () => {
+    const text = [resy.description, resy.overview, ...(resy.highlights ?? []), ...(resy.sections ?? []).map((s) => s.body)].join(" ")
+    expect(text).not.toMatch(/deposit polic|end-of-night|per cover|Notify for Friday|guest email|move booking|Amex/i)
   })
 })
