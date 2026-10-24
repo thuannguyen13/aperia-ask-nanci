@@ -2,7 +2,8 @@
 
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { TONIGHT_DATE, BOOK_AS_OF, BOOK_SLOTS, BOOK_COVERS, BOOK_PEAK, BOOK_PARTIES, LARGE_PARTIES, PACING_PER_15_MIN, PACING_PER_HALF_HOUR, TO_KNOW, UNCONFIRMED, UNCONFIRMED_COVERS } from "@/lib/ask-nanci/data/panels/resy-tonight"
+import { PACING_PER_15_MIN, PACING_PER_HALF_HOUR } from "@/lib/ask-nanci/data/panels/resy-group"
+import { TONIGHT_DATE, BOOK_AS_OF, BOOK_SLOTS, BOOK_COVERS, BOOK_PEAK, BOOK_PARTIES, LARGE_PARTIES, TO_KNOW, UNCONFIRMED, UNCONFIRMED_COVERS } from "@/lib/ask-nanci/data/panels/resy-tonight"
 import { PanelShell, PanelHeader, PanelBody, PanelExportButton, StatCard, Callout } from "@/components/shared"
 
 // The bar heights put a slot that meets the pacing exactly on the dashed line.
