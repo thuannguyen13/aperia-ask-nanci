@@ -14,6 +14,7 @@ import { CARD_PER_COVER, FEES_CHARGED, NO_SHOW_COST, UNCONFIRMED_NO_SHOW_PCT, CO
 import { BOOK_COVERS, BOOK_PARTIES, BOOK_PEAK, LARGE_PARTIES, TO_KNOW, CELEBRATIONS, UNCONFIRMED, UNCONFIRMED_COVERS, LARGEST_UNCONFIRMED, partiesWithReply, coversWithReply, WAITING, WAITING_GUESTS, WAIT_SUMMARY, LEFT_QUOTES, quoteFor } from "./panels/resy-tonight";
 import { formatWholeCurrency } from "../../../components/shared/format";
 import { inScope, type FlowScope } from "./flow-scopes";
+import { isAwaitingTurn } from "../is-awaiting-turn";
 
 // ─── Flow-key constants ───────────────────────────────────────────────────────
 
@@ -507,8 +508,7 @@ const FLOW28_CANCELLED = partiesWithReply("cancelled")[0];
 const FLOW28_ASK_TO_SEND = `${capitalize(spellCount(UNCONFIRMED.length))} parties, ${UNCONFIRMED_COVERS} covers, didn't answer yesterday's 4pm confirmation text, including the ${LARGEST_UNCONFIRMED.time} party of ${LARGEST_UNCONFIRMED.party}. It matters: in October, ${UNCONFIRMED_NO_SHOW_PCT}% of unconfirmed covers didn't show against ${CONFIRMED_NO_SHOW_PCT}% of confirmed ones, and no-shows have cost you ${formatWholeCurrency(NO_SHOW_COST)} at your ${formatWholeCurrency(CARD_PER_COVER)} a cover, with ${formatWholeCurrency(FEES_CHARGED)} back in fees. Want me to send Resy's confirmation follow-up to these ${spellCount(UNCONFIRMED.length)} now?`;
 
 /** True while flow 28 is parked on its confirm step: idle, with the offer as the last message. */
-export const isAwaitingFlow28Send = (messages: { role: string; content: string }[], chatState: string) =>
-  chatState === "idle" && messages.at(-1)?.role === "assistant" && messages.at(-1)?.content === FLOW28_ASK_TO_SEND;
+export const isAwaitingFlow28Send = (messages: { role: string; content: string }[], chatState: string) => isAwaitingTurn(messages, chatState, FLOW28_ASK_TO_SEND);
 
 export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
   // Aperia Risk theme — landing quick-action / Nanci's-take chat answers.

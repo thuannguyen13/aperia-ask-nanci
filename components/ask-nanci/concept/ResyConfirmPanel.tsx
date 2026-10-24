@@ -1,6 +1,5 @@
 "use client"
 
-import { Button } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { Check, Phone, Users, X } from "lucide-react"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
@@ -9,6 +8,7 @@ import { CARD_PER_COVER, FEES_CHARGED, MONTH_TO_DATE, NO_SHOW_COST, NO_SHOW_NET 
 import { BOOK_AFTER, BOOK_AS_OF, REPLIES_AS_OF, TONIGHT_DATE, UNCONFIRMED, UNCONFIRMED_COVERS, coversWithReply, partiesWithReply, type ConfirmReply, type UnconfirmedParty } from "@/lib/ask-nanci/data/panels/resy-tonight"
 import { formatWholeCurrency } from "@/components/shared/format"
 import { PanelShell, PanelHeader, PanelBody } from "@/components/shared"
+import { ResyConfirmCard } from "./ResyConfirmCard"
 
 // How each reply to Resy's follow-up shows on its row, in the sent view only.
 const REPLY_STATUS: Record<ConfirmReply, { label: string; className: string; icon: typeof Check; note?: (p: UnconfirmedParty) => string }> = {
@@ -66,22 +66,14 @@ function ConfirmRow({ party, showReply }: { party: UnconfirmedParty; showReply: 
 }
 
 function ProposedCard() {
-  const { handlePrompt, chatState, messages, dismissPanelSheet } = useAskNanci()
-  // Send works only while the flow waits on "Send it". A double advance is already
-  // blocked by the player, so the button keeps no state of its own.
-  const send = () => {
-    // On a phone the sheet goes down so the replies and the next chip are in view. The
-    // answer's panel card brings the sent view back. Desktop has no sheet to move.
-    dismissPanelSheet()
-    handlePrompt(CONCEPT_FLOW28_SEND)
-  }
-
   return (
-    <div className="rounded-xl border border-primary/30 bg-primary/5 p-4">
-      <p className="text-sm font-semibold text-foreground">Send Resy&apos;s confirmation follow-up to {UNCONFIRMED.length} parties for tonight.</p>
-      <p className="mt-1 text-sm text-muted-foreground">Guests reply CONFIRM or CANCEL, and Resy updates each booking. Nothing is sent until you confirm.</p>
-      <Button className="mt-3" size="sm" onClick={send} disabled={!isAwaitingFlow28Send(messages, chatState)}>Send</Button>
-    </div>
+    <ResyConfirmCard
+      title={`Send Resy's confirmation follow-up to ${UNCONFIRMED.length} parties for tonight.`}
+      detail="Guests reply CONFIRM or CANCEL, and Resy updates each booking. Nothing is sent until you confirm."
+      buttonLabel="Send"
+      awaiting={isAwaitingFlow28Send}
+      onConfirmTurn={CONCEPT_FLOW28_SEND}
+    />
   )
 }
 
