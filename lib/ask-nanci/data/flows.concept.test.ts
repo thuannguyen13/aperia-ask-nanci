@@ -216,12 +216,18 @@ describe("flow 28, tonight's service", () => {
 describe("Resy Marketplace listing", () => {
   const resy = MARKETPLACE_SERVICES.find((s) => s.id === "resy")!
 
-  it("links flow 28 alone", () => {
-    expect(resy.connected?.flowSlugs).toEqual(["28"])
+  it("links flows 28 and 29", () => {
+    expect(resy.connected?.flowSlugs).toEqual(["28", "29"])
   })
 
-  it("promises nothing tonight's service does not show", () => {
+  it("promises nothing tonight's service or filling the book does not show", () => {
     const text = [resy.description, resy.overview, resy.connected?.message, ...(resy.highlights ?? []), ...(resy.sections ?? []).map((s) => s.body)].join(" ")
-    expect(text).not.toMatch(/deposit polic|end-of-night|per cover|Notify for Friday|guest email|move booking|Amex/i)
+    expect(text).not.toMatch(/deposit polic|end-of-night|per cover|guest email|Amex/i)
+  })
+
+  it("names every action flows 28 and 29 take, and asks before each", () => {
+    const canDo = resy.sections?.find((s) => s.title === "What Nanci can do")?.body ?? ""
+    for (const action of ["confirmation follow-up", "move a booking", "change availability", "Nanci asks before every change"]) expect(canDo).toContain(action)
+    expect(resy.highlights).toContain("Move bookings and open tables, with your OK")
   })
 })

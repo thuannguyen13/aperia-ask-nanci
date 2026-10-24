@@ -67,25 +67,27 @@ export const MARKETPLACE_SERVICES: MarketplaceService[] = [
     id: "resy",
     icon: CalendarCheck,
     title: "Resy",
-    description: "Connect your Resy account so Ask Nanci can read your book and waitlist, and act in Resy when you confirm.",
+    description: "Connect your Resy account so Ask Nanci can read your book, waitlist and Notify list, and act in Resy when you confirm.",
     vendor: { name: "Resy", logo: null },
     scope: "resy",
     enableLabel: "Connect",
     overview:
-      "Resy runs your reservations, confirmations and waitlist. Connected to Ask Nanci, it sits beside your card sales, so one question can answer from both. Ask how tonight looks, who hasn't confirmed, or how long the wait is at the door.",
+      "Resy runs your reservations, confirmations, waitlist and Notify list. Connected to Ask Nanci, it sits beside your card sales, so one question can answer from both. Ask how tonight looks, who hasn't confirmed, or who's on Notify for Friday.",
     highlights: [
       "Tonight's book, confirmations and waitlist, on request",
       "What no-shows cost you, measured against your card sales",
+      "Who's on Notify, and what a table earns per seat-hour after card fees",
       "Resy's confirmation follow-up, sent with your OK",
+      "Move bookings and open tables, with your OK",
     ],
     sections: [
-      { title: "What Nanci can read", body: "Reservations, confirmations, the waitlist and the no-show fees charged in Resy." },
-      { title: "What Nanci can do", body: "Send Resy's confirmation follow-up. Nanci asks before every change, and Resy records it as made through Ask Nanci." },
+      { title: "What Nanci can read", body: "Reservations, confirmations, the waitlist, Notify lists, turn times and the no-show fees charged in Resy." },
+      { title: "What Nanci can do", body: "Send Resy's confirmation follow-up, move a booking and change availability. Nanci asks before every change, and Resy records it as made through Ask Nanci." },
       { title: "About this demo", body: "A concept built on sample data. No connection to Resy exists." },
     ],
     connected: {
-      message: "Resy is connected. Your book and confirmations are now part of Ask Nanci.",
-      flowSlugs: ["28"],
+      message: "Resy is connected. Your book, confirmations and Notify list are now part of Ask Nanci.",
+      flowSlugs: ["28", "29"],
     },
   },
   {
