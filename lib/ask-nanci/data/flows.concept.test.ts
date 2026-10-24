@@ -8,9 +8,6 @@ import {
   CONCEPT_MANUAL_PROMPTS,
   promptsInScope,
 } from "./flows.concept"
-import { NO_SHOW_TOTALS, CHECK_PER_COVER } from "./panels/resy-no-shows"
-import { REPORT_COVERS, REPORT_SALES, REPORT_PER_COVER, RESY_PER_COVER } from "./panels/resy-service-day"
-import { formatCurrency, formatWholeCurrency } from "../../../components/shared/format"
 import { RISK_QUICK_ACTIONS, RISK_NANCI_TAKES } from "./risk-landing"
 import { RISK_SUGGESTION_DESTS, DETECTION_QUEUE_PROMPT } from "./risk-conversations"
 import type { ConceptScriptedTurn } from "../types"
@@ -129,7 +126,6 @@ describe("concept routing tables", () => {
 
 const flowKey = (num: number) => FLOW_DEFS.find((f) => f.num === num)!.key
 const RESY_KEYS = FLOW_DEFS.filter((f) => f.scope === "resy").map((f) => f.key)
-const answers = (num: number) => CONVERSATIONS[flowKey(num)].filter((t) => t.role === "assistant").map((t) => t.content)
 
 describe("promptsInScope", () => {
   it("leaves the Resy flows out of the unscoped demo", () => {
@@ -137,14 +133,15 @@ describe("promptsInScope", () => {
     for (const k of RESY_KEYS) expect(unscoped).not.toContain(k)
   })
 
-  it("is exactly flows 25 and 26 in resy mode", () => {
-    expect(promptsInScope("resy")).toEqual([flowKey(25), flowKey(26)])
+  it("holds no trigger flow in resy mode", () => {
+    expect(promptsInScope("resy")).toEqual([])
   })
 
   it("adds each flow's followups after its own prompt", () => {
-    const withFollowups = promptsInScope("resy", { followups: true })
-    const flow25 = FLOW_DEFS.find((f) => f.num === 25)!
-    expect(withFollowups.slice(0, 1 + (flow25.followups?.length ?? 0))).toEqual([flow25.key, ...(flow25.followups ?? [])])
+    const withFollowups = promptsInScope(null, { followups: true })
+    const withFollowupsFlow = FLOW_DEFS.find((f) => f.followups?.length && !f.scope && !f.destination && !f.proactive)!
+    const at = withFollowups.indexOf(withFollowupsFlow.key)
+    expect(withFollowups.slice(at, at + 1 + withFollowupsFlow.followups!.length)).toEqual([withFollowupsFlow.key, ...withFollowupsFlow.followups!])
   })
 })
 
@@ -154,28 +151,5 @@ describe("flow 17 sibling chips", () => {
     const chips = script[script.length - 1].suggestions ?? []
     expect(chips.length).toBeGreaterThan(0)
     for (const k of RESY_KEYS) expect(chips).not.toContain(k)
-  })
-})
-
-describe("Resy chat quotes the figures from the panel data", () => {
-  it("flow 25 states the no-show totals", () => {
-    const first = answers(25)[0]
-    for (const figure of [formatWholeCurrency(NO_SHOW_TOTALS.lostRevenue), formatWholeCurrency(NO_SHOW_TOTALS.feesCharged), formatWholeCurrency(CHECK_PER_COVER), `${NO_SHOW_TOTALS.parties} Resy bookings`, `${NO_SHOW_TOTALS.seats} seats`]) {
-      expect(first).toContain(figure)
-    }
-  })
-
-  it("flow 26 ends on the report's covers, sales and per-cover figures", () => {
-    const last = answers(26).at(-1)!
-    for (const figure of [`${REPORT_COVERS} covers`, formatWholeCurrency(REPORT_SALES), formatCurrency(REPORT_PER_COVER), formatCurrency(RESY_PER_COVER)]) {
-      expect(last).toContain(figure)
-    }
-  })
-
-  it("flow 25 plays 3 answers with its deposit followup, and flow 26 plays 5", () => {
-    const flow25 = FLOW_DEFS.find((f) => f.num === 25)!
-    const followupAnswers = (flow25.followups ?? []).flatMap((k) => CONVERSATIONS[k].filter((t) => t.role === "assistant"))
-    expect(answers(25).length + followupAnswers.length).toBe(3)
-    expect(answers(26)).toHaveLength(5)
   })
 })
