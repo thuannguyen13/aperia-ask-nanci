@@ -19,7 +19,7 @@ export function ResyShiftPanel() {
 
       <PanelBody className="space-y-4">
         <div className="grid grid-cols-3 gap-3">
-          <StatCard label="Covers" value={String(SHIFT_COVERS)} sublabel="booked on Resy" emphasis />
+          <StatCard label="Covers" value={String(SHIFT_COVERS)} sublabel="on the book" emphasis />
           <StatCard label="Parties" value={String(SHIFT_PARTIES)} />
           <StatCard label="Waitlist" value={String(SHIFT_WAITLIST)} sublabel="parties" />
         </div>

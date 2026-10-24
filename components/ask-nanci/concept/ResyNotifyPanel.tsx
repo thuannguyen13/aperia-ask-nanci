@@ -3,8 +3,7 @@
 import { cn } from "aperia-ds5/utils"
 import { Bell, Users } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { CANCELLED, NOTIFY_LIST, NOTIFY_TAKER, RECOVERED_VALUE, type NotifyEntry } from "@/lib/ask-nanci/data/panels/resy-service-day"
-import { CHECK_PER_COVER } from "@/lib/ask-nanci/data/panels/resy-no-shows"
+import { CANCELLED, NOTIFY_LIST, NOTIFY_TAKER, RECOVERED_VALUE, RESY_CHECK_PER_COVER, type NotifyEntry } from "@/lib/ask-nanci/data/panels/resy-service-day"
 import { PanelShell, PanelHeader, PanelBody, Callout, formatWholeCurrency } from "@/components/shared"
 
 const STATUS: Record<NotifyEntry["status"], { label: string; cls: string }> = {
@@ -26,7 +25,7 @@ export function ResyNotifyPanel() {
 
       <PanelBody className="space-y-4">
         <Callout variant="green">
-          <span className="font-semibold">Table back on the book.</span> {NOTIFY_TAKER.name} took it {NOTIFY_TAKER.reason.replace("Accepted ", "")} after the offer went out. At {formatWholeCurrency(CHECK_PER_COVER)} per cover, that is {formatWholeCurrency(RECOVERED_VALUE)} that would have sat empty.
+          <span className="font-semibold">Table back on the book.</span> {NOTIFY_TAKER.name} took it within {NOTIFY_TAKER.minutes} minutes of the offer going out. At {formatWholeCurrency(RESY_CHECK_PER_COVER)} per cover, that is {formatWholeCurrency(RECOVERED_VALUE)} that would have sat empty.
         </Callout>
 
         <div className="rounded-xl border">

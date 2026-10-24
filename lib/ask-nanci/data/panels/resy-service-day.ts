@@ -1,5 +1,4 @@
 import type { ChartWidget } from "../../types"
-import { CHECK_PER_COVER } from "./resy-no-shows"
 
 // Flow 26: one Saturday service run through Resy from the chat. Five Resy OS features,
 // one per exchange: shift view, guest profiles, Waitlist & Notify, guest SMS, reports.
@@ -62,8 +61,12 @@ export const GUESTS_TO_KNOW: GuestToKnow[] = [
 
 // ─── Waitlist & Notify ────────────────────────────────────────────────────────
 
+// What a Resy guest spent per cover that night. The refilled table and the report's
+// Resy row are both priced at it.
+export const RESY_CHECK_PER_COVER = 59
+
 export const CANCELLED = { guest: "the Chens", time: "8:00 PM", party: 4 }
-export const RECOVERED_VALUE = CANCELLED.party * CHECK_PER_COVER
+export const RECOVERED_VALUE = CANCELLED.party * RESY_CHECK_PER_COVER
 
 export interface NotifyEntry {
   name: string
@@ -117,11 +120,10 @@ export const SMS_GUESTS = SMS_RECIPIENTS.reduce((total, r) => total + r.party, 0
 export const REPORT_NO_SHOWS = { parties: 2, seats: 10 }
 
 // Booked covers seated are the shift's book less its no-shows, so the report and the
-// shift view agree. Phone takes its share and Resy the rest, at Resy's check per cover.
+// shift view agree. Phone takes its share and Resy the rest, at RESY_CHECK_PER_COVER.
 const BOOKED_SEATED = SHIFT_COVERS - REPORT_NO_SHOWS.seats
 const PHONE_COVERS = 6
 const RESY_COVERS = BOOKED_SEATED - PHONE_COVERS
-const RESY_CHECK_PER_COVER = 59
 
 // Card sales matched to tables, split by where the booking came from.
 const SOURCES_RAW = [

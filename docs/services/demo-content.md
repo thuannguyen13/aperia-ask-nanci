@@ -32,7 +32,7 @@ The lib shells (`mock-data.ts`, `embed-demo-config.ts`) contain logic alongside 
 
 A partner demo shown inside the full concept catalog reads as one more card, and the partner's story gets lost. `?mode=resy` narrows the concept demo to the Resy story: its home, Marketplace, question lists and chips show only items whose `scope` is `"resy"`, and every other mode leaves those items out.
 
-Filter with `inScope(scope)` from `data/flow-scopes.ts` and list prompts with `promptsInScope(scope)` from `data/flows.concept.ts`. Do not write a new scope filter by hand. The mode's header copy is `SCOPE_CATALOG` in `data/flow-scopes.ts`, and onboarding does not open in a scoped mode.
+Filter with `inScope(scope)` from `data/flow-scopes.ts` and list prompts with `promptsInScope(scope)` from `data/flows.concept.ts`. Do not write a new scope filter by hand. The mode's header copy is `SCOPE_CATALOG` in `data/flow-scopes.ts`, and neither the onboarding dialog nor the tour opens by itself in a scoped mode. `/tour` still replays the tour on request.
 
 ## Personas are deliberately separate
 
