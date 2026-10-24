@@ -14,7 +14,7 @@ import { NO_SHOW_TOTALS, RECOVERED_PCT, CHECK_PER_COVER, PEAK_LARGE_SEATS, PEAK_
 // Flow 26 does the same with the service-day figures.
 import { SHIFT_COVERS, SHIFT_PARTIES, SHIFT_PEAK, SHIFT_WAITLIST, KITCHEN_PACE, GUESTS_TO_KNOW, CANCELLED, NOTIFY_TAKER, RECOVERED_VALUE, SMS_SLOT, SMS_DELAY_MIN, SMS_RECIPIENTS, SMS_GUESTS, REPORT_COVERS, REPORT_SALES, REPORT_PER_COVER, REPORT_NO_SHOWS, RESY_PER_COVER, RESY_LIFT_PER_COVER, REPORT_CHART } from "./panels/resy-service-day";
 import { formatCurrency, formatWholeCurrency } from "../../../components/shared/format";
-import type { FlowScope } from "./flow-scopes";
+import { inScope, type FlowScope } from "./flow-scopes";
 
 // ─── Flow-key constants ───────────────────────────────────────────────────────
 
@@ -441,17 +441,30 @@ export const CONCEPT_EMBED_FLOW_LAYOUTS: Record<string, ConceptEmbedLayout> = {
   "22": { fullApp: true, openMarketplace: true },
 };
 
-// Trigger prompts (routing guard + recycled as end-of-flow suggestion chips), in
-// ascending card number. Proactive and destination flows have no prompt — excluded.
+// A flow that a typed or clicked prompt can start. Proactive and destination flows
+// have no prompt.
+const isTriggerFlow = (f: FlowDef) => !f.proactive && !f.destination;
+
+// Trigger prompts in ascending card number, across every scope: the routing guard.
+// Suggestion surfaces use promptsInScope instead, so one mode never offers another's.
 export const CONCEPT_ALL_PROMPTS = [...FLOW_DEFS]
-  .filter((f) => !f.proactive && !f.destination)
+  .filter(isTriggerFlow)
   .sort((a, b) => a.num - b.num)
   .map((f) => f.key);
+
+// Trigger prompts for one scope (null is the unscoped demo), by card number. With
+// `followups`, each flow's continuation prompts follow its own: the question lists.
+export function promptsInScope(scope: FlowScope | null, { followups = false } = {}): string[] {
+  return [...FLOW_DEFS]
+    .filter((f) => isTriggerFlow(f) && inScope(scope)(f))
+    .sort((a, b) => a.num - b.num)
+    .flatMap((f) => [f.key, ...(followups ? f.followups ?? [] : [])]);
+}
 
 // Merchant-money group prompts, ascending. End-of-flow chips suggest sibling flows
 // in the same group — otherMerchantPrompts(self) drops the flow that just finished.
 const CONCEPT_MERCHANT_PROMPTS = [...FLOW_DEFS]
-  .filter((f) => f.section === "merchant" && !f.proactive && !f.destination)
+  .filter((f) => f.section === "merchant" && isTriggerFlow(f))
   .sort((a, b) => a.num - b.num)
   .map((f) => f.key);
 

@@ -6,7 +6,7 @@ import { Tabs, TabsContent } from "aperia-ds5"
 import { ResponsiveTabsList } from "@/components/shared"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { ISO_PROMPT_CATEGORIES, BUSINESS_OWNER_PROMPT_CATEGORIES } from "@/lib/ask-nanci/embed-demo-config"
-import { FLOW_DEFS } from "@/lib/ask-nanci/data/flows.concept"
+import { promptsInScope } from "@/lib/ask-nanci/data/flows.concept"
 import { SCOPE_CATALOG } from "@/lib/ask-nanci/data/flow-scopes"
 import type { PromptCategory } from "@/lib/ask-nanci/types"
 
@@ -24,7 +24,7 @@ export function ExplorePrompts({ title, description, onPromptClick }: ExplorePro
   const scopedCategories: PromptCategory[] | null = scope && [{
     id: scope,
     label: SCOPE_CATALOG[scope].title,
-    prompts: FLOW_DEFS.filter((f) => f.scope === scope && !f.destination).flatMap((f) => [f.key, ...(f.followups ?? [])]),
+    prompts: promptsInScope(scope, { followups: true }),
   }]
 
   const visibleCategories = scopedCategories ?? (embedVariant === "iso"

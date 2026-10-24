@@ -8,6 +8,7 @@ import {
 } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
+import { inScope } from "@/lib/ask-nanci/data/flow-scopes"
 import { MarketplaceDetailPanel, AddedBadge, VendorLogo } from "./MarketplaceDetailPanel"
 import {
   MARKETPLACE_CATEGORY,
@@ -52,7 +53,7 @@ function ServiceCard({ service, enabled, selected, onClick }: { service: Marketp
 export function ServiceMarketplacePanel() {
   const { marketplaceOpen, scope } = useAskNanci()
   // A scoped mode lists only its partner's listings; every other mode leaves those out.
-  const listed = MARKETPLACE_SERVICES.filter((s) => (s.scope ?? null) === scope)
+  const listed = MARKETPLACE_SERVICES.filter(inScope(scope))
   const [query, setQuery] = useState("")
   const [selectedId, setSelectedId] = useState<string | null>(null)
   // Which add-ons are on. Seeded from the data's `added` flag, then owned here so the

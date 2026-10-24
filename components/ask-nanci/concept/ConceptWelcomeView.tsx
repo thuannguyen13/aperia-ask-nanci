@@ -6,13 +6,13 @@ import { TriangleAlert } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { FLOW_DEFS, type FlowDef, CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY } from "@/lib/ask-nanci/data/flows.concept"
 import { ChatInput } from "@/components/ask-nanci/ChatInput"
-import { SCOPE_CATALOG, type FlowScope } from "@/lib/ask-nanci/data/flow-scopes"
+import { SCOPE_CATALOG, inScope, type FlowScope } from "@/lib/ask-nanci/data/flow-scopes"
 
 const PROACTIVE_CONTENT = CONCEPT_SCRIPTED_CONVERSATIONS[CONCEPT_FLOW6_KEY][0].content
 
 // Welcome-view cards derive from the single flow registry (data/flows.concept.ts).
 // Scoped flows belong to their own mode, so the full catalog leaves them out.
-const UNSCOPED = FLOW_DEFS.filter((f) => !f.scope)
+const UNSCOPED = FLOW_DEFS.filter(inScope(null))
 const FLOWS = UNSCOPED.filter((f) => f.section === "pattern")
 const MONEY_FLOWS = UNSCOPED.filter((f) => f.section === "merchant")
 
@@ -132,7 +132,7 @@ function ScopedWelcomeView({ scope }: { scope: FlowScope }) {
   const { handlePrompt } = useAskNanci()
   const { title, subtitle } = SCOPE_CATALOG[scope]
   const flows = FLOW_DEFS
-    .filter((f) => f.scope === scope)
+    .filter(inScope(scope))
     .sort((a, b) => Number(!a.destination) - Number(!b.destination) || a.num - b.num)
 
   return (
