@@ -1,6 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useCallback, useRef, useEffect } from "react"
+import type { FlowScope } from "@/lib/ask-nanci/data/flow-scopes"
 import type { Message, Session, Source, UsageData, ConceptScriptedTurn, PanelId, PanelAction, SheetActionData } from "@/lib/ask-nanci/types"
 import { usePanelStack } from "@/lib/ask-nanci/use-panel-stack"
 import { turnToPanelActions } from "@/lib/ask-nanci/panel-actions"
@@ -21,7 +22,7 @@ import type { CurrentUser, PromptCategory } from "@/lib/ask-nanci/api"
 import { MOCK_USAGE, DEFAULT_CURRENT_USER } from "@/lib/ask-nanci/mock-data"
 import { EMBED_DEMO_SOURCES, EMBED_BUSINESS_OWNER_DEMO_SOURCES, EMBED_ISO_DEMO_SOURCES, EMBED_VW_DEMO_SOURCES, SCRIPTED_CONVERSATIONS } from "@/lib/ask-nanci/embed-demo-config"
 import type { EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
-import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_ALL_PROMPTS, CONCEPT_PANEL_REPLIES, CONCEPT_NO_RESET_PROMPTS, CONCEPT_MANUAL_PROMPTS, CONCEPT_LOOP_PROMPTS, CONCEPT_FLOW16_FOLLOWUPS, CONCEPT_FAKE_FOLLOWUPS, CONCEPT_CHAT_TITLES, CONCEPT_DECLINE_REPLIES, CONCEPT_OFFER_NO } from "@/lib/ask-nanci/data/flows.concept"
+import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_PANEL_REPLIES, promptsInScope, CONCEPT_NO_RESET_PROMPTS, CONCEPT_MANUAL_PROMPTS, CONCEPT_LOOP_PROMPTS, CONCEPT_FLOW16_FOLLOWUPS, CONCEPT_FAKE_FOLLOWUPS, CONCEPT_CHAT_TITLES, CONCEPT_DECLINE_REPLIES, CONCEPT_OFFER_NO } from "@/lib/ask-nanci/data/flows.concept"
 import { ACCOUNT_CHANGE_SHEET } from "@/lib/ask-nanci/data/panels/account-change"
 import { FOUNDATION_SOURCE_ID } from "@/lib/ask-nanci/source-store"
 import { ONBOARDING_KEY } from "@/lib/ask-nanci/storage-keys"
@@ -154,6 +155,8 @@ interface AskNanciCtx {
   isConceptVersion: boolean
   /** The welcome screen is the flow catalog rather than the standard one. */
   catalog: boolean
+  /** The partner this mode is narrowed to, if any (see ParsedMode.scope). */
+  scope: FlowScope | null
   submitFormPanel: () => void
   submitOfferApplication: (panelId: PanelId, message: string, sheetAction: SheetActionData) => void
   submitStepUpPanel: () => void
@@ -197,7 +200,7 @@ export function usePanelView(id: PanelId, fallback: string): string {
   return useAskNanci().panelViews[id] ?? fallback
 }
 
-export function AskNanciProvider({ children, isEmbed = false, embedVariant = null, isConceptVersion = false, catalog = false, autoPlayFlow = null, autoPlay = false, initialView, initialMarketplaceOpen = false, forceOnboarding = false, skipOnboarding = false, genericBrand = false, intro = false }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null; isConceptVersion?: boolean; catalog?: boolean; autoPlayFlow?: string | null; autoPlay?: boolean; initialView?: ChatView; initialMarketplaceOpen?: boolean; forceOnboarding?: boolean; skipOnboarding?: boolean; genericBrand?: boolean; intro?: boolean }) {
+export function AskNanciProvider({ children, isEmbed = false, embedVariant = null, isConceptVersion = false, catalog = false, scope = null, autoPlayFlow = null, autoPlay = false, initialView, initialMarketplaceOpen = false, forceOnboarding = false, skipOnboarding = false, genericBrand = false, intro = false }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null; isConceptVersion?: boolean; catalog?: boolean; scope?: FlowScope | null; autoPlayFlow?: string | null; autoPlay?: boolean; initialView?: ChatView; initialMarketplaceOpen?: boolean; forceOnboarding?: boolean; skipOnboarding?: boolean; genericBrand?: boolean; intro?: boolean }) {
   const [view, setView] = useState<ChatView>(initialView ?? (embedVariant === "concept-embed" ? "chat" : "welcome"))
   const [messages, setMessages] = useState<Message[]>([])
   const [chatState, setChatState] = useState<ChatState>("idle")
@@ -379,7 +382,8 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
             botMsg.content += chunk.content
             setPendingBot({ ...botMsg })
           } else if (chunk.type === "suggestions") {
-            botMsg.suggestions = chunk.items
+            // A scoped mode suggests only its own flows, whatever the reply proposed.
+            botMsg.suggestions = scope ? promptsInScope(scope) : chunk.items
           } else if (chunk.type === "sources") {
             botMsg.attributedSources = chunk.items
           } else if (chunk.type === "chart") {
@@ -419,7 +423,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     }
 
     run()
-  }, [chatState, sources, persistAndReload, appendBotMessage])
+  }, [chatState, sources, persistAndReload, appendBotMessage, scope])
 
   const stopAnimation = useCallback(() => {
     stopRef.current = true
@@ -442,15 +446,15 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   }, [])
 
   // Append one canned assistant message — the tail every panel-submit handler shares.
-  // Pills default to the full prompt set, which is what a completed panel action ends
+  // Pills default to this mode's prompt set, which is what a completed panel action ends
   // with; pass `suggestions: undefined` in `extra` to opt out (the offer flows do —
   // their follow-ups live on the sheet instead).
   const appendAssistant = useCallback((content: string, extra?: Partial<Message>) => {
     setMessages((prev) => [
       ...prev,
-      { id: newSessionId(), role: "assistant" as const, content, suggestions: CONCEPT_ALL_PROMPTS, ...extra },
+      { id: newSessionId(), role: "assistant" as const, content, suggestions: promptsInScope(scope), ...extra },
     ])
-  }, [])
+  }, [scope])
 
   const playScripted = useCallback((prompt: string) => {
     const script = SCRIPTED_CONVERSATIONS[prompt]
@@ -995,7 +999,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       mobileSidebarOpen, setMobileSidebarOpen,
       shownPanelId, setShownPanelId, panelSheetDismissed, dismissPanelSheet, reopenPanelSheet, panelSheetOpen,
       onboardingOpen, setOnboardingOpen, forceOnboarding, genericBrand, tourActive, setTourActive, tourRequest, requestTour, flowFinished, conversationFading, introShowing, leavesCurrentFlow,
-      isConceptVersion, catalog,
+      isConceptVersion, catalog, scope,
       submitFormPanel, submitOfferApplication, submitStepUpPanel,
       triggerProactiveFlow, proactiveNotificationActive, activateProactiveNotification,
       closingPanels, closePanel, closeAllNewPanels, submitDisputeDraft,

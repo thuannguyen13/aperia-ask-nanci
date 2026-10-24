@@ -1,8 +1,9 @@
 // Flow 22: Marketplace — Mastercard Services offerings shown as a full content-area view.
 // ponytail: illustrative marketing copy only; not live product terms.
 
-import { Brain, MessagesSquare, Handshake, CreditCard, FileChartLine } from "lucide-react";
+import { Brain, MessagesSquare, Handshake, CreditCard, FileChartLine, CalendarCheck } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import type { FlowScope } from "../flow-scopes";
 
 // Page title, and the sidebar nav label that opens it.
 export const MARKETPLACE_TITLE = "Marketplace";
@@ -20,9 +21,14 @@ export const MARKETPLACE_EMPTY = {
   description: "Try a different search term to find services for your business.",
 };
 
-// ponytail: every listing in the design is Mastercard, so the vendor is one constant
-// rather than a per-service field.
-export const MARKETPLACE_VENDOR = { name: "Mastercard", logo: "/logos/mastercard-logomark.svg" };
+// Every listing in the design is Mastercard, so that is the default vendor. A listing
+// from anyone else names its own. A null logo renders the name as text.
+export interface MarketplaceVendor {
+  name: string;
+  logo: string | null;
+}
+
+export const MARKETPLACE_VENDOR: MarketplaceVendor = { name: "Mastercard", logo: "/logos/mastercard-logomark.svg" };
 
 export interface MarketplaceService {
   id: string;
@@ -36,6 +42,14 @@ export interface MarketplaceService {
   highlights: string[];
   /** Collapsed detail sections, in order. */
   sections: { title: string; body: string }[];
+  /** Defaults to MARKETPLACE_VENDOR. */
+  vendor?: MarketplaceVendor;
+  /** Listed only in the mode with this scope, which lists nothing else. */
+  scope?: FlowScope;
+  /** Replaces the "Add" label, for an integration that connects an account. */
+  enableLabel?: string;
+  /** Once on: a line saying what changed, and the flows to try next (by embed slug). */
+  connected?: { message: string; flowSlugs: string[] };
 }
 
 export const MARKETPLACE_DETAIL_LABELS = {
@@ -49,6 +63,32 @@ export const MARKETPLACE_DETAIL_LABELS = {
 };
 
 export const MARKETPLACE_SERVICES: MarketplaceService[] = [
+  {
+    id: "resy",
+    icon: CalendarCheck,
+    title: "Resy",
+    description: "Connect your Resy account so Ask Nanci can read your book, guests and waitlist, and act in Resy from the chat.",
+    vendor: { name: "Resy", logo: null },
+    scope: "resy",
+    enableLabel: "Connect",
+    overview:
+      "Resy runs your reservations, waitlist, guest profiles and guest texts. Connected to Ask Nanci, it sits beside your card sales, so one question can answer from both. Ask about tonight's book, fill a cancellation from the Notify list, or see what Resy guests spend per cover.",
+    highlights: [
+      "Tonight's covers, pacing and waitlist, on request",
+      "Guest profiles with tags, notes and card spend",
+      "Fill cancellations from Notify, and text guests through Resy",
+      "End-of-night reports that match Resy tables to card sales",
+    ],
+    sections: [
+      { title: "What Nanci can read", body: "Reservations, covers, waitlist and Notify lists, guest profiles and the fees and deposits Resy charges." },
+      { title: "What Nanci can do", body: "Offer an open table to the Notify list, text a group of guests, and change deposit policies. Each action shows in Resy as done by Ask Nanci." },
+      { title: "About this demo", body: "A concept built on sample data. No connection to Resy exists." },
+    ],
+    connected: {
+      message: "Resy is connected. Your book and guests are now part of Ask Nanci.",
+      flowSlugs: ["25", "26"],
+    },
+  },
   {
     id: "portfolio-intelligence",
     icon: Brain,

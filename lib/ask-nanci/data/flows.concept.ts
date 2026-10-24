@@ -9,7 +9,12 @@ import { RISK_LANDING_CONVERSATIONS } from "./risk-conversations";
 import { CARD_FIGURES } from "./panels/credit-card-offer";
 // Flow 24 does the same with the location review figures.
 import { REVIEW_TOTAL_SALES, REVIEW_TOTAL_CHANGE_PCT, REVIEW_LEADER, REVIEW_WATCH, REVIEW_LOCATIONS, WATCH_TRANSACTIONS, REVIEW_SALES_CHART, REVIEW_TREND_CHART, averageTicket } from "./panels/location-review";
-import { formatWholeCurrency } from "../../../components/shared/format";
+// Flow 25 does the same with the Resy no-show figures.
+import { NO_SHOW_TOTALS, RECOVERED_PCT, CHECK_PER_COVER, PEAK_LARGE_SEATS, PEAK_LARGE_SHARE_PCT, NO_SHOW_CHART, DEPOSIT_POLICY, DEPOSIT_WOULD_HAVE_KEPT, BOOK_DATE, BOOK_PREVIEW, BOOK_HELD, BOOK_AWAITING } from "./panels/resy-no-shows";
+// Flow 26 does the same with the service-day figures.
+import { SHIFT_COVERS, SHIFT_PARTIES, SHIFT_PEAK, SHIFT_WAITLIST, KITCHEN_PACE, GUESTS_TO_KNOW, CANCELLED, NOTIFY_TAKER, RECOVERED_VALUE, SMS_SLOT, SMS_DELAY_MIN, SMS_RECIPIENTS, SMS_GUESTS, REPORT_COVERS, REPORT_SALES, REPORT_PER_COVER, REPORT_NO_SHOWS, RESY_PER_COVER, RESY_LIFT_PER_COVER, REPORT_CHART } from "./panels/resy-service-day";
+import { formatCurrency, formatWholeCurrency } from "../../../components/shared/format";
+import { inScope, type FlowScope } from "./flow-scopes";
 
 // ─── Flow-key constants ───────────────────────────────────────────────────────
 
@@ -48,6 +53,10 @@ const CONCEPT_FLOW24_BREAKDOWN = "show me the full breakdown";
 const CONCEPT_FLOW24_WATCH = "what's going on at Midtown?";
 // Reading time after a chart or the panel lands, before the next question covers it.
 const CONCEPT_FLOW24_READ_MS = 2500;
+const CONCEPT_FLOW25_PROMPT = "What are no-shows costing me this month?";
+const CONCEPT_FLOW25_PEAK = "which nights are worst?";
+const CONCEPT_FLOW25_DEPOSIT = "Turn on a $25 deposit for Fri and Sat parties of 6+";
+const CONCEPT_FLOW26_PROMPT = "What does tonight look like?";
 // Both offer flows share the same accept/decline pills (matched per-active-flow, so
 // reuse is safe). "No, ignore for now" is decorative — registered as a fake follow-up.
 const CONCEPT_OFFER_YES = "Yes, show me";
@@ -114,6 +123,10 @@ const CONCEPT_FLOW23_FOLLOWUPS_FAKE = ["Check weekend deposit timing", "Compare 
 
 const CONCEPT_FLOW24_FOLLOWUPS_FAKE = ["Compare Midtown to last year", "Who's on shift at Midtown this week?", "Check what's running low"];
 
+const CONCEPT_FLOW26_FOLLOWUPS_FAKE = ["Block the patio Saturday", "Who are my best regulars?", "Set up a Valentine's tasting"];
+
+const CONCEPT_FLOW25_FOLLOWUPS_FAKE = ["Show deposits collected this week", "Text tonight's large parties a reminder", "Who are my best regulars?"];
+
 // Every fake follow-up across flows — handlePrompt treats these as no-op decoration.
 // Add each flow's follow-up array here as the treatment rolls out.
 // Flow 6 (proactive auto-play): decorative "road not taken" pills on non-final turns.
@@ -133,6 +146,8 @@ export const CONCEPT_FAKE_FOLLOWUPS = new Set<string>([
   ...CONCEPT_FLOW19_FOLLOWUPS,
   ...CONCEPT_FLOW23_FOLLOWUPS_FAKE,
   ...CONCEPT_FLOW24_FOLLOWUPS_FAKE,
+  ...CONCEPT_FLOW25_FOLLOWUPS_FAKE,
+  ...CONCEPT_FLOW26_FOLLOWUPS_FAKE,
 ]);
 
 // ─── Flow registry — single source of truth for showcased flows ──────────────
@@ -158,6 +173,8 @@ export interface FlowDef {
   // A destination card opens a surface instead of playing a conversation. Its `key`
   // is an internal id, not a prompt, so it stays out of the trigger-prompt lists.
   destination?: "marketplace";
+  // Shown only in the mode with this scope, which in turn shows only these flows.
+  scope?: FlowScope;
 }
 
 export const FLOW_DEFS: FlowDef[] = [
@@ -370,6 +387,38 @@ export const FLOW_DEFS: FlowDef[] = [
     followups: [CONCEPT_FLOW23_FOLLOWUP],
     description: "A day-by-hour sales heatmap finds the peaks — the follow-up ranks the quietest window, the safe place to cut a shift.",
   },
+  {
+    num: 25,
+    section: "merchant",
+    title: "Reservation No-Shows",
+    badge: "Resy",
+    key: CONCEPT_FLOW25_PROMPT,
+    slug: "25",
+    followups: [CONCEPT_FLOW25_DEPOSIT],
+    scope: "resy",
+    description: "Resy no-shows priced at the card data's average check, then a deposit policy turned on in Resy from the chat. A concept: no Resy connection exists.",
+  },
+  {
+    num: 26,
+    section: "merchant",
+    title: "A Night on Resy",
+    badge: "Resy",
+    key: CONCEPT_FLOW26_PROMPT,
+    slug: "26",
+    manual: false,
+    scope: "resy",
+    description: "One Saturday run from the chat through five Resy features: shift view, guest profiles, Waitlist & Notify, guest texts and the end-of-night report. A concept: no Resy connection exists.",
+  },
+  {
+    num: 27,
+    section: "merchant",
+    title: "Connect Resy",
+    badge: "Resy",
+    key: "__resy_marketplace__",
+    destination: "marketplace",
+    scope: "resy",
+    description: "Open the Marketplace, find Resy and turn the integration on. Nanci then offers the first questions to ask.",
+  },
 ];
 
 // Derived — do not hand-maintain; add to FLOW_DEFS above instead.
@@ -392,19 +441,25 @@ export const CONCEPT_EMBED_FLOW_LAYOUTS: Record<string, ConceptEmbedLayout> = {
   "22": { fullApp: true, openMarketplace: true },
 };
 
-// Trigger prompts (routing guard + recycled as end-of-flow suggestion chips), in
-// ascending card number. Proactive and destination flows have no prompt — excluded.
-export const CONCEPT_ALL_PROMPTS = [...FLOW_DEFS]
-  .filter((f) => !f.proactive && !f.destination)
-  .sort((a, b) => a.num - b.num)
-  .map((f) => f.key);
+// Flows that a typed or clicked prompt can start, by card number, narrowed by `keep`.
+// Proactive and destination flows have no prompt.
+const triggerFlows = (keep: (f: FlowDef) => boolean) =>
+  FLOW_DEFS.filter((f) => !f.proactive && !f.destination && keep(f)).sort((a, b) => a.num - b.num);
 
-// Merchant-money group prompts, ascending. End-of-flow chips suggest sibling flows
-// in the same group — otherMerchantPrompts(self) drops the flow that just finished.
-const CONCEPT_MERCHANT_PROMPTS = [...FLOW_DEFS]
-  .filter((f) => f.section === "merchant" && !f.proactive && !f.destination)
-  .sort((a, b) => a.num - b.num)
-  .map((f) => f.key);
+// Every trigger prompt across every scope: the list check-flows resolves. Routing goes
+// through CONCEPT_FLOW_SLUGS and the scripted conversations, not through this list.
+// Suggestion surfaces use promptsInScope instead, so one mode never offers another's.
+export const CONCEPT_ALL_PROMPTS = triggerFlows(() => true).map((f) => f.key);
+
+// Trigger prompts for one scope (null is the unscoped demo), by card number. With
+// `followups`, each flow's continuation prompts follow its own: the question lists.
+export function promptsInScope(scope: FlowScope | null, { followups = false } = {}): string[] {
+  return triggerFlows(inScope(scope)).flatMap((f) => [f.key, ...(followups ? f.followups ?? [] : [])]);
+}
+
+// Unscoped merchant-money prompts, ascending. End-of-flow chips suggest sibling flows
+// in the same group. Flow 17 plays only unscoped, so a scoped flow is never a sibling.
+const CONCEPT_MERCHANT_PROMPTS = triggerFlows((f) => f.section === "merchant" && inScope(null)(f)).map((f) => f.key);
 
 const otherMerchantPrompts = (self: string) => CONCEPT_MERCHANT_PROMPTS.filter((k) => k !== self);
 
@@ -1033,6 +1088,84 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       view: "watch",
       revealPanel: true,
       suggestions: CONCEPT_FLOW24_FOLLOWUPS_FAKE,
+    },
+  ],
+
+  // ── Flow 25: Reservation No-Shows (Resy concept) ──────────────────────────
+  // Reservations come from Resy and the check per cover from the card data, which is
+  // the point: neither system can price a no-show alone. The figures are quoted from
+  // data/panels/resy-no-shows.ts so the answers and the panel cannot disagree.
+  [CONCEPT_FLOW25_PROMPT]: [
+    { role: "user", content: CONCEPT_FLOW25_PROMPT },
+    {
+      role: "assistant",
+      content: `About ${formatWholeCurrency(NO_SHOW_TOTALS.lostRevenue)} so far in October. ${NO_SHOW_TOTALS.parties} Resy bookings never showed, ${NO_SHOW_TOTALS.seats} seats at your ${formatWholeCurrency(CHECK_PER_COVER)} average check per cover. You charged ${formatWholeCurrency(NO_SHOW_TOTALS.feesCharged)} in no-show fees, so ${RECOVERED_PCT}% of it came back.`,
+      chart: NO_SHOW_CHART,
+      panel: "resy-no-shows",
+      source: "Resy reservations + card transactions",
+    },
+    { role: "user", content: CONCEPT_FLOW25_PEAK, pauseBefore: CONCEPT_FLOW24_READ_MS },
+    {
+      role: "assistant",
+      content: `Friday and Saturday, and it is the big tables. Parties of ${DEPOSIT_POLICY.minParty} or more on those two nights left ${PEAK_LARGE_SEATS} seats empty, ${PEAK_LARGE_SHARE_PCT}% of the total. A deposit on just those bookings covers nearly half the risk without touching your regulars.`,
+      panel: "resy-no-shows",
+      view: "peak",
+      suggestions: [CONCEPT_FLOW25_DEPOSIT],
+    },
+  ],
+  [CONCEPT_FLOW25_DEPOSIT]: [
+    { role: "user", content: CONCEPT_FLOW25_DEPOSIT },
+    {
+      role: "assistant",
+      content: `Done in Resy. From ${DEPOSIT_POLICY.startsOn}, ${DEPOSIT_POLICY.nights} bookings of ${DEPOSIT_POLICY.minParty} or more take a $${DEPOSIT_POLICY.perGuest} deposit per guest, refundable up to ${DEPOSIT_POLICY.refundWindowHours} hours before. At October's pace that is ${formatWholeCurrency(DEPOSIT_WOULD_HAVE_KEPT)} kept instead of lost. ${BOOK_PREVIEW.length} large parties are already booked for ${BOOK_DATE}: ${formatWholeCurrency(BOOK_HELD)} is held and ${BOOK_AWAITING.map((b) => b.guest.split(" ")[1]).join(", ")} has the request. Deposits pay out through Resy, not your merchant deposits, so I will match them to your statement each week.`,
+      panel: "resy-no-shows",
+      view: "deposit",
+      revealPanel: true,
+      suggestions: CONCEPT_FLOW25_FOLLOWUPS_FAKE,
+    },
+  ],
+
+  // ── Flow 26: A Night on Resy (Resy concept) ───────────────────────────────
+  // One Saturday, five Resy OS features, one per exchange. Each answer replaces the
+  // last panel so the screen always shows the feature being talked about. Plays on its
+  // own (`manual: false`); the figures are quoted from data/panels/resy-service-day.ts.
+  [CONCEPT_FLOW26_PROMPT]: [
+    { role: "user", content: CONCEPT_FLOW26_PROMPT },
+    {
+      role: "assistant",
+      content: `Busy. ${SHIFT_COVERS} covers across ${SHIFT_PARTIES} parties, peaking at ${SHIFT_PEAK.time} with ${SHIFT_PEAK.covers}, two short of the ${KITCHEN_PACE} your kitchen paces to. ${SHIFT_WAITLIST} parties are on the waitlist.`,
+      panel: "resy-shift",
+    },
+    { role: "user", content: "Anyone special coming in?", pauseBefore: CONCEPT_FLOW24_READ_MS },
+    {
+      role: "assistant",
+      content: `Three to know. ${GUESTS_TO_KNOW[0].name} brings ${GUESTS_TO_KNOW[0].party} for her birthday at ${GUESTS_TO_KNOW[0].time}, and she averages ${formatWholeCurrency(GUESTS_TO_KNOW[0].avgSpend ?? 0)} a visit. The Whitfields are here for their anniversary, with a shellfish allergy on the table. ${GUESTS_TO_KNOW[2].name} is new, a food writer.`,
+      panel: "resy-guests",
+      closePanel: "resy-shift",
+    },
+    { role: "user", content: `${CANCELLED.guest.replace("the ", "The ")} just cancelled ${CANCELLED.time.replace(":00 PM", "pm")}. Fill it`, pauseBefore: CONCEPT_FLOW24_READ_MS },
+    {
+      role: "assistant",
+      content: `Done. I offered the table to ${NOTIFY_TAKER.name} first, a regular whose Notify window fit exactly, and he took it within ${NOTIFY_TAKER.minutes} minutes. That puts ${formatWholeCurrency(RECOVERED_VALUE)} back on the book.`,
+      panel: "resy-notify",
+      closePanel: "resy-guests",
+    },
+    { role: "user", content: `Kitchen's backed up. Text the ${SMS_SLOT.replace(" PM", "")}s we're running ${SMS_DELAY_MIN} late`, pauseBefore: CONCEPT_FLOW24_READ_MS },
+    {
+      role: "assistant",
+      content: `Sent to ${SMS_RECIPIENTS.length} parties, ${SMS_GUESTS} guests, with a round at the bar on you. Two replied already. The Torres party asked to keep the booth, so I flagged it for the host stand.`,
+      panel: "resy-sms",
+      closePanel: "resy-notify",
+    },
+    { role: "user", content: "How did tonight close out?", pauseBefore: CONCEPT_FLOW24_READ_MS },
+    {
+      role: "assistant",
+      content: `Strong. ${REPORT_COVERS} covers and ${formatWholeCurrency(REPORT_SALES)} on cards, ${formatCurrency(REPORT_PER_COVER)} a cover, with ${REPORT_NO_SHOWS.parties} no-shows. Resy guests spent ${formatCurrency(RESY_PER_COVER)} a cover, ${formatWholeCurrency(RESY_LIFT_PER_COVER)} more than walk-ins.`,
+      chart: REPORT_CHART,
+      panel: "resy-report",
+      closePanel: "resy-sms",
+      revealPanel: true,
+      suggestions: CONCEPT_FLOW26_FOLLOWUPS_FAKE,
     },
   ],
 };

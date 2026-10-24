@@ -6,12 +6,15 @@ import { TriangleAlert } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { FLOW_DEFS, type FlowDef, CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY } from "@/lib/ask-nanci/data/flows.concept"
 import { ChatInput } from "@/components/ask-nanci/ChatInput"
+import { SCOPE_CATALOG, inScope, type FlowScope } from "@/lib/ask-nanci/data/flow-scopes"
 
 const PROACTIVE_CONTENT = CONCEPT_SCRIPTED_CONVERSATIONS[CONCEPT_FLOW6_KEY][0].content
 
 // Welcome-view cards derive from the single flow registry (data/flows.concept.ts).
-const FLOWS = FLOW_DEFS.filter((f) => f.section === "pattern")
-const MONEY_FLOWS = FLOW_DEFS.filter((f) => f.section === "merchant")
+// Scoped flows belong to their own mode, so the full catalog leaves them out.
+const UNSCOPED = FLOW_DEFS.filter(inScope(null))
+const FLOWS = UNSCOPED.filter((f) => f.section === "pattern")
+const MONEY_FLOWS = UNSCOPED.filter((f) => f.section === "merchant")
 
 const BADGE_COLORS: Record<string, string> = {
   "Chat only":       "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",
@@ -31,6 +34,11 @@ const BADGE_COLORS: Record<string, string> = {
 const MARKETING_BADGE = "bg-blue-600 text-white uppercase tracking-wide"
 
 export function ConceptWelcomeView() {
+  const { scope } = useAskNanci()
+  return scope ? <ScopedWelcomeView scope={scope} /> : <CatalogWelcomeView />
+}
+
+function CatalogWelcomeView() {
   const { handlePrompt, triggerProactiveFlow, activateProactiveNotification, embedVariant } = useAskNanci()
   const [proactiveAlertVisible, setProactiveAlertVisible] = useState(false)
   const [detailsExpanded, setDetailsExpanded] = useState(false)
@@ -118,17 +126,43 @@ export function ConceptWelcomeView() {
   )
 }
 
-function FlowGrid({ flows, onTryIt, onSimulateLogin }: { flows: FlowDef[]; onTryIt: (prompt: string) => void; onSimulateLogin: () => void }) {
+// A mode narrowed to one partner: its flows only, connect step first, numbered in the
+// order they are meant to be played rather than by their place in the full catalog.
+function ScopedWelcomeView({ scope }: { scope: FlowScope }) {
+  const { handlePrompt } = useAskNanci()
+  const { title, subtitle } = SCOPE_CATALOG[scope]
+  const flows = FLOW_DEFS
+    .filter(inScope(scope))
+    .sort((a, b) => Number(!a.destination) - Number(!b.destination) || a.num - b.num)
+
+  return (
+    <div className="flex flex-1 flex-col items-center overflow-y-auto px-4 py-8 md:px-8 md:py-12">
+      <div className="flex w-full max-w-[800px] flex-col gap-8 mx-auto">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={40} height={40} />
+          <div>
+            <p className="text-2xl font-medium text-foreground">{title}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
+          </div>
+        </div>
+        <ChatInput />
+        <FlowGrid flows={flows} onTryIt={handlePrompt} numbered />
+      </div>
+    </div>
+  )
+}
+
+function FlowGrid({ flows, onTryIt, onSimulateLogin, numbered }: { flows: FlowDef[]; onTryIt: (prompt: string) => void; onSimulateLogin?: () => void; numbered?: boolean }) {
   // A destination card opens a surface rather than playing a script.
   const { setMarketplaceOpen } = useAskNanci()
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-      {flows.map((flow) => (
+      {flows.map((flow, i) => (
         <div key={flow.num} className="flex flex-col gap-3 rounded-2xl border bg-card p-4">
           <div className="flex items-start justify-between gap-2">
             <div className="flex items-center gap-2">
               <span className="flex size-6 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
-                {flow.num}
+                {numbered ? i + 1 : flow.num}
               </span>
               <h3 className="text-sm font-semibold text-foreground">{flow.title}</h3>
             </div>

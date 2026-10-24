@@ -2,6 +2,8 @@
 
 import { useState } from "react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
+import { promptsInScope } from "@/lib/ask-nanci/data/flows.concept"
+import type { FlowScope } from "@/lib/ask-nanci/data/flow-scopes"
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
   DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, Input,
@@ -72,16 +74,19 @@ interface Props {
   onAction: (action: SlashAction) => void
 }
 
+// A scoped mode lists only its own flows' questions. The fetched list is the unscoped demo's.
+const listQuestions = (scope: FlowScope | null, fetched: string[]) => (scope ? promptsInScope(scope, { followups: true }) : fetched)
+
 export function SlashCommandPopover({ query, onAction }: Props) {
   const [questionSearch, setQuestionSearch] = useState("")
   const [mode, setMode] = useState<"commands" | "questions">("commands")
-  const { allQuestions } = useAskNanci()
+  const { allQuestions, scope } = useAskNanci()
 
   const filteredCommands = COMMANDS.filter((c) =>
     c.id.includes(query.toLowerCase().replace("/", "")),
   )
 
-  const filteredQuestions = allQuestions.filter((q) =>
+  const filteredQuestions = listQuestions(scope, allQuestions).filter((q) =>
     !questionSearch || q.toLowerCase().includes(questionSearch.toLowerCase()),
   ).slice(0, MAX_VISIBLE_QUESTIONS)
 

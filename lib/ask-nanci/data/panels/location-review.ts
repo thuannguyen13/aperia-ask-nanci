@@ -87,7 +87,7 @@ export function averageTicket(l: ReviewLocation) {
 }
 
 /** One trend point per label, every location as a series. */
-export function trendFor(period: ReviewPeriod) {
+function trendFor(period: ReviewPeriod) {
   const n = period.points.length
   return period.points.map((label, i) => {
     // Position along the period, 0 at the start and 1 at the end, mapped onto the

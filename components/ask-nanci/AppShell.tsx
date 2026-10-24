@@ -59,10 +59,11 @@ function HostIntro({ src, children }: { src: string | null; children: React.Reac
 // Chat column. The marketplace is a full content-area view, so the chat hides (stays
 // mounted — never remounted) while it's open.
 function ChatArea({ children }: { children: React.ReactNode }) {
-  const { marketplaceOpen } = useAskNanci()
+  const { marketplaceOpen, scope } = useAskNanci()
   return (
     <>
-      <ServiceMarketplacePanel />
+      {/* Keyed on scope: the enabled set it seeds must not outlive a mode change. */}
+      <ServiceMarketplacePanel key={String(scope)} />
       <div className={`min-w-0 flex-1 overflow-hidden bg-background md:rounded-2xl md:border ${marketplaceOpen ? "hidden" : "flex"}`}>
         {children}
       </div>
@@ -71,7 +72,7 @@ function ChatArea({ children }: { children: React.ReactNode }) {
 }
 
 function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode; noSidebar?: boolean }) {
-  const { dynamicPanels, marketplaceOpen } = useAskNanci()
+  const { dynamicPanels, marketplaceOpen, scope } = useAskNanci()
   const isDQ = dynamicPanels.some((p) => DQ_PANELS.has(p))
   const [showDQ, setShowDQ] = useState(false)
   const [dqVisible, setDqVisible] = useState(false)
@@ -101,7 +102,7 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
     <div className={`flex min-w-0 flex-1 md:py-1 md:pr-1${noSidebar ? " md:pl-1" : ""}`}>
       <PersonalizePanel />
       {/* Marketplace panel only where a sidebar can open it (not the compact widget). */}
-      {!noSidebar && <ServiceMarketplacePanel />}
+      {!noSidebar && <ServiceMarketplacePanel key={String(scope)} />}
       {/* Chat is always mounted at this position so React never remounts it.
           It stays on the left in every mode (matching the latest flows); in DQ mode it
           just shrinks to a fixed width while the panel area fills the space to its right. */}
@@ -131,7 +132,7 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams()
-  const { isEmbed, embedVariant, isConceptVersion, catalog, theme, forceOnboarding, intro } = parseMode(searchParams.get("mode"))
+  const { isEmbed, embedVariant, isConceptVersion, catalog, theme, forceOnboarding, intro, scope } = parseMode(searchParams.get("mode"))
   const rawFlow = searchParams.get("flow")
   const autoPlayFlow = (rawFlow && CONCEPT_FLOW_SLUGS[rawFlow]) ?? null
   // `?autoplay` plays ?flow= on load rather than waiting for the Ask button. Opt-in and
@@ -227,7 +228,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <ChatStreamProvider>
     {/* autoPlayFlow reaches the non-embed modes too, so ?autoplay composes with
         concept / tib / woodforest, not just the embed */}
-    <AskNanciProvider isConceptVersion={isConceptVersion} catalog={catalog} autoPlayFlow={autoPlayFlow} autoPlay={autoPlay} genericBrand={genericBrand} forceOnboarding={forceOnboarding} skipOnboarding={skipOnboarding}>
+    <AskNanciProvider isConceptVersion={isConceptVersion} catalog={catalog} scope={scope} autoPlayFlow={autoPlayFlow} autoPlay={autoPlay} genericBrand={genericBrand} forceOnboarding={forceOnboarding} skipOnboarding={skipOnboarding || !!scope}>
       <AppFrame
         theme={theme}
         topBar={

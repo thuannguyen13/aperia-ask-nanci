@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogTitle } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { ONBOARDING_KEY, TOUR_DONE_KEY, TOUR_STEP_KEY } from "@/lib/ask-nanci/storage-keys"
 import { TutorialModal } from "./TutorialModal"
+import { shouldAutoOpenTour } from "./should-auto-open-tour"
 
 /**
  * Product tour. Runs once, after the link-accounts dialog has been completed, and
@@ -127,7 +128,7 @@ const steps: Step[] = TOUR_STEPS.map((step, i) => ({
 }))
 
 export function Onboarding() {
-  const { onboardingOpen, forceOnboarding, setTourActive, tourRequest } = useAskNanci()
+  const { onboardingOpen, forceOnboarding, setTourActive, tourRequest, scope } = useAskNanci()
   const [run, setRun] = useState(false)
   const [showIntro, setShowIntro] = useState(false)
   const [initialStep, setInitialStep] = useState(0)
@@ -150,10 +151,10 @@ export function Onboarding() {
   // Defer until the link-accounts dialog has closed and set ONBOARDING_KEY.
   // Re-runs when onboardingOpen transitions false so the tour gate opens the
   // moment the wizard finishes — not on initial mount alongside the dialog.
+  // A scoped mode skips it, as it skips the dialog; /tour still replays it above.
   useEffect(() => {
-    if (run || showIntro) return
-    if (onboardingOpen) return
-    if (tourRequest !== firstRequest.current) return // a /tour replay owns the state
+    const replayed = tourRequest !== firstRequest.current
+    if (!shouldAutoOpenTour({ run, showIntro, onboardingOpen, replayed, scoped: !!scope })) return
     try {
       // `?mode=onboarding` replays the whole first run, so it ignores both the
       // accounts-linked gate and the done flag — the mode never writes either.
@@ -169,7 +170,7 @@ export function Onboarding() {
     } catch {
       setShowIntro(true) // private browsing/quota: still show, just don't persist
     }
-  }, [onboardingOpen, run, showIntro, forceOnboarding, tourRequest])
+  }, [onboardingOpen, run, showIntro, forceOnboarding, tourRequest, scope])
 
   // The sidebar is a hover rail that collapses to icons, and three of the steps point
   // at things only the expanded rail renders — the Link Accounts card is not in the DOM

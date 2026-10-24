@@ -6,6 +6,7 @@
  */
 
 import type { ThemeId } from "./data/theme-logos"
+import type { FlowScope } from "./data/flow-scopes"
 
 export const EMBED_VARIANTS = ["clover", "business-owner", "iso", "concept-embed", "vw", "abc"] as const
 export type EmbedVariant = (typeof EMBED_VARIANTS)[number]
@@ -40,12 +41,17 @@ interface ParsedMode {
    * Embed shell only.
    */
   intro: { flow: string; src: string } | null
+  /**
+   * Narrow the mode to one partner: the catalog and the marketplace show only what
+   * carries this scope. Onboarding is skipped, since its tour is about the full app.
+   */
+  scope: FlowScope | null
 }
 
 export function parseMode(mode: string | null): ParsedMode {
   // Every mode is the default shape plus whatever it changes, so adding a field to
   // ParsedMode does not mean editing thirteen rows.
-  const base = { isEmbed: false, embedVariant: null, isConceptVersion: false, theme: "aperia" as ThemeId, forceOnboarding: false, catalog: false, intro: null }
+  const base = { isEmbed: false, embedVariant: null, isConceptVersion: false, theme: "aperia" as ThemeId, forceOnboarding: false, catalog: false, intro: null, scope: null }
   switch (mode) {
     case "clover":          return { ...base, isEmbed: true,  embedVariant: "clover",         theme: "clover"      }
     case "business-owner":  return { ...base, isEmbed: true,  embedVariant: "business-owner", theme: "access-one"  }
@@ -69,6 +75,9 @@ export function parseMode(mode: string | null): ParsedMode {
     // Same pair as titan / titan-embed, wearing the Talus brand.
     case "talus":           return { ...base, isConceptVersion: true, catalog: true, theme: "talus" }
     case "talus-embed":     return { ...base, isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true, catalog: true, theme: "talus", intro: { flow: "24", src: "/intros/talus-accounts-overview.png" } }
+    // The concept demo narrowed to the Resy story: connect Resy in the marketplace, then
+    // the Resy flows. Nothing else in the catalog or the marketplace.
+    case "resy":            return { ...base, isConceptVersion: true, catalog: true, scope: "resy" }
     case "tib":             return { ...base, theme: "tib"         }
     case "woodforest":      return { ...base, theme: "woodforest"  }
     case "placeholder":     return { ...base, theme: "placeholder" }
