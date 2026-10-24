@@ -77,7 +77,7 @@ export const MARKETPLACE_SERVICES: MarketplaceService[] = [
       "Tonight's covers, pacing and waitlist, on request",
       "Guest profiles with tags, notes and card spend",
       "Fill cancellations from Notify, and text guests through Resy",
-      "Next-day reports that match Resy tables to card sales",
+      "End-of-night reports that match Resy tables to card sales",
     ],
     sections: [
       { title: "What Nanci can read", body: "Reservations, covers, waitlist and Notify lists, guest profiles and the fees and deposits Resy charges." },

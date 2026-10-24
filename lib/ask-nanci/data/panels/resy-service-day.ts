@@ -114,18 +114,26 @@ export const SMS_GUESTS = SMS_RECIPIENTS.reduce((total, r) => total + r.party, 0
 
 // ─── Report ───────────────────────────────────────────────────────────────────
 
+export const REPORT_NO_SHOWS = { parties: 2, seats: 10 }
+
+// Booked covers seated are the shift's book less its no-shows, so the report and the
+// shift view agree. Phone takes its share and Resy the rest, at Resy's check per cover.
+const BOOKED_SEATED = SHIFT_COVERS - REPORT_NO_SHOWS.seats
+const PHONE_COVERS = 6
+const RESY_COVERS = BOOKED_SEATED - PHONE_COVERS
+const RESY_CHECK_PER_COVER = 59
+
 // Card sales matched to tables, split by where the booking came from.
 const SOURCES_RAW = [
-  { source: "Resy",    covers: 112, sales: 6608 },
-  { source: "Walk-in", covers: 19,  sales: 836 },
-  { source: "Phone",   covers: 6,   sales: 300 },
+  { source: "Resy",    covers: RESY_COVERS,  sales: RESY_COVERS * RESY_CHECK_PER_COVER },
+  { source: "Walk-in", covers: 19,           sales: 836 },
+  { source: "Phone",   covers: PHONE_COVERS, sales: 300 },
 ]
 
 export const REPORT_SOURCES = SOURCES_RAW.map((s) => ({ ...s, perCover: s.sales / s.covers }))
 export const REPORT_COVERS = REPORT_SOURCES.reduce((total, s) => total + s.covers, 0)
 export const REPORT_SALES = REPORT_SOURCES.reduce((total, s) => total + s.sales, 0)
 export const REPORT_PER_COVER = REPORT_SALES / REPORT_COVERS
-export const REPORT_NO_SHOWS = { parties: 2, seats: 10 }
 
 const resy = REPORT_SOURCES[0]
 const walkIn = REPORT_SOURCES[1]
