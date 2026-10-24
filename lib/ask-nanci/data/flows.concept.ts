@@ -9,11 +9,10 @@ import { RISK_LANDING_CONVERSATIONS } from "./risk-conversations";
 import { CARD_FIGURES } from "./panels/credit-card-offer";
 // Flow 24 does the same with the location review figures.
 import { REVIEW_TOTAL_SALES, REVIEW_TOTAL_CHANGE_PCT, REVIEW_LEADER, REVIEW_WATCH, REVIEW_LOCATIONS, WATCH_TRANSACTIONS, REVIEW_SALES_CHART, REVIEW_TREND_CHART, averageTicket } from "./panels/location-review";
-// Flow 25 does the same with the Resy no-show figures.
-import { NO_SHOW_TOTALS, RECOVERED_PCT, CHECK_PER_COVER, PEAK_LARGE_SEATS, PEAK_LARGE_SHARE_PCT, NO_SHOW_CHART, DEPOSIT_POLICY, DEPOSIT_WOULD_HAVE_KEPT, BOOK_DATE, BOOK_PREVIEW, BOOK_HELD, BOOK_AWAITING } from "./panels/resy-no-shows";
-// Flow 26 does the same with the service-day figures.
-import { SHIFT_COVERS, SHIFT_PARTIES, SHIFT_PEAK, SHIFT_WAITLIST, KITCHEN_PACE, GUESTS_TO_KNOW, CANCELLED, NOTIFY_TAKER, RECOVERED_VALUE, SMS_SLOT, SMS_DELAY_MIN, SMS_RECIPIENTS, SMS_GUESTS, REPORT_COVERS, REPORT_SALES, REPORT_PER_COVER, REPORT_NO_SHOWS, RESY_PER_COVER, RESY_LIFT_PER_COVER, REPORT_CHART } from "./panels/resy-service-day";
-import { formatCurrency, formatWholeCurrency } from "../../../components/shared/format";
+// Flow 28 does the same with the Tallis figures: tonight's book and October's no-shows.
+import { CARD_PER_COVER, FEES_CHARGED, NO_SHOW_COST, UNCONFIRMED_NO_SHOW_PCT, CONFIRMED_NO_SHOW_PCT } from "./panels/resy-group";
+import { BOOK_COVERS, BOOK_PARTIES, BOOK_PEAK, LARGE_PARTIES, TO_KNOW, CELEBRATIONS, UNCONFIRMED, UNCONFIRMED_COVERS, LARGEST_UNCONFIRMED, partiesWithReply, coversWithReply, WAITING, WAITING_GUESTS, WAIT_SUMMARY, LEFT_QUOTES, quoteFor } from "./panels/resy-tonight";
+import { formatWholeCurrency } from "../../../components/shared/format";
 import { inScope, type FlowScope } from "./flow-scopes";
 
 // ─── Flow-key constants ───────────────────────────────────────────────────────
@@ -53,10 +52,12 @@ const CONCEPT_FLOW24_BREAKDOWN = "show me the full breakdown";
 const CONCEPT_FLOW24_WATCH = "what's going on at Midtown?";
 // Reading time after a chart or the panel lands, before the next question covers it.
 const CONCEPT_FLOW24_READ_MS = 2500;
-const CONCEPT_FLOW25_PROMPT = "What are no-shows costing me this month?";
-const CONCEPT_FLOW25_PEAK = "which nights are worst?";
-const CONCEPT_FLOW25_DEPOSIT = "Turn on a $25 deposit for Fri and Sat parties of 6+";
-const CONCEPT_FLOW26_PROMPT = "What does tonight look like?";
+const CONCEPT_FLOW28_PROMPT = "How does tonight look?";
+const CONCEPT_FLOW28_UNCONFIRMED = "Who hasn't confirmed?";
+// The confirm step. ResyConfirmPanel's Send button sends this same turn, so the button
+// and the chip advance the flow the same way.
+export const CONCEPT_FLOW28_SEND = "Send it";
+const CONCEPT_FLOW28_WAIT = "Door's packed. What's the wait right now?";
 // Both offer flows share the same accept/decline pills (matched per-active-flow, so
 // reuse is safe). "No, ignore for now" is decorative — registered as a fake follow-up.
 const CONCEPT_OFFER_YES = "Yes, show me";
@@ -123,10 +124,6 @@ const CONCEPT_FLOW23_FOLLOWUPS_FAKE = ["Check weekend deposit timing", "Compare 
 
 const CONCEPT_FLOW24_FOLLOWUPS_FAKE = ["Compare Midtown to last year", "Who's on shift at Midtown this week?", "Check what's running low"];
 
-const CONCEPT_FLOW26_FOLLOWUPS_FAKE = ["Block the patio Saturday", "Who are my best regulars?", "Set up a Valentine's tasting"];
-
-const CONCEPT_FLOW25_FOLLOWUPS_FAKE = ["Show deposits collected this week", "Text tonight's large parties a reminder", "Who are my best regulars?"];
-
 // Every fake follow-up across flows — handlePrompt treats these as no-op decoration.
 // Add each flow's follow-up array here as the treatment rolls out.
 // Flow 6 (proactive auto-play): decorative "road not taken" pills on non-final turns.
@@ -146,8 +143,6 @@ export const CONCEPT_FAKE_FOLLOWUPS = new Set<string>([
   ...CONCEPT_FLOW19_FOLLOWUPS,
   ...CONCEPT_FLOW23_FOLLOWUPS_FAKE,
   ...CONCEPT_FLOW24_FOLLOWUPS_FAKE,
-  ...CONCEPT_FLOW25_FOLLOWUPS_FAKE,
-  ...CONCEPT_FLOW26_FOLLOWUPS_FAKE,
 ]);
 
 // ─── Flow registry — single source of truth for showcased flows ──────────────
@@ -388,26 +383,14 @@ export const FLOW_DEFS: FlowDef[] = [
     description: "A day-by-hour sales heatmap finds the peaks — the follow-up ranks the quietest window, the safe place to cut a shift.",
   },
   {
-    num: 25,
+    num: 28,
     section: "merchant",
-    title: "Reservation No-Shows",
+    title: "Tonight's service",
     badge: "Resy",
-    key: CONCEPT_FLOW25_PROMPT,
-    slug: "25",
-    followups: [CONCEPT_FLOW25_DEPOSIT],
+    key: CONCEPT_FLOW28_PROMPT,
+    slug: "28",
     scope: "resy",
-    description: "Resy no-shows priced at the card data's average check, then a deposit policy turned on in Resy from the chat. A concept: no Resy connection exists.",
-  },
-  {
-    num: 26,
-    section: "merchant",
-    title: "A Night on Resy",
-    badge: "Resy",
-    key: CONCEPT_FLOW26_PROMPT,
-    slug: "26",
-    manual: false,
-    scope: "resy",
-    description: "One Saturday run from the chat through five Resy features: shift view, guest profiles, Waitlist & Notify, guest texts and the end-of-night report. A concept: no Resy connection exists.",
+    description: "Saturday at the Tallis flagship: tonight's book, the parties who haven't confirmed and what no-shows cost, Resy's follow-up sent with your OK, then the walk-in wait at 7:40pm. A concept: no Resy connection exists.",
   },
   {
     num: 27,
@@ -512,6 +495,20 @@ const FLOW19_SHEET: SheetActionData = {
 };
 
 // ─── Scripted conversations ───────────────────────────────────────────────────
+
+// Flow 28 speaks small counts as words, the way an owner would hear them.
+const NUMBER_WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"];
+const spellCount = (n: number) => NUMBER_WORDS[n] ?? String(n);
+const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
+const joinNames = (names: string[]) => (names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names.at(-1)}` : names.join(""));
+const FLOW28_CANCELLED = partiesWithReply("cancelled")[0];
+// The answer that offers the follow-up. Flow 28 waits on "Send it" only while it is the
+// last thing in the chat.
+const FLOW28_ASK_TO_SEND = `${capitalize(spellCount(UNCONFIRMED.length))} parties, ${UNCONFIRMED_COVERS} covers, didn't answer yesterday's 4pm confirmation text, including the ${LARGEST_UNCONFIRMED.time} party of ${LARGEST_UNCONFIRMED.party}. It matters: in October, ${UNCONFIRMED_NO_SHOW_PCT}% of unconfirmed covers didn't show against ${CONFIRMED_NO_SHOW_PCT}% of confirmed ones, and no-shows have cost you ${formatWholeCurrency(NO_SHOW_COST)} at your ${formatWholeCurrency(CARD_PER_COVER)} a cover, with ${formatWholeCurrency(FEES_CHARGED)} back in fees. Want me to send Resy's confirmation follow-up to these ${spellCount(UNCONFIRMED.length)} now?`;
+
+/** True while flow 28 is parked on its confirm step: idle, with the offer as the last message. */
+export const isAwaitingFlow28Send = (messages: { role: string; content: string }[], chatState: string) =>
+  chatState === "idle" && messages.at(-1)?.role === "assistant" && messages.at(-1)?.content === FLOW28_ASK_TO_SEND;
 
 export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
   // Aperia Risk theme — landing quick-action / Nanci's-take chat answers.
@@ -1091,81 +1088,44 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     },
   ],
 
-  // ── Flow 25: Reservation No-Shows (Resy concept) ──────────────────────────
-  // Reservations come from Resy and the check per cover from the card data, which is
-  // the point: neither system can price a no-show alone. The figures are quoted from
-  // data/panels/resy-no-shows.ts so the answers and the panel cannot disagree.
-  [CONCEPT_FLOW25_PROMPT]: [
-    { role: "user", content: CONCEPT_FLOW25_PROMPT },
+  // ── Flow 28: Tonight's service (Resy concept) ─────────────────────────────
+  // Saturday at the Tallis flagship, in three owner questions. The confirm step is a
+  // scripted user turn: the chip and the panel's Send button both send it, and the
+  // answer flips the confirm panel to its sent view. Figures are quoted from
+  // data/panels/resy-tonight.ts and resy-group.ts, so the chat and panels agree.
+  [CONCEPT_FLOW28_PROMPT]: [
+    { role: "user", content: CONCEPT_FLOW28_PROMPT },
     {
       role: "assistant",
-      content: `About ${formatWholeCurrency(NO_SHOW_TOTALS.lostRevenue)} so far in October. ${NO_SHOW_TOTALS.parties} Resy bookings never showed, ${NO_SHOW_TOTALS.seats} seats at your ${formatWholeCurrency(CHECK_PER_COVER)} average check per cover. You charged ${formatWholeCurrency(NO_SHOW_TOTALS.feesCharged)} in no-show fees, so ${RECOVERED_PCT}% of it came back.`,
-      chart: NO_SHOW_CHART,
-      panel: "resy-no-shows",
+      content: `Full. ${BOOK_COVERS} covers across ${BOOK_PARTIES} parties, peaking at ${BOOK_PEAK.time} with ${BOOK_PEAK.covers}, right at your pacing. ${capitalize(spellCount(LARGE_PARTIES.length))} large parties, ${spellCount(TO_KNOW.allergies)} allergy notes and ${spellCount(CELEBRATIONS)} celebrations, ${spellCount(TO_KNOW.birthdays)} of them birthdays.`,
+      panel: "resy-shift",
+      source: "Resy reservations",
+    },
+    { role: "user", content: CONCEPT_FLOW28_UNCONFIRMED },
+    {
+      role: "assistant",
+      content: FLOW28_ASK_TO_SEND,
+      panel: "resy-confirm",
+      closePanel: "resy-shift",
+      revealPanel: true,
       source: "Resy reservations + card transactions",
     },
-    { role: "user", content: CONCEPT_FLOW25_PEAK, pauseBefore: CONCEPT_FLOW24_READ_MS },
+    { role: "user", content: CONCEPT_FLOW28_SEND },
     {
       role: "assistant",
-      content: `Friday and Saturday, and it is the big tables. Parties of ${DEPOSIT_POLICY.minParty} or more on those two nights left ${PEAK_LARGE_SEATS} seats empty, ${PEAK_LARGE_SHARE_PCT}% of the total. A deposit on just those bookings covers nearly half the risk without touching your regulars.`,
-      panel: "resy-no-shows",
-      view: "peak",
-      suggestions: [CONCEPT_FLOW25_DEPOSIT],
+      content: `${capitalize(spellCount(partiesWithReply("confirmed").length))} have confirmed, ${coversWithReply("confirmed")} covers. The ${FLOW28_CANCELLED.name} ${spellCount(FLOW28_CANCELLED.party)}-top at ${FLOW28_CANCELLED.time} cancelled, so Resy has alerted your Notify list for it. The ${joinNames(partiesWithReply("none").map((p) => `${p.name}s`))} haven't replied, so I've flagged them for a call from the host stand.`,
+      panel: "resy-confirm",
+      view: "sent",
+      source: "Resy reservations",
     },
-  ],
-  [CONCEPT_FLOW25_DEPOSIT]: [
-    { role: "user", content: CONCEPT_FLOW25_DEPOSIT },
+    { role: "user", content: CONCEPT_FLOW28_WAIT },
     {
       role: "assistant",
-      content: `Done in Resy. From ${DEPOSIT_POLICY.startsOn}, ${DEPOSIT_POLICY.nights} bookings of ${DEPOSIT_POLICY.minParty} or more take a $${DEPOSIT_POLICY.perGuest} deposit per guest, refundable up to ${DEPOSIT_POLICY.refundWindowHours} hours before. At October's pace that is ${formatWholeCurrency(DEPOSIT_WOULD_HAVE_KEPT)} kept instead of lost. ${BOOK_PREVIEW.length} large parties are already booked for ${BOOK_DATE}: ${formatWholeCurrency(BOOK_HELD)} is held and ${BOOK_AWAITING.map((b) => b.guest.split(" ")[1]).join(", ")} has the request. Deposits pay out through Resy, not your merchant deposits, so I will match them to your statement each week.`,
-      panel: "resy-no-shows",
-      view: "deposit",
+      content: `${capitalize(spellCount(WAITING.length))} parties, ${WAITING_GUESTS} guests, quoted ${quoteFor(2)} minutes for twos and ${quoteFor(4)} for fours. Your quotes are running long: the ${spellCount(WAIT_SUMMARY.seated)} parties seated tonight waited ${WAIT_SUMMARY.avgWaited} minutes against ${WAIT_SUMMARY.avgQuoted} quoted. ${capitalize(spellCount(WAIT_SUMMARY.left))} parties quoted ${LEFT_QUOTES.join(" and ")} minutes left before they were seated.`,
+      panel: "resy-waitlist",
+      closePanel: "resy-confirm",
       revealPanel: true,
-      suggestions: CONCEPT_FLOW25_FOLLOWUPS_FAKE,
-    },
-  ],
-
-  // ── Flow 26: A Night on Resy (Resy concept) ───────────────────────────────
-  // One Saturday, five Resy OS features, one per exchange. Each answer replaces the
-  // last panel so the screen always shows the feature being talked about. Plays on its
-  // own (`manual: false`); the figures are quoted from data/panels/resy-service-day.ts.
-  [CONCEPT_FLOW26_PROMPT]: [
-    { role: "user", content: CONCEPT_FLOW26_PROMPT },
-    {
-      role: "assistant",
-      content: `Busy. ${SHIFT_COVERS} covers across ${SHIFT_PARTIES} parties, peaking at ${SHIFT_PEAK.time} with ${SHIFT_PEAK.covers}, two short of the ${KITCHEN_PACE} your kitchen paces to. ${SHIFT_WAITLIST} parties are on the waitlist.`,
-      panel: "resy-shift",
-    },
-    { role: "user", content: "Anyone special coming in?", pauseBefore: CONCEPT_FLOW24_READ_MS },
-    {
-      role: "assistant",
-      content: `Three to know. ${GUESTS_TO_KNOW[0].name} brings ${GUESTS_TO_KNOW[0].party} for her birthday at ${GUESTS_TO_KNOW[0].time}, and she averages ${formatWholeCurrency(GUESTS_TO_KNOW[0].avgSpend ?? 0)} a visit. The Whitfields are here for their anniversary, with a shellfish allergy on the table. ${GUESTS_TO_KNOW[2].name} is new, a food writer.`,
-      panel: "resy-guests",
-      closePanel: "resy-shift",
-    },
-    { role: "user", content: `${CANCELLED.guest.replace("the ", "The ")} just cancelled ${CANCELLED.time.replace(":00 PM", "pm")}. Fill it`, pauseBefore: CONCEPT_FLOW24_READ_MS },
-    {
-      role: "assistant",
-      content: `Done. I offered the table to ${NOTIFY_TAKER.name} first, a regular whose Notify window fit exactly, and he took it within ${NOTIFY_TAKER.minutes} minutes. That puts ${formatWholeCurrency(RECOVERED_VALUE)} back on the book.`,
-      panel: "resy-notify",
-      closePanel: "resy-guests",
-    },
-    { role: "user", content: `Kitchen's backed up. Text the ${SMS_SLOT.replace(" PM", "")}s we're running ${SMS_DELAY_MIN} late`, pauseBefore: CONCEPT_FLOW24_READ_MS },
-    {
-      role: "assistant",
-      content: `Sent to ${SMS_RECIPIENTS.length} parties, ${SMS_GUESTS} guests, with a round at the bar on you. Two replied already. The Torres party asked to keep the booth, so I flagged it for the host stand.`,
-      panel: "resy-sms",
-      closePanel: "resy-notify",
-    },
-    { role: "user", content: "How did tonight close out?", pauseBefore: CONCEPT_FLOW24_READ_MS },
-    {
-      role: "assistant",
-      content: `Strong. ${REPORT_COVERS} covers and ${formatWholeCurrency(REPORT_SALES)} on cards, ${formatCurrency(REPORT_PER_COVER)} a cover, with ${REPORT_NO_SHOWS.parties} no-shows. Resy guests spent ${formatCurrency(RESY_PER_COVER)} a cover, ${formatWholeCurrency(RESY_LIFT_PER_COVER)} more than walk-ins.`,
-      chart: REPORT_CHART,
-      panel: "resy-report",
-      closePanel: "resy-sms",
-      revealPanel: true,
-      suggestions: CONCEPT_FLOW26_FOLLOWUPS_FAKE,
+      source: "Resy waitlist + card transactions",
     },
   ],
 };

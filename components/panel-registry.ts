@@ -31,12 +31,9 @@ import { BusinessLoanOfferPanel } from "./ask-nanci/concept/BusinessLoanOfferPan
 import { BusiestTimesPanel } from "./ask-nanci/concept/BusiestTimesPanel"
 import { SlowestWindowsPanel } from "./ask-nanci/concept/SlowestWindowsPanel"
 import { LocationReviewPanel } from "./ask-nanci/concept/LocationReviewPanel"
-import { ResyNoShowsPanel } from "./ask-nanci/concept/ResyNoShowsPanel"
 import { ResyShiftPanel } from "./ask-nanci/concept/ResyShiftPanel"
-import { ResyGuestsPanel } from "./ask-nanci/concept/ResyGuestsPanel"
-import { ResyNotifyPanel } from "./ask-nanci/concept/ResyNotifyPanel"
-import { ResySmsPanel } from "./ask-nanci/concept/ResySmsPanel"
-import { ResyReportPanel } from "./ask-nanci/concept/ResyReportPanel"
+import { ResyConfirmPanel } from "./ask-nanci/concept/ResyConfirmPanel"
+import { ResyWaitlistPanel } from "./ask-nanci/concept/ResyWaitlistPanel"
 import { DashboardInsightPanel } from "@/components/risk/dashboard/DashboardInsightPanel"
 import { Dashboard as RiskDashboard } from "@/components/risk/dashboard/Dashboard"
 import { DetectionQueue as RiskDetectionQueue } from "@/components/risk/DetectionQueue"
@@ -88,12 +85,9 @@ export const PANELS = {
   "busiest-times":       { component: BusiestTimesPanel,      label: "Busiest Times" },
   "slowest-windows":     { component: SlowestWindowsPanel,    label: "Slowest Windows" },
   "location-review":     { component: LocationReviewPanel,    label: "Location Review" },
-  "resy-no-shows":       { component: ResyNoShowsPanel,       label: "No-Show Cost" },
   "resy-shift":          { component: ResyShiftPanel,         label: "Tonight" },
-  "resy-guests":         { component: ResyGuestsPanel,        label: "Guests" },
-  "resy-notify":         { component: ResyNotifyPanel,        label: "Notify" },
-  "resy-sms":            { component: ResySmsPanel,           label: "Guest Text" },
-  "resy-report":         { component: ResyReportPanel,        label: "End of Night" },
+  "resy-confirm":        { component: ResyConfirmPanel,       label: "Confirmations" },
+  "resy-waitlist":       { component: ResyWaitlistPanel,      label: "Waitlist" },
   "dashboard-insight":   { component: DashboardInsightPanel,  label: "Dashboard Insight" },
   "detection-queue-insight": { component: DetectionQueueInsightPanel, label: "Queue Insight" },
   // Aperia Risk destinations — every risk UI is a registered panel.
