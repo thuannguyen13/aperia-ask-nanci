@@ -1,11 +1,10 @@
 "use client"
 
-import { useState } from "react"
 import { Button } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { Check, Phone, Users, X } from "lucide-react"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
-import { CONCEPT_FLOW28_SEND } from "@/lib/ask-nanci/data/flows.concept"
+import { CONCEPT_FLOW28_SEND, isAwaitingFlow28Send } from "@/lib/ask-nanci/data/flows.concept"
 import { CARD_PER_COVER, FEES_CHARGED, MONTH_TO_DATE, NO_SHOW_COST, NO_SHOW_NET } from "@/lib/ask-nanci/data/panels/resy-group"
 import { BOOK_AFTER, BOOK_AS_OF, REPLIES_AS_OF, TONIGHT_DATE, UNCONFIRMED, UNCONFIRMED_COVERS, coversWithReply, partiesWithReply, type ConfirmReply, type UnconfirmedParty } from "@/lib/ask-nanci/data/panels/resy-tonight"
 import { formatWholeCurrency } from "@/components/shared/format"
@@ -55,20 +54,25 @@ function ConfirmRow({ party, showReply }: { party: UnconfirmedParty; showReply: 
         <p className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">{party.name}</p>
         <span className="flex shrink-0 items-center gap-1 text-xs tabular-nums text-muted-foreground"><Users className="size-3.5" />{party.party}</span>
         <span className="w-16 shrink-0 text-right text-xs text-muted-foreground">Booked {party.booked}</span>
-        {showReply && <ReplyChip party={party} />}
       </div>
-      {showReply && note && <p className="mt-1 pl-13 text-xs text-muted-foreground">{note(party)}</p>}
+      {showReply && (
+        <div className="mt-1.5 flex flex-wrap items-center gap-2 pl-13">
+          <ReplyChip party={party} />
+          {note && <p className="text-xs text-muted-foreground">{note(party)}</p>}
+        </div>
+      )}
     </li>
   )
 }
 
 function ProposedCard() {
-  const { handlePrompt, chatState } = useAskNanci()
-  // Pressed once is enough: a second click, or a click while an answer streams, must
-  // not send the turn again.
-  const [pressed, setPressed] = useState(false)
+  const { handlePrompt, chatState, messages, dismissPanelSheet } = useAskNanci()
+  // Send works only while the flow waits on "Send it". A double advance is already
+  // blocked by the player, so the button keeps no state of its own.
   const send = () => {
-    setPressed(true)
+    // On a phone the sheet goes down so the replies and the next chip are in view. The
+    // answer's panel card brings the sent view back. Desktop has no sheet to move.
+    dismissPanelSheet()
     handlePrompt(CONCEPT_FLOW28_SEND)
   }
 
@@ -76,7 +80,7 @@ function ProposedCard() {
     <div className="rounded-xl border border-primary/30 bg-primary/5 p-4">
       <p className="text-sm font-semibold text-foreground">Send Resy&apos;s confirmation follow-up to {UNCONFIRMED.length} parties for tonight.</p>
       <p className="mt-1 text-sm text-muted-foreground">Guests reply CONFIRM or CANCEL, and Resy updates each booking. Nothing is sent until you confirm.</p>
-      <Button className="mt-3" size="sm" onClick={send} disabled={pressed || chatState !== "idle"}>Send</Button>
+      <Button className="mt-3" size="sm" onClick={send} disabled={!isAwaitingFlow28Send(messages, chatState)}>Send</Button>
     </div>
   )
 }
@@ -109,12 +113,12 @@ export function ResyConfirmPanel() {
 
       <PanelBody className="space-y-4">
         <CostStrip />
+        {isSent ? <SentSummary /> : <ProposedCard />}
         <div className="rounded-xl border">
           <ul className="divide-y">
             {UNCONFIRMED.map((p) => <ConfirmRow key={p.name} party={p} showReply={isSent} />)}
           </ul>
         </div>
-        {isSent ? <SentSummary /> : <ProposedCard />}
       </PanelBody>
     </PanelShell>
   )

@@ -75,6 +75,10 @@ describe("unconfirmed parties", () => {
     expect(partiesWithReply("none").map((p) => p.name)).toEqual(["Brandt", "Lindqvist", "Abernathy"])
   })
 
+  it("were all booked before yesterday's 4pm confirmation text", () => {
+    for (const p of UNCONFIRMED) expect(["Oct 23", "Oct 24"]).not.toContain(p.booked)
+  })
+
   it("leave a book of 212 covers and 73 parties after the cancellation", () => {
     expect(BOOK_AFTER).toEqual({ covers: 212, parties: 73 })
   })

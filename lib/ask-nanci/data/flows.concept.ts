@@ -502,6 +502,13 @@ const spellCount = (n: number) => NUMBER_WORDS[n] ?? String(n);
 const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
 const joinNames = (names: string[]) => (names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names.at(-1)}` : names.join(""));
 const FLOW28_CANCELLED = partiesWithReply("cancelled")[0];
+// The answer that offers the follow-up. Flow 28 waits on "Send it" only while it is the
+// last thing in the chat.
+const FLOW28_ASK_TO_SEND = `${capitalize(spellCount(UNCONFIRMED.length))} parties, ${UNCONFIRMED_COVERS} covers, didn't answer yesterday's 4pm confirmation text, including the ${LARGEST_UNCONFIRMED.time} party of ${LARGEST_UNCONFIRMED.party}. It matters: in October, ${UNCONFIRMED_NO_SHOW_PCT}% of unconfirmed covers didn't show against ${CONFIRMED_NO_SHOW_PCT}% of confirmed ones, and no-shows have cost you ${formatWholeCurrency(NO_SHOW_COST)} at your ${formatWholeCurrency(CARD_PER_COVER)} a cover, with ${formatWholeCurrency(FEES_CHARGED)} back in fees. Want me to send Resy's confirmation follow-up to these ${spellCount(UNCONFIRMED.length)} now?`;
+
+/** True while flow 28 is parked on its confirm step: idle, with the offer as the last message. */
+export const isAwaitingFlow28Send = (messages: { role: string; content: string }[], chatState: string) =>
+  chatState === "idle" && messages.at(-1)?.role === "assistant" && messages.at(-1)?.content === FLOW28_ASK_TO_SEND;
 
 export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
   // Aperia Risk theme — landing quick-action / Nanci's-take chat answers.
@@ -1097,7 +1104,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     { role: "user", content: CONCEPT_FLOW28_UNCONFIRMED },
     {
       role: "assistant",
-      content: `${capitalize(spellCount(UNCONFIRMED.length))} parties, ${UNCONFIRMED_COVERS} covers, didn't answer yesterday's 4pm confirmation text, including the ${LARGEST_UNCONFIRMED.time} party of ${LARGEST_UNCONFIRMED.party}. It matters: in October, ${UNCONFIRMED_NO_SHOW_PCT}% of unconfirmed covers didn't show against ${CONFIRMED_NO_SHOW_PCT}% of confirmed ones, and no-shows have cost you ${formatWholeCurrency(NO_SHOW_COST)} at your ${formatWholeCurrency(CARD_PER_COVER)} a cover, with ${formatWholeCurrency(FEES_CHARGED)} back in fees. Want me to send Resy's confirmation follow-up to these ${spellCount(UNCONFIRMED.length)} now?`,
+      content: FLOW28_ASK_TO_SEND,
       panel: "resy-confirm",
       closePanel: "resy-shift",
       revealPanel: true,

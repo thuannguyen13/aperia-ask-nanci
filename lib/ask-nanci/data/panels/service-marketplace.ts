@@ -84,7 +84,7 @@ export const MARKETPLACE_SERVICES: MarketplaceService[] = [
       { title: "About this demo", body: "A concept built on sample data. No connection to Resy exists." },
     ],
     connected: {
-      message: "Resy is connected. Your book and guests are now part of Ask Nanci.",
+      message: "Resy is connected. Your book and confirmations are now part of Ask Nanci.",
       flowSlugs: ["28"],
     },
   },

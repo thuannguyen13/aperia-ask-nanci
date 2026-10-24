@@ -8,6 +8,7 @@ import {
   CONCEPT_MANUAL_PROMPTS,
   promptsInScope,
   CONCEPT_FLOW28_SEND,
+  isAwaitingFlow28Send,
 } from "./flows.concept"
 import { CARD_PER_COVER, FEES_CHARGED, NO_SHOW_COST } from "./panels/resy-group"
 import { BOOK_COVERS, BOOK_PARTIES, BOOK_PEAK, UNCONFIRMED_COVERS, coversWithReply, WAITING_GUESTS, WAIT_SUMMARY, LEFT_QUOTES } from "./panels/resy-tonight"
@@ -192,6 +193,17 @@ describe("flow 28, tonight's service", () => {
     for (const figure of [`${WAITING_GUESTS} guests`, `${WAIT_SUMMARY.avgWaited} minutes against ${WAIT_SUMMARY.avgQuoted} quoted`, LEFT_QUOTES.join(" and ")]) expect(wait).toContain(figure)
   })
 
+  it("waits on Send it only while idle with the offer as the last message", () => {
+    const offer = { role: "assistant", content: script[3].content }
+    const opening = [{ role: "user", content: flow28.key }, { role: "assistant", content: script[1].content }, { role: "user", content: script[2].content }]
+    expect(isAwaitingFlow28Send([...opening, offer], "idle")).toBe(true)
+    expect(isAwaitingFlow28Send([...opening, offer], "streaming")).toBe(false)
+    expect(isAwaitingFlow28Send([...opening, { role: "assistant", content: script[3].content.slice(0, 40) }], "idle")).toBe(false)
+    expect(isAwaitingFlow28Send([...opening, offer, { role: "user", content: "what is the weather like" }, { role: "assistant", content: "Sunny." }], "idle")).toBe(false)
+    expect(isAwaitingFlow28Send([...opening, offer, { role: "user", content: CONCEPT_FLOW28_SEND }, { role: "assistant", content: script[5].content }], "idle")).toBe(false)
+    expect(isAwaitingFlow28Send([], "idle")).toBe(false)
+  })
+
   it("never says holds, settled or Card Members", () => {
     for (const text of answers(28)) {
       expect(text).not.toMatch(/Card Member/)
@@ -209,7 +221,7 @@ describe("Resy Marketplace listing", () => {
   })
 
   it("promises nothing tonight's service does not show", () => {
-    const text = [resy.description, resy.overview, ...(resy.highlights ?? []), ...(resy.sections ?? []).map((s) => s.body)].join(" ")
+    const text = [resy.description, resy.overview, resy.connected?.message, ...(resy.highlights ?? []), ...(resy.sections ?? []).map((s) => s.body)].join(" ")
     expect(text).not.toMatch(/deposit polic|end-of-night|per cover|Notify for Friday|guest email|move booking|Amex/i)
   })
 })

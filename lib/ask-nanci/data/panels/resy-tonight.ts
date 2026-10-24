@@ -51,17 +51,18 @@ export interface UnconfirmedParty {
   reply: ConfirmReply // the reply to Resy's confirmation follow-up
 }
 
-// Excludes today's six bookings, which Resy auto-confirmed.
+// Excludes today's six bookings, which Resy auto-confirmed. Every booking predates
+// yesterday's 4pm confirmation text, so the latest is Oct 22.
 export const UNCONFIRMED: UnconfirmedParty[] = [
-  { time: "7:00", name: "Okafor", party: 7, booked: "Oct 3", reply: "confirmed" },
-  { time: "7:15", name: "Brandt", party: 6, booked: "Oct 9", reply: "none" },
-  { time: "6:30", name: "Lindqvist", party: 4, booked: "Oct 14", reply: "none" },
-  { time: "8:00", name: "Ferreira", party: 4, booked: "Oct 17", reply: "confirmed" },
-  { time: "6:00", name: "Huang", party: 2, booked: "Oct 19", reply: "confirmed" },
-  { time: "6:45", name: "Delacroix", party: 2, booked: "Oct 20", reply: "confirmed" },
-  { time: "7:30", name: "Novak", party: 2, booked: "Oct 21", reply: "confirmed" },
-  { time: "8:30", name: "Sato", party: 2, booked: "Oct 22", reply: "cancelled" },
-  { time: "9:00", name: "Abernathy", party: 2, booked: "Oct 23", reply: "none" },
+  { time: "7:00", name: "Okafor", party: 7, booked: "Oct 2", reply: "confirmed" },
+  { time: "7:15", name: "Brandt", party: 6, booked: "Oct 8", reply: "none" },
+  { time: "6:30", name: "Lindqvist", party: 4, booked: "Oct 13", reply: "none" },
+  { time: "8:00", name: "Ferreira", party: 4, booked: "Oct 16", reply: "confirmed" },
+  { time: "6:00", name: "Huang", party: 2, booked: "Oct 18", reply: "confirmed" },
+  { time: "6:45", name: "Delacroix", party: 2, booked: "Oct 19", reply: "confirmed" },
+  { time: "7:30", name: "Novak", party: 2, booked: "Oct 20", reply: "confirmed" },
+  { time: "8:30", name: "Sato", party: 2, booked: "Oct 21", reply: "cancelled" },
+  { time: "9:00", name: "Abernathy", party: 2, booked: "Oct 22", reply: "none" },
 ]
 
 export const UNCONFIRMED_COVERS = UNCONFIRMED.reduce((total, p) => total + p.party, 0)
