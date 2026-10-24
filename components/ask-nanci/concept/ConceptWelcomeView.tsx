@@ -146,13 +146,13 @@ function ScopedWelcomeView({ scope }: { scope: FlowScope }) {
           </div>
         </div>
         <ChatInput />
-        <FlowGrid flows={flows} onTryIt={handlePrompt} onSimulateLogin={() => {}} numbered />
+        <FlowGrid flows={flows} onTryIt={handlePrompt} numbered />
       </div>
     </div>
   )
 }
 
-function FlowGrid({ flows, onTryIt, onSimulateLogin, numbered }: { flows: FlowDef[]; onTryIt: (prompt: string) => void; onSimulateLogin: () => void; numbered?: boolean }) {
+function FlowGrid({ flows, onTryIt, onSimulateLogin, numbered }: { flows: FlowDef[]; onTryIt: (prompt: string) => void; onSimulateLogin?: () => void; numbered?: boolean }) {
   // A destination card opens a surface rather than playing a script.
   const { setMarketplaceOpen } = useAskNanci()
   return (

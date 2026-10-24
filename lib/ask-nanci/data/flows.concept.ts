@@ -407,7 +407,7 @@ export const FLOW_DEFS: FlowDef[] = [
     slug: "26",
     manual: false,
     scope: "resy",
-    description: "One Saturday run from the chat through five Resy features: shift view, guest profiles, Waitlist & Notify, guest texts and the next-day report. A concept: no Resy connection exists.",
+    description: "One Saturday run from the chat through five Resy features: shift view, guest profiles, Waitlist & Notify, guest texts and the end-of-night report. A concept: no Resy connection exists.",
   },
   {
     num: 27,
@@ -441,32 +441,25 @@ export const CONCEPT_EMBED_FLOW_LAYOUTS: Record<string, ConceptEmbedLayout> = {
   "22": { fullApp: true, openMarketplace: true },
 };
 
-// A flow that a typed or clicked prompt can start. Proactive and destination flows
-// have no prompt.
-const isTriggerFlow = (f: FlowDef) => !f.proactive && !f.destination;
+// Flows that a typed or clicked prompt can start, by card number, narrowed by `keep`.
+// Proactive and destination flows have no prompt.
+const triggerFlows = (keep: (f: FlowDef) => boolean) =>
+  FLOW_DEFS.filter((f) => !f.proactive && !f.destination && keep(f)).sort((a, b) => a.num - b.num);
 
-// Trigger prompts in ascending card number, across every scope: the routing guard.
+// Every trigger prompt across every scope: the list check-flows resolves. Routing goes
+// through CONCEPT_FLOW_SLUGS and the scripted conversations, not through this list.
 // Suggestion surfaces use promptsInScope instead, so one mode never offers another's.
-export const CONCEPT_ALL_PROMPTS = [...FLOW_DEFS]
-  .filter(isTriggerFlow)
-  .sort((a, b) => a.num - b.num)
-  .map((f) => f.key);
+export const CONCEPT_ALL_PROMPTS = triggerFlows(() => true).map((f) => f.key);
 
 // Trigger prompts for one scope (null is the unscoped demo), by card number. With
 // `followups`, each flow's continuation prompts follow its own: the question lists.
 export function promptsInScope(scope: FlowScope | null, { followups = false } = {}): string[] {
-  return [...FLOW_DEFS]
-    .filter((f) => isTriggerFlow(f) && inScope(scope)(f))
-    .sort((a, b) => a.num - b.num)
-    .flatMap((f) => [f.key, ...(followups ? f.followups ?? [] : [])]);
+  return triggerFlows(inScope(scope)).flatMap((f) => [f.key, ...(followups ? f.followups ?? [] : [])]);
 }
 
 // Unscoped merchant-money prompts, ascending. End-of-flow chips suggest sibling flows
 // in the same group. Flow 17 plays only unscoped, so a scoped flow is never a sibling.
-const CONCEPT_MERCHANT_PROMPTS = [...FLOW_DEFS]
-  .filter((f) => f.section === "merchant" && isTriggerFlow(f) && inScope(null)(f))
-  .sort((a, b) => a.num - b.num)
-  .map((f) => f.key);
+const CONCEPT_MERCHANT_PROMPTS = triggerFlows((f) => f.section === "merchant" && inScope(null)(f)).map((f) => f.key);
 
 const otherMerchantPrompts = (self: string) => CONCEPT_MERCHANT_PROMPTS.filter((k) => k !== self);
 
@@ -1114,7 +1107,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     { role: "user", content: CONCEPT_FLOW25_PEAK, pauseBefore: CONCEPT_FLOW24_READ_MS },
     {
       role: "assistant",
-      content: `Friday and Saturday, and it is the big tables. Parties of ${DEPOSIT_POLICY.minParty} or more on those two nights left ${PEAK_LARGE_SEATS} seats empty, ${PEAK_LARGE_SHARE_PCT}% of the total. A deposit on just those bookings covers most of the risk without touching your regulars.`,
+      content: `Friday and Saturday, and it is the big tables. Parties of ${DEPOSIT_POLICY.minParty} or more on those two nights left ${PEAK_LARGE_SEATS} seats empty, ${PEAK_LARGE_SHARE_PCT}% of the total. A deposit on just those bookings covers nearly half the risk without touching your regulars.`,
       panel: "resy-no-shows",
       view: "peak",
       suggestions: [CONCEPT_FLOW25_DEPOSIT],
@@ -1153,7 +1146,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     { role: "user", content: `${CANCELLED.guest.replace("the ", "The ")} just cancelled ${CANCELLED.time.replace(":00 PM", "pm")}. Fill it`, pauseBefore: CONCEPT_FLOW24_READ_MS },
     {
       role: "assistant",
-      content: `Done. I offered the table to ${NOTIFY_TAKER.name} first, a regular whose Notify window fit exactly, and he took it ${NOTIFY_TAKER.reason.replace("Accepted ", "")} later. That puts ${formatWholeCurrency(RECOVERED_VALUE)} back on the book.`,
+      content: `Done. I offered the table to ${NOTIFY_TAKER.name} first, a regular whose Notify window fit exactly, and he took it within ${NOTIFY_TAKER.minutes} minutes. That puts ${formatWholeCurrency(RECOVERED_VALUE)} back on the book.`,
       panel: "resy-notify",
       closePanel: "resy-guests",
     },
@@ -1164,7 +1157,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       panel: "resy-sms",
       closePanel: "resy-notify",
     },
-    { role: "user", content: "How did last night go?", pauseBefore: CONCEPT_FLOW24_READ_MS },
+    { role: "user", content: "How did tonight close out?", pauseBefore: CONCEPT_FLOW24_READ_MS },
     {
       role: "assistant",
       content: `Strong. ${REPORT_COVERS} covers and ${formatWholeCurrency(REPORT_SALES)} on cards, ${formatCurrency(REPORT_PER_COVER)} a cover, with ${REPORT_NO_SHOWS.parties} no-shows. Resy guests spent ${formatCurrency(RESY_PER_COVER)} a cover, ${formatWholeCurrency(RESY_LIFT_PER_COVER)} more than walk-ins.`,

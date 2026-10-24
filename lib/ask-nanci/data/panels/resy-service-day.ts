@@ -72,11 +72,15 @@ export interface NotifyEntry {
   visits: number
   status: "booked" | "standby" | "no-fit"
   reason: string
+  /** How long the guest took to accept the offered table. */
+  minutes?: number
 }
+
+const TAKER_MINUTES = 2
 
 // Ranked the way Nanci offered the table: exact fit and a regular first.
 export const NOTIFY_LIST: NotifyEntry[] = [
-  { name: "Sam Patel",   party: 4, window: "7:30–8:30 PM", visits: 5, status: "booked",  reason: "Accepted in 2 min" },
+  { name: "Sam Patel",   party: 4, window: "7:30–8:30 PM", visits: 5, status: "booked",  reason: `Accepted in ${TAKER_MINUTES} min`, minutes: TAKER_MINUTES },
   { name: "Nora Kim",    party: 4, window: "7:45–9:00 PM", visits: 0, status: "standby", reason: "Next in line" },
   { name: "Jules Martin", party: 3, window: "7:00–8:00 PM", visits: 1, status: "standby", reason: "Fits, ranked lower" },
   { name: "Alex Rivera", party: 6, window: "8:00–9:00 PM", visits: 2, status: "no-fit",  reason: "Party too large" },

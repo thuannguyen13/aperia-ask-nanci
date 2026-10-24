@@ -10,7 +10,7 @@ export function ResyReportPanel() {
   return (
     <PanelShell>
       <PanelHeader
-        title={`Last Night · ${SHIFT_DATE}`}
+        title={`End of Night · ${SHIFT_DATE}`}
         size="lg"
         actions={<PanelExportButton />}
         onClose={() => closeDynamicPanel("resy-report")}

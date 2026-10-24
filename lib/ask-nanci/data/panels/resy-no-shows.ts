@@ -90,7 +90,7 @@ interface BookedPartyRaw {
 }
 
 const BOOK_RAW: BookedPartyRaw[] = [
-  { time: "6:30 PM", guest: "Maria Alvarez",  party: 8,  status: "paid", note: "Birthday" },
+  { time: "6:30 PM", guest: "Maria Alvarez",  party: 8,  status: "paid", note: "Anniversary" },
   { time: "7:00 PM", guest: "David Chen",     party: 6,  status: "paid" },
   { time: "7:45 PM", guest: "Grace Okafor",   party: 10, status: "requested", note: "Link sent 2h ago" },
   { time: "8:30 PM", guest: "Liam Brennan",   party: 6,  status: "paid", note: "Regular · 9 visits" },

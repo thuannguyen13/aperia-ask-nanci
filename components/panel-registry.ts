@@ -93,7 +93,7 @@ export const PANELS = {
   "resy-guests":         { component: ResyGuestsPanel,        label: "Guests" },
   "resy-notify":         { component: ResyNotifyPanel,        label: "Notify" },
   "resy-sms":            { component: ResySmsPanel,           label: "Guest Text" },
-  "resy-report":         { component: ResyReportPanel,        label: "Last Night" },
+  "resy-report":         { component: ResyReportPanel,        label: "End of Night" },
   "dashboard-insight":   { component: DashboardInsightPanel,  label: "Dashboard Insight" },
   "detection-queue-insight": { component: DetectionQueueInsightPanel, label: "Queue Insight" },
   // Aperia Risk destinations — every risk UI is a registered panel.

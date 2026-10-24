@@ -130,7 +130,7 @@ export function ResyNoShowsPanel() {
 
         {peakHighlighted && (
           <Callout variant="amber">
-            <span className="font-semibold">{PEAK_NIGHTS.join(" and ")}, parties of {DEPOSIT_POLICY.minParty}+:</span> {PEAK_LARGE_SEATS} empty seats, {PEAK_LARGE_SHARE_PCT}% of the month, from just two cells. A deposit on those bookings alone covers most of the loss without asking anything of a table for two.
+            <span className="font-semibold">{PEAK_NIGHTS.join(" and ")}, parties of {DEPOSIT_POLICY.minParty}+:</span> {PEAK_LARGE_SEATS} empty seats, {PEAK_LARGE_SHARE_PCT}% of the month, from just two cells. A deposit on those bookings alone covers nearly half the loss without asking anything of a table for two.
           </Callout>
         )}
       </PanelBody>

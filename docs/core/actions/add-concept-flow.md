@@ -4,8 +4,8 @@
 
 The recurring work in this repo, and the task every architectural decision is scored against.
 
-1. Add a flow definition to `FLOW_DEFS` in `lib/ask-nanci/data/flows.concept.ts`. The prompt lists are all *derived* from it, so do not hand-edit them: `CONCEPT_ALL_PROMPTS` (from each flow's `key`), `CONCEPT_NO_RESET_PROMPTS` (from `keepSession` + `followups`), `CONCEPT_MANUAL_PROMPTS` (from `manual`/`section` + `followups`), and `CONCEPT_LOOP_PROMPTS` (from `loop`).
-2. A partner's flow in the full catalog sits beside flows that partner has nothing to do with. Set `scope` on its definition so it shows only in the mode with that scope: `promptsInScope` then leaves it out of every other mode's cards, question lists and chips. `CONCEPT_ALL_PROMPTS` still routes it, so its embed slug keeps working.
+1. Add a flow definition to `FLOW_DEFS` in `lib/ask-nanci/data/flows.concept.ts`. The prompt lists are all *derived* from it, so do not hand-edit them: `CONCEPT_ALL_PROMPTS` (from each flow's `key`, the list `check:flows` resolves), `CONCEPT_NO_RESET_PROMPTS` (from `keepSession` + `followups`), `CONCEPT_MANUAL_PROMPTS` (from `manual`/`section` + `followups`), and `CONCEPT_LOOP_PROMPTS` (from `loop`).
+2. A partner's flow in the full catalog sits beside flows that partner has nothing to do with. Set `scope` on its definition so it shows only in the mode with that scope. Cards and Marketplace listings filter with `inScope`, and question lists and chips come from `promptsInScope`. Routing goes through `CONCEPT_FLOW_SLUGS` and the scripted conversations in every mode, so its embed slug keeps working.
 3. Add the full turn sequence to `CONCEPT_SCRIPTED_CONVERSATIONS`, keyed by the flow's `key`.
 4. Wire panel effects in the turn objects: `panel`, `view`, `closePanel`, `filterDeclineReport`, `closeAllPanels`. See "Turn effects" below.
 5. If the flow needs a new panel, do Read-when **adding a panel** first.
