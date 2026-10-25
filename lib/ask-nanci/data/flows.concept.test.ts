@@ -17,10 +17,13 @@ import {
   CONCEPT_FLOW30_SEND,
   isAwaitingFlow30Tag,
   isAwaitingFlow30Send,
+  CONCEPT_FLOW31_CHARGE,
+  isAwaitingFlow31Charge,
 } from "./flows.concept"
 import { CARD_PER_COVER, FEES_CHARGED, NO_SHOW_COST } from "./panels/resy-group"
 import { BOOK_COVERS, BOOK_PARTIES, BOOK_PEAK, UNCONFIRMED_COVERS, coversWithReply, WAITING_GUESTS, WAIT_SUMMARY, LEFT_QUOTES } from "./panels/resy-tonight"
 import { THANK_YOU_EMAIL } from "./panels/resy-guests"
+import { NO_SHOW_FEE, FEES_AFTER_CHARGE, WINE_DINNER, EVENT_TOTALS, NIGHT_SPEND_PER_GUEST } from "./panels/resy-deposits"
 import { PACING_CHECK, NOTIFY_PARTIES, NOTIFY_GUESTS, REBOOK, FOUR_TOP_SEAT_HOUR, HELD_SEAT_HOUR, AVAILABILITY, POST_OPEN } from "./panels/resy-friday"
 import { MARKETPLACE_SERVICES } from "./panels/service-marketplace"
 import { formatWholeCurrency } from "../../../components/shared/format"
@@ -388,6 +391,92 @@ describe("flow 30, know your guests", () => {
       const users = Object.entries(CONVERSATIONS).filter(([k]) => k !== flow30.key).flatMap(([, turns]) => turns.filter((t) => t.role === "user").map((t) => t.content))
       expect(users).not.toContain(turn)
     }
+  })
+})
+
+// ── Flow 31: No-show fees and events ──
+
+describe("flow 31, no-show fees and events", () => {
+  const flow31 = FLOW_DEFS.find((f) => f.num === 31)!
+  const script = CONVERSATIONS[flow31.key]
+  const [chargeOffer, charged, evidence, events] = answers(31)
+
+  it("is a manual merchant flow in resy scope, left out of the unscoped demo", () => {
+    expect(flow31).toMatchObject({ section: "merchant", scope: "resy", slug: "31", badge: "Resy", title: "No-show fees and events" })
+    expect(CONCEPT_MANUAL_PROMPTS.has(flow31.key)).toBe(true)
+    expect(promptsInScope(null, { followups: true })).not.toContain(flow31.key)
+  })
+
+  it("takes four user turns, confirming with Charge it.", () => {
+    expect(script.map((t) => t.role)).toEqual(Array.from({ length: 8 }, (_, i) => (i % 2 ? "assistant" : "user")))
+    expect(script[0].content).toBe("Did we charge the no-show fee for last night's 7:30 four-top?")
+    expect(script[2].content).toBe(CONCEPT_FLOW31_CHARGE)
+    expect(script[4].content).toBe("If they dispute it, are we covered?")
+    expect(script[6].content).toBe("How many seats are left for the wine dinner?")
+    expect(CONCEPT_FLOW31_CHARGE).toBe("Charge it.")
+  })
+
+  it("proposes on the fee panel, charges it, shows the evidence, then opens the events", () => {
+    expect(script[1]).toMatchObject({ panel: "resy-fee", closePanel: "resy-events", revealPanel: true, source: "Resy reservations" })
+    expect(script[1].view).toBeUndefined()
+    expect(script[3]).toMatchObject({ panel: "resy-fee", view: "charged", source: "Resy reservations" })
+    expect(script[5]).toMatchObject({ panel: "resy-fee", view: "evidence", source: "Resy reservations + messages" })
+    expect(script[7]).toMatchObject({ panel: "resy-events", closePanel: "resy-fee", source: "Resy events + card transactions" })
+    expect(script[7].view).toBeUndefined()
+    // Only the step whose panel holds the confirm raises the phone sheet.
+    for (const i of [3, 5, 7]) expect(script[i].revealPanel).toBeUndefined()
+  })
+
+  it("quotes the figures the panels show", () => {
+    expect(chargeOffer).toContain(`${formatWholeCurrency(NO_SHOW_FEE)} is eligible`)
+    expect(chargeOffer).toContain("$100")
+    expect(charged).toContain(formatWholeCurrency(FEES_AFTER_CHARGE))
+    expect(charged).toContain("$1,050")
+    expect(events.startsWith("Seven of 48")).toBe(true)
+    expect([WINE_DINNER.seats, WINE_DINNER.open]).toEqual([48, 7])
+    for (const figure of ["18 guests", "$7,935", "$26,675", "95 open seats", "$13,475", "$41 a guest"]) expect(events).toContain(figure)
+    expect(events).toContain(formatWholeCurrency(EVENT_TOTALS.openValue))
+    expect(events).toContain(formatWholeCurrency(NIGHT_SPEND_PER_GUEST))
+  })
+
+  it("says a strong case, never a win, and where the money and the dispute land", () => {
+    expect(evidence).toContain("strong case")
+    for (const text of [charged, evidence, events]) expect(text).toContain("Stripe")
+    expect(charged).toContain("won't appear in your card deposits")
+    for (const text of answers(31)) expect(text).not.toMatch(/you'll win|you will win/i)
+  })
+
+  it("never says holds, settled or Card Members, and only the card spend settles", () => {
+    for (const text of answers(31)) {
+      expect(text).not.toMatch(/Card Member/)
+      expect(text).not.toMatch(/\bholds?\b/i)
+      expect(text).not.toMatch(/settled/)
+    }
+    expect(answers(31).filter((text) => /settl/.test(text))).toEqual([events])
+    expect(events).toContain("settles the next business day")
+  })
+
+  it("waits on the charge only while idle with its offer as the last message", () => {
+    const opening = [{ role: "user", content: flow31.key }]
+    const offer = { role: "assistant", content: chargeOffer }
+    expect(isAwaitingFlow31Charge([...opening, offer], "idle")).toBe(true)
+    expect(isAwaitingFlow31Charge([...opening, offer], "streaming")).toBe(false)
+    expect(isAwaitingFlow31Charge(opening, "idle")).toBe(false)
+    expect(isAwaitingFlow31Charge([...opening, offer, { role: "user", content: CONCEPT_FLOW31_CHARGE }, { role: "assistant", content: charged }], "idle")).toBe(false)
+    expect(isAwaitingFlow31Charge([...opening, offer, { role: "user", content: "what is the weather like" }, { role: "assistant", content: "Sunny." }], "idle")).toBe(false)
+  })
+
+  it("never waits on a flow 28, 29 or 30 cue, and those flows never wait on its cue", () => {
+    for (const content of [...answers(28), ...answers(29), ...answers(30)]) expect(isAwaitingFlow31Charge([{ role: "assistant", content }], "idle")).toBe(false)
+    const msgs = [{ role: "assistant", content: chargeOffer }]
+    for (const awaiting of [isAwaitingFlow28Send, isAwaitingFlow29Move, isAwaitingFlow29Open, isAwaitingFlow30Tag, isAwaitingFlow30Send]) expect(awaiting(msgs, "idle")).toBe(false)
+  })
+
+  it("uses a confirm turn no other script or fake follow-up uses", () => {
+    expect(convKeys.has(CONCEPT_FLOW31_CHARGE)).toBe(false)
+    expect(CONCEPT_FAKE_FOLLOWUPS.has(CONCEPT_FLOW31_CHARGE)).toBe(false)
+    const users = Object.entries(CONVERSATIONS).filter(([k]) => k !== flow31.key).flatMap(([, turns]) => turns.filter((t) => t.role === "user").map((t) => t.content))
+    expect(users).not.toContain(CONCEPT_FLOW31_CHARGE)
   })
 })
 
