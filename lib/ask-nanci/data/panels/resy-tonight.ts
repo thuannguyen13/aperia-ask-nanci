@@ -12,10 +12,6 @@ export const WAITLIST_AS_OF = "7:40pm"
 
 // ─── Tonight's book ───────────────────────────────────────────────────────────
 
-// Resy paces per 15 minutes; the arrival chart buckets by half hour.
-export const PACING_PER_15_MIN = 16
-export const PACING_PER_HALF_HOUR = PACING_PER_15_MIN * 2
-
 const SLOTS_RAW: [string, number][] = [
   ["5:00", 12], ["5:30", 18], ["6:00", 24], ["6:30", 28], ["7:00", 32],
   ["7:30", 30], ["8:00", 26], ["8:30", 20], ["9:00", 14], ["9:30", 10],

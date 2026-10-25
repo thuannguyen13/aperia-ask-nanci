@@ -2,6 +2,19 @@
 // Every figure is sample data. Covers and fees come from Resy; card sales come from the
 // processor. Authored figures are the weekly rows; every total is derived from them.
 
+// ─── Flagship settings in Resy ────────────────────────────────────────────────
+
+// Resy paces per 15 minutes; the arrival charts bucket by half hour.
+export const PACING_PER_15_MIN = 16
+export const PACING_PER_HALF_HOUR = PACING_PER_15_MIN * 2
+
+/** Turn times by party size, in minutes, as set in Resy and measured on Fridays. */
+export const TURN_TIMES = { "2": 90, "4": 105, "6+": 135 }
+export type PartyTier = keyof typeof TURN_TIMES
+
+/** Blended processing fees on the flagship's card sales. */
+export const CARD_FEE_RATE = 0.027
+
 // ─── Flagship month to date (Oct 1–23) ────────────────────────────────────────
 
 interface FlagshipWeek {
