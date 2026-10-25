@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs"
 import { describe, expect, it } from "vitest"
 import {
   FLOW_DEFS,
@@ -26,6 +27,7 @@ import { THANK_YOU_EMAIL } from "./panels/resy-guests"
 import { NO_SHOW_FEE, FEES_AFTER_CHARGE, WINE_DINNER, EVENT_TOTALS, NIGHT_SPEND_PER_GUEST } from "./panels/resy-deposits"
 import { PACING_CHECK, NOTIFY_PARTIES, NOTIFY_GUESTS, REBOOK, FOUR_TOP_SEAT_HOUR, HELD_SEAT_HOUR, AVAILABILITY, POST_OPEN } from "./panels/resy-friday"
 import { MARKETPLACE_SERVICES } from "./panels/service-marketplace"
+import { WEEK_REPORT, SURVEY_SUMMARY, VENUES, LOCATIONS_WINDOW } from "./panels/resy-reports"
 import { formatWholeCurrency } from "../../../components/shared/format"
 import { RISK_QUICK_ACTIONS, RISK_NANCI_TAKES } from "./risk-landing"
 import { RISK_SUGGESTION_DESTS, DETECTION_QUEUE_PROMPT } from "./risk-conversations"
@@ -477,6 +479,89 @@ describe("flow 31, no-show fees and events", () => {
     expect(CONCEPT_FAKE_FOLLOWUPS.has(CONCEPT_FLOW31_CHARGE)).toBe(false)
     const users = Object.entries(CONVERSATIONS).filter(([k]) => k !== flow31.key).flatMap(([, turns]) => turns.filter((t) => t.role === "user").map((t) => t.content))
     expect(users).not.toContain(CONCEPT_FLOW31_CHARGE)
+  })
+})
+
+// ── Flow 32: How we're doing ──
+
+describe("flow 32, how we're doing", () => {
+  const flow32 = FLOW_DEFS.find((f) => f.num === 32)!
+  const script = CONVERSATIONS[flow32.key]
+  const [week, surveys, locations] = answers(32)
+  const userTurns = script.filter((t) => t.role === "user").map((t) => t.content)
+  const source = (path: string) => readFileSync(new URL(path, import.meta.url), "utf8")
+
+  it("is a manual merchant flow in resy scope, left out of the unscoped demo", () => {
+    expect(flow32).toMatchObject({ section: "merchant", scope: "resy", slug: "32", badge: "Resy", title: "How we're doing" })
+    expect(CONCEPT_MANUAL_PROMPTS.has(flow32.key)).toBe(true)
+    expect(promptsInScope(null, { followups: true })).not.toContain(flow32.key)
+  })
+
+  it("plays three questions and three answers, in the storyboard's words", () => {
+    expect(script.map((t) => t.role)).toEqual(["user", "assistant", "user", "assistant", "user", "assistant"])
+    expect(userTurns).toEqual(["How did covers and turn times compare to last week?", "Any bad feedback this week?", "Which location had the most no-shows in October?"])
+  })
+
+  it("opens each panel and closes the last, with no views or reveals", () => {
+    expect(script[1]).toMatchObject({ panel: "resy-report", closePanel: "resy-locations", source: "Resy reports + card transactions" })
+    expect(script[3]).toMatchObject({ panel: "resy-surveys", closePanel: "resy-report", source: "Resy Surveys" })
+    expect(script[5]).toMatchObject({ panel: "resy-locations", closePanel: "resy-surveys", source: "Resy multi-location + card transactions" })
+    for (const turn of script) {
+      expect(turn).not.toHaveProperty("view")
+      expect(turn).not.toHaveProperty("revealPanel")
+    }
+  })
+
+  it("has no confirm step, and its turns collide with no other script or fake follow-up", () => {
+    expect(source("./flows.concept.ts")).not.toMatch(/isAwaitingFlow32/)
+    const others = Object.entries(CONVERSATIONS).filter(([k]) => k !== flow32.key).flatMap(([, turns]) => turns.filter((t) => t.role === "user").map((t) => t.content))
+    for (const turn of userTurns) {
+      expect(others).not.toContain(turn)
+      expect(CONCEPT_FAKE_FOLLOWUPS.has(turn)).toBe(false)
+    }
+    for (const turn of userTurns.slice(1)) expect(convKeys.has(turn)).toBe(false)
+  })
+
+  it("quotes the week report's figures", () => {
+    for (const figure of ["1,312", "1,214", "8%", "1:41", "6 minutes", "71", "58", "38%", "$102,330", "32.4%"]) expect(week).toContain(figure)
+    expect(week).toContain("Amex cards at 32.4%")
+    expect(week).toContain(`${WEEK_REPORT.cardSales.changePct}% to ${formatWholeCurrency(WEEK_REPORT.cardSales.latest)}`)
+  })
+
+  it("names both weeks in the report caption", () => {
+    expect([WEEK_REPORT.latest, WEEK_REPORT.prior]).toEqual(["Oct 17–23", "Oct 10–16"])
+    expect(source("../../../components/ask-nanci/concept/ResyReportPanel.tsx")).toContain("{WEEK_REPORT.latest} against {WEEK_REPORT.prior}")
+  })
+
+  it("quotes the surveys, the two Friday tables and the 8:00 tie-in", () => {
+    for (const figure of [String(SURVEY_SUMMARY.responses), String(SURVEY_SUMMARY.average), "8:00 and 8:15", "nine and five times", "too loud last Saturday"]) expect(surveys).toContain(figure)
+    expect(surveys).toContain("Worth watching now that next Friday has two more 8:00 four-tops.")
+    expect(surveys).not.toMatch(/regulars?/i)
+  })
+
+  it("quotes the locations, says so far, and draws no Amex link", () => {
+    for (const figure of ["118", "4.8%", "3.5%", "2.7%", "$5,856", "$61"]) expect(locations).toContain(figure)
+    expect(locations).toContain("so far")
+    expect(LOCATIONS_WINDOW).toContain("so far")
+    expect(locations).not.toMatch(/Amex/)
+    expect(locations).toContain("Market charges no fee, so none of that came back. A card-on-file fee like yours would recover part of it.")
+    expect(VENUES.map((v) => v.name)).toEqual(["Tallis", "Little Tallis", "Tallis Market"])
+  })
+
+  it("never says holds, settled or Card Members", () => {
+    for (const text of answers(32)) {
+      expect(text).not.toMatch(/Card Member/)
+      expect(text).not.toMatch(/\bholds?\b/i)
+      expect(text).not.toMatch(/settled/)
+    }
+  })
+
+  it("never calls the surveys reviews, in chat, data or panels", () => {
+    expect(surveys).not.toMatch(/review/i)
+    for (const path of ["./panels/resy-reports.ts", "../../../components/ask-nanci/concept/ResyReportPanel.tsx", "../../../components/ask-nanci/concept/ResySurveysPanel.tsx", "../../../components/ask-nanci/concept/ResyLocationsPanel.tsx"]) expect(source(path)).not.toMatch(/review/i)
+    const labels = source("../../../components/panel-registry.ts").split("\n").filter((line) => /"resy-(report|surveys|locations)"/.test(line))
+    expect(labels).toHaveLength(3)
+    for (const line of labels) expect(line).not.toMatch(/review/i)
   })
 })
 
