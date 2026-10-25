@@ -73,3 +73,22 @@ export const FEES_CHARGED = FEE_COVERS_CHARGED * FEE_POLICY.perGuest
 
 export const NO_SHOW_COST = MONTH_TO_DATE.noShows * CARD_PER_COVER
 export const NO_SHOW_NET = NO_SHOW_COST - FEES_CHARGED
+
+// ─── October card sales by card brand (processor) ─────────────────────────────
+
+// The processor carries the brand of the card that paid, so this is Amex cards on the
+// flagship's card processing, not who is a Card Member. Authored: Amex's transactions
+// and amount, and the other brands' transaction count. Other brands' sales are the rest.
+const AMEX_OCTOBER = { transactions: 511, sales: 95046 }
+const OTHER_TRANSACTIONS = 1601
+
+const averagePayment = (sales: number, transactions: number) => Math.round(sales / transactions)
+const otherSales = MONTH_TO_DATE.cardSales - AMEX_OCTOBER.sales
+
+/** October card sales split by brand. Average payment is per transaction, not per cover. */
+export const CARD_BRANDS = {
+  amex: { ...AMEX_OCTOBER, averagePayment: averagePayment(AMEX_OCTOBER.sales, AMEX_OCTOBER.transactions) },
+  other: { transactions: OTHER_TRANSACTIONS, sales: otherSales, averagePayment: averagePayment(otherSales, OTHER_TRANSACTIONS) },
+  /** Amex share of card sales, as a percentage with one decimal: 31.0. */
+  amexSharePct: ((AMEX_OCTOBER.sales / MONTH_TO_DATE.cardSales) * 100).toFixed(1),
+}
