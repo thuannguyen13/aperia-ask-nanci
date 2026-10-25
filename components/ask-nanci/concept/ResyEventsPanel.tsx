@@ -12,7 +12,7 @@ const addOns = (e: EventRow) => (e.addOn ? `${e.addOn.sold} × ${formatWholeCurr
 
 const CASH_TIMELINE = [
   { icon: Ticket, label: "Tickets", text: `Stripe payout typically about ${STRIPE_PAYOUT_DAYS} business days after each sale, less Stripe and Resy fees.` },
-  { icon: CreditCard, label: "On-the-night spend", text: "Through your card processing, next business day." },
+  { icon: CreditCard, label: "On-the-night spend", text: "through your card processing, next business day." },
   { icon: Banknote, label: `${WINE_DINNER.date.slice(4)} estimate`, text: `${WINE_DINNER.seats} × ${formatWholeCurrency(NIGHT_SPEND_PER_GUEST)} = ${formatWholeCurrency(NIGHT_ESTIMATE)} if it sells out.` },
 ]
 

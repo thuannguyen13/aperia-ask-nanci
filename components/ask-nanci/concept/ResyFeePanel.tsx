@@ -16,7 +16,7 @@ const POLICY = `${formatWholeCurrency(FEE_POLICY.perGuest)} per guest no-show fe
 
 const STATUS = {
   eligible: { text: "Eligible, not charged.", tone: "bg-amber-50 text-amber-800 dark:bg-amber-950/30 dark:text-amber-300" },
-  charged: { text: `Charged ${FEE}`, tone: "bg-green-50 text-green-700 dark:bg-green-950/30 dark:text-green-400" },
+  charged: { text: "Charged", tone: "bg-green-50 text-green-700 dark:bg-green-950/30 dark:text-green-400" },
 }
 
 function Booking({ status }: { status: keyof typeof STATUS }) {

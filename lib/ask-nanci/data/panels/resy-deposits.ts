@@ -5,6 +5,7 @@
 // processor. Authored figures are the rows below, and every total is derived from them,
 // so the chat and the panels quote the same numbers.
 
+import { formatWholeCurrency } from "../../../../components/shared/format"
 import { FEE_POLICY, FEES_CHARGED } from "./resy-group"
 
 // ─── Steps 1 and 2: last night's no-show and its evidence ─────────────────────
@@ -37,7 +38,7 @@ export const EVIDENCE_TIMELINE = [
   stamp("2026-10-22 18:12", "Guest replied CONFIRM"),
   stamp("2026-10-23", "No cancellation logged"),
   stamp("2026-10-23 20:15", "Marked No-Show"),
-  stamp("2026-10-24 15:20", `$${NO_SHOW_FEE} charged`),
+  stamp("2026-10-24 15:20", `${formatWholeCurrency(NO_SHOW_FEE)} charged`),
 ]
 
 // ─── Step 3: ticketed events through New Year's ───────────────────────────────

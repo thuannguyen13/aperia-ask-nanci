@@ -36,13 +36,14 @@ describe("the evidence timeline", () => {
     expect(ats).toEqual([...ats].sort())
     expect(ats[0].startsWith("2026-10-12")).toBe(true)
     expect(NO_SHOW_BOOKING.bookedOn).toBe(EVIDENCE_TIMELINE[0].label.split(",")[0])
-    expect(ats[0] < "2026-10-23").toBe(true)
     expect(ats.at(-1)! > "2026-10-23 20:15").toBe(true)
   })
 
   it("sends the confirmation text the day before the booking", () => {
-    expect(EVIDENCE_TIMELINE[1]).toMatchObject({ at: "2026-10-22 16:00", text: "Confirmation text sent" })
-    expect(EVIDENCE_TIMELINE[2].at.startsWith("2026-10-22")).toBe(true)
+    const [, month, day] = NO_SHOW_BOOKING.date.split(" ")
+    const dayBefore = `${month} ${Number(day) - 1}`
+    expect(EVIDENCE_TIMELINE[1]).toMatchObject({ label: `${dayBefore}, 4:00 PM`, text: "Confirmation text sent" })
+    expect(EVIDENCE_TIMELINE[2].label.startsWith(`${dayBefore},`)).toBe(true)
   })
 })
 
