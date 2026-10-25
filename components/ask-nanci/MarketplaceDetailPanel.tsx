@@ -1,13 +1,11 @@
 "use client"
 
 import { useState } from "react"
-import { ArrowRight, Check, Plus } from "lucide-react"
+import { Check, Plus } from "lucide-react"
 import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger, Badge, Button, ScrollArea,
 } from "aperia-ds5"
-import { PanelShell, PanelHeader, Callout } from "@/components/shared"
-import { useAskNanci } from "@/contexts/AskNanciContext"
-import { CONCEPT_FLOW_SLUGS } from "@/lib/ask-nanci/data/flows.concept"
+import { PanelShell, PanelHeader } from "@/components/shared"
 import {
   MARKETPLACE_DETAIL_LABELS as L,
   MARKETPLACE_VENDOR,
@@ -38,7 +36,7 @@ export function MarketplaceDetailPanel({
   onToggle: () => void
   onClose: () => void
 }) {
-  const { icon: Icon, title, description, overview, highlights, sections, vendor = MARKETPLACE_VENDOR, enableLabel = L.enable, connected } = service
+  const { icon: Icon, title, description, overview, highlights, sections, vendor = MARKETPLACE_VENDOR, enableLabel = L.enable, enabledLabel } = service
 
   return (
     <PanelShell>
@@ -65,17 +63,18 @@ export function MarketplaceDetailPanel({
               </div>
             </div>
             {enabled ? (
-              <Button variant="outline" className="shrink-0" onClick={onToggle}>
-                {L.remove}
-              </Button>
+              <div className="flex shrink-0 items-center gap-2">
+                <AddedBadge label={enabledLabel} />
+                <Button variant="outline" onClick={onToggle}>
+                  {L.remove}
+                </Button>
+              </div>
             ) : (
               <Button className="shrink-0" onClick={onToggle}>
                 <Plus className="size-3.5" /> {enableLabel}
               </Button>
             )}
           </div>
-
-          {enabled && <ConnectedCallout connected={connected} />}
 
           <div className="flex flex-col gap-2">
             <p className="text-base font-medium text-foreground">{L.overview}</p>
@@ -110,38 +109,15 @@ export function MarketplaceDetailPanel({
   )
 }
 
-// What changed once an integration is on, with links that leave the marketplace and
-// start each flow, the same as its catalog card's Try it.
-function ConnectedCallout({ connected }: { connected: MarketplaceService["connected"] }) {
-  const { setMarketplaceOpen, handlePrompt } = useAskNanci()
-  if (!connected) return null
-  const tryFlow = (prompt: string) => {
-    setMarketplaceOpen(false)
-    handlePrompt(prompt)
-  }
-  return (
-    <Callout variant="green">
-      <p className="font-semibold">{connected.message}</p>
-      <div className="mt-2 flex flex-col items-start gap-1.5">
-        {connected.flowSlugs.map((slug) => CONCEPT_FLOW_SLUGS[slug]).filter(Boolean).map((prompt) => (
-          <button key={prompt} onClick={() => tryFlow(prompt)} className="flex items-center gap-1.5 font-medium underline-offset-2 hover:underline">
-            <ArrowRight className="size-3.5" /> {prompt}
-          </button>
-        ))}
-      </div>
-    </Callout>
-  )
-}
-
 // The "Added"/enabled pill shown on a grid card — same shape as the detail's state.
-export function AddedBadge() {
+export function AddedBadge({ label = L.added }: { label?: string }) {
   return (
     <Badge
       variant="outline"
       className="gap-1 border-green-200 bg-green-50 text-green-700 dark:border-green-900 dark:bg-green-950/40 dark:text-green-400"
     >
       <Check className="size-3" />
-      {L.added}
+      {label}
     </Badge>
   )
 }

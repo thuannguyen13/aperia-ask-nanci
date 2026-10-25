@@ -568,18 +568,19 @@ describe("flow 32, how we're doing", () => {
 describe("Resy Marketplace listing", () => {
   const resy = MARKETPLACE_SERVICES.find((s) => s.id === "resy")!
 
-  it("links flows 28 to 32", () => {
-    expect(resy.connected?.flowSlugs).toEqual(["28", "29", "30", "31", "32"])
+  it("reads Connect, then Connected once on", () => {
+    expect(resy.enableLabel).toBe("Connect")
+    expect(resy.enabledLabel).toBe("Connected")
   })
 
   it("promises nothing the Resy flows do not show, and names no card brand", () => {
-    const text = [resy.description, resy.overview, resy.connected?.message, ...(resy.highlights ?? []), ...(resy.sections ?? []).map((s) => s.body)].join(" ")
+    const text = [resy.description, resy.overview, ...(resy.highlights ?? []), ...(resy.sections ?? []).map((s) => s.body)].join(" ")
     expect(text).not.toMatch(/deposit polic|end-of-night|per cover|Amex|Card Member/i)
     expect(text).not.toMatch(/\breviews?\b/i)
   })
 
   it("never claims Nanci sees Stripe payouts", () => {
-    const text = [resy.description, resy.overview, resy.connected?.message, ...(resy.highlights ?? []), ...(resy.sections ?? []).map((s) => s.body)].join(" ")
+    const text = [resy.description, resy.overview, ...(resy.highlights ?? []), ...(resy.sections ?? []).map((s) => s.body)].join(" ")
     expect(text).not.toMatch(/\bsees?\b[^.]*Stripe payouts|Stripe payouts arrive/i)
   })
 
@@ -600,6 +601,6 @@ describe("Resy Marketplace listing", () => {
     expect(resy.highlights).toContain("Private guest surveys, and every venue in your group side by side")
     const canRead = resy.sections?.find((s) => s.title === "What Nanci can read")?.body ?? ""
     for (const item of ["private guest surveys", "reports across every venue in your group"]) expect(canRead).toContain(item)
-    for (const text of [resy.description, resy.connected?.message]) expect(text).toMatch(/surveys and reports/)
+    expect(resy.description).toMatch(/surveys and reports/)
   })
 })

@@ -21,7 +21,7 @@ import {
 } from "@/lib/ask-nanci/data/panels/service-marketplace"
 
 function ServiceCard({ service, enabled, selected, onClick }: { service: MarketplaceService; enabled: boolean; selected: boolean; onClick: () => void }) {
-  const { icon: Icon, title, description, vendor } = service
+  const { icon: Icon, title, description, vendor, enabledLabel } = service
   return (
     <button
       onClick={onClick}
@@ -32,7 +32,7 @@ function ServiceCard({ service, enabled, selected, onClick }: { service: Marketp
     >
       <div className="flex items-start justify-between gap-2">
         <Icon className="size-8 shrink-0 text-foreground" strokeWidth={1.5} />
-        {enabled && <AddedBadge />}
+        {enabled && <AddedBadge label={enabledLabel} />}
       </div>
       <div className="flex flex-col gap-1">
         <p className="truncate text-sm font-medium text-foreground">{title}</p>
