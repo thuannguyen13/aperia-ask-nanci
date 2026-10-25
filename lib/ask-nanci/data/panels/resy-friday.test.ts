@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
 import { CARD_FEE_RATE, TURN_TIMES } from "./resy-group"
 import {
-  FRIDAY_DATE, FRIDAY_AS_OF, ONLINE_WINDOW, OPEN_INCREMENT, MOVE, MOVE_TABLE, PACING_CHECK, SEAT_HOURS, FOUR_TOP_SEAT_HOUR, formatTurn,
+  FRIDAY_DATE, FRIDAY_AS_OF, ONLINE_WINDOW, OPEN_INCREMENT, MOVE, MOVE_TABLE, PACING_CHECK, SEAT_HOURS, FOUR_TOP_SEAT_HOUR, toTime,
   REBOOK, NOTIFY_PARTIES, NOTIFY_GUESTS, NOTIFY_BY_SIZE, NOTIFY_HISTOGRAM, NOTIFY_SIZES, NOTIFY_TOP, PEAK_WINDOW,
   AVAILABILITY, RELEASED_TABLES, HELD_FILL_PCT, HELD_EMPTY_PCT, HELD_SEAT_HOUR, POST_OPEN, STILL_OPEN,
 } from "./resy-friday"
@@ -11,7 +11,7 @@ import {
 describe("venue settings", () => {
   it("charges 2.7% in card fees and turns 2s, 4s and 6+ in 1:30, 1:45 and 2:15", () => {
     expect(CARD_FEE_RATE).toBe(0.027)
-    expect(Object.values(TURN_TIMES).map(formatTurn)).toEqual(["1:30", "1:45", "2:15"])
+    expect(Object.values(TURN_TIMES).map(toTime)).toEqual(["1:30", "1:45", "2:15"])
   })
 })
 

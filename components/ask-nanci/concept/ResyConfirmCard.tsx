@@ -6,7 +6,8 @@ import { useAskNanci } from "@/contexts/AskNanciContext"
 interface ResyConfirmCardProps {
   title: string
   detail: string
-  buttonLabel: string
+  /** Defaults to the confirm turn without its closing period. */
+  buttonLabel?: string
   /** True only while the flow waits on this step's confirm turn. */
   awaiting: (messages: { role: string; content: string }[], chatState: string) => boolean
   /** The scripted user turn the button sends, the same one its chip sends. */
@@ -15,7 +16,7 @@ interface ResyConfirmCardProps {
 
 // The confirm step every Resy action shares. A double advance is already blocked by
 // the player, so the button keeps no state of its own.
-export function ResyConfirmCard({ title, detail, buttonLabel, awaiting, onConfirmTurn }: ResyConfirmCardProps) {
+export function ResyConfirmCard({ title, detail, onConfirmTurn, buttonLabel = onConfirmTurn.replace(/\.$/, ""), awaiting }: ResyConfirmCardProps) {
   const { handlePrompt, chatState, messages, dismissPanelSheet } = useAskNanci()
   const confirm = () => {
     // On a phone the sheet goes down so the answer and the next chip are in view. The

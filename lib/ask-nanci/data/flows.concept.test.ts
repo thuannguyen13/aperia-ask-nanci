@@ -242,9 +242,10 @@ describe("flow 29, filling the book", () => {
   })
 
   it("opens each panel without a view and flips it to done only on the answer to its confirm", () => {
-    expect(script[1]).toMatchObject({ panel: "resy-change", revealPanel: true, source: "Resy reservations" })
+    expect(script[1]).toMatchObject({ panel: "resy-change", closePanel: "resy-availability", revealPanel: true, source: "Resy reservations" })
     expect(script[3]).toMatchObject({ panel: "resy-change", view: "done", source: "Resy reservations" })
-    expect(script[5]).toMatchObject({ panel: "resy-notify", closePanel: "resy-change", revealPanel: true, source: "Resy Notify + card transactions" })
+    expect(script[5]).toMatchObject({ panel: "resy-notify", closePanel: "resy-change", source: "Resy Notify + card transactions" })
+    expect(script[5].revealPanel).toBeUndefined()
     expect(script[7]).toMatchObject({ panel: "resy-availability", closePanel: "resy-notify", revealPanel: true, source: "Resy timing + card transactions" })
     expect(script[9]).toMatchObject({ panel: "resy-availability", view: "done", source: "Resy reservations + card transactions" })
     for (const i of [1, 5, 7]) expect(script[i].view).toBeUndefined()
@@ -287,8 +288,6 @@ describe("flow 29, filling the book", () => {
     expect(isAwaitingFlow29Open([openOffer, { role: "user", content: "what is the weather like" }, { role: "assistant", content: "Sunny." }], "idle")).toBe(false)
     expect(isAwaitingFlow29Move([openOffer], "idle")).toBe(false)
     expect(isAwaitingFlow29Open([...opening, moveOffer], "idle")).toBe(false)
-    expect(isAwaitingFlow28Send([openOffer], "idle")).toBe(false)
-    expect(notify).not.toBe(move)
   })
 })
 

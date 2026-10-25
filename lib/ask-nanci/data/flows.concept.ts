@@ -518,7 +518,7 @@ const FLOW19_SHEET: SheetActionData = {
 
 // Flow 28 speaks small counts as words, the way an owner would hear them.
 const NUMBER_WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"];
-const spellCount = (n: number) => NUMBER_WORDS[n] ?? String(n);
+export const spellCount = (n: number) => NUMBER_WORDS[n] ?? String(n);
 const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
 const joinNames = (names: string[]) => (names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names.at(-1)}` : names.join(""));
 const FLOW28_CANCELLED = partiesWithReply("cancelled")[0];
@@ -529,7 +529,7 @@ const FLOW28_ASK_TO_SEND = `${capitalize(spellCount(UNCONFIRMED.length))} partie
 /** True while flow 28 is parked on its confirm step: idle, with the offer as the last message. */
 export const isAwaitingFlow28Send = (messages: { role: string; content: string }[], chatState: string) => isAwaitingTurn(messages, chatState, FLOW28_ASK_TO_SEND);
 
-const tableList = (tables: number[]) => joinNames(tables.map((t) => `T${t}`));
+export const tableList = (tables: number[]) => joinNames(tables.map((t) => `T${t}`));
 // The answers that offer flow 29's two changes. Each confirm waits on its turn only
 // while its offer is the last thing in the chat.
 const FLOW29_ASK_TO_MOVE = `Yes. Table ${MOVE.to.table} frees at ${MOVE_TABLE.frees} when its ${MOVE_TABLE.earlier} party turns, and ${PACING_CHECK.time} has room in your pacing, ${PACING_CHECK.before} of ${PACING_CHECK.cap}. Moving them also frees their ${MOVE.from.time} ${spellCount(MOVE.party)}-top.`;
@@ -1170,6 +1170,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       role: "assistant",
       content: FLOW29_ASK_TO_MOVE,
       panel: "resy-change",
+      closePanel: "resy-availability",
       revealPanel: true,
       source: "Resy reservations",
     },
@@ -1187,7 +1188,6 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       content: `${NOTIFY_PARTIES} parties, ${NOTIFY_GUESTS} guests, and the ${spellCount(MOVE.party)}-top you just freed is already gone: a party of ${REBOOK.party} took it off Notify in ${REBOOK.minutes} minutes, ${formatWholeCurrency(REBOOK.value)} back on the book. Most of the rest want ${PEAK_WINDOW.label.replace("–", " to ")} for two or four, and you have nothing open there.`,
       panel: "resy-notify",
       closePanel: "resy-change",
-      revealPanel: true,
       source: "Resy Notify + card transactions",
     },
     { role: "user", content: CONCEPT_FLOW29_OPEN_ASK },

@@ -2,20 +2,18 @@
 
 import { ArrowRight } from "lucide-react"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
-import { CONCEPT_FLOW29_OPEN, isAwaitingFlow29Open } from "@/lib/ask-nanci/data/flows.concept"
-import { AVAILABILITY, FRIDAY_AS_OF, FRIDAY_DATE, ONLINE_WINDOW, OPEN_INCREMENT, POST_OPEN, RELEASED_TABLES, SEAT_HOURS, STILL_OPEN, formatTurn } from "@/lib/ask-nanci/data/panels/resy-friday"
+import { CONCEPT_FLOW29_OPEN, isAwaitingFlow29Open, spellCount, tableList } from "@/lib/ask-nanci/data/flows.concept"
+import { AVAILABILITY, FRIDAY_AS_OF, FRIDAY_DATE, FRIDAY_DATE_PLAIN, ONLINE_WINDOW, OPEN_INCREMENT, POST_OPEN, RELEASED_TABLES, SEAT_HOURS, STILL_OPEN, toTime } from "@/lib/ask-nanci/data/panels/resy-friday"
 import { PanelShell, PanelHeader, PanelBody, Callout, PanelTable, Thead, Th, Td, formatCurrency, formatWholeCurrency } from "@/components/shared"
 import { ResyConfirmCard } from "./ResyConfirmCard"
 
-const FRIDAY_SHORT = FRIDAY_DATE.replace(",", "")
-const TABLES = RELEASED_TABLES.map((t) => `T${t}`).join(" and ")
-const PROPOSAL = `Change ${FRIDAY_SHORT} dinner only. ${TABLES} go online from ${ONLINE_WINDOW.from} to ${ONLINE_WINDOW.to}, and ${OPEN_INCREMENT} pacing goes from ${AVAILABILITY.pacing.before} to ${AVAILABILITY.pacing.after} covers. Other nights stay as they are.`
-const WHAT_CHANGES = `What changes in Resy: a shift override for ${FRIDAY_SHORT} releases two held four-tops to online booking and raises ${OPEN_INCREMENT} pacing. Nothing changes in Resy until you confirm.`
+const PROPOSAL = `Change ${FRIDAY_DATE_PLAIN} dinner only. ${tableList(RELEASED_TABLES)} go online from ${ONLINE_WINDOW.from} to ${ONLINE_WINDOW.to}, and ${OPEN_INCREMENT} pacing goes from ${AVAILABILITY.pacing.before} to ${AVAILABILITY.pacing.after} covers. Other nights stay as they are.`
+const WHAT_CHANGES = `What changes in Resy: a shift override for ${FRIDAY_DATE_PLAIN} releases ${spellCount(RELEASED_TABLES.length)} held four-tops to online booking and raises ${OPEN_INCREMENT} pacing. Nothing changes in Resy until you confirm.`
 
 const CHANGE_ROWS = [
   { label: `Online four-tops at ${OPEN_INCREMENT}`, ...AVAILABILITY.fourTops },
   { label: `Pacing at ${OPEN_INCREMENT}, per 15 min`, ...AVAILABILITY.pacing },
-  { label: `${OPEN_INCREMENT}–8:30 half-hour total`, ...AVAILABILITY.halfHour },
+  { label: `${OPEN_INCREMENT}–${ONLINE_WINDOW.to} half-hour total`, ...AVAILABILITY.halfHour },
 ]
 
 const TABLE_STATUS = [
@@ -55,7 +53,7 @@ function SeatHourTable() {
           {SEAT_HOURS.map((r) => (
             <tr key={r.tier}>
               <Td>{r.tier}</Td>
-              <Td align="right" className="tabular-nums">{formatTurn(r.turn)}</Td>
+              <Td align="right" className="tabular-nums">{toTime(r.turn)}</Td>
               <Td align="right" className="tabular-nums">{formatCurrency(r.afterFees)}</Td>
               <Td align="right" className="font-semibold tabular-nums">{formatWholeCurrency(Math.round(r.perSeatHour))}</Td>
             </tr>
@@ -67,18 +65,18 @@ function SeatHourTable() {
 }
 
 function OpenConfirm() {
-  return <ResyConfirmCard title={PROPOSAL} detail={WHAT_CHANGES} buttonLabel={CONCEPT_FLOW29_OPEN.replace(/\.$/, "")} awaiting={isAwaitingFlow29Open} onConfirmTurn={CONCEPT_FLOW29_OPEN} />
+  return <ResyConfirmCard title={PROPOSAL} detail={WHAT_CHANGES} awaiting={isAwaitingFlow29Open} onConfirmTurn={CONCEPT_FLOW29_OPEN} />
 }
 
 function OpenDone() {
   return (
-    <div className="rounded-xl border border-green-200 bg-green-50 p-4 text-green-800 dark:border-green-800 dark:bg-green-950/20 dark:text-green-300">
-      <p className="text-xs font-semibold">Shift override · {FRIDAY_SHORT} only</p>
+    <Callout variant="green">
+      <p className="text-xs font-semibold">Shift override · {FRIDAY_DATE_PLAIN} only</p>
       <p className="mt-1 text-sm font-semibold">{AVAILABILITY.fourTops.after} four-tops online at {OPEN_INCREMENT}</p>
       <ul className="mt-2 space-y-1">
         {TABLE_STATUS.map((t) => <li key={t.table} className="text-sm tabular-nums"><span className="font-semibold">T{t.table}</span> · {t.status}</li>)}
       </ul>
-    </div>
+    </Callout>
   )
 }
 
@@ -94,9 +92,9 @@ export function ResyAvailabilityPanel() {
       <PanelHeader title={`Open tables · ${OPEN_INCREMENT} PM`} subtitle={`${FRIDAY_DATE} · ${FRIDAY_AS_OF}`} size="lg" onClose={() => closeDynamicPanel("resy-availability")} />
       <PanelBody className="space-y-4">
         <ChangeRows />
-        <SeatHourTable />
-        <Callout variant="amber">That puts {AVAILABILITY.halfHour.after} covers into {OPEN_INCREMENT}–8:30 against your usual {AVAILABILITY.halfHour.before}. Give the kitchen a heads-up.</Callout>
         <Body />
+        <SeatHourTable />
+        <Callout variant="amber">That puts {AVAILABILITY.halfHour.after} covers into {OPEN_INCREMENT}–{ONLINE_WINDOW.to} against your usual {AVAILABILITY.halfHour.before}. Give the kitchen a heads-up.</Callout>
       </PanelBody>
     </PanelShell>
   )

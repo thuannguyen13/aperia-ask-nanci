@@ -7,6 +7,8 @@ import { CARD_FEE_RATE, PACING_PER_15_MIN, PACING_PER_HALF_HOUR, TURN_TIMES, typ
 // quote the same numbers.
 
 export const FRIDAY_DATE = "Fri, Oct 30"
+/** The date as the confirm cards write it, "Fri Oct 30". */
+export const FRIDAY_DATE_PLAIN = FRIDAY_DATE.replace(",", "")
 export const FRIDAY_AS_OF = "Resy book as of Sat, Oct 24"
 
 // Clock times are evening "h:mm" strings.
@@ -14,10 +16,8 @@ const toMinutes = (time: string) => {
   const [h, m] = time.split(":").map(Number)
   return h * 60 + m
 }
-const toTime = (minutes: number) => `${Math.floor(minutes / 60)}:${String(minutes % 60).padStart(2, "0")}`
-
-/** A turn time as Resy shows it, "1:45". */
-export const formatTurn = (minutes: number) => toTime(minutes)
+/** Minutes as Resy shows a clock time or a turn: "7:15", "1:45". */
+export const toTime = (minutes: number) => `${Math.floor(minutes / 60)}:${String(minutes % 60).padStart(2, "0")}`
 
 // ─── Step 1: move the Marsh party ─────────────────────────────────────────────
 

@@ -2,13 +2,14 @@
 
 import { ArrowRight, Users } from "lucide-react"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
-import { CONCEPT_FLOW29_MOVE, isAwaitingFlow29Move } from "@/lib/ask-nanci/data/flows.concept"
-import { FRIDAY_AS_OF, FRIDAY_DATE, MOVE, MOVE_TABLE, PACING_CHECK } from "@/lib/ask-nanci/data/panels/resy-friday"
+import { CONCEPT_FLOW29_MOVE, isAwaitingFlow29Move, spellCount } from "@/lib/ask-nanci/data/flows.concept"
+import { FRIDAY_AS_OF, FRIDAY_DATE, FRIDAY_DATE_PLAIN, MOVE, MOVE_TABLE, PACING_CHECK } from "@/lib/ask-nanci/data/panels/resy-friday"
 import { PanelShell, PanelHeader, PanelBody, Callout } from "@/components/shared"
 import { ResyConfirmCard } from "./ResyConfirmCard"
 
-const PROPOSAL = `Move the ${MOVE.guest} party, ${FRIDAY_DATE.replace(",", "")}, from ${MOVE.from.time} to ${MOVE.to.time} on Table ${MOVE.to.table}. Resy will send them the updated booking.`
-const WHAT_CHANGES = `What changes in Resy: the booking moves to ${MOVE.to.time} PM on T${MOVE.to.table}, and the ${MOVE.from.time} six-top on T${MOVE.from.table} goes online. Nothing changes in Resy until you confirm.`
+const FREED_TABLE = `${spellCount(MOVE.party)}-top`
+const PROPOSAL = `Move the ${MOVE.guest} party, ${FRIDAY_DATE_PLAIN}, from ${MOVE.from.time} to ${MOVE.to.time} on Table ${MOVE.to.table}. Resy will send them the updated booking.`
+const WHAT_CHANGES = `What changes in Resy: the booking moves to ${MOVE.to.time} PM on T${MOVE.to.table}, and the ${MOVE.from.time} ${FREED_TABLE} on T${MOVE.from.table} goes online. Nothing changes in Resy until you confirm.`
 
 function BookingRow({ label, time, table }: { label: string; time: string; table: number }) {
   return (
@@ -40,14 +41,14 @@ function BeforeAfter() {
 }
 
 function MoveConfirm() {
-  return <ResyConfirmCard title={PROPOSAL} detail={WHAT_CHANGES} buttonLabel={CONCEPT_FLOW29_MOVE.replace(/\.$/, "")} awaiting={isAwaitingFlow29Move} onConfirmTurn={CONCEPT_FLOW29_MOVE} />
+  return <ResyConfirmCard title={PROPOSAL} detail={WHAT_CHANGES} awaiting={isAwaitingFlow29Move} onConfirmTurn={CONCEPT_FLOW29_MOVE} />
 }
 
 function MoveDone() {
   return (
     <Callout variant="green">
       <p className="font-semibold">Moved in Resy: {MOVE.to.time} PM on T{MOVE.to.table}.</p>
-      <p className="mt-1">The {MOVE.from.time} six-top on T{MOVE.from.table} is open online.</p>
+      <p className="mt-1">The {MOVE.from.time} {FREED_TABLE} on T{MOVE.from.table} is open online.</p>
     </Callout>
   )
 }

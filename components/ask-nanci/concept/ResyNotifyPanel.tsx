@@ -89,7 +89,7 @@ function NotifyList() {
       <ul className="divide-y">
         {NOTIFY_TOP.map((row, i) => <NotifyListRow key={row.name} row={row} rank={i + 1} />)}
       </ul>
-      <p className="border-t px-4 py-3 text-sm font-medium tabular-nums text-foreground">{NOTIFY_PARTIES} parties, {NOTIFY_GUESTS} guests on Notify</p>
+      <p className="border-t px-4 py-3 text-sm font-medium tabular-nums text-foreground">{NOTIFY_PARTIES} parties, {NOTIFY_GUESTS} guests still waiting on Notify</p>
     </div>
   )
 }
