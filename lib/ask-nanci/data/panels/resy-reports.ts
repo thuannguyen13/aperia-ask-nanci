@@ -6,7 +6,7 @@
 // numbers.
 
 import { formatWholeCurrency } from "../../../../components/shared/format"
-import { CARD_BRANDS, CARD_PER_COVER, COMPARED_WEEKS, MONTH_TO_DATE, seatedCovers } from "./resy-group"
+import { CARD_BRANDS, CARD_PER_COVER, COMPARED_WEEKS, MONTH_TO_DATE, NO_SHOW_COST, seatedCovers } from "./resy-group"
 import { FEES_AFTER_CHARGE } from "./resy-deposits"
 import { toTime } from "./resy-friday"
 
@@ -101,16 +101,24 @@ interface VenueFigures {
   fees: number // no-show fees charged in Resy
 }
 
-const venue = (name: string, v: VenueFigures) => ({ name, ...v, ratePct: share(v.noShows, v.booked), cost: v.noShows * v.perCover, amexSharePct: share(v.amexSales, v.cardSales) })
+// `short` is how the chat names the venue after its first mention.
+const venue = (name: string, short: string, v: VenueFigures) => ({ name, short, ...v, ratePct: share(v.noShows, v.booked), cost: v.noShows * v.perCover, amexSharePct: share(v.amexSales, v.cardSales) })
 
 // The other venues: authored from Resy and their own MIDs. Card sales are seated covers
 // at the venue's per-cover figure. Neither venue has a no-show fee in Resy.
-const otherVenue = (name: string, v: Omit<VenueFigures, "cardSales" | "fees">) => venue(name, { ...v, cardSales: seatedCovers(v) * v.perCover, fees: 0 })
+const otherVenue = (name: string, short: string, v: Omit<VenueFigures, "cardSales" | "fees">) => venue(name, short, { ...v, cardSales: seatedCovers(v) * v.perCover, fees: 0 })
+
+// The flagship's row reuses resy-group's cost and Amex share rather than recomputing them.
+export const FLAGSHIP_VENUE = {
+  ...venue("Tallis", "Tallis", { ...MONTH_TO_DATE, perCover: CARD_PER_COVER, amexSales: CARD_BRANDS.amex.sales, fees: FEES_AFTER_CHARGE }),
+  cost: NO_SHOW_COST,
+  amexSharePct: CARD_BRANDS.amexSharePct,
+}
 
 export const VENUES = [
-  venue("Tallis", { ...MONTH_TO_DATE, perCover: CARD_PER_COVER, amexSales: CARD_BRANDS.amex.sales, fees: FEES_AFTER_CHARGE }),
-  otherVenue("Little Tallis", { booked: 1520, noShows: 41, walkIns: 221, perCover: 54, amexSales: 20563 }),
-  otherVenue("Tallis Market", { booked: 1980, noShows: 96, walkIns: 266, perCover: 61, amexSales: 35542 }),
+  FLAGSHIP_VENUE,
+  otherVenue("Little Tallis", "Little Tallis", { booked: 1520, noShows: 41, walkIns: 221, perCover: 54, amexSales: 20563 }),
+  otherVenue("Tallis Market", "Market", { booked: 1980, noShows: 96, walkIns: 266, perCover: 61, amexSales: 35542 }),
 ]
 
 const sumVenues = (pick: (v: (typeof VENUES)[number]) => number) => VENUES.reduce((total, v) => total + pick(v), 0)

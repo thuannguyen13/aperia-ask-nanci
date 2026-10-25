@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest"
-import { CARD_BRANDS, COMPARED_WEEKS, FLAGSHIP_WEEKS, seatedCovers } from "./resy-group"
+import { CARD_BRANDS, COMPARED_WEEKS, FLAGSHIP_WEEKS, NO_SHOW_COST, seatedCovers } from "./resy-group"
 import { WEEK_REPORT, WEEK_ROWS, SURVEY_SUMMARY, LOW_RATINGS, FRIDAY_LOW_RATINGS, LOCATIONS_WINDOW, VENUES, GROUP, MOST_NO_SHOWS, HIGHEST_RATE, LOCATION_ROWS } from "./resy-reports"
 
 // Storyboard section 5: the week identities under "Flagship month to date" and every
@@ -103,6 +103,11 @@ describe("no-shows by location", () => {
   it("costs them 9,204, 2,214 and 5,856, 17,274 for the group", () => {
     expect(VENUES.map((v) => v.cost)).toEqual([9204, 2214, 5856])
     expect(GROUP.cost).toBe(17274)
+  })
+
+  it("reuses the flagship's no-show cost and Amex share from resy-group", () => {
+    expect(VENUES[0].cost).toBe(NO_SHOW_COST)
+    expect(VENUES[0].amexSharePct).toBe(CARD_BRANDS.amexSharePct)
   })
 
   it("charges fees only at the flagship, $1,050 after flow 31", () => {

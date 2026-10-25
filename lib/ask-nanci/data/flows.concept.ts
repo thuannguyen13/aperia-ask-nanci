@@ -17,7 +17,7 @@ import { MOVE, MOVE_TABLE, PACING_CHECK, REBOOK, NOTIFY_PARTIES, NOTIFY_GUESTS, 
 // Flow 30 does the same with the guestbook and October's card brands.
 import { GUEST, GUEST_UPDATE, SEGMENT, TOP_FIVE_TOTAL } from "./panels/resy-guests";
 import { NO_SHOW_BOOKING, NO_SHOW_FEE, FEES_AFTER_CHARGE, EVENTS, EVENT_TOTALS, WINE_DINNER, NIGHT_SPEND_PER_GUEST } from "./panels/resy-deposits";
-import { WEEK_REPORT, SURVEY_SUMMARY, LOW_RATINGS, FRIDAY_LOW_RATINGS, VENUES, MOST_NO_SHOWS, HIGHEST_RATE } from "./panels/resy-reports";
+import { WEEK_REPORT, SURVEY_SUMMARY, LOW_RATINGS, FRIDAY_LOW_RATINGS, VENUES, FLAGSHIP_VENUE, MOST_NO_SHOWS, HIGHEST_RATE } from "./panels/resy-reports";
 import { formatWholeCurrency } from "../../../components/shared/format";
 import { inScope, type FlowScope } from "./flow-scopes";
 import { isAwaitingTurn } from "../is-awaiting-turn";
@@ -569,6 +569,8 @@ const FLOW19_SHEET: SheetActionData = {
 // Flow 28 speaks small counts as words, the way an owner would hear them.
 const NUMBER_WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"];
 export const spellCount = (n: number) => NUMBER_WORDS[n] ?? String(n);
+const ORDINAL_WORDS = ["zeroth", "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth", "eleventh", "twelfth"];
+const spellOrdinal = (n: number) => ORDINAL_WORDS[n] ?? `${n}th`;
 const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
 const joinNames = (names: string[]) => (names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names.at(-1)}` : names.join(""));
 const FLOW28_CANCELLED = partiesWithReply("cancelled")[0];
@@ -612,9 +614,13 @@ export const isAwaitingFlow31Charge = (messages: { role: string; content: string
 const { covers: W_COVERS, turn: W_TURN, cardSales: W_SALES, cancellations: W_CANCELLED, repeatPct: W_REPEAT, amexShare: W_AMEX } = WEEK_REPORT;
 const FLOW32_WEEK = `Up. ${W_COVERS.latest.toLocaleString("en-US")} covers against ${W_COVERS.prior.toLocaleString("en-US")}, ${W_COVERS.changePct}% more, and tables turned ${W_TURN.minutesFaster} minutes faster at ${W_TURN.latest}. Cancellations fell from ${W_CANCELLED.prior} to ${W_CANCELLED.latest}, and ${W_REPEAT.latest}% of parties were repeat guests, up from ${W_REPEAT.prior}%. Card sales rose ${W_SALES.changePct}% to ${formatWholeCurrency(W_SALES.latest)}, with Amex cards at ${W_AMEX.latest}% of it.`;
 const FRIDAY_TIMES = FRIDAY_LOW_RATINGS.map((r) => r.time.replace(" PM", ""));
-const FLOW32_SURVEYS = `${capitalize(spellCount(LOW_RATINGS.length))} of ${SURVEY_SUMMARY.responses} survey responses rated ${spellCount(SURVEY_SUMMARY.lowAtMost)} stars or less, against a ${SURVEY_SUMMARY.average} average. ${capitalize(spellCount(FRIDAY_LOW_RATINGS.length))} of them were Friday's ${FRIDAY_TIMES.join(" and ")} tables, both about waiting 20-plus minutes past the booking, and the third said the back room was too loud last Saturday. Both Friday guests have been in before, ${FRIDAY_LOW_RATINGS.map((r) => spellCount(r.visits)).join(" and ")} times. Worth watching now that next Friday has ${spellCount(RELEASED_TABLES.length)} more ${OPEN_INCREMENT} four-tops.`;
-const [FLAGSHIP_VENUE, LITTLE_VENUE] = VENUES;
-const FLOW32_LOCATIONS = `By count, ${MOST_NO_SHOWS.name}, with ${MOST_NO_SHOWS.noShows} covers so far. By rate it's ${HIGHEST_RATE.name} at ${HIGHEST_RATE.ratePct}%, against ${FLAGSHIP_VENUE.ratePct}% here and ${LITTLE_VENUE.ratePct}% at ${LITTLE_VENUE.name}. That cost Market ${formatWholeCurrency(HIGHEST_RATE.cost)} at its ${formatWholeCurrency(HIGHEST_RATE.perCover)} a cover. Market charges no fee, so none of that came back. A card-on-file fee like yours would recover part of it.`;
+const FLOW32_SURVEYS = `${capitalize(spellCount(LOW_RATINGS.length))} of ${SURVEY_SUMMARY.responses} survey responses rated ${spellCount(SURVEY_SUMMARY.lowAtMost)} stars or less, against a ${SURVEY_SUMMARY.average} average. ${capitalize(spellCount(FRIDAY_LOW_RATINGS.length))} of them were Friday's ${FRIDAY_TIMES.join(" and ")} tables, both about waiting 20-plus minutes past the booking, and the third said the back room was too loud last Saturday. Both Friday guests are returning, on their ${FRIDAY_LOW_RATINGS.map((r) => spellOrdinal(r.visits)).join(" and ")} visits. Worth watching now that next Friday has ${spellCount(RELEASED_TABLES.length)} more ${OPEN_INCREMENT} four-tops.`;
+// "Here" is the flagship; the third venue is whichever is neither it nor the highest rate.
+const [THIRD_VENUE] = VENUES.filter((v) => v !== FLAGSHIP_VENUE && v !== HIGHEST_RATE);
+const FEES_BACK = HIGHEST_RATE.fees === 0
+  ? `${HIGHEST_RATE.short} charges no fee, so none of that came back. A card-on-file fee like yours would recover part of it.`
+  : `${HIGHEST_RATE.short} has charged ${formatWholeCurrency(HIGHEST_RATE.fees)} in fees.`;
+const FLOW32_LOCATIONS = `By count, ${MOST_NO_SHOWS.name}, with ${MOST_NO_SHOWS.noShows} covers so far. By rate it's ${HIGHEST_RATE.name} at ${HIGHEST_RATE.ratePct}%, against ${FLAGSHIP_VENUE.ratePct}% here and ${THIRD_VENUE.ratePct}% at ${THIRD_VENUE.name}. That cost ${HIGHEST_RATE.short} ${formatWholeCurrency(HIGHEST_RATE.cost)} at its ${formatWholeCurrency(HIGHEST_RATE.perCover)} a cover. ${FEES_BACK}`;
 
 export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
   // Aperia Risk theme — landing quick-action / Nanci's-take chat answers.

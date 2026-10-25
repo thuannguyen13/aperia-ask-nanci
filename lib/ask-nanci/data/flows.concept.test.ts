@@ -534,7 +534,7 @@ describe("flow 32, how we're doing", () => {
   })
 
   it("quotes the surveys, the two Friday tables and the 8:00 tie-in", () => {
-    for (const figure of [String(SURVEY_SUMMARY.responses), String(SURVEY_SUMMARY.average), "8:00 and 8:15", "nine and five times", "too loud last Saturday"]) expect(surveys).toContain(figure)
+    for (const figure of [String(SURVEY_SUMMARY.responses), String(SURVEY_SUMMARY.average), "8:00 and 8:15", "Both Friday guests are returning, on their ninth and fifth visits.", "too loud last Saturday"]) expect(surveys).toContain(figure)
     expect(surveys).toContain("Worth watching now that next Friday has two more 8:00 four-tops.")
     expect(surveys).not.toMatch(/regulars?/i)
   })
@@ -544,7 +544,7 @@ describe("flow 32, how we're doing", () => {
     expect(locations).toContain("so far")
     expect(LOCATIONS_WINDOW).toContain("so far")
     expect(locations).not.toMatch(/Amex/)
-    expect(locations).toContain("Market charges no fee, so none of that came back. A card-on-file fee like yours would recover part of it.")
+    expect(locations).toBe("By count, Tallis, with 118 covers so far. By rate it's Tallis Market at 4.8%, against 3.5% here and 2.7% at Little Tallis. That cost Market $5,856 at its $61 a cover. Market charges no fee, so none of that came back. A card-on-file fee like yours would recover part of it.")
     expect(VENUES.map((v) => v.name)).toEqual(["Tallis", "Little Tallis", "Tallis Market"])
   })
 
