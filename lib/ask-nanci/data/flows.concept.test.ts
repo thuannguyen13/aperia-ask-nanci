@@ -483,13 +483,14 @@ describe("flow 31, no-show fees and events", () => {
 describe("Resy Marketplace listing", () => {
   const resy = MARKETPLACE_SERVICES.find((s) => s.id === "resy")!
 
-  it("links flows 28, 29, 30 and 31", () => {
-    expect(resy.connected?.flowSlugs).toEqual(["28", "29", "30", "31"])
+  it("links flows 28 to 32", () => {
+    expect(resy.connected?.flowSlugs).toEqual(["28", "29", "30", "31", "32"])
   })
 
   it("promises nothing the Resy flows do not show, and names no card brand", () => {
     const text = [resy.description, resy.overview, resy.connected?.message, ...(resy.highlights ?? []), ...(resy.sections ?? []).map((s) => s.body)].join(" ")
     expect(text).not.toMatch(/deposit polic|end-of-night|per cover|Amex|Card Member/i)
+    expect(text).not.toMatch(/\breviews?\b/i)
   })
 
   it("never claims Nanci sees Stripe payouts", () => {
@@ -507,5 +508,13 @@ describe("Resy Marketplace listing", () => {
     expect(resy.highlights).toContain("Ticketed events, and where each payment lands")
     expect(resy.overview).toContain("how many seats are left for the wine dinner")
     expect(resy.sections?.find((s) => s.title === "What Nanci can read")?.body).toContain("events and ticket sales")
+  })
+
+  it("names flow 32's weekly reports, private surveys and group comparison", () => {
+    expect(resy.highlights).toContain("Weekly reports that match Resy tables to card sales")
+    expect(resy.highlights).toContain("Private guest surveys, and every venue in your group side by side")
+    const canRead = resy.sections?.find((s) => s.title === "What Nanci can read")?.body ?? ""
+    for (const item of ["private guest surveys", "reports across every venue in your group"]) expect(canRead).toContain(item)
+    for (const text of [resy.description, resy.connected?.message]) expect(text).toMatch(/surveys and reports/)
   })
 })

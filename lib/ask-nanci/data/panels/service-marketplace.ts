@@ -67,12 +67,12 @@ export const MARKETPLACE_SERVICES: MarketplaceService[] = [
     id: "resy",
     icon: CalendarCheck,
     title: "Resy",
-    description: "Connect your Resy account so Ask Nanci can read your book, waitlist, Notify list, guestbook and events, and act in Resy when you confirm.",
+    description: "Connect your Resy account so Ask Nanci can read your book, waitlist, Notify list, guestbook, events, surveys and reports, and act in Resy when you confirm.",
     vendor: { name: "Resy", logo: null },
     scope: "resy",
     enableLabel: "Connect",
     overview:
-      "Resy runs your reservations, confirmations, waitlist, Notify list, guest profiles and events. Connected to Ask Nanci, it sits beside your card sales, so one question can answer from both. Ask how tonight looks, who's on Notify for Friday, who the guest at 8:15 is, or how many seats are left for the wine dinner.",
+      "Resy runs your reservations, confirmations, waitlist, Notify list, guest profiles, events and guest surveys. Connected to Ask Nanci, it sits beside your card sales, so one question can answer from both. Ask how tonight looks, who's on Notify for Friday, who the guest at 8:15 is, how many seats are left for the wine dinner, or how this week compared with last.",
     highlights: [
       "Tonight's book, confirmations and waitlist, on request",
       "What no-shows cost you, measured against your card sales",
@@ -83,15 +83,17 @@ export const MARKETPLACE_SERVICES: MarketplaceService[] = [
       "Tags, notes and thank-you emails drafted for your OK",
       "No-show fees charged with your OK",
       "Ticketed events, and where each payment lands",
+      "Weekly reports that match Resy tables to card sales",
+      "Private guest surveys, and every venue in your group side by side",
     ],
     sections: [
-      { title: "What Nanci can read", body: "Reservations, confirmations, the waitlist, Notify lists, turn times, the no-show fees charged in Resy, events and ticket sales, and the guestbook: profiles, tags, notes, visits and spend." },
+      { title: "What Nanci can read", body: "Reservations, confirmations, the waitlist, Notify lists, turn times, the no-show fees charged in Resy, events and ticket sales, private guest surveys, reports across every venue in your group, and the guestbook: profiles, tags, notes, visits and spend." },
       { title: "What Nanci can do", body: "Send Resy's confirmation follow-up, move a booking, change availability, update tags and notes, charge a no-show fee, and send guest emails. Nanci asks before every change, and Resy records it as made through Ask Nanci." },
       { title: "About this demo", body: "A concept built on sample data. No connection to Resy exists." },
     ],
     connected: {
-      message: "Resy is connected. Your book, confirmations, Notify list, guests and events are now part of Ask Nanci.",
-      flowSlugs: ["28", "29", "30", "31"],
+      message: "Resy is connected. Your book, confirmations, Notify list, guests, events, surveys and reports are now part of Ask Nanci.",
+      flowSlugs: ["28", "29", "30", "31", "32"],
     },
   },
   {
