@@ -17,6 +17,7 @@ import { MOVE, MOVE_TABLE, PACING_CHECK, REBOOK, NOTIFY_PARTIES, NOTIFY_GUESTS, 
 // Flow 30 does the same with the guestbook and October's card brands.
 import { GUEST, GUEST_UPDATE, SEGMENT, TOP_FIVE_TOTAL } from "./panels/resy-guests";
 import { NO_SHOW_BOOKING, NO_SHOW_FEE, FEES_AFTER_CHARGE, EVENTS, EVENT_TOTALS, WINE_DINNER, NIGHT_SPEND_PER_GUEST } from "./panels/resy-deposits";
+import { WEEK_REPORT, SURVEY_SUMMARY, LOW_RATINGS, FRIDAY_LOW_RATINGS, VENUES, MOST_NO_SHOWS, HIGHEST_RATE } from "./panels/resy-reports";
 import { formatWholeCurrency } from "../../../components/shared/format";
 import { inScope, type FlowScope } from "./flow-scopes";
 import { isAwaitingTurn } from "../is-awaiting-turn";
@@ -84,6 +85,9 @@ const CONCEPT_FLOW31_EVENTS = "How many seats are left for the wine dinner?";
 // Flow 31's confirm step. ResyFeePanel's Charge button sends this same turn, so the
 // button and the chip advance the flow the same way.
 export const CONCEPT_FLOW31_CHARGE = "Charge it.";
+const CONCEPT_FLOW32_PROMPT = "How did covers and turn times compare to last week?";
+const CONCEPT_FLOW32_SURVEYS = "Any bad feedback this week?";
+const CONCEPT_FLOW32_LOCATIONS = "Which location had the most no-shows in October?";
 // Both offer flows share the same accept/decline pills (matched per-active-flow, so
 // reuse is safe). "No, ignore for now" is decorative — registered as a fake follow-up.
 const CONCEPT_OFFER_YES = "Yes, show me";
@@ -449,6 +453,16 @@ export const FLOW_DEFS: FlowDef[] = [
     description: "Saturday at the Tallis flagship: last night's no-show fee charged with your OK, the evidence pack if the guest disputes it, then the seats left across three ticketed events and how each kind of money reaches your bank. A concept: no Resy connection exists.",
   },
   {
+    num: 32,
+    section: "merchant",
+    title: "How we're doing",
+    badge: "Resy",
+    key: CONCEPT_FLOW32_PROMPT,
+    slug: "32",
+    scope: "resy",
+    description: "Saturday at the Tallis group: last week against the week before from Resy and card sales, the private survey responses that rated two stars or less, then no-shows by location in October so far. Read-only. A concept: no Resy connection exists.",
+  },
+  {
     num: 27,
     section: "merchant",
     title: "Connect Resy",
@@ -592,6 +606,15 @@ const FLOW31_ASK_TO_CHARGE = `Not yet. The ${NO_SHOW_BOOKING.guest} party booked
 
 /** True while flow 31 is parked on its charge confirm, with the offer as the last message. */
 export const isAwaitingFlow31Charge = (messages: { role: string; content: string }[], chatState: string) => isAwaitingTurn(messages, chatState, FLOW31_ASK_TO_CHARGE);
+
+// Flow 32 reads only. Each answer names the window it covers, so "last week" and
+// "October" never mean more than the data behind them.
+const { covers: W_COVERS, turn: W_TURN, cardSales: W_SALES, cancellations: W_CANCELLED, repeatPct: W_REPEAT, amexShare: W_AMEX } = WEEK_REPORT;
+const FLOW32_WEEK = `Up. ${W_COVERS.latest.toLocaleString("en-US")} covers against ${W_COVERS.prior.toLocaleString("en-US")}, ${W_COVERS.changePct}% more, and tables turned ${W_TURN.minutesFaster} minutes faster at ${W_TURN.latest}. Cancellations fell from ${W_CANCELLED.prior} to ${W_CANCELLED.latest}, and ${W_REPEAT.latest}% of parties were repeat guests, up from ${W_REPEAT.prior}%. Card sales rose ${W_SALES.changePct}% to ${formatWholeCurrency(W_SALES.latest)}, with Amex cards at ${W_AMEX.latest}% of it.`;
+const FRIDAY_TIMES = FRIDAY_LOW_RATINGS.map((r) => r.time.replace(" PM", ""));
+const FLOW32_SURVEYS = `${capitalize(spellCount(LOW_RATINGS.length))} of ${SURVEY_SUMMARY.responses} survey responses rated ${spellCount(SURVEY_SUMMARY.lowAtMost)} stars or less, against a ${SURVEY_SUMMARY.average} average. ${capitalize(spellCount(FRIDAY_LOW_RATINGS.length))} of them were Friday's ${FRIDAY_TIMES.join(" and ")} tables, both about waiting 20-plus minutes past the booking, and the third said the back room was too loud last Saturday. Both Friday guests have been in before, ${FRIDAY_LOW_RATINGS.map((r) => spellCount(r.visits)).join(" and ")} times. Worth watching now that next Friday has ${spellCount(RELEASED_TABLES.length)} more ${OPEN_INCREMENT} four-tops.`;
+const [FLAGSHIP_VENUE, LITTLE_VENUE] = VENUES;
+const FLOW32_LOCATIONS = `By count, ${MOST_NO_SHOWS.name}, with ${MOST_NO_SHOWS.noShows} covers so far. By rate it's ${HIGHEST_RATE.name} at ${HIGHEST_RATE.ratePct}%, against ${FLAGSHIP_VENUE.ratePct}% here and ${LITTLE_VENUE.ratePct}% at ${LITTLE_VENUE.name}. That cost Market ${formatWholeCurrency(HIGHEST_RATE.cost)} at its ${formatWholeCurrency(HIGHEST_RATE.perCover)} a cover. Market charges no fee, so none of that came back. A card-on-file fee like yours would recover part of it.`;
 
 export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
   // Aperia Risk theme — landing quick-action / Nanci's-take chat answers.
@@ -1350,6 +1373,37 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       panel: "resy-events",
       closePanel: "resy-fee",
       source: "Resy events + card transactions",
+    },
+  ],
+
+  // ── Flow 32: How we're doing (Resy concept) ───────────────────────────────
+  // Today at the Tallis group: last week against the week before, the low survey
+  // ratings, then no-shows by location. Read-only, so no step has a confirm or a
+  // reveal. Figures are quoted from data/panels/resy-reports.ts and resy-group.ts.
+  [CONCEPT_FLOW32_PROMPT]: [
+    { role: "user", content: CONCEPT_FLOW32_PROMPT },
+    {
+      role: "assistant",
+      content: FLOW32_WEEK,
+      panel: "resy-report",
+      closePanel: "resy-locations",
+      source: "Resy reports + card transactions",
+    },
+    { role: "user", content: CONCEPT_FLOW32_SURVEYS },
+    {
+      role: "assistant",
+      content: FLOW32_SURVEYS,
+      panel: "resy-surveys",
+      closePanel: "resy-report",
+      source: "Resy Surveys",
+    },
+    { role: "user", content: CONCEPT_FLOW32_LOCATIONS },
+    {
+      role: "assistant",
+      content: FLOW32_LOCATIONS,
+      panel: "resy-locations",
+      closePanel: "resy-surveys",
+      source: "Resy multi-location + card transactions",
     },
   ],
 };
