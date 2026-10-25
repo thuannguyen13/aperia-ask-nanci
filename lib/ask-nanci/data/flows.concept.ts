@@ -10,10 +10,12 @@ import { CARD_FIGURES } from "./panels/credit-card-offer";
 // Flow 24 does the same with the location review figures.
 import { REVIEW_TOTAL_SALES, REVIEW_TOTAL_CHANGE_PCT, REVIEW_LEADER, REVIEW_WATCH, REVIEW_LOCATIONS, WATCH_TRANSACTIONS, REVIEW_SALES_CHART, REVIEW_TREND_CHART, averageTicket } from "./panels/location-review";
 // Flow 28 does the same with the Tallis figures: tonight's book and October's no-shows.
-import { CARD_PER_COVER, FEES_CHARGED, NO_SHOW_COST, UNCONFIRMED_NO_SHOW_PCT, CONFIRMED_NO_SHOW_PCT } from "./panels/resy-group";
+import { CARD_PER_COVER, FEES_CHARGED, NO_SHOW_COST, UNCONFIRMED_NO_SHOW_PCT, CONFIRMED_NO_SHOW_PCT, CARD_BRANDS } from "./panels/resy-group";
 import { BOOK_COVERS, BOOK_PARTIES, BOOK_PEAK, LARGE_PARTIES, TO_KNOW, CELEBRATIONS, UNCONFIRMED, UNCONFIRMED_COVERS, LARGEST_UNCONFIRMED, partiesWithReply, coversWithReply, WAITING, WAITING_GUESTS, WAIT_SUMMARY, LEFT_QUOTES, quoteFor } from "./panels/resy-tonight";
 // Flow 29 does the same with Friday's figures: the move, Notify and the open tables.
 import { MOVE, MOVE_TABLE, PACING_CHECK, REBOOK, NOTIFY_PARTIES, NOTIFY_GUESTS, PEAK_WINDOW, RELEASED_TABLES, AVAILABILITY, OPEN_INCREMENT, FOUR_TOP_SEAT_HOUR, HELD_EMPTY_PCT, HELD_SEAT_HOUR, POST_OPEN, STILL_OPEN } from "./panels/resy-friday";
+// Flow 30 does the same with the guestbook and October's card brands.
+import { GUEST, GUEST_UPDATE, SEGMENT, TOP_FIVE_TOTAL } from "./panels/resy-guests";
 import { formatWholeCurrency } from "../../../components/shared/format";
 import { inScope, type FlowScope } from "./flow-scopes";
 import { isAwaitingTurn } from "../is-awaiting-turn";
@@ -68,6 +70,13 @@ const CONCEPT_FLOW29_OPEN_ASK = "Open two more 8pm tables Friday.";
 // send these same turns, so each button and its chip advance the flow the same way.
 export const CONCEPT_FLOW29_MOVE = "Do it.";
 export const CONCEPT_FLOW29_OPEN = "Go ahead.";
+const CONCEPT_FLOW30_PROMPT = "Tell me about the guest at 8:15 tonight.";
+const CONCEPT_FLOW30_TAG_ASK = "Tag him as a regular, and note his wife's shellfish allergy.";
+const CONCEPT_FLOW30_THANK = "Thank everyone who celebrated an anniversary with us in September.";
+// Flow 30's two confirm steps. ResyGuestsPanel's and ResyOutreachPanel's buttons send
+// these same turns, so each button and its chip advance the flow the same way.
+export const CONCEPT_FLOW30_TAG = "Yes.";
+export const CONCEPT_FLOW30_SEND = "Send.";
 // Both offer flows share the same accept/decline pills (matched per-active-flow, so
 // reuse is safe). "No, ignore for now" is decorative — registered as a fake follow-up.
 const CONCEPT_OFFER_YES = "Yes, show me";
@@ -413,6 +422,16 @@ export const FLOW_DEFS: FlowDef[] = [
     description: "Next Friday at the Tallis flagship: a party moved with your OK frees a six-top, Resy's Notify refills it, and the demand left over makes the case for opening two held four-tops, priced per seat-hour after card fees. A concept: no Resy connection exists.",
   },
   {
+    num: 30,
+    section: "merchant",
+    title: "Know your guests",
+    badge: "Resy",
+    key: CONCEPT_FLOW30_PROMPT,
+    slug: "30",
+    scope: "resy",
+    description: "Saturday at the Tallis flagship: the guest at 8:15 and the cards he pays with, a Regular tag and an allergy note saved with your OK, then a thank-you to September's anniversary guests, sent with your OK. A concept: no Resy connection exists.",
+  },
+  {
     num: 27,
     section: "merchant",
     title: "Connect Resy",
@@ -539,6 +558,16 @@ const FLOW29_ASK_TO_OPEN = `I can release ${tableList(RELEASED_TABLES)}, the fou
 export const isAwaitingFlow29Move = (messages: { role: string; content: string }[], chatState: string) => isAwaitingTurn(messages, chatState, FLOW29_ASK_TO_MOVE);
 /** True while flow 29 is parked on its open-tables confirm, with that offer as the last message. */
 export const isAwaitingFlow29Open = (messages: { role: string; content: string }[], chatState: string) => isAwaitingTurn(messages, chatState, FLOW29_ASK_TO_OPEN);
+
+// The answers that offer flow 30's two changes. Each confirm waits on its turn only
+// while its offer is the last thing in the chat.
+const FLOW30_ASK_TO_TAG = `Add the tag ${GUEST_UPDATE.tag} and the guest note '${GUEST_UPDATE.note}' to ${GUEST.name}'s profile, so it shows on every future booking. I'll also put it on tonight's visit note so the kitchen sees it at ${GUEST.time}. OK?`;
+const FLOW30_ASK_TO_SEND = `${SEGMENT.parties} parties marked an anniversary in ${SEGMENT.month}, and ${SEGMENT.emailable} can be emailed. Your five biggest spenders among them have spent ${formatWholeCurrency(TOP_FIVE_TOTAL)} with us, and ${SEGMENT.amex} of the ${SEGMENT.matched} whose checks I could match paid with an Amex that night. Here's a draft, sent from Tallis through Resy, with no offer unless you want one.`;
+
+/** True while flow 30 is parked on its tag-and-note confirm, with that offer as the last message. */
+export const isAwaitingFlow30Tag = (messages: { role: string; content: string }[], chatState: string) => isAwaitingTurn(messages, chatState, FLOW30_ASK_TO_TAG);
+/** True while flow 30 is parked on its send confirm, with the draft as the last message. */
+export const isAwaitingFlow30Send = (messages: { role: string; content: string }[], chatState: string) => isAwaitingTurn(messages, chatState, FLOW30_ASK_TO_SEND);
 
 export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
   // Aperia Risk theme — landing quick-action / Nanci's-take chat answers.
@@ -1206,6 +1235,57 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       panel: "resy-availability",
       view: "done",
       source: "Resy reservations + card transactions",
+    },
+  ],
+
+  // ── Flow 30: Know your guests (Resy concept) ──────────────────────────────
+  // Today at the Tallis flagship: the 8:15 guest's profile beside the cards he pays
+  // with, a tag and an allergy note, then a thank-you to September's anniversary
+  // guests. Both changes are scripted confirm turns, sent by the chip or the panel's
+  // button. Figures are quoted from data/panels/resy-guests.ts and resy-group.ts.
+  [CONCEPT_FLOW30_PROMPT]: [
+    { role: "user", content: CONCEPT_FLOW30_PROMPT },
+    {
+      role: "assistant",
+      content: `${GUEST.name}, party of ${GUEST.party} in booth ${GUEST.booth}, ${spellCount(GUEST.flagship.visits)} visits since ${GUEST.firstVisit}, the last on ${GUEST.lastVisit}. He averages ${formatWholeCurrency(GUEST.flagship.averageSpend)} a visit, and he's paid with an Amex on ${GUEST.amexChecks} of the ${GUEST.matchedChecks} checks I could match. Amex cards are ${Math.round(Number(CARD_BRANDS.amexSharePct))}% of your card sales this month and average ${formatWholeCurrency(CARD_BRANDS.amex.averagePayment)} a payment, against ${formatWholeCurrency(CARD_BRANDS.other.averagePayment)} for other cards.`,
+      panel: "resy-guest",
+      closePanel: "resy-outreach",
+      revealPanel: true,
+      source: "Resy guestbook + card transactions",
+    },
+    { role: "user", content: CONCEPT_FLOW30_TAG_ASK },
+    {
+      role: "assistant",
+      content: FLOW30_ASK_TO_TAG,
+      panel: "resy-guest",
+      view: "proposed",
+      revealPanel: true,
+      source: "Resy guestbook",
+    },
+    { role: "user", content: CONCEPT_FLOW30_TAG },
+    {
+      role: "assistant",
+      content: `Done. Both are on his profile in Resy and on tonight's ${GUEST.time} chit.`,
+      panel: "resy-guest",
+      view: "done",
+      source: "Resy guestbook",
+    },
+    { role: "user", content: CONCEPT_FLOW30_THANK },
+    {
+      role: "assistant",
+      content: FLOW30_ASK_TO_SEND,
+      panel: "resy-outreach",
+      closePanel: "resy-guest",
+      revealPanel: true,
+      source: "Resy guestbook + card transactions",
+    },
+    { role: "user", content: CONCEPT_FLOW30_SEND },
+    {
+      role: "assistant",
+      content: `Sent. The email went from Tallis through Resy to the ${SEGMENT.emailable} guests, and it now sits in each one's message history. The ${spellCount(SEGMENT.excluded)} without email consent were left out.`,
+      panel: "resy-outreach",
+      view: "done",
+      source: "Resy messages",
     },
   ],
 };
