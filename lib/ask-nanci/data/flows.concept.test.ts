@@ -394,8 +394,8 @@ describe("flow 30, know your guests", () => {
 describe("Resy Marketplace listing", () => {
   const resy = MARKETPLACE_SERVICES.find((s) => s.id === "resy")!
 
-  it("links flows 28, 29 and 30", () => {
-    expect(resy.connected?.flowSlugs).toEqual(["28", "29", "30"])
+  it("links flows 28, 29, 30 and 31", () => {
+    expect(resy.connected?.flowSlugs).toEqual(["28", "29", "30", "31"])
   })
 
   it("promises nothing the Resy flows do not show, and names no card brand", () => {
@@ -403,11 +403,20 @@ describe("Resy Marketplace listing", () => {
     expect(text).not.toMatch(/deposit polic|end-of-night|per cover|Amex|Card Member/i)
   })
 
+  it("never claims Nanci sees Stripe payouts", () => {
+    const text = [resy.description, resy.overview, resy.connected?.message, ...(resy.highlights ?? []), ...(resy.sections ?? []).map((s) => s.body)].join(" ")
+    expect(text).not.toMatch(/\bsees?\b[^.]*Stripe payouts|Stripe payouts arrive/i)
+  })
+
   it("names every action the Resy flows take, and asks before each", () => {
     const canDo = resy.sections?.find((s) => s.title === "What Nanci can do")?.body ?? ""
-    for (const action of ["confirmation follow-up", "move a booking", "change availability", "tags and notes", "guest emails", "Nanci asks before every change"]) expect(canDo).toContain(action)
+    for (const action of ["confirmation follow-up", "move a booking", "change availability", "tags and notes", "no-show fee", "guest emails", "Nanci asks before every change"]) expect(canDo).toContain(action)
     expect(resy.highlights).toContain("Move bookings and open tables, with your OK")
     expect(resy.highlights).toContain("Guest profiles with tags, notes and the cards guests pay with")
     expect(resy.highlights).toContain("Tags, notes and thank-you emails drafted for your OK")
+    expect(resy.highlights).toContain("No-show fees charged with your OK")
+    expect(resy.highlights).toContain("Ticketed events, and where each payment lands")
+    expect(resy.overview).toContain("how many seats are left for the wine dinner")
+    expect(resy.sections?.find((s) => s.title === "What Nanci can read")?.body).toContain("events and ticket sales")
   })
 })
