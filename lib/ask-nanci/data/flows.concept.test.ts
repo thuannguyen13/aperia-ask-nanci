@@ -13,9 +13,14 @@ import {
   CONCEPT_FLOW29_OPEN,
   isAwaitingFlow29Move,
   isAwaitingFlow29Open,
+  CONCEPT_FLOW30_TAG,
+  CONCEPT_FLOW30_SEND,
+  isAwaitingFlow30Tag,
+  isAwaitingFlow30Send,
 } from "./flows.concept"
 import { CARD_PER_COVER, FEES_CHARGED, NO_SHOW_COST } from "./panels/resy-group"
 import { BOOK_COVERS, BOOK_PARTIES, BOOK_PEAK, UNCONFIRMED_COVERS, coversWithReply, WAITING_GUESTS, WAIT_SUMMARY, LEFT_QUOTES } from "./panels/resy-tonight"
+import { THANK_YOU_EMAIL } from "./panels/resy-guests"
 import { PACING_CHECK, NOTIFY_PARTIES, NOTIFY_GUESTS, REBOOK, FOUR_TOP_SEAT_HOUR, HELD_SEAT_HOUR, AVAILABILITY, POST_OPEN } from "./panels/resy-friday"
 import { MARKETPLACE_SERVICES } from "./panels/service-marketplace"
 import { formatWholeCurrency } from "../../../components/shared/format"
@@ -144,8 +149,8 @@ describe("promptsInScope", () => {
     for (const k of RESY_KEYS) expect(unscoped).not.toContain(k)
   })
 
-  it("is exactly flows 28 and 29 in resy mode", () => {
-    expect(promptsInScope("resy")).toEqual([flowKey(28), flowKey(29)])
+  it("is exactly flows 28, 29 and 30 in resy mode", () => {
+    expect(promptsInScope("resy")).toEqual([flowKey(28), flowKey(29), flowKey(30)])
   })
 
   it("adds each flow's followups after its own prompt", () => {
@@ -291,21 +296,118 @@ describe("flow 29, filling the book", () => {
   })
 })
 
+// ── Flow 30: Know your guests ──
+
+describe("flow 30, know your guests", () => {
+  const flow30 = FLOW_DEFS.find((f) => f.num === 30)!
+  const script = CONVERSATIONS[flow30.key]
+  const [profile, tagOffer, tagged, sendOffer, sent] = answers(30)
+
+  it("is a manual merchant flow in resy scope, left out of the unscoped demo", () => {
+    expect(flow30).toMatchObject({ section: "merchant", scope: "resy", slug: "30", badge: "Resy", title: "Know your guests" })
+    expect(CONCEPT_MANUAL_PROMPTS.has(flow30.key)).toBe(true)
+    expect(promptsInScope(null, { followups: true })).not.toContain(flow30.key)
+  })
+
+  it("takes five user turns, confirming with Yes. and Send.", () => {
+    expect(script.map((t) => t.role)).toEqual(Array.from({ length: 10 }, (_, i) => (i % 2 ? "assistant" : "user")))
+    expect(script[0].content).toBe("Tell me about the guest at 8:15 tonight.")
+    expect(script[2].content).toBe("Tag him as a regular, and note his wife's shellfish allergy.")
+    expect(script[4].content).toBe(CONCEPT_FLOW30_TAG)
+    expect(script[6].content).toBe("Thank everyone who celebrated an anniversary with us in September.")
+    expect(script[8].content).toBe(CONCEPT_FLOW30_SEND)
+    expect([CONCEPT_FLOW30_TAG, CONCEPT_FLOW30_SEND]).toEqual(["Yes.", "Send."])
+  })
+
+  it("opens the profile, proposes on it, marks it done, then opens and sends the email", () => {
+    expect(script[1]).toMatchObject({ panel: "resy-guest", closePanel: "resy-outreach", source: "Resy guestbook + card transactions" })
+    // Only steps whose panel holds a confirm raise the phone sheet.
+    expect(script[1].view).toBeUndefined()
+    expect(script[1].revealPanel).toBeUndefined()
+    expect(script[3]).toMatchObject({ panel: "resy-guest", view: "proposed", revealPanel: true, source: "Resy guestbook" })
+    expect(script[5]).toMatchObject({ panel: "resy-guest", view: "done", source: "Resy guestbook" })
+    expect(script[7]).toMatchObject({ panel: "resy-outreach", closePanel: "resy-guest", revealPanel: true, source: "Resy guestbook + card transactions" })
+    expect(script[7].view).toBeUndefined()
+    expect(script[9]).toMatchObject({ panel: "resy-outreach", view: "done", source: "Resy messages" })
+  })
+
+  it("quotes the figures the panels show", () => {
+    for (const figure of ["Rafael Ortiz", "booth 14", "six visits since March, the last on Oct 3", "$236", "5 of the 6", "31%", "$186", "$132"]) expect(profile).toContain(figure)
+    for (const figure of ["26 parties", "21 can be emailed", "$14,820 with us", "16 of the 19"]) expect(sendOffer).toContain(figure)
+    expect(sent).toContain("21 guests")
+  })
+
+  it("puts the note on the profile for good and on tonight's visit only", () => {
+    expect(tagOffer).toContain("every future booking")
+    expect(tagOffer).toContain("tonight's visit note")
+    expect(tagged).toContain("tonight's 8:15 chit")
+  })
+
+  it("never says holds, settled or Card Members", () => {
+    for (const text of answers(30)) {
+      expect(text).not.toMatch(/Card Member/)
+      expect(text).not.toMatch(/\bholds?\b/i)
+      expect(text).not.toMatch(/settled/)
+    }
+  })
+
+  it("offers no discount in the outreach or the email", () => {
+    for (const text of [sendOffer, sent, THANK_YOU_EMAIL.subject, THANK_YOU_EMAIL.body]) expect(text).not.toMatch(/% off|\bfree\b|discount/i)
+  })
+
+  it("waits on each confirm only while idle with its own offer as the last message", () => {
+    const opening = [{ role: "user", content: flow30.key }, { role: "assistant", content: profile }]
+    const tagMsg = { role: "assistant", content: tagOffer }
+    const sendMsg = { role: "assistant", content: sendOffer }
+    expect(isAwaitingFlow30Tag([...opening, tagMsg], "idle")).toBe(true)
+    expect(isAwaitingFlow30Tag([...opening, tagMsg], "streaming")).toBe(false)
+    expect(isAwaitingFlow30Tag(opening, "idle")).toBe(false)
+    expect(isAwaitingFlow30Tag([...opening, tagMsg, { role: "user", content: CONCEPT_FLOW30_TAG }, { role: "assistant", content: tagged }], "idle")).toBe(false)
+    expect(isAwaitingFlow30Send([sendMsg], "idle")).toBe(true)
+    expect(isAwaitingFlow30Send([sendMsg, { role: "user", content: "what is the weather like" }, { role: "assistant", content: "Sunny." }], "idle")).toBe(false)
+    expect(isAwaitingFlow30Tag([sendMsg], "idle")).toBe(false)
+    expect(isAwaitingFlow30Send([tagMsg], "idle")).toBe(false)
+  })
+
+  it("never waits on a flow 28 or 29 cue, and flows 28 and 29 never wait on its cues", () => {
+    const earlier = [...answers(28), ...answers(29)].map((content) => [{ role: "assistant", content }])
+    for (const msgs of earlier) {
+      expect(isAwaitingFlow30Tag(msgs, "idle")).toBe(false)
+      expect(isAwaitingFlow30Send(msgs, "idle")).toBe(false)
+    }
+    for (const content of [tagOffer, sendOffer]) {
+      const msgs = [{ role: "assistant", content }]
+      for (const awaiting of [isAwaitingFlow28Send, isAwaitingFlow29Move, isAwaitingFlow29Open]) expect(awaiting(msgs, "idle")).toBe(false)
+    }
+  })
+
+  it("uses confirm turns no other script or fake follow-up uses", () => {
+    for (const turn of [CONCEPT_FLOW30_TAG, CONCEPT_FLOW30_SEND]) {
+      expect(convKeys.has(turn)).toBe(false)
+      expect(CONCEPT_FAKE_FOLLOWUPS.has(turn)).toBe(false)
+      const users = Object.entries(CONVERSATIONS).filter(([k]) => k !== flow30.key).flatMap(([, turns]) => turns.filter((t) => t.role === "user").map((t) => t.content))
+      expect(users).not.toContain(turn)
+    }
+  })
+})
+
 describe("Resy Marketplace listing", () => {
   const resy = MARKETPLACE_SERVICES.find((s) => s.id === "resy")!
 
-  it("links flows 28 and 29", () => {
-    expect(resy.connected?.flowSlugs).toEqual(["28", "29"])
+  it("links flows 28, 29 and 30", () => {
+    expect(resy.connected?.flowSlugs).toEqual(["28", "29", "30"])
   })
 
-  it("promises nothing tonight's service or filling the book does not show", () => {
+  it("promises nothing the Resy flows do not show, and names no card brand", () => {
     const text = [resy.description, resy.overview, resy.connected?.message, ...(resy.highlights ?? []), ...(resy.sections ?? []).map((s) => s.body)].join(" ")
-    expect(text).not.toMatch(/deposit polic|end-of-night|per cover|guest email|Amex/i)
+    expect(text).not.toMatch(/deposit polic|end-of-night|per cover|Amex|Card Member/i)
   })
 
-  it("names every action flows 28 and 29 take, and asks before each", () => {
+  it("names every action the Resy flows take, and asks before each", () => {
     const canDo = resy.sections?.find((s) => s.title === "What Nanci can do")?.body ?? ""
-    for (const action of ["confirmation follow-up", "move a booking", "change availability", "Nanci asks before every change"]) expect(canDo).toContain(action)
+    for (const action of ["confirmation follow-up", "move a booking", "change availability", "tags and notes", "guest emails", "Nanci asks before every change"]) expect(canDo).toContain(action)
     expect(resy.highlights).toContain("Move bookings and open tables, with your OK")
+    expect(resy.highlights).toContain("Guest profiles with tags, notes and the cards guests pay with")
+    expect(resy.highlights).toContain("Tags, notes and thank-you emails drafted for your OK")
   })
 })

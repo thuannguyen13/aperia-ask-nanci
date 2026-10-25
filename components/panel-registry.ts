@@ -37,6 +37,8 @@ import { ResyWaitlistPanel } from "./ask-nanci/concept/ResyWaitlistPanel"
 import { ResyChangePanel } from "./ask-nanci/concept/ResyChangePanel"
 import { ResyNotifyPanel } from "./ask-nanci/concept/ResyNotifyPanel"
 import { ResyAvailabilityPanel } from "./ask-nanci/concept/ResyAvailabilityPanel"
+import { ResyGuestsPanel } from "./ask-nanci/concept/ResyGuestsPanel"
+import { ResyOutreachPanel } from "./ask-nanci/concept/ResyOutreachPanel"
 import { DashboardInsightPanel } from "@/components/risk/dashboard/DashboardInsightPanel"
 import { Dashboard as RiskDashboard } from "@/components/risk/dashboard/Dashboard"
 import { DetectionQueue as RiskDetectionQueue } from "@/components/risk/DetectionQueue"
@@ -94,6 +96,8 @@ export const PANELS = {
   "resy-change":         { component: ResyChangePanel,        label: "Move a booking" },
   "resy-notify":         { component: ResyNotifyPanel,        label: "Notify" },
   "resy-availability":   { component: ResyAvailabilityPanel,  label: "Open tables" },
+  "resy-guest":          { component: ResyGuestsPanel,        label: "Guest profile" },
+  "resy-outreach":       { component: ResyOutreachPanel,      label: "Thank-you email" },
   "dashboard-insight":   { component: DashboardInsightPanel,  label: "Dashboard Insight" },
   "detection-queue-insight": { component: DetectionQueueInsightPanel, label: "Queue Insight" },
   // Aperia Risk destinations — every risk UI is a registered panel.
