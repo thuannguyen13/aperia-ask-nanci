@@ -1250,7 +1250,6 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       content: `${GUEST.name}, party of ${GUEST.party} in booth ${GUEST.booth}, ${spellCount(GUEST.flagship.visits)} visits since ${GUEST.firstVisit}, the last on ${GUEST.lastVisit}. He averages ${formatWholeCurrency(GUEST.flagship.averageSpend)} a visit, and he's paid with an Amex on ${GUEST.amexChecks} of the ${GUEST.matchedChecks} checks I could match. Amex cards are ${Math.round(Number(CARD_BRANDS.amexSharePct))}% of your card sales this month and average ${formatWholeCurrency(CARD_BRANDS.amex.averagePayment)} a payment, against ${formatWholeCurrency(CARD_BRANDS.other.averagePayment)} for other cards.`,
       panel: "resy-guest",
       closePanel: "resy-outreach",
-      revealPanel: true,
       source: "Resy guestbook + card transactions",
     },
     { role: "user", content: CONCEPT_FLOW30_TAG_ASK },

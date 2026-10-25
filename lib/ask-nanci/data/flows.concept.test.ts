@@ -320,8 +320,10 @@ describe("flow 30, know your guests", () => {
   })
 
   it("opens the profile, proposes on it, marks it done, then opens and sends the email", () => {
-    expect(script[1]).toMatchObject({ panel: "resy-guest", closePanel: "resy-outreach", revealPanel: true, source: "Resy guestbook + card transactions" })
+    expect(script[1]).toMatchObject({ panel: "resy-guest", closePanel: "resy-outreach", source: "Resy guestbook + card transactions" })
+    // Only steps whose panel holds a confirm raise the phone sheet.
     expect(script[1].view).toBeUndefined()
+    expect(script[1].revealPanel).toBeUndefined()
     expect(script[3]).toMatchObject({ panel: "resy-guest", view: "proposed", revealPanel: true, source: "Resy guestbook" })
     expect(script[5]).toMatchObject({ panel: "resy-guest", view: "done", source: "Resy guestbook" })
     expect(script[7]).toMatchObject({ panel: "resy-outreach", closePanel: "resy-guest", revealPanel: true, source: "Resy guestbook + card transactions" })
