@@ -10,12 +10,13 @@ import { CARD_FIGURES } from "./panels/credit-card-offer";
 // Flow 24 does the same with the location review figures.
 import { REVIEW_TOTAL_SALES, REVIEW_TOTAL_CHANGE_PCT, REVIEW_LEADER, REVIEW_WATCH, REVIEW_LOCATIONS, WATCH_TRANSACTIONS, REVIEW_SALES_CHART, REVIEW_TREND_CHART, averageTicket } from "./panels/location-review";
 // Flow 28 does the same with the Tallis figures: tonight's book and October's no-shows.
-import { CARD_PER_COVER, FEES_CHARGED, NO_SHOW_COST, UNCONFIRMED_NO_SHOW_PCT, CONFIRMED_NO_SHOW_PCT, CARD_BRANDS } from "./panels/resy-group";
+import { CARD_PER_COVER, FEES_CHARGED, NO_SHOW_COST, UNCONFIRMED_NO_SHOW_PCT, CONFIRMED_NO_SHOW_PCT, CARD_BRANDS, FEE_POLICY } from "./panels/resy-group";
 import { BOOK_COVERS, BOOK_PARTIES, BOOK_PEAK, LARGE_PARTIES, TO_KNOW, CELEBRATIONS, UNCONFIRMED, UNCONFIRMED_COVERS, LARGEST_UNCONFIRMED, partiesWithReply, coversWithReply, WAITING, WAITING_GUESTS, WAIT_SUMMARY, LEFT_QUOTES, quoteFor } from "./panels/resy-tonight";
 // Flow 29 does the same with Friday's figures: the move, Notify and the open tables.
 import { MOVE, MOVE_TABLE, PACING_CHECK, REBOOK, NOTIFY_PARTIES, NOTIFY_GUESTS, PEAK_WINDOW, RELEASED_TABLES, AVAILABILITY, OPEN_INCREMENT, FOUR_TOP_SEAT_HOUR, HELD_EMPTY_PCT, HELD_SEAT_HOUR, POST_OPEN, STILL_OPEN } from "./panels/resy-friday";
 // Flow 30 does the same with the guestbook and October's card brands.
 import { GUEST, GUEST_UPDATE, SEGMENT, TOP_FIVE_TOTAL } from "./panels/resy-guests";
+import { NO_SHOW_BOOKING, NO_SHOW_FEE, FEES_AFTER_CHARGE, EVENTS, EVENT_TOTALS, WINE_DINNER, NIGHT_SPEND_PER_GUEST } from "./panels/resy-deposits";
 import { formatWholeCurrency } from "../../../components/shared/format";
 import { inScope, type FlowScope } from "./flow-scopes";
 import { isAwaitingTurn } from "../is-awaiting-turn";
@@ -77,6 +78,12 @@ const CONCEPT_FLOW30_THANK = "Thank everyone who celebrated an anniversary with 
 // these same turns, so each button and its chip advance the flow the same way.
 export const CONCEPT_FLOW30_TAG = "Yes.";
 export const CONCEPT_FLOW30_SEND = "Send.";
+const CONCEPT_FLOW31_PROMPT = "Did we charge the no-show fee for last night's 7:30 four-top?";
+const CONCEPT_FLOW31_DISPUTE = "If they dispute it, are we covered?";
+const CONCEPT_FLOW31_EVENTS = "How many seats are left for the wine dinner?";
+// Flow 31's confirm step. ResyFeePanel's Charge button sends this same turn, so the
+// button and the chip advance the flow the same way.
+export const CONCEPT_FLOW31_CHARGE = "Charge it.";
 // Both offer flows share the same accept/decline pills (matched per-active-flow, so
 // reuse is safe). "No, ignore for now" is decorative — registered as a fake follow-up.
 const CONCEPT_OFFER_YES = "Yes, show me";
@@ -432,6 +439,16 @@ export const FLOW_DEFS: FlowDef[] = [
     description: "Saturday at the Tallis flagship: the guest at 8:15 and the cards he pays with, a Regular tag and an allergy note saved with your OK, then a thank-you to September's anniversary guests, sent with your OK. A concept: no Resy connection exists.",
   },
   {
+    num: 31,
+    section: "merchant",
+    title: "No-show fees and events",
+    badge: "Resy",
+    key: CONCEPT_FLOW31_PROMPT,
+    slug: "31",
+    scope: "resy",
+    description: "Saturday at the Tallis flagship: last night's no-show fee charged with your OK, the evidence pack if the guest disputes it, then the seats left across three ticketed events and how each kind of money reaches your bank. A concept: no Resy connection exists.",
+  },
+  {
     num: 27,
     section: "merchant",
     title: "Connect Resy",
@@ -568,6 +585,13 @@ const FLOW30_ASK_TO_SEND = `${SEGMENT.parties} parties marked an anniversary in 
 export const isAwaitingFlow30Tag = (messages: { role: string; content: string }[], chatState: string) => isAwaitingTurn(messages, chatState, FLOW30_ASK_TO_TAG);
 /** True while flow 30 is parked on its send confirm, with the draft as the last message. */
 export const isAwaitingFlow30Send = (messages: { role: string; content: string }[], chatState: string) => isAwaitingTurn(messages, chatState, FLOW30_ASK_TO_SEND);
+
+// The answer that offers flow 31's charge. The confirm waits on its turn only while the
+// offer is the last thing in the chat.
+const FLOW31_ASK_TO_CHARGE = `Not yet. The ${NO_SHOW_BOOKING.guest} party booked under your ${formatWholeCurrency(FEE_POLICY.perGuest)}-a-guest policy, confirmed by text on Thursday and never arrived, so ${formatWholeCurrency(NO_SHOW_FEE)} is eligible in Resy. Want me to charge the card on file?`;
+
+/** True while flow 31 is parked on its charge confirm, with the offer as the last message. */
+export const isAwaitingFlow31Charge = (messages: { role: string; content: string }[], chatState: string) => isAwaitingTurn(messages, chatState, FLOW31_ASK_TO_CHARGE);
 
 export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
   // Aperia Risk theme — landing quick-action / Nanci's-take chat answers.
@@ -1285,6 +1309,47 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       panel: "resy-outreach",
       view: "done",
       source: "Resy messages",
+    },
+  ],
+
+  // ── Flow 31: No-show fees and events (Resy concept) ────────────────────────
+  // Today at the Tallis flagship: last night's no-show fee, charged with the owner's
+  // OK, its evidence pack, then the ticketed events and how their money reaches the
+  // bank. The charge is a scripted confirm turn, sent by the chip or the panel's
+  // button. Figures are quoted from data/panels/resy-deposits.ts and resy-group.ts.
+  [CONCEPT_FLOW31_PROMPT]: [
+    { role: "user", content: CONCEPT_FLOW31_PROMPT },
+    {
+      role: "assistant",
+      content: FLOW31_ASK_TO_CHARGE,
+      panel: "resy-fee",
+      closePanel: "resy-events",
+      revealPanel: true,
+      source: "Resy reservations",
+    },
+    { role: "user", content: CONCEPT_FLOW31_CHARGE },
+    {
+      role: "assistant",
+      content: `Charged. It pays out through your Stripe account, the one Resy charges through, so it won't appear in your card deposits here. October's fees are now ${formatWholeCurrency(FEES_AFTER_CHARGE)}.`,
+      panel: "resy-fee",
+      view: "charged",
+      source: "Resy reservations",
+    },
+    { role: "user", content: CONCEPT_FLOW31_DISPUTE },
+    {
+      role: "assistant",
+      content: `You have a strong case. They booked on ${NO_SHOW_BOOKING.bookedOn} and accepted the policy with a card on file. They replied CONFIRM to Thursday's text, and Resy shows no cancellation. I've put it into one evidence pack. A dispute on this charge arrives in Stripe, not your card processing, so that's where you'd upload it.`,
+      panel: "resy-fee",
+      view: "evidence",
+      source: "Resy reservations + messages",
+    },
+    { role: "user", content: CONCEPT_FLOW31_EVENTS },
+    {
+      role: "assistant",
+      content: `${capitalize(spellCount(WINE_DINNER.open))} of ${WINE_DINNER.seats} for the ${WINE_DINNER.date.slice(4)} Harvest dinner, and ${WINE_DINNER.addOn?.sold} guests added the ${WINE_DINNER.addOn?.label}, so ${formatWholeCurrency(WINE_DINNER.soldValue)} is already sold. Across your ${spellCount(EVENTS.length)} events through New Year's you've sold ${formatWholeCurrency(EVENT_TOTALS.soldValue)}, which reaches your bank through Stripe as each ticket sells. The ${EVENT_TOTALS.open} open seats are worth ${formatWholeCurrency(EVENT_TOTALS.openValue)} more, and on-the-night spend goes through your card processing and settles the next business day: ${formatWholeCurrency(NIGHT_SPEND_PER_GUEST)} a guest at last year's wine dinner.`,
+      panel: "resy-events",
+      closePanel: "resy-fee",
+      source: "Resy events + card transactions",
     },
   ],
 };
