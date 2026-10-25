@@ -41,6 +41,9 @@ import { ResyGuestsPanel } from "./ask-nanci/concept/ResyGuestsPanel"
 import { ResyOutreachPanel } from "./ask-nanci/concept/ResyOutreachPanel"
 import { ResyFeePanel } from "./ask-nanci/concept/ResyFeePanel"
 import { ResyEventsPanel } from "./ask-nanci/concept/ResyEventsPanel"
+import { ResyReportPanel } from "./ask-nanci/concept/ResyReportPanel"
+import { ResySurveysPanel } from "./ask-nanci/concept/ResySurveysPanel"
+import { ResyLocationsPanel } from "./ask-nanci/concept/ResyLocationsPanel"
 import { DashboardInsightPanel } from "@/components/risk/dashboard/DashboardInsightPanel"
 import { Dashboard as RiskDashboard } from "@/components/risk/dashboard/Dashboard"
 import { DetectionQueue as RiskDetectionQueue } from "@/components/risk/DetectionQueue"
@@ -102,6 +105,9 @@ export const PANELS = {
   "resy-outreach":       { component: ResyOutreachPanel,      label: "Thank-you email" },
   "resy-fee":            { component: ResyFeePanel,           label: "No-show fee" },
   "resy-events":         { component: ResyEventsPanel,        label: "Events" },
+  "resy-report":         { component: ResyReportPanel,        label: "Week report" },
+  "resy-surveys":        { component: ResySurveysPanel,       label: "Surveys" },
+  "resy-locations":      { component: ResyLocationsPanel,     label: "Locations" },
   "dashboard-insight":   { component: DashboardInsightPanel,  label: "Dashboard Insight" },
   "detection-queue-insight": { component: DetectionQueueInsightPanel, label: "Queue Insight" },
   // Aperia Risk destinations — every risk UI is a registered panel.
