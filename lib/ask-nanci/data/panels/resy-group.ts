@@ -24,13 +24,26 @@ interface FlagshipWeek {
   noShows: number // Resy no-show covers
   walkIns: number
   cardSales: number // processor card sales, before tips
+  amexSales: number // processor sales on Amex cards, before tips
+  // Authored only for the two weeks flow 32 compares.
+  turnMinutes?: number // Resy Timing, average turn
+  cancellations?: number // Resy cancellations
+  repeatPct?: number // share of parties who are repeat guests
 }
 
+type ComparedWeek = Required<FlagshipWeek>
+
+const PRIOR_WEEK: ComparedWeek = { label: "Oct 10–16", nights: 6, booked: 1045, noShows: 41, walkIns: 210, cardSales: 94690, amexSales: 28028, turnMinutes: 107, cancellations: 71, repeatPct: 35 }
+const LATEST_WEEK: ComparedWeek = { label: "Oct 17–23", nights: 6, booked: 1128, noShows: 36, walkIns: 220, cardSales: 102330, amexSales: 33155, turnMinutes: 101, cancellations: 58, repeatPct: 38 }
+
 export const FLAGSHIP_WEEKS: FlagshipWeek[] = [
-  { label: "Oct 1–9", nights: 8, booked: 1222, noShows: 41, walkIns: 221, cardSales: 109358 },
-  { label: "Oct 10–16", nights: 6, booked: 1045, noShows: 41, walkIns: 210, cardSales: 94690 },
-  { label: "Oct 17–23", nights: 6, booked: 1128, noShows: 36, walkIns: 220, cardSales: 102330 },
+  { label: "Oct 1–9", nights: 8, booked: 1222, noShows: 41, walkIns: 221, cardSales: 109358, amexSales: 33863 },
+  PRIOR_WEEK,
+  LATEST_WEEK,
 ]
+
+/** The weeks flow 32 compares: the last seven days against the seven before. */
+export const COMPARED_WEEKS = { prior: PRIOR_WEEK, latest: LATEST_WEEK }
 
 const sumWeeks = (pick: (w: FlagshipWeek) => number) => FLAGSHIP_WEEKS.reduce((total, w) => total + pick(w), 0)
 
@@ -77,9 +90,10 @@ export const NO_SHOW_NET = NO_SHOW_COST - FEES_CHARGED
 // ─── October card sales by card brand (processor) ─────────────────────────────
 
 // The processor carries the brand of the card that paid, so this is Amex cards on the
-// flagship's card processing, not who is a Card Member. Authored: Amex's transactions
-// and amount, and the other brands' transaction count. Other brands' sales are the rest.
-const AMEX_OCTOBER = { transactions: 511, sales: 95046 }
+// flagship's card processing, not who is a Card Member. Authored: Amex's transactions,
+// the other brands' transaction count and the weekly Amex amounts, which sum to Amex's
+// sales. Other brands' sales are the rest.
+const AMEX_OCTOBER = { transactions: 511, sales: sumWeeks((w) => w.amexSales) }
 const OTHER_TRANSACTIONS = 1601
 
 const averagePayment = (sales: number, transactions: number) => Math.round(sales / transactions)
