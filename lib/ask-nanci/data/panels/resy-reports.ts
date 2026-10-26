@@ -25,6 +25,9 @@ const salesChange = changePct(latest.cardSales, prior.cardSales)
 const turnChange = latest.turnMinutes - prior.turnMinutes
 const amexShare = { prior: share(prior.amexSales, prior.cardSales), latest: share(latest.amexSales, latest.cardSales) }
 
+/** The week panel's title, shared by its header and the card its answer leaves in the chat. */
+export const WEEK_TITLE = "Week Report"
+
 export const WEEK_REPORT = {
   latest: latest.label,
   prior: prior.label,

@@ -1,5 +1,7 @@
 "use client"
 
+import type { LucideIcon } from "lucide-react"
+import { Alert, AlertDescription, AlertTitle } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 
 type CalloutVariant = "red" | "amber" | "green" | "blue"
@@ -14,10 +16,22 @@ const VARIANT_CLS: Record<CalloutVariant, string> = {
 interface CalloutProps {
   variant: CalloutVariant
   className?: string
+  /** With a title, the callout is the design system's Alert: icon, title, then a muted body. */
+  icon?: LucideIcon
+  title?: React.ReactNode
   children: React.ReactNode
 }
 
-export function Callout({ variant, className, children }: CalloutProps) {
+export function Callout({ variant, className, icon: Icon, title, children }: CalloutProps) {
+  if (title) {
+    return (
+      <Alert className={cn("rounded-xl", VARIANT_CLS[variant], className)}>
+        {Icon && <Icon />}
+        <AlertTitle>{title}</AlertTitle>
+        <AlertDescription className="[&_p:not(:last-child)]:mb-0.5">{children}</AlertDescription>
+      </Alert>
+    )
+  }
   return (
     <div className={cn("rounded-xl border px-4 py-3 text-sm", VARIANT_CLS[variant], className)}>
       {children}

@@ -51,6 +51,11 @@ import { DetectionQueueInsightPanel } from "@/components/risk/DetectionQueueInsi
 import { BarometerReport as RiskBarometer } from "@/components/risk/BarometerReport"
 import { RiskReport as RiskRiskReport } from "@/components/risk/RiskReport"
 import { AssignmentManagement as RiskAssignments } from "@/components/risk/AssignmentManagement"
+import { SHIFT_TITLE, CONFIRM_TITLE, WAITLIST_TITLE } from "@/lib/ask-nanci/data/panels/resy-tonight"
+import { MOVE_TITLE, NOTIFY_TITLE, OPEN_TITLE } from "@/lib/ask-nanci/data/panels/resy-friday"
+import { GUEST_TITLE } from "@/lib/ask-nanci/data/panels/resy-guests"
+import { FEE_TITLE } from "@/lib/ask-nanci/data/panels/resy-deposits"
+import { WEEK_TITLE } from "@/lib/ask-nanci/data/panels/resy-reports"
 
 // The single registry of concept panels. Add a panel here (+ its component) and it
 // becomes renderable everywhere — `PanelId` is derived from these keys, so there is
@@ -95,17 +100,17 @@ export const PANELS = {
   "busiest-times":       { component: BusiestTimesPanel,      label: "Busiest Times" },
   "slowest-windows":     { component: SlowestWindowsPanel,    label: "Slowest Windows" },
   "location-review":     { component: LocationReviewPanel,    label: "Location Review" },
-  "resy-shift":          { component: ResyShiftPanel,         label: "Tonight" },
-  "resy-confirm":        { component: ResyConfirmPanel,       label: "Confirmations" },
-  "resy-waitlist":       { component: ResyWaitlistPanel,      label: "Waitlist" },
-  "resy-change":         { component: ResyChangePanel,        label: "Move a booking" },
-  "resy-notify":         { component: ResyNotifyPanel,        label: "Notify" },
-  "resy-availability":   { component: ResyAvailabilityPanel,  label: "Open tables" },
-  "resy-guest":          { component: ResyGuestsPanel,        label: "Guest profile" },
+  "resy-shift":          { component: ResyShiftPanel,         label: SHIFT_TITLE },
+  "resy-confirm":        { component: ResyConfirmPanel,       label: CONFIRM_TITLE },
+  "resy-waitlist":       { component: ResyWaitlistPanel,      label: WAITLIST_TITLE },
+  "resy-change":         { component: ResyChangePanel,        label: MOVE_TITLE },
+  "resy-notify":         { component: ResyNotifyPanel,        label: NOTIFY_TITLE },
+  "resy-availability":   { component: ResyAvailabilityPanel,  label: OPEN_TITLE },
+  "resy-guest":          { component: ResyGuestsPanel,        label: GUEST_TITLE },
   "resy-outreach":       { component: ResyOutreachPanel,      label: "Thank-you email" },
-  "resy-fee":            { component: ResyFeePanel,           label: "No-show fee" },
+  "resy-fee":            { component: ResyFeePanel,           label: FEE_TITLE },
   "resy-events":         { component: ResyEventsPanel,        label: "Events" },
-  "resy-report":         { component: ResyReportPanel,        label: "Week report" },
+  "resy-report":         { component: ResyReportPanel,        label: WEEK_TITLE },
   "resy-surveys":        { component: ResySurveysPanel,       label: "Surveys" },
   "resy-locations":      { component: ResyLocationsPanel,     label: "Locations" },
   "dashboard-insight":   { component: DashboardInsightPanel,  label: "Dashboard Insight" },

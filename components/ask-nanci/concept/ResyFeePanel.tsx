@@ -1,11 +1,11 @@
 "use client"
 
-import { cn } from "aperia-ds5/utils"
-import { FileText, Users } from "lucide-react"
+import { Alert, AlertDescription, Badge } from "aperia-ds5"
+import { CheckCheck, CircleAlert, FileText } from "lucide-react"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { CONCEPT_FLOW31_CHARGE, isAwaitingFlow31Charge } from "@/lib/ask-nanci/data/flows.concept"
 import { FEE_POLICY } from "@/lib/ask-nanci/data/panels/resy-group"
-import { NO_SHOW_BOOKING, NO_SHOW_FEE, FEES_AFTER_CHARGE, EVIDENCE_TIMELINE } from "@/lib/ask-nanci/data/panels/resy-deposits"
+import { FEE_TITLE, NO_SHOW_BOOKING, NO_SHOW_FEE, FEES_AFTER_CHARGE, EVIDENCE_TIMELINE } from "@/lib/ask-nanci/data/panels/resy-deposits"
 import { PanelShell, PanelHeader, PanelBody, Callout, formatWholeCurrency } from "@/components/shared"
 import { ResyConfirmCard } from "./ResyConfirmCard"
 
@@ -21,13 +21,13 @@ const STATUS = {
 
 function Booking({ status }: { status: keyof typeof STATUS }) {
   return (
-    <div className="rounded-xl border p-4">
-      <p className="text-base font-bold text-foreground">{NO_SHOW_BOOKING.guest} party</p>
-      <p className="flex items-center gap-1.5 text-xs tabular-nums text-muted-foreground">
-        {NO_SHOW_BOOKING.date}, {NO_SHOW_BOOKING.time} · <Users className="size-3.5" />Party of {NO_SHOW_BOOKING.party} · Table {NO_SHOW_BOOKING.table}
-      </p>
-      <p className="mt-3 text-sm text-foreground">Policy: {POLICY}.</p>
-      <span className={cn("mt-3 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium", STATUS[status].tone)}>{STATUS[status].text}</span>
+    <div className="space-y-1 rounded-lg border px-3 py-2.5 text-sm">
+      <div className="flex items-start justify-between gap-2">
+        <p className="font-medium text-foreground">{NO_SHOW_BOOKING.guest} Party</p>
+        <Badge className={STATUS[status].tone}>{STATUS[status].text}</Badge>
+      </div>
+      <p className="tabular-nums text-muted-foreground">{NO_SHOW_BOOKING.date}, {NO_SHOW_BOOKING.time} · Party of {NO_SHOW_BOOKING.party} · Table {NO_SHOW_BOOKING.table}</p>
+      <p className="text-foreground">Policy: {POLICY}.</p>
     </div>
   )
 }
@@ -45,13 +45,16 @@ function ProposedView() {
 function ChargedView() {
   return (
     <>
-      <Callout variant="green">
-        <p className="font-semibold">Charged {FEE}</p>
-        <p className="mt-1">Charged by you via Ask Nanci. Shows as charged on Resy&apos;s Xcl/No Show list.</p>
-        <p className="mt-1">It pays out through your Stripe account, not your card deposits.</p>
+      <Callout variant="green" icon={CheckCheck} title={`Charged ${FEE}`}>
+        <p>Charged by you via Ask Nanci.</p>
+        <p>Shows as charged on Resy&apos;s Xcl/No Show list.</p>
+        <p>It pays out through your Stripe account, not your card deposits.</p>
       </Callout>
       <Booking status="charged" />
-      <p className="rounded-lg bg-muted px-3 py-2 text-xs tabular-nums text-muted-foreground">October no-show fees: {formatWholeCurrency(FEES_AFTER_CHARGE)}</p>
+      <Alert>
+        <CircleAlert />
+        <AlertDescription className="text-foreground tabular-nums">October no-show fees: {formatWholeCurrency(FEES_AFTER_CHARGE)}</AlertDescription>
+      </Alert>
     </>
   )
 }
@@ -87,7 +90,7 @@ export function ResyFeePanel() {
 
   return (
     <PanelShell>
-      <PanelHeader title="No-show fee" subtitle="Resy reservations · pays out through your Stripe account" size="lg" onClose={() => closeDynamicPanel("resy-fee")} />
+      <PanelHeader title={FEE_TITLE} subtitle="Resy Reservations" size="lg" onClose={() => closeDynamicPanel("resy-fee")} />
       <PanelBody className="space-y-4">
         <Body />
       </PanelBody>

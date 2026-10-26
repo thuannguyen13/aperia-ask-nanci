@@ -1,91 +1,70 @@
 "use client"
 
-import { cn } from "aperia-ds5/utils"
-import { Check, Phone, Users, X } from "lucide-react"
+import { Badge } from "aperia-ds5"
+import { CalendarCheck, Check, CheckCheck, Clock4, Phone, Users, X } from "lucide-react"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { CONCEPT_FLOW28_SEND, isAwaitingFlow28Send } from "@/lib/ask-nanci/data/flows.concept"
 import { CARD_PER_COVER, FEES_CHARGED, MONTH_TO_DATE, NO_SHOW_COST, NO_SHOW_NET } from "@/lib/ask-nanci/data/panels/resy-group"
-import { BOOK_AFTER, BOOK_AS_OF, REPLIES_AS_OF, TONIGHT_DATE, UNCONFIRMED, UNCONFIRMED_COVERS, coversWithReply, partiesWithReply, type ConfirmReply, type UnconfirmedParty } from "@/lib/ask-nanci/data/panels/resy-tonight"
+import { BOOK_AFTER, BOOK_AS_OF, CONFIRM_TITLE, REPLIES_AS_OF, TONIGHT_DATE, UNCONFIRMED, coversWithReply, partiesWithReply, resyUpdatedAt, type ConfirmReply, type UnconfirmedParty } from "@/lib/ask-nanci/data/panels/resy-tonight"
 import { formatWholeCurrency } from "@/components/shared/format"
-import { PanelShell, PanelHeader, PanelBody } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody, PanelItem, StatCard, Callout } from "@/components/shared"
 import { ResyConfirmCard } from "./ResyConfirmCard"
 
 // How each reply to Resy's follow-up shows on its row, in the sent view only.
-const REPLY_STATUS: Record<ConfirmReply, { label: string; className: string; icon: typeof Check; note?: (p: UnconfirmedParty) => string }> = {
-  confirmed: { label: "Confirmed", className: "bg-green-50 text-green-700 dark:bg-green-950/30 dark:text-green-400", icon: Check },
-  cancelled: { label: "Cancelled", className: "bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-400", icon: X, note: (p) => `Resy alerted the Notify list for ${p.time}.` },
-  none: { label: "No reply · call", className: "bg-amber-50 text-amber-800 dark:bg-amber-950/30 dark:text-amber-300", icon: Phone },
+const REPLY_STATUS: Record<ConfirmReply, { label: string; variant: "default" | "destructive"; className?: string; icon: typeof Check; note?: (p: UnconfirmedParty) => string }> = {
+  confirmed: { label: "Confirmed", variant: "default", className: "bg-green-50 text-green-700 dark:bg-green-950/30 dark:text-green-400", icon: Check },
+  cancelled: { label: "Cancelled", variant: "destructive", icon: X, note: (p) => `Resy alerted the Notify list for ${p.time}.` },
+  none: { label: "No reply · call", variant: "default", className: "bg-amber-50 text-amber-800 dark:bg-amber-950/30 dark:text-amber-300", icon: Phone },
 }
 
-// The header line for each view: the book before the follow-up, the replies after.
-const VIEW_SUBTITLE: Record<string, string> = {
-  proposed: `${UNCONFIRMED.length} parties, ${UNCONFIRMED_COVERS} covers · Resy book as of ${BOOK_AS_OF}`,
-  sent: `Replies as of ${REPLIES_AS_OF}`,
-}
+// The book before the follow-up, the replies after.
+const VIEW_AS_OF: Record<string, string> = { proposed: BOOK_AS_OF, sent: REPLIES_AS_OF }
 
-function CostStrip() {
+function CostCard() {
   return (
-    <div className="rounded-xl border bg-muted/40 p-3">
-      <p className="text-xs font-semibold text-muted-foreground">October so far</p>
-      <p className="mt-1 text-sm text-foreground tabular-nums">
-        {MONTH_TO_DATE.noShows} no-show covers × {formatWholeCurrency(CARD_PER_COVER)} = {formatWholeCurrency(NO_SHOW_COST)}, less {formatWholeCurrency(FEES_CHARGED)} in fees charged in Resy
-      </p>
-      <p className="mt-1 text-base font-bold text-foreground tabular-nums">{formatWholeCurrency(NO_SHOW_NET)} net</p>
+    <StatCard
+      size="lg"
+      label="Month to Date"
+      sublabel={`${MONTH_TO_DATE.noShows} no-show covers × ${formatWholeCurrency(CARD_PER_COVER)} = ${formatWholeCurrency(NO_SHOW_COST)}, less ${formatWholeCurrency(FEES_CHARGED)} in fees charged in Resy`}
+      value={`${formatWholeCurrency(NO_SHOW_NET)} net`}
+    />
+  )
+}
+
+function ReplyStatus({ party }: { party: UnconfirmedParty }) {
+  const status = REPLY_STATUS[party.reply]
+  const Icon = status.icon
+  return (
+    <div className="flex min-w-0 flex-1 flex-col items-end gap-1 text-right">
+      <Badge variant={status.variant} className={status.className}><Icon />{status.label}</Badge>
+      {status.note && <p className="text-xs text-muted-foreground">{status.note(party)}</p>}
     </div>
   )
 }
 
-function ReplyChip({ party }: { party: UnconfirmedParty }) {
-  const status = REPLY_STATUS[party.reply]
-  const Icon = status.icon
-  return (
-    <span className={cn("inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium", status.className)}>
-      <Icon className="size-3.5" />{status.label}
-    </span>
-  )
-}
-
 function ConfirmRow({ party, showReply }: { party: UnconfirmedParty; showReply: boolean }) {
-  const note = REPLY_STATUS[party.reply].note
   return (
-    <li className="px-4 py-3">
-      <div className="flex items-center gap-3">
-        <span className="w-10 shrink-0 text-sm font-semibold tabular-nums text-foreground">{party.time}</span>
-        <p className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">{party.name}</p>
-        <span className="flex shrink-0 items-center gap-1 text-xs tabular-nums text-muted-foreground"><Users className="size-3.5" />{party.party}</span>
-        <span className="w-16 shrink-0 text-right text-xs text-muted-foreground">Booked {party.booked}</span>
-      </div>
-      {showReply && (
-        <div className="mt-1.5 flex flex-wrap items-center gap-2 pl-13">
-          <ReplyChip party={party} />
-          {note && <p className="text-xs text-muted-foreground">{note(party)}</p>}
+    <li>
+      <PanelItem icon={Clock4}>
+        {/* Equal columns, as in the design: three before the follow-up, four after. */}
+        <div className="min-w-0 flex-1 space-y-1">
+          <p className="truncate text-sm leading-4 font-medium text-foreground">{party.name}</p>
+          <p className="text-xs text-muted-foreground tabular-nums">{party.time} PM</p>
         </div>
-      )}
+        <p className="hidden min-w-0 flex-1 self-center text-xs text-muted-foreground sm:block">Booked {party.booked}</p>
+        <span className="flex min-w-0 flex-1 items-center gap-1 self-center text-xs tabular-nums text-foreground"><Users className="size-4 text-muted-foreground" />{party.party}</span>
+        {showReply && <ReplyStatus party={party} />}
+      </PanelItem>
     </li>
-  )
-}
-
-function ProposedCard() {
-  return (
-    <ResyConfirmCard
-      title={`Send Resy's confirmation follow-up to ${UNCONFIRMED.length} parties for tonight.`}
-      detail="Guests reply CONFIRM or CANCEL, and Resy updates each booking. Nothing is sent until you confirm."
-      buttonLabel="Send"
-      awaiting={isAwaitingFlow28Send}
-      onConfirmTurn={CONCEPT_FLOW28_SEND}
-    />
   )
 }
 
 function SentSummary() {
   return (
-    <div className="rounded-xl border border-green-200 bg-green-50 p-4 text-green-800 dark:border-green-800 dark:bg-green-950/20 dark:text-green-300">
-      <p className="text-sm font-semibold">Follow-up sent through Resy for {TONIGHT_DATE}.</p>
-      <p className="mt-1 text-sm">
-        {partiesWithReply("confirmed").length} confirmed ({coversWithReply("confirmed")} covers), {partiesWithReply("cancelled").length} cancelled, {partiesWithReply("none").length} to call.
-      </p>
-      <p className="mt-2 text-base font-bold tabular-nums">The book now reads {BOOK_AFTER.covers} covers, {BOOK_AFTER.parties} parties.</p>
-    </div>
+    <Callout variant="green" icon={CheckCheck} title={`Follow-up sent through Resy for ${TONIGHT_DATE}.`}>
+      <p>{partiesWithReply("confirmed").length} confirmed ({coversWithReply("confirmed")} covers), {partiesWithReply("cancelled").length} cancelled, {partiesWithReply("none").length} to call.</p>
+      <p className="text-base font-semibold text-green-700 tabular-nums dark:text-green-400">The book now reads {BOOK_AFTER.covers} covers, {BOOK_AFTER.parties} parties.</p>
+    </Callout>
   )
 }
 
@@ -97,20 +76,27 @@ export function ResyConfirmPanel() {
   return (
     <PanelShell>
       <PanelHeader
-        title="Unconfirmed tonight"
-        subtitle={VIEW_SUBTITLE[view]}
+        title={CONFIRM_TITLE}
+        subtitle={resyUpdatedAt(VIEW_AS_OF[view])}
         size="lg"
         onClose={() => closeDynamicPanel("resy-confirm")}
       />
 
       <PanelBody className="space-y-4">
-        <CostStrip />
-        {isSent ? <SentSummary /> : <ProposedCard />}
-        <div className="rounded-xl border">
-          <ul className="divide-y">
-            {UNCONFIRMED.map((p) => <ConfirmRow key={p.name} party={p} showReply={isSent} />)}
-          </ul>
-        </div>
+        <CostCard />
+        {isSent ? <SentSummary /> : (
+          <ResyConfirmCard
+            icon={CalendarCheck}
+            title={`Send Resy's confirmation follow-up to ${UNCONFIRMED.length} parties for tonight.`}
+            detail="Guests reply CONFIRM or CANCEL, and Resy updates each booking. Nothing is sent until you confirm."
+            buttonLabel="Send"
+            awaiting={isAwaitingFlow28Send}
+            onConfirmTurn={CONCEPT_FLOW28_SEND}
+          />
+        )}
+        <ul className="space-y-2">
+          {UNCONFIRMED.map((p) => <ConfirmRow key={p.name} party={p} showReply={isSent} />)}
+        </ul>
       </PanelBody>
     </PanelShell>
   )

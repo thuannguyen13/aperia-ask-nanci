@@ -10,6 +10,14 @@ export const BOOK_AS_OF = "3:00pm"
 export const REPLIES_AS_OF = "3:03pm"
 export const WAITLIST_AS_OF = "7:40pm"
 
+// Each panel's title, shared by its header and the card its answer leaves in the chat.
+export const SHIFT_TITLE = "Saturday, Oct 24 · Dinner"
+export const CONFIRM_TITLE = "Unconfirmed Bookings"
+export const WAITLIST_TITLE = "Walk-in Waitlist"
+
+/** The panel subtitle naming Resy as the source: "3:00pm" reads "Resy, updated 3:00 PM". */
+export const resyUpdatedAt = (time: string) => `Resy, updated ${time.replace(/(am|pm)$/, " $1").toUpperCase()}`
+
 // ─── Tonight's book ───────────────────────────────────────────────────────────
 
 const SLOTS_RAW: [string, number][] = [

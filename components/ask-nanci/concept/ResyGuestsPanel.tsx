@@ -1,12 +1,12 @@
 "use client"
 
-import { cn } from "aperia-ds5/utils"
-import { CreditCard, Users } from "lucide-react"
+import { Alert, AlertDescription, Avatar, AvatarFallback, Badge } from "aperia-ds5"
+import { CheckCheck, CircleAlert, User } from "lucide-react"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { CONCEPT_FLOW30_TAG, isAwaitingFlow30Tag } from "@/lib/ask-nanci/data/flows.concept"
 import { CARD_BRANDS, MONTH_TO_DATE } from "@/lib/ask-nanci/data/panels/resy-group"
-import { GUEST, GUEST_UPDATE } from "@/lib/ask-nanci/data/panels/resy-guests"
-import { PanelShell, PanelHeader, PanelBody, Callout, formatWholeCurrency } from "@/components/shared"
+import { GUEST, GUEST_TITLE, GUEST_UPDATE } from "@/lib/ask-nanci/data/panels/resy-guests"
+import { PanelShell, PanelHeader, PanelBody, Callout, StatCard, formatWholeCurrency } from "@/components/shared"
 import { ResyConfirmCard } from "./ResyConfirmCard"
 
 // Tag chips share the tone classes the other Resy panels use for status pills.
@@ -21,59 +21,66 @@ const WHAT_CHANGES = `What changes in Resy: the tag and the guest note go on his
 const visitCount = (n: number) => `${n} visit${n === 1 ? "" : "s"}`
 const lifetimeSplit = () => `${formatWholeCurrency(GUEST.flagship.lifetime)} ${GUEST.flagship.venue} + ${formatWholeCurrency(GUEST.sister.lifetime)} ${GUEST.sister.venue}`
 
-function Stat({ label, value }: { label: string; value: string }) {
+function SummaryRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div>
-      <p className="text-muted-foreground">{label}</p>
-      <p className="font-semibold tabular-nums text-foreground">{value}</p>
+    <div className="flex gap-3 text-sm">
+      <p className="w-32 shrink-0 text-muted-foreground">{label}</p>
+      <div className="min-w-0 flex-1 space-y-1 text-foreground">{children}</div>
     </div>
   )
 }
 
-function Note({ text, byline }: { text: string; byline?: string }) {
+function ProfileSummary({ updated }: { updated: boolean }) {
+  const tags = updated ? [...GUEST.tags, GUEST_UPDATE.tag] : GUEST.tags
   return (
-    <div className="border-l-2 border-amber-400 pl-2.5">
-      <p className="text-sm text-foreground">{text}</p>
-      {byline && <p className="text-xs text-muted-foreground">{byline}</p>}
+    <div className="space-y-2 rounded-lg border p-3">
+      <p className="text-sm font-medium text-foreground">Profile Summary</p>
+      <SummaryRow label="Tags">
+        <div className="flex flex-wrap gap-1.5">
+          {tags.map((t) => <Badge key={t} className={TAG_TONE[t]}>{t}</Badge>)}
+        </div>
+      </SummaryRow>
+      <SummaryRow label="Note">
+        <p>{GUEST.note}</p>
+        {updated && <p>{GUEST_UPDATE.note} <span className="ml-1 text-xs text-muted-foreground">({GUEST_UPDATE.byline})</span></p>}
+      </SummaryRow>
     </div>
   )
 }
 
 function Profile({ updated }: { updated: boolean }) {
-  const tags = updated ? [...GUEST.tags, GUEST_UPDATE.tag] : GUEST.tags
   return (
-    <div className="rounded-xl border p-4">
-      <p className="text-base font-bold text-foreground">{GUEST.name}</p>
-      <p className="flex items-center gap-1.5 text-xs tabular-nums text-muted-foreground">
-        Tonight {GUEST.time} · <Users className="size-3.5" />Party of {GUEST.party} · Booth {GUEST.booth}
-      </p>
-      <div className="mt-3 flex flex-wrap gap-1.5">
-        {tags.map((t) => <span key={t} className={cn("rounded-full px-2.5 py-0.5 text-xs font-medium", TAG_TONE[t])}>{t}</span>)}
+    <div className="space-y-4 rounded-xl border p-4 shadow-xs">
+      <div className="flex items-center gap-3">
+        <Avatar size="lg"><AvatarFallback><User className="size-4" /></AvatarFallback></Avatar>
+        <div className="min-w-0">
+          <p className="text-base font-semibold text-foreground">{GUEST.name}</p>
+          <p className="text-sm tabular-nums text-muted-foreground">Tonight {GUEST.time} · Party of {GUEST.party} · Booth {GUEST.booth}</p>
+        </div>
       </div>
-      <div className="mt-3 space-y-2">
-        <Note text={GUEST.note} />
-        {updated && <Note text={GUEST_UPDATE.note} byline={GUEST_UPDATE.byline} />}
+      <ProfileSummary updated={updated} />
+      <div className="grid grid-cols-3 gap-3">
+        <StatCard size="lg" label="Visits" sublabel={`First visit in ${GUEST.firstVisit}`} value={String(GUEST.flagship.visits)} />
+        <StatCard size="lg" label="Avg. Spend" value={formatWholeCurrency(GUEST.flagship.averageSpend)} />
+        <StatCard size="lg" label="Last Visit" value={GUEST.lastVisit} />
       </div>
-      <div className="mt-3 grid grid-cols-3 gap-2 border-t pt-3 text-xs">
-        <Stat label="Visits" value={String(GUEST.flagship.visits)} />
-        <Stat label="Avg spend" value={formatWholeCurrency(GUEST.flagship.averageSpend)} />
-        <Stat label="Last visit" value={GUEST.lastVisit} />
+      <div className="space-y-1 text-sm">
+        <p className="text-muted-foreground">Paid with: Amex {GUEST.amexChecks} of {GUEST.matchedChecks} matched visits.</p>
+        <p className="text-muted-foreground">Also {visitCount(GUEST.sister.visits)} at {GUEST.sister.venue}, {formatWholeCurrency(GUEST.sister.averageSpend)} average.</p>
+        <p className="tabular-nums text-foreground">Lifetime spend across the group: {formatWholeCurrency(GUEST.lifetime)} ({lifetimeSplit()})</p>
       </div>
-      <p className="mt-2 text-xs text-muted-foreground">First visit in {GUEST.firstVisit}</p>
-      <p className="mt-3 flex items-center gap-1.5 border-t pt-3 text-sm font-medium text-foreground">
-        <CreditCard className="size-4 text-muted-foreground" />Paid with: Amex {GUEST.amexChecks} of {GUEST.matchedChecks} matched visits.
-      </p>
-      <p className="mt-2 text-sm text-muted-foreground">Also {visitCount(GUEST.sister.visits)} at {GUEST.sister.venue}, {formatWholeCurrency(GUEST.sister.averageSpend)} average.</p>
-      <p className="mt-1 text-sm tabular-nums text-foreground">Lifetime spend across the group: <span className="font-semibold">{formatWholeCurrency(GUEST.lifetime)}</span> ({lifetimeSplit()})</p>
     </div>
   )
 }
 
 function CardStrip() {
   return (
-    <p className="rounded-lg bg-muted px-3 py-2 text-xs tabular-nums text-muted-foreground">
-      October card sales: Amex {CARD_BRANDS.amexSharePct}% ({formatWholeCurrency(CARD_BRANDS.amex.sales)} of {formatWholeCurrency(MONTH_TO_DATE.cardSales)}), average payment {formatWholeCurrency(CARD_BRANDS.amex.averagePayment)} vs {formatWholeCurrency(CARD_BRANDS.other.averagePayment)}.
-    </p>
+    <Alert>
+      <CircleAlert />
+      <AlertDescription className="text-foreground tabular-nums">
+        October card sales: Amex {CARD_BRANDS.amexSharePct}% ({formatWholeCurrency(CARD_BRANDS.amex.sales)} of {formatWholeCurrency(MONTH_TO_DATE.cardSales)}), average payment {formatWholeCurrency(CARD_BRANDS.amex.averagePayment)} vs {formatWholeCurrency(CARD_BRANDS.other.averagePayment)}.
+      </AlertDescription>
+    </Alert>
   )
 }
 
@@ -94,9 +101,9 @@ function ProposedView() {
 function DoneView() {
   return (
     <>
-      <Callout variant="green">
-        <p className="font-semibold">Saved in Resy: the {GUEST_UPDATE.tag} tag and the guest note.</p>
-        <p className="mt-1">Visit note on tonight&apos;s {GUEST.time} booking: {GUEST_UPDATE.note}. {GUEST_UPDATE.byline}.</p>
+      <Callout variant="green" icon={CheckCheck} title={`Saved in Resy: the ${GUEST_UPDATE.tag} tag and the guest note.`}>
+        <p>Visit note on tonight&apos;s {GUEST.time} booking: {GUEST_UPDATE.note}.</p>
+        <p>{GUEST_UPDATE.byline}.</p>
       </Callout>
       <Profile updated />
     </>
@@ -112,7 +119,7 @@ export function ResyGuestsPanel() {
 
   return (
     <PanelShell>
-      <PanelHeader title="Guest profile" subtitle="Resy guestbook · card payments matched through your POS" size="lg" onClose={() => closeDynamicPanel("resy-guest")} />
+      <PanelHeader title={GUEST_TITLE} size="lg" onClose={() => closeDynamicPanel("resy-guest")} />
       <PanelBody className="space-y-4">
         <Body />
         <CardStrip />

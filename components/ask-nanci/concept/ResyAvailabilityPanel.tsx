@@ -1,10 +1,10 @@
 "use client"
 
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, CheckCheck } from "lucide-react"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { CONCEPT_FLOW29_OPEN, isAwaitingFlow29Open, spellCount, tableList } from "@/lib/ask-nanci/data/flows.concept"
-import { AVAILABILITY, FRIDAY_AS_OF, FRIDAY_DATE, FRIDAY_DATE_PLAIN, ONLINE_WINDOW, OPEN_INCREMENT, POST_OPEN, RELEASED_TABLES, SEAT_HOURS, STILL_OPEN, toTime } from "@/lib/ask-nanci/data/panels/resy-friday"
-import { PanelShell, PanelHeader, PanelBody, Callout, PanelTable, Thead, Th, Td, formatCurrency, formatWholeCurrency } from "@/components/shared"
+import { AVAILABILITY, FRIDAY_AS_OF, FRIDAY_DATE, FRIDAY_DATE_PLAIN, ONLINE_WINDOW, OPEN_INCREMENT, OPEN_TITLE, POST_OPEN, RELEASED_TABLES, SEAT_HOURS, STILL_OPEN, toTime } from "@/lib/ask-nanci/data/panels/resy-friday"
+import { PanelShell, PanelHeader, PanelBody, Callout, SectionHeader, PanelTable, Thead, Th, Td, formatCurrency, formatWholeCurrency } from "@/components/shared"
 import { ResyConfirmCard } from "./ResyConfirmCard"
 
 const PROPOSAL = `Change ${FRIDAY_DATE_PLAIN} dinner only. ${tableList(RELEASED_TABLES)} go online from ${ONLINE_WINDOW.from} to ${ONLINE_WINDOW.to}, and ${OPEN_INCREMENT} pacing goes from ${AVAILABILITY.pacing.before} to ${AVAILABILITY.pacing.after} covers. Other nights stay as they are.`
@@ -41,13 +41,13 @@ function ChangeRows() {
 function SeatHourTable() {
   return (
     <div>
-      <p className="mb-2 text-sm font-semibold text-foreground">Revenue per seat-hour, after card fees <span className="font-normal text-muted-foreground">· Fridays, October</span></p>
+      <SectionHeader title="Revenue per seat-hour, after card fees" description="Fridays, October" />
       <PanelTable>
         <Thead>
           <Th>Party</Th>
           <Th align="right">Turn</Th>
-          <Th align="right">Card sales per cover, after fees</Th>
-          <Th align="right">Per seat-hour</Th>
+          <Th align="right">Card Sales per Cover (after fees)</Th>
+          <Th align="right">Per Seat-Hour</Th>
         </Thead>
         <tbody>
           {SEAT_HOURS.map((r) => (
@@ -55,7 +55,7 @@ function SeatHourTable() {
               <Td>{r.tier}</Td>
               <Td align="right" className="tabular-nums">{toTime(r.turn)}</Td>
               <Td align="right" className="tabular-nums">{formatCurrency(r.afterFees)}</Td>
-              <Td align="right" className="font-semibold tabular-nums">{formatWholeCurrency(Math.round(r.perSeatHour))}</Td>
+              <Td align="right" className="tabular-nums">{formatWholeCurrency(Math.round(r.perSeatHour))}</Td>
             </tr>
           ))}
         </tbody>
@@ -70,12 +70,9 @@ function OpenConfirm() {
 
 function OpenDone() {
   return (
-    <Callout variant="green">
-      <p className="text-xs font-semibold">Shift override · {FRIDAY_DATE_PLAIN} only</p>
-      <p className="mt-1 text-sm font-semibold">{AVAILABILITY.fourTops.after} four-tops online at {OPEN_INCREMENT}</p>
-      <ul className="mt-2 space-y-1">
-        {TABLE_STATUS.map((t) => <li key={t.table} className="text-sm tabular-nums"><span className="font-semibold">T{t.table}</span> · {t.status}</li>)}
-      </ul>
+    <Callout variant="green" icon={CheckCheck} title={`${AVAILABILITY.fourTops.after} four-tops online at ${OPEN_INCREMENT}`}>
+      <p>Shift override · {FRIDAY_DATE_PLAIN} only</p>
+      {TABLE_STATUS.map((t) => <p key={t.table} className="text-green-700 tabular-nums dark:text-green-400"><span className="font-semibold">T{t.table}</span> · {t.status}</p>)}
     </Callout>
   )
 }
@@ -89,7 +86,7 @@ export function ResyAvailabilityPanel() {
 
   return (
     <PanelShell>
-      <PanelHeader title={`Open tables · ${OPEN_INCREMENT} PM`} subtitle={`${FRIDAY_DATE} · ${FRIDAY_AS_OF}`} size="lg" onClose={() => closeDynamicPanel("resy-availability")} />
+      <PanelHeader title={OPEN_TITLE} subtitle={`${FRIDAY_DATE} · ${FRIDAY_AS_OF}`} size="lg" onClose={() => closeDynamicPanel("resy-availability")} />
       <PanelBody className="space-y-4">
         <ChangeRows />
         <Body />
