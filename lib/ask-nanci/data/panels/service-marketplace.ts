@@ -48,8 +48,8 @@ export interface MarketplaceService {
   scope?: FlowScope;
   /** Replaces the "Add" label, for an integration that connects an account. */
   enableLabel?: string;
-  /** Once on: a line saying what changed, and the flows to try next (by embed slug). */
-  connected?: { message: string; flowSlugs: string[] };
+  /** Replaces the "Added" badge, for an integration that connects an account. */
+  enabledLabel?: string;
 }
 
 export const MARKETPLACE_DETAIL_LABELS = {
@@ -68,9 +68,10 @@ export const MARKETPLACE_SERVICES: MarketplaceService[] = [
     icon: CalendarCheck,
     title: "Resy",
     description: "Connect your Resy account so Ask Nanci can read your book, waitlist, Notify list, guestbook, events, surveys and reports, and act in Resy when you confirm.",
-    vendor: { name: "Resy", logo: null },
+    vendor: { name: "Resy", logo: "/logos/resy-logo.png" },
     scope: "resy",
     enableLabel: "Connect",
+    enabledLabel: "Connected",
     overview:
       "Resy runs your reservations, confirmations, waitlist, Notify list, guest profiles, events and guest surveys. Connected to Ask Nanci, it sits beside your card sales, so one question can answer from both. Ask how tonight looks, who's on Notify for Friday, who the guest at 8:15 is, how many seats are left for the wine dinner, or how this week compared with last.",
     highlights: [
@@ -91,10 +92,6 @@ export const MARKETPLACE_SERVICES: MarketplaceService[] = [
       { title: "What Nanci can do", body: "Send Resy's confirmation follow-up, move a booking, change availability, update tags and notes, charge a no-show fee, and send guest emails. Nanci asks before every change, and Resy records it as made through Ask Nanci." },
       { title: "About this demo", body: "A concept built on sample data. No connection to Resy exists." },
     ],
-    connected: {
-      message: "Resy is connected. Your book, confirmations, Notify list, guests, events, surveys and reports are now part of Ask Nanci.",
-      flowSlugs: ["28", "29", "30", "31", "32"],
-    },
   },
   {
     id: "portfolio-intelligence",

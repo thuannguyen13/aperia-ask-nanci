@@ -470,7 +470,7 @@ export const FLOW_DEFS: FlowDef[] = [
     key: "__resy_marketplace__",
     destination: "marketplace",
     scope: "resy",
-    description: "Open the Marketplace, find Resy and turn the integration on. Nanci then offers the first questions to ask.",
+    description: "Open the Marketplace, find Resy and connect it. The listing then shows Resy as Connected.",
   },
 ];
 
