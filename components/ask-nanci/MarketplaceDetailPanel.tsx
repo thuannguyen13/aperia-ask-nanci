@@ -42,18 +42,22 @@ export function ServiceMark({ service, size }: { service: MarketplaceService; si
 function MetaInfo({ service, enabled }: { service: MarketplaceService; enabled: boolean }) {
   const { vendor = MARKETPLACE_VENDOR, enabledLabel, disabledLabel = L.notAdded } = service
   const label = "text-[9px] font-bold uppercase tracking-[0.12em] text-muted-foreground"
-  if (service.logo) return (
-    <div className="flex min-w-0 flex-col items-start gap-1">
-      <p className={label}>{L.status}</p>
-      {enabled ? <AddedBadge label={enabledLabel} /> : <span className="text-sm font-medium text-foreground">{disabledLabel}</span>}
-    </div>
-  )
-  return (
+  const builtBy = (
     <div className="flex min-w-0 flex-col gap-1">
       <p className={label}>{L.builtBy}</p>
       <div className="flex items-center gap-1.5">
         {vendor.logo && <VendorLogo vendor={vendor} className="h-5 w-auto" />}
         <span className="truncate text-sm font-medium text-foreground">{vendor.name}</span>
+      </div>
+    </div>
+  )
+  if (!service.logo) return builtBy
+  return (
+    <div className="flex min-w-0 items-start gap-6">
+      {builtBy}
+      <div className="flex flex-col items-start gap-1">
+        <p className={label}>{L.status}</p>
+        {enabled ? <AddedBadge label={enabledLabel} /> : <span className="text-sm font-medium text-foreground">{disabledLabel}</span>}
       </div>
     </div>
   )
