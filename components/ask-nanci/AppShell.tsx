@@ -183,6 +183,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         autoPlay={autoPlay} genericBrand={genericBrand} intro={!!introSrc}
         initialView={fullApp ? "welcome" : undefined}
         initialMarketplaceOpen={autoPlay && !!embedLayout?.openMarketplace}
+        autoConnectListing={autoPlay ? embedLayout?.autoConnect : undefined}
       >
         <HostIntro src={introSrc}>
         <div
@@ -228,7 +229,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <ChatStreamProvider>
     {/* autoPlayFlow reaches the non-embed modes too, so ?autoplay composes with
         concept / tib / woodforest, not just the embed */}
-    <AskNanciProvider isConceptVersion={isConceptVersion} catalog={catalog} scope={scope} autoPlayFlow={autoPlayFlow} autoPlay={autoPlay} genericBrand={genericBrand} forceOnboarding={forceOnboarding} skipOnboarding={skipOnboarding || !!scope}>
+    <AskNanciProvider isConceptVersion={isConceptVersion} catalog={catalog} scope={scope} autoPlayFlow={autoPlayFlow} autoPlay={autoPlay} genericBrand={genericBrand} forceOnboarding={forceOnboarding} skipOnboarding={skipOnboarding || !!scope} initialMarketplaceOpen={autoPlay && !!embedLayout?.openMarketplace} autoConnectListing={autoPlay ? embedLayout?.autoConnect : undefined}>
       <AppFrame
         theme={theme}
         topBar={

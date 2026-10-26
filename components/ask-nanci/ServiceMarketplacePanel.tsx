@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Search, SearchX } from "lucide-react"
 import {
   Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle,
@@ -53,12 +53,28 @@ function ServiceCard({ service, enabled, selected, onClick }: { service: Marketp
  * while open and is toggled from the sidebar's Marketplace nav item.
  */
 export function ServiceMarketplacePanel() {
-  const { marketplaceOpen, scope, marketplaceEnabled: enabled, toggleMarketplaceService: toggle } = useAskNanci()
+  const { marketplaceOpen, scope, marketplaceEnabled: enabled, toggleMarketplaceService: toggle, autoConnectListing } = useAskNanci()
   // A scoped mode lists only its partner's listings; every other mode leaves those out.
   const listed = MARKETPLACE_SERVICES.filter(inScope(scope))
   const [query, setQuery] = useState("")
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const selected = listed.find((s) => s.id === selectedId) ?? null
+
+  // Nobody is driving under ?autoplay, so the page plays the connect: open the listing,
+  // then press Connect. Timers rather than mount order, because the saved enabled set
+  // loads after this mounts. A listing left on from a past visit is switched off first.
+  const enabledRef = useRef(enabled)
+  useEffect(() => { enabledRef.current = enabled }, [enabled])
+  useEffect(() => {
+    if (!autoConnectListing) return
+    const id = autoConnectListing
+    const open = setTimeout(() => {
+      if (enabledRef.current.has(id)) toggle(id)
+      setSelectedId(id)
+    }, 1200)
+    const connect = setTimeout(() => { if (!enabledRef.current.has(id)) toggle(id) }, 3500)
+    return () => { clearTimeout(open); clearTimeout(connect) }
+  }, [autoConnectListing, toggle])
 
   const q = query.trim().toLowerCase()
   const services = q

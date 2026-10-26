@@ -18,7 +18,7 @@ interface PanelItemProps {
 export function PanelItem({ icon: Icon, variant = "outline", iconClassName, className, children }: PanelItemProps) {
   const muted = variant === "muted"
   return (
-    <div className={cn("flex items-start gap-2 rounded-lg", muted ? "bg-muted/50 px-3 py-2.5" : "border px-2.5 py-2", className)}>
+    <div className={cn("flex items-center gap-2 rounded-lg", muted ? "bg-muted/50 px-3 py-2.5" : "border px-2.5 py-2", className)}>
       <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-md border", muted ? "bg-background" : "bg-muted")}>
         <Icon className={cn("size-4", iconClassName)} />
       </span>
