@@ -11,6 +11,7 @@ import { SourceIcon, getSourceInitials } from "./SourceIcon"
 import { ConnectWizard } from "./ConnectWizard"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { readSources } from "@/lib/ask-nanci/source-store"
+import { MARKETPLACE_SOURCE_GROUP, listMarketplaceSources } from "@/lib/ask-nanci/data/panels/service-marketplace"
 import type { Source } from "@/lib/ask-nanci/types"
 
 interface Props {
@@ -24,8 +25,31 @@ interface Props {
  * its own tooltip — adding and reviewing are different intents, and routing both
  * through one popover meant the plus icon promised something it did not do.
  */
-export function ChatActiveSources({ sources }: Props) {
-  const { setSources } = useAskNanci()
+// One row of the Sources Used list.
+function SourceItem({ source: s }: { source: Source }) {
+  return (
+    <div className="flex items-center gap-2 px-3 py-2">
+      <div className="flex size-8 items-center justify-center overflow-hidden rounded-md border border-border bg-white shrink-0">
+        {s.logo
+          ? <Image src={s.logo} alt={s.institution ?? s.name} width={20} height={20} className="object-contain p-0.5" />
+          : <SourceIcon source={s} size="md" />
+        }
+      </div>
+      <div className="min-w-0">
+        <p className="text-sm font-medium text-foreground truncate">{s.name}</p>
+        {s.institution && (
+          <p className="text-xs text-muted-foreground truncate">{s.institution}</p>
+        )}
+      </div>
+    </div>
+  )
+}
+
+export function ChatActiveSources({ sources: accounts }: Props) {
+  const { setSources, marketplaceEnabled } = useAskNanci()
+  // Marketplace sources join the avatar stack but list under their own group.
+  const extensions = listMarketplaceSources(marketplaceEnabled)
+  const sources = [...accounts, ...extensions]
   const [popoverOpen, setPopoverOpen] = useState(false)
   const [wizardOpen, setWizardOpen] = useState(false)
   const [tipOpen, setTipOpen] = useState(false)
@@ -105,22 +129,11 @@ export function ChatActiveSources({ sources }: Props) {
             <PopoverContent side="top" align="start" className="w-[320px] p-0 gap-0 overflow-hidden flex flex-col max-h-[360px]">
               <p className="px-3 pt-3 pb-2 text-sm font-medium text-foreground shrink-0">Sources Used</p>
               <div className="overflow-y-auto flex-1 min-h-0 pb-1">
-                {sources.map((s) => (
-                  <div key={s.id} className="flex items-center gap-2 px-3 py-2">
-                    <div className="flex size-8 items-center justify-center overflow-hidden rounded-md border border-border bg-white shrink-0">
-                      {s.logo
-                        ? <Image src={s.logo} alt={s.institution ?? s.name} width={20} height={20} className="object-contain p-0.5" />
-                        : <SourceIcon source={s} size="md" />
-                      }
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-foreground truncate">{s.name}</p>
-                      {s.institution && (
-                        <p className="text-xs text-muted-foreground truncate">{s.institution}</p>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                {accounts.map((s) => <SourceItem key={s.id} source={s} />)}
+                {extensions.length > 0 && (
+                  <p className="px-3 pt-2 pb-1 text-xs font-medium text-muted-foreground">{MARKETPLACE_SOURCE_GROUP}</p>
+                )}
+                {extensions.map((s) => <SourceItem key={s.id} source={s} />)}
               </div>
             </PopoverContent>
           </Popover>

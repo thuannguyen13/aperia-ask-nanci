@@ -26,6 +26,7 @@ import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_PANEL_REPLIE
 import { ACCOUNT_CHANGE_SHEET } from "@/lib/ask-nanci/data/panels/account-change"
 import { FOUNDATION_SOURCE_ID } from "@/lib/ask-nanci/source-store"
 import { ONBOARDING_KEY } from "@/lib/ask-nanci/storage-keys"
+import { MARKETPLACE_SERVICES } from "@/lib/ask-nanci/data/panels/service-marketplace"
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
@@ -77,6 +78,9 @@ interface AskNanciCtx {
   setKbOpen: (open: boolean) => void
   marketplaceOpen: boolean
   setMarketplaceOpen: (open: boolean) => void
+  /** Ids of the Marketplace listings that are on. Held here because the source lists read it too. */
+  marketplaceEnabled: ReadonlySet<string>
+  toggleMarketplaceService: (id: string) => void
   draft: string
   setDraft: (text: string) => void
   error: string | null
@@ -230,6 +234,16 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setMarketplaceOpenState(open)
     if (open) setKbOpenState(false)
   }, [])
+  // Seeded from the data's `added` flag, then owned here so the grid badge, the detail
+  // panel's button and the source lists can never disagree.
+  const [marketplaceEnabled, setMarketplaceEnabled] = useState<ReadonlySet<string>>(
+    () => new Set(MARKETPLACE_SERVICES.filter((s) => s.added).map((s) => s.id)),
+  )
+  const toggleMarketplaceService = useCallback((id: string) => setMarketplaceEnabled((prev) => {
+    const next = new Set(prev)
+    if (!next.delete(id)) next.add(id)
+    return next
+  }), [])
   const [draft, setDraft] = useState("")
   const [error, setError] = useState<string | null>(null)
   const usage: UsageData = MOCK_USAGE
@@ -990,7 +1004,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       deleteSessionById,
       sources, setSources: handleSetSources, thinking,
       kbOpen, setKbOpen,
-      marketplaceOpen, setMarketplaceOpen,
+      marketplaceOpen, setMarketplaceOpen, marketplaceEnabled, toggleMarketplaceService,
       draft, setDraft,
       error,
       usage, currentUser, promptCategories, allQuestions,

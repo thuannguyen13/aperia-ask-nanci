@@ -26,7 +26,7 @@ import { BOOK_COVERS, BOOK_PARTIES, BOOK_PEAK, UNCONFIRMED_COVERS, coversWithRep
 import { THANK_YOU_EMAIL } from "./panels/resy-guests"
 import { NO_SHOW_FEE, FEES_AFTER_CHARGE, WINE_DINNER, EVENT_TOTALS, NIGHT_SPEND_PER_GUEST } from "./panels/resy-deposits"
 import { PACING_CHECK, NOTIFY_PARTIES, NOTIFY_GUESTS, REBOOK, FOUR_TOP_SEAT_HOUR, HELD_SEAT_HOUR, AVAILABILITY, POST_OPEN } from "./panels/resy-friday"
-import { MARKETPLACE_SERVICES } from "./panels/service-marketplace"
+import { MARKETPLACE_SERVICES, listMarketplaceSources } from "./panels/service-marketplace"
 import { WEEK_REPORT, SURVEY_SUMMARY, VENUES, LOCATIONS_WINDOW } from "./panels/resy-reports"
 import { formatWholeCurrency } from "../../../components/shared/format"
 import { RISK_QUICK_ACTIONS, RISK_NANCI_TAKES } from "./risk-landing"
@@ -602,5 +602,14 @@ describe("Resy Marketplace listing", () => {
     const canRead = resy.sections?.find((s) => s.title === "What Nanci can read")?.body ?? ""
     for (const item of ["private guest surveys", "reports across every venue in your group"]) expect(canRead).toContain(item)
     expect(resy.description).toMatch(/surveys and reports/)
+  })
+})
+
+describe("Marketplace sources", () => {
+  it("lists Resy only once it is connected", () => {
+    expect(listMarketplaceSources(new Set())).toEqual([])
+    const [resy, ...rest] = listMarketplaceSources(new Set(["resy", "portfolio-intelligence"]))
+    expect(rest).toEqual([])
+    expect(resy).toMatchObject({ id: "resy", name: "Resy", logo: "/logos/resy-logo.png", active: true })
   })
 })
