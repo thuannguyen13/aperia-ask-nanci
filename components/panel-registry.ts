@@ -51,6 +51,7 @@ import { DetectionQueueInsightPanel } from "@/components/risk/DetectionQueueInsi
 import { BarometerReport as RiskBarometer } from "@/components/risk/BarometerReport"
 import { RiskReport as RiskRiskReport } from "@/components/risk/RiskReport"
 import { AssignmentManagement as RiskAssignments } from "@/components/risk/AssignmentManagement"
+import { SHIFT_TITLE, CONFIRM_TITLE, WAITLIST_TITLE } from "@/lib/ask-nanci/data/panels/resy-tonight"
 
 // The single registry of concept panels. Add a panel here (+ its component) and it
 // becomes renderable everywhere — `PanelId` is derived from these keys, so there is
@@ -95,9 +96,9 @@ export const PANELS = {
   "busiest-times":       { component: BusiestTimesPanel,      label: "Busiest Times" },
   "slowest-windows":     { component: SlowestWindowsPanel,    label: "Slowest Windows" },
   "location-review":     { component: LocationReviewPanel,    label: "Location Review" },
-  "resy-shift":          { component: ResyShiftPanel,         label: "Tonight" },
-  "resy-confirm":        { component: ResyConfirmPanel,       label: "Confirmations" },
-  "resy-waitlist":       { component: ResyWaitlistPanel,      label: "Waitlist" },
+  "resy-shift":          { component: ResyShiftPanel,         label: SHIFT_TITLE },
+  "resy-confirm":        { component: ResyConfirmPanel,       label: CONFIRM_TITLE },
+  "resy-waitlist":       { component: ResyWaitlistPanel,      label: WAITLIST_TITLE },
   "resy-change":         { component: ResyChangePanel,        label: "Move a booking" },
   "resy-notify":         { component: ResyNotifyPanel,        label: "Notify" },
   "resy-availability":   { component: ResyAvailabilityPanel,  label: "Open tables" },
