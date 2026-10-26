@@ -33,6 +33,8 @@ export const MARKETPLACE_VENDOR: MarketplaceVendor = { name: "Mastercard", logo:
 export interface MarketplaceService {
   id: string;
   icon: LucideIcon;
+  /** The listing's own mark, shown in place of the icon. It names the vendor, so the card drops "Powered by". */
+  logo?: string;
   title: string;
   description: string;
   /** Already enabled for this merchant — renders the green "Added" badge. */
@@ -66,6 +68,7 @@ export const MARKETPLACE_SERVICES: MarketplaceService[] = [
   {
     id: "resy",
     icon: CalendarCheck,
+    logo: "/logos/resy-logo.png",
     title: "Resy",
     description: "Connect your Resy account so Ask Nanci can read your book, waitlist, Notify list, guestbook, events, surveys and reports, and act in Resy when you confirm.",
     vendor: { name: "Resy", logo: "/logos/resy-logo.png" },

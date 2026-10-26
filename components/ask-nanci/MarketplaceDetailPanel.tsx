@@ -23,6 +23,20 @@ export function VendorLogo({ vendor = MARKETPLACE_VENDOR, className = "h-4 w-aut
   )
 }
 
+// The listing's top mark: its own logo when it has one, else its icon in a box.
+// Shared by the grid card and the detail panel, at their two sizes.
+export function ServiceMark({ service, size }: { service: MarketplaceService; size: "card" | "detail" }) {
+  const { icon: Icon, logo, title } = service
+  const box = size === "card" ? "size-8" : "size-10"
+  if (logo) return <img src={logo} alt={title} className={`${box} shrink-0 rounded-lg`} />
+  if (size === "card") return <Icon className="size-8 shrink-0 text-foreground" strokeWidth={1.5} />
+  return (
+    <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border">
+      <Icon className="size-5 text-foreground" strokeWidth={1.5} />
+    </div>
+  )
+}
+
 // Detail for one add-on, opened beside the marketplace grid. Layout follows the
 // reference: identity block, a meta card carrying the Enable action, overview, then
 // collapsed detail sections.
@@ -36,7 +50,7 @@ export function MarketplaceDetailPanel({
   onToggle: () => void
   onClose: () => void
 }) {
-  const { icon: Icon, title, description, overview, highlights, sections, vendor = MARKETPLACE_VENDOR, enableLabel = L.enable, enabledLabel } = service
+  const { title, description, overview, highlights, sections, vendor = MARKETPLACE_VENDOR, enableLabel = L.enable, enabledLabel } = service
 
   return (
     <PanelShell>
@@ -46,9 +60,7 @@ export function MarketplaceDetailPanel({
       <ScrollArea className="min-h-0 flex-1">
         <div className="flex flex-col gap-6 p-4">
           <div className="flex items-start gap-3">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border">
-              <Icon className="size-5 text-foreground" strokeWidth={1.5} />
-            </div>
+            <ServiceMark service={service} size="detail" />
             <p className="text-sm text-muted-foreground">{description}</p>
           </div>
 
