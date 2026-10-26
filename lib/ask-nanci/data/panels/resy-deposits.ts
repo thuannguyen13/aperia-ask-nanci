@@ -8,6 +8,9 @@
 import { formatWholeCurrency } from "../../../../components/shared/format"
 import { FEE_POLICY, FEES_CHARGED } from "./resy-group"
 
+/** The fee panel's title, shared by its header and the card its answer leaves in the chat. */
+export const FEE_TITLE = "No-Show Fee"
+
 // ─── Steps 1 and 2: last night's no-show and its evidence ─────────────────────
 
 /** Fri Oct 23 is a fee night, so the policy applies. */
