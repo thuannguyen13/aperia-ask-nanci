@@ -68,7 +68,7 @@ export const MARKETPLACE_SERVICES: MarketplaceService[] = [
     icon: CalendarCheck,
     title: "Resy",
     description: "Connect your Resy account so Ask Nanci can read your book, waitlist, Notify list, guestbook, events, surveys and reports, and act in Resy when you confirm.",
-    vendor: { name: "Resy", logo: "/logos/resy-logo.svg" },
+    vendor: { name: "Resy", logo: "/logos/resy-logo.png" },
     scope: "resy",
     enableLabel: "Connect",
     enabledLabel: "Connected",
