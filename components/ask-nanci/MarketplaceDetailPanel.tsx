@@ -28,7 +28,7 @@ export function VendorLogo({ vendor = MARKETPLACE_VENDOR, className = "h-4 w-aut
 export function ServiceMark({ service, size }: { service: MarketplaceService; size: "card" | "detail" }) {
   const { icon: Icon, logo, title } = service
   const box = size === "card" ? "size-8" : "size-10"
-  if (logo) return <img src={logo} alt={title} className={`${box} shrink-0 rounded-lg`} />
+  if (logo) return <img src={logo} alt={title} className={`${box} shrink-0`} />
   if (size === "card") return <Icon className="size-8 shrink-0 text-foreground" strokeWidth={1.5} />
   return (
     <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border">
