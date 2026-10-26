@@ -486,12 +486,15 @@ export const CONCEPT_FLOW_SLUGS: Record<string, string> = Object.fromEntries(
 interface ConceptEmbedLayout {
   fullApp: boolean; // render Sidebar + standard WelcomeView instead of the compact widget
   openMarketplace?: boolean; // auto-open the Service Marketplace panel on load
+  autoConnect?: string; // under ?autoplay, open this listing and connect it
 }
 export const CONCEPT_EMBED_FLOW_LAYOUTS: Record<string, ConceptEmbedLayout> = {
   // Merchant Service Marketplace. Under ?autoplay the panel opens on load — autoplay
   // means nobody is driving, so waiting for a click on the sidebar banner would leave
   // the embed sitting on the welcome screen showing none of what the flow is about.
   "22": { fullApp: true, openMarketplace: true },
+  // Connect Resy has no conversation, so its autoplay link plays the connect itself.
+  "27": { fullApp: true, openMarketplace: true, autoConnect: "resy" },
 };
 
 // Flows that a typed or clicked prompt can start, by card number, narrowed by `keep`.

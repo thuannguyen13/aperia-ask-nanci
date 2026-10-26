@@ -85,6 +85,8 @@ interface AskNanciCtx {
   /** Connected Marketplace sources switched off in Accounts, the same as an account's toggle. */
   mutedMarketplaceSources: ReadonlySet<string>
   toggleMarketplaceSource: (id: string) => void
+  /** Under ?autoplay, the Marketplace listing the page opens and connects by itself. */
+  autoConnectListing?: string
   draft: string
   setDraft: (text: string) => void
   error: string | null
@@ -208,7 +210,7 @@ export function usePanelView(id: PanelId, fallback: string): string {
   return useAskNanci().panelViews[id] ?? fallback
 }
 
-export function AskNanciProvider({ children, isEmbed = false, embedVariant = null, isConceptVersion = false, catalog = false, scope = null, autoPlayFlow = null, autoPlay = false, initialView, initialMarketplaceOpen = false, forceOnboarding = false, skipOnboarding = false, genericBrand = false, intro = false }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null; isConceptVersion?: boolean; catalog?: boolean; scope?: FlowScope | null; autoPlayFlow?: string | null; autoPlay?: boolean; initialView?: ChatView; initialMarketplaceOpen?: boolean; forceOnboarding?: boolean; skipOnboarding?: boolean; genericBrand?: boolean; intro?: boolean }) {
+export function AskNanciProvider({ children, isEmbed = false, embedVariant = null, isConceptVersion = false, catalog = false, scope = null, autoPlayFlow = null, autoPlay = false, initialView, initialMarketplaceOpen = false, autoConnectListing, forceOnboarding = false, skipOnboarding = false, genericBrand = false, intro = false }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null; isConceptVersion?: boolean; catalog?: boolean; scope?: FlowScope | null; autoPlayFlow?: string | null; autoPlay?: boolean; initialView?: ChatView; initialMarketplaceOpen?: boolean; autoConnectListing?: string; forceOnboarding?: boolean; skipOnboarding?: boolean; genericBrand?: boolean; intro?: boolean }) {
   const [view, setView] = useState<ChatView>(initialView ?? (embedVariant === "concept-embed" ? "chat" : "welcome"))
   const [messages, setMessages] = useState<Message[]>([])
   const [chatState, setChatState] = useState<ChatState>("idle")
@@ -1021,7 +1023,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       deleteSessionById,
       sources, setSources: handleSetSources, thinking,
       kbOpen, setKbOpen,
-      marketplaceOpen, setMarketplaceOpen, marketplaceEnabled, toggleMarketplaceService, mutedMarketplaceSources, toggleMarketplaceSource,
+      marketplaceOpen, setMarketplaceOpen, marketplaceEnabled, toggleMarketplaceService, mutedMarketplaceSources, toggleMarketplaceSource, autoConnectListing,
       draft, setDraft,
       error,
       usage, currentUser, promptCategories, allQuestions,
