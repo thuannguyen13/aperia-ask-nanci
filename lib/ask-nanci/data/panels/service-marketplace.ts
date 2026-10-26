@@ -53,12 +53,16 @@ export interface MarketplaceService {
   enableLabel?: string;
   /** Replaces the "Added" badge, for an integration that connects an account. */
   enabledLabel?: string;
+  /** Replaces "Not added" as the off status, for the same integration. */
+  disabledLabel?: string;
   /** Once on, Nanci answers from it, so Accounts and Sources Used list it under the Marketplace group. */
   isSource?: boolean;
 }
 
 export const MARKETPLACE_DETAIL_LABELS = {
   builtBy: "Built by",
+  status: "Status",
+  notAdded: "Not added",
   overview: "Overview",
   highlights: "What you get",
   enable: "Add",
@@ -78,6 +82,7 @@ export const MARKETPLACE_SERVICES: MarketplaceService[] = [
     scope: "resy",
     enableLabel: "Connect",
     enabledLabel: "Connected",
+    disabledLabel: "Not connected",
     isSource: true,
     overview:
       "Resy runs your reservations, confirmations, waitlist, Notify list, guest profiles, events and guest surveys. Connected to Ask Nanci, it sits beside your card sales, so one question can answer from both. Ask how tonight looks, who's on Notify for Friday, who the guest at 8:15 is, how many seats are left for the wine dinner, or how this week compared with last.",
@@ -210,14 +215,14 @@ export const MARKETPLACE_SERVICES: MarketplaceService[] = [
 export const MARKETPLACE_SOURCE_GROUP = "From Marketplace";
 
 // The on listings Nanci answers from, shaped as sources (keeping the listing id) so the source lists render them
-// with the same row and avatar as a linked account.
-export function listMarketplaceSources(enabled: ReadonlySet<string>): Source[] {
+// with the same row and avatar as a linked account. A muted one stays connected but is switched off as a source.
+export function listMarketplaceSources(enabled: ReadonlySet<string>, muted: ReadonlySet<string> = new Set()): Source[] {
   return MARKETPLACE_SERVICES.filter((s) => s.isSource && enabled.has(s.id)).map((s) => ({
     id: s.id,
     name: s.title,
     kind: "bank",
     logo: s.logo,
-    active: true,
+    active: !muted.has(s.id),
     addedAt: 0,
   }));
 }

@@ -81,6 +81,9 @@ interface AskNanciCtx {
   /** Ids of the Marketplace listings that are on. Held here because the source lists read it too. */
   marketplaceEnabled: ReadonlySet<string>
   toggleMarketplaceService: (id: string) => void
+  /** Connected Marketplace sources switched off in Accounts, the same as an account's toggle. */
+  mutedMarketplaceSources: ReadonlySet<string>
+  toggleMarketplaceSource: (id: string) => void
   draft: string
   setDraft: (text: string) => void
   error: string | null
@@ -240,6 +243,12 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     () => new Set(MARKETPLACE_SERVICES.filter((s) => s.added).map((s) => s.id)),
   )
   const toggleMarketplaceService = useCallback((id: string) => setMarketplaceEnabled((prev) => {
+    const next = new Set(prev)
+    if (!next.delete(id)) next.add(id)
+    return next
+  }), [])
+  const [mutedMarketplaceSources, setMutedMarketplaceSources] = useState<ReadonlySet<string>>(() => new Set())
+  const toggleMarketplaceSource = useCallback((id: string) => setMutedMarketplaceSources((prev) => {
     const next = new Set(prev)
     if (!next.delete(id)) next.add(id)
     return next
@@ -1004,7 +1013,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       deleteSessionById,
       sources, setSources: handleSetSources, thinking,
       kbOpen, setKbOpen,
-      marketplaceOpen, setMarketplaceOpen, marketplaceEnabled, toggleMarketplaceService,
+      marketplaceOpen, setMarketplaceOpen, marketplaceEnabled, toggleMarketplaceService, mutedMarketplaceSources, toggleMarketplaceSource,
       draft, setDraft,
       error,
       usage, currentUser, promptCategories, allQuestions,

@@ -611,5 +611,6 @@ describe("Marketplace sources", () => {
     const [resy, ...rest] = listMarketplaceSources(new Set(["resy", "portfolio-intelligence"]))
     expect(rest).toEqual([])
     expect(resy).toMatchObject({ id: "resy", name: "Resy", logo: "/logos/resy-logo.png", active: true })
+    expect(listMarketplaceSources(new Set(["resy"]), new Set(["resy"]))[0].active).toBe(false)
   })
 })

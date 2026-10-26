@@ -46,9 +46,10 @@ function SourceItem({ source: s }: { source: Source }) {
 }
 
 export function ChatActiveSources({ sources: accounts }: Props) {
-  const { setSources, marketplaceEnabled } = useAskNanci()
-  // Marketplace sources join the avatar stack but list under their own group.
-  const extensions = listMarketplaceSources(marketplaceEnabled)
+  const { setSources, marketplaceEnabled, mutedMarketplaceSources } = useAskNanci()
+  // Marketplace sources join the avatar stack but list under their own group. Like
+  // the accounts passed in, only the ones switched on are shown.
+  const extensions = listMarketplaceSources(marketplaceEnabled, mutedMarketplaceSources).filter((s) => s.active)
   const sources = [...accounts, ...extensions]
   const [popoverOpen, setPopoverOpen] = useState(false)
   const [wizardOpen, setWizardOpen] = useState(false)

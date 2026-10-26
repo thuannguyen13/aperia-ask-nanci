@@ -45,12 +45,11 @@ function FileTypeIcon({ name }: { name: string }) {
 
 // ─── Source row ──────────────────────────────────────────────────────────────
 
-// No onToggle: the source is always on (a Marketplace source is turned off by removing it).
-function SourceRow({ source, onToggle, onRemove }: { source: Source; onToggle?: () => void; onRemove: () => void }) {
+function SourceRow({ source, onToggle, onRemove }: { source: Source; onToggle: () => void; onRemove: () => void }) {
   const isBuiltIn = source.id === FOUNDATION_SOURCE.id
   return (
     <div className={`flex items-center gap-3 py-2.5 ${!source.active ? "opacity-50" : ""}`}>
-      {isBuiltIn || !onToggle
+      {isBuiltIn
         ? <div className="size-6 shrink-0" />
         : <Switch checked={source.active} onCheckedChange={onToggle} />
       }
@@ -75,8 +74,8 @@ function SourceRow({ source, onToggle, onRemove }: { source: Source; onToggle?: 
 // ─── Main panel ──────────────────────────────────────────────────────────────
 
 export function PersonalizePanel() {
-  const { kbOpen, setKbOpen, sources, setSources, marketplaceEnabled, toggleMarketplaceService } = useAskNanci()
-  const extensions = listMarketplaceSources(marketplaceEnabled)
+  const { kbOpen, setKbOpen, sources, setSources, marketplaceEnabled, toggleMarketplaceService, mutedMarketplaceSources, toggleMarketplaceSource } = useAskNanci()
+  const extensions = listMarketplaceSources(marketplaceEnabled, mutedMarketplaceSources)
   const fileRef = useRef<HTMLInputElement>(null)
   const [wizardOpen, setWizardOpen] = useState(false)
 
@@ -179,7 +178,7 @@ export function PersonalizePanel() {
               <div className="flex flex-col">
                 <p className="text-xs font-medium text-muted-foreground">{MARKETPLACE_SOURCE_GROUP}</p>
                 {extensions.map((s) => (
-                  <SourceRow key={s.id} source={s} onRemove={() => toggleMarketplaceService(s.id)} />
+                  <SourceRow key={s.id} source={s} onToggle={() => toggleMarketplaceSource(s.id)} onRemove={() => toggleMarketplaceService(s.id)} />
                 ))}
               </div>
             )}

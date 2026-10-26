@@ -37,6 +37,28 @@ export function ServiceMark({ service, size }: { service: MarketplaceService; si
   )
 }
 
+// Left side of the meta card. A listing headed by its own logo already names the
+// vendor, so it shows its status here instead of "Built by".
+function MetaInfo({ service, enabled }: { service: MarketplaceService; enabled: boolean }) {
+  const { vendor = MARKETPLACE_VENDOR, enabledLabel, disabledLabel = L.notAdded } = service
+  const label = "text-[9px] font-bold uppercase tracking-[0.12em] text-muted-foreground"
+  if (service.logo) return (
+    <div className="flex min-w-0 flex-col items-start gap-1">
+      <p className={label}>{L.status}</p>
+      {enabled ? <AddedBadge label={enabledLabel} /> : <span className="text-sm font-medium text-foreground">{disabledLabel}</span>}
+    </div>
+  )
+  return (
+    <div className="flex min-w-0 flex-col gap-1">
+      <p className={label}>{L.builtBy}</p>
+      <div className="flex items-center gap-1.5">
+        {vendor.logo && <VendorLogo vendor={vendor} className="h-5 w-auto" />}
+        <span className="truncate text-sm font-medium text-foreground">{vendor.name}</span>
+      </div>
+    </div>
+  )
+}
+
 // Detail for one add-on, opened beside the marketplace grid. Layout follows the
 // reference: identity block, a meta card carrying the Enable action, overview, then
 // collapsed detail sections.
@@ -50,7 +72,7 @@ export function MarketplaceDetailPanel({
   onToggle: () => void
   onClose: () => void
 }) {
-  const { title, description, overview, highlights, sections, vendor = MARKETPLACE_VENDOR, enableLabel = L.enable, enabledLabel } = service
+  const { title, description, overview, highlights, sections, enableLabel = L.enable, enabledLabel } = service
 
   return (
     <PanelShell>
@@ -67,16 +89,10 @@ export function MarketplaceDetailPanel({
           {/* Meta + the one action. Enabling an add-on is reversible and low-stakes,
               so the button acts directly — no confirm step. */}
           <div className="flex items-center justify-between gap-3 rounded-xl border p-3">
-            <div className="flex min-w-0 flex-col gap-1">
-              <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-muted-foreground">{L.builtBy}</p>
-              <div className="flex items-center gap-1.5">
-                {vendor.logo && <VendorLogo vendor={vendor} className="h-5 w-auto" />}
-                <span className="truncate text-sm font-medium text-foreground">{vendor.name}</span>
-              </div>
-            </div>
+            <MetaInfo service={service} enabled={enabled} />
             {enabled ? (
               <div className="flex shrink-0 items-center gap-2">
-                <AddedBadge label={enabledLabel} />
+                {!service.logo && <AddedBadge label={enabledLabel} />}
                 <Button variant="outline" onClick={onToggle}>
                   {L.remove}
                 </Button>
