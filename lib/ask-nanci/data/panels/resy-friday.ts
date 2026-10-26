@@ -11,6 +11,10 @@ export const FRIDAY_DATE = "Fri, Oct 30"
 export const FRIDAY_DATE_PLAIN = FRIDAY_DATE.replace(",", "")
 export const FRIDAY_AS_OF = "Resy book as of Sat, Oct 24"
 
+// Each panel's title, shared by its header and the card its answer leaves in the chat.
+export const MOVE_TITLE = "Move a Booking"
+export const NOTIFY_TITLE = "Notify"
+
 // Clock times are evening "h:mm" strings.
 const toMinutes = (time: string) => {
   const [h, m] = time.split(":").map(Number)
@@ -130,6 +134,7 @@ const FOUR_TOP_SEATS = 4
 export const RELEASED_TABLES = [21, 22]
 export const ONLINE_WINDOW = { from: "7:45", to: "8:30" }
 export const OPEN_INCREMENT = "8:00"
+export const OPEN_TITLE = `Open tables · ${OPEN_INCREMENT} PM`
 
 const raisedPacing = PACING_PER_15_MIN + RELEASED_TABLES.length * FOUR_TOP_SEATS
 

@@ -52,6 +52,7 @@ import { BarometerReport as RiskBarometer } from "@/components/risk/BarometerRep
 import { RiskReport as RiskRiskReport } from "@/components/risk/RiskReport"
 import { AssignmentManagement as RiskAssignments } from "@/components/risk/AssignmentManagement"
 import { SHIFT_TITLE, CONFIRM_TITLE, WAITLIST_TITLE } from "@/lib/ask-nanci/data/panels/resy-tonight"
+import { MOVE_TITLE, NOTIFY_TITLE, OPEN_TITLE } from "@/lib/ask-nanci/data/panels/resy-friday"
 
 // The single registry of concept panels. Add a panel here (+ its component) and it
 // becomes renderable everywhere — `PanelId` is derived from these keys, so there is
@@ -99,9 +100,9 @@ export const PANELS = {
   "resy-shift":          { component: ResyShiftPanel,         label: SHIFT_TITLE },
   "resy-confirm":        { component: ResyConfirmPanel,       label: CONFIRM_TITLE },
   "resy-waitlist":       { component: ResyWaitlistPanel,      label: WAITLIST_TITLE },
-  "resy-change":         { component: ResyChangePanel,        label: "Move a booking" },
-  "resy-notify":         { component: ResyNotifyPanel,        label: "Notify" },
-  "resy-availability":   { component: ResyAvailabilityPanel,  label: "Open tables" },
+  "resy-change":         { component: ResyChangePanel,        label: MOVE_TITLE },
+  "resy-notify":         { component: ResyNotifyPanel,        label: NOTIFY_TITLE },
+  "resy-availability":   { component: ResyAvailabilityPanel,  label: OPEN_TITLE },
   "resy-guest":          { component: ResyGuestsPanel,        label: "Guest profile" },
   "resy-outreach":       { component: ResyOutreachPanel,      label: "Thank-you email" },
   "resy-fee":            { component: ResyFeePanel,           label: "No-show fee" },
