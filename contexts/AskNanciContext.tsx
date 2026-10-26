@@ -25,7 +25,8 @@ import type { EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
 import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_PANEL_REPLIES, promptsInScope, CONCEPT_NO_RESET_PROMPTS, CONCEPT_MANUAL_PROMPTS, CONCEPT_LOOP_PROMPTS, CONCEPT_FLOW16_FOLLOWUPS, CONCEPT_FAKE_FOLLOWUPS, CONCEPT_CHAT_TITLES, CONCEPT_DECLINE_REPLIES, CONCEPT_OFFER_NO } from "@/lib/ask-nanci/data/flows.concept"
 import { ACCOUNT_CHANGE_SHEET } from "@/lib/ask-nanci/data/panels/account-change"
 import { FOUNDATION_SOURCE_ID } from "@/lib/ask-nanci/source-store"
-import { ONBOARDING_KEY } from "@/lib/ask-nanci/storage-keys"
+import { ONBOARDING_KEY, MARKETPLACE_ENABLED_KEY, MARKETPLACE_MUTED_KEY } from "@/lib/ask-nanci/storage-keys"
+import { readIdSet, writeIdSet } from "@/lib/ask-nanci/marketplace-store"
 import { MARKETPLACE_SERVICES } from "@/lib/ask-nanci/data/panels/service-marketplace"
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
@@ -245,12 +246,14 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const toggleMarketplaceService = useCallback((id: string) => setMarketplaceEnabled((prev) => {
     const next = new Set(prev)
     if (!next.delete(id)) next.add(id)
+    writeIdSet(MARKETPLACE_ENABLED_KEY, next)
     return next
   }), [])
   const [mutedMarketplaceSources, setMutedMarketplaceSources] = useState<ReadonlySet<string>>(() => new Set())
   const toggleMarketplaceSource = useCallback((id: string) => setMutedMarketplaceSources((prev) => {
     const next = new Set(prev)
     if (!next.delete(id)) next.add(id)
+    writeIdSet(MARKETPLACE_MUTED_KEY, next)
     return next
   }), [])
   const [draft, setDraft] = useState("")
@@ -340,6 +343,11 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     // localStorage on the client but not the server, mismatching Dialog's `open` on hydrate.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (forceOnboarding || (!skipOnboarding && !localStorage.getItem(ONBOARDING_KEY))) setOnboardingOpen(true)
+    // Same reason: saved Marketplace state is read after hydrate, not in the initializers.
+    const savedEnabled = readIdSet(MARKETPLACE_ENABLED_KEY)
+    if (savedEnabled) setMarketplaceEnabled(savedEnabled)
+    const savedMuted = readIdSet(MARKETPLACE_MUTED_KEY)
+    if (savedMuted) setMutedMarketplaceSources(savedMuted)
   }, [isEmbed, forceOnboarding, skipOnboarding])
 
 

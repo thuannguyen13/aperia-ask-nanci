@@ -16,6 +16,9 @@ export const TOUR_STEP_KEY = "ask_nanci_tour_step"
 // renaming one orphans that browser's state.
 export const SOURCES_KEY = "asknanci_sources"
 export const SESSIONS_KEY = "asknanci_chats"
+// Which Marketplace listings are on, and which connected sources are switched off.
+export const MARKETPLACE_ENABLED_KEY = "ask_nanci_marketplace_on"
+export const MARKETPLACE_MUTED_KEY = "ask_nanci_marketplace_muted"
 
 /** Everything a test or a reset must clear to reach an untouched first-run state. */
 export const ALL_STORAGE_KEYS = [
@@ -24,4 +27,6 @@ export const ALL_STORAGE_KEYS = [
   TOUR_STEP_KEY,
   SOURCES_KEY,
   SESSIONS_KEY,
+  MARKETPLACE_ENABLED_KEY,
+  MARKETPLACE_MUTED_KEY,
 ] as const
