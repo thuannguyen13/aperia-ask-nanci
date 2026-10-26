@@ -5,7 +5,7 @@ export type FlowScope = "resy"
 
 export const SCOPE_CATALOG: Record<FlowScope, { title: string; subtitle: string }> = {
   resy: {
-    title: "Ask Nanci × Resy",
+    title: "Ask Nanci",
     subtitle: "Your Resy book and your card sales in one conversation. Connect Resy in the Marketplace, then ask. A concept: no Resy connection exists.",
   },
 }

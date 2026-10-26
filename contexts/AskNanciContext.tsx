@@ -25,7 +25,9 @@ import type { EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
 import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_PANEL_REPLIES, promptsInScope, CONCEPT_NO_RESET_PROMPTS, CONCEPT_MANUAL_PROMPTS, CONCEPT_LOOP_PROMPTS, CONCEPT_FLOW16_FOLLOWUPS, CONCEPT_FAKE_FOLLOWUPS, CONCEPT_CHAT_TITLES, CONCEPT_DECLINE_REPLIES, CONCEPT_OFFER_NO } from "@/lib/ask-nanci/data/flows.concept"
 import { ACCOUNT_CHANGE_SHEET } from "@/lib/ask-nanci/data/panels/account-change"
 import { FOUNDATION_SOURCE_ID } from "@/lib/ask-nanci/source-store"
-import { ONBOARDING_KEY } from "@/lib/ask-nanci/storage-keys"
+import { ONBOARDING_KEY, MARKETPLACE_ENABLED_KEY, MARKETPLACE_MUTED_KEY } from "@/lib/ask-nanci/storage-keys"
+import { readIdSet, writeIdSet } from "@/lib/ask-nanci/marketplace-store"
+import { MARKETPLACE_SERVICES } from "@/lib/ask-nanci/data/panels/service-marketplace"
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
@@ -77,6 +79,12 @@ interface AskNanciCtx {
   setKbOpen: (open: boolean) => void
   marketplaceOpen: boolean
   setMarketplaceOpen: (open: boolean) => void
+  /** Ids of the Marketplace listings that are on. Held here because the source lists read it too. */
+  marketplaceEnabled: ReadonlySet<string>
+  toggleMarketplaceService: (id: string) => void
+  /** Connected Marketplace sources switched off in Accounts, the same as an account's toggle. */
+  mutedMarketplaceSources: ReadonlySet<string>
+  toggleMarketplaceSource: (id: string) => void
   draft: string
   setDraft: (text: string) => void
   error: string | null
@@ -230,6 +238,24 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setMarketplaceOpenState(open)
     if (open) setKbOpenState(false)
   }, [])
+  // Seeded from the data's `added` flag, then owned here so the grid badge, the detail
+  // panel's button and the source lists can never disagree.
+  const [marketplaceEnabled, setMarketplaceEnabled] = useState<ReadonlySet<string>>(
+    () => new Set(MARKETPLACE_SERVICES.filter((s) => s.added).map((s) => s.id)),
+  )
+  const toggleMarketplaceService = useCallback((id: string) => setMarketplaceEnabled((prev) => {
+    const next = new Set(prev)
+    if (!next.delete(id)) next.add(id)
+    writeIdSet(MARKETPLACE_ENABLED_KEY, next)
+    return next
+  }), [])
+  const [mutedMarketplaceSources, setMutedMarketplaceSources] = useState<ReadonlySet<string>>(() => new Set())
+  const toggleMarketplaceSource = useCallback((id: string) => setMutedMarketplaceSources((prev) => {
+    const next = new Set(prev)
+    if (!next.delete(id)) next.add(id)
+    writeIdSet(MARKETPLACE_MUTED_KEY, next)
+    return next
+  }), [])
   const [draft, setDraft] = useState("")
   const [error, setError] = useState<string | null>(null)
   const usage: UsageData = MOCK_USAGE
@@ -317,6 +343,11 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     // localStorage on the client but not the server, mismatching Dialog's `open` on hydrate.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (forceOnboarding || (!skipOnboarding && !localStorage.getItem(ONBOARDING_KEY))) setOnboardingOpen(true)
+    // Same reason: saved Marketplace state is read after hydrate, not in the initializers.
+    const savedEnabled = readIdSet(MARKETPLACE_ENABLED_KEY)
+    if (savedEnabled) setMarketplaceEnabled(savedEnabled)
+    const savedMuted = readIdSet(MARKETPLACE_MUTED_KEY)
+    if (savedMuted) setMutedMarketplaceSources(savedMuted)
   }, [isEmbed, forceOnboarding, skipOnboarding])
 
 
@@ -990,7 +1021,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       deleteSessionById,
       sources, setSources: handleSetSources, thinking,
       kbOpen, setKbOpen,
-      marketplaceOpen, setMarketplaceOpen,
+      marketplaceOpen, setMarketplaceOpen, marketplaceEnabled, toggleMarketplaceService, mutedMarketplaceSources, toggleMarketplaceSource,
       draft, setDraft,
       error,
       usage, currentUser, promptCategories, allQuestions,

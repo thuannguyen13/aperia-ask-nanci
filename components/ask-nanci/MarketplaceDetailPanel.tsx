@@ -23,6 +23,42 @@ export function VendorLogo({ vendor = MARKETPLACE_VENDOR, className = "h-4 w-aut
   )
 }
 
+// The listing's top mark: its own logo when it has one, else its icon in a box.
+// Shared by the grid card and the detail panel, at their two sizes.
+export function ServiceMark({ service, size }: { service: MarketplaceService; size: "card" | "detail" }) {
+  const { icon: Icon, logo, title } = service
+  const box = size === "card" ? "size-8" : "size-10"
+  if (logo) return <img src={logo} alt={title} className={`${box} shrink-0`} />
+  if (size === "card") return <Icon className="size-8 shrink-0 text-foreground" strokeWidth={1.5} />
+  return (
+    <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border">
+      <Icon className="size-5 text-foreground" strokeWidth={1.5} />
+    </div>
+  )
+}
+
+// Left side of the meta card. A listing headed by its own logo already names the
+// vendor, so it shows its status here instead of "Built by".
+function MetaInfo({ service, enabled }: { service: MarketplaceService; enabled: boolean }) {
+  const { vendor = MARKETPLACE_VENDOR, enabledLabel, disabledLabel = L.notAdded } = service
+  const label = "text-[9px] font-bold uppercase tracking-[0.12em] text-muted-foreground"
+  if (service.logo) return (
+    <div className="flex min-w-0 flex-col items-start gap-1">
+      <p className={label}>{L.status}</p>
+      {enabled ? <AddedBadge label={enabledLabel} /> : <span className="text-sm font-medium text-foreground">{disabledLabel}</span>}
+    </div>
+  )
+  return (
+    <div className="flex min-w-0 flex-col gap-1">
+      <p className={label}>{L.builtBy}</p>
+      <div className="flex items-center gap-1.5">
+        {vendor.logo && <VendorLogo vendor={vendor} className="h-5 w-auto" />}
+        <span className="truncate text-sm font-medium text-foreground">{vendor.name}</span>
+      </div>
+    </div>
+  )
+}
+
 // Detail for one add-on, opened beside the marketplace grid. Layout follows the
 // reference: identity block, a meta card carrying the Enable action, overview, then
 // collapsed detail sections.
@@ -36,7 +72,7 @@ export function MarketplaceDetailPanel({
   onToggle: () => void
   onClose: () => void
 }) {
-  const { icon: Icon, title, description, overview, highlights, sections, vendor = MARKETPLACE_VENDOR, enableLabel = L.enable, enabledLabel } = service
+  const { title, description, overview, highlights, sections, enableLabel = L.enable, enabledLabel } = service
 
   return (
     <PanelShell>
@@ -46,25 +82,17 @@ export function MarketplaceDetailPanel({
       <ScrollArea className="min-h-0 flex-1">
         <div className="flex flex-col gap-6 p-4">
           <div className="flex items-start gap-3">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-lg border">
-              <Icon className="size-5 text-foreground" strokeWidth={1.5} />
-            </div>
+            <ServiceMark service={service} size="detail" />
             <p className="text-sm text-muted-foreground">{description}</p>
           </div>
 
           {/* Meta + the one action. Enabling an add-on is reversible and low-stakes,
               so the button acts directly — no confirm step. */}
           <div className="flex items-center justify-between gap-3 rounded-xl border p-3">
-            <div className="flex min-w-0 flex-col gap-1">
-              <p className="text-[9px] font-bold uppercase tracking-[0.12em] text-muted-foreground">{L.builtBy}</p>
-              <div className="flex items-center gap-1.5">
-                {vendor.logo && <VendorLogo vendor={vendor} className="h-5 w-auto" />}
-                <span className="truncate text-sm font-medium text-foreground">{vendor.name}</span>
-              </div>
-            </div>
+            <MetaInfo service={service} enabled={enabled} />
             {enabled ? (
               <div className="flex shrink-0 items-center gap-2">
-                <AddedBadge label={enabledLabel} />
+                {!service.logo && <AddedBadge label={enabledLabel} />}
                 <Button variant="outline" onClick={onToggle}>
                   {L.remove}
                 </Button>

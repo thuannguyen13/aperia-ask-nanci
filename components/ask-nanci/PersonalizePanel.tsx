@@ -8,6 +8,7 @@ import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "ap
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { FOUNDATION_SOURCE, addFileSources, toggleSource, removeSource, readSources } from "@/lib/ask-nanci/source-store"
+import { MARKETPLACE_SOURCE_GROUP, listMarketplaceSources } from "@/lib/ask-nanci/data/panels/service-marketplace"
 import { SourceIcon } from "./SourceIcon"
 import type { Source } from "@/lib/ask-nanci/types"
 import { ConnectWizard } from "./ConnectWizard"
@@ -73,7 +74,8 @@ function SourceRow({ source, onToggle, onRemove }: { source: Source; onToggle: (
 // ─── Main panel ──────────────────────────────────────────────────────────────
 
 export function PersonalizePanel() {
-  const { kbOpen, setKbOpen, sources, setSources } = useAskNanci()
+  const { kbOpen, setKbOpen, sources, setSources, marketplaceEnabled, toggleMarketplaceService, mutedMarketplaceSources, toggleMarketplaceSource } = useAskNanci()
+  const extensions = listMarketplaceSources(marketplaceEnabled, mutedMarketplaceSources)
   const fileRef = useRef<HTMLInputElement>(null)
   const [wizardOpen, setWizardOpen] = useState(false)
 
@@ -170,6 +172,15 @@ export function PersonalizePanel() {
                   <EmptyDescription>Link an account to get started.</EmptyDescription>
                 </EmptyHeader>
               </Empty>
+            )}
+
+            {extensions.length > 0 && (
+              <div className="flex flex-col">
+                <p className="text-xs font-medium text-muted-foreground">{MARKETPLACE_SOURCE_GROUP}</p>
+                {extensions.map((s) => (
+                  <SourceRow key={s.id} source={s} onToggle={() => toggleMarketplaceSource(s.id)} onRemove={() => toggleMarketplaceService(s.id)} />
+                ))}
+              </div>
             )}
           </div>
         </div>

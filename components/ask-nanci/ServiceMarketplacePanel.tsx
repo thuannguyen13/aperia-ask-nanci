@@ -9,7 +9,7 @@ import {
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { inScope } from "@/lib/ask-nanci/data/flow-scopes"
-import { MarketplaceDetailPanel, AddedBadge, VendorLogo } from "./MarketplaceDetailPanel"
+import { MarketplaceDetailPanel, AddedBadge, ServiceMark, VendorLogo } from "./MarketplaceDetailPanel"
 import {
   MARKETPLACE_CATEGORY,
   MARKETPLACE_EMPTY,
@@ -21,7 +21,7 @@ import {
 } from "@/lib/ask-nanci/data/panels/service-marketplace"
 
 function ServiceCard({ service, enabled, selected, onClick }: { service: MarketplaceService; enabled: boolean; selected: boolean; onClick: () => void }) {
-  const { icon: Icon, title, description, vendor, enabledLabel } = service
+  const { title, description, vendor, logo, enabledLabel } = service
   return (
     <button
       onClick={onClick}
@@ -31,17 +31,19 @@ function ServiceCard({ service, enabled, selected, onClick }: { service: Marketp
       )}
     >
       <div className="flex items-start justify-between gap-2">
-        <Icon className="size-8 shrink-0 text-foreground" strokeWidth={1.5} />
+        <ServiceMark service={service} size="card" />
         {enabled && <AddedBadge label={enabledLabel} />}
       </div>
       <div className="flex flex-col gap-1">
         <p className="truncate text-sm font-medium text-foreground">{title}</p>
         <p className="text-xs text-muted-foreground">{description}</p>
       </div>
-      <div className="mt-auto flex items-center gap-1.5">
-        <span className="text-xs text-muted-foreground">Powered by</span>
-        <VendorLogo vendor={vendor} />
-      </div>
+      {!logo && (
+        <div className="mt-auto flex items-center gap-1.5">
+          <span className="text-xs text-muted-foreground">Powered by</span>
+          <VendorLogo vendor={vendor} />
+        </div>
+      )}
     </button>
   )
 }
@@ -51,21 +53,11 @@ function ServiceCard({ service, enabled, selected, onClick }: { service: Marketp
  * while open and is toggled from the sidebar's Marketplace nav item.
  */
 export function ServiceMarketplacePanel() {
-  const { marketplaceOpen, scope } = useAskNanci()
+  const { marketplaceOpen, scope, marketplaceEnabled: enabled, toggleMarketplaceService: toggle } = useAskNanci()
   // A scoped mode lists only its partner's listings; every other mode leaves those out.
   const listed = MARKETPLACE_SERVICES.filter(inScope(scope))
   const [query, setQuery] = useState("")
   const [selectedId, setSelectedId] = useState<string | null>(null)
-  // Which add-ons are on. Seeded from the data's `added` flag, then owned here so the
-  // grid badge and the detail panel's Enable button can never disagree.
-  const [enabled, setEnabled] = useState<Set<string>>(
-    () => new Set(listed.filter((s) => s.added).map((s) => s.id)),
-  )
-  const toggle = (id: string) => setEnabled((prev) => {
-    const next = new Set(prev)
-    if (!next.delete(id)) next.add(id)
-    return next
-  })
   const selected = listed.find((s) => s.id === selectedId) ?? null
 
   const q = query.trim().toLowerCase()
