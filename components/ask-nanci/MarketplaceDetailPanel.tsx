@@ -81,7 +81,7 @@ export function MarketplaceDetailPanel({
       {/* min-h-0: see the grid's ScrollArea in ServiceMarketplacePanel. */}
       <ScrollArea className="min-h-0 flex-1">
         <div className="flex flex-col gap-6 p-4">
-          <div className="flex items-start gap-3">
+          <div className="flex flex-col items-start gap-3 rounded-xl bg-muted/50 p-3">
             <ServiceMark service={service} size="detail" />
             <p className="text-sm text-muted-foreground">{description}</p>
           </div>
@@ -106,18 +106,16 @@ export function MarketplaceDetailPanel({
 
           <div className="flex flex-col gap-2">
             <p className="text-base font-medium text-foreground">{L.overview}</p>
-            <p className="text-sm leading-relaxed text-muted-foreground">{overview}</p>
+            <p className="text-base text-foreground">{overview}</p>
           </div>
 
           <div className="flex flex-col gap-2">
             <p className="text-base font-medium text-foreground">{L.highlights}</p>
-            <ul className="flex flex-col gap-2">
+            <ul className="flex flex-col gap-3">
               {highlights.map((h) => (
-                <li key={h} className="flex items-start gap-2">
-                  <span className="mt-0.5 flex size-4 shrink-0 items-center justify-center rounded bg-primary/10">
-                    <Check className="size-2.5 text-primary" />
-                  </span>
-                  <span className="text-sm text-foreground">{h}</span>
+                <li key={h} className="flex items-start gap-3 pl-3">
+                  <Check className="mt-0.5 size-4 shrink-0 text-green-700 dark:text-green-400" />
+                  <span className="text-sm text-muted-foreground">{h}</span>
                 </li>
               ))}
             </ul>

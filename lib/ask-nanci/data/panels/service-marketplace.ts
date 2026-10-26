@@ -100,8 +100,8 @@ export const MARKETPLACE_SERVICES: MarketplaceService[] = [
       "Private guest surveys, and every venue in your group side by side",
     ],
     sections: [
-      { title: "What Nanci can read", body: "Reservations, confirmations, the waitlist, Notify lists, turn times, the no-show fees charged in Resy, events and ticket sales, private guest surveys, reports across every venue in your group, and the guestbook: profiles, tags, notes, visits and spend." },
-      { title: "What Nanci can do", body: "Send Resy's confirmation follow-up, move a booking, change availability, update tags and notes, charge a no-show fee, and send guest emails. Nanci asks before every change, and Resy records it as made through Ask Nanci." },
+      { title: "What Ask Nanci can read", body: "Reservations, confirmations, the waitlist, Notify lists, turn times, the no-show fees charged in Resy, events and ticket sales, private guest surveys, reports across every venue in your group, and the guestbook: profiles, tags, notes, visits and spend." },
+      { title: "What Ask Nanci can do", body: "Send Resy's confirmation follow-up, move a booking, change availability, update tags and notes, charge a no-show fee, and send guest emails. Ask Nanci asks before every change, and Resy records it as made through Ask Nanci." },
       { title: "About this demo", body: "A concept built on sample data. No connection to Resy exists." },
     ],
   },

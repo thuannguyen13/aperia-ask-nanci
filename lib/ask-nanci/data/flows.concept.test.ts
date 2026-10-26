@@ -585,7 +585,7 @@ describe("Resy Marketplace listing", () => {
   })
 
   it("names every action the Resy flows take, and asks before each", () => {
-    const canDo = resy.sections?.find((s) => s.title === "What Nanci can do")?.body ?? ""
+    const canDo = resy.sections?.find((s) => s.title === "What Ask Nanci can do")?.body ?? ""
     for (const action of ["confirmation follow-up", "move a booking", "change availability", "tags and notes", "no-show fee", "guest emails", "Nanci asks before every change"]) expect(canDo).toContain(action)
     expect(resy.highlights).toContain("Move bookings and open tables, with your OK")
     expect(resy.highlights).toContain("Guest profiles with tags, notes and the cards guests pay with")
@@ -593,13 +593,13 @@ describe("Resy Marketplace listing", () => {
     expect(resy.highlights).toContain("No-show fees charged with your OK")
     expect(resy.highlights).toContain("Ticketed events, and where each payment lands")
     expect(resy.overview).toContain("how many seats are left for the wine dinner")
-    expect(resy.sections?.find((s) => s.title === "What Nanci can read")?.body).toContain("events and ticket sales")
+    expect(resy.sections?.find((s) => s.title === "What Ask Nanci can read")?.body).toContain("events and ticket sales")
   })
 
   it("names flow 32's weekly reports, private surveys and group comparison", () => {
     expect(resy.highlights).toContain("Weekly reports that match Resy tables to card sales")
     expect(resy.highlights).toContain("Private guest surveys, and every venue in your group side by side")
-    const canRead = resy.sections?.find((s) => s.title === "What Nanci can read")?.body ?? ""
+    const canRead = resy.sections?.find((s) => s.title === "What Ask Nanci can read")?.body ?? ""
     for (const item of ["private guest surveys", "reports across every venue in your group"]) expect(canRead).toContain(item)
     expect(resy.description).toMatch(/surveys and reports/)
   })
