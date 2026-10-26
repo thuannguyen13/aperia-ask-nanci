@@ -4,6 +4,9 @@
 // matched to Resy tables through the POS. Authored figures are the rows below, and every
 // total is derived from them, so the chat and the panels quote the same numbers.
 
+/** The profile panel's title, shared by its header and the card its answer leaves in the chat. */
+export const GUEST_TITLE = "Guest Profile"
+
 // ─── Step 1: the guest at 8:15 ────────────────────────────────────────────────
 
 // Visits by venue. Profiles are unified across the group, so both venues show.
