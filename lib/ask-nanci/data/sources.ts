@@ -28,6 +28,18 @@ const ACCESS_ONE_SOURCE: Source = {
   addedAt: 0,
 }
 
+// The Resy mode's foundation: Resy is an American Express company, so the mode wears
+// AMEX and its built-in data is AMEX's.
+export const AMEX_SOURCE: Source = {
+  id: FOUNDATION_SOURCE_ID,
+  name: "American Express",
+  kind: "bank",
+  institution: "American Express Data",
+  logo: "/logos/amex.svg",
+  active: true,
+  addedAt: 0,
+}
+
 // ─── Per-variant source lists ─────────────────────────────────────────────────
 
 export const EMBED_DEMO_SOURCES: Source[] = [

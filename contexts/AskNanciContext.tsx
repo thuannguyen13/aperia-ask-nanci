@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useCallback, useRef, useEffect } from "react"
-import type { FlowScope } from "@/lib/ask-nanci/data/flow-scopes"
+import { SCOPE_FOUNDATION, type FlowScope } from "@/lib/ask-nanci/data/flow-scopes"
 import type { Message, Session, Source, UsageData, ConceptScriptedTurn, PanelId, PanelAction, SheetActionData } from "@/lib/ask-nanci/types"
 import { usePanelStack } from "@/lib/ask-nanci/use-panel-stack"
 import { turnToPanelActions } from "@/lib/ask-nanci/panel-actions"
@@ -24,7 +24,7 @@ import { EMBED_DEMO_SOURCES, EMBED_BUSINESS_OWNER_DEMO_SOURCES, EMBED_ISO_DEMO_S
 import type { EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
 import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_PANEL_REPLIES, promptsInScope, CONCEPT_NO_RESET_PROMPTS, CONCEPT_MANUAL_PROMPTS, CONCEPT_LOOP_PROMPTS, CONCEPT_FLOW16_FOLLOWUPS, CONCEPT_FAKE_FOLLOWUPS, CONCEPT_CHAT_TITLES, CONCEPT_DECLINE_REPLIES, CONCEPT_OFFER_NO } from "@/lib/ask-nanci/data/flows.concept"
 import { ACCOUNT_CHANGE_SHEET } from "@/lib/ask-nanci/data/panels/account-change"
-import { FOUNDATION_SOURCE_ID } from "@/lib/ask-nanci/source-store"
+import { FOUNDATION_SOURCE, FOUNDATION_SOURCE_ID } from "@/lib/ask-nanci/source-store"
 import { ONBOARDING_KEY, MARKETPLACE_ENABLED_KEY, MARKETPLACE_MUTED_KEY } from "@/lib/ask-nanci/storage-keys"
 import { readIdSet, writeIdSet } from "@/lib/ask-nanci/marketplace-store"
 import { MARKETPLACE_SERVICES } from "@/lib/ask-nanci/data/panels/service-marketplace"
@@ -167,6 +167,8 @@ interface AskNanciCtx {
   catalog: boolean
   /** The partner this mode is narrowed to, if any (see ParsedMode.scope). */
   scope: FlowScope | null
+  /** The built-in data source this mode ships with: its scope's, or the default one. */
+  foundationSource: Source
   submitFormPanel: () => void
   submitOfferApplication: (panelId: PanelId, message: string, sheetAction: SheetActionData) => void
   submitStepUpPanel: () => void
@@ -219,6 +221,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   // pendingBot lives in ChatStreamContext (see that file): its per-token churn must
   // not re-render this provider's ~40 consumers. We only ever write it here.
   const setPendingBot = usePendingBotSetter()
+  const foundationSource = scope ? SCOPE_FOUNDATION[scope] : FOUNDATION_SOURCE
   const [sources, setSourcesState] = useState<Source[]>(
     isEmbed ? (
       embedVariant === "business-owner" ? EMBED_BUSINESS_OWNER_DEMO_SOURCES :
@@ -340,7 +343,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     fetchSessions().then(setSessions)
     fetchPromptCategories().then(setPromptCategories)
     fetchAllQuestions().then(setAllQuestions)
-    if (!isEmbed) fetchSources().then(setSourcesState)
+    if (!isEmbed) fetchSources(foundationSource).then(setSourcesState)
     // ponytail: must stay in the effect — a lazy useState initializer would read
     // localStorage on the client but not the server, mismatching Dialog's `open` on hydrate.
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -350,7 +353,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     if (savedEnabled) setMarketplaceEnabled(savedEnabled)
     const savedMuted = readIdSet(MARKETPLACE_MUTED_KEY)
     if (savedMuted) setMutedMarketplaceSources(savedMuted)
-  }, [isEmbed, forceOnboarding, skipOnboarding])
+  }, [isEmbed, forceOnboarding, skipOnboarding, foundationSource])
 
 
   const persistAndReload = useCallback(async (msgs: Message[]) => {
@@ -1032,7 +1035,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       mobileSidebarOpen, setMobileSidebarOpen,
       shownPanelId, setShownPanelId, panelSheetDismissed, dismissPanelSheet, reopenPanelSheet, panelSheetOpen,
       onboardingOpen, setOnboardingOpen, forceOnboarding, genericBrand, tourActive, setTourActive, tourRequest, requestTour, flowFinished, conversationFading, introShowing, leavesCurrentFlow,
-      isConceptVersion, catalog, scope,
+      isConceptVersion, catalog, scope, foundationSource,
       submitFormPanel, submitOfferApplication, submitStepUpPanel,
       triggerProactiveFlow, proactiveNotificationActive, activateProactiveNotification,
       closingPanels, closePanel, closeAllNewPanels, submitDisputeDraft,

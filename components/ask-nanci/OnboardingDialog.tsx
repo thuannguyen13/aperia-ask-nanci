@@ -7,7 +7,7 @@ import { Button } from "aperia-ds5"
 import { Dialog, DialogContent, DialogTitle } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { ConnectWizard } from "./ConnectWizard"
-import { FOUNDATION_SOURCE, readSources } from "@/lib/ask-nanci/source-store"
+import { readSources } from "@/lib/ask-nanci/source-store"
 import { ONBOARDING_KEY } from "@/lib/ask-nanci/storage-keys"
 
 
@@ -53,7 +53,7 @@ function MarqueeRow({ logos, direction, className = "" }: { logos: typeof ROW1; 
 type OnboardingStep = 1 | 2  // 1 = welcome, 2 = link accounts
 
 export function OnboardingDialog() {
-  const { onboardingOpen, setOnboardingOpen, setSources, forceOnboarding } = useAskNanci()
+  const { onboardingOpen, setOnboardingOpen, setSources, forceOnboarding, foundationSource } = useAskNanci()
   const [step, setStep] = useState<OnboardingStep>(1)
   const [wizardOpen, setWizardOpen] = useState(false)
 
@@ -76,7 +76,7 @@ export function OnboardingDialog() {
   }
 
   function handleLinked() {
-    setSources([FOUNDATION_SOURCE, ...readSources()])
+    setSources([foundationSource, ...readSources()])
     setWizardOpen(false)
     completeWelcome()
   }
