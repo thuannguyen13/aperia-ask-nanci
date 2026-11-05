@@ -133,7 +133,7 @@ function ConceptContentArea({ children, noSidebar }: { children: React.ReactNode
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams()
-  const { isEmbed, embedVariant, isConceptVersion, catalog, theme, forceOnboarding, intro, scope } = parseMode(searchParams.get("mode"))
+  const { isEmbed, embedVariant, isConceptVersion, catalog, theme, forceOnboarding, intro, scope, onboarded } = parseMode(searchParams.get("mode"))
   const rawFlow = searchParams.get("flow")
   const autoPlayFlow = (rawFlow && CONCEPT_FLOW_SLUGS[rawFlow]) ?? null
   // `?autoplay` plays ?flow= on load rather than waiting for the Ask button. Opt-in and
@@ -152,7 +152,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // like autoplay and brand, so no existing URL changes. `?mode=onboarding` still wins:
   // forcing onboarding is the entire point of that mode.
   const rawOnboarded = searchParams.get("onboarded")
-  const skipOnboarding = rawOnboarded !== null && rawOnboarded !== "0" && rawOnboarded !== "false"
+  const skipOnboarding = onboarded || (rawOnboarded !== null && rawOnboarded !== "0" && rawOnboarded !== "false")
   // Per-flow embed layout: some flows (e.g. 22, Service Marketplace) render the full
   // app shell (sidebar + standard welcome) instead of the compact concept-embed widget.
   const embedLayout = (rawFlow && CONCEPT_EMBED_FLOW_LAYOUTS[rawFlow]) || null

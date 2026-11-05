@@ -12,6 +12,10 @@ describe("parseMode", () => {
     expect(parseMode("resy-embed")).toMatchObject({ scope: "resy", theme: "amex", isEmbed: true, embedVariant: "concept-embed" })
   })
 
+  it("keeps onboarding closed in mode=amex", () => {
+    expect(parseMode("amex")).toMatchObject({ theme: "amex", scope: null, onboarded: true })
+  })
+
   it.each(OTHER_MODES)("leaves mode=%s unscoped", (mode) => {
     expect(parseMode(mode).scope).toBeNull()
   })

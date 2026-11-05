@@ -46,12 +46,17 @@ interface ParsedMode {
    * carries this scope. Onboarding is skipped, since its tour is about the full app.
    */
   scope: FlowScope | null
+  /**
+   * Treat the browser as having already seen the welcome, as `?onboarded` does. A mode
+   * shown as a demo link would otherwise open the onboarding dialog over its flow.
+   */
+  onboarded: boolean
 }
 
 export function parseMode(mode: string | null): ParsedMode {
   // Every mode is the default shape plus whatever it changes, so adding a field to
   // ParsedMode does not mean editing thirteen rows.
-  const base = { isEmbed: false, embedVariant: null, isConceptVersion: false, theme: "aperia" as ThemeId, forceOnboarding: false, catalog: false, intro: null, scope: null }
+  const base = { isEmbed: false, embedVariant: null, isConceptVersion: false, theme: "aperia" as ThemeId, forceOnboarding: false, catalog: false, intro: null, scope: null, onboarded: false }
   switch (mode) {
     case "clover":          return { ...base, isEmbed: true,  embedVariant: "clover",         theme: "clover"      }
     case "business-owner":  return { ...base, isEmbed: true,  embedVariant: "business-owner", theme: "access-one"  }
@@ -83,7 +88,8 @@ export function parseMode(mode: string | null): ParsedMode {
     // so &flow=<slug>&autoplay plays the same way.
     case "resy-embed":      return { ...base, isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true, catalog: true, scope: "resy", theme: "amex" }
     // The default app wearing the AMEX brand, without the Resy scope or the catalog.
-    case "amex":            return { ...base, theme: "amex"        }
+    // Onboarding stays closed so &flow=<slug>&autoplay plays without the dialog over it.
+    case "amex":            return { ...base, theme: "amex", onboarded: true }
     case "tib":             return { ...base, theme: "tib"         }
     case "woodforest":      return { ...base, theme: "woodforest"  }
     case "placeholder":     return { ...base, theme: "placeholder" }
