@@ -88,8 +88,9 @@ export function parseMode(mode: string | null): ParsedMode {
     // so &flow=<slug>&autoplay plays the same way.
     case "resy-embed":      return { ...base, isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true, catalog: true, scope: "resy", theme: "amex" }
     // The default app wearing the AMEX brand, without the Resy scope or the catalog.
-    // Onboarding stays closed so &flow=<slug>&autoplay plays without the dialog over it.
-    case "amex":            return { ...base, theme: "amex", onboarded: true }
+    // Runs the concept engine like the default app, so every &flow=<slug>&autoplay plays
+    // with its panels. Onboarding stays closed so the dialog never covers the flow.
+    case "amex":            return { ...base, isConceptVersion: true, theme: "amex", onboarded: true }
     case "tib":             return { ...base, theme: "tib"         }
     case "woodforest":      return { ...base, theme: "woodforest"  }
     case "placeholder":     return { ...base, theme: "placeholder" }
