@@ -52,6 +52,11 @@ const THEME_LOGOS = {
   woodforest: {
     frame: { src: "/logos/logo-woodforest.png", alt: "Woodforest National Bank", width: 278, height: 48 },
   },
+  // Resy belongs to American Express, so the Resy mode wears the AMEX brand. The logo is
+  // the blue box with white lettering, square, so it reads as a badge on the navy bar.
+  amex: {
+    frame: { src: "/logos/amex.svg", alt: "American Express", width: 50, height: 50 },
+  },
   // White-label placeholder — swap the asset and the [data-theme="placeholder"] block
   // to stand up a new brand without touching anything else.
   placeholder: {

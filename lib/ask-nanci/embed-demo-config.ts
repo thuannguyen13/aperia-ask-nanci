@@ -76,8 +76,9 @@ export function parseMode(mode: string | null): ParsedMode {
     case "talus":           return { ...base, isConceptVersion: true, catalog: true, theme: "talus" }
     case "talus-embed":     return { ...base, isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true, catalog: true, theme: "talus", intro: { flow: "24", src: "/intros/talus-accounts-overview.png" } }
     // The concept demo narrowed to the Resy story: connect Resy in the marketplace, then
-    // the Resy flows. Nothing else in the catalog or the marketplace.
-    case "resy":            return { ...base, isConceptVersion: true, catalog: true, scope: "resy" }
+    // the Resy flows. Nothing else in the catalog or the marketplace. Wears the AMEX brand,
+    // since Resy is an American Express company.
+    case "resy":            return { ...base, isConceptVersion: true, catalog: true, scope: "resy", theme: "amex" }
     case "tib":             return { ...base, theme: "tib"         }
     case "woodforest":      return { ...base, theme: "woodforest"  }
     case "placeholder":     return { ...base, theme: "placeholder" }
