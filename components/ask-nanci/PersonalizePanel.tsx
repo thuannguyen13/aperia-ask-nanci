@@ -74,7 +74,7 @@ function SourceRow({ source, onToggle, onRemove }: { source: Source; onToggle: (
 // ─── Main panel ──────────────────────────────────────────────────────────────
 
 export function PersonalizePanel() {
-  const { kbOpen, setKbOpen, sources, setSources, marketplaceEnabled, toggleMarketplaceService, mutedMarketplaceSources, toggleMarketplaceSource } = useAskNanci()
+  const { kbOpen, setKbOpen, sources, setSources, foundationSource, marketplaceEnabled, toggleMarketplaceService, mutedMarketplaceSources, toggleMarketplaceSource } = useAskNanci()
   const extensions = listMarketplaceSources(marketplaceEnabled, mutedMarketplaceSources)
   const fileRef = useRef<HTMLInputElement>(null)
   const [wizardOpen, setWizardOpen] = useState(false)
@@ -83,9 +83,9 @@ export function PersonalizePanel() {
   const hasSources = userSources.length > 0
   // The active host's foundation source (VisionWeb non-embed, Clover in the clover
   // demo, etc.), so the "…Data Added" pill reflects the theme, not a hardcoded brand.
-  const builtIn = sources.find((s) => s.id === FOUNDATION_SOURCE.id) ?? FOUNDATION_SOURCE
+  const builtIn = sources.find((s) => s.id === FOUNDATION_SOURCE.id) ?? foundationSource
 
-  function refresh() { setSources([FOUNDATION_SOURCE, ...readSources()]) }
+  function refresh() { setSources([foundationSource, ...readSources()]) }
   function handleToggle(id: string) { toggleSource(id); refresh() }
   function handleRemove(id: string) { removeSource(id); refresh() }
 

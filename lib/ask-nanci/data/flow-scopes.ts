@@ -1,7 +1,15 @@
 // A scope narrows a mode to one partner's story. A flow or marketplace listing with a
 // scope shows only in the mode that carries it, and that mode shows nothing else.
 
+import type { Source } from "../types"
+import { AMEX_SOURCE } from "./sources"
+
 export type FlowScope = "resy"
+
+// The built-in data source a scoped mode ships with, in place of the default foundation.
+export const SCOPE_FOUNDATION: Record<FlowScope, Source> = {
+  resy: AMEX_SOURCE,
+}
 
 export const SCOPE_CATALOG: Record<FlowScope, { title: string; subtitle: string }> = {
   resy: {

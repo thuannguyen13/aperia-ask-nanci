@@ -104,6 +104,15 @@
   --app-gradient: linear-gradient(180deg, #002F67 0%, #c5d5ed 200px);
 }
 
+/* American Express, worn by the Resy mode. The logo is a Bright Blue box, so the frame
+   gradient starts on Deep Blue: a bar in the logo's own blue would swallow the box edge. */
+[data-theme="amex"] {
+  --primary: #006FCF;
+  --ring: #006FCF;
+  --sidebar-primary: #006FCF;
+  --app-gradient: linear-gradient(180deg, #00175A 0%, #cfe0f5 200px);
+}
+
 [data-theme="access-one"] {
   --primary: #FC6A25;
   --ring: #FC6A25;

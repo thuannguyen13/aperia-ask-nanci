@@ -116,8 +116,8 @@ export function newSessionId(): string {
 
 // ─── Sources ──────────────────────────────────────────────────────────────────
 
-export async function fetchSources(): Promise<Source[]> {
-  return [FOUNDATION_SOURCE, ...readSources()]
+export async function fetchSources(foundation: Source = FOUNDATION_SOURCE): Promise<Source[]> {
+  return [foundation, ...readSources()]
 }
 
 export async function persistSources(sources: Source[]): Promise<void> {
