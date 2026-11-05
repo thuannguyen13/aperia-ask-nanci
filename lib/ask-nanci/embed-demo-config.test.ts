@@ -16,6 +16,10 @@ describe("parseMode", () => {
     expect(parseMode("amex")).toMatchObject({ theme: "amex", scope: null, isConceptVersion: true, catalog: false, onboarded: true })
   })
 
+  it.each([null, "concept", "titan", "talus", "resy", "amex", "tib", "woodforest", "placeholder", "onboarding"])("plays concept flows in full-app mode=%s", (mode) => {
+    expect(parseMode(mode).isConceptVersion).toBe(true)
+  })
+
   it.each(OTHER_MODES)("leaves mode=%s unscoped", (mode) => {
     expect(parseMode(mode).scope).toBeNull()
   })

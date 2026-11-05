@@ -152,7 +152,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   // like autoplay and brand, so no existing URL changes. `?mode=onboarding` still wins:
   // forcing onboarding is the entire point of that mode.
   const rawOnboarded = searchParams.get("onboarded")
-  const skipOnboarding = onboarded || (rawOnboarded !== null && rawOnboarded !== "0" && rawOnboarded !== "false")
+  // An autoplay link is a demo of one flow, so onboarding never opens over it either.
+  const skipOnboarding = onboarded || autoPlay || (rawOnboarded !== null && rawOnboarded !== "0" && rawOnboarded !== "false")
   // Per-flow embed layout: some flows (e.g. 22, Service Marketplace) render the full
   // app shell (sidebar + standard welcome) instead of the compact concept-embed widget.
   const embedLayout = (rawFlow && CONCEPT_EMBED_FLOW_LAYOUTS[rawFlow]) || null

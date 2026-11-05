@@ -87,8 +87,8 @@ const MODE_NOTES: Record<string, string> = {
   talus: "Duplicate of `concept` wearing the Talus brand: same welcome card catalog and panel demo",
   resy: "The concept demo narrowed to Resy: a catalog of the Resy flows only, and a marketplace listing only Resy, which is where the demo starts",
   amex: "Default app wearing the American Express brand: plays every &flow=<slug>&autoplay with its panels, onboarding closed",
-  tib: "Full app (sidebar, sessions, KB panel) wearing the TIB brand",
-  woodforest: "Full app (sidebar, sessions, KB panel) wearing the Woodforest brand",
+  tib: "Default app wearing the TIB brand: plays every &flow=<slug>&autoplay with its panels",
+  woodforest: "Default app wearing the Woodforest brand: plays every &flow=<slug>&autoplay with its panels",
   placeholder: "Full app wearing the white-label placeholder brand — swap the logo + theme block to stand up a new one",
   onboarding: "Default app, but the onboarding dialog opens on every load and finishing it records nothing — so it can be demoed repeatedly without clearing localStorage",
 }

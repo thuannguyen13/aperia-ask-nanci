@@ -91,11 +91,13 @@ export function parseMode(mode: string | null): ParsedMode {
     // Runs the concept engine like the default app, so every &flow=<slug>&autoplay plays
     // with its panels. Onboarding stays closed so the dialog never covers the flow.
     case "amex":            return { ...base, isConceptVersion: true, theme: "amex", onboarded: true }
-    case "tib":             return { ...base, theme: "tib"         }
-    case "woodforest":      return { ...base, theme: "woodforest"  }
-    case "placeholder":     return { ...base, theme: "placeholder" }
+    // The default app in each brand. The concept engine is on, as in the default app,
+    // so every &flow=<slug>&autoplay plays with its panels.
+    case "tib":             return { ...base, isConceptVersion: true, theme: "tib"         }
+    case "woodforest":      return { ...base, isConceptVersion: true, theme: "woodforest"  }
+    case "placeholder":     return { ...base, isConceptVersion: true, theme: "placeholder" }
     // The default app, but onboarding opens every time and never records that it ran.
-    case "onboarding":      return { ...base, forceOnboarding: true }
+    case "onboarding":      return { ...base, isConceptVersion: true, forceOnboarding: true }
     // The default app plays scripted flows with their panels when a flow's prompt is
     // typed. Not the catalog: the welcome stays the standard one.
     default:                return { ...base, isConceptVersion: true }
