@@ -76,7 +76,7 @@ export function MarketplaceDetailPanel({
   onToggle: () => void
   onClose: () => void
 }) {
-  const { title, description, overview, highlights, sections, enableLabel = L.enable, enabledLabel } = service
+  const { title, description, overview, highlights, sections, enableLabel = L.enable, enabledLabel, disableLabel = L.remove } = service
 
   return (
     <PanelShell>
@@ -98,7 +98,7 @@ export function MarketplaceDetailPanel({
               <div className="flex shrink-0 items-center gap-2">
                 {!service.logo && <AddedBadge label={enabledLabel} />}
                 <Button variant="outline" onClick={onToggle}>
-                  {L.remove}
+                  {disableLabel}
                 </Button>
               </div>
             ) : (

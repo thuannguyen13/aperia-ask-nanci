@@ -55,6 +55,8 @@ export interface MarketplaceService {
   enabledLabel?: string;
   /** Replaces "Not added" as the off status, for the same integration. */
   disabledLabel?: string;
+  /** Replaces the "Remove" action, for the same integration. */
+  disableLabel?: string;
   /** Once on, Nanci answers from it, so Accounts and Sources Used list it under the Marketplace group. */
   isSource?: boolean;
 }
@@ -83,6 +85,7 @@ export const MARKETPLACE_SERVICES: MarketplaceService[] = [
     enableLabel: "Connect",
     enabledLabel: "Connected",
     disabledLabel: "Not connected",
+    disableLabel: "Disconnect",
     isSource: true,
     overview:
       "Resy runs your reservations, confirmations, waitlist, Notify list, guest profiles, events and guest surveys. Connected to Ask Nanci, it sits beside your card sales, so one question can answer from both. Ask how tonight looks, who's on Notify for Friday, who the guest at 8:15 is, how many seats are left for the wine dinner, or how this week compared with last.",
