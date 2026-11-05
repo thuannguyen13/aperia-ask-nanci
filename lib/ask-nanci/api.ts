@@ -117,8 +117,15 @@ export function newSessionId(): string {
 
 // ─── Sources ──────────────────────────────────────────────────────────────────
 
-export async function fetchSources(foundation: Source = FOUNDATION_SOURCE): Promise<Source[]> {
-  return [foundation, ...readSources()]
+// Built-ins first (the foundation, then any always-linked accounts), then what the
+// merchant linked. A saved copy of a built-in is dropped so it never lists twice.
+export function listSources(builtIns: Source[]): Source[] {
+  const ids = new Set(builtIns.map((s) => s.id))
+  return [...builtIns, ...readSources().filter((s) => !ids.has(s.id))]
+}
+
+export async function fetchSources(builtIns: Source[] = [FOUNDATION_SOURCE]): Promise<Source[]> {
+  return listSources(builtIns)
 }
 
 export async function persistSources(sources: Source[]): Promise<void> {

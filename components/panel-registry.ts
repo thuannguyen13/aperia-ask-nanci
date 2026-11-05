@@ -31,6 +31,7 @@ import { BusinessLoanOfferPanel } from "./ask-nanci/concept/BusinessLoanOfferPan
 import { BusiestTimesPanel } from "./ask-nanci/concept/BusiestTimesPanel"
 import { SlowestWindowsPanel } from "./ask-nanci/concept/SlowestWindowsPanel"
 import { LocationReviewPanel } from "./ask-nanci/concept/LocationReviewPanel"
+import { ResyConnectPanel } from "./ask-nanci/concept/ResyConnectPanel"
 import { ResyShiftPanel } from "./ask-nanci/concept/ResyShiftPanel"
 import { ResyConfirmPanel } from "./ask-nanci/concept/ResyConfirmPanel"
 import { ResyWaitlistPanel } from "./ask-nanci/concept/ResyWaitlistPanel"
@@ -51,6 +52,7 @@ import { DetectionQueueInsightPanel } from "@/components/risk/DetectionQueueInsi
 import { BarometerReport as RiskBarometer } from "@/components/risk/BarometerReport"
 import { RiskReport as RiskRiskReport } from "@/components/risk/RiskReport"
 import { AssignmentManagement as RiskAssignments } from "@/components/risk/AssignmentManagement"
+import { MARKETPLACE_TITLE } from "@/lib/ask-nanci/data/panels/service-marketplace"
 import { SHIFT_TITLE, CONFIRM_TITLE, WAITLIST_TITLE } from "@/lib/ask-nanci/data/panels/resy-tonight"
 import { MOVE_TITLE, NOTIFY_TITLE, OPEN_TITLE } from "@/lib/ask-nanci/data/panels/resy-friday"
 import { GUEST_TITLE } from "@/lib/ask-nanci/data/panels/resy-guests"
@@ -100,6 +102,7 @@ export const PANELS = {
   "busiest-times":       { component: BusiestTimesPanel,      label: "Busiest Times" },
   "slowest-windows":     { component: SlowestWindowsPanel,    label: "Slowest Windows" },
   "location-review":     { component: LocationReviewPanel,    label: "Location Review" },
+  "resy-connect":        { component: ResyConnectPanel,       label: MARKETPLACE_TITLE },
   "resy-shift":          { component: ResyShiftPanel,         label: SHIFT_TITLE },
   "resy-confirm":        { component: ResyConfirmPanel,       label: CONFIRM_TITLE },
   "resy-waitlist":       { component: ResyWaitlistPanel,      label: WAITLIST_TITLE },

@@ -126,14 +126,14 @@ function CatalogWelcomeView() {
   )
 }
 
-// A mode narrowed to one partner: its flows only, connect step first, numbered in the
-// order they are meant to be played rather than by their place in the full catalog.
+// A mode narrowed to one partner: its flows only, in play order. Each card shows its
+// flow number, the one its &flow=<slug> link uses.
 function ScopedWelcomeView({ scope }: { scope: FlowScope }) {
   const { handlePrompt } = useAskNanci()
   const { title, subtitle } = SCOPE_CATALOG[scope]
   const flows = FLOW_DEFS
     .filter(inScope(scope))
-    .sort((a, b) => Number(!a.destination) - Number(!b.destination) || a.num - b.num)
+    .sort((a, b) => a.num - b.num)
 
   return (
     <div className="flex flex-1 flex-col items-center overflow-y-auto px-4 py-8 md:px-8 md:py-12">
@@ -146,23 +146,23 @@ function ScopedWelcomeView({ scope }: { scope: FlowScope }) {
           </div>
         </div>
         <ChatInput />
-        <FlowGrid flows={flows} onTryIt={handlePrompt} numbered />
+        <FlowGrid flows={flows} onTryIt={handlePrompt} />
       </div>
     </div>
   )
 }
 
-function FlowGrid({ flows, onTryIt, onSimulateLogin, numbered }: { flows: FlowDef[]; onTryIt: (prompt: string) => void; onSimulateLogin?: () => void; numbered?: boolean }) {
+function FlowGrid({ flows, onTryIt, onSimulateLogin }: { flows: FlowDef[]; onTryIt: (prompt: string) => void; onSimulateLogin?: () => void }) {
   // A destination card opens a surface rather than playing a script.
   const { setMarketplaceOpen } = useAskNanci()
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-      {flows.map((flow, i) => (
+      {flows.map((flow) => (
         <div key={flow.num} className="flex flex-col gap-3 rounded-2xl border bg-card p-4">
           <div className="flex items-start justify-between gap-2">
             <div className="flex items-center gap-2">
               <span className="flex size-6 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
-                {numbered ? i + 1 : flow.num}
+                {flow.num}
               </span>
               <h3 className="text-sm font-semibold text-foreground">{flow.title}</h3>
             </div>

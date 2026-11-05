@@ -10,7 +10,7 @@ import {
 import { SourceIcon, getSourceInitials } from "./SourceIcon"
 import { ConnectWizard } from "./ConnectWizard"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { readSources } from "@/lib/ask-nanci/source-store"
+import { listSources } from "@/lib/ask-nanci/api"
 import { MARKETPLACE_SOURCE_GROUP, listMarketplaceSources } from "@/lib/ask-nanci/data/panels/service-marketplace"
 import type { Source } from "@/lib/ask-nanci/types"
 
@@ -46,7 +46,7 @@ function SourceItem({ source: s }: { source: Source }) {
 }
 
 export function ChatActiveSources({ sources: accounts }: Props) {
-  const { setSources, marketplaceEnabled, mutedMarketplaceSources } = useAskNanci()
+  const { setSources, builtInSources, marketplaceEnabled, mutedMarketplaceSources } = useAskNanci()
   // Marketplace sources join the avatar stack but list under their own group. Like
   // the accounts passed in, only the ones switched on are shown.
   const extensions = listMarketplaceSources(marketplaceEnabled, mutedMarketplaceSources).filter((s) => s.active)
@@ -144,7 +144,7 @@ export function ChatActiveSources({ sources: accounts }: Props) {
       <ConnectWizard
         open={wizardOpen}
         onClose={() => setWizardOpen(false)}
-        onLinked={() => { setSources(readSources()); setWizardOpen(false) }}
+        onLinked={() => { setSources(listSources(builtInSources)); setWizardOpen(false) }}
       />
     </TooltipProvider>
   )

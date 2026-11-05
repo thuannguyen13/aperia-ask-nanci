@@ -7,7 +7,8 @@ import { Button, Switch, Separator, Card, CardContent, ScrollArea } from "aperia
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { FOUNDATION_SOURCE, addFileSources, toggleSource, removeSource, readSources } from "@/lib/ask-nanci/source-store"
+import { FOUNDATION_SOURCE, addFileSources, toggleSource, removeSource } from "@/lib/ask-nanci/source-store"
+import { listSources } from "@/lib/ask-nanci/api"
 import { MARKETPLACE_SOURCE_GROUP, listMarketplaceSources } from "@/lib/ask-nanci/data/panels/service-marketplace"
 import { SourceIcon } from "./SourceIcon"
 import type { Source } from "@/lib/ask-nanci/types"
@@ -74,18 +75,18 @@ function SourceRow({ source, onToggle, onRemove }: { source: Source; onToggle: (
 // ─── Main panel ──────────────────────────────────────────────────────────────
 
 export function PersonalizePanel() {
-  const { kbOpen, setKbOpen, sources, setSources, foundationSource, marketplaceEnabled, toggleMarketplaceService, mutedMarketplaceSources, toggleMarketplaceSource } = useAskNanci()
+  const { kbOpen, setKbOpen, sources, setSources, builtInSources, marketplaceEnabled, toggleMarketplaceService, mutedMarketplaceSources, toggleMarketplaceSource } = useAskNanci()
   const extensions = listMarketplaceSources(marketplaceEnabled, mutedMarketplaceSources)
   const fileRef = useRef<HTMLInputElement>(null)
   const [wizardOpen, setWizardOpen] = useState(false)
 
-  const userSources = sources.filter((s) => s.id !== FOUNDATION_SOURCE.id)
+  // The mode's built-ins (its foundation, plus any always-linked account) show as
+  // "Added" pills that reflect the theme. They have no toggle or remove.
+  const builtInIds = new Set(builtInSources.map((s) => s.id))
+  const userSources = sources.filter((s) => s.id !== FOUNDATION_SOURCE.id && !builtInIds.has(s.id))
   const hasSources = userSources.length > 0
-  // The active host's foundation source (VisionWeb non-embed, Clover in the clover
-  // demo, etc.), so the "…Data Added" pill reflects the theme, not a hardcoded brand.
-  const builtIn = sources.find((s) => s.id === FOUNDATION_SOURCE.id) ?? foundationSource
 
-  function refresh() { setSources([foundationSource, ...readSources()]) }
+  function refresh() { setSources(listSources(builtInSources)) }
   function handleToggle(id: string) { toggleSource(id); refresh() }
   function handleRemove(id: string) { removeSource(id); refresh() }
 
@@ -144,10 +145,12 @@ export function PersonalizePanel() {
               </p>
             </div>
 
-            <div className="flex items-center justify-center gap-2 rounded-md border border-primary/30 bg-primary/5 px-3 py-2">
-              <SourceIcon source={builtIn} size="sm" />
-              <span className="text-sm font-medium text-foreground">{builtIn.institution} Added</span>
-            </div>
+            {builtInSources.map((s) => (
+              <div key={s.id} className="flex items-center justify-center gap-2 rounded-md border border-primary/30 bg-primary/5 px-3 py-2">
+                <SourceIcon source={s} size="sm" />
+                <span className="text-sm font-medium text-foreground">{s.institution} Added</span>
+              </div>
+            ))}
 
             {hasSources ? (
               <div className="flex flex-col">

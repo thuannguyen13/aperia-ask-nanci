@@ -10,6 +10,8 @@ import {
   promptsInScope,
   CONCEPT_FLOW28_SEND,
   isAwaitingFlow28Send,
+  isAwaitingFlow27Connect,
+  CONCEPT_FLOW27_CONNECT,
   CONCEPT_FLOW29_MOVE,
   CONCEPT_FLOW29_OPEN,
   isAwaitingFlow29Move,
@@ -154,8 +156,8 @@ describe("promptsInScope", () => {
     for (const k of RESY_KEYS) expect(unscoped).not.toContain(k)
   })
 
-  it("is exactly flows 28 to 32 in resy mode", () => {
-    expect(promptsInScope("resy")).toEqual([flowKey(28), flowKey(29), flowKey(30), flowKey(31), flowKey(32)])
+  it("is exactly flows 27 to 32 in resy mode", () => {
+    expect(promptsInScope("resy")).toEqual([flowKey(27), flowKey(28), flowKey(29), flowKey(30), flowKey(31), flowKey(32)])
   })
 
   it("adds each flow's followups after its own prompt", () => {
@@ -172,6 +174,44 @@ describe("flow 17 sibling chips", () => {
     const chips = script[script.length - 1].suggestions ?? []
     expect(chips.length).toBeGreaterThan(0)
     for (const k of RESY_KEYS) expect(chips).not.toContain(k)
+  })
+})
+
+// ── Flow 27: Connect Resy ──
+
+describe("flow 27, connect Resy", () => {
+  const flow27 = FLOW_DEFS.find((f) => f.num === 27)!
+  const script = CONVERSATIONS[flow27.key]
+
+  it("starts with the owner asking whether Ask Nanci can see the Resy book", () => {
+    expect(flow27).toMatchObject({ key: "Can Ask Nanci see my Resy book?", scope: "resy", slug: "27" })
+    expect(flow27.destination).toBeUndefined()
+    expect(script[0]).toMatchObject({ role: "user", content: flow27.key })
+  })
+
+  it("plays three questions, the second being the connect step", () => {
+    expect(script.map((t) => t.role)).toEqual(["user", "assistant", "user", "assistant", "user", "assistant"])
+    expect(script[2].content).toBe(CONCEPT_FLOW27_CONNECT)
+  })
+
+  it("opens the Resy listing, and connects it on the Connect turn, before the answer", () => {
+    expect(script[1]).toMatchObject({ panel: "resy-connect", revealPanel: true })
+    expect(script[1].view).toBeUndefined()
+    expect(script[2]).toMatchObject({ panel: "resy-connect", view: "connected" })
+    expect(script[3].panel).toBeUndefined()
+  })
+
+  it("quotes tonight's book once Resy is connected", () => {
+    expect(script[5].content).toContain(`${BOOK_COVERS} covers across ${BOOK_PARTIES} parties`)
+    expect(script[5].source).toBe("Resy reservations")
+  })
+
+  it("waits on the connect step only while the offer is the last message", () => {
+    const offer = { role: "assistant", content: script[1].content }
+    const opening = [{ role: "user", content: script[0].content }]
+    expect(isAwaitingFlow27Connect([...opening, offer], "idle")).toBe(true)
+    expect(isAwaitingFlow27Connect([...opening, offer], "streaming")).toBe(false)
+    expect(isAwaitingFlow27Connect([...opening, offer, { role: "user", content: CONCEPT_FLOW27_CONNECT }], "idle")).toBe(false)
   })
 })
 

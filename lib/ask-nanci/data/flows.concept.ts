@@ -59,6 +59,11 @@ const CONCEPT_FLOW24_BREAKDOWN = "show me the full breakdown";
 const CONCEPT_FLOW24_WATCH = "what's going on at Midtown?";
 // Reading time after a chart or the panel lands, before the next question covers it.
 const CONCEPT_FLOW24_READ_MS = 2500;
+const CONCEPT_FLOW27_PROMPT = "Can Ask Nanci see my Resy book?";
+// The connect step. ResyConnectPanel's Connect button sends this same turn, so the
+// button and the chip advance the flow the same way.
+export const CONCEPT_FLOW27_CONNECT = "Connect Resy";
+const CONCEPT_FLOW27_CHECK = "Can you see tonight's book now?";
 const CONCEPT_FLOW28_PROMPT = "How does tonight look?";
 const CONCEPT_FLOW28_UNCONFIRMED = "Who hasn't confirmed?";
 // The confirm step. ResyConfirmPanel's Send button sends this same turn, so the button
@@ -467,10 +472,10 @@ export const FLOW_DEFS: FlowDef[] = [
     section: "merchant",
     title: "Connect Resy",
     badge: "Resy",
-    key: "__resy_marketplace__",
-    destination: "marketplace",
+    key: CONCEPT_FLOW27_PROMPT,
+    slug: "27",
     scope: "resy",
-    description: "Open the Marketplace, find Resy and connect it. The listing then shows Resy as Connected.",
+    description: "Ask whether Nanci can see your Resy book. The Marketplace listing for Resy opens beside the chat, and Connect there links the account.",
   },
 ];
 
@@ -493,8 +498,8 @@ export const CONCEPT_EMBED_FLOW_LAYOUTS: Record<string, ConceptEmbedLayout> = {
   // means nobody is driving, so waiting for a click on the sidebar banner would leave
   // the embed sitting on the welcome screen showing none of what the flow is about.
   "22": { fullApp: true, openMarketplace: true },
-  // Connect Resy has no conversation, so its autoplay link plays the connect itself.
-  "27": { fullApp: true, openMarketplace: true, autoConnect: "resy" },
+  // Connect Resy opens in the full app, so the Resy listing sits beside the chat.
+  "27": { fullApp: true },
 };
 
 // Flows that a typed or clicked prompt can start, by card number, narrowed by `keep`.
@@ -580,6 +585,11 @@ const FLOW28_CANCELLED = partiesWithReply("cancelled")[0];
 // The answer that offers the follow-up. Flow 28 waits on "Send it" only while it is the
 // last thing in the chat.
 const FLOW28_ASK_TO_SEND = `${capitalize(spellCount(UNCONFIRMED.length))} parties, ${UNCONFIRMED_COVERS} covers, didn't answer yesterday's 4pm confirmation text, including the ${LARGEST_UNCONFIRMED.time} party of ${LARGEST_UNCONFIRMED.party}. It matters: in October, ${UNCONFIRMED_NO_SHOW_PCT}% of unconfirmed covers didn't show against ${CONFIRMED_NO_SHOW_PCT}% of confirmed ones, and no-shows have cost you ${formatWholeCurrency(NO_SHOW_COST)} at your ${formatWholeCurrency(CARD_PER_COVER)} a cover, with ${formatWholeCurrency(FEES_CHARGED)} back in fees. Want me to send Resy's confirmation follow-up to these ${spellCount(UNCONFIRMED.length)} now?`;
+
+const FLOW27_ASK_TO_CONNECT = "Not yet. Resy isn't connected, so I can only see your card sales. Connect it from the listing and I can read your book, waitlist, Notify list, guestbook, events and surveys. Want me to connect it now?";
+
+/** True while flow 27 is parked on its connect step: idle, with the offer as the last message. */
+export const isAwaitingFlow27Connect = (messages: { role: string; content: string }[], chatState: string) => isAwaitingTurn(messages, chatState, FLOW27_ASK_TO_CONNECT);
 
 /** True while flow 28 is parked on its confirm step: idle, with the offer as the last message. */
 export const isAwaitingFlow28Send = (messages: { role: string; content: string }[], chatState: string) => isAwaitingTurn(messages, chatState, FLOW28_ASK_TO_SEND);
@@ -1200,6 +1210,35 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       view: "watch",
       revealPanel: true,
       suggestions: CONCEPT_FLOW24_FOLLOWUPS_FAKE,
+    },
+  ],
+
+  // ── Flow 27: Connect Resy (Resy concept) ──────────────────────────────────
+  // The owner asks before anything is connected. The answer opens the Marketplace's
+  // Resy listing as a panel and parks on the connect step: the chip and the panel's
+  // Connect button both send it. Sending it connects Resy, so the listing reads
+  // Connected before the answer confirms it. The last question shows the book is now
+  // readable.
+  // Figures are quoted from data/panels/resy-tonight.ts.
+  [CONCEPT_FLOW27_PROMPT]: [
+    { role: "user", content: CONCEPT_FLOW27_PROMPT },
+    {
+      role: "assistant",
+      content: FLOW27_ASK_TO_CONNECT,
+      panel: "resy-connect",
+      revealPanel: true,
+    },
+    // Under ?autoplay, a beat on the listing before the connect goes through.
+    { role: "user", content: CONCEPT_FLOW27_CONNECT, pauseBefore: 2500, panel: "resy-connect", view: "connected" },
+    {
+      role: "assistant",
+      content: "Connected. Resy now sits beside your card sales, so one question can answer from both. I read your book, waitlist and guestbook, and I act in Resy only when you confirm.",
+    },
+    { role: "user", content: CONCEPT_FLOW27_CHECK },
+    {
+      role: "assistant",
+      content: `Yes. Tonight's book at the Tallis flagship is full: ${BOOK_COVERS} covers across ${BOOK_PARTIES} parties, peaking at ${BOOK_PEAK.time} with ${BOOK_PEAK.covers}. Ask how tonight looks for who hasn't confirmed and the wait at the door.`,
+      source: "Resy reservations",
     },
   ],
 

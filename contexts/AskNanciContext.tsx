@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, useCallback, useRef, useEffect } from "react"
+import { createContext, useContext, useState, useCallback, useRef, useEffect, useMemo } from "react"
 import { SCOPE_FOUNDATION, type FlowScope } from "@/lib/ask-nanci/data/flow-scopes"
 import type { Message, Session, Source, UsageData, ConceptScriptedTurn, PanelId, PanelAction, SheetActionData } from "@/lib/ask-nanci/types"
 import { usePanelStack } from "@/lib/ask-nanci/use-panel-stack"
@@ -25,7 +25,7 @@ import type { EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
 import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_PANEL_REPLIES, promptsInScope, CONCEPT_NO_RESET_PROMPTS, CONCEPT_MANUAL_PROMPTS, CONCEPT_LOOP_PROMPTS, CONCEPT_FLOW16_FOLLOWUPS, CONCEPT_FAKE_FOLLOWUPS, CONCEPT_CHAT_TITLES, CONCEPT_DECLINE_REPLIES, CONCEPT_OFFER_NO } from "@/lib/ask-nanci/data/flows.concept"
 import { ACCOUNT_CHANGE_SHEET } from "@/lib/ask-nanci/data/panels/account-change"
 import { FOUNDATION_SOURCE, FOUNDATION_SOURCE_ID } from "@/lib/ask-nanci/source-store"
-import { ONBOARDING_KEY, MARKETPLACE_ENABLED_KEY, MARKETPLACE_MUTED_KEY } from "@/lib/ask-nanci/storage-keys"
+import { ONBOARDING_KEY, MARKETPLACE_MUTED_KEY } from "@/lib/ask-nanci/storage-keys"
 import { readIdSet, writeIdSet } from "@/lib/ask-nanci/marketplace-store"
 import { MARKETPLACE_SERVICES } from "@/lib/ask-nanci/data/panels/service-marketplace"
 
@@ -169,6 +169,8 @@ interface AskNanciCtx {
   scope: FlowScope | null
   /** The built-in data source this mode ships with: its theme's, its scope's, or the default one. */
   foundationSource: Source
+  /** The foundation, then any accounts the mode always has linked. Never saved, never removable. */
+  builtInSources: Source[]
   submitFormPanel: () => void
   submitOfferApplication: (panelId: PanelId, message: string, sheetAction: SheetActionData) => void
   submitStepUpPanel: () => void
@@ -212,7 +214,7 @@ export function usePanelView(id: PanelId, fallback: string): string {
   return useAskNanci().panelViews[id] ?? fallback
 }
 
-export function AskNanciProvider({ children, isEmbed = false, embedVariant = null, isConceptVersion = false, catalog = false, scope = null, foundation, autoPlayFlow = null, autoPlay = false, initialView, initialMarketplaceOpen = false, autoConnectListing, forceOnboarding = false, skipOnboarding = false, genericBrand = false, intro = false }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null; isConceptVersion?: boolean; catalog?: boolean; scope?: FlowScope | null; foundation?: Source; autoPlayFlow?: string | null; autoPlay?: boolean; initialView?: ChatView; initialMarketplaceOpen?: boolean; autoConnectListing?: string; forceOnboarding?: boolean; skipOnboarding?: boolean; genericBrand?: boolean; intro?: boolean }) {
+export function AskNanciProvider({ children, isEmbed = false, embedVariant = null, isConceptVersion = false, catalog = false, scope = null, foundation, accounts, autoPlayFlow = null, autoPlay = false, initialView, initialMarketplaceOpen = false, autoConnectListing, forceOnboarding = false, skipOnboarding = false, genericBrand = false, intro = false }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null; isConceptVersion?: boolean; catalog?: boolean; scope?: FlowScope | null; foundation?: Source; accounts?: Source[]; autoPlayFlow?: string | null; autoPlay?: boolean; initialView?: ChatView; initialMarketplaceOpen?: boolean; autoConnectListing?: string; forceOnboarding?: boolean; skipOnboarding?: boolean; genericBrand?: boolean; intro?: boolean }) {
   const [view, setView] = useState<ChatView>(initialView ?? (embedVariant === "concept-embed" ? "chat" : "welcome"))
   const [messages, setMessages] = useState<Message[]>([])
   const [chatState, setChatState] = useState<ChatState>("idle")
@@ -225,13 +227,20 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   // keeps its variant's built-in source (Clover, AccessOne) rather than the default.
   const ownFoundation = foundation ?? (scope ? SCOPE_FOUNDATION[scope] : undefined)
   const foundationSource = ownFoundation ?? FOUNDATION_SOURCE
-  const [sources, setSourcesState] = useState<Source[]>(
-    isEmbed ? (
+  const builtInSources = useMemo(() => [foundationSource, ...(accounts ?? [])], [foundationSource, accounts])
+  // An embed starts from its variant's demo list. The mode's always-linked accounts
+  // follow the foundation, and a demo entry with the same id gives way to them.
+  const [sources, setSourcesState] = useState<Source[]>(() => {
+    if (!isEmbed) return []
+    const demo = (
       embedVariant === "business-owner" ? EMBED_BUSINESS_OWNER_DEMO_SOURCES :
       embedVariant === "iso" ? EMBED_ISO_DEMO_SOURCES :
       embedVariant === "vw" || embedVariant === "abc" || embedVariant === "concept-embed" ? EMBED_VW_DEMO_SOURCES :
-      EMBED_DEMO_SOURCES).map((s) => (ownFoundation && s.id === ownFoundation.id ? ownFoundation : s)) : []
-  )
+      EMBED_DEMO_SOURCES).map((s) => (ownFoundation && s.id === ownFoundation.id ? ownFoundation : s))
+    const always = new Set((accounts ?? []).map((s) => s.id))
+    const [first, ...rest] = demo
+    return [first, ...(accounts ?? []), ...rest.filter((s) => !always.has(s.id))]
+  })
   const [thinking, setThinking] = useState<{ source: Source | null; label: string }>({ source: null, label: "Thinking…" })
   // Personalize Ask Nanci and Service Marketplace are mutually exclusive — opening one
   // closes the other (one panel per user action). Enforced in the setters so
@@ -247,14 +256,14 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     if (open) setKbOpenState(false)
   }, [])
   // Seeded from the data's `added` flag, then owned here so the grid badge, the detail
-  // panel's button and the source lists can never disagree.
+  // panel's button and the source lists can never disagree. Not saved: a connection
+  // made in one demo would otherwise still be on in the next one on that machine.
   const [marketplaceEnabled, setMarketplaceEnabled] = useState<ReadonlySet<string>>(
     () => new Set(MARKETPLACE_SERVICES.filter((s) => s.added).map((s) => s.id)),
   )
   const toggleMarketplaceService = useCallback((id: string) => setMarketplaceEnabled((prev) => {
     const next = new Set(prev)
     if (!next.delete(id)) next.add(id)
-    writeIdSet(MARKETPLACE_ENABLED_KEY, next)
     return next
   }), [])
   const [mutedMarketplaceSources, setMutedMarketplaceSources] = useState<ReadonlySet<string>>(() => new Set())
@@ -346,17 +355,15 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     fetchSessions().then(setSessions)
     fetchPromptCategories().then(setPromptCategories)
     fetchAllQuestions().then(setAllQuestions)
-    if (!isEmbed) fetchSources(foundationSource).then(setSourcesState)
+    if (!isEmbed) fetchSources(builtInSources).then(setSourcesState)
     // ponytail: must stay in the effect — a lazy useState initializer would read
     // localStorage on the client but not the server, mismatching Dialog's `open` on hydrate.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (forceOnboarding || (!skipOnboarding && !localStorage.getItem(ONBOARDING_KEY))) setOnboardingOpen(true)
     // Same reason: saved Marketplace state is read after hydrate, not in the initializers.
-    const savedEnabled = readIdSet(MARKETPLACE_ENABLED_KEY)
-    if (savedEnabled) setMarketplaceEnabled(savedEnabled)
     const savedMuted = readIdSet(MARKETPLACE_MUTED_KEY)
     if (savedMuted) setMutedMarketplaceSources(savedMuted)
-  }, [isEmbed, forceOnboarding, skipOnboarding, foundationSource])
+  }, [isEmbed, forceOnboarding, skipOnboarding, builtInSources])
 
 
   const persistAndReload = useCallback(async (msgs: Message[]) => {
@@ -789,7 +796,9 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     // If the script opens with an assistant turn, show the thinking indicator now.
     if (script[0]?.role === "assistant") setChatState("thinking")
 
-    if (CONCEPT_MANUAL_PROMPTS.has(prompt)) {
+    // Under ?autoplay nobody clicks the pills, so the flow being autoplayed walks its
+    // whole script instead of stepping.
+    if (CONCEPT_MANUAL_PROMPTS.has(prompt) && !(autoPlay && prompt === autoPlayFlow)) {
       // Merchant Money flows: step one turn per pill click.
       activeFlowRef.current = { key: prompt, script, cursor: 0 }
       runConceptStep()
@@ -1010,8 +1019,9 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
 
   const handleSetSources = useCallback((next: Source[]) => {
     setSourcesState(next)
-    persistSources(next.filter((s) => s.id !== FOUNDATION_SOURCE_ID))
-  }, [])
+    const builtIn = new Set(builtInSources.map((s) => s.id))
+    persistSources(next.filter((s) => s.id !== FOUNDATION_SOURCE_ID && !builtIn.has(s.id)))
+  }, [builtInSources])
 
   const openSettings = useCallback(() => {
     setSettingsOpen(true)
@@ -1038,7 +1048,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       mobileSidebarOpen, setMobileSidebarOpen,
       shownPanelId, setShownPanelId, panelSheetDismissed, dismissPanelSheet, reopenPanelSheet, panelSheetOpen,
       onboardingOpen, setOnboardingOpen, forceOnboarding, genericBrand, tourActive, setTourActive, tourRequest, requestTour, flowFinished, conversationFading, introShowing, leavesCurrentFlow,
-      isConceptVersion, catalog, scope, foundationSource,
+      isConceptVersion, catalog, scope, foundationSource, builtInSources,
       submitFormPanel, submitOfferApplication, submitStepUpPanel,
       triggerProactiveFlow, proactiveNotificationActive, activateProactiveNotification,
       closingPanels, closePanel, closeAllNewPanels, submitDisputeDraft,

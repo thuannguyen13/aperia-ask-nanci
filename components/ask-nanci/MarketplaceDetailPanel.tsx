@@ -69,18 +69,20 @@ function MetaInfo({ service, enabled }: { service: MarketplaceService; enabled: 
 // ponytail: no product screenshots — we have no assets, so the reference's media
 // carousel is a "What you get" list instead. Swap it back if art ever lands.
 export function MarketplaceDetailPanel({
-  service, enabled, onToggle, onClose,
+  service, enabled, onToggle, onClose, heading = service.title,
 }: {
   service: MarketplaceService
   enabled: boolean
   onToggle: () => void
   onClose: () => void
+  /** The header title. Defaults to the listing's name, which the grid beside it lacks. */
+  heading?: string
 }) {
-  const { title, description, overview, highlights, sections, enableLabel = L.enable, enabledLabel, disableLabel = L.remove } = service
+  const { description, overview, highlights, sections, enableLabel = L.enable, enabledLabel, disableLabel = L.remove } = service
 
   return (
     <PanelShell>
-      <PanelHeader title={title} size="lg" onClose={onClose} />
+      <PanelHeader title={heading} size="lg" onClose={onClose} />
 
       {/* min-h-0: see the grid's ScrollArea in ServiceMarketplacePanel. */}
       <ScrollArea className="min-h-0 flex-1">

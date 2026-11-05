@@ -7,7 +7,7 @@ import { FOUNDATION_SOURCE, FOUNDATION_SOURCE_ID } from "../source-store"
 
 // ─── Internal build blocks ────────────────────────────────────────────────────
 // Per-host foundation sources (all share FOUNDATION_SOURCE_ID so the "is built-in?"
-// checks stay theme-agnostic). FOUNDATION_SOURCE itself is VisionWeb (see source-store).
+// checks stay theme-agnostic). FOUNDATION_SOURCE itself is ABC Bank (see source-store).
 
 const CLOVER_SOURCE: Source = {
   id: FOUNDATION_SOURCE_ID,
@@ -29,21 +29,31 @@ const ACCESS_ONE_SOURCE: Source = {
   addedAt: 0,
 }
 
-// The Resy mode's foundation: Resy is an American Express company, so the mode wears
-// AMEX and its built-in data is AMEX's.
-export const AMEX_SOURCE: Source = {
+// The AMEX and Resy modes wear the American Express brand but their built-in data is
+// VisionWeb's.
+export const VISION_WEB_SOURCE: Source = {
   id: FOUNDATION_SOURCE_ID,
-  name: "American Express",
+  name: "VisionWeb",
   kind: "bank",
-  institution: "American Express Data",
-  logo: "/logos/amex.svg",
+  institution: "VisionWeb Data",
+  logo: "/logos/vision-web-source-logo.svg",
   active: true,
   addedAt: 0,
 }
 
-// A theme whose brand owns the data replaces the default foundation with its own.
+// A theme can replace the default foundation with its own built-in data.
 export const THEME_FOUNDATION: Partial<Record<ThemeId, Source>> = {
-  amex: AMEX_SOURCE,
+  amex: VISION_WEB_SOURCE,
+}
+
+// The merchant's American Express account. The embed demo lists it among the linked
+// accounts. The AMEX theme has it always linked.
+const AMEX_ACCOUNT: Source = { id: "demo-amex", name: "Amex Business Gold ••5561", kind: "bank", institution: "American Express", color: "bg-sky-600", initials: "AX", logo: "/fi/amex.svg", active: true, addedAt: 0 }
+
+// Accounts a theme always has linked, after its foundation. They cannot be removed
+// and are never saved, so every load starts with them.
+export const THEME_ACCOUNTS: Partial<Record<ThemeId, Source[]>> = {
+  amex: [AMEX_ACCOUNT],
 }
 
 // ─── Per-variant source lists ─────────────────────────────────────────────────
@@ -54,7 +64,7 @@ export const EMBED_DEMO_SOURCES: Source[] = [
   { id: "demo-chase", name: "Chase Business Checking ••4892", kind: "bank", institution: "Chase",            color: "bg-blue-700",   initials: "CH", logo: "/fi/chase.png",      active: true, addedAt: 0 },
   { id: "demo-bofa",  name: "BofA Savings ••2341",            kind: "bank", institution: "Bank of America",  color: "bg-red-600",    initials: "BA", logo: "/fi/bofa.png",       active: true, addedAt: 0 },
   { id: "demo-wf",    name: "Wells Fargo Business ••7823",    kind: "bank", institution: "Wells Fargo",      color: "bg-yellow-600", initials: "WF", logo: "/fi/wellsfargo.png", active: true, addedAt: 0 },
-  { id: "demo-amex",  name: "Amex Business Gold ••5561",      kind: "bank", institution: "American Express", color: "bg-sky-600",    initials: "AX", logo: "/fi/amex.svg",       active: true, addedAt: 0 },
+  AMEX_ACCOUNT,
 ]
 
 export const EMBED_BUSINESS_OWNER_DEMO_SOURCES: Source[] = EMBED_DEMO_SOURCES.map((s) =>
