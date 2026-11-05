@@ -30,7 +30,8 @@ export function ResyConfirmCard({ title, detail, icon = CircleAlert, onConfirmTu
   }
 
   return (
-    <PanelItem variant="muted" icon={icon} iconClassName="text-primary">
+    // Top-aligned: the icon sits beside the title, not the middle of the text and button.
+    <PanelItem variant="muted" icon={icon} iconClassName="text-primary" className="items-start">
       <div className="min-w-0 flex-1 space-y-1 text-sm">
         <p className="font-medium text-foreground">{title}</p>
         <p className="text-muted-foreground">{detail}</p>
