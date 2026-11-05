@@ -181,9 +181,6 @@ function BotMessageBase({
             <div>{renderContent(displayedContent)}</div>
           )}
         </div>
-        {showExtras && message.source && (
-          <ChatScriptedSources source={message.source} />
-        )}
         {showExtras && message.widget === "ai-triage-summary" && (
           <AiTriageSummaryWidget />
         )}
@@ -202,6 +199,8 @@ function BotMessageBase({
             {message.attributedSources?.length ? (
               <ChatCitedSources sources={message.attributedSources} />
             ) : null}
+            {/* The source sits after everything the answer shows, just above its suggestions. */}
+            {message.source && <ChatScriptedSources source={message.source} />}
             {message.suggestions?.length ? (
               <SuggestedQuestions suggestions={message.suggestions} />
             ) : null}
