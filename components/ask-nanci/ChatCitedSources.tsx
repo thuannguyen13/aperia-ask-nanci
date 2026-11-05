@@ -5,6 +5,8 @@ import { FileText } from "lucide-react"
 import { Popover, PopoverTrigger, PopoverContent } from "aperia-ds5"
 import type { Source } from "@/lib/ask-nanci/types"
 import { getSourceInitials } from "./SourceIcon"
+import { useAskNanci } from "@/contexts/AskNanciContext"
+import { citeSource } from "@/lib/ask-nanci/cite-source"
 
 
 export function ChatCitedSources({ sources }: { sources: Source[] }) {
@@ -71,4 +73,11 @@ export function ChatCitedSources({ sources }: { sources: Source[] }) {
       </PopoverContent>
     </Popover>
   )
+}
+
+// A scripted answer's text source ("Resy reservations + card transactions"), drawn as
+// the same pill and popover as the sources a live answer cites.
+export function ChatScriptedSources({ source }: { source: string }) {
+  const { foundationSource } = useAskNanci()
+  return <ChatCitedSources sources={citeSource(source, foundationSource)} />
 }

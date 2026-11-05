@@ -3,8 +3,7 @@
 import { memo, useState } from "react"
 import { FileText } from "lucide-react"
 import type { Message, SheetActionData } from "@/lib/ask-nanci/types"
-import { ChatCitedSources } from "./ChatCitedSources"
-import { SourcePill } from "./SourcePill"
+import { ChatCitedSources, ChatScriptedSources } from "./ChatCitedSources"
 import { SuggestedQuestions } from "./SuggestedQuestions"
 import { MessageChart } from "./MessageChart"
 import { PanelArtifactCard } from "./PanelArtifactCard"
@@ -183,7 +182,7 @@ function BotMessageBase({
           )}
         </div>
         {showExtras && message.source && (
-          <div><SourcePill source={message.source} /></div>
+          <ChatScriptedSources source={message.source} />
         )}
         {showExtras && message.widget === "ai-triage-summary" && (
           <AiTriageSummaryWidget />

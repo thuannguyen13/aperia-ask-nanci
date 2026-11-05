@@ -8,7 +8,7 @@ import { useAskNanci } from "@/contexts/AskNanciContext"
 import { PanelShell, PanelHeader } from "@/components/shared"
 import { UserMessage, BotMessage } from "@/components/ask-nanci/ChatMessage"
 import { ChatActiveSources } from "@/components/ask-nanci/ChatActiveSources"
-import { SourcePill } from "@/components/ask-nanci/SourcePill"
+import { ChatScriptedSources } from "@/components/ask-nanci/ChatCitedSources"
 import { ThinkingIndicator } from "@/components/ask-nanci/ThinkingIndicator"
 import { streamWords } from "@/lib/ask-nanci/stream-words"
 import { RISK_LANDING_CONVERSATIONS, RISK_SUGGESTION_DESTS } from "@/lib/ask-nanci/data/risk-conversations"
@@ -117,7 +117,7 @@ export function NanciPanel({ panelId, prompt }: { panelId: string; prompt: strin
               {/* Extras land once the answer finishes typing. */}
               {m.id === streamingId ? null : <>
               {m.dashChart && <div className="px-4"><DashChartCard id={m.dashChart} /></div>}
-              {m.source && <div className="px-4"><SourcePill source={m.source} /></div>}
+              {m.source && <div className="px-4"><ChatScriptedSources source={m.source} /></div>}
               {m.suggestions?.length ? (
                 <div className="flex flex-wrap gap-2 px-4 pt-3">
                   {m.suggestions.map((s) => (
