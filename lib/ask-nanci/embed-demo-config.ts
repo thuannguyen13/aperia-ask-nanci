@@ -79,6 +79,11 @@ export function parseMode(mode: string | null): ParsedMode {
     // the Resy flows. Nothing else in the catalog or the marketplace. Wears the AMEX brand,
     // since Resy is an American Express company.
     case "resy":            return { ...base, isConceptVersion: true, catalog: true, scope: "resy", theme: "amex" }
+    // Embeddable counterpart to `resy`, as talus-embed is to talus: the compact widget,
+    // so &flow=<slug>&autoplay plays the same way.
+    case "resy-embed":      return { ...base, isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true, catalog: true, scope: "resy", theme: "amex" }
+    // The default app wearing the AMEX brand, without the Resy scope or the catalog.
+    case "amex":            return { ...base, theme: "amex"        }
     case "tib":             return { ...base, theme: "tib"         }
     case "woodforest":      return { ...base, theme: "woodforest"  }
     case "placeholder":     return { ...base, theme: "placeholder" }

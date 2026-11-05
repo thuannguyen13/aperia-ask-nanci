@@ -2,6 +2,7 @@
 // Swap with real API data when wiring the backend.
 
 import type { Source } from "../types"
+import type { ThemeId } from "./theme-logos"
 import { FOUNDATION_SOURCE, FOUNDATION_SOURCE_ID } from "../source-store"
 
 // ─── Internal build blocks ────────────────────────────────────────────────────
@@ -38,6 +39,11 @@ export const AMEX_SOURCE: Source = {
   logo: "/logos/amex.svg",
   active: true,
   addedAt: 0,
+}
+
+// A theme whose brand owns the data replaces the default foundation with its own.
+export const THEME_FOUNDATION: Partial<Record<ThemeId, Source>> = {
+  amex: AMEX_SOURCE,
 }
 
 // ─── Per-variant source lists ─────────────────────────────────────────────────

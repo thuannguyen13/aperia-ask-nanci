@@ -1,17 +1,15 @@
 @import "tailwindcss";
 @import "aperia-ds5/base.css";
 
-
-
 :root {
   --primary: #218800;
   --ring: var(--primary);
 
-  --chart-1: #3F65C2;
-  --chart-2: #F18442;
-  --chart-3: #951B19;  
-  --chart-4: #9FD689;  
-  --chart-5: #ECD1FB;
+  --chart-1: #3f65c2;
+  --chart-2: #f18442;
+  --chart-3: #951b19;
+  --chart-4: #9fd689;
+  --chart-5: #ecd1fb;
 }
 
 /* ─── Themes ───────────────────────────────────────────────────────────────────
@@ -27,7 +25,7 @@
    so the page backdrop can never paint itself across a portaled surface. */
 
 [data-theme="clover"] {
-  --app-gradient: linear-gradient(180deg, #218800 0%, #BFCDC5 200px);
+  --app-gradient: linear-gradient(180deg, #218800 0%, #bfcdc5 200px);
 }
 
 [data-theme="aperia"] {
@@ -40,10 +38,10 @@
 /* Titan — the aperia theme's original navy branding, kept as its own theme for the
    `?mode=titan` embed after `aperia` was rebranded to ABC Bank. */
 [data-theme="titan"] {
-  --primary: #002F67;
-  --ring: #002F67;
-  --sidebar-primary: #002F67;
-  --app-gradient: linear-gradient(180deg, #002F67 0%, #c5d5ed 200px);
+  --primary: #002f67;
+  --ring: #002f67;
+  --sidebar-primary: #002f67;
+  --app-gradient: linear-gradient(180deg, #002f67 0%, #c5d5ed 200px);
 }
 
 /* Aperia Risk runs a brighter primary than the concept app. Split from the shared
@@ -51,34 +49,36 @@
    embeds, and this is a Risk decision. The frame gradient stays the deep navy: it
    is the Titan brand bar, not a primary-colored surface. */
 [data-theme="aperia-risk"] {
-  --primary: #0058CC;
-  --ring: #0058CC;
-  --sidebar-primary: #0058CC;
-  --app-gradient: linear-gradient(180deg, #002F67 0%, #c5d5ed 200px);
+  --primary: #0058cc;
+  --ring: #0058cc;
+  --sidebar-primary: #0058cc;
+  --app-gradient: linear-gradient(180deg, #002f67 0%, #c5d5ed 200px);
 }
 
 /* Talus. The logo is full-color artwork with dark ink, which vanishes on the bar, so
    the frame slot renders it white like every other brand's frame logo. */
 [data-theme="talus"] {
-  --primary: #2FABD1;
-  --ring: #2FABD1;
-  --sidebar-primary: #2FABD1;
-  --app-gradient: linear-gradient(180deg, #2FABD1 0%, #cfe9ee 200px);
+  --primary: #2fabd1;
+  --ring: #2fabd1;
+  --sidebar-primary: #2fabd1;
+  --app-gradient: linear-gradient(180deg, #2fabd1 0%, #cfe9ee 200px);
 }
 
-[data-theme="talus"] [data-logo="frame"] { filter: brightness(0) invert(1); }
+[data-theme="talus"] [data-logo="frame"] {
+  filter: brightness(0) invert(1);
+}
 
 /* White-label placeholder. Same shape as Woodforest, and for the same reason: the brand
    color is light, so the frame gradient starts on a dark shade of it (the placeholder
    wordmark is white artwork) and --primary-foreground carries dark ink. To stand up a new
    brand, replace these values and the logo in theme-logos.ts. */
 [data-theme="placeholder"] {
-  --primary: #FFD8A8;
-  --primary-foreground: #4A2B00;
-  --ring: #FFD8A8;
-  --sidebar-primary: #FFD8A8;
-  --sidebar-primary-foreground: #4A2B00;
-  --app-gradient: linear-gradient(180deg, #8A4300 0%, #ffead5 200px);
+  --primary: #ffd8a8;
+  --primary-foreground: #4a2b00;
+  --ring: #ffd8a8;
+  --sidebar-primary: #ffd8a8;
+  --sidebar-primary-foreground: #4a2b00;
+  --app-gradient: linear-gradient(180deg, #8a4300 0%, #ffead5 200px);
 }
 
 /* Woodforest. The brand green is light, so two things differ from the other themes:
@@ -86,22 +86,22 @@
    artwork and would vanish on #AED581), and --primary-foreground flips to dark ink so
    button labels stay readable on a light primary — the DS default is near-white. */
 [data-theme="woodforest"] {
-  --primary: #AED581;
-  --primary-foreground: #1B3409;
-  --ring: #AED581;
-  --sidebar-primary: #AED581;
-  --sidebar-primary-foreground: #1B3409;
-  --app-gradient: linear-gradient(180deg, #33691E 0%, #dcedc8 200px);
+  --primary: #aed581;
+  --primary-foreground: #1b3409;
+  --ring: #aed581;
+  --sidebar-primary: #aed581;
+  --sidebar-primary-foreground: #1b3409;
+  --app-gradient: linear-gradient(180deg, #33691e 0%, #dcedc8 200px);
 }
 
 /* TIB currently runs Titan's palette. Written out in full rather than sharing the
    `aperia` block on purpose: TIB is its own brand, so when its real colors land this
    is the one place that changes, and nothing on the live Titan embeds moves with it. */
 [data-theme="tib"] {
-  --primary: #002F67;
-  --ring: #002F67;
-  --sidebar-primary: #002F67;
-  --app-gradient: linear-gradient(180deg, #002F67 0%, #c5d5ed 200px);
+  --primary: #002f67;
+  --ring: #002f67;
+  --sidebar-primary: #002f67;
+  --app-gradient: linear-gradient(180deg, #002f67 0%, #c5d5ed 200px);
 }
 
 /* American Express, worn by the Resy mode. The logo is a Bright Blue box, so the frame
@@ -114,18 +114,20 @@
 }
 
 [data-theme="access-one"] {
-  --primary: #FC6A25;
-  --ring: #FC6A25;
-  --app-gradient: linear-gradient(180deg, #FC6A25 0%, #fde8d8 200px);
+  --primary: #fc6a25;
+  --ring: #fc6a25;
+  --app-gradient: linear-gradient(180deg, #fc6a25 0%, #fde8d8 200px);
 }
 
 [data-theme="vision-web"] {
-  --primary: #1565C0;
-  --ring: #1565C0;
-  --app-gradient: linear-gradient(180deg, #1565C0 0%, #d0e4f7 200px);
+  --primary: #1565c0;
+  --ring: #1565c0;
+  --app-gradient: linear-gradient(180deg, #1565c0 0%, #d0e4f7 200px);
 }
 
-.app-frame { background: var(--app-gradient); }
+.app-frame {
+  background: var(--app-gradient);
+}
 
 /* Nesting the background behind a mobile panel sheet: the conversation scales down
    and dims so the sheet reads as the focused layer, the way iOS treats a card behind
@@ -204,31 +206,49 @@ html[data-sheet-scrub] {
 /* Sidebar logos are flat SVGs with baked-in ink, so dark mode inverts them. Scoped
    per slot + theme so a brand shipping a light-ink logo can opt out with its own rule. */
 html.dark [data-logo="sidebar"],
-html.dark [data-logo="sidebar-collapsed"] { filter: invert(1); }
+html.dark [data-logo="sidebar-collapsed"] {
+  filter: invert(1);
+}
 
 /* Aperia Risk's wordmark carries the Mastercard roundel — hue-rotate keeps it red
    rather than letting the invert turn it cyan. */
-html.dark[data-theme="aperia-risk"] [data-logo="sidebar"] { filter: invert(1) hue-rotate(180deg); }
+html.dark[data-theme="aperia-risk"] [data-logo="sidebar"] {
+  filter: invert(1) hue-rotate(180deg);
+}
 
 /* The Ask Nanci lockup ships with dark ink for light surfaces. Same invert +
    hue-rotate as the sidebar wordmarks above: the invert lifts the wordmark off a
    dark panel, the hue-rotate puts the logomark's blue gradient back to blue. */
-html.dark [data-logo="ask-nanci"] { filter: invert(1) hue-rotate(180deg); }
-
-
+html.dark [data-logo="ask-nanci"] {
+  filter: invert(1) hue-rotate(180deg);
+}
 
 @keyframes marquee-left {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 @keyframes marquee-right {
-  from { transform: translateX(-50%); }
-  to   { transform: translateX(0); }
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
 }
 
 @keyframes panel-fade-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* One petal of the thinking spinner (ThinkingIndicator.tsx). The stops are the
@@ -236,17 +256,44 @@ html.dark [data-logo="ask-nanci"] { filter: invert(1) hue-rotate(180deg); }
    and deep blue on the beat, cyan by the next one, then a long fade to nothing and
    a one-beat rise back. Every petal runs this same curve on its own delay. */
 @keyframes thinking-petal {
-  0%     { opacity: 1;   fill: #0354ce; }
-  11.05% { opacity: .79; fill: #0a94e6; }
-  22.11% { opacity: .62; fill: #00dcf4; }
-  33.16% { opacity: .45; }
-  44.22% { opacity: .33; }
-  55.27% { opacity: .21; }
-  66.33% { opacity: .12; }
-  77.38% { opacity: .05; }
-  88.44% { opacity: .01; }
-  89.36% { opacity: 0;   fill: #00dcf4; }
-  100%   { opacity: 1;   fill: #0354ce; }
+  0% {
+    opacity: 1;
+    fill: #0354ce;
+  }
+  11.05% {
+    opacity: 0.79;
+    fill: #0a94e6;
+  }
+  22.11% {
+    opacity: 0.62;
+    fill: #00dcf4;
+  }
+  33.16% {
+    opacity: 0.45;
+  }
+  44.22% {
+    opacity: 0.33;
+  }
+  55.27% {
+    opacity: 0.21;
+  }
+  66.33% {
+    opacity: 0.12;
+  }
+  77.38% {
+    opacity: 0.05;
+  }
+  88.44% {
+    opacity: 0.01;
+  }
+  89.36% {
+    opacity: 0;
+    fill: #00dcf4;
+  }
+  100% {
+    opacity: 1;
+    fill: #0354ce;
+  }
 }
 
 @theme {
@@ -283,13 +330,30 @@ html.dark [data-logo="ask-nanci"] { filter: invert(1) hue-rotate(180deg); }
    saying a panel landed. So the core goes white and the halo is a soft spectrum that
    belongs to no theme, which reads as something lighting up rather than as one more
    primary-coloured button appearing at the bottom of the screen. */
-@property --pulse-core { syntax: "<color>"; inherits: false; initial-value: transparent; }
-@property --pulse-warm { syntax: "<color>"; inherits: false; initial-value: transparent; }
-@property --pulse-mid  { syntax: "<color>"; inherits: false; initial-value: transparent; }
-@property --pulse-cool { syntax: "<color>"; inherits: false; initial-value: transparent; }
+@property --pulse-core {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: transparent;
+}
+@property --pulse-warm {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: transparent;
+}
+@property --pulse-mid {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: transparent;
+}
+@property --pulse-cool {
+  syntax: "<color>";
+  inherits: false;
+  initial-value: transparent;
+}
 
 @keyframes grabber-pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     --pulse-core: transparent;
     --pulse-warm: transparent;
@@ -300,7 +364,7 @@ html.dark [data-logo="ask-nanci"] { filter: invert(1) hue-rotate(180deg); }
     transform: scale(1.2);
     --pulse-core: rgb(255 255 255 / 0.95);
     --pulse-warm: rgb(255 120 195 / 0.75);
-    --pulse-mid:  rgb(140 118 255 / 0.6);
+    --pulse-mid: rgb(140 118 255 / 0.6);
     --pulse-cool: rgb(90 205 250 / 0.5);
   }
 }
@@ -308,7 +372,8 @@ html.dark [data-logo="ask-nanci"] { filter: invert(1) hue-rotate(180deg); }
 /* The same two beats with nothing moving, for a reader who asked for no motion. Light
    is not motion, so the glow stays; only the swell goes. */
 @keyframes grabber-pulse-still {
-  0%, 100% {
+  0%,
+  100% {
     --pulse-core: transparent;
     --pulse-warm: transparent;
     --pulse-mid: transparent;
@@ -317,7 +382,7 @@ html.dark [data-logo="ask-nanci"] { filter: invert(1) hue-rotate(180deg); }
   45% {
     --pulse-core: rgb(255 255 255 / 0.95);
     --pulse-warm: rgb(255 120 195 / 0.75);
-    --pulse-mid:  rgb(140 118 255 / 0.6);
+    --pulse-mid: rgb(140 118 255 / 0.6);
     --pulse-cool: rgb(90 205 250 / 0.5);
   }
 }
@@ -349,7 +414,9 @@ html.dark [data-logo="ask-nanci"] { filter: invert(1) hue-rotate(180deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-pulse] { animation-name: grabber-pulse-still; }
+  [data-pulse] {
+    animation-name: grabber-pulse-still;
+  }
 }
 
 @layer base {
@@ -369,8 +436,13 @@ html.dark [data-logo="ask-nanci"] { filter: invert(1) hue-rotate(180deg); }
     height: 100%;
   }
 
-  button, [role="button"], label[for],
-  [role="menuitem"], [role="option"], [role="menuitemcheckbox"], [role="menuitemradio"] {
+  button,
+  [role="button"],
+  label[for],
+  [role="menuitem"],
+  [role="option"],
+  [role="menuitemcheckbox"],
+  [role="menuitemradio"] {
     cursor: pointer;
   }
 
@@ -518,9 +590,19 @@ html.dark [data-logo="ask-nanci"] { filter: invert(1) hue-rotate(180deg); }
      buttons (the sidebar toggle, the sheet pager, a recent chat row) have no slot;
      every slot in the 44px rule renders as one of these. No media query: touch-action
      is inert under a mouse. */
-  button, [role="button"], a, label[for], summary,
-  input, textarea, select,
-  [role="menuitem"], [role="option"], [role="menuitemcheckbox"], [role="menuitemradio"], [role="tab"] {
+  button,
+  [role="button"],
+  a,
+  label[for],
+  summary,
+  input,
+  textarea,
+  select,
+  [role="menuitem"],
+  [role="option"],
+  [role="menuitemcheckbox"],
+  [role="menuitemradio"],
+  [role="tab"] {
     touch-action: manipulation;
   }
 }

@@ -48,6 +48,7 @@ export async function* streamChat(
   activeSources: Source[],
   _sessionId: string,
   embedVariant?: EmbedVariant | null,
+  foundation: Source = FOUNDATION_SOURCE,
 ): AsyncGenerator<ChatStreamChunk> {
   const lastUser = [...messages].reverse().find((m) => m.role === "user")
   const match = findResponse(lastUser?.content ?? "")
@@ -59,7 +60,7 @@ export async function* streamChat(
   const map = match?.map
 
   // Cycle through active sources during thinking phase (BE: replace with real thinking chunks)
-  const thinkingSources = activeSources.length ? activeSources : [FOUNDATION_SOURCE]
+  const thinkingSources = activeSources.length ? activeSources : [foundation]
   for (const source of thinkingSources) {
     yield { type: "thinking", source }
     await new Promise((r) => setTimeout(r, 1200))

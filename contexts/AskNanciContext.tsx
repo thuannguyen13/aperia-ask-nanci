@@ -167,7 +167,7 @@ interface AskNanciCtx {
   catalog: boolean
   /** The partner this mode is narrowed to, if any (see ParsedMode.scope). */
   scope: FlowScope | null
-  /** The built-in data source this mode ships with: its scope's, or the default one. */
+  /** The built-in data source this mode ships with: its theme's, its scope's, or the default one. */
   foundationSource: Source
   submitFormPanel: () => void
   submitOfferApplication: (panelId: PanelId, message: string, sheetAction: SheetActionData) => void
@@ -212,7 +212,7 @@ export function usePanelView(id: PanelId, fallback: string): string {
   return useAskNanci().panelViews[id] ?? fallback
 }
 
-export function AskNanciProvider({ children, isEmbed = false, embedVariant = null, isConceptVersion = false, catalog = false, scope = null, autoPlayFlow = null, autoPlay = false, initialView, initialMarketplaceOpen = false, autoConnectListing, forceOnboarding = false, skipOnboarding = false, genericBrand = false, intro = false }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null; isConceptVersion?: boolean; catalog?: boolean; scope?: FlowScope | null; autoPlayFlow?: string | null; autoPlay?: boolean; initialView?: ChatView; initialMarketplaceOpen?: boolean; autoConnectListing?: string; forceOnboarding?: boolean; skipOnboarding?: boolean; genericBrand?: boolean; intro?: boolean }) {
+export function AskNanciProvider({ children, isEmbed = false, embedVariant = null, isConceptVersion = false, catalog = false, scope = null, foundation, autoPlayFlow = null, autoPlay = false, initialView, initialMarketplaceOpen = false, autoConnectListing, forceOnboarding = false, skipOnboarding = false, genericBrand = false, intro = false }: { children: React.ReactNode; isEmbed?: boolean; embedVariant?: EmbedVariant | null; isConceptVersion?: boolean; catalog?: boolean; scope?: FlowScope | null; foundation?: Source; autoPlayFlow?: string | null; autoPlay?: boolean; initialView?: ChatView; initialMarketplaceOpen?: boolean; autoConnectListing?: string; forceOnboarding?: boolean; skipOnboarding?: boolean; genericBrand?: boolean; intro?: boolean }) {
   const [view, setView] = useState<ChatView>(initialView ?? (embedVariant === "concept-embed" ? "chat" : "welcome"))
   const [messages, setMessages] = useState<Message[]>([])
   const [chatState, setChatState] = useState<ChatState>("idle")
@@ -221,13 +221,16 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   // pendingBot lives in ChatStreamContext (see that file): its per-token churn must
   // not re-render this provider's ~40 consumers. We only ever write it here.
   const setPendingBot = usePendingBotSetter()
-  const foundationSource = scope ? SCOPE_FOUNDATION[scope] : FOUNDATION_SOURCE
+  // A mode's own foundation comes from its theme or its scope. Without one, an embed
+  // keeps its variant's built-in source (Clover, AccessOne) rather than the default.
+  const ownFoundation = foundation ?? (scope ? SCOPE_FOUNDATION[scope] : undefined)
+  const foundationSource = ownFoundation ?? FOUNDATION_SOURCE
   const [sources, setSourcesState] = useState<Source[]>(
     isEmbed ? (
       embedVariant === "business-owner" ? EMBED_BUSINESS_OWNER_DEMO_SOURCES :
       embedVariant === "iso" ? EMBED_ISO_DEMO_SOURCES :
       embedVariant === "vw" || embedVariant === "abc" || embedVariant === "concept-embed" ? EMBED_VW_DEMO_SOURCES :
-      EMBED_DEMO_SOURCES) : []
+      EMBED_DEMO_SOURCES).map((s) => (ownFoundation && s.id === ownFoundation.id ? ownFoundation : s)) : []
   )
   const [thinking, setThinking] = useState<{ source: Source | null; label: string }>({ source: null, label: "Thinking…" })
   // Personalize Ask Nanci and Service Marketplace are mutually exclusive — opening one
@@ -403,7 +406,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       let started = false
 
       try {
-        for await (const chunk of streamChat(allMsgs, activeSources, sentSessionId, embedVariant)) {
+        for await (const chunk of streamChat(allMsgs, activeSources, sentSessionId, embedVariant, foundationSource)) {
           if (stopRef.current) break
 
           if (chunk.type === "thinking") {
@@ -459,7 +462,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     }
 
     run()
-  }, [chatState, sources, persistAndReload, appendBotMessage, scope])
+  }, [chatState, sources, persistAndReload, appendBotMessage, scope, foundationSource])
 
   const stopAnimation = useCallback(() => {
     stopRef.current = true

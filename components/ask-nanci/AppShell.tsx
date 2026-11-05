@@ -11,6 +11,7 @@ import { ChatStreamProvider } from "@/contexts/ChatStreamContext"
 import { parseMode, CONCEPT_FLOW_SLUGS, CONCEPT_EMBED_FLOW_LAYOUTS } from "@/lib/ask-nanci/embed-demo-config"
 import { AppFrame, useAppTheme } from "./AppFrame"
 import { getThemeLogos } from "@/lib/ask-nanci/data/theme-logos"
+import { THEME_FOUNDATION } from "@/lib/ask-nanci/data/sources"
 import { Sidebar } from "./Sidebar"
 import { PersonalizePanel } from "./PersonalizePanel"
 import { ServiceMarketplacePanel } from "./ServiceMarketplacePanel"
@@ -179,6 +180,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         embedVariant={embedVariant}
         isConceptVersion={fullApp ? false : isConceptVersion}
         catalog={fullApp ? false : catalog}
+        scope={scope}
+        foundation={THEME_FOUNDATION[theme]}
         autoPlayFlow={autoPlayFlow}
         autoPlay={autoPlay} genericBrand={genericBrand} intro={!!introSrc}
         initialView={fullApp ? "welcome" : undefined}
@@ -229,7 +232,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <ChatStreamProvider>
     {/* autoPlayFlow reaches the non-embed modes too, so ?autoplay composes with
         concept / tib / woodforest, not just the embed */}
-    <AskNanciProvider isConceptVersion={isConceptVersion} catalog={catalog} scope={scope} autoPlayFlow={autoPlayFlow} autoPlay={autoPlay} genericBrand={genericBrand} forceOnboarding={forceOnboarding} skipOnboarding={skipOnboarding || !!scope} initialMarketplaceOpen={autoPlay && !!embedLayout?.openMarketplace} autoConnectListing={autoPlay ? embedLayout?.autoConnect : undefined}>
+    <AskNanciProvider isConceptVersion={isConceptVersion} catalog={catalog} scope={scope} foundation={THEME_FOUNDATION[theme]} autoPlayFlow={autoPlayFlow} autoPlay={autoPlay} genericBrand={genericBrand} forceOnboarding={forceOnboarding} skipOnboarding={skipOnboarding || !!scope} initialMarketplaceOpen={autoPlay && !!embedLayout?.openMarketplace} autoConnectListing={autoPlay ? embedLayout?.autoConnect : undefined}>
       <AppFrame
         theme={theme}
         topBar={
