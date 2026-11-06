@@ -37,4 +37,10 @@ The rewind is an animation, not a reset. The phone's sheet goes down to its hand
 
 Two limits. The loop runs only under `?autoplay`, so a flow someone opened from a card still ends where its script ends. A looping flow never sets `flowFinished`, so it shows no Restart button: it is about to restart itself.
 
+## Autoplay
+
+Nobody taps a chip or fills in a panel on an `?autoplay` link, so a flow stalls at the first one it reaches. The script runs on into each of the flow's `followups` that its last answer offers as a chip, through `getAutoplayScript`. A panel the flow hands over to plays its own steps through `usePanelAutoplay`, typing sample values and pressing its buttons.
+
+Give a new panel step its own autoplay steps. Without them the flow stalls at that step under `?autoplay`.
+
 Adding a declarative field here is nearly always better than adding an imperative branch in `playConceptScripted`: the whole point is that a flow is data, not code.

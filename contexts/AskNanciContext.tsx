@@ -22,7 +22,7 @@ import type { CurrentUser, PromptCategory } from "@/lib/ask-nanci/api"
 import { MOCK_USAGE, DEFAULT_CURRENT_USER } from "@/lib/ask-nanci/mock-data"
 import { EMBED_DEMO_SOURCES, EMBED_BUSINESS_OWNER_DEMO_SOURCES, EMBED_ISO_DEMO_SOURCES, EMBED_VW_DEMO_SOURCES, SCRIPTED_CONVERSATIONS } from "@/lib/ask-nanci/embed-demo-config"
 import type { EmbedVariant } from "@/lib/ask-nanci/embed-demo-config"
-import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY, CONCEPT_PANEL_REPLIES, promptsInScope, CONCEPT_NO_RESET_PROMPTS, CONCEPT_MANUAL_PROMPTS, CONCEPT_LOOP_PROMPTS, CONCEPT_FLOW16_FOLLOWUPS, CONCEPT_FAKE_FOLLOWUPS, CONCEPT_CHAT_TITLES, CONCEPT_DECLINE_REPLIES, CONCEPT_OFFER_NO } from "@/lib/ask-nanci/data/flows.concept"
+import { CONCEPT_SCRIPTED_CONVERSATIONS, getAutoplayScript, CONCEPT_FLOW6_KEY, CONCEPT_PANEL_REPLIES, promptsInScope, CONCEPT_NO_RESET_PROMPTS, CONCEPT_MANUAL_PROMPTS, CONCEPT_LOOP_PROMPTS, CONCEPT_FLOW16_FOLLOWUPS, CONCEPT_FAKE_FOLLOWUPS, CONCEPT_CHAT_TITLES, CONCEPT_DECLINE_REPLIES, CONCEPT_OFFER_NO } from "@/lib/ask-nanci/data/flows.concept"
 import { ACCOUNT_CHANGE_SHEET } from "@/lib/ask-nanci/data/panels/account-change"
 import { FOUNDATION_SOURCE, FOUNDATION_SOURCE_ID } from "@/lib/ask-nanci/source-store"
 import { ONBOARDING_KEY, MARKETPLACE_MUTED_KEY } from "@/lib/ask-nanci/storage-keys"
@@ -146,6 +146,11 @@ interface AskNanciCtx {
    * while it waits for the next pill click, so it would read as finished mid-demo.
    */
   flowFinished: boolean
+  /**
+   * True on an ?autoplay link to one flow. Nobody is there to type into a panel or
+   * press its buttons, so a panel the flow hands over to plays those steps itself.
+   */
+  autoplaying: boolean
   /**
    * True while a looping demo is winding the screen back to empty between runs. The
    * conversation fades on it, so the messages are gone before they are cleared.
@@ -727,7 +732,9 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
         // Effects first, as in runConceptStep: the pause is a beat on what they changed.
         applyTurnEffects(turn)
         if (turn.pauseAfter) await sleep(turn.pauseAfter)
-        setChatState("thinking")
+        // A script that ends on a user turn hands the demo to the panel it opened, so
+        // no answer is coming. Thinking there would hold the chat busy for good.
+        setChatState(i === script.length - 1 ? "idle" : "thinking")
       } else {
         await sleep(1800)
         if (shouldStop()) break
@@ -789,8 +796,9 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   }, [runConceptTurns, rewindForLoop, playIntro])
 
   const playConceptScripted = useCallback((prompt: string) => {
-    const script = CONCEPT_SCRIPTED_CONVERSATIONS[prompt]
-    if (!script) return
+    if (!CONCEPT_SCRIPTED_CONVERSATIONS[prompt]) return
+    // The flow being autoplayed also plays the follow-ups nobody is there to tap.
+    const script = autoPlay && prompt === autoPlayFlow ? getAutoplayScript(prompt) : CONCEPT_SCRIPTED_CONVERSATIONS[prompt]
     scriptStopRef.current = false
     // This run owns the screen from here: any auto-play still sleeping mid-loop sees
     // the number move and stops.
@@ -1058,7 +1066,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       settingsOpen, openSettings, setSettingsOpen,
       mobileSidebarOpen, setMobileSidebarOpen,
       shownPanelId, setShownPanelId, panelSheetDismissed, dismissPanelSheet, reopenPanelSheet, panelSheetOpen,
-      onboardingOpen, setOnboardingOpen, forceOnboarding, genericBrand, tourActive, setTourActive, tourRequest, requestTour, flowFinished, conversationFading, introShowing, leavesCurrentFlow,
+      onboardingOpen, setOnboardingOpen, forceOnboarding, genericBrand, tourActive, setTourActive, tourRequest, requestTour, flowFinished, autoplaying: autoPlay && !!autoPlayFlow, conversationFading, introShowing, leavesCurrentFlow,
       isConceptVersion, catalog, scope, foundationSource, builtInSources,
       submitFormPanel, submitOfferApplication, submitStepUpPanel,
       triggerProactiveFlow, proactiveNotificationActive, activateProactiveNotification,

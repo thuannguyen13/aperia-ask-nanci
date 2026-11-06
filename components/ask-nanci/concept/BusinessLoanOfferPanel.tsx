@@ -3,6 +3,7 @@
 import { CheckCheck } from "lucide-react"
 import { Button, Checkbox, Label } from "aperia-ds5"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
+import { useAutoplayForm } from "./use-panel-autoplay"
 import {
   getLoanBrand, LOAN_APPLICANT, LOAN_SUGGESTED, LOAN_COST, LOAN_CONSENT, LOAN_INSIGHT_PRE, LOAN_INSIGHT_BOLD, LOAN_INSIGHT_POST, LOAN_PREFILL_NOTE,
   LOAN_REQUEST_REF, LOAN_SUBMITTED_TITLE, LOAN_SUCCESS_MESSAGE, LOAN_VERIFY,
@@ -47,6 +48,7 @@ export function BusinessLoanOfferPanel() {
       status: "submitted",
     })
   }
+  const { endRef, consented } = useAutoplayForm(view === "offer", submit)
 
   if (view === "verify") {
     return (
@@ -131,8 +133,8 @@ export function BusinessLoanOfferPanel() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Checkbox id="loan-consent" />
+        <div ref={endRef} className="flex items-center gap-2">
+          <Checkbox id="loan-consent" {...(consented !== undefined ? { checked: consented } : {})} />
           <Label htmlFor="loan-consent" className="text-xs text-foreground">{LOAN_CONSENT}</Label>
         </div>
 

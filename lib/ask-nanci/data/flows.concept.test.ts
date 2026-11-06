@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs"
 import { describe, expect, it } from "vitest"
 import {
+  getAutoplayScript,
   FLOW_DEFS,
   CONCEPT_SCRIPTED_CONVERSATIONS,
   CONCEPT_FAKE_FOLLOWUPS,
@@ -653,5 +654,21 @@ describe("Marketplace sources", () => {
     expect(rest).toEqual([])
     expect(resy).toMatchObject({ id: "resy", name: "Resy", institution: "Resy Data", logo: "/logos/resy-logo.png", active: true })
     expect(listMarketplaceSources(new Set(["resy"]), new Set(["resy"]))[0].active).toBe(false)
+  })
+})
+
+describe("Autoplay script", () => {
+  const userTurns = (slug: string) => getAutoplayScript(CONCEPT_FLOW_SLUGS[slug]).filter((t) => t.role === "user").map((t) => t.content)
+
+  it("plays on into each follow-up the last answer offers", () => {
+    expect(userTurns("5")).toContain("Update my business name")
+    expect(userTurns("12")).toEqual(["Show me the detection queue", "Yes, open it", "Pull up Coastal's risk report alongside", "Escalate this one and open a risk case."])
+    expect(userTurns("15")).toContain("nice. was there a slow day?")
+    expect(userTurns("23")).toContain("and when's it dead? I want to cut a shift")
+  })
+
+  it("leaves a flow without follow-ups as it is, and lets a looping flow rest", () => {
+    for (const slug of ["1", "16", "20", "28"]) expect(getAutoplayScript(CONCEPT_FLOW_SLUGS[slug])).toEqual(CONCEPT_SCRIPTED_CONVERSATIONS[CONCEPT_FLOW_SLUGS[slug]])
+    expect(getAutoplayScript(CONCEPT_FLOW_SLUGS["24"])).toEqual(CONCEPT_SCRIPTED_CONVERSATIONS[CONCEPT_FLOW_SLUGS["24"]])
   })
 })

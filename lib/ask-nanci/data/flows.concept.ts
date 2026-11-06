@@ -1457,3 +1457,26 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     },
   ],
 };
+
+// A beat on the answer before its follow-up chip is sent, as a reader would take.
+const AUTOPLAY_FOLLOWUP_PAUSE_MS = 2500;
+
+/**
+ * The script a flow plays under ?autoplay. Nobody taps the chips there, so a flow whose
+ * last answer offers one of its own `followups` plays on into it, and into that one's
+ * follow-up in turn. A looping flow rests on its last step instead.
+ */
+export function getAutoplayScript(key: string): ConceptScriptedTurn[] {
+  const script = [...(CONCEPT_SCRIPTED_CONVERSATIONS[key] ?? [])];
+  const flow = FLOW_DEFS.find((f) => f.key === key || f.altEntries?.some((e) => e.key === key));
+  if (!flow || flow.loop) return script;
+  const played = new Set([key]);
+  for (;;) {
+    const last = script[script.length - 1];
+    const next = last?.role === "assistant" ? last.suggestions?.find((s) => flow.followups?.includes(s) && !played.has(s) && CONCEPT_SCRIPTED_CONVERSATIONS[s]) : undefined;
+    if (!next) return script;
+    played.add(next);
+    const [first, ...rest] = CONCEPT_SCRIPTED_CONVERSATIONS[next];
+    script.push({ ...first, pauseBefore: first.pauseBefore ?? AUTOPLAY_FOLLOWUP_PAUSE_MS }, ...rest);
+  }
+}

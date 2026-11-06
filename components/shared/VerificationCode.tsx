@@ -7,13 +7,14 @@ import { InputOTP, InputOTPGroup, InputOTPSlot, Label } from "aperia-ds5"
 // a third and fourth copy, and StepUpAuthPanel had already drifted to a hand-rolled
 // <input maxLength={6}> that looks nothing like this one.
 //
-// Uncontrolled and always empty: the code is something the person entered, and a
-// seeded field reads as a mock the moment anyone looks closely.
-export function VerificationCode({ email }: { email: string }) {
+// Uncontrolled and empty: the code is something the person entered, and a seeded field
+// reads as a mock the moment anyone looks closely. `value` is for ?autoplay only, where
+// the panel types the code in itself.
+export function VerificationCode({ email, value }: { email: string; value?: string }) {
   return (
     <div className="flex flex-col items-center gap-2">
       <Label className="text-xs">Verification Code</Label>
-      <InputOTP maxLength={6}>
+      <InputOTP maxLength={6} {...(value !== undefined ? { value, readOnly: true } : {})}>
         <InputOTPGroup className="gap-2">
           {Array.from({ length: 6 }).map((_, i) => (
             <InputOTPSlot key={i} index={i} className="rounded-lg border-l" />

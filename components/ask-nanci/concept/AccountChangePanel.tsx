@@ -5,6 +5,7 @@ import { Button, Input, Label, Tooltip, TooltipTrigger, TooltipContent, TooltipP
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { CURRENT_ACCOUNT, NEW_ACCOUNT, CONFIRMATION_EMAIL } from "@/lib/ask-nanci/data/panels/account-change"
 import { PanelShell, PanelHeader, Callout, VerificationCode } from "@/components/shared"
+import { typeAt, typedBy, useAutoplayCode, usePanelAutoplay } from "./use-panel-autoplay"
 
 function AccountRow({ last4, className }: { last4: string; className?: string }) {
   return (
@@ -21,12 +22,13 @@ function AccountRow({ last4, className }: { last4: string; className?: string })
 }
 
 // A field with a "Secure" lock icon on the right; the lock is a tooltip trigger.
-function SecureInput({ id, label, placeholder }: { id: string; label: string; placeholder: string }) {
+// `value` is for ?autoplay only, where the panel types the account in itself.
+function SecureInput({ id, label, placeholder, value }: { id: string; label: string; placeholder: string; value?: string }) {
   return (
     <div className="flex flex-col gap-1.5">
       <Label htmlFor={id} className="text-xs">{label}</Label>
       <div className="relative">
-        <Input id={id} placeholder={placeholder} className="pr-9" />
+        <Input id={id} placeholder={placeholder} className="pr-9" {...(value !== undefined ? { value, readOnly: true } : {})} />
         <Tooltip>
           <TooltipTrigger asChild>
             <button
@@ -45,7 +47,15 @@ function SecureInput({ id, label, placeholder }: { id: string; label: string; pl
   )
 }
 
+// Under ?autoplay the routing number is typed, then the account number, then Request
+// Changes is pressed.
+const ROUTING_FROM_MS = 800
+const ACCOUNT_FROM_MS = typedBy(NEW_ACCOUNT.routing, ROUTING_FROM_MS) + 400
+const SUBMIT_AT_MS = typedBy(NEW_ACCOUNT.number, ACCOUNT_FROM_MS) + 1000
+
 function Step1({ onSubmit }: { onSubmit: () => void }) {
+  const elapsed = usePanelAutoplay([{ at: SUBMIT_AT_MS, run: onSubmit }])
+  const typed = (text: string, from: number) => (elapsed === null ? undefined : typeAt(text, elapsed, from))
   return (
     <div className="flex flex-1 flex-col overflow-y-auto px-4 py-3 gap-4">
       <div>
@@ -57,8 +67,8 @@ function Step1({ onSubmit }: { onSubmit: () => void }) {
         <p className="mb-2 text-base font-bold text-foreground">New Account</p>
         <TooltipProvider delayDuration={300}>
           <div className="flex flex-col gap-3">
-            <SecureInput id="new-routing" label="Routing Number" placeholder="9 Digits" />
-            <SecureInput id="new-account" label="Account Number" placeholder="Enter Account Number" />
+            <SecureInput id="new-routing" label="Routing Number" placeholder="9 Digits" value={typed(NEW_ACCOUNT.routing, ROUTING_FROM_MS)} />
+            <SecureInput id="new-account" label="Account Number" placeholder="Enter Account Number" value={typed(NEW_ACCOUNT.number, ACCOUNT_FROM_MS)} />
           </div>
         </TooltipProvider>
       </div>
@@ -69,6 +79,7 @@ function Step1({ onSubmit }: { onSubmit: () => void }) {
 }
 
 function Step2({ onBack, onConfirm }: { onBack: () => void; onConfirm: () => void }) {
+  const code = useAutoplayCode(onConfirm)
   return (
     <div className="flex flex-1 flex-col overflow-y-auto px-4 py-3 gap-4">
       <Callout variant="green">
@@ -94,7 +105,7 @@ function Step2({ onBack, onConfirm }: { onBack: () => void; onConfirm: () => voi
         <p className="mb-2 text-base font-bold text-foreground">Verification</p>
         {/* Left unseeded: this step confirms a money-movement change, so the code is
             typed rather than arriving pre-filled the way the offer gate does. */}
-        <VerificationCode email={CONFIRMATION_EMAIL} />
+        <VerificationCode email={CONFIRMATION_EMAIL} value={code} />
       </div>
 
       <div className="flex gap-2">

@@ -3,6 +3,7 @@
 import { CheckCheck } from "lucide-react"
 import { Button, Checkbox, Label } from "aperia-ds5"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
+import { useAutoplayForm } from "./use-panel-autoplay"
 import {
   CREDIT_CARD_OFFERS, getCardBrand, CARD_APPLICANT, CARD_EMPLOYEE_CARD_OPTIONS, CARD_VALUE, CARD_FEES, CARD_FEES_TITLE,
   CARD_INSIGHT_LEAD, CARD_INSIGHT_BODY, CARD_INSIGHT_OFFER_PRE, CARD_INSIGHT_OFFER_BOLD, CARD_INSIGHT_OFFER_POST,
@@ -58,6 +59,7 @@ export function CreditCardOfferPanel() {
       status: "submitted",
     })
   }
+  const { endRef, consented } = useAutoplayForm(view === "offer", submit)
 
   if (view === "verify") {
     return (
@@ -146,8 +148,8 @@ export function CreditCardOfferPanel() {
           </dl>
         </div>
 
-        <div className="flex items-start gap-2">
-          <Checkbox id="cc-consent" className="mt-0.5" />
+        <div ref={endRef} className="flex items-start gap-2">
+          <Checkbox id="cc-consent" className="mt-0.5" {...(consented !== undefined ? { checked: consented } : {})} />
           <Label htmlFor="cc-consent" className="text-xs font-normal leading-relaxed text-foreground">{CARD_CONSENT}</Label>
         </div>
 
