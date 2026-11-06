@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { FEE_POLICY, FEES_CHARGED } from "./resy-group"
-import { NO_SHOW_BOOKING, NO_SHOW_FEE, FEES_AFTER_CHARGE, EVIDENCE_TIMELINE, EVENTS, EVENT_TOTALS, WINE_DINNER, NIGHT_SPEND_PER_GUEST, NIGHT_ESTIMATE, STRIPE_PAYOUT_DAYS } from "./resy-deposits"
+import { NO_SHOW_BOOKING, NO_SHOW_FEE, FEES_AFTER_CHARGE, EVIDENCE_TIMELINE, EVENTS, EVENT_TOTALS, WINE_DINNER, NIGHT_SPEND_PER_GUEST, NIGHT_ESTIMATE, PAYOUT_DAYS } from "./resy-deposits"
 
 // Storyboard section 5: every identity under "Flow 5", plus the "After Flow 5" fee line.
 
@@ -76,7 +76,7 @@ describe("ticketed events", () => {
     expect(NIGHT_ESTIMATE).toBe(1968)
   })
 
-  it("pays tickets out through Stripe about 2 business days after each sale", () => {
-    expect(STRIPE_PAYOUT_DAYS).toBe(2)
+  it("pays tickets out to the bank account about 2 business days after each sale", () => {
+    expect(PAYOUT_DAYS).toBe(2)
   })
 })

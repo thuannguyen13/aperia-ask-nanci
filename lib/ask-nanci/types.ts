@@ -53,6 +53,8 @@ export interface ConceptScriptedTurn extends ScriptedTurn {
   // open; add `view` to set its view; `closePanel` closes one panel (e.g. replace).
   panel?: PanelId
   view?: string
+  /** Switch Marketplace listings on or off by id, as their Connect and Disconnect buttons do. */
+  marketplace?: Record<string, boolean>
   /**
    * On a phone, bring the sheet up with the panel instead of leaving it resting as a
    * handle. For a turn whose whole point is the panel arriving; the default keeps the

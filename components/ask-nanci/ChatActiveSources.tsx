@@ -11,6 +11,7 @@ import { SourceIcon, getSourceInitials } from "./SourceIcon"
 import { ConnectWizard } from "./ConnectWizard"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { listSources } from "@/lib/ask-nanci/api"
+import { foundationFirst } from "@/lib/ask-nanci/source-store"
 import { MARKETPLACE_SOURCE_GROUP, listMarketplaceSources } from "@/lib/ask-nanci/data/panels/service-marketplace"
 import type { Source } from "@/lib/ask-nanci/types"
 
@@ -50,7 +51,9 @@ export function ChatActiveSources({ sources: accounts }: Props) {
   // Marketplace sources join the avatar stack but list under their own group. Like
   // the accounts passed in, only the ones switched on are shown.
   const extensions = listMarketplaceSources(marketplaceEnabled, mutedMarketplaceSources).filter((s) => s.active)
-  const sources = [...accounts, ...extensions]
+  // The foundation leads the stack and the list, whatever order the accounts arrived in.
+  const listed = foundationFirst(accounts)
+  const sources = [...listed, ...extensions]
   const [popoverOpen, setPopoverOpen] = useState(false)
   const [wizardOpen, setWizardOpen] = useState(false)
   const [tipOpen, setTipOpen] = useState(false)
@@ -130,7 +133,7 @@ export function ChatActiveSources({ sources: accounts }: Props) {
             <PopoverContent side="top" align="start" className="w-[320px] p-0 gap-0 overflow-hidden flex flex-col max-h-[360px]">
               <p className="px-3 pt-3 pb-2 text-sm font-medium text-foreground shrink-0">Sources Used</p>
               <div className="overflow-y-auto flex-1 min-h-0 pb-1">
-                {accounts.map((s) => <SourceItem key={s.id} source={s} />)}
+                {listed.map((s) => <SourceItem key={s.id} source={s} />)}
                 {extensions.length > 0 && (
                   <p className="px-3 pt-2 pb-1 text-xs font-medium text-muted-foreground">{MARKETPLACE_SOURCE_GROUP}</p>
                 )}

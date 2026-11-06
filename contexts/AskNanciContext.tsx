@@ -28,6 +28,7 @@ import { FOUNDATION_SOURCE, FOUNDATION_SOURCE_ID } from "@/lib/ask-nanci/source-
 import { ONBOARDING_KEY, MARKETPLACE_MUTED_KEY } from "@/lib/ask-nanci/storage-keys"
 import { readIdSet, writeIdSet } from "@/lib/ask-nanci/marketplace-store"
 import { MARKETPLACE_SERVICES } from "@/lib/ask-nanci/data/panels/service-marketplace"
+import { listCitedServiceIds } from "@/lib/ask-nanci/cite-source"
 
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms))
 
@@ -256,10 +257,11 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     if (open) setKbOpenState(false)
   }, [])
   // Seeded from the data's `added` flag, then owned here so the grid badge, the detail
-  // panel's button and the source lists can never disagree. Not saved: a connection
+  // panel's button and the source lists can never disagree. A scoped mode's own
+  // listings start connected, since its demos read from them. Not saved: a connection
   // made in one demo would otherwise still be on in the next one on that machine.
   const [marketplaceEnabled, setMarketplaceEnabled] = useState<ReadonlySet<string>>(
-    () => new Set(MARKETPLACE_SERVICES.filter((s) => s.added).map((s) => s.id)),
+    () => new Set(MARKETPLACE_SERVICES.filter((s) => s.added || (scope && s.scope === scope)).map((s) => s.id)),
   )
   const toggleMarketplaceService = useCallback((id: string) => setMarketplaceEnabled((prev) => {
     const next = new Set(prev)
@@ -583,6 +585,14 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
 
   const applyTurnEffects = useCallback((turn: ConceptScriptedTurn) => {
     turnToPanelActions(turn).forEach(applyPanelAction)
+    // A turn's own switches, then whatever its answer cites, so a cited source is
+    // always one the composer lists as connected.
+    const listings = { ...turn.marketplace, ...Object.fromEntries((turn.source ? listCitedServiceIds(turn.source) : []).map((id) => [id, true])) }
+    if (Object.keys(listings).length) setMarketplaceEnabled((prev) => {
+      const next = new Set(prev)
+      for (const [id, on] of Object.entries(listings)) { if (on) next.add(id); else next.delete(id) }
+      return next
+    })
   }, [applyPanelAction])
 
   // Stagger the open panels closed, right column first and then left, and reset
@@ -714,8 +724,9 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
         await sleep(i === 0 ? 1000 : 1800)
         if (shouldStop()) break
         setMessages((prev) => [...withClearedSuggestions(prev), { id: newSessionId(), role: "user" as const, content: turn.content }])
-        if (turn.pauseAfter) await sleep(turn.pauseAfter)
+        // Effects first, as in runConceptStep: the pause is a beat on what they changed.
         applyTurnEffects(turn)
+        if (turn.pauseAfter) await sleep(turn.pauseAfter)
         setChatState("thinking")
       } else {
         await sleep(1800)

@@ -7,10 +7,13 @@ import type { Source } from "@/lib/ask-nanci/types"
 import { getSourceInitials } from "./SourceIcon"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { citeSource } from "@/lib/ask-nanci/cite-source"
+import { foundationFirst } from "@/lib/ask-nanci/source-store"
 
 
-export function ChatCitedSources({ sources }: { sources: Source[] }) {
-  if (!sources.length) return null
+export function ChatCitedSources({ sources: cited }: { sources: Source[] }) {
+  if (!cited.length) return null
+  // An answer's sources can arrive in any order. The foundation leads, as in the composer.
+  const sources = foundationFirst(cited)
 
   return (
     <Popover>

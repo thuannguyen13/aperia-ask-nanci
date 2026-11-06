@@ -24,6 +24,11 @@ export const FOUNDATION_SOURCE: Source = {
   addedAt: 0,
 }
 
+// The foundation leads every list of sources, whatever order the rest arrived in.
+export function foundationFirst(sources: Source[]): Source[] {
+  return [...sources.filter((s) => s.id === FOUNDATION_SOURCE_ID), ...sources.filter((s) => s.id !== FOUNDATION_SOURCE_ID)]
+}
+
 export function readSources(): Source[] {
   if (typeof window === "undefined") return []
   try {

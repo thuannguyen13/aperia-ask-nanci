@@ -1,7 +1,7 @@
 // Flow 31: no-show fees and events at the Tallis flagship, today, Sat Oct 24. Every
 // figure is sample data. The booking, its timeline, the events and their sales come from
 // Resy. Last year's wine-dinner spend comes from card payments matched to Resy tables
-// through the POS. Fees and tickets pay out through the venue's Stripe account, not the
+// through the POS. Fees and tickets pay out to the venue's bank account, not through the
 // processor. Authored figures are the rows below, and every total is derived from them,
 // so the chat and the panels quote the same numbers.
 
@@ -91,5 +91,5 @@ export const NIGHT_SPEND_PER_GUEST = 41
 /** On-the-night card spend at the wine dinner if it sells out. */
 export const NIGHT_ESTIMATE = WINE_DINNER.seats * NIGHT_SPEND_PER_GUEST
 
-/** Stripe's usual U.S. payout delay after a sale, in business days. */
-export const STRIPE_PAYOUT_DAYS = 2
+/** The usual payout delay to the bank account after a sale, in business days. */
+export const PAYOUT_DAYS = 2

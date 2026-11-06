@@ -194,10 +194,10 @@ describe("flow 27, connect Resy", () => {
     expect(script[2].content).toBe(CONCEPT_FLOW27_CONNECT)
   })
 
-  it("opens the Resy listing, and connects it on the Connect turn, before the answer", () => {
+  it("disconnects Resy on the question, and connects it on the Connect turn, before the answer", () => {
+    expect(script[0]).toMatchObject({ marketplace: { resy: false } })
     expect(script[1]).toMatchObject({ panel: "resy-connect", revealPanel: true })
-    expect(script[1].view).toBeUndefined()
-    expect(script[2]).toMatchObject({ panel: "resy-connect", view: "connected" })
+    expect(script[2]).toMatchObject({ marketplace: { resy: true }, pauseAfter: 1500 })
     expect(script[3].panel).toBeUndefined()
   })
 
@@ -296,7 +296,7 @@ describe("flow 29, filling the book", () => {
     expect(script[3]).toMatchObject({ panel: "resy-change", view: "done", source: "Resy reservations" })
     expect(script[5]).toMatchObject({ panel: "resy-notify", closePanel: "resy-change", source: "Resy Notify + card transactions" })
     expect(script[5].revealPanel).toBeUndefined()
-    expect(script[7]).toMatchObject({ panel: "resy-availability", closePanel: "resy-notify", revealPanel: true, source: "Resy timing + card transactions" })
+    expect(script[7]).toMatchObject({ panel: "resy-availability", closePanel: "resy-notify", revealPanel: true, source: "Resy reservations + card transactions" })
     expect(script[9]).toMatchObject({ panel: "resy-availability", view: "done", source: "Resy reservations + card transactions" })
     for (const i of [1, 5, 7]) expect(script[i].view).toBeUndefined()
   })
@@ -373,7 +373,7 @@ describe("flow 30, know your guests", () => {
     expect(script[5]).toMatchObject({ panel: "resy-guest", view: "done", source: "Resy guestbook" })
     expect(script[7]).toMatchObject({ panel: "resy-outreach", closePanel: "resy-guest", revealPanel: true, source: "Resy guestbook + card transactions" })
     expect(script[7].view).toBeUndefined()
-    expect(script[9]).toMatchObject({ panel: "resy-outreach", view: "done", source: "Resy messages" })
+    expect(script[9]).toMatchObject({ panel: "resy-outreach", view: "done", source: "Resy guestbook" })
   })
 
   it("quotes the figures the panels show", () => {
@@ -462,7 +462,7 @@ describe("flow 31, no-show fees and events", () => {
     expect(script[1]).toMatchObject({ panel: "resy-fee", closePanel: "resy-events", revealPanel: true, source: "Resy reservations" })
     expect(script[1].view).toBeUndefined()
     expect(script[3]).toMatchObject({ panel: "resy-fee", view: "charged", source: "Resy reservations" })
-    expect(script[5]).toMatchObject({ panel: "resy-fee", view: "evidence", source: "Resy reservations + messages" })
+    expect(script[5]).toMatchObject({ panel: "resy-fee", view: "evidence", source: "Resy reservations" })
     expect(script[7]).toMatchObject({ panel: "resy-events", closePanel: "resy-fee", source: "Resy events + card transactions" })
     expect(script[7].view).toBeUndefined()
     // Only the step whose panel holds the confirm raises the phone sheet.
@@ -483,7 +483,7 @@ describe("flow 31, no-show fees and events", () => {
 
   it("says a strong case, never a win, and where the money and the dispute land", () => {
     expect(evidence).toContain("strong case")
-    for (const text of [charged, evidence, events]) expect(text).toContain("Stripe")
+    for (const text of [charged, evidence, events]) expect(text).toContain("bank account")
     expect(charged).toContain("won't appear in your card deposits")
     for (const text of answers(31)) expect(text).not.toMatch(/you'll win|you will win/i)
   })
@@ -619,9 +619,10 @@ describe("Resy Marketplace listing", () => {
     expect(text).not.toMatch(/\breviews?\b/i)
   })
 
-  it("never claims Nanci sees Stripe payouts", () => {
+  it("never names Stripe, in the listing or any Resy answer", () => {
     const text = [resy.description, resy.overview, ...(resy.highlights ?? []), ...(resy.sections ?? []).map((s) => s.body)].join(" ")
-    expect(text).not.toMatch(/\bsees?\b[^.]*Stripe payouts|Stripe payouts arrive/i)
+    expect(text).not.toMatch(/stripe/i)
+    for (const num of [27, 28, 29, 30, 31, 32]) for (const answer of answers(num)) expect(answer).not.toMatch(/stripe/i)
   })
 
   it("names every action the Resy flows take, and asks before each", () => {
@@ -650,7 +651,7 @@ describe("Marketplace sources", () => {
     expect(listMarketplaceSources(new Set())).toEqual([])
     const [resy, ...rest] = listMarketplaceSources(new Set(["resy", "portfolio-intelligence"]))
     expect(rest).toEqual([])
-    expect(resy).toMatchObject({ id: "resy", name: "Resy", logo: "/logos/resy-logo.png", active: true })
+    expect(resy).toMatchObject({ id: "resy", name: "Resy", institution: "Resy Data", logo: "/logos/resy-logo.png", active: true })
     expect(listMarketplaceSources(new Set(["resy"]), new Set(["resy"]))[0].active).toBe(false)
   })
 })

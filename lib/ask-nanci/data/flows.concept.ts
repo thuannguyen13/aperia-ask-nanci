@@ -586,7 +586,7 @@ const FLOW28_CANCELLED = partiesWithReply("cancelled")[0];
 // last thing in the chat.
 const FLOW28_ASK_TO_SEND = `${capitalize(spellCount(UNCONFIRMED.length))} parties, ${UNCONFIRMED_COVERS} covers, didn't answer yesterday's 4pm confirmation text, including the ${LARGEST_UNCONFIRMED.time} party of ${LARGEST_UNCONFIRMED.party}. It matters: in October, ${UNCONFIRMED_NO_SHOW_PCT}% of unconfirmed covers didn't show against ${CONFIRMED_NO_SHOW_PCT}% of confirmed ones, and no-shows have cost you ${formatWholeCurrency(NO_SHOW_COST)} at your ${formatWholeCurrency(CARD_PER_COVER)} a cover, with ${formatWholeCurrency(FEES_CHARGED)} back in fees. Want me to send Resy's confirmation follow-up to these ${spellCount(UNCONFIRMED.length)} now?`;
 
-const FLOW27_ASK_TO_CONNECT = "Not yet. Resy isn't connected, so I can only see your card sales. Connect it from the listing and I can read your book, waitlist, Notify list, guestbook, events and surveys. Want me to connect it now?";
+const FLOW27_ASK_TO_CONNECT = "Yes, but you have to connect Resy first. Right now I can only see your card sales. Connect it from the listing and I can read your book, waitlist, Notify list, guestbook, events and surveys. Want me to connect it now?";
 
 /** True while flow 27 is parked on its connect step: idle, with the offer as the last message. */
 export const isAwaitingFlow27Connect = (messages: { role: string; content: string }[], chatState: string) => isAwaitingTurn(messages, chatState, FLOW27_ASK_TO_CONNECT);
@@ -1216,12 +1216,13 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
   // ── Flow 27: Connect Resy (Resy concept) ──────────────────────────────────
   // The owner asks before anything is connected. The answer opens the Marketplace's
   // Resy listing as a panel and parks on the connect step: the chip and the panel's
-  // Connect button both send it. Sending it connects Resy, so the listing reads
+  // Connect button both send it. Resy starts connected in this mode, so the opening
+  // question disconnects it. Sending the connect step connects it, so the listing reads
   // Connected before the answer confirms it. The last question shows the book is now
   // readable.
   // Figures are quoted from data/panels/resy-tonight.ts.
   [CONCEPT_FLOW27_PROMPT]: [
-    { role: "user", content: CONCEPT_FLOW27_PROMPT },
+    { role: "user", content: CONCEPT_FLOW27_PROMPT, marketplace: { resy: false } },
     {
       role: "assistant",
       content: FLOW27_ASK_TO_CONNECT,
@@ -1229,7 +1230,8 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       revealPanel: true,
     },
     // Under ?autoplay, a beat on the listing before the connect goes through.
-    { role: "user", content: CONCEPT_FLOW27_CONNECT, pauseBefore: 2500, panel: "resy-connect", view: "connected" },
+    // The listing flips to Disconnect, holds there, and only then does Nanci confirm.
+    { role: "user", content: CONCEPT_FLOW27_CONNECT, pauseBefore: 2500, pauseAfter: 1500, marketplace: { resy: true } },
     {
       role: "assistant",
       content: "Connected. Resy now sits beside your card sales, so one question can answer from both. I read your book, waitlist and guestbook, and I act in Resy only when you confirm.",
@@ -1321,7 +1323,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       panel: "resy-availability",
       closePanel: "resy-notify",
       revealPanel: true,
-      source: "Resy timing + card transactions",
+      source: "Resy reservations + card transactions",
     },
     { role: "user", content: CONCEPT_FLOW29_OPEN },
     {
@@ -1379,7 +1381,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       content: `Sent. The email went from Tallis through Resy to the ${SEGMENT.emailable} guests, and it now sits in each one's message history. The ${spellCount(SEGMENT.excluded)} without email consent were left out.`,
       panel: "resy-outreach",
       view: "done",
-      source: "Resy messages",
+      source: "Resy guestbook",
     },
   ],
 
@@ -1401,7 +1403,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     { role: "user", content: CONCEPT_FLOW31_CHARGE },
     {
       role: "assistant",
-      content: `Charged. It pays out through your Stripe account, the one Resy charges through, so it won't appear in your card deposits here. October's fees are now ${formatWholeCurrency(FEES_AFTER_CHARGE)}.`,
+      content: `Charged. It pays out to your bank account, so it won't appear in your card deposits here. October's fees are now ${formatWholeCurrency(FEES_AFTER_CHARGE)}.`,
       panel: "resy-fee",
       view: "charged",
       source: "Resy reservations",
@@ -1409,15 +1411,15 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     { role: "user", content: CONCEPT_FLOW31_DISPUTE },
     {
       role: "assistant",
-      content: `You have a strong case. They booked on ${NO_SHOW_BOOKING.bookedOn} and accepted the policy with a card on file. They replied CONFIRM to Thursday's text, and Resy shows no cancellation. I've put it into one evidence pack. A dispute on this charge arrives in Stripe, not your card processing, so that's where you'd upload it.`,
+      content: `You have a strong case. They booked on ${NO_SHOW_BOOKING.bookedOn} and accepted the policy with a card on file. They replied CONFIRM to Thursday's text, and Resy shows no cancellation. I've put it into one evidence pack. A dispute on this charge arrives in your bank account, not your card processing, so that's where you'd upload it.`,
       panel: "resy-fee",
       view: "evidence",
-      source: "Resy reservations + messages",
+      source: "Resy reservations",
     },
     { role: "user", content: CONCEPT_FLOW31_EVENTS },
     {
       role: "assistant",
-      content: `${capitalize(spellCount(WINE_DINNER.open))} of ${WINE_DINNER.seats} for the ${WINE_DINNER.date.slice(4)} Harvest dinner, and ${WINE_DINNER.addOn?.sold} guests added the ${WINE_DINNER.addOn?.label}, so ${formatWholeCurrency(WINE_DINNER.soldValue)} is already sold. Across your ${spellCount(EVENTS.length)} events through New Year's you've sold ${formatWholeCurrency(EVENT_TOTALS.soldValue)}, which reaches your bank through Stripe, typically a couple of business days after each sale. The ${EVENT_TOTALS.open} open seats are worth ${formatWholeCurrency(EVENT_TOTALS.openValue)} more, and on-the-night spend goes through your card processing and settles the next business day: ${formatWholeCurrency(NIGHT_SPEND_PER_GUEST)} a guest at last year's wine dinner.`,
+      content: `${capitalize(spellCount(WINE_DINNER.open))} of ${WINE_DINNER.seats} for the ${WINE_DINNER.date.slice(4)} Harvest dinner, and ${WINE_DINNER.addOn?.sold} guests added the ${WINE_DINNER.addOn?.label}, so ${formatWholeCurrency(WINE_DINNER.soldValue)} is already sold. Across your ${spellCount(EVENTS.length)} events through New Year's you've sold ${formatWholeCurrency(EVENT_TOTALS.soldValue)}, which reaches your bank account typically a couple of business days after each sale. The ${EVENT_TOTALS.open} open seats are worth ${formatWholeCurrency(EVENT_TOTALS.openValue)} more, and on-the-night spend goes through your card processing and settles the next business day: ${formatWholeCurrency(NIGHT_SPEND_PER_GUEST)} a guest at last year's wine dinner.`,
       panel: "resy-events",
       closePanel: "resy-fee",
       source: "Resy events + card transactions",

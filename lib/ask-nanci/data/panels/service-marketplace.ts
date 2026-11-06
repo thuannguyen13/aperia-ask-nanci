@@ -219,13 +219,11 @@ export const MARKETPLACE_SOURCE_GROUP = "From Marketplace";
 
 // The on listings Nanci answers from, shaped as sources (keeping the listing id) so the source lists render them
 // with the same row and avatar as a linked account. A muted one stays connected but is switched off as a source.
+/** A service as a source, named like the built-in ones: "Resy" over "Resy Data". */
+export function toMarketplaceSource(s: MarketplaceService, active = true): Source {
+  return { id: s.id, name: s.title, kind: "bank", institution: `${s.title} Data`, logo: s.logo, active, addedAt: 0 };
+}
+
 export function listMarketplaceSources(enabled: ReadonlySet<string>, muted: ReadonlySet<string> = new Set()): Source[] {
-  return MARKETPLACE_SERVICES.filter((s) => s.isSource && enabled.has(s.id)).map((s) => ({
-    id: s.id,
-    name: s.title,
-    kind: "bank",
-    logo: s.logo,
-    active: !muted.has(s.id),
-    addedAt: 0,
-  }));
+  return MARKETPLACE_SERVICES.filter((s) => s.isSource && enabled.has(s.id)).map((s) => toMarketplaceSource(s, !muted.has(s.id)));
 }

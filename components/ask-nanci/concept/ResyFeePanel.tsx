@@ -11,7 +11,7 @@ import { ResyConfirmCard } from "./ResyConfirmCard"
 
 const FEE = formatWholeCurrency(NO_SHOW_FEE)
 const PROPOSAL = `Charge ${FEE} to the ${NO_SHOW_BOOKING.guest}s' card on file in Resy. It will show as charged by you, through Ask Nanci.`
-const WHAT_CHANGES = `What changes in Resy: Resy charges ${FEE} to the card on file. It pays out through your Stripe account. Nothing changes until you confirm.`
+const WHAT_CHANGES = `What changes in Resy: Resy charges ${FEE} to the card on file. It pays out to your bank account. Nothing changes until you confirm.`
 const POLICY = `${formatWholeCurrency(FEE_POLICY.perGuest)} per guest no-show fee, cancel by ${FEE_POLICY.cancelByHours} hours before`
 
 const STATUS = {
@@ -48,7 +48,7 @@ function ChargedView() {
       <Callout variant="green" icon={CheckCheck} title={`Charged ${FEE}`}>
         <p>Charged by you via Ask Nanci.</p>
         <p>Shows as charged on Resy&apos;s Xcl/No Show list.</p>
-        <p>It pays out through your Stripe account, not your card deposits.</p>
+        <p>It pays out to your bank account, not your card deposits.</p>
       </Callout>
       <Booking status="charged" />
       <Alert>
@@ -74,8 +74,8 @@ function EvidenceView() {
         </ol>
       </div>
       <Callout variant="blue">
-        <p className="font-semibold">Evidence pack ready · upload it in Stripe if a dispute arrives.</p>
-        <p className="mt-1">A dispute on this charge arrives in your Stripe account, not your card processing.</p>
+        <p className="font-semibold">Evidence pack ready · upload it from your bank account if a dispute arrives.</p>
+        <p className="mt-1">A dispute on this charge arrives in your bank account, not your card processing.</p>
       </Callout>
     </>
   )

@@ -1,17 +1,25 @@
 import { describe, expect, it } from "vitest"
-import { citeSource } from "./cite-source"
+import { citeSource, listCitedServiceIds } from "./cite-source"
 import { VISION_WEB_SOURCE } from "./data/sources"
 
 describe("citeSource", () => {
-  it("gives a Resy source the Resy logo", () => {
-    expect(citeSource("Resy reservations", VISION_WEB_SOURCE)).toMatchObject([{ name: "Resy reservations", institution: "Resy", logo: "/logos/resy-logo.png" }])
+  it("names any Resy part as the one Resy source, as the composer lists it", () => {
+    expect(citeSource("Resy reservations", VISION_WEB_SOURCE)).toMatchObject([{ name: "Resy", institution: "Resy Data", logo: "/logos/resy-logo.png" }])
+    expect(citeSource("Resy multi-location", VISION_WEB_SOURCE)).toMatchObject([{ name: "Resy", institution: "Resy Data" }])
   })
 
-  it("splits a Resy source from the card data", () => {
-    expect(citeSource("Resy reservations + card transactions", VISION_WEB_SOURCE)).toEqual([expect.objectContaining({ name: "Resy reservations", institution: "Resy" }), VISION_WEB_SOURCE])
+  it("splits a Resy source from the card data, card data first as in the composer", () => {
+    expect(citeSource("Resy reservations + card transactions", VISION_WEB_SOURCE)).toEqual([VISION_WEB_SOURCE, expect.objectContaining({ name: "Resy", institution: "Resy Data" })])
   })
 
   it("keeps a report name with a plus in it as one source", () => {
     expect(citeSource("Combined MC + VW analysis · 774 chargeback merchants", VISION_WEB_SOURCE)).toMatchObject([{ name: "Combined MC + VW analysis · 774 chargeback merchants", kind: "file" }])
+  })
+})
+
+describe("listCitedServiceIds", () => {
+  it("names the marketplace sources an answer cites", () => {
+    expect(listCitedServiceIds("Resy reservations + card transactions")).toEqual(["resy"])
+    expect(listCitedServiceIds("Detection Queue · Phase 2")).toEqual([])
   })
 })
