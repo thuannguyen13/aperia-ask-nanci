@@ -86,7 +86,7 @@ const MODE_NOTES: Record<string, string> = {
   titan: "Duplicate of `concept` — same welcome card catalog and panel demo — wearing the Titan brand",
   talus: "Duplicate of `concept` wearing the Talus brand: same welcome card catalog and panel demo",
   resy: "The concept demo narrowed to Resy: a catalog of the Resy flows only, and a marketplace listing only Resy, which is where the demo starts",
-  att: "The concept demo narrowed to the AT&T carrier stories: six cards, the carrier account as the built-in source, and a concept notice under the composer",
+  att: "The concept demo narrowed to the AT&T carrier stories: six cards and the carrier account as the built-in source",
   amex: "Default app wearing the American Express brand: plays every &flow=<slug>&autoplay with its panels, onboarding closed",
   tib: "Default app wearing the TIB brand: plays every &flow=<slug>&autoplay with its panels",
   woodforest: "Default app wearing the Woodforest brand: plays every &flow=<slug>&autoplay with its panels",

@@ -88,8 +88,8 @@ export function parseMode(mode: string | null): ParsedMode {
     // so &flow=<slug>&autoplay plays the same way.
     case "resy-embed":      return { ...base, isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true, catalog: true, scope: "resy", theme: "amex" }
     // The concept demo narrowed to the carrier stories, for a conversation with AT&T's
-    // business team: the six stories as cards, the carrier account as the built-in source,
-    // and a concept notice under the composer.
+    // business team: the six stories as cards, and the carrier account as the built-in
+    // source.
     case "att":             return { ...base, isConceptVersion: true, catalog: true, scope: "carrier", theme: "att" }
     // Embeddable counterpart to `att`, as resy-embed is to resy.
     case "att-embed":       return { ...base, isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true, catalog: true, scope: "carrier", theme: "att" }

@@ -13,9 +13,7 @@ export const SCOPE_FOUNDATION: Record<FlowScope, Source> = {
   carrier: CARRIER_SOURCE,
 }
 
-// `notice` sits under the composer for the whole session, so no screen of the mode
-// reads as real.
-export const SCOPE_CATALOG: Record<FlowScope, { title: string; subtitle: string; notice?: string }> = {
+export const SCOPE_CATALOG: Record<FlowScope, { title: string; subtitle: string }> = {
   resy: {
     title: "Ask Nanci",
     subtitle: "Your Resy book and your card sales in one conversation. Connect Resy in the Marketplace, then ask. A concept: no Resy connection exists.",
@@ -23,7 +21,6 @@ export const SCOPE_CATALOG: Record<FlowScope, { title: string; subtitle: string;
   carrier: {
     title: "Ask Nanci",
     subtitle: `Your sales and your ${CARRIER.business} account in one conversation. Ask about the business, and send ${CARRIER.name} a request when something needs to change.`,
-    notice: "Concept demo. Example data.",
   },
 }
 
