@@ -15,13 +15,13 @@ import { RequestDraft, RequestOptions, RequestSent } from "./carrier-request"
 
 const PANEL_ID = "outage-impact"
 
-// The Busiest Times scale, so a busy hour here reads as busy there.
+// Busiest Times levels in blue, which the AT&T theme turns into its cobalt scale.
 const LEVEL_CLS = [
   "bg-muted",
-  "bg-teal-100 dark:bg-teal-950/40",
-  "bg-teal-200 dark:bg-teal-900/50",
-  "bg-teal-400 dark:bg-teal-700",
-  "bg-teal-500 dark:bg-teal-600",
+  "bg-blue-100 dark:bg-blue-950/40",
+  "bg-blue-200 dark:bg-blue-900/50",
+  "bg-blue-400 dark:bg-blue-700",
+  "bg-blue-600 dark:bg-blue-500",
 ]
 
 const SPAN = EVENING.end - EVENING.start
