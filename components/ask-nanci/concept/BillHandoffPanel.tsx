@@ -104,7 +104,6 @@ export function BillHandoffPanel() {
           </Callout>
         )}
 
-        <p className="text-xs text-muted-foreground">Example figures</p>
       </PanelBody>
     </PanelShell>
   )

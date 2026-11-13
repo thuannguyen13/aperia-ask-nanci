@@ -87,7 +87,6 @@ export function UnusedLinesPanel() {
           </div>
         </div>
 
-        <p className="text-xs text-muted-foreground">Example figures</p>
       </PanelBody>
     </PanelShell>
   )

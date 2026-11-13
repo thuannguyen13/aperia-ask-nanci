@@ -15,10 +15,6 @@ import { usePanelAutoplay } from "./use-panel-autoplay"
 const CHOOSE_AT_MS = 3000
 const SEND_AT_MS = 3500
 
-export function ExampleFiguresNote() {
-  return <p className="text-xs text-muted-foreground">Example figures</p>
-}
-
 const costLine = (option: CarrierRequestOption) => `Example: ${formatWholeCurrency(option.monthlyCost)} a month`
 
 export function RequestOptions({ heading, options, ranked = false, onChoose }: {

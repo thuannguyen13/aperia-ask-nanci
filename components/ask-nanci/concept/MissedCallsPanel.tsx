@@ -11,7 +11,7 @@ import {
 import { parseRequestView, requestView } from "@/lib/ask-nanci/data/panels/carrier-request"
 import { isAwaitingCallsRequest } from "@/lib/ask-nanci/data/carrier-flows/calls"
 import { PanelShell, PanelHeader, PanelBody, NanciInsight, StatCard } from "@/components/shared"
-import { ExampleFiguresNote, RequestDraft, RequestOptions, RequestSent } from "./carrier-request"
+import { RequestDraft, RequestOptions, RequestSent } from "./carrier-request"
 
 const PANEL_ID = "missed-calls"
 
@@ -134,7 +134,6 @@ export function MissedCallsPanel() {
         )}
         {step === "sent" && option && <RequestSent option={option} />}
         {step === "findings" && <Findings />}
-        <ExampleFiguresNote />
       </PanelBody>
     </PanelShell>
   )

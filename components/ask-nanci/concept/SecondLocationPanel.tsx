@@ -66,7 +66,6 @@ export function SecondLocationPanel() {
           </Callout>
         )}
 
-        <p className="text-xs text-muted-foreground">Example figures</p>
       </PanelBody>
     </PanelShell>
   )
