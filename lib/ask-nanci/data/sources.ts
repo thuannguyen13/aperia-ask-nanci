@@ -67,15 +67,10 @@ const AMEX_ACCOUNT: Source = { id: "demo-amex", name: "Amex Business Gold ••
 
 const CHASE_ACCOUNT: Source = { id: "demo-chase", name: "Chase Business Checking ••4892", kind: "bank", institution: "Chase", color: "bg-blue-700", initials: "CH", logo: "/fi/chase.png", active: true, addedAt: 0 }
 
-// The register beside the carrier account. Clover's data under its own id, because the
-// foundation id is what marks a source as built in.
-const REGISTER_ACCOUNT: Source = { ...CLOVER_SOURCE, id: "demo-register" }
-
 // Accounts a theme always has linked, after its foundation. They cannot be removed
 // and are never saved, so every load starts with them.
 export const THEME_ACCOUNTS: Partial<Record<ThemeId, Source[]>> = {
   amex: [AMEX_ACCOUNT],
-  att: [REGISTER_ACCOUNT, CHASE_ACCOUNT],
 }
 
 // ─── Per-variant source lists ─────────────────────────────────────────────────
