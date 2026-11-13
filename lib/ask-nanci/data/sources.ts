@@ -43,8 +43,7 @@ export const VISION_WEB_SOURCE: Source = {
 }
 
 // The carrier modes' built-in data: the business owner's carrier account, with calls,
-// service status, lines and billing. Initials stand in for a logo, since no approved
-// carrier asset exists.
+// service status, lines and billing, under the AT&T globe.
 export const CARRIER_SOURCE: Source = {
   id: FOUNDATION_SOURCE_ID,
   name: `${CARRIER.business} account`,
@@ -52,6 +51,7 @@ export const CARRIER_SOURCE: Source = {
   institution: CARRIER.business,
   color: "bg-sky-700",
   initials: "AT",
+  logo: "/logos/att-globe.svg",
   active: true,
   addedAt: 0,
 }

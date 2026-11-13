@@ -57,10 +57,10 @@ const THEME_LOGOS = {
   amex: {
     frame: { src: "/logos/amex.svg", alt: "American Express", width: 50, height: 50 },
   },
-  // A text lockup, not the carrier's logo: no approved asset exists. White text for the
-  // navy bar. No sidebar slots, so the Ask Nanci lockup shows there.
+  // The AT&T globe and wordmark, all white, as AT&T sets it on its own blue. No sidebar
+  // slots, so the Ask Nanci lockup shows there and Ask Nanci stays the product.
   att: {
-    frame: { src: "/logos/att-concept.svg", alt: "Concept for AT&T Business", width: 220, height: 24 },
+    frame: { src: "/logos/att.svg", alt: "AT&T", width: 1000, height: 411 },
   },
   // White-label placeholder — swap the asset and the [data-theme="placeholder"] block
   // to stand up a new brand without touching anything else.

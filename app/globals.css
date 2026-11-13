@@ -113,13 +113,14 @@
   --app-gradient: linear-gradient(180deg, #00175A 0%, #cfe0f5 200px);
 }
 
-/* The AT&T carrier concept. A plain cobalt, not the carrier's trade dress: white on
-   #0057B8 is 6.9:1, so --primary-foreground stays white. */
+/* AT&T Cobalt, one blue for the frame bar and the controls so the two read as one brand.
+   White on Cobalt is 6.9:1, so the white logo and --primary-foreground both hold. AT&T
+   Blue (#009FDB) is under 3:1 against white, so it carries neither. */
 [data-theme="att"] {
   --primary: #0057B8;
   --ring: #0057B8;
   --sidebar-primary: #0057B8;
-  --app-gradient: linear-gradient(180deg, #0B2E5C 0%, #d3e3f6 200px);
+  --app-gradient: linear-gradient(180deg, #0057B8 0%, #d6e4f5 200px);
 }
 
 [data-theme="access-one"] {
