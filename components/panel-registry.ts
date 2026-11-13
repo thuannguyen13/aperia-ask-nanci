@@ -45,7 +45,9 @@ import { ResyEventsPanel } from "./ask-nanci/concept/ResyEventsPanel"
 import { ResyReportPanel } from "./ask-nanci/concept/ResyReportPanel"
 import { ResySurveysPanel } from "./ask-nanci/concept/ResySurveysPanel"
 import { ResyLocationsPanel } from "./ask-nanci/concept/ResyLocationsPanel"
+import { UnusedLinesPanel } from "./ask-nanci/concept/UnusedLinesPanel"
 import { SecondLocationPanel } from "./ask-nanci/concept/SecondLocationPanel"
+import { PlanValuePanel } from "./ask-nanci/concept/PlanValuePanel"
 import { BillHandoffPanel } from "./ask-nanci/concept/BillHandoffPanel"
 import { DashboardInsightPanel } from "@/components/risk/dashboard/DashboardInsightPanel"
 import { Dashboard as RiskDashboard } from "@/components/risk/dashboard/Dashboard"
@@ -60,6 +62,8 @@ import { MOVE_TITLE, NOTIFY_TITLE, OPEN_TITLE } from "@/lib/ask-nanci/data/panel
 import { GUEST_TITLE } from "@/lib/ask-nanci/data/panels/resy-guests"
 import { FEE_TITLE } from "@/lib/ask-nanci/data/panels/resy-deposits"
 import { WEEK_TITLE } from "@/lib/ask-nanci/data/panels/resy-reports"
+import { UNUSED_LINES_TITLE } from "@/lib/ask-nanci/data/panels/unused-lines"
+import { PLAN_VALUE_TITLE } from "@/lib/ask-nanci/data/panels/plan-value"
 
 // The single registry of concept panels. Add a panel here (+ its component) and it
 // becomes renderable everywhere — `PanelId` is derived from these keys, so there is
@@ -118,7 +122,10 @@ export const PANELS = {
   "resy-report":         { component: ResyReportPanel,        label: WEEK_TITLE },
   "resy-surveys":        { component: ResySurveysPanel,       label: "Surveys" },
   "resy-locations":      { component: ResyLocationsPanel,     label: "Locations" },
+  // Carrier stories (?mode=att).
+  "unused-lines":        { component: UnusedLinesPanel,       label: UNUSED_LINES_TITLE },
   "second-location":     { component: SecondLocationPanel,    label: "Second Location" },
+  "plan-value":          { component: PlanValuePanel,         label: PLAN_VALUE_TITLE },
   "bill-handoff":        { component: BillHandoffPanel,       label: "Bill Question" },
   "dashboard-insight":   { component: DashboardInsightPanel,  label: "Dashboard Insight" },
   "detection-queue-insight": { component: DetectionQueueInsightPanel, label: "Queue Insight" },
