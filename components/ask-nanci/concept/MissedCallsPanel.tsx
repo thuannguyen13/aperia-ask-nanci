@@ -1,6 +1,5 @@
 "use client"
 
-import { PhoneMissed } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { HEATMAP_HOURS, HEATMAP_ROWS, HEATMAP_APPROX } from "@/lib/ask-nanci/data/panels/busiest-times"
@@ -25,18 +24,8 @@ const LEVEL_CLS = [
 ]
 
 // A missed-call count sits on its Friday cell as a badge, so the calls read against
-// the sales of the same hour without a second row. The theme's accent colours it. The
-// icon drops out below sm, where a cell is too narrow for both.
-const MISSED_BADGE = "inline-flex h-4 min-w-4 items-center justify-center gap-0.5 rounded-full bg-[var(--brand-accent,var(--color-amber-500))] px-1.5 font-mono text-[10px] font-semibold leading-none tabular-nums text-neutral-950 shadow-sm"
-
-function MissedBadge({ count, icon = "sm" }: { count: number; icon?: "sm" | "always" }) {
-  return (
-    <span className={MISSED_BADGE}>
-      <PhoneMissed className={cn("size-2.5 shrink-0", icon === "sm" && "hidden sm:block")} strokeWidth={2.5} />
-      {count}
-    </span>
-  )
-}
+// the sales of the same hour without a second row. The theme's accent colours it.
+const MISSED_BADGE = "inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--brand-accent,var(--color-amber-500))] px-1 font-mono text-[10px] font-bold leading-none tabular-nums text-white shadow-sm"
 
 const GRID = "grid grid-cols-[32px_repeat(11,1fr)] gap-[5px]"
 
@@ -65,7 +54,7 @@ function Heatmap() {
                     title={`${row.day} ${HEATMAP_HOURS[i]} · ${HEATMAP_APPROX[lvl]}${missed ? ` · ${missed} missed` : ""}`}
                     className={cn("flex h-6 items-center justify-center rounded-[4px]", LEVEL_CLS[lvl])}
                   >
-                    {missed > 0 && <MissedBadge count={missed} />}
+                    {missed > 0 && <span className={MISSED_BADGE}>{missed}</span>}
                   </span>
                 )
               })}
@@ -81,7 +70,7 @@ function Heatmap() {
           <span>Busy</span>
         </span>
         <span className="flex items-center gap-1.5">
-          <MissedBadge count={9} icon="always" />
+          <span className={MISSED_BADGE}>9</span>
           <span>Missed calls in that hour, last Friday</span>
         </span>
       </div>
