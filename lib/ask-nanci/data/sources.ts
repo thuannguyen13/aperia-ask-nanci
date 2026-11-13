@@ -56,9 +56,9 @@ export const CARRIER_SOURCE: Source = {
   addedAt: 0,
 }
 
-// The register, as an answer cites it. Clover's data under its own id, so it never reads
-// as the built-in source.
-export const REGISTER_SOURCE: Source = { ...CLOVER_SOURCE, id: "cited-clover" }
+// The register, as an answer cites it and as the carrier modes link it. Clover's data
+// under its own id, so it never reads as the built-in source.
+export const REGISTER_SOURCE: Source = { ...CLOVER_SOURCE, id: "demo-register" }
 
 // Sources a scripted answer can name by their own name, beside the built-in source and
 // the marketplace services.
@@ -79,7 +79,7 @@ export const THEME_FOUNDATION: Partial<Record<ThemeId, Source>> = {
 // accounts. The AMEX theme has it always linked.
 const AMEX_ACCOUNT: Source = { id: "demo-amex", name: "Amex Business Gold ••5561", kind: "bank", institution: "American Express", color: "bg-sky-600", initials: "AX", logo: "/fi/amex.svg", active: true, addedAt: 0 }
 
-const CHASE_ACCOUNT: Source = { id: "demo-chase", name: "Chase Business Checking ••4892", kind: "bank", institution: "Chase", color: "bg-blue-700", initials: "CH", logo: "/fi/chase.png", active: true, addedAt: 0 }
+export const CHASE_ACCOUNT: Source = { id: "demo-chase", name: "Chase Business Checking ••4892", kind: "bank", institution: "Chase", color: "bg-blue-700", initials: "CH", logo: "/fi/chase.png", active: true, addedAt: 0 }
 
 // Accounts a theme always has linked, after its foundation. They cannot be removed
 // and are never saved, so every load starts with them.

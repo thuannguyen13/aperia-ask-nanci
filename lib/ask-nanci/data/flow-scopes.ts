@@ -2,7 +2,7 @@
 // scope shows only in the mode that carries it, and that mode shows nothing else.
 
 import type { Source } from "../types"
-import { CARRIER_SOURCE, VISION_WEB_SOURCE } from "./sources"
+import { CARRIER_SOURCE, CHASE_ACCOUNT, REGISTER_SOURCE, VISION_WEB_SOURCE } from "./sources"
 import { CARRIER } from "./carrier"
 
 export type FlowScope = "resy" | "carrier"
@@ -11,6 +11,12 @@ export type FlowScope = "resy" | "carrier"
 export const SCOPE_FOUNDATION: Record<FlowScope, Source> = {
   resy: VISION_WEB_SOURCE,
   carrier: CARRIER_SOURCE,
+}
+
+// The business owner's own accounts a scoped mode starts with, linked after the built-in
+// source. Every story in the mode, and its embed, reads from the same list.
+export const SCOPE_ACCOUNTS: Partial<Record<FlowScope, Source[]>> = {
+  carrier: [REGISTER_SOURCE, CHASE_ACCOUNT],
 }
 
 export const SCOPE_CATALOG: Record<FlowScope, { title: string; subtitle: string }> = {

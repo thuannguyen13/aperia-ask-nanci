@@ -8,7 +8,7 @@ import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "ap
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { FOUNDATION_SOURCE, addFileSources, toggleSource, removeSource } from "@/lib/ask-nanci/source-store"
-import { listSources } from "@/lib/ask-nanci/api"
+import { SCOPE_ACCOUNTS } from "@/lib/ask-nanci/data/flow-scopes"
 import { MARKETPLACE_SOURCE_GROUP, listMarketplaceSources } from "@/lib/ask-nanci/data/panels/service-marketplace"
 import { SourceIcon } from "./SourceIcon"
 import type { Source } from "@/lib/ask-nanci/types"
@@ -75,7 +75,7 @@ function SourceRow({ source, onToggle, onRemove }: { source: Source; onToggle: (
 // ─── Main panel ──────────────────────────────────────────────────────────────
 
 export function PersonalizePanel() {
-  const { kbOpen, setKbOpen, sources, setSources, builtInSources, marketplaceEnabled, toggleMarketplaceService, mutedMarketplaceSources, toggleMarketplaceSource } = useAskNanci()
+  const { kbOpen, setKbOpen, sources, setSources, reloadSources, scope, builtInSources, marketplaceEnabled, toggleMarketplaceService, mutedMarketplaceSources, toggleMarketplaceSource } = useAskNanci()
   const extensions = listMarketplaceSources(marketplaceEnabled, mutedMarketplaceSources)
   const fileRef = useRef<HTMLInputElement>(null)
   const [wizardOpen, setWizardOpen] = useState(false)
@@ -86,9 +86,17 @@ export function PersonalizePanel() {
   const userSources = sources.filter((s) => s.id !== FOUNDATION_SOURCE.id && !builtInIds.has(s.id))
   const hasSources = userSources.length > 0
 
-  function refresh() { setSources(listSources(builtInSources)) }
-  function handleToggle(id: string) { toggleSource(id); refresh() }
-  function handleRemove(id: string) { removeSource(id); refresh() }
+  // A scoped mode's own accounts are not saved, so they change in place.
+  const scopeIds = new Set((scope ? SCOPE_ACCOUNTS[scope] ?? [] : []).map((s) => s.id))
+  const refresh = reloadSources
+  function handleToggle(id: string) {
+    if (scopeIds.has(id)) return setSources(sources.map((s) => (s.id === id ? { ...s, active: !s.active } : s)))
+    toggleSource(id); refresh()
+  }
+  function handleRemove(id: string) {
+    if (scopeIds.has(id)) return setSources(sources.filter((s) => s.id !== id))
+    removeSource(id); refresh()
+  }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     addFileSources(e.target.files)

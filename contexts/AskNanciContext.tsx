@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useCallback, useRef, useEffect, useMemo } from "react"
-import { SCOPE_FOUNDATION, type FlowScope } from "@/lib/ask-nanci/data/flow-scopes"
+import { SCOPE_ACCOUNTS, SCOPE_FOUNDATION, type FlowScope } from "@/lib/ask-nanci/data/flow-scopes"
 import type { Message, Session, Source, UsageData, ConceptScriptedTurn, PanelId, PanelAction, SheetActionData } from "@/lib/ask-nanci/types"
 import { usePanelStack } from "@/lib/ask-nanci/use-panel-stack"
 import { turnToPanelActions } from "@/lib/ask-nanci/panel-actions"
@@ -13,6 +13,7 @@ import {
   removeSessionById,
   newSessionId,
   fetchSources,
+  listSources,
   persistSources,
   streamChat,
   fetchPromptCategories,
@@ -75,6 +76,8 @@ interface AskNanciCtx {
   deleteSessionById: (id: string) => void
   sources: Source[]
   setSources: (sources: Source[]) => void
+  /** Reread the saved accounts. A scoped mode's own accounts stay as they are. */
+  reloadSources: () => void
   thinking: { source: Source | null; label: string }
   kbOpen: boolean
   setKbOpen: (open: boolean) => void
@@ -234,9 +237,13 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const ownFoundation = foundation ?? (scope ? SCOPE_FOUNDATION[scope] : undefined)
   const foundationSource = ownFoundation ?? FOUNDATION_SOURCE
   const builtInSources = useMemo(() => [foundationSource, ...(accounts ?? [])], [foundationSource, accounts])
-  // An embed starts from its variant's demo list. The mode's always-linked accounts
-  // follow the foundation, and a demo entry with the same id gives way to them.
+  // A scoped mode with its own accounts starts from them, embed or not, so every story in
+  // it reads from the same list. Otherwise an embed starts from its variant's demo list.
+  // The mode's always-linked accounts follow the foundation, and a demo entry with the
+  // same id gives way to them.
+  const scopeAccounts = scope ? SCOPE_ACCOUNTS[scope] : undefined
   const [sources, setSourcesState] = useState<Source[]>(() => {
+    if (scopeAccounts) return [foundationSource, ...(accounts ?? []), ...scopeAccounts]
     if (!isEmbed) return []
     const demo = (
       embedVariant === "business-owner" ? EMBED_BUSINESS_OWNER_DEMO_SOURCES :
@@ -362,7 +369,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     fetchSessions().then(setSessions)
     fetchPromptCategories().then(setPromptCategories)
     fetchAllQuestions().then(setAllQuestions)
-    if (!isEmbed) fetchSources(builtInSources).then(setSourcesState)
+    if (!isEmbed && !scopeAccounts) fetchSources(builtInSources).then(setSourcesState)
     // ponytail: must stay in the effect — a lazy useState initializer would read
     // localStorage on the client but not the server, mismatching Dialog's `open` on hydrate.
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -1036,11 +1043,23 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     if (activeSessionId === id) startNewChat()
   }, [activeSessionId, startNewChat])
 
+  // A scoped mode's own accounts live only in memory. Saving them would link them in
+  // every other mode on this browser, so they are left out of what is saved.
+  const scopeIds = useMemo(() => new Set((scopeAccounts ?? []).map((s) => s.id)), [scopeAccounts])
   const handleSetSources = useCallback((next: Source[]) => {
     setSourcesState(next)
     const builtIn = new Set(builtInSources.map((s) => s.id))
-    persistSources(next.filter((s) => s.id !== FOUNDATION_SOURCE_ID && !builtIn.has(s.id)))
-  }, [builtInSources])
+    persistSources(next.filter((s) => s.id !== FOUNDATION_SOURCE_ID && !builtIn.has(s.id) && !scopeIds.has(s.id)))
+  }, [builtInSources, scopeIds])
+  // The saved accounts, read again after one is linked, toggled or removed. The scope's
+  // own accounts keep their place after the built-ins.
+  const reloadSources = useCallback(() => {
+    setSourcesState((prev) => {
+      const next = listSources(builtInSources)
+      const kept = prev.filter((s) => scopeIds.has(s.id))
+      return [...next.slice(0, builtInSources.length), ...kept, ...next.slice(builtInSources.length)]
+    })
+  }, [builtInSources, scopeIds])
 
   const openSettings = useCallback(() => {
     setSettingsOpen(true)
@@ -1056,7 +1075,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       view, messages, chatState, chatTitle, sessions, activeSessionId,
       sendMessage, handlePrompt, stopAnimation, startNewChat, replayFlow, resumeSession,
       deleteSessionById,
-      sources, setSources: handleSetSources, thinking,
+      sources, setSources: handleSetSources, reloadSources, thinking,
       kbOpen, setKbOpen,
       marketplaceOpen, setMarketplaceOpen, marketplaceEnabled, toggleMarketplaceService, mutedMarketplaceSources, toggleMarketplaceSource, autoConnectListing,
       draft, setDraft,
