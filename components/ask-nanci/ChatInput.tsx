@@ -5,6 +5,7 @@ import { ArrowUp, Square, Bell, MessageCircleQuestion, Clock5 } from "lucide-rea
 import { Button, Textarea, Popover, PopoverTrigger, PopoverContent, Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "aperia-ds5"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "aperia-ds5"
 import { useAskNanci } from "@/contexts/AskNanciContext"
+import { SCOPE_CATALOG } from "@/lib/ask-nanci/data/flow-scopes"
 import { CONCEPT_SCRIPTED_CONVERSATIONS, CONCEPT_FLOW6_KEY } from "@/lib/ask-nanci/data/flows.concept"
 import { SlashCommandPopover, type SlashAction } from "./SlashCommandPopover"
 import { ChatActiveSources } from "./ChatActiveSources"
@@ -18,7 +19,7 @@ import { useSoftKeyboard } from "@/hooks/use-is-mobile"
 const PROACTIVE_CONTENT = CONCEPT_SCRIPTED_CONVERSATIONS[CONCEPT_FLOW6_KEY][0].content
 
 export function ChatInput() {
-  const { handlePrompt, startNewChat, chatState, stopAnimation, sources, draft, setDraft, usage, setTokenLimitReached, setOnboardingOpen, isEmbed, embedVariant, isConceptVersion, triggerProactiveFlow, proactiveNotificationActive, replayFlow, requestTour } = useAskNanci()
+  const { handlePrompt, startNewChat, chatState, stopAnimation, sources, draft, setDraft, usage, setTokenLimitReached, setOnboardingOpen, isEmbed, embedVariant, isConceptVersion, triggerProactiveFlow, proactiveNotificationActive, replayFlow, requestTour, scope } = useAskNanci()
   const isDetect = embedVariant === "concept-embed"
   const activeSources = sources.filter((s) => s.active)
 
@@ -88,6 +89,8 @@ export function ChatInput() {
     }
     textareaRef.current?.focus()
   }
+
+  const notice = scope ? SCOPE_CATALOG[scope].notice : undefined
 
   return (
     <div className="relative">
@@ -200,6 +203,8 @@ export function ChatInput() {
           </div>
         </div>
       </div>
+
+      {notice && <p className="mt-1.5 text-center text-xs text-muted-foreground">{notice}</p>}
 
       <Dialog open={commonQOpen} onOpenChange={setCommonQOpen}>
         <DialogContent className="sm:max-w-[750px]">

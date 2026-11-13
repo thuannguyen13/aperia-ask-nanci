@@ -4,6 +4,7 @@
 import type { Source } from "../types"
 import type { ThemeId } from "./theme-logos"
 import { FOUNDATION_SOURCE, FOUNDATION_SOURCE_ID } from "../source-store"
+import { CARRIER } from "./carrier"
 
 // ─── Internal build blocks ────────────────────────────────────────────────────
 // Per-host foundation sources (all share FOUNDATION_SOURCE_ID so the "is built-in?"
@@ -41,6 +42,20 @@ export const VISION_WEB_SOURCE: Source = {
   addedAt: 0,
 }
 
+// The carrier modes' built-in data: the business owner's carrier account, with calls,
+// service status, lines and billing. Initials stand in for a logo, since no approved
+// carrier asset exists.
+export const CARRIER_SOURCE: Source = {
+  id: FOUNDATION_SOURCE_ID,
+  name: `${CARRIER.business} account`,
+  kind: "bank",
+  institution: CARRIER.business,
+  color: "bg-sky-700",
+  initials: "AT",
+  active: true,
+  addedAt: 0,
+}
+
 // A theme can replace the default foundation with its own built-in data.
 export const THEME_FOUNDATION: Partial<Record<ThemeId, Source>> = {
   amex: VISION_WEB_SOURCE,
@@ -50,10 +65,17 @@ export const THEME_FOUNDATION: Partial<Record<ThemeId, Source>> = {
 // accounts. The AMEX theme has it always linked.
 const AMEX_ACCOUNT: Source = { id: "demo-amex", name: "Amex Business Gold ••5561", kind: "bank", institution: "American Express", color: "bg-sky-600", initials: "AX", logo: "/fi/amex.svg", active: true, addedAt: 0 }
 
+const CHASE_ACCOUNT: Source = { id: "demo-chase", name: "Chase Business Checking ••4892", kind: "bank", institution: "Chase", color: "bg-blue-700", initials: "CH", logo: "/fi/chase.png", active: true, addedAt: 0 }
+
+// The register beside the carrier account. Clover's data under its own id, because the
+// foundation id is what marks a source as built in.
+const REGISTER_ACCOUNT: Source = { ...CLOVER_SOURCE, id: "demo-register" }
+
 // Accounts a theme always has linked, after its foundation. They cannot be removed
 // and are never saved, so every load starts with them.
 export const THEME_ACCOUNTS: Partial<Record<ThemeId, Source[]>> = {
   amex: [AMEX_ACCOUNT],
+  att: [REGISTER_ACCOUNT, CHASE_ACCOUNT],
 }
 
 // ─── Per-variant source lists ─────────────────────────────────────────────────
@@ -61,7 +83,7 @@ export const THEME_ACCOUNTS: Partial<Record<ThemeId, Source[]>> = {
 export const EMBED_DEMO_SOURCES: Source[] = [
   CLOVER_SOURCE,
   { id: "demo-qb",    name: "Walker's Business Books",        kind: "bank", institution: "QuickBooks",       color: "bg-green-600",  initials: "QB", logo: "/fi/quickbook.svg",  active: true, addedAt: 0 },
-  { id: "demo-chase", name: "Chase Business Checking ••4892", kind: "bank", institution: "Chase",            color: "bg-blue-700",   initials: "CH", logo: "/fi/chase.png",      active: true, addedAt: 0 },
+  CHASE_ACCOUNT,
   { id: "demo-bofa",  name: "BofA Savings ••2341",            kind: "bank", institution: "Bank of America",  color: "bg-red-600",    initials: "BA", logo: "/fi/bofa.png",       active: true, addedAt: 0 },
   { id: "demo-wf",    name: "Wells Fargo Business ••7823",    kind: "bank", institution: "Wells Fargo",      color: "bg-yellow-600", initials: "WF", logo: "/fi/wellsfargo.png", active: true, addedAt: 0 },
   AMEX_ACCOUNT,

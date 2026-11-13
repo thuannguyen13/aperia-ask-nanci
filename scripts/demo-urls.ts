@@ -86,13 +86,14 @@ const MODE_NOTES: Record<string, string> = {
   titan: "Duplicate of `concept` — same welcome card catalog and panel demo — wearing the Titan brand",
   talus: "Duplicate of `concept` wearing the Talus brand: same welcome card catalog and panel demo",
   resy: "The concept demo narrowed to Resy: a catalog of the Resy flows only, and a marketplace listing only Resy, which is where the demo starts",
+  att: "The concept demo narrowed to the AT&T carrier stories: six cards, the carrier account as the built-in source, and a concept notice under the composer",
   amex: "Default app wearing the American Express brand: plays every &flow=<slug>&autoplay with its panels, onboarding closed",
   tib: "Default app wearing the TIB brand: plays every &flow=<slug>&autoplay with its panels",
   woodforest: "Default app wearing the Woodforest brand: plays every &flow=<slug>&autoplay with its panels",
   placeholder: "Full app wearing the white-label placeholder brand — swap the logo + theme block to stand up a new one",
   onboarding: "Default app, but the onboarding dialog opens on every load and finishing it records nothing — so it can be demoed repeatedly without clearing localStorage",
 }
-for (const mode of ["", ...EMBED_VARIANTS, "concept", "concept-nav", "titan", "titan-embed", "talus", "talus-embed", "resy", "resy-embed", "amex", "tib", "woodforest", "placeholder", "onboarding"]) {
+for (const mode of ["", ...EMBED_VARIANTS, "concept", "concept-nav", "titan", "titan-embed", "talus", "talus-embed", "resy", "resy-embed", "att", "att-embed", "amex", "tib", "woodforest", "placeholder", "onboarding"]) {
   const q = mode ? `mode=${mode}` : ""
   const { isEmbed, isConceptVersion } = parseMode(mode || null)
   const note = MODE_NOTES[mode] ?? (isConceptVersion ? "Panel demo, embeddable" : "Chat-only embed")

@@ -20,6 +20,7 @@ import { NO_SHOW_BOOKING, NO_SHOW_FEE, FEES_AFTER_CHARGE, EVENTS, EVENT_TOTALS, 
 import { WEEK_REPORT, SURVEY_SUMMARY, LOW_RATINGS, FRIDAY_LOW_RATINGS, VENUES, FLAGSHIP_VENUE, MOST_NO_SHOWS, HIGHEST_RATE } from "./panels/resy-reports";
 import { formatWholeCurrency } from "../../../components/shared/format";
 import { inScope, type FlowScope } from "./flow-scopes";
+import { CARRIER_FLOW_DEFS, CARRIER_CONVERSATIONS } from "./flows.carrier";
 import { isAwaitingTurn } from "../is-awaiting-turn";
 
 // ─── Flow-key constants ───────────────────────────────────────────────────────
@@ -477,6 +478,8 @@ export const FLOW_DEFS: FlowDef[] = [
     scope: "resy",
     description: "Ask whether Nanci can see your Resy book. The Marketplace listing for Resy opens beside the chat, and Connect there links the account.",
   },
+  // The carrier stories, scoped to ?mode=att.
+  ...CARRIER_FLOW_DEFS,
 ];
 
 // Derived — do not hand-maintain; add to FLOW_DEFS above instead.
@@ -1456,6 +1459,8 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       source: "Resy multi-location + card transactions",
     },
   ],
+  // ── Flows 33–38: the carrier stories (?mode=att) ─────────────────────────
+  ...CARRIER_CONVERSATIONS,
 };
 
 // A beat on the answer before its follow-up chip is sent, as a reader would take.
