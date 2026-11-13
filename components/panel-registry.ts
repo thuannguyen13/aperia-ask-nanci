@@ -45,6 +45,8 @@ import { ResyEventsPanel } from "./ask-nanci/concept/ResyEventsPanel"
 import { ResyReportPanel } from "./ask-nanci/concept/ResyReportPanel"
 import { ResySurveysPanel } from "./ask-nanci/concept/ResySurveysPanel"
 import { ResyLocationsPanel } from "./ask-nanci/concept/ResyLocationsPanel"
+import { MissedCallsPanel } from "./ask-nanci/concept/MissedCallsPanel"
+import { OutageImpactPanel } from "./ask-nanci/concept/OutageImpactPanel"
 import { UnusedLinesPanel } from "./ask-nanci/concept/UnusedLinesPanel"
 import { SecondLocationPanel } from "./ask-nanci/concept/SecondLocationPanel"
 import { PlanValuePanel } from "./ask-nanci/concept/PlanValuePanel"
@@ -62,6 +64,8 @@ import { MOVE_TITLE, NOTIFY_TITLE, OPEN_TITLE } from "@/lib/ask-nanci/data/panel
 import { GUEST_TITLE } from "@/lib/ask-nanci/data/panels/resy-guests"
 import { FEE_TITLE } from "@/lib/ask-nanci/data/panels/resy-deposits"
 import { WEEK_TITLE } from "@/lib/ask-nanci/data/panels/resy-reports"
+import { MISSED_CALLS_TITLE } from "@/lib/ask-nanci/data/panels/missed-calls"
+import { OUTAGE_IMPACT_TITLE } from "@/lib/ask-nanci/data/panels/outage-impact"
 import { UNUSED_LINES_TITLE } from "@/lib/ask-nanci/data/panels/unused-lines"
 import { PLAN_VALUE_TITLE } from "@/lib/ask-nanci/data/panels/plan-value"
 
@@ -123,6 +127,8 @@ export const PANELS = {
   "resy-surveys":        { component: ResySurveysPanel,       label: "Surveys" },
   "resy-locations":      { component: ResyLocationsPanel,     label: "Locations" },
   // Carrier stories (?mode=att).
+  "missed-calls":        { component: MissedCallsPanel,       label: MISSED_CALLS_TITLE },
+  "outage-impact":       { component: OutageImpactPanel,      label: OUTAGE_IMPACT_TITLE },
   "unused-lines":        { component: UnusedLinesPanel,       label: UNUSED_LINES_TITLE },
   "second-location":     { component: SecondLocationPanel,    label: "Second Location" },
   "plan-value":          { component: PlanValuePanel,         label: PLAN_VALUE_TITLE },
