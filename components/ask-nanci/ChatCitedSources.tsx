@@ -8,6 +8,7 @@ import { getSourceInitials } from "./SourceIcon"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { citeSource } from "@/lib/ask-nanci/cite-source"
 import { foundationFirst } from "@/lib/ask-nanci/source-store"
+import { CITABLE_SOURCES } from "@/lib/ask-nanci/data/sources"
 
 
 export function ChatCitedSources({ sources: cited }: { sources: Source[] }) {
@@ -82,5 +83,5 @@ export function ChatCitedSources({ sources: cited }: { sources: Source[] }) {
 // the same pill and popover as the sources a live answer cites.
 export function ChatScriptedSources({ source }: { source: string }) {
   const { foundationSource } = useAskNanci()
-  return <ChatCitedSources sources={citeSource(source, foundationSource)} />
+  return <ChatCitedSources sources={citeSource(source, foundationSource, CITABLE_SOURCES)} />
 }

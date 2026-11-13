@@ -7,6 +7,7 @@
 import type { ConceptScriptedTurn, SheetActionData } from "../../types"
 import type { FlowDef } from "../flows.concept"
 import { CARRIER } from "../carrier"
+import { CARRIER_CITES } from "../sources"
 import {
   FIRST_LOCATION, NEW_LOCATION, FIRST_LOCATION_USE, SECOND_LOCATION_REQUEST,
 } from "../panels/second-location"
@@ -57,6 +58,7 @@ export const EXPANSION_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
         `Here is the new address. Coverage there supports the same service you have today.\n\n{{MAP}}\n\nYour first location runs on ${spell(FIRST_LOCATION_USE.lines)} lines and ${spell(FIRST_LOCATION_USE.internet)} internet connection. It opened with ${spell(FIRST_LOCATION_USE.openedWithLines)} lines and needed a ${ordinal(FIRST_LOCATION_USE.lines)} by its ${ordinal(FIRST_LOCATION_USE.addedInMonth)} month, so the suggested setup starts the new site with ${spell(FIRST_LOCATION_USE.lines)}. I can send it to ${CARRIER.business} as a request.`,
       map: { address: NEW_LOCATION.address, lat: NEW_LOCATION.lat, lng: NEW_LOCATION.lng },
       panel: "second-location",
+      source: CARRIER_CITES.account,
     },
     { role: "user", content: SETUP_REQUEST },
     {

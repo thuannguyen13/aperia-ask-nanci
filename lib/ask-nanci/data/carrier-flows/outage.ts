@@ -7,6 +7,7 @@
 import type { ConceptScriptedTurn } from "../../types"
 import type { FlowDef } from "../flows.concept"
 import { CARRIER } from "../carrier"
+import { CARRIER_CITES } from "../sources"
 import { isAwaitingTurn } from "../../is-awaiting-turn"
 import { formatWholeCurrency } from "../../../../components/shared/format"
 import { buildRequestConversations } from "../panels/carrier-request"
@@ -43,6 +44,7 @@ export const OUTAGE_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
       role: "assistant",
       content: `Your internet was down for ${OUTAGE_MINUTES} minutes on Thursday, from ${OUTAGE_WINDOW}. Your register could not take cards in that window, and ${FAILED_PAYMENTS} card payments failed. Based on a usual Thursday dinner, that is about ${formatWholeCurrency(ESTIMATED_SALES_AFFECTED)} in card sales.`,
       panel: "outage-impact",
+      source: CARRIER_CITES.withSales,
       suggestions: [OUTAGE_BACKUP],
     },
   ],

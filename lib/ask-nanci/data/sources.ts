@@ -56,6 +56,20 @@ export const CARRIER_SOURCE: Source = {
   addedAt: 0,
 }
 
+// The register, as an answer cites it. Clover's data under its own id, so it never reads
+// as the built-in source.
+export const REGISTER_SOURCE: Source = { ...CLOVER_SOURCE, id: "cited-clover" }
+
+// Sources a scripted answer can name by their own name, beside the built-in source and
+// the marketplace services.
+export const CITABLE_SOURCES: Source[] = [REGISTER_SOURCE]
+
+// What the carrier stories cite: the carrier account alone, or with the register's sales.
+export const CARRIER_CITES = {
+  account: CARRIER_SOURCE.name,
+  withSales: `${CARRIER_SOURCE.name} + ${REGISTER_SOURCE.name}`,
+}
+
 // A theme can replace the default foundation with its own built-in data.
 export const THEME_FOUNDATION: Partial<Record<ThemeId, Source>> = {
   amex: VISION_WEB_SOURCE,

@@ -16,18 +16,22 @@ export function listCitedServiceIds(source: string): string[] {
 // A scripted answer names its source as text ("Resy reservations + card transactions").
 // The cited-sources pill needs Source objects. A part named after a marketplace service
 // becomes that service, named as the composer lists it. "card transactions", or the
-// built-in source's own name, is the mode's built-in data source. A string with neither
-// stays one source, so a "+" inside a report name is not split. The built-in source
+// built-in source's own name, is the mode's built-in data source. A part named after one
+// of the `known` sources is that source. A string with none of these stays one source,
+// so a "+" inside a report name is not split. The built-in source
 // leads, as the foundation leads the composer's sources, so both stacks read in the
 // same order. A service is listed once, whichever parts of it the answer read.
-export function citeSource(source: string, foundation: Source): Source[] {
+export function citeSource(source: string, foundation: Source, known: Source[] = []): Source[] {
   // "card transactions" and the built-in source's own name both cite the built-in source.
   const isFoundation = (part: string) => CARD_DATA.test(part) || part === foundation.name
   const parts = source.split(" + ").map((p) => p.trim())
-  const splits = parts.length > 1 && parts.some((p) => findService(p) || isFoundation(p))
+  const findKnown = (part: string) => known.find((s) => s.name === part)
+  const splits = parts.length > 1 && parts.some((p) => findService(p) || isFoundation(p) || findKnown(p))
   const ordered = splits ? [...parts.filter(isFoundation), ...parts.filter((p) => !isFoundation(p))] : [source]
   const cited = ordered.map((part): Source => {
     if (isFoundation(part)) return foundation
+    const named = findKnown(part)
+    if (named) return named
     const service = findService(part)
     return service
       ? toMarketplaceSource(service)

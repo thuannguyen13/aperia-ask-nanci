@@ -6,6 +6,7 @@
 import type { ConceptScriptedTurn, SheetActionData } from "../../types"
 import type { FlowDef } from "../flows.concept"
 import { CARRIER } from "../carrier"
+import { CARRIER_CITES } from "../sources"
 import { BILL_CHARGE, HANDOFF_REQUEST } from "../panels/bill-handoff"
 
 export const HANDOFF_PROMPT = "This charge on my bill doesn't look right."
@@ -39,6 +40,7 @@ export const HANDOFF_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
       role: "assistant",
       content: `I can see a $${BILL_CHARGE.amount} charge on this month's bill, labelled as a ${BILL_CHARGE.label.toLowerCase()}. It was added on ${BILL_CHARGE.added}. I can tell you when it was added, but I can't see why, and I can't remove it.`,
       panel: "bill-handoff",
+      source: CARRIER_CITES.account,
     },
     { role: "user", content: "Who can sort it out?" },
     {

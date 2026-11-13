@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { citeSource, listCitedServiceIds } from "./cite-source"
-import { CARRIER_SOURCE, VISION_WEB_SOURCE } from "./data/sources"
+import { CARRIER_CITES, CARRIER_SOURCE, CITABLE_SOURCES, REGISTER_SOURCE, VISION_WEB_SOURCE } from "./data/sources"
 
 describe("citeSource", () => {
   it("names any Resy part as the one Resy source, as the composer lists it", () => {
@@ -14,6 +14,10 @@ describe("citeSource", () => {
 
   it("cites the built-in source, logo and all, when the answer names it", () => {
     expect(citeSource(CARRIER_SOURCE.name, CARRIER_SOURCE)).toEqual([CARRIER_SOURCE])
+  })
+
+  it("cites the carrier account and the register as two sources, the built-in first", () => {
+    expect(citeSource(CARRIER_CITES.withSales, CARRIER_SOURCE, CITABLE_SOURCES)).toEqual([CARRIER_SOURCE, REGISTER_SOURCE])
   })
 
   it("keeps a report name with a plus in it as one source", () => {

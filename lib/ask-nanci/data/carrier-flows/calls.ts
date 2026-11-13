@@ -7,6 +7,7 @@
 import type { ConceptScriptedTurn } from "../../types"
 import type { FlowDef } from "../flows.concept"
 import { CARRIER } from "../carrier"
+import { CARRIER_CITES } from "../sources"
 import { isAwaitingTurn } from "../../is-awaiting-turn"
 import { formatWholeCurrency } from "../../../../components/shared/format"
 import { buildRequestConversations } from "../panels/carrier-request"
@@ -43,6 +44,7 @@ export const CALLS_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
       role: "assistant",
       content: `Friday lunch came in ${LUNCH_DROP_PCT}% under a usual Friday, about ${formatWholeCurrency(LUNCH_SHORTFALL)} less. Between ${MISSED_WINDOW.from} and ${MISSED_WINDOW.to} you also missed ${MISSED_IN_WINDOW} calls on your business line, and ${NO_CALLBACK} of those callers did not call back. That window is your busiest for both sales and calls.`,
       panel: "missed-calls",
+      source: CARRIER_CITES.withSales,
       suggestions: [CALLS_COVER],
     },
   ],
