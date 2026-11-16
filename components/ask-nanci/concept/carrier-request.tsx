@@ -24,6 +24,8 @@ import { RENEWAL_REQUEST_TITLE, RENEWAL_OPTION } from "@/lib/ask-nanci/data/pane
 import { isAwaitingRenewalRequest } from "@/lib/ask-nanci/data/carrier-flows/renewal"
 import { BILL_DATE_TITLE, BILL_DATE_OPTION } from "@/lib/ask-nanci/data/panels/cash-flow"
 import { isAwaitingBillDate } from "@/lib/ask-nanci/data/carrier-flows/cash-flow"
+import { WINBACK_TITLE, WINBACK_OPTION } from "@/lib/ask-nanci/data/panels/phone-customers"
+import { isAwaitingWinback } from "@/lib/ask-nanci/data/carrier-flows/callers"
 import { SEASONAL_PAUSE_TITLE, PAUSE_OPTIONS, PAUSE_OPTIONS_HEADING } from "@/lib/ask-nanci/data/panels/seasonal-closure"
 import { isAwaitingPauseRequest } from "@/lib/ask-nanci/data/carrier-flows/seasonal"
 import { usePanelAutoplay } from "./use-panel-autoplay"
@@ -188,4 +190,8 @@ export function RenewalRequestPanel() {
 
 export function BillDateRequestPanel() {
   return <RequestPanel panelId="bill-date-request" title={BILL_DATE_TITLE} heading={SINGLE} options={[BILL_DATE_OPTION]} isAwaiting={isAwaitingBillDate} />
+}
+
+export function WinbackRequestPanel() {
+  return <RequestPanel panelId="winback-request" title={WINBACK_TITLE} heading={SINGLE} options={[WINBACK_OPTION]} isAwaiting={isAwaitingWinback} />
 }

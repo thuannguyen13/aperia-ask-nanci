@@ -47,10 +47,10 @@ import { ResySurveysPanel } from "./ask-nanci/concept/ResySurveysPanel"
 import { ResyLocationsPanel } from "./ask-nanci/concept/ResyLocationsPanel"
 import { MissedCallsPanel } from "./ask-nanci/concept/MissedCallsPanel"
 import { OutageImpactPanel } from "./ask-nanci/concept/OutageImpactPanel"
-import { CallsCoverPanel, OutageBackupPanel, SeasonalPausePanel, LinesRequestPanel, OverageRequestPanel, LocationRequestPanel, RenewalRequestPanel, BillDateRequestPanel } from "./ask-nanci/concept/carrier-request"
+import { CallsCoverPanel, OutageBackupPanel, SeasonalPausePanel, LinesRequestPanel, OverageRequestPanel, LocationRequestPanel, RenewalRequestPanel, BillDateRequestPanel, WinbackRequestPanel } from "./ask-nanci/concept/carrier-request"
 import { SeasonalClosurePanel } from "./ask-nanci/concept/SeasonalClosurePanel"
 import { DailyBriefingPanel } from "./ask-nanci/concept/DailyBriefingPanel"
-import { YearHistoryPanel } from "./ask-nanci/concept/YearHistoryPanel"
+import { PhoneCustomersPanel } from "./ask-nanci/concept/PhoneCustomersPanel"
 import { DataOveragePanel } from "./ask-nanci/concept/DataOveragePanel"
 import { CashFlowPanel } from "./ask-nanci/concept/CashFlowPanel"
 import { CashPlanPanel } from "./ask-nanci/concept/CashPlanPanel"
@@ -77,7 +77,7 @@ import { OUTAGE_IMPACT_TITLE, OUTAGE_BACKUP_TITLE } from "@/lib/ask-nanci/data/p
 import { CASH_FLOW_TITLE, CASH_PLAN_TITLE, BILL_DATE_TITLE } from "@/lib/ask-nanci/data/panels/cash-flow"
 import { SEASONAL_CLOSURE_TITLE, SEASONAL_PAUSE_TITLE } from "@/lib/ask-nanci/data/panels/seasonal-closure"
 import { BRIEFING_TITLE } from "@/lib/ask-nanci/data/panels/daily-briefing"
-import { HISTORY_TITLE } from "@/lib/ask-nanci/data/panels/year-history"
+import { PHONE_CUSTOMERS_TITLE, WINBACK_TITLE } from "@/lib/ask-nanci/data/panels/phone-customers"
 import { DATA_OVERAGE_TITLE, OVERAGE_REQUEST_TITLE } from "@/lib/ask-nanci/data/panels/data-overage"
 import { UNUSED_LINES_TITLE, LINES_REQUEST_TITLE } from "@/lib/ask-nanci/data/panels/unused-lines"
 import { LOCATION_REQUEST_TITLE } from "@/lib/ask-nanci/data/panels/second-location"
@@ -155,7 +155,8 @@ export const PANELS = {
   "seasonal-closure":    { component: SeasonalClosurePanel,   label: SEASONAL_CLOSURE_TITLE },
   "seasonal-pause":      { component: SeasonalPausePanel,     label: SEASONAL_PAUSE_TITLE },
   "daily-briefing":      { component: DailyBriefingPanel,     label: BRIEFING_TITLE },
-  "year-history":        { component: YearHistoryPanel,       label: HISTORY_TITLE },
+  "phone-customers":     { component: PhoneCustomersPanel,    label: PHONE_CUSTOMERS_TITLE },
+  "winback-request":     { component: WinbackRequestPanel,    label: WINBACK_TITLE },
   "data-overage":        { component: DataOveragePanel,       label: DATA_OVERAGE_TITLE },
   "lines-request":       { component: LinesRequestPanel,      label: LINES_REQUEST_TITLE },
   "overage-request":     { component: OverageRequestPanel,    label: OVERAGE_REQUEST_TITLE },
