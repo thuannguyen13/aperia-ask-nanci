@@ -16,7 +16,7 @@ import {
 
 // Nanci opens the flow, so its key is an id rather than a prompt.
 const LINES_KEY = "__unused-lines__"
-const LINES_SEND = "Request the smaller plan"
+const LINES_SEND = "Request the lower plan"
 const LINES_KEEP = `Keep all ${spellCount(LINES.length)}`
 
 export const LINES_FLOW: FlowDef = {
@@ -31,7 +31,7 @@ export const LINES_FLOW: FlowDef = {
   churn: { cause: "Plan mismatch", metric: "Churn" },
   // The request comes first, so ?autoplay plays on into it.
   followups: [LINES_SEND, LINES_KEEP],
-  description: "Before the bill posts, Nanci flags two lines with no use in 60 days and offers a request to move to a smaller plan.",
+  description: "Before the bill posts, Nanci flags two lines with no use in 60 days and offers a request to move to a lower plan.",
 }
 
 const planLabel = (plan: { lines: number; monthly: number }) => `${plan.lines} lines, ${formatWholeCurrency(plan.monthly)} a month`
@@ -53,7 +53,7 @@ export const LINES_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
   [LINES_KEY]: [
     {
       role: "assistant",
-      content: `Your bill posts on Friday, and it covers ${spellCount(LINES.length)} lines. ${capitalize(spellCount(IDLE_LINES.length))} of them, ${IDLE_LINE_NAMES}, have had no calls, texts or data in the last ${IDLE_DAYS} days. A plan with ${spellCount(SUGGESTED_PLAN.lines)} lines would cost ${formatWholeCurrency(MONTHLY_DIFFERENCE)} less each month, or ${formatWholeCurrency(YEARLY_DIFFERENCE)} over a year.\n\nI can send ${CARRIER.business} a request to move you to the smaller plan.`,
+      content: `Your bill posts on Friday, and it covers ${spellCount(LINES.length)} lines. ${capitalize(spellCount(IDLE_LINES.length))} of them, ${IDLE_LINE_NAMES}, have had no calls, texts or data in the last ${IDLE_DAYS} days. A plan with ${spellCount(SUGGESTED_PLAN.lines)} lines would cost ${formatWholeCurrency(MONTHLY_DIFFERENCE)} less each month, or ${formatWholeCurrency(YEARLY_DIFFERENCE)} over a year.\n\nI can send ${CARRIER.business} a request to move you to the lower plan.`,
       panel: "unused-lines",
       source: CARRIER_SOURCE.name,
       suggestions: [LINES_SEND, LINES_KEEP],

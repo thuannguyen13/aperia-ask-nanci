@@ -56,7 +56,7 @@ export const RENEWAL_REQUEST = {
 
 // The monthly receipt Nanci opens on the 1st. Its catches are the other carrier stories,
 // read from their own data, so the receipt cannot disagree with them. Only the outage
-// credit and the smaller plan have a figure, and only those count as savings.
+// credit and the lower plan have a figure, and only those count as savings.
 const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
 
 export const MONTH_CATCHES = [
@@ -107,4 +107,4 @@ export const MONTH_TILES = [
 
 export const MONTH_CATCHES_TITLE = `Caught in ${MONTH}`
 
-export const MONTH_NOTE = "Savings count only where there is a figure: the outage credit and the smaller plan. Missed calls and the payroll warning are listed without one."
+export const MONTH_NOTE = "Savings count only where there is a figure: the outage credit and the lower plan. Missed calls and the payroll warning are listed without one."

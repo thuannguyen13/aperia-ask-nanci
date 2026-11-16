@@ -42,7 +42,7 @@ export const lastUsed = (days: number) => (days === 0 ? "Today" : days === 1 ? "
 
 // Invented prices. No real plan or price is used.
 export const CURRENT_PLAN = { name: "Current plan", lines: LINES.length, monthly: 289 }
-export const SUGGESTED_PLAN = { name: "Smaller plan", lines: ACTIVE_LINES.length, monthly: 219 }
+export const SUGGESTED_PLAN = { name: "Lower plan", lines: ACTIVE_LINES.length, monthly: 219 }
 export const MONTHLY_DIFFERENCE = CURRENT_PLAN.monthly - SUGGESTED_PLAN.monthly
 export const YEARLY_DIFFERENCE = MONTHLY_DIFFERENCE * 12
 
