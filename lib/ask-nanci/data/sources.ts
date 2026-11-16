@@ -73,6 +73,7 @@ export const CARRIER_CITES = {
   account: CARRIER_SOURCE.name,
   withSales: `${CARRIER_SOURCE.name} + ${REGISTER_SOURCE.name}`,
   cashFlow: `${REGISTER_SOURCE.name} + ${CHASE_ACCOUNT.name}`,
+  all: `${CARRIER_SOURCE.name} + ${REGISTER_SOURCE.name} + ${CHASE_ACCOUNT.name}`,
 }
 
 // A theme can replace the default foundation with its own built-in data.

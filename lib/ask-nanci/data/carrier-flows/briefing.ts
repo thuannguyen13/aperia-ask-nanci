@@ -2,9 +2,10 @@
 // the stories are written side by side without touching each other.
 //
 // The owner usually hears from the carrier only at bill time. Here Nanci sends a short
-// text each morning, and the chat opens on the full briefing: yesterday's sales, the
-// deposit, the top items and the one thing worth a look. The owner then shares it with
-// the shift manager, so more of the business relies on it.
+// text each morning, and what makes it worth opening is what only the carrier sees: the
+// business line's calls, matched to the register, so a missed call becomes a regular who
+// could not get through. The owner then shares it with the shift manager, so more of the
+// business relies on it.
 import type { ConceptScriptedTurn } from "../../types"
 import type { FlowDef } from "../flows.concept"
 import { CARRIER, nanciLink } from "../carrier"
@@ -12,6 +13,7 @@ import { CARRIER_CITES } from "../sources"
 import { formatWholeCurrency } from "../../../../components/shared/format"
 import {
   YESTERDAY, YESTERDAY_CHANGE_PCT, DEPOSITED, TOP_ITEMS, WORTH_A_LOOK, SHIFT_MANAGER, BRIEFING_TIME, lowerFirst,
+  LINE_YESTERDAY, MISSED_REGULARS, REGULARS_FLAG, REGULARS_USUAL,
 } from "../panels/daily-briefing"
 
 // Nanci opens the flow, so its key is an id rather than a prompt.
@@ -33,34 +35,34 @@ export const BRIEFING_FLOW: FlowDef = {
   scope: "carrier",
   churn: { cause: "Low engagement", metric: "Churn" },
   followups: [BRIEFING_SHARE],
-  description: "A morning text with yesterday's sales, the deposit, the top items and one thing worth a look, then shared with the shift manager.",
+  description: "A morning text with yesterday's sales and calls: two regulars who order by phone could not get through at lunch. Then shared with the shift manager.",
 }
 
 export const BRIEFING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
   [BRIEFING_KEY]: [
     {
       role: "assistant",
-      content: `Good morning. ${YESTERDAY.day}: ${formatWholeCurrency(YESTERDAY.sales)} in sales, ${YESTERDAY_CHANGE_PCT}% above a usual ${YESTERDAY.day}. ${WORTH_A_LOOK.title}.`,
+      content: `Good morning. ${YESTERDAY.day}: ${formatWholeCurrency(YESTERDAY.sales)} in sales, ${YESTERDAY_CHANGE_PCT}% above a usual ${YESTERDAY.day}. ${REGULARS_FLAG}.`,
       textFrom: CARRIER.business,
       textLink: nanciLink("b7Kq2"),
-      chatContent: `While you were away I went through ${YESTERDAY.day}. Sales were ${formatWholeCurrency(YESTERDAY.sales)}, ${YESTERDAY_CHANGE_PCT}% above a usual ${YESTERDAY.day}. One thing needs you this week: ${lowerFirst(WORTH_A_LOOK.title)}, a day before your next delivery.`,
+      chatContent: `While you were away I went through ${YESTERDAY.day}. Sales were ${formatWholeCurrency(YESTERDAY.sales)}, ${YESTERDAY_CHANGE_PCT}% above a usual ${YESTERDAY.day}. Your line missed ${LINE_YESTERDAY.missed} calls at lunch, and ${MISSED_REGULARS.length} of those callers are regulars who order by phone. Neither called back.`,
       workTrail: {
         when: "05:56 AM CST",
         steps: [
           { text: `Checked ${YESTERDAY.orders} orders on your register` },
-          { text: `Matched ${formatWholeCurrency(DEPOSITED)} in deposits to Thursday's card sales` },
-          { text: "Compared your stock with this week's pace" },
-          { flag: true, text: `Flagged: ${lowerFirst(WORTH_A_LOOK.title)}` },
+          { text: `Checked ${LINE_YESTERDAY.calls} calls on your business line` },
+          { text: "Matched the missed callers to past phone orders" },
+          { flag: true, text: `Flagged: ${lowerFirst(REGULARS_FLAG)}` },
         ],
       },
-      source: CARRIER_CITES.cashFlow,
+      source: CARRIER_CITES.withSales,
     },
     { role: "user", content: BRIEFING_ASK, pauseBefore: OPEN_PAUSE_MS },
     {
       role: "assistant",
-      content: `${YESTERDAY.orders} orders came through, and the ${TOP_ITEMS[0].name} led again with ${TOP_ITEMS[0].sold} sold. ${formatWholeCurrency(DEPOSITED)} from Thursday's card sales landed in your bank overnight.\n\nOn the mozzarella: ${WORTH_A_LOOK.body}`,
+      content: `The missed calls all came ${LINE_YESTERDAY.missedHour}, your busiest hour. ${MISSED_REGULARS.map((r) => r.name).join(" and ")} usually order by phone on Fridays, about ${formatWholeCurrency(REGULARS_USUAL)} between them.\n\n${YESTERDAY.orders} orders came through, and the ${TOP_ITEMS[0].name} led again with ${TOP_ITEMS[0].sold} sold. ${formatWholeCurrency(DEPOSITED)} from Thursday's card sales landed in your bank overnight. One more for this week: ${lowerFirst(WORTH_A_LOOK.title)}, a day before your next delivery.`,
       panel: "daily-briefing",
-      source: CARRIER_CITES.cashFlow,
+      source: CARRIER_CITES.all,
       suggestions: [BRIEFING_SHARE],
     },
   ],
@@ -68,7 +70,7 @@ export const BRIEFING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
     { role: "user", content: BRIEFING_SHARE },
     {
       role: "assistant",
-      content: `Done. From tomorrow, your shift manager's line, ending ${SHIFT_MANAGER.ending}, gets the same briefing at ${BRIEFING_TIME}. Their copy shows sales and stock only. Your bank account and your ${CARRIER.business} bill stay with you.`,
+      content: `Done. From tomorrow, your shift manager's line, ending ${SHIFT_MANAGER.ending}, gets the same briefing at ${BRIEFING_TIME}. Their copy shows sales, calls and stock only. Your bank account and your ${CARRIER.business} bill stay with you.`,
       panel: "daily-briefing",
       view: "shared",
     },
