@@ -47,6 +47,13 @@ const LOOP_BLANK_MS = 400
 const INTRO_HOLD_MS = 3000
 /** Matches the slide in HostIntro (AppShell). */
 const INTRO_SLIDE_MS = 550
+// Index of the first user turn at or after a parked flow's cursor whose text is
+// `prompt`, or -1. Only a flow parked on a user turn can be stepped this way; one
+// mid-reply has nothing waiting for the merchant yet.
+const findUserTurnAhead = (flow: { script: ConceptScriptedTurn[]; cursor: number }, prompt: string) => {
+  if (flow.script[flow.cursor]?.role !== "user") return -1
+  return flow.script.findIndex((t, i) => i >= flow.cursor && t.role === "user" && t.content === prompt)
+}
 
 // Once the conversation moves past an assistant message (a new user turn is sent),
 // drop that message's suggestion pills so a clicked pill doesn't linger.
@@ -647,7 +654,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
             ...(turn.chart ? { chart: turn.chart } : {}),
             ...(turn.map ? { map: turn.map } : {}),
             ...(turn.source ? { source: turn.source } : {}),
-            ...(turn.panel ? { panel: turn.panel } : {}),
+            ...(turn.panel ? { panel: turn.panel, panelView: turn.view } : {}),
           }
         }
         return next
@@ -937,8 +944,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
    */
   const leavesCurrentFlow = useCallback((prompt: string) => {
     if (!autoPlayFlow) return false
-    const flow = activeFlowRef.current
-    if (flow && flow.script[flow.cursor]?.role === "user" && flow.script[flow.cursor].content === prompt) return false
+    if (activeFlowRef.current && findUserTurnAhead(activeFlowRef.current, prompt) !== -1) return false
     // A follow-up continues the thread it is already in — it is a conversation key
     // like any other, but CONCEPT_NO_RESET_PROMPTS is exactly the set that does not
     // start over. Without this, every follow-up chip in flows 2, 12, 15 and friends
@@ -963,9 +969,14 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       // Fake end-of-flow follow-ups are decorative only — no conversation behind them.
       if (CONCEPT_FAKE_FOLLOWUPS.has(prompt)) return
       // A pill that matches the active flow's pending user turn steps it forward,
-      // rather than restarting a flow keyed by that same text.
+      // rather than restarting a flow keyed by that same text. A later user turn counts
+      // too: a panel button can be the merchant's reply to a question the script would
+      // have asked first (Flow 39's Approve, pressed before "Why only those three?"), so
+      // the flow skips ahead to it instead of dropping to the canned fallback.
       const flow = activeFlowRef.current
-      if (flow && flow.script[flow.cursor]?.role === "user" && flow.script[flow.cursor].content === prompt) {
+      const ahead = flow && !isAdvancingRef.current ? findUserTurnAhead(flow, prompt) : -1
+      if (flow && ahead !== -1) {
+        activeFlowRef.current = { ...flow, cursor: ahead }
         advanceConceptFlow()
         return
       }

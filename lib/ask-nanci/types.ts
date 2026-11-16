@@ -147,6 +147,8 @@ export interface Message {
    * it without asking Nanci for it again.
    */
   panel?: PanelId
+  /** The view that panel was in when this answer opened it, so the card can name that state. */
+  panelView?: string
   /** True when the stream ended (user stopped or natural completion). Prevents re-appending a partial response on session resume. */
   stopped?: boolean
 }
