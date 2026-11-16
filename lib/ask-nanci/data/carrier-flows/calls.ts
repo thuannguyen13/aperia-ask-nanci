@@ -53,11 +53,10 @@ export const CALLS_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
     {
       role: "assistant",
       content: CALLS_OPTIONS_ANSWER,
-      panel: "missed-calls",
-      view: "options",
+      panel: "calls-cover",
       // The owner picks in the panel, so on a phone it comes up with the answer.
       revealPanel: true,
     },
   ],
-  ...buildRequestConversations(CALLS_OPTIONS, "missed-calls", CALLS_REQUEST_TIMESTAMP),
+  ...buildRequestConversations(CALLS_OPTIONS, "calls-cover", CALLS_REQUEST_TIMESTAMP),
 }

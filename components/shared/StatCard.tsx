@@ -15,6 +15,8 @@ interface StatCardProps {
    * amber means held/review/attention and is never used just to stand out.
    */
   tone?: "amber"
+  /** "value" keeps the card white and tints only the number. */
+  toneScope?: "card" | "value"
   /**
    * "lg" is the design system's small Card: the label and sublabel head the card and a
    * larger value sits at its foot, level with its neighbours' in a grid row.
@@ -22,13 +24,14 @@ interface StatCardProps {
   size?: "default" | "lg"
 }
 
-export function StatCard({ label, value, sublabel, emphasis, tone, size = "default" }: StatCardProps) {
+export function StatCard({ label, value, sublabel, emphasis, tone, toneScope = "card", size = "default" }: StatCardProps) {
   const amber = tone === "amber"
+  const amberCard = amber && toneScope === "card"
   if (size === "lg") {
     return (
       <Card size="sm" className={cn(
         "justify-between shadow-xs",
-        amber ? "bg-amber-50 ring-amber-200 dark:bg-amber-950/20 dark:ring-amber-900" : emphasis && "bg-primary/5 ring-primary/30",
+        amberCard ? "bg-amber-50 ring-amber-200 dark:bg-amber-950/20 dark:ring-amber-900" : emphasis && "bg-primary/5 ring-primary/30",
       )}>
         <CardHeader>
           <CardTitle>{label}</CardTitle>
@@ -43,7 +46,7 @@ export function StatCard({ label, value, sublabel, emphasis, tone, size = "defau
   return (
     <div className={cn(
       "rounded-lg border px-3 py-3",
-      amber
+      amberCard
         ? "border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/20"
         : emphasis ? "border-primary/30 bg-primary/5" : "bg-background",
     )}>

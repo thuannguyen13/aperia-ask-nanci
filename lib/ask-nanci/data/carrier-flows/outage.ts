@@ -68,11 +68,10 @@ export const OUTAGE_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
     {
       role: "assistant",
       content: OUTAGE_OPTIONS_ANSWER,
-      panel: "outage-impact",
-      view: "options",
+      panel: "outage-backup",
       // The owner picks in the panel, so on a phone it comes up with the answer.
       revealPanel: true,
     },
   ],
-  ...buildRequestConversations(OUTAGE_OPTIONS, "outage-impact", OUTAGE_REQUEST_TIMESTAMP),
+  ...buildRequestConversations(OUTAGE_OPTIONS, "outage-backup", OUTAGE_REQUEST_TIMESTAMP),
 }

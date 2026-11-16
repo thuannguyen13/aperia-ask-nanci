@@ -14,6 +14,7 @@ import { FIRST_LOCATION } from "./second-location"
 import { formatWholeCurrency } from "../../../../components/shared/format"
 
 export const OUTAGE_IMPACT_TITLE = "Outage Impact"
+export const OUTAGE_BACKUP_TITLE = "Backup Internet"
 
 const roundTo10 = (n: number) => Math.round(n / 10) * 10
 
@@ -50,36 +51,43 @@ export const USUAL_DINNER_HOUR = roundTo10(THURSDAY.sales * DINNER_SHARE)
 export const ESTIMATED_SALES_AFFECTED = roundTo10(THURSDAY.sales * DINNER_SHARE * OUTAGE_FRACTION)
 export const FAILED_PAYMENTS = Math.round(THURSDAY.transactions * DINNER_SHARE * OUTAGE_FRACTION)
 
-export const OUTAGE_INSIGHT = "This was not a slow night. Thursday 6 to 7 is one of your busier dinner hours, and the register could not take cards for most of it."
+// The conclusion in the owner's terms. The tiles, the timeline and the credit below break it down.
+export const OUTAGE_INSIGHT = `Your register went offline during your dinner rush. ${FAILED_PAYMENTS} card payments failed, about ${formatWholeCurrency(ESTIMATED_SALES_AFFECTED)} in sales.`
 
 export const OUTAGE_TILES = [
-  { label: "Outage length", value: `${OUTAGE_MINUTES} min`, sublabel: OUTAGE_WINDOW },
-  { label: "Failed card payments", value: String(FAILED_PAYMENTS), sublabel: "declined at the register" },
-  { label: "Estimated sales affected", value: formatWholeCurrency(ESTIMATED_SALES_AFFECTED), sublabel: "from a usual Thursday dinner", tone: "amber" as const },
+  { label: "Outage Length", value: `${OUTAGE_MINUTES} min`, sublabel: OUTAGE_WINDOW },
+  { label: "Failed Card Payments", value: String(FAILED_PAYMENTS), sublabel: "Declined at the register" },
+  { label: "Estimated Sales Affected", value: formatWholeCurrency(ESTIMATED_SALES_AFFECTED), sublabel: "From a usual Thursday dinner", tone: "amber" as const, toneScope: "value" as const },
 ]
 
-export const OUTAGE_WHY = {
-  title: "Why card payments failed",
-  body: "Your register sends each card payment over the internet. With the connection down it could not reach the card network, so payments were declined at the counter.",
-}
-
-// The evening the timeline spans, 5 to 9 PM, shaded by how busy a usual Thursday is.
+// The evening the chart spans, 5 to 9 PM, each hour shaded by how busy a usual Thursday
+// is, with the outage laid over it.
 export const EVENING = { start: 17 * 60, end: 21 * 60 }
 export const EVENING_HOURS = ["5p", "6p", "7p", "8p"]
+export const EVENING_CHART = {
+  title: "Thursday Evening",
+  description: "How busy a usual Thursday is, 5 to 9 PM",
+}
+
+// The section breaks down what happened, so it is named for the incident and dated.
+export const INCIDENT_TITLE = "Incident Details"
+export const INCIDENT_WHEN = `Thursday, November 12, 2026, from ${formatClock(OUTAGE.start)} to ${formatClock(OUTAGE.end, true)}`
 
 export const OUTAGE_EVENTS = [
   { at: OUTAGE.start, label: "Internet connection dropped", detail: `${CARRIER.business} service record`, down: true },
   { at: OUTAGE.start + 2, label: "First card payment failed", detail: "Register could not reach the card network", down: true },
   { at: OUTAGE.end, label: "Connection restored", detail: `${CARRIER.business} service record`, down: false },
-  { at: OUTAGE.end + 2, label: "Card payments going through again", detail: "Register", down: false },
+  { at: OUTAGE.end + 2, label: "Card payments resumed", detail: "Register", down: false },
 ]
 
+// The resolution, last: what was done about it, and that nothing is left to do.
 export const OUTAGE_CREDIT_NOTE = {
-  title: `${formatWholeCurrency(OUTAGE_CREDIT)} credit on your next bill`,
-  body: `${CARRIER.business} applied it for the outage. You don't need to ask for it.`,
+  title: `${formatWholeCurrency(OUTAGE_CREDIT)} Credit Applied`,
+  body: `Confirmed by ${CARRIER.business} for your next bill. No action needed.`,
 }
 
-export const OUTAGE_ESTIMATE_NOTE = `How this was estimated: a usual Thursday 6 to 7 PM brings in about ${formatWholeCurrency(USUAL_DINNER_HOUR)} on your register. The connection was down for ${OUTAGE_MINUTES} of those 60 minutes, so about ${formatWholeCurrency(ESTIMATED_SALES_AFFECTED)}.`
+// Why payments failed, then how the figure was worked out: one footnote, not a callout.
+export const OUTAGE_ESTIMATE_NOTE = `Your register sends each card payment over the internet, so with the connection down it could not reach the card network. How this was estimated: a usual Thursday 6 to 7 PM brings in about ${formatWholeCurrency(USUAL_DINNER_HOUR)} on your register. The connection was down for ${OUTAGE_MINUTES} of those 60 minutes, so about ${formatWholeCurrency(ESTIMATED_SALES_AFFECTED)}.`
 
 export const OUTAGE_REQUEST_TIMESTAMP = `Today, ${formatClock(OUTAGE_FOLLOWUP_AT + 6, true)}`
 

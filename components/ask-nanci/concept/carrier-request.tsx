@@ -1,13 +1,19 @@
 "use client"
 
-// The request step the carrier panels share: the options, the pre-filled request, and
-// the request sent. Each panel keeps its own first view and hands these its options.
+// The request step the carrier stories share: the options, the pre-filled request, and
+// the request sent. It is a panel of its own, opened under the story's findings panel,
+// so the findings stay in view while the owner picks.
 import { ArrowLeft, CheckCheck, ChevronRight, Info } from "lucide-react"
 import { Button } from "aperia-ds5"
 import { cn } from "aperia-ds5/utils"
-import { useAskNanci } from "@/contexts/AskNanciContext"
-import { Callout, PanelItem, SectionHeader, formatWholeCurrency } from "@/components/shared"
-import { REQUEST_DRAFT_NOTE, REQUEST_HOLD_NOTE, REQUEST_SENT_TITLE, type CarrierRequestOption } from "@/lib/ask-nanci/data/panels/carrier-request"
+import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
+import { Callout, PanelItem, SectionHeader, PanelShell, PanelHeader, PanelBody, formatWholeCurrency } from "@/components/shared"
+import type { Message, PanelId } from "@/lib/ask-nanci/types"
+import { REQUEST_DRAFT_NOTE, REQUEST_HOLD_NOTE, REQUEST_SENT_TITLE, parseRequestView, requestView, type CarrierRequestOption } from "@/lib/ask-nanci/data/panels/carrier-request"
+import { CALLS_COVER_TITLE, CALLS_OPTIONS, CALLS_OPTIONS_HEADING } from "@/lib/ask-nanci/data/panels/missed-calls"
+import { OUTAGE_BACKUP_TITLE, OUTAGE_OPTIONS, OUTAGE_OPTIONS_HEADING } from "@/lib/ask-nanci/data/panels/outage-impact"
+import { isAwaitingCallsRequest } from "@/lib/ask-nanci/data/carrier-flows/calls"
+import { isAwaitingOutageRequest } from "@/lib/ask-nanci/data/carrier-flows/outage"
 import { usePanelAutoplay } from "./use-panel-autoplay"
 
 // Under ?autoplay: a beat to read the options before the first is picked, and a beat
@@ -105,4 +111,41 @@ export function RequestSent({ option }: { option: CarrierRequestOption }) {
       <RequestFields option={option} />
     </div>
   )
+}
+
+// One story's request step as a panel: options first, then the request, then sent.
+function RequestPanel({ panelId, title, heading, options, ranked = false, isAwaiting }: {
+  panelId: PanelId
+  title: string
+  heading: { title: string; description: string }
+  options: CarrierRequestOption[]
+  ranked?: boolean
+  /** True while the story waits on the Send press. */
+  isAwaiting: (messages: Message[], chatState: string) => boolean
+}) {
+  const { closeDynamicPanel, setPanelView, messages, chatState } = useAskNanci()
+  const { step, id } = parseRequestView(usePanelView(panelId, "options"))
+  const option = options.find((o) => o.id === id)
+  return (
+    <PanelShell>
+      <PanelHeader title={title} size="lg" onClose={() => closeDynamicPanel(panelId)} />
+      <PanelBody className="flex flex-col gap-4">
+        {step === "options" && (
+          <RequestOptions heading={heading} options={options} ranked={ranked} onChoose={(o) => setPanelView(panelId, requestView(o.id))} />
+        )}
+        {step === "request" && option && (
+          <RequestDraft option={option} onBack={() => setPanelView(panelId, "options")} canSend={isAwaiting(messages, chatState)} />
+        )}
+        {step === "sent" && option && <RequestSent option={option} />}
+      </PanelBody>
+    </PanelShell>
+  )
+}
+
+export function CallsCoverPanel() {
+  return <RequestPanel panelId="calls-cover" title={CALLS_COVER_TITLE} heading={CALLS_OPTIONS_HEADING} options={CALLS_OPTIONS} isAwaiting={isAwaitingCallsRequest} />
+}
+
+export function OutageBackupPanel() {
+  return <RequestPanel panelId="outage-backup" title={OUTAGE_BACKUP_TITLE} heading={OUTAGE_OPTIONS_HEADING} options={OUTAGE_OPTIONS} ranked isAwaiting={isAwaitingOutageRequest} />
 }

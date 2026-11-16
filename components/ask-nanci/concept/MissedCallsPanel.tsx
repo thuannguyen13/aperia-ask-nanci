@@ -1,16 +1,12 @@
 "use client"
 
 import { cn } from "aperia-ds5/utils"
-import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
+import { useAskNanci } from "@/contexts/AskNanciContext"
 import { HEATMAP_HOURS, HEATMAP_ROWS, HEATMAP_APPROX } from "@/lib/ask-nanci/data/panels/busiest-times"
 import {
   MISSED_CALLS_TITLE, MISSED_CALLS_INSIGHT, MISSED_CALLS_TILES, MISSED_CALLS_NOTE, MISSED_BY_HOUR,
-  CALLS_OPTIONS, CALLS_OPTIONS_HEADING,
 } from "@/lib/ask-nanci/data/panels/missed-calls"
-import { parseRequestView, requestView } from "@/lib/ask-nanci/data/panels/carrier-request"
-import { isAwaitingCallsRequest } from "@/lib/ask-nanci/data/carrier-flows/calls"
 import { PanelShell, PanelHeader, PanelBody, NanciInsight, StatCard } from "@/components/shared"
-import { RequestDraft, RequestOptions, RequestSent } from "./carrier-request"
 
 const PANEL_ID = "missed-calls"
 
@@ -95,23 +91,13 @@ function Findings() {
 }
 
 export function MissedCallsPanel() {
-  const { closeDynamicPanel, setPanelView, messages, chatState } = useAskNanci()
-  const view = usePanelView(PANEL_ID, "findings")
-  const { step, id } = parseRequestView(view)
-  const option = CALLS_OPTIONS.find((o) => o.id === id)
+  const { closeDynamicPanel } = useAskNanci()
 
   return (
     <PanelShell>
       <PanelHeader title={MISSED_CALLS_TITLE} size="lg" onClose={() => closeDynamicPanel(PANEL_ID)} />
       <PanelBody className="flex flex-col gap-4">
-        {step === "options" && (
-          <RequestOptions heading={CALLS_OPTIONS_HEADING} options={CALLS_OPTIONS} onChoose={(o) => setPanelView(PANEL_ID, requestView(o.id))} />
-        )}
-        {step === "request" && option && (
-          <RequestDraft option={option} onBack={() => setPanelView(PANEL_ID, "options")} canSend={isAwaitingCallsRequest(messages, chatState)} />
-        )}
-        {step === "sent" && option && <RequestSent option={option} />}
-        {step === "findings" && <Findings />}
+        <Findings />
       </PanelBody>
     </PanelShell>
   )

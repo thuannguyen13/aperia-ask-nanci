@@ -11,6 +11,7 @@ import type { CarrierRequestOption } from "./carrier-request"
 import { formatWholeCurrency } from "../../../../components/shared/format"
 
 export const MISSED_CALLS_TITLE = "Missed Calls"
+export const CALLS_COVER_TITLE = "Lunch Calls"
 
 const roundTo10 = (n: number) => Math.round(n / 10) * 10
 
