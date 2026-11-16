@@ -22,6 +22,7 @@ export const EXPANSION_FLOW: FlowDef = {
   key: EXPANSION_PROMPT,
   slug: "36",
   scope: "carrier",
+  churn: { cause: "Growth", metric: "ARPU" },
   description: "Coverage at the new address and what the first location uses, then a request for lines and internet there.",
 }
 

@@ -35,6 +35,7 @@ export const SEASONAL_FLOW: FlowDef = {
   key: SEASONAL_PROMPT,
   slug: "40",
   scope: "carrier",
+  churn: { cause: "Seasonal cancellation", metric: "Churn" },
   // The pause comes first, so ?autoplay plays on into it.
   followups: [SEASONAL_PAUSE_ASK, ...PAUSE_OPTIONS.map((o) => o.sendPrompt), SEASONAL_CANCEL],
   description: "An owner about to cancel for the off-season sees last winter's closure and calls, then requests a pause that keeps the number.",

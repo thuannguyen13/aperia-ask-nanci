@@ -28,6 +28,7 @@ export const LINES_FLOW: FlowDef = {
   proactive: true,
   slug: "35",
   scope: "carrier",
+  churn: { cause: "Plan mismatch", metric: "Churn" },
   // The request comes first, so ?autoplay plays on into it.
   followups: [LINES_SEND, LINES_KEEP],
   description: "Before the bill posts, Nanci flags two lines with no use in 60 days and offers a request to move to a smaller plan.",

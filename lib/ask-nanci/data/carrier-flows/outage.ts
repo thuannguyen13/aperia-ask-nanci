@@ -43,6 +43,7 @@ export const OUTAGE_FLOW: FlowDef = {
   proactive: true,
   slug: "34",
   scope: "carrier",
+  churn: { cause: "Outages", metric: "Churn, attach rate" },
   followups: [OUTAGE_BACKUP, ...OUTAGE_OPTIONS.map((o) => o.sendPrompt)],
   description: "Nanci texts the owner while the internet is down, reports the failed payments and the credit once it is back, then requests backup internet.",
 }

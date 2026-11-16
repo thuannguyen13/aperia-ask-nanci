@@ -22,6 +22,7 @@ export const HANDOFF_FLOW: FlowDef = {
   proactive: true,
   slug: "38",
   scope: "carrier",
+  churn: { cause: "Bill shock", metric: "Churn" },
   description: "Nanci flags a new fee on the bill it can see but not explain, and hands it to a business specialist with the details attached.",
 }
 

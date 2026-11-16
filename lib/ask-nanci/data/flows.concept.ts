@@ -206,6 +206,8 @@ export interface FlowDef {
   destination?: "marketplace";
   // Shown only in the mode with this scope, which in turn shows only these flows.
   scope?: FlowScope;
+  // The churn cause a carrier story answers and the metric it moves, shown on its card.
+  churn?: { cause: string; metric: string };
 }
 
 export const FLOW_DEFS: FlowDef[] = [

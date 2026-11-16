@@ -33,6 +33,7 @@ export const CALLS_FLOW: FlowDef = {
   key: CALLS_PROMPT,
   slug: "33",
   scope: "carrier",
+  churn: { cause: "Missed revenue", metric: "Attach rate" },
   followups: [CALLS_COVER, ...CALLS_OPTIONS.map((o) => o.sendPrompt)],
   description: "Friday lunch sales against the calls the business line missed in the same window, then a request to cover it.",
 }

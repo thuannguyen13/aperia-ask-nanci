@@ -35,6 +35,7 @@ export const CASH_FLOW_FLOW: FlowDef = {
   proactive: true,
   slug: "39",
   scope: "carrier",
+  churn: { cause: "Business closing", metric: "Churn" },
   // The offer comes first, so ?autoplay plays on into it.
   followups: [CASH_ASK, CASH_OFFER, CASH_CUT],
   description: "Nanci warns before payroll that deposits are running low, lays out what cutting back covers, and offers working capital for the rest.",

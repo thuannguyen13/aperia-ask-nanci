@@ -32,6 +32,7 @@ export const RENEWAL_FLOW: FlowDef = {
   proactive: true,
   slug: "37",
   scope: "carrier",
+  churn: { cause: "Price shopping at renewal", metric: "Churn" },
   // The renewal comes first, so ?autoplay plays on into it.
   followups: [RENEWAL_PROMPT, RENEWAL_RENEW, RENEWAL_OPTIONS_ASK],
   description: "Nanci sends a monthly receipt of what it caught on the account, then a year beside the plan's cost when the owner asks about renewal.",

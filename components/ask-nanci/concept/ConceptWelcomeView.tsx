@@ -158,7 +158,7 @@ function FlowGrid({ flows, onTryIt, onSimulateLogin }: { flows: FlowDef[]; onTry
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
       {flows.map((flow) => (
-        <div key={flow.num} className="flex flex-col gap-3 rounded-2xl border bg-card p-4">
+        <div key={flow.num} className="flex flex-col gap-3 rounded-2xl border bg-card p-4 [&>button]:mt-auto">
           <div className="flex items-start justify-between gap-2">
             <div className="flex items-center gap-2">
               <span className="flex size-6 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">
@@ -171,6 +171,14 @@ function FlowGrid({ flows, onTryIt, onSimulateLogin }: { flows: FlowDef[]; onTry
             </span>
           </div>
           <p className="text-sm text-muted-foreground leading-relaxed">{flow.description}</p>
+          {flow.churn && (
+            <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
+              <dt className="text-muted-foreground">Churn Cause</dt>
+              <dd className="font-medium text-foreground">{flow.churn.cause}</dd>
+              <dt className="text-muted-foreground">Moves</dt>
+              <dd className="font-medium text-foreground">{flow.churn.metric}</dd>
+            </dl>
+          )}
           {flow.destination === "marketplace" ? (
             <button
               onClick={() => setMarketplaceOpen(true)}
