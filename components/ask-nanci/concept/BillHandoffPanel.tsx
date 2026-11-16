@@ -16,7 +16,7 @@ const CHARGE_ROWS: [string, string][] = [
 ]
 
 const SUMMARY_ROWS: [string, string][] = [
-  ["You asked", HANDOFF_SUMMARY.asked],
+  ["I noticed", HANDOFF_SUMMARY.noticed],
   ["I found", HANDOFF_SUMMARY.found],
   ["Still open", HANDOFF_SUMMARY.open],
 ]

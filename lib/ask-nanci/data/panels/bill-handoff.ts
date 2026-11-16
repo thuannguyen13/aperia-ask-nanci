@@ -11,7 +11,7 @@ export const BILL_CHARGE = {
 }
 
 export const HANDOFF_SUMMARY = {
-  asked: "Why a charge on this month's bill looks wrong.",
+  noticed: "A fee on this month's bill that hasn't appeared before.",
   found: `A ${BILL_CHARGE.label.toLowerCase()} of $${BILL_CHARGE.amount}, added on ${BILL_CHARGE.added}. It applies to the account, not a line, and is the first in 12 months.`,
   open: "Why it was added, and whether it can be credited.",
 }

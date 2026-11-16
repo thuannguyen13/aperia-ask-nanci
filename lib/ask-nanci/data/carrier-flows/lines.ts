@@ -1,8 +1,8 @@
 // Carrier story 35, Unused Lines. Its definition and its script, one file per story, so the
 // stories are written side by side without touching each other.
 //
-// Advice in the owner's interest, at a small cost to the carrier: two idle lines and a
-// smaller plan. It ends in a request to the carrier, or in a short acknowledgement if the
+// Nanci speaks first, in the app, before the bill posts: two idle lines and a smaller
+// plan, advice in the owner's interest at a small cost to the carrier. It ends in a request to the carrier, or in a short acknowledgement if the
 // owner keeps all six. The figures are read from the panel's data, so the chat and the
 // panel cannot disagree.
 import type { ConceptScriptedTurn, SheetActionData } from "../../types"
@@ -14,7 +14,8 @@ import {
   IDLE_DAYS, LINES, IDLE_LINES, IDLE_LINE_NAMES, CURRENT_PLAN, SUGGESTED_PLAN, MONTHLY_DIFFERENCE, YEARLY_DIFFERENCE, LINES_REQUEST, spellCount,
 } from "../panels/unused-lines"
 
-export const LINES_PROMPT = "Am I paying for more than I need?"
+// Nanci opens the flow, so its key is an id rather than a prompt.
+const LINES_KEY = "__unused-lines__"
 const LINES_SEND = "Request the smaller plan"
 const LINES_KEEP = `Keep all ${spellCount(LINES.length)}`
 
@@ -23,12 +24,13 @@ export const LINES_FLOW: FlowDef = {
   section: "merchant",
   title: "Unused Lines",
   badge: "Billing",
-  key: LINES_PROMPT,
+  key: LINES_KEY,
+  proactive: true,
   slug: "35",
   scope: "carrier",
   // The request comes first, so ?autoplay plays on into it.
   followups: [LINES_SEND, LINES_KEEP],
-  description: "Two lines with no use in 60 days, and a request to move to a smaller plan.",
+  description: "Before the bill posts, Nanci flags two lines with no use in 60 days and offers a request to move to a smaller plan.",
 }
 
 const planLabel = (plan: { lines: number; monthly: number }) => `${plan.lines} lines, ${formatWholeCurrency(plan.monthly)} a month`
@@ -47,11 +49,10 @@ const LINES_SHEET: SheetActionData = {
 const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
 
 export const LINES_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
-  [LINES_PROMPT]: [
-    { role: "user", content: LINES_PROMPT },
+  [LINES_KEY]: [
     {
       role: "assistant",
-      content: `You have ${spellCount(LINES.length)} lines. ${capitalize(spellCount(IDLE_LINES.length))} of them, ${IDLE_LINE_NAMES}, have had no calls, texts or data in the last ${IDLE_DAYS} days. A plan with ${spellCount(SUGGESTED_PLAN.lines)} lines would cost ${formatWholeCurrency(MONTHLY_DIFFERENCE)} less each month, or ${formatWholeCurrency(YEARLY_DIFFERENCE)} over a year.\n\nI can send ${CARRIER.business} a request to move you to the smaller plan.`,
+      content: `Your bill posts on Friday, and it covers ${spellCount(LINES.length)} lines. ${capitalize(spellCount(IDLE_LINES.length))} of them, ${IDLE_LINE_NAMES}, have had no calls, texts or data in the last ${IDLE_DAYS} days. A plan with ${spellCount(SUGGESTED_PLAN.lines)} lines would cost ${formatWholeCurrency(MONTHLY_DIFFERENCE)} less each month, or ${formatWholeCurrency(YEARLY_DIFFERENCE)} over a year.\n\nI can send ${CARRIER.business} a request to move you to the smaller plan.`,
       panel: "unused-lines",
       source: CARRIER_SOURCE.name,
       suggestions: [LINES_SEND, LINES_KEEP],
