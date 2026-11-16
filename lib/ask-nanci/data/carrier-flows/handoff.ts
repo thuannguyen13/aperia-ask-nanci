@@ -2,16 +2,26 @@
 // stories are written side by side without touching each other.
 //
 // Nanci speaks first, in the app, when the bill posts with a fee it has not seen before.
-// Escalation (flow 17) is the model: what Ask Nanci can see, the ways a person can pick
+// Then the other side of bill shock: a charge that has not landed yet. The kitchen line is
+// heading over its data, Nanci can explain that one, and the owner can stop it. It ends in
+// a request to the carrier, or in leaving it as it is.
+// Escalation (flow 17) is the model for the hand-off: what Ask Nanci can see, the ways a person can pick
 // it up, then the hand-off with a reference. Short on purpose.
 import type { ConceptScriptedTurn, SheetActionData } from "../../types"
 import type { FlowDef } from "../flows.concept"
 import { CARRIER } from "../carrier"
 import { CARRIER_CITES } from "../sources"
+import { formatWholeCurrency } from "../../../../components/shared/format"
 import { BILL_CHARGE, HANDOFF_REQUEST } from "../panels/bill-handoff"
+import { DATA, OVER_GB, OVERAGE_COST, UNLIMITED_EXTRA, KITCHEN_LINE, OVERAGE_REQUEST } from "../panels/data-overage"
 
 // Nanci opens the flow, so its key is an id rather than a prompt.
 const HANDOFF_KEY = "__bill-question__"
+// The hand-off is done before Nanci raises the next thing. The extra beat lets it land.
+const OVERAGE_PAUSE_MS = 2000
+const OVERAGE_UNLIMITED = "Move it to unlimited"
+const OVERAGE_SLOW = "Slow it down instead"
+const OVERAGE_LEAVE = "Leave it as it is"
 
 export const HANDOFF_FLOW: FlowDef = {
   num: 38,
@@ -23,7 +33,9 @@ export const HANDOFF_FLOW: FlowDef = {
   slug: "38",
   scope: "carrier",
   churn: { cause: "Bill shock", metric: "Churn" },
-  description: "Nanci flags a new fee on the bill it can see but not explain, and hands it to a business specialist with the details attached.",
+  // Unlimited comes first, so ?autoplay plays on into it.
+  followups: [OVERAGE_UNLIMITED, OVERAGE_SLOW, OVERAGE_LEAVE],
+  description: "Nanci flags a new fee it can't explain and hands it to a specialist, then warns that a line is heading over its data before the charge lands.",
 }
 
 const HANDOFF_SHEET: SheetActionData = {
@@ -35,6 +47,19 @@ const HANDOFF_SHEET: SheetActionData = {
   reference: HANDOFF_REQUEST.reference,
   sentTo: CARRIER.business,
   timestamp: HANDOFF_REQUEST.timestamp,
+}
+
+function overageSheet(fromValue: string, toValue: string): SheetActionData {
+  return {
+    field: `Kitchen line data, ending ${KITCHEN_LINE.ending}`,
+    fromValue,
+    toValue,
+    timestamp: OVERAGE_REQUEST.timestamp,
+    status: "submitted",
+    reference: OVERAGE_REQUEST.reference,
+    sentTo: OVERAGE_REQUEST.sentTo,
+    iconKind: "phone",
+  }
 }
 
 export const HANDOFF_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
@@ -59,6 +84,41 @@ export const HANDOFF_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
       panel: "bill-handoff",
       view: "sent",
       sheetAction: HANDOFF_SHEET,
+    },
+    {
+      role: "assistant",
+      content: `One more thing before your next bill. Your kitchen line has used ${DATA.usedGb} of its ${DATA.limitGb} GB with ${DATA.daysLeft} days left. At this pace it goes about ${OVER_GB} GB over, which adds about ${formatWholeCurrency(OVERAGE_COST)}.\n\nUnlimited data on that line costs ${formatWholeCurrency(UNLIMITED_EXTRA)} more a month. Or I can ask ${CARRIER.business} to slow it down at ${DATA.limitGb} GB, so nothing is added.`,
+      pauseBefore: OVERAGE_PAUSE_MS,
+      panel: "data-overage",
+      source: CARRIER_CITES.account,
+      suggestions: [OVERAGE_UNLIMITED, OVERAGE_SLOW, OVERAGE_LEAVE],
+    },
+  ],
+  [OVERAGE_UNLIMITED]: [
+    { role: "user", content: OVERAGE_UNLIMITED },
+    {
+      role: "assistant",
+      content: `Sent to ${CARRIER.business} as a request to move the kitchen line to unlimited data, for ${formatWholeCurrency(UNLIMITED_EXTRA)} more a month. Reference ${OVERAGE_REQUEST.reference}. Nothing changes until they confirm.`,
+      panel: "data-overage",
+      view: "unlimited",
+      sheetAction: overageSheet(`${DATA.limitGb} GB a month`, `Unlimited, ${formatWholeCurrency(UNLIMITED_EXTRA)} more a month`),
+    },
+  ],
+  [OVERAGE_SLOW]: [
+    { role: "user", content: OVERAGE_SLOW },
+    {
+      role: "assistant",
+      content: `Sent to ${CARRIER.business} as a request to slow the kitchen line at ${DATA.limitGb} GB instead of charging for more. Reference ${OVERAGE_REQUEST.reference}. Nothing changes until they confirm.`,
+      panel: "data-overage",
+      view: "slowed",
+      sheetAction: overageSheet(`Charged past ${DATA.limitGb} GB`, `Slowed at ${DATA.limitGb} GB`),
+    },
+  ],
+  [OVERAGE_LEAVE]: [
+    { role: "user", content: OVERAGE_LEAVE },
+    {
+      role: "assistant",
+      content: `Okay. Nothing was sent to ${CARRIER.business}. I'll tell you if the kitchen line goes over.`,
     },
   ],
 }
