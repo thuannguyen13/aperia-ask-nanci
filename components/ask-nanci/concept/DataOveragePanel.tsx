@@ -1,12 +1,11 @@
 "use client"
 
-import { CheckCheck } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "aperia-ds5"
-import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
+import { useAskNanci } from "@/contexts/AskNanciContext"
 import {
-  DATA_OVERAGE_TITLE, OVERAGE_INSIGHT, OVERAGE_TILES, USAGE_METER, DATA, PROJECTED_GB, OVERAGE_NOTE, OVERAGE_VIEWS,
+  DATA_OVERAGE_TITLE, OVERAGE_INSIGHT, OVERAGE_TILES, USAGE_METER, DATA, PROJECTED_GB, OVERAGE_NOTE,
 } from "@/lib/ask-nanci/data/panels/data-overage"
-import { PanelShell, PanelHeader, PanelBody, NanciInsight, StatCard, Callout } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody, NanciInsight, StatCard } from "@/components/shared"
 
 const PANEL_ID = "data-overage"
 
@@ -41,11 +40,9 @@ function UsageMeter() {
   )
 }
 
-// Views: "projected" until the owner answers, then "unlimited", "slowed" or "kept".
+// The findings only. A request the owner sends opens in its own panel underneath.
 export function DataOveragePanel() {
   const { closeDynamicPanel } = useAskNanci()
-  const view = usePanelView(PANEL_ID, "projected")
-  const done = view === "unlimited" || view === "slowed" ? OVERAGE_VIEWS[view] : null
   return (
     <PanelShell>
       <PanelHeader title={DATA_OVERAGE_TITLE} size="lg" onClose={() => closeDynamicPanel(PANEL_ID)} />
@@ -58,11 +55,6 @@ export function DataOveragePanel() {
           ))}
         </div>
         <UsageMeter />
-        {done && (
-          <Callout variant="green" icon={CheckCheck} title={done.title}>
-            <p>{done.body}</p>
-          </Callout>
-        )}
         <p className="text-xs leading-relaxed text-muted-foreground">{OVERAGE_NOTE}</p>
       </PanelBody>
     </PanelShell>

@@ -13,7 +13,8 @@ import { CARRIER } from "../carrier"
 import { CARRIER_CITES } from "../sources"
 import { formatWholeCurrency } from "../../../../components/shared/format"
 import { BILL_CHARGE, HANDOFF_REQUEST } from "../panels/bill-handoff"
-import { DATA, OVER_GB, OVERAGE_COST, UNLIMITED_EXTRA, KITCHEN_LINE, OVERAGE_REQUEST } from "../panels/data-overage"
+import { DATA, OVER_GB, OVERAGE_COST, UNLIMITED_EXTRA, KITCHEN_LINE, OVERAGE_REQUEST, OVERAGE_OPTIONS } from "../panels/data-overage"
+import { isAwaitingAny, requestView, sentView } from "../panels/carrier-request"
 
 // Nanci opens the flow, so its key is an id rather than a prompt.
 const HANDOFF_KEY = "__bill-question__"
@@ -22,6 +23,14 @@ const OVERAGE_PAUSE_MS = 2000
 const OVERAGE_UNLIMITED = "Move it to unlimited"
 const OVERAGE_SLOW = "Slow it down instead"
 const OVERAGE_LEAVE = "Leave it as it is"
+const [UNLIMITED_OPTION, SLOW_OPTION] = OVERAGE_OPTIONS
+
+// The answers the request waits on, one per option. The panel's Send button is live only
+// while one of them is the last thing in the chat.
+const OVERAGE_REVIEW_ANSWER = `Here is the request to ${CARRIER.business} for the kitchen line. Check it, then send it.`
+
+/** True while story 37 waits on a kitchen line request: idle, with the review answer last. */
+export const isAwaitingOverageRequest = (messages: { role: string; content: string }[], chatState: string) => isAwaitingAny(messages, chatState, [OVERAGE_REVIEW_ANSWER])
 
 export const HANDOFF_FLOW: FlowDef = {
   num: 37,
@@ -34,7 +43,7 @@ export const HANDOFF_FLOW: FlowDef = {
   scope: "carrier",
   churn: { cause: "Bill shock", metric: "Churn" },
   // Unlimited comes first, so ?autoplay plays on into it.
-  followups: [OVERAGE_UNLIMITED, OVERAGE_SLOW, OVERAGE_LEAVE],
+  followups: [OVERAGE_UNLIMITED, OVERAGE_SLOW, ...OVERAGE_OPTIONS.map((o) => o.sendPrompt), OVERAGE_LEAVE],
   description: "Nanci flags a new fee it can't explain and hands it to a specialist, then warns that a line is heading over its data before the charge lands.",
 }
 
@@ -94,23 +103,33 @@ export const HANDOFF_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
       suggestions: [OVERAGE_UNLIMITED, OVERAGE_SLOW, OVERAGE_LEAVE],
     },
   ],
+  // Each choice opens its request for review. The panel's Send button sends it, and Back
+  // shows the other option.
   [OVERAGE_UNLIMITED]: [
     { role: "user", content: OVERAGE_UNLIMITED },
-    {
-      role: "assistant",
-      content: `Sent to ${CARRIER.business} as a request to move the kitchen line to unlimited data, for ${formatWholeCurrency(UNLIMITED_EXTRA)} more a month. Reference ${OVERAGE_REQUEST.reference}. Nothing changes until they confirm.`,
-      panel: "data-overage",
-      view: "unlimited",
-      sheetAction: overageSheet(`${DATA.limitGb} GB a month`, `Unlimited, ${formatWholeCurrency(UNLIMITED_EXTRA)} more a month`),
-    },
+    { role: "assistant", content: OVERAGE_REVIEW_ANSWER, panel: "overage-request", view: requestView(UNLIMITED_OPTION.id), revealPanel: true },
   ],
   [OVERAGE_SLOW]: [
     { role: "user", content: OVERAGE_SLOW },
+    { role: "assistant", content: OVERAGE_REVIEW_ANSWER, panel: "overage-request", view: requestView(SLOW_OPTION.id), revealPanel: true },
+  ],
+  [UNLIMITED_OPTION.sendPrompt]: [
+    { role: "user", content: UNLIMITED_OPTION.sendPrompt },
+    {
+      role: "assistant",
+      content: `Sent to ${CARRIER.business} as a request to move the kitchen line to unlimited data, for ${formatWholeCurrency(UNLIMITED_EXTRA)} more a month. Reference ${OVERAGE_REQUEST.reference}. Nothing changes until they confirm.`,
+      panel: "overage-request",
+      view: sentView(UNLIMITED_OPTION.id),
+      sheetAction: overageSheet(`${DATA.limitGb} GB a month`, `Unlimited, ${formatWholeCurrency(UNLIMITED_EXTRA)} more a month`),
+    },
+  ],
+  [SLOW_OPTION.sendPrompt]: [
+    { role: "user", content: SLOW_OPTION.sendPrompt },
     {
       role: "assistant",
       content: `Sent to ${CARRIER.business} as a request to slow the kitchen line at ${DATA.limitGb} GB instead of charging for more. Reference ${OVERAGE_REQUEST.reference}. Nothing changes until they confirm.`,
-      panel: "data-overage",
-      view: "slowed",
+      panel: "overage-request",
+      view: sentView(SLOW_OPTION.id),
       sheetAction: overageSheet(`Charged past ${DATA.limitGb} GB`, `Slowed at ${DATA.limitGb} GB`),
     },
   ],

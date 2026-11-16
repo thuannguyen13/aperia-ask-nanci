@@ -1,4 +1,5 @@
-import { PhoneMissed, Smartphone, WalletCards, WifiOff } from "lucide-react"
+import { PhoneMissed, RefreshCw, Smartphone, WalletCards, WifiOff } from "lucide-react"
+import type { CarrierRequestOption } from "./carrier-request"
 import { CARRIER } from "../carrier"
 import { CURRENT_PLAN, LINES, IDLE_LINES, IDLE_LINE_NAMES, MONTHLY_DIFFERENCE, spellCount } from "./unused-lines"
 export { spellCount }
@@ -108,3 +109,22 @@ export const MONTH_TILES = [
 export const MONTH_CATCHES_TITLE = `Caught in ${MONTH}`
 
 export const MONTH_NOTE = "Savings count only where there is a figure: the outage credit and the lower plan. Missed calls and the payroll warning are listed without one."
+
+export const RENEWAL_REQUEST_TITLE = "Plan Renewal"
+
+// The renewal request, reviewed before it goes.
+export const RENEWAL_OPTION: CarrierRequestOption = {
+  id: "renew",
+  icon: RefreshCw,
+  title: "Renew as it is",
+  description: "Same lines, same internet, another 12 months.",
+  requestLabel: "Renewal request",
+  fields: [
+    { label: "Plan", value: "Same plan, 12 months" },
+    { label: "Includes", value: `${LINES.length} lines and business internet` },
+    { label: "Monthly cost", value: formatWholeCurrency(PLAN_MONTHLY) },
+    { label: "Starts", value: RENEWS_ON },
+  ],
+  reference: RENEWAL_REQUEST.reference,
+  sendPrompt: "Send the renewal request",
+}

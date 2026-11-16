@@ -1,20 +1,19 @@
 "use client"
 
-import { Phone, Wifi, CheckCircle2, Clock } from "lucide-react"
-import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
+import { Phone, Wifi, CheckCircle2 } from "lucide-react"
+import { useAskNanci } from "@/contexts/AskNanciContext"
 import {
-  FIRST_LOCATION, NEW_LOCATION, FIRST_LOCATION_USE, COVERAGE, SUGGESTED_SETUP, SECOND_LOCATION_REQUEST,
+  FIRST_LOCATION, NEW_LOCATION, FIRST_LOCATION_USE, COVERAGE, SUGGESTED_SETUP,
 } from "@/lib/ask-nanci/data/panels/second-location"
-import { PanelShell, PanelHeader, PanelBody, PanelExportButton, NanciInsight, StatCard, PanelItem, SectionHeader, Callout } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody, PanelExportButton, NanciInsight, StatCard, PanelItem, SectionHeader } from "@/components/shared"
 
 const SETUP_ICONS = { lines: Phone, internet: Wifi } as const
 
 // Carrier story 39. The map sits in the conversation; the panel is what the first
-// location uses and the setup that follows from it. The chat drives the one view change,
-// to "requested", so there is nothing here to click.
+// location uses and the setup that follows from it. The request opens in its own panel
+// underneath, so there is nothing here to click.
 export function SecondLocationPanel() {
   const { closeDynamicPanel } = useAskNanci()
-  const requested = usePanelView("second-location", "setup") === "requested"
 
   return (
     <PanelShell>
@@ -60,11 +59,6 @@ export function SecondLocationPanel() {
           </div>
         </div>
 
-        {requested && (
-          <Callout variant="amber" icon={Clock} title={`Request sent to ${SECOND_LOCATION_REQUEST.sentTo}`}>
-            <p>Reference {SECOND_LOCATION_REQUEST.reference}. Nothing on your account changes until they confirm.</p>
-          </Callout>
-        )}
 
       </PanelBody>
     </PanelShell>

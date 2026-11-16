@@ -14,14 +14,22 @@ import { CARRIER } from "../carrier"
 import { CARRIER_SOURCE, CARRIER_CITES } from "../sources"
 import { formatWholeCurrency } from "../../../../components/shared/format"
 import {
-  PLAN_MONTHLY, PLAN_YEARLY, RENEWS_ON, YEAR_WITH_NANCI, RENEWAL_OPTIONS, RENEWAL_REQUEST, MONTH, MONTH_CATCHES, MONTH_SAVINGS, spellCount,
+  PLAN_MONTHLY, PLAN_YEARLY, RENEWS_ON, YEAR_WITH_NANCI, RENEWAL_OPTIONS, RENEWAL_REQUEST, RENEWAL_OPTION, MONTH, MONTH_CATCHES, MONTH_SAVINGS, spellCount,
 } from "../panels/plan-value"
+import { isAwaitingAny, requestView, sentView } from "../panels/carrier-request"
 
 // Nanci opens the flow, so its key is an id rather than a prompt.
 const MONTH_KEY = "__plan-value__"
 export const RENEWAL_PROMPT = "My plan renews next month. Is it worth keeping?"
 const RENEWAL_RENEW = "Renew my plan"
 const RENEWAL_OPTIONS_ASK = "Show me other options"
+
+// The answer the request waits on. Its Send button is live only while this is the last
+// thing in the chat.
+const RENEWAL_REVIEW_ANSWER = `Here is the renewal request to ${CARRIER.business}. Check it, then send it.`
+
+/** True while story 42 waits on its request: idle, with the review answer as the last message. */
+export const isAwaitingRenewalRequest = (messages: { role: string; content: string }[], chatState: string) => isAwaitingAny(messages, chatState, [RENEWAL_REVIEW_ANSWER])
 
 export const RENEWAL_FLOW: FlowDef = {
   num: 42,
@@ -34,7 +42,7 @@ export const RENEWAL_FLOW: FlowDef = {
   scope: "carrier",
   churn: { cause: "Price shopping at renewal", metric: "Churn" },
   // The renewal comes first, so ?autoplay plays on into it.
-  followups: [RENEWAL_PROMPT, RENEWAL_RENEW, RENEWAL_OPTIONS_ASK],
+  followups: [RENEWAL_PROMPT, RENEWAL_RENEW, RENEWAL_OPTION.sendPrompt, RENEWAL_OPTIONS_ASK],
   description: "Nanci sends a monthly receipt of what it caught on the account, then a year beside the plan's cost when the owner asks about renewal.",
 }
 
@@ -69,13 +77,18 @@ export const RENEWAL_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
       suggestions: [RENEWAL_RENEW, RENEWAL_OPTIONS_ASK],
     },
   ],
+  // The owner reviews the request before it goes. The panel's Send button sends it.
   [RENEWAL_RENEW]: [
     { role: "user", content: RENEWAL_RENEW },
+    { role: "assistant", content: RENEWAL_REVIEW_ANSWER, panel: "renewal-request", view: requestView(RENEWAL_OPTION.id), revealPanel: true },
+  ],
+  [RENEWAL_OPTION.sendPrompt]: [
+    { role: "user", content: RENEWAL_OPTION.sendPrompt },
     {
       role: "assistant",
       content: `Sent to ${CARRIER.business} as a request to renew the same plan for another 12 months. Nothing on your account changes until they confirm, and your plan runs as it is until ${RENEWS_ON}.`,
-      panel: "plan-value",
-      view: "renewal-requested",
+      panel: "renewal-request",
+      view: sentView(RENEWAL_OPTION.id),
       sheetAction: RENEWAL_SHEET,
     },
   ],

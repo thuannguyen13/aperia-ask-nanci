@@ -1,4 +1,4 @@
-// The request step two carrier stories share (Missed Calls, Outage Impact): a short list
+// The request step the carrier stories share (Missed Calls, Outage Impact): a short list
 // of options, a request filled in from what Ask Nanci found, and the request sent to the
 // carrier. Nothing on the carrier account changes here. The carrier confirms first.
 import type { LucideIcon } from "lucide-react"
@@ -10,8 +10,9 @@ export interface CarrierRequestOption {
   icon: LucideIcon
   title: string
   description: string
-  /** Invented example price. No real plan or price is used. */
-  monthlyCost: number
+  /** Invented example price. No real plan or price is used. A request whose fields
+   *  already state the cost leaves it out. */
+  monthlyCost?: number
   /** Why this option ranks where it does. Shown on a ranked list only. */
   fit?: string
   /** Names the request on the chat card and the audit record. */
@@ -32,6 +33,12 @@ export const REQUEST_DRAFT_NOTE = `Sending asks ${CARRIER.business} to make this
 // and a turn can set it: "request:forwarding", then "sent:forwarding".
 export const requestView = (id: string) => `request:${id}`
 export const sentView = (id: string) => `sent:${id}`
+/** True while a story waits on one of its review answers: idle, with that answer last. */
+export const isAwaitingAny = (messages: { role: string; content: string }[], chatState: string, answers: string[]) => {
+  const last = messages.at(-1)
+  return chatState === "idle" && last?.role === "assistant" && answers.includes(last.content)
+}
+
 export const parseRequestView = (view: string) => {
   const [step, id] = view.split(":")
   return { step, id }

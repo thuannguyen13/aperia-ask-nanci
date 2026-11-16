@@ -1,24 +1,17 @@
 "use client"
 
-import { Check, Clock } from "lucide-react"
+import { Check } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { CARRIER } from "@/lib/ask-nanci/data/carrier"
 import {
-  UNUSED_LINES_TITLE, IDLE_DAYS, LINES, IDLE_LINES, CURRENT_PLAN, SUGGESTED_PLAN, MONTHLY_DIFFERENCE, YEARLY_DIFFERENCE, LINES_REQUEST, lastUsed,
+  UNUSED_LINES_TITLE, IDLE_DAYS, LINES, IDLE_LINES, CURRENT_PLAN, SUGGESTED_PLAN, MONTHLY_DIFFERENCE, YEARLY_DIFFERENCE, lastUsed,
 } from "@/lib/ask-nanci/data/panels/unused-lines"
 import { PanelShell, PanelHeader, PanelBody, NanciInsight, SectionHeader, StatCard, Callout, PanelTable, Thead, Th, Td, formatWholeCurrency } from "@/components/shared"
 
-// Views: "proposed" until the owner answers, then "requested" or "kept". The chat turn
-// that answers sets the view, so the panel never asks for the same thing twice.
+// Views: "proposed" until the owner answers, then "kept" if they keep every line. A request
+// opens in its own panel underneath, which shows it sent.
 function Outcome({ view }: { view: string }) {
-  if (view === "requested") {
-    return (
-      <Callout variant="amber" icon={Clock} title={`Request sent to ${CARRIER.business}`}>
-        <p>Reference {LINES_REQUEST.reference}. Nothing on your account changes until they confirm.</p>
-      </Callout>
-    )
-  }
   if (view === "kept") {
     return (
       <Callout variant="blue" icon={Check} title={`Keeping all ${LINES.length} lines`}>

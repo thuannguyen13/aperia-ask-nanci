@@ -9,15 +9,23 @@ import type { ConceptScriptedTurn, SheetActionData } from "../../types"
 import type { FlowDef } from "../flows.concept"
 import { CARRIER } from "../carrier"
 import { CARRIER_SOURCE } from "../sources"
+import { isAwaitingAny, requestView, sentView } from "../panels/carrier-request"
 import { formatWholeCurrency } from "../../../../components/shared/format"
 import {
-  IDLE_DAYS, LINES, IDLE_LINES, IDLE_LINE_NAMES, CURRENT_PLAN, SUGGESTED_PLAN, MONTHLY_DIFFERENCE, YEARLY_DIFFERENCE, LINES_REQUEST, spellCount,
+  IDLE_DAYS, LINES, IDLE_LINES, IDLE_LINE_NAMES, CURRENT_PLAN, SUGGESTED_PLAN, MONTHLY_DIFFERENCE, YEARLY_DIFFERENCE, LINES_REQUEST, LINES_OPTION, spellCount,
 } from "../panels/unused-lines"
 
 // Nanci opens the flow, so its key is an id rather than a prompt.
 const LINES_KEY = "__unused-lines__"
 const LINES_SEND = "Request the lower plan"
 const LINES_KEEP = `Keep all ${spellCount(LINES.length)}`
+
+// The answer the request waits on. Its Send button is live only while this is the last
+// thing in the chat.
+const LINES_REVIEW_ANSWER = `Here is the request to ${CARRIER.business}, filled in from your lines. Check it, then send it.`
+
+/** True while story 36 waits on its request: idle, with the review answer as the last message. */
+export const isAwaitingLinesRequest = (messages: { role: string; content: string }[], chatState: string) => isAwaitingAny(messages, chatState, [LINES_REVIEW_ANSWER])
 
 export const LINES_FLOW: FlowDef = {
   num: 36,
@@ -30,7 +38,7 @@ export const LINES_FLOW: FlowDef = {
   scope: "carrier",
   churn: { cause: "Plan mismatch", metric: "Churn" },
   // The request comes first, so ?autoplay plays on into it.
-  followups: [LINES_SEND, LINES_KEEP],
+  followups: [LINES_SEND, LINES_OPTION.sendPrompt, LINES_KEEP],
   description: "Before the bill posts, Nanci flags two lines with no use in 60 days and offers a request to move to a lower plan.",
 }
 
@@ -59,13 +67,24 @@ export const LINES_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
       suggestions: [LINES_SEND, LINES_KEEP],
     },
   ],
+  // The owner reviews the request before it goes. The panel's Send button sends it.
   [LINES_SEND]: [
     { role: "user", content: LINES_SEND },
     {
       role: "assistant",
+      content: LINES_REVIEW_ANSWER,
+      panel: "lines-request",
+      view: requestView(LINES_OPTION.id),
+      revealPanel: true,
+    },
+  ],
+  [LINES_OPTION.sendPrompt]: [
+    { role: "user", content: LINES_OPTION.sendPrompt },
+    {
+      role: "assistant",
       content: `Sent to ${CARRIER.business} as a request to move from ${spellCount(CURRENT_PLAN.lines)} lines to ${spellCount(SUGGESTED_PLAN.lines)}, dropping ${IDLE_LINE_NAMES}. Nothing on your account changes until they confirm.`,
-      panel: "unused-lines",
-      view: "requested",
+      panel: "lines-request",
+      view: sentView(LINES_OPTION.id),
       sheetAction: LINES_SHEET,
     },
   ],

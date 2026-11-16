@@ -1,20 +1,18 @@
 "use client"
 
-import { Clock, Headset, Smartphone, Sparkles, Wifi } from "lucide-react"
-import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
+import { Headset, Smartphone, Sparkles, Wifi } from "lucide-react"
+import { useAskNanci } from "@/contexts/AskNanciContext"
 import { CARRIER } from "@/lib/ask-nanci/data/carrier"
 import {
-  PLAN_VALUE_TITLE, PLAN_MONTHLY, PLAN_YEARLY, RENEWS_ON, YEAR_WITH_NANCI, PLAN_INCLUDES, RENEWAL_REQUEST,
+  PLAN_VALUE_TITLE, PLAN_MONTHLY, PLAN_YEARLY, RENEWS_ON, YEAR_WITH_NANCI, PLAN_INCLUDES,
 } from "@/lib/ask-nanci/data/panels/plan-value"
-import { PanelShell, PanelHeader, PanelBody, NanciInsight, SectionHeader, StatCard, Callout, PanelItem, formatWholeCurrency } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody, NanciInsight, SectionHeader, StatCard, PanelItem, formatWholeCurrency } from "@/components/shared"
 
 const INCLUDE_ICONS = { lines: Smartphone, internet: Wifi, assistant: Sparkles, support: Headset }
 
-// Views: "summary" until the owner answers, then "renewal-requested" once the renewal
-// goes to the carrier. The chat turn that sends it sets the view.
+// The year beside the plan's cost. A renewal request opens in its own panel underneath.
 export function PlanValuePanel() {
   const { closeDynamicPanel } = useAskNanci()
-  const view = usePanelView("plan-value", "summary")
 
   return (
     <PanelShell>
@@ -54,11 +52,6 @@ export function PlanValuePanel() {
             ))}
           </ul>
         </div>
-        {view === "renewal-requested" && (
-          <Callout variant="amber" icon={Clock} title={`Renewal request sent to ${CARRIER.business}`}>
-            <p>Reference {RENEWAL_REQUEST.reference}. Nothing on your account changes until they confirm.</p>
-          </Callout>
-        )}
       </PanelBody>
     </PanelShell>
   )

@@ -14,6 +14,14 @@ import { CALLS_COVER_TITLE, CALLS_OPTIONS, CALLS_OPTIONS_HEADING } from "@/lib/a
 import { OUTAGE_BACKUP_TITLE, OUTAGE_OPTIONS, OUTAGE_OPTIONS_HEADING } from "@/lib/ask-nanci/data/panels/outage-impact"
 import { isAwaitingCallsRequest } from "@/lib/ask-nanci/data/carrier-flows/calls"
 import { isAwaitingOutageRequest } from "@/lib/ask-nanci/data/carrier-flows/outage"
+import { LINES_REQUEST_TITLE, LINES_OPTION } from "@/lib/ask-nanci/data/panels/unused-lines"
+import { isAwaitingLinesRequest } from "@/lib/ask-nanci/data/carrier-flows/lines"
+import { OVERAGE_REQUEST_TITLE, OVERAGE_OPTIONS, OVERAGE_OPTIONS_HEADING } from "@/lib/ask-nanci/data/panels/data-overage"
+import { isAwaitingOverageRequest } from "@/lib/ask-nanci/data/carrier-flows/handoff"
+import { LOCATION_REQUEST_TITLE, LOCATION_OPTION } from "@/lib/ask-nanci/data/panels/second-location"
+import { isAwaitingLocationRequest } from "@/lib/ask-nanci/data/carrier-flows/expansion"
+import { RENEWAL_REQUEST_TITLE, RENEWAL_OPTION } from "@/lib/ask-nanci/data/panels/plan-value"
+import { isAwaitingRenewalRequest } from "@/lib/ask-nanci/data/carrier-flows/renewal"
 import { SEASONAL_PAUSE_TITLE, PAUSE_OPTIONS, PAUSE_OPTIONS_HEADING } from "@/lib/ask-nanci/data/panels/seasonal-closure"
 import { isAwaitingPauseRequest } from "@/lib/ask-nanci/data/carrier-flows/seasonal"
 import { usePanelAutoplay } from "./use-panel-autoplay"
@@ -23,7 +31,7 @@ import { usePanelAutoplay } from "./use-panel-autoplay"
 const CHOOSE_AT_MS = 3000
 const SEND_AT_MS = 3500
 
-const costLine = (option: CarrierRequestOption) => `Example: ${formatWholeCurrency(option.monthlyCost)} a month`
+const costLine = (option: CarrierRequestOption) => option.monthlyCost === undefined ? null : `Example: ${formatWholeCurrency(option.monthlyCost)} a month`
 
 export function RequestOptions({ heading, options, ranked = false, onChoose }: {
   heading: { title: string; description: string }
@@ -49,7 +57,7 @@ export function RequestOptions({ heading, options, ranked = false, onChoose }: {
                   <p className="font-medium text-foreground">{ranked && `${i + 1}. `}{option.title}</p>
                   <p className="text-muted-foreground">{option.description}</p>
                   {option.fit && <p className="text-xs text-foreground">{option.fit}</p>}
-                  <p className="text-xs text-muted-foreground tabular-nums">{costLine(option)}</p>
+                  {costLine(option) && <p className="text-xs text-muted-foreground tabular-nums">{costLine(option)}</p>}
                 </div>
                 <ChevronRight className="size-4 shrink-0 self-center text-muted-foreground" />
               </PanelItem>
@@ -64,7 +72,7 @@ export function RequestOptions({ heading, options, ranked = false, onChoose }: {
 function RequestFields({ option }: { option: CarrierRequestOption }) {
   return (
     <dl className="rounded-xl border px-4 py-1">
-      {[...option.fields, { label: "Example monthly cost", value: formatWholeCurrency(option.monthlyCost) }].map((f) => (
+      {[...option.fields, ...(option.monthlyCost === undefined ? [] : [{ label: "Example monthly cost", value: formatWholeCurrency(option.monthlyCost) }])].map((f) => (
         <div key={f.label} className="flex items-start justify-between gap-4 border-b py-2 text-sm last:border-0">
           <dt className="shrink-0 text-muted-foreground">{f.label}</dt>
           <dd className="text-right font-medium text-foreground">{f.value}</dd>
@@ -76,7 +84,8 @@ function RequestFields({ option }: { option: CarrierRequestOption }) {
 
 export function RequestDraft({ option, onBack, canSend }: {
   option: CarrierRequestOption
-  onBack: () => void
+  /** Back to the options. A request with nothing to choose between has none. */
+  onBack?: () => void
   /** True only while the story waits on this step, so a second press sends nothing. */
   canSend: boolean
 }) {
@@ -97,7 +106,7 @@ export function RequestDraft({ option, onBack, canSend }: {
         <span>{REQUEST_DRAFT_NOTE}</span>
       </Callout>
       <div className="flex gap-2">
-        <Button variant="secondary" onClick={onBack}><ArrowLeft />Back</Button>
+        {onBack && <Button variant="secondary" onClick={onBack}><ArrowLeft />Back</Button>}
         <Button className="flex-1" onClick={send} disabled={!canSend}>Send request</Button>
       </div>
     </div>
@@ -136,7 +145,7 @@ function RequestPanel({ panelId, title, heading, options, ranked = false, isAwai
           <RequestOptions heading={heading} options={options} ranked={ranked} onChoose={(o) => setPanelView(panelId, requestView(o.id))} />
         )}
         {step === "request" && option && (
-          <RequestDraft option={option} onBack={() => setPanelView(panelId, "options")} canSend={isAwaiting(messages, chatState)} />
+          <RequestDraft option={option} onBack={options.length > 1 ? () => setPanelView(panelId, "options") : undefined} canSend={isAwaiting(messages, chatState)} />
         )}
         {step === "sent" && option && <RequestSent option={option} />}
       </PanelBody>
@@ -154,4 +163,23 @@ export function OutageBackupPanel() {
 
 export function SeasonalPausePanel() {
   return <RequestPanel panelId="seasonal-pause" title={SEASONAL_PAUSE_TITLE} heading={PAUSE_OPTIONS_HEADING} options={PAUSE_OPTIONS} isAwaiting={isAwaitingPauseRequest} />
+}
+
+// A single request needs no options list: the panel opens on the request itself.
+const SINGLE = { title: "", description: "" }
+
+export function LinesRequestPanel() {
+  return <RequestPanel panelId="lines-request" title={LINES_REQUEST_TITLE} heading={SINGLE} options={[LINES_OPTION]} isAwaiting={isAwaitingLinesRequest} />
+}
+
+export function OverageRequestPanel() {
+  return <RequestPanel panelId="overage-request" title={OVERAGE_REQUEST_TITLE} heading={OVERAGE_OPTIONS_HEADING} options={OVERAGE_OPTIONS} isAwaiting={isAwaitingOverageRequest} />
+}
+
+export function LocationRequestPanel() {
+  return <RequestPanel panelId="location-request" title={LOCATION_REQUEST_TITLE} heading={SINGLE} options={[LOCATION_OPTION]} isAwaiting={isAwaitingLocationRequest} />
+}
+
+export function RenewalRequestPanel() {
+  return <RequestPanel panelId="renewal-request" title={RENEWAL_REQUEST_TITLE} heading={SINGLE} options={[RENEWAL_OPTION]} isAwaiting={isAwaitingRenewalRequest} />
 }

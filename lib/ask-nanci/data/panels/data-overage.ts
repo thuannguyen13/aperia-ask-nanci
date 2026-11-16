@@ -2,7 +2,9 @@
 // cycle ends. The fee in the first half has already landed. This charge has not, so the
 // owner can stop it. The line is the kitchen's, from story 36's account. Every figure and
 // price is invented.
+import { Gauge, Infinity as Unlimited } from "lucide-react"
 import { LINES } from "./unused-lines"
+import type { CarrierRequestOption } from "./carrier-request"
 import { CARRIER } from "../carrier"
 import { formatWholeCurrency } from "../../../../components/shared/format"
 
@@ -44,7 +46,45 @@ export const OVERAGE_REQUEST = {
   sentTo: CARRIER.business,
 }
 
-export const OVERAGE_VIEWS = {
-  unlimited: { title: "Unlimited data requested", body: `Reference ${OVERAGE_REQUEST.reference}. Nothing on your account changes until ${CARRIER.business} confirms.` },
-  slowed: { title: "Slowdown requested", body: `Reference ${OVERAGE_REQUEST.reference}. The line slows at ${DATA.limitGb} GB instead of adding charges.` },
+export const OVERAGE_REQUEST_TITLE = "Kitchen Line Request"
+
+export const OVERAGE_OPTIONS_HEADING = {
+  title: "Before the Charge Lands",
+  description: `Two ways to keep the kitchen line from adding about ${formatWholeCurrency(OVERAGE_COST)}.`,
 }
+
+const OVERAGE_REASON = `On pace to go about ${OVER_GB} GB over, about ${formatWholeCurrency(OVERAGE_COST)}`
+const LINE_FIELD = { label: "Line", value: `Kitchen, ending ${KITCHEN_LINE.ending}` }
+
+export const OVERAGE_OPTIONS: CarrierRequestOption[] = [
+  {
+    id: "unlimited",
+    icon: Unlimited,
+    title: "Unlimited data",
+    description: "The kitchen line never runs out or adds a charge.",
+    requestLabel: "Unlimited data request",
+    fields: [
+      LINE_FIELD,
+      { label: "Data", value: `${DATA.limitGb} GB a month to unlimited` },
+      { label: "Monthly cost", value: `${formatWholeCurrency(UNLIMITED_EXTRA)} more` },
+      { label: "Why", value: OVERAGE_REASON },
+    ],
+    reference: OVERAGE_REQUEST.reference,
+    sendPrompt: "Send the unlimited data request",
+  },
+  {
+    id: "slow",
+    icon: Gauge,
+    title: "Slow it down",
+    description: `The kitchen line slows at ${DATA.limitGb} GB instead of adding charges.`,
+    requestLabel: "Slowdown request",
+    fields: [
+      LINE_FIELD,
+      { label: "At the limit", value: `Slows at ${DATA.limitGb} GB, no charge` },
+      { label: "Monthly cost", value: "No change" },
+      { label: "Why", value: OVERAGE_REASON },
+    ],
+    reference: OVERAGE_REQUEST.reference,
+    sendPrompt: "Send the slowdown request",
+  },
+]

@@ -1,4 +1,7 @@
+import { Smartphone } from "lucide-react"
 import { CARRIER } from "../carrier"
+import type { CarrierRequestOption } from "./carrier-request"
+import { formatWholeCurrency } from "../../../../components/shared/format"
 
 // Carrier story 36, Unused Lines. Every figure is example data from the carrier account.
 // The authored figures are the six lines and the two plan prices. The idle lines, the
@@ -58,4 +61,24 @@ export const LINES_REQUEST = {
   reference: "LN-2093",
   timestamp: "Today, 10:42 AM",
   sentTo: CARRIER.business,
+}
+
+export const LINES_REQUEST_TITLE = "Lower Plan"
+
+// The one request this story sends, reviewed before it goes.
+export const LINES_OPTION: CarrierRequestOption = {
+  id: "lower-plan",
+  icon: Smartphone,
+  title: "The lower plan",
+  description: `${SUGGESTED_PLAN.lines} lines instead of ${CURRENT_PLAN.lines}.`,
+  requestLabel: "Lower plan request",
+  fields: [
+    { label: "Service", value: "Move to the lower plan" },
+    { label: "Lines", value: `${CURRENT_PLAN.lines} to ${SUGGESTED_PLAN.lines}` },
+    { label: "Remove", value: IDLE_LINES.map((line) => `${line.label}, ending ${line.ending}`).join("; ") },
+    { label: "Monthly cost", value: `${formatWholeCurrency(CURRENT_PLAN.monthly)} to ${formatWholeCurrency(SUGGESTED_PLAN.monthly)}` },
+    { label: "Why", value: `No calls, texts or data in ${IDLE_DAYS} days` },
+  ],
+  reference: LINES_REQUEST.reference,
+  sendPrompt: "Send the lower plan request",
 }

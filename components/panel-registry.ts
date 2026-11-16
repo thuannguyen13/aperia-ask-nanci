@@ -47,7 +47,7 @@ import { ResySurveysPanel } from "./ask-nanci/concept/ResySurveysPanel"
 import { ResyLocationsPanel } from "./ask-nanci/concept/ResyLocationsPanel"
 import { MissedCallsPanel } from "./ask-nanci/concept/MissedCallsPanel"
 import { OutageImpactPanel } from "./ask-nanci/concept/OutageImpactPanel"
-import { CallsCoverPanel, OutageBackupPanel, SeasonalPausePanel } from "./ask-nanci/concept/carrier-request"
+import { CallsCoverPanel, OutageBackupPanel, SeasonalPausePanel, LinesRequestPanel, OverageRequestPanel, LocationRequestPanel, RenewalRequestPanel } from "./ask-nanci/concept/carrier-request"
 import { SeasonalClosurePanel } from "./ask-nanci/concept/SeasonalClosurePanel"
 import { DailyBriefingPanel } from "./ask-nanci/concept/DailyBriefingPanel"
 import { YearHistoryPanel } from "./ask-nanci/concept/YearHistoryPanel"
@@ -78,9 +78,10 @@ import { CASH_FLOW_TITLE, CASH_PLAN_TITLE } from "@/lib/ask-nanci/data/panels/ca
 import { SEASONAL_CLOSURE_TITLE, SEASONAL_PAUSE_TITLE } from "@/lib/ask-nanci/data/panels/seasonal-closure"
 import { BRIEFING_TITLE } from "@/lib/ask-nanci/data/panels/daily-briefing"
 import { HISTORY_TITLE } from "@/lib/ask-nanci/data/panels/year-history"
-import { DATA_OVERAGE_TITLE } from "@/lib/ask-nanci/data/panels/data-overage"
-import { UNUSED_LINES_TITLE } from "@/lib/ask-nanci/data/panels/unused-lines"
-import { PLAN_VALUE_TITLE, MONTH_VALUE_TITLE } from "@/lib/ask-nanci/data/panels/plan-value"
+import { DATA_OVERAGE_TITLE, OVERAGE_REQUEST_TITLE } from "@/lib/ask-nanci/data/panels/data-overage"
+import { UNUSED_LINES_TITLE, LINES_REQUEST_TITLE } from "@/lib/ask-nanci/data/panels/unused-lines"
+import { LOCATION_REQUEST_TITLE } from "@/lib/ask-nanci/data/panels/second-location"
+import { PLAN_VALUE_TITLE, MONTH_VALUE_TITLE, RENEWAL_REQUEST_TITLE } from "@/lib/ask-nanci/data/panels/plan-value"
 
 // The single registry of concept panels. Add a panel here (+ its component) and it
 // becomes renderable everywhere — `PanelId` is derived from these keys, so there is
@@ -156,6 +157,10 @@ export const PANELS = {
   "daily-briefing":      { component: DailyBriefingPanel,     label: BRIEFING_TITLE },
   "year-history":        { component: YearHistoryPanel,       label: HISTORY_TITLE },
   "data-overage":        { component: DataOveragePanel,       label: DATA_OVERAGE_TITLE },
+  "lines-request":       { component: LinesRequestPanel,      label: LINES_REQUEST_TITLE },
+  "overage-request":     { component: OverageRequestPanel,    label: OVERAGE_REQUEST_TITLE },
+  "location-request":    { component: LocationRequestPanel,   label: LOCATION_REQUEST_TITLE },
+  "renewal-request":     { component: RenewalRequestPanel,    label: RENEWAL_REQUEST_TITLE },
   "dashboard-insight":   { component: DashboardInsightPanel,  label: "Dashboard Insight" },
   "detection-queue-insight": { component: DetectionQueueInsightPanel, label: "Queue Insight" },
   // Aperia Risk destinations — every risk UI is a registered panel.

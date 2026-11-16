@@ -1,7 +1,9 @@
 // Data for carrier story 39, Second Location. The first location is the address flow 19
 // has on file, so the two stories describe one business. "Lines in daily use" is four
 // because story 36 has six lines with two idle: the same account, read from two sides.
+import { MapPin } from "lucide-react"
 import { CARRIER } from "../carrier"
+import type { CarrierRequestOption } from "./carrier-request"
 
 export const FIRST_LOCATION = {
   name: "Oak Street",
@@ -49,4 +51,24 @@ export const SECOND_LOCATION_REQUEST = {
   timestamp: "Today, 3:05 PM",
   sentTo: CARRIER.business,
   summary: `${FIRST_LOCATION_USE.lines} lines and ${FIRST_LOCATION_USE.internet} internet connection at ${NEW_LOCATION.short}`,
+}
+
+export const LOCATION_REQUEST_TITLE = "New Location Service"
+
+// The one request this story sends, reviewed before it goes.
+export const LOCATION_OPTION: CarrierRequestOption = {
+  id: "setup",
+  icon: MapPin,
+  title: "The suggested setup",
+  description: SECOND_LOCATION_REQUEST.summary,
+  requestLabel: "New location service request",
+  fields: [
+    { label: "Address", value: NEW_LOCATION.address },
+    { label: "Lines", value: String(FIRST_LOCATION_USE.lines) },
+    { label: "Internet", value: `${FIRST_LOCATION_USE.internet} connection` },
+    { label: "Coverage", value: COVERAGE.status },
+    { label: "Why", value: `What ${FIRST_LOCATION.name} settled on` },
+  ],
+  reference: SECOND_LOCATION_REQUEST.reference,
+  sendPrompt: "Send the new location request",
 }

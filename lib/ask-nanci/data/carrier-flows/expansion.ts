@@ -9,10 +9,12 @@ import type { FlowDef } from "../flows.concept"
 import { CARRIER } from "../carrier"
 import { CARRIER_CITES } from "../sources"
 import {
-  FIRST_LOCATION, NEW_LOCATION, FIRST_LOCATION_USE, SECOND_LOCATION_REQUEST,
+  FIRST_LOCATION, NEW_LOCATION, FIRST_LOCATION_USE, SECOND_LOCATION_REQUEST, LOCATION_OPTION,
 } from "../panels/second-location"
+import { isAwaitingAny, requestView, sentView } from "../panels/carrier-request"
 
 export const EXPANSION_PROMPT = "I'm opening a second location."
+const SETUP_REQUEST = "Request that setup"
 
 export const EXPANSION_FLOW: FlowDef = {
   num: 39,
@@ -23,6 +25,7 @@ export const EXPANSION_FLOW: FlowDef = {
   slug: "39",
   scope: "carrier",
   churn: { cause: "Growth", metric: "ARPU" },
+  followups: [SETUP_REQUEST, LOCATION_OPTION.sendPrompt],
   description: "Coverage at the new address and what the first location uses, then a request for lines and internet there.",
 }
 
@@ -42,7 +45,12 @@ const EXPANSION_SHEET: SheetActionData = {
   timestamp: SECOND_LOCATION_REQUEST.timestamp,
 }
 
-const SETUP_REQUEST = "Request that setup"
+// The answer the request waits on. Its Send button is live only while this is the last
+// thing in the chat.
+const SETUP_REVIEW_ANSWER = `Here is the request to ${CARRIER.business}, filled in from what ${FIRST_LOCATION.name} uses. Check it, then send it.`
+
+/** True while story 39 waits on its request: idle, with the review answer as the last message. */
+export const isAwaitingLocationRequest = (messages: { role: string; content: string }[], chatState: string) => isAwaitingAny(messages, chatState, [SETUP_REVIEW_ANSWER])
 
 export const EXPANSION_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
   [EXPANSION_PROMPT]: [
@@ -60,13 +68,21 @@ export const EXPANSION_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
       map: { address: NEW_LOCATION.address, lat: NEW_LOCATION.lat, lng: NEW_LOCATION.lng },
       panel: "second-location",
       source: CARRIER_CITES.account,
+      suggestions: [SETUP_REQUEST],
     },
+  ],
+  // The owner reviews the request before it goes. The panel's Send button sends it.
+  [SETUP_REQUEST]: [
     { role: "user", content: SETUP_REQUEST },
+    { role: "assistant", content: SETUP_REVIEW_ANSWER, panel: "location-request", view: requestView(LOCATION_OPTION.id), revealPanel: true },
+  ],
+  [LOCATION_OPTION.sendPrompt]: [
+    { role: "user", content: LOCATION_OPTION.sendPrompt },
     {
       role: "assistant",
       content: `Sent to ${CARRIER.business}: ${SECOND_LOCATION_REQUEST.summary}. Reference ${SECOND_LOCATION_REQUEST.reference}. Nothing on your account changes until they confirm, and they'll be in touch to set an install date.`,
-      panel: "second-location",
-      view: "requested",
+      panel: "location-request",
+      view: sentView(LOCATION_OPTION.id),
       sheetAction: EXPANSION_SHEET,
     },
   ],
