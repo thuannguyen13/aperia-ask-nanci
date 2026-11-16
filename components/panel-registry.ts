@@ -50,6 +50,7 @@ import { OutageImpactPanel } from "./ask-nanci/concept/OutageImpactPanel"
 import { CallsCoverPanel, OutageBackupPanel, SeasonalPausePanel } from "./ask-nanci/concept/carrier-request"
 import { SeasonalClosurePanel } from "./ask-nanci/concept/SeasonalClosurePanel"
 import { DailyBriefingPanel } from "./ask-nanci/concept/DailyBriefingPanel"
+import { YearHistoryPanel } from "./ask-nanci/concept/YearHistoryPanel"
 import { CashFlowPanel } from "./ask-nanci/concept/CashFlowPanel"
 import { CashPlanPanel } from "./ask-nanci/concept/CashPlanPanel"
 import { UnusedLinesPanel } from "./ask-nanci/concept/UnusedLinesPanel"
@@ -75,6 +76,7 @@ import { OUTAGE_IMPACT_TITLE, OUTAGE_BACKUP_TITLE } from "@/lib/ask-nanci/data/p
 import { CASH_FLOW_TITLE, CASH_PLAN_TITLE } from "@/lib/ask-nanci/data/panels/cash-flow"
 import { SEASONAL_CLOSURE_TITLE, SEASONAL_PAUSE_TITLE } from "@/lib/ask-nanci/data/panels/seasonal-closure"
 import { BRIEFING_TITLE } from "@/lib/ask-nanci/data/panels/daily-briefing"
+import { HISTORY_TITLE } from "@/lib/ask-nanci/data/panels/year-history"
 import { UNUSED_LINES_TITLE } from "@/lib/ask-nanci/data/panels/unused-lines"
 import { PLAN_VALUE_TITLE, MONTH_VALUE_TITLE } from "@/lib/ask-nanci/data/panels/plan-value"
 
@@ -150,6 +152,7 @@ export const PANELS = {
   "seasonal-closure":    { component: SeasonalClosurePanel,   label: SEASONAL_CLOSURE_TITLE },
   "seasonal-pause":      { component: SeasonalPausePanel,     label: SEASONAL_PAUSE_TITLE },
   "daily-briefing":      { component: DailyBriefingPanel,     label: BRIEFING_TITLE },
+  "year-history":        { component: YearHistoryPanel,       label: HISTORY_TITLE },
   "dashboard-insight":   { component: DashboardInsightPanel,  label: "Dashboard Insight" },
   "detection-queue-insight": { component: DetectionQueueInsightPanel, label: "Queue Insight" },
   // Aperia Risk destinations — every risk UI is a registered panel.
