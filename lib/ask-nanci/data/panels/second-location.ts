@@ -1,6 +1,6 @@
-// Data for carrier story 36, Second Location. The first location is the address flow 19
+// Data for carrier story 39, Second Location. The first location is the address flow 19
 // has on file, so the two stories describe one business. "Lines in daily use" is four
-// because story 35 has six lines with two idle: the same account, read from two sides.
+// because story 36 has six lines with two idle: the same account, read from two sides.
 import { CARRIER } from "../carrier"
 
 export const FIRST_LOCATION = {

@@ -1,6 +1,6 @@
 import { CARRIER } from "../carrier"
 
-// Carrier story 35, Unused Lines. Every figure is example data from the carrier account.
+// Carrier story 36, Unused Lines. Every figure is example data from the carrier account.
 // The authored figures are the six lines and the two plan prices. The idle lines, the
 // suggested plan's size and the monthly difference are derived from them, so the chat
 // and the panel quote the same numbers.

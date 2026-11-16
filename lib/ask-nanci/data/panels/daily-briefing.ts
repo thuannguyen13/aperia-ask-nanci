@@ -1,4 +1,4 @@
-// Data for carrier story 41, Daily Briefing: Friday's sales, deposits, top items and the
+// Data for carrier story 33, Daily Briefing: Friday's sales, deposits, top items and the
 // one thing worth a look, sent each morning. The menu and the stock are the same mock
 // business as Menu Margin and Inventory. Every figure is invented.
 import { STOCK_ITEMS } from "./inventory"
@@ -28,7 +28,7 @@ export const WORTH_A_LOOK = {
   body: `${TIGHTEST.onHand} on hand at about ${TIGHTEST.pace.replace("~", "")}. Your next delivery is Thursday.`,
 }
 
-// The line the briefing is shared to: the shift manager's, from story 35's account.
+// The line the briefing is shared to: the shift manager's, from story 36's account.
 export const SHIFT_MANAGER = LINES.find((line) => line.label === "Shift manager")!
 export const BRIEFING_TIME = "7 AM"
 

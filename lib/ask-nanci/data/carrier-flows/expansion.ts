@@ -1,4 +1,4 @@
-// Carrier story 36, Second Location. Its definition and its script, one file per story, so the
+// Carrier story 39, Second Location. Its definition and its script, one file per story, so the
 // stories are written side by side without touching each other.
 //
 // Address Change (flow 19) is the model: the current address on an inline map, the new
@@ -15,12 +15,12 @@ import {
 export const EXPANSION_PROMPT = "I'm opening a second location."
 
 export const EXPANSION_FLOW: FlowDef = {
-  num: 36,
+  num: 39,
   section: "merchant",
   title: "Second Location",
   badge: "Life Events",
   key: EXPANSION_PROMPT,
-  slug: "36",
+  slug: "39",
   scope: "carrier",
   churn: { cause: "Growth", metric: "ARPU" },
   description: "Coverage at the new address and what the first location uses, then a request for lines and internet there.",

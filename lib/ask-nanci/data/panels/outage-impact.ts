@@ -1,4 +1,4 @@
-// Data for carrier story 34, Outage Impact: Thursday evening's internet outage on the
+// Data for carrier story 35, Outage Impact: Thursday evening's internet outage on the
 // carrier's service record, matched to the card payments the register could not take.
 //
 // The estimate is the same mock business as Busiest Times and the Sales Snapshot.

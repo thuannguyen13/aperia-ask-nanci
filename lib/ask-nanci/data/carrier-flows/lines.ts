@@ -1,4 +1,4 @@
-// Carrier story 35, Unused Lines. Its definition and its script, one file per story, so the
+// Carrier story 36, Unused Lines. Its definition and its script, one file per story, so the
 // stories are written side by side without touching each other.
 //
 // Nanci speaks first, in the app, before the bill posts: two idle lines and a smaller
@@ -20,13 +20,13 @@ const LINES_SEND = "Request the smaller plan"
 const LINES_KEEP = `Keep all ${spellCount(LINES.length)}`
 
 export const LINES_FLOW: FlowDef = {
-  num: 35,
+  num: 36,
   section: "merchant",
   title: "Unused Lines",
   badge: "Billing",
   key: LINES_KEY,
   proactive: true,
-  slug: "35",
+  slug: "36",
   scope: "carrier",
   churn: { cause: "Plan mismatch", metric: "Churn" },
   // The request comes first, so ?autoplay plays on into it.

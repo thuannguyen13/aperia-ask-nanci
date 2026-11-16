@@ -2,7 +2,7 @@
 // January and thinks about cancelling the plan until they reopen. Last winter's register
 // shows the closure, and the business line's call records show the phone kept ringing.
 //
-// The plan's monthly cost is story 37's, so the stories quote one price. Every figure is
+// The plan's monthly cost is story 42's, so the stories quote one price. Every figure is
 // invented.
 import { PauseCircle, PhoneForwarded } from "lucide-react"
 import type { CarrierRequestOption } from "./carrier-request"

@@ -1,6 +1,6 @@
-// Data for the second half of carrier story 38: a line heading over its data before the
+// Data for the second half of carrier story 37: a line heading over its data before the
 // cycle ends. The fee in the first half has already landed. This charge has not, so the
-// owner can stop it. The line is the kitchen's, from story 35's account. Every figure and
+// owner can stop it. The line is the kitchen's, from story 36's account. Every figure and
 // price is invented.
 import { LINES } from "./unused-lines"
 import { CARRIER } from "../carrier"

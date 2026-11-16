@@ -1,4 +1,4 @@
-// Data for carrier story 39, Cash Flow Warning: deposits running below last month with
+// Data for carrier story 38, Cash Flow Warning: deposits running below last month with
 // payroll due Friday, then what to cut back or how to bridge the gap.
 //
 // The shortfall, the payroll day and the catering invoices are the ones the Business Loan

@@ -1,4 +1,4 @@
-// Carrier story 39, Cash Flow Warning. Its definition and its script, one file per story,
+// Carrier story 38, Cash Flow Warning. Its definition and its script, one file per story,
 // so the stories are written side by side without touching each other.
 //
 // Nanci speaks first, in the app: nothing is down and payroll is days away, so opening the
@@ -23,17 +23,17 @@ const PLAN_READ_MS = 5000
 // last thing in the chat.
 const CASH_PLAN_ANSWER = `Cutting back this week could cover about ${formatWholeCurrency(CUT_BACK_TOTAL)} of it. Working capital could cover all of it. Both are in the panel.`
 
-/** True while story 39 is parked on its plan: idle, with the plan answer as the last message. */
+/** True while story 38 is parked on its plan: idle, with the plan answer as the last message. */
 export const isAwaitingCashPlan = (messages: { role: string; content: string }[], chatState: string) => isAwaitingTurn(messages, chatState, CASH_PLAN_ANSWER)
 
 export const CASH_FLOW_FLOW: FlowDef = {
-  num: 39,
+  num: 38,
   section: "merchant",
   title: "Cash Flow Warning",
   badge: "Involuntary Churn",
   key: CASH_KEY,
   proactive: true,
-  slug: "39",
+  slug: "38",
   scope: "carrier",
   churn: { cause: "Business closing", metric: "Churn" },
   // The offer comes first, so ?autoplay plays on into it.

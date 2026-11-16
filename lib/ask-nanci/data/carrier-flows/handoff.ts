@@ -1,4 +1,4 @@
-// Carrier story 38, Billing Question. Its definition and its script, one file per story, so the
+// Carrier story 37, Billing Question. Its definition and its script, one file per story, so the
 // stories are written side by side without touching each other.
 //
 // Nanci speaks first, in the app, when the bill posts with a fee it has not seen before.
@@ -24,13 +24,13 @@ const OVERAGE_SLOW = "Slow it down instead"
 const OVERAGE_LEAVE = "Leave it as it is"
 
 export const HANDOFF_FLOW: FlowDef = {
-  num: 38,
+  num: 37,
   section: "merchant",
   title: "Billing Question",
   badge: "Support",
   key: HANDOFF_KEY,
   proactive: true,
-  slug: "38",
+  slug: "37",
   scope: "carrier",
   churn: { cause: "Bill shock", metric: "Churn" },
   // Unlimited comes first, so ?autoplay plays on into it.

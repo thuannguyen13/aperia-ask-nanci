@@ -1,4 +1,4 @@
-// Carrier story 42, Accumulated Value. Its definition and its script, one file per story,
+// Carrier story 41, Accumulated Value. Its definition and its script, one file per story,
 // so the stories are written side by side without touching each other.
 //
 // Value builds up the longer the owner stays: this year against last, nearby restaurants
@@ -15,12 +15,12 @@ export const HISTORY_PROMPT = "How did November compare to last year?"
 const HISTORY_EXPORT = "Can I download all of my history?"
 
 export const HISTORY_FLOW: FlowDef = {
-  num: 42,
+  num: 41,
   section: "merchant",
   title: "Year over Year",
   badge: "Accumulated Value",
   key: HISTORY_PROMPT,
-  slug: "42",
+  slug: "41",
   scope: "carrier",
   churn: { cause: "Short tenure", metric: "Churn" },
   followups: [HISTORY_EXPORT],

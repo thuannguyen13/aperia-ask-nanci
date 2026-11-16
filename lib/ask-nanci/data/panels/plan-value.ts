@@ -7,8 +7,8 @@ import { OUTAGE_MINUTES, OUTAGE_CREDIT } from "./outage-impact"
 import { PAYROLL, SHORTFALL } from "./cash-flow"
 import { formatWholeCurrency } from "../../../../components/shared/format"
 
-// Carrier story 37, Plan Value. Every figure is example data. The plan is the same one
-// story 35 reads: its lines are priced there, and the internet is added here. The
+// Carrier story 42, Plan Value. Every figure is example data. The plan is the same one
+// story 36 reads: its lines are priced there, and the internet is added here. The
 // monthly and yearly costs are derived from those prices, so the chat and the panel
 // quote the same numbers.
 

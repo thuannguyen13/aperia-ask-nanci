@@ -1,4 +1,4 @@
-// Carrier story 33, Missed Calls. Its definition and its script, one file per story, so the
+// Carrier story 34, Missed Calls. Its definition and its script, one file per story, so the
 // stories are written side by side without touching each other.
 //
 // The owner picks an option in the panel, so the script stops on the options answer. The
@@ -22,16 +22,16 @@ const CALLS_COVER = "What can I do about the lunch calls?"
 // last thing in the chat.
 const CALLS_OPTIONS_ANSWER = `Two options would cover that window. Forward unanswered calls to a second phone during lunch, or add a second line so two calls can be taken at once. Pick one in the panel and I will fill in the request to ${CARRIER.business}.`
 
-/** True while story 33 is parked on its options: idle, with the options answer as the last message. */
+/** True while story 34 is parked on its options: idle, with the options answer as the last message. */
 export const isAwaitingCallsRequest = (messages: { role: string; content: string }[], chatState: string) => isAwaitingTurn(messages, chatState, CALLS_OPTIONS_ANSWER)
 
 export const CALLS_FLOW: FlowDef = {
-  num: 33,
+  num: 34,
   section: "merchant",
   title: "Missed Calls",
   badge: "Engagement",
   key: CALLS_PROMPT,
-  slug: "33",
+  slug: "34",
   scope: "carrier",
   churn: { cause: "Missed revenue", metric: "Attach rate" },
   followups: [CALLS_COVER, ...CALLS_OPTIONS.map((o) => o.sendPrompt)],

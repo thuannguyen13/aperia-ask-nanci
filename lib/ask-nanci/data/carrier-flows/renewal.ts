@@ -1,4 +1,4 @@
-// Carrier story 37, Plan Value. Its definition and its script, one file per story, so the
+// Carrier story 42, Plan Value. Its definition and its script, one file per story, so the
 // stories are written side by side without touching each other.
 //
 // Nanci speaks first, in the app, on the 1st: a receipt of what it caught on the account
@@ -24,13 +24,13 @@ const RENEWAL_RENEW = "Renew my plan"
 const RENEWAL_OPTIONS_ASK = "Show me other options"
 
 export const RENEWAL_FLOW: FlowDef = {
-  num: 37,
+  num: 42,
   section: "merchant",
   title: "Plan Value",
   badge: "Renewal",
   key: MONTH_KEY,
   proactive: true,
-  slug: "37",
+  slug: "42",
   scope: "carrier",
   churn: { cause: "Price shopping at renewal", metric: "Churn" },
   // The renewal comes first, so ?autoplay plays on into it.

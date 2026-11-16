@@ -1,4 +1,4 @@
-// Data for carrier story 42, Accumulated Value: this year's sales against last year's,
+// Data for carrier story 41, Accumulated Value: this year's sales against last year's,
 // month by month, beside nearby restaurants, and the history Ask Nanci holds. The value
 // is the history, not the cost of leaving it: it is the owner's to download at any time.
 //

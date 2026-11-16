@@ -1,4 +1,4 @@
-// Carrier story 34, Outage Impact. Its definition and its script, one file per story, so the
+// Carrier story 35, Outage Impact. Its definition and its script, one file per story, so the
 // stories are written side by side without touching each other.
 //
 // Nanci speaks first. It texts the owner while the internet is down: the text travels over
@@ -31,17 +31,17 @@ const OUTAGE_BACKUP = "How do I keep taking cards if it happens again?"
 // is the last thing in the chat.
 const OUTAGE_OPTIONS_ANSWER = `A wireless backup keeps the register online when the main connection drops. Here are the options, ranked by fit for a business your size. Tap one and I will fill in the request to ${CARRIER.business}.`
 
-/** True while story 34 is parked on its options: idle, with the options answer as the last message. */
+/** True while story 35 is parked on its options: idle, with the options answer as the last message. */
 export const isAwaitingOutageRequest = (messages: { role: string; content: string }[], chatState: string) => isAwaitingTurn(messages, chatState, OUTAGE_OPTIONS_ANSWER)
 
 export const OUTAGE_FLOW: FlowDef = {
-  num: 34,
+  num: 35,
   section: "merchant",
   title: "Outage Impact",
   badge: "Trust",
   key: OUTAGE_KEY,
   proactive: true,
-  slug: "34",
+  slug: "35",
   scope: "carrier",
   churn: { cause: "Outages", metric: "Churn, attach rate" },
   followups: [OUTAGE_BACKUP, ...OUTAGE_OPTIONS.map((o) => o.sendPrompt)],
