@@ -72,7 +72,7 @@ export function RequestOptions({ heading, options, ranked = false, onChoose }: {
 function RequestFields({ option }: { option: CarrierRequestOption }) {
   return (
     <dl className="rounded-xl border px-4 py-1">
-      {[...option.fields, ...(option.monthlyCost === undefined ? [] : [{ label: "Example monthly cost", value: formatWholeCurrency(option.monthlyCost) }])].map((f) => (
+      {[...option.fields, ...(option.monthlyCost === undefined ? [] : [{ label: "Example Monthly Cost", value: formatWholeCurrency(option.monthlyCost) }])].map((f) => (
         <div key={f.label} className="flex items-start justify-between gap-4 border-b py-2 text-sm last:border-0">
           <dt className="shrink-0 text-muted-foreground">{f.label}</dt>
           <dd className="text-right font-medium text-foreground">{f.value}</dd>
@@ -99,7 +99,7 @@ export function RequestDraft({ option, onBack, canSend }: {
   usePanelAutoplay([{ at: SEND_AT_MS, run: send }])
   return (
     <div className="space-y-4">
-      <SectionHeader title={option.requestLabel} description="Filled in from what I found. Check it, then send." />
+      <SectionHeader title={option.requestLabel} description="Review the request, then send it." />
       <RequestFields option={option} />
       <Callout variant="blue" className="flex items-start gap-2">
         <Info className="mt-0.5 size-4 shrink-0" />
@@ -107,7 +107,7 @@ export function RequestDraft({ option, onBack, canSend }: {
       </Callout>
       <div className="flex gap-2">
         {onBack && <Button variant="secondary" onClick={onBack}><ArrowLeft />Back</Button>}
-        <Button className="flex-1" onClick={send} disabled={!canSend}>Send request</Button>
+        <Button className="flex-1" onClick={send} disabled={!canSend}>Send Request</Button>
       </div>
     </div>
   )

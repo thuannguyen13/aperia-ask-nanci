@@ -30,17 +30,18 @@ export const NOVEMBER_CHANGE_PCT = Math.round((NOVEMBER.thisYear / NOVEMBER.last
 export const NEARBY_CHANGE_PCT = 8
 
 // This year's best day, against the record it beat.
-export const BEST_DAY = { date: "Saturday, November 7", sales: 4480 }
-const PREVIOUS_BEST = { date: "Saturday, May 16", sales: SATURDAY_DRILLDOWN.sales }
+// "date" is how Nanci says it in chat; "fullDate" is how a panel writes it, with the year.
+export const BEST_DAY = { date: "Saturday, November 7", fullDate: "Saturday, November 7, 2026", sales: 4480 }
+const PREVIOUS_BEST = { fullDate: "Saturday, May 16, 2026", sales: SATURDAY_DRILLDOWN.sales }
 
 export const YEARS_OF_HISTORY = 3
 
-export const HISTORY_INSIGHT = `November is up ${NOVEMBER_CHANGE_PCT}% on last year, ahead of nearby restaurants at ${NEARBY_CHANGE_PCT}%. ${BEST_DAY.date} was your best day since you opened.`
+export const HISTORY_INSIGHT = `November is up ${NOVEMBER_CHANGE_PCT}% on last year, ahead of nearby restaurants at ${NEARBY_CHANGE_PCT}%. ${BEST_DAY.fullDate} was your best day since you opened.`
 
 export const HISTORY_TILES = [
   { label: "November vs Last Year", value: `+${NOVEMBER_CHANGE_PCT}%`, sublabel: `${formatWholeCurrency(NOVEMBER.thisYear * 1000)} against ${formatWholeCurrency(NOVEMBER.lastYear * 1000)}` },
   { label: "Nearby Restaurants", value: `+${NEARBY_CHANGE_PCT}%`, sublabel: "Same month, within 2 miles" },
-  { label: "Best Day Ever", value: formatWholeCurrency(BEST_DAY.sales), sublabel: BEST_DAY.date },
+  { label: "Best Day Ever", value: formatWholeCurrency(BEST_DAY.sales), sublabel: BEST_DAY.fullDate },
 ]
 
 export const SALES_CHART = {
@@ -51,13 +52,13 @@ export const SALES_CHART = {
 export const HELD_TITLE = "Your History in Ask Nanci"
 export const HELD_ITEMS = [
   { id: "sales", title: `${YEARS_OF_HISTORY} years of sales`, detail: "Every day, item and hour from your register." },
-  { id: "records", title: "Your records", detail: `Best day ${formatWholeCurrency(BEST_DAY.sales)} on ${BEST_DAY.date}, beating ${formatWholeCurrency(PREVIOUS_BEST.sales)} on ${PREVIOUS_BEST.date}.` },
+  { id: "records", title: "Your records", detail: `Best day ${formatWholeCurrency(BEST_DAY.sales)} on ${BEST_DAY.fullDate}, beating ${formatWholeCurrency(PREVIOUS_BEST.sales)} on ${PREVIOUS_BEST.fullDate}.` },
   { id: "benchmarks", title: "Nearby benchmarks", detail: "How restaurants within 2 miles did each month, with no names." },
 ]
 
 export const HISTORY_NOTE = "Sales are from your register. Nearby restaurants are an anonymous average of businesses using Ask Nanci within 2 miles. Your history is yours to download at any time."
 
 export const EXPORT_NOTE = {
-  title: "Download ready",
+  title: "Download Ready",
   body: `${YEARS_OF_HISTORY} years of sales by day, item and hour, as a spreadsheet. The link is in your email and works for 7 days.`,
 }

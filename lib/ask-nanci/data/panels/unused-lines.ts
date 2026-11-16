@@ -44,8 +44,8 @@ const ACTIVE_LINES = LINES.filter((line) => !line.idle)
 export const lastUsed = (days: number) => (days === 0 ? "Today" : days === 1 ? "Yesterday" : `${days} days ago`)
 
 // Invented prices. No real plan or price is used.
-export const CURRENT_PLAN = { name: "Current plan", lines: LINES.length, monthly: 289 }
-export const SUGGESTED_PLAN = { name: "Lower plan", lines: ACTIVE_LINES.length, monthly: 219 }
+export const CURRENT_PLAN = { name: "Current Plan", lines: LINES.length, monthly: 289 }
+export const SUGGESTED_PLAN = { name: "Lower Plan", lines: ACTIVE_LINES.length, monthly: 219 }
 export const MONTHLY_DIFFERENCE = CURRENT_PLAN.monthly - SUGGESTED_PLAN.monthly
 export const YEARLY_DIFFERENCE = MONTHLY_DIFFERENCE * 12
 
@@ -71,12 +71,12 @@ export const LINES_OPTION: CarrierRequestOption = {
   icon: Smartphone,
   title: "The lower plan",
   description: `${SUGGESTED_PLAN.lines} lines instead of ${CURRENT_PLAN.lines}.`,
-  requestLabel: "Lower plan request",
+  requestLabel: "Lower Plan Request",
   fields: [
     { label: "Service", value: "Move to the lower plan" },
     { label: "Lines", value: `${CURRENT_PLAN.lines} to ${SUGGESTED_PLAN.lines}` },
     { label: "Remove", value: IDLE_LINES.map((line) => `${line.label}, ending ${line.ending}`).join("; ") },
-    { label: "Monthly cost", value: `${formatWholeCurrency(CURRENT_PLAN.monthly)} to ${formatWholeCurrency(SUGGESTED_PLAN.monthly)}` },
+    { label: "Monthly Cost", value: `${formatWholeCurrency(CURRENT_PLAN.monthly)} to ${formatWholeCurrency(SUGGESTED_PLAN.monthly)}` },
     { label: "Why", value: `No calls, texts or data in ${IDLE_DAYS} days` },
   ],
   reference: LINES_REQUEST.reference,

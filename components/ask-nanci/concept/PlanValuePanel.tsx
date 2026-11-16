@@ -4,7 +4,7 @@ import { Headset, Smartphone, Sparkles, Wifi } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { CARRIER } from "@/lib/ask-nanci/data/carrier"
 import {
-  PLAN_VALUE_TITLE, PLAN_MONTHLY, PLAN_YEARLY, RENEWS_ON, YEAR_WITH_NANCI, PLAN_INCLUDES,
+  PLAN_VALUE_TITLE, PLAN_MONTHLY, PLAN_YEARLY, RENEWS_ON_DATE, YEAR_WITH_NANCI, PLAN_INCLUDES,
 } from "@/lib/ask-nanci/data/panels/plan-value"
 import { PanelShell, PanelHeader, PanelBody, NanciInsight, SectionHeader, StatCard, PanelItem, formatWholeCurrency } from "@/components/shared"
 
@@ -20,7 +20,7 @@ export function PlanValuePanel() {
 
       <PanelBody className="flex flex-col gap-4">
         <NanciInsight>
-          Here is the year I can measure, beside what your plan costs over the same 12 months.
+          A year of Ask Nanci beside what your plan costs over the same 12 months.
         </NanciInsight>
 
         {/* The year and the plan side by side. Column flow on a four-row grid keeps the
@@ -32,7 +32,7 @@ export function PlanValuePanel() {
           <StatCard label="Bill Questions Answered" value={YEAR_WITH_NANCI.billQuestionsAnswered} sublabel={`About your ${CARRIER.business} bill`} />
           <StatCard label="Estimated Savings" value={formatWholeCurrency(YEAR_WITH_NANCI.estimatedSavings)} sublabel="Only savings with a figure behind them" emphasis />
           <SectionHeader title="Your Plan" className="mb-0 max-sm:mt-2" />
-          <StatCard label="Renews" value={`On ${RENEWS_ON}`} sublabel="Next month, for another 12 months" />
+          <StatCard label="Renews" value={RENEWS_ON_DATE} sublabel="Next month, for another 12 months" />
           <StatCard label="Monthly Cost" value={formatWholeCurrency(PLAN_MONTHLY)} sublabel="Lines, internet and Ask Nanci" />
           <StatCard label="Cost Over a Year" value={formatWholeCurrency(PLAN_YEARLY)} sublabel="12 months at the monthly cost" emphasis />
         </div>

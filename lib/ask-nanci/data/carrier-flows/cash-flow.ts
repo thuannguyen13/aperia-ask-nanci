@@ -21,7 +21,7 @@ const PLAN_READ_MS = 5000
 
 // The answer the plan waits on. The panel's offer button is live only while this is the
 // last thing in the chat.
-const CASH_PLAN_ANSWER = `Cutting back this week could cover about ${formatWholeCurrency(CUT_BACK_TOTAL)} of it. Working capital could cover all of it. Both are in the panel.`
+const CASH_PLAN_ANSWER = `Cutting back this week could cover about ${formatWholeCurrency(CUT_BACK_TOTAL)} of it. Working capital could cover all of it. Both are under Before Payroll.`
 
 /** True while story 38 is parked on its plan: idle, with the plan answer as the last message. */
 export const isAwaitingCashPlan = (messages: { role: string; content: string }[], chatState: string) => isAwaitingTurn(messages, chatState, CASH_PLAN_ANSWER)

@@ -14,7 +14,7 @@ import { PanelShell, PanelHeader, PanelBody, NanciInsight, SectionHeader, StatCa
 function Outcome({ view }: { view: string }) {
   if (view === "kept") {
     return (
-      <Callout variant="blue" icon={Check} title={`Keeping all ${LINES.length} lines`}>
+      <Callout variant="blue" icon={Check} title={`Keeping All ${LINES.length} Lines`}>
         <p>Nothing was sent to {CARRIER.business}.</p>
       </Callout>
     )
@@ -37,11 +37,11 @@ export function UnusedLinesPanel() {
         </NanciInsight>
 
         <div>
-          <SectionHeader title="Your lines" description={`Marked lines have had no use in ${IDLE_DAYS} days.`} />
+          <SectionHeader title="Your Lines" description={`Marked lines have had no use in ${IDLE_DAYS} days.`} />
           <PanelTable>
             <Thead>
               <Th>Line</Th>
-              <Th>Last used</Th>
+              <Th>Last Used</Th>
               <Th>Usage</Th>
             </Thead>
             <tbody>
@@ -68,13 +68,13 @@ export function UnusedLinesPanel() {
         </div>
 
         <div>
-          <SectionHeader title="Current and suggested plan" />
+          <SectionHeader title="Current and Suggested Plan" />
           {/* Three across fits the panel; on a phone the two plans share a row and the
               difference takes the width, as on Busiest Times. */}
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 [&>:last-child]:col-span-2 sm:[&>:last-child]:col-span-1">
-            <StatCard label={CURRENT_PLAN.name} value={`${formatWholeCurrency(CURRENT_PLAN.monthly)}/mo`} sublabel={`${CURRENT_PLAN.lines} lines`} />
-            <StatCard label={SUGGESTED_PLAN.name} value={`${formatWholeCurrency(SUGGESTED_PLAN.monthly)}/mo`} sublabel={`${SUGGESTED_PLAN.lines} lines`} />
-            <StatCard label="Difference" value={`${formatWholeCurrency(MONTHLY_DIFFERENCE)}/mo`} sublabel={`${formatWholeCurrency(YEARLY_DIFFERENCE)} a year`} emphasis />
+            <StatCard label={CURRENT_PLAN.name} value={`${formatWholeCurrency(CURRENT_PLAN.monthly)}/month`} sublabel={`${CURRENT_PLAN.lines} lines`} />
+            <StatCard label={SUGGESTED_PLAN.name} value={`${formatWholeCurrency(SUGGESTED_PLAN.monthly)}/month`} sublabel={`${SUGGESTED_PLAN.lines} lines`} />
+            <StatCard label="Difference" value={`${formatWholeCurrency(MONTHLY_DIFFERENCE)}/month`} sublabel={`${formatWholeCurrency(YEARLY_DIFFERENCE)} a year`} emphasis />
           </div>
         </div>
 

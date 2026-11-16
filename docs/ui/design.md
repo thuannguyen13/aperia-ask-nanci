@@ -24,6 +24,16 @@ A panel is a generated answer to one question, not a fixed dashboard template. T
 
 7. **Highlight what's relevant — don't render every row equally.** If one item is the reason the panel opened, it should look different (bordered, expanded, colored) from the rest, not sit as one more uniform row.
 
+## Copy
+
+Screen text follows Aperia's UI Style Guide V4.3, which the `ui-copy` skill holds. The decisions below depart from it or settle what it leaves open.
+
+- **Nanci's chat speaks as "I", and the screen around it does not.** Chat is the assistant's voice. Panel headings, labels, callouts and buttons never say I, me or we.
+- **No contractions anywhere, chat included.** The guide bans them on every screen, and the chat reads as well without them.
+- **Panels format values the guide's way, and chat keeps them natural.** A panel writes 06:10 PM CST and Friday, November 20, 2026. Nanci says 6:10 PM and Friday.
+- **Each panel keeps its source footnote.** The guide cuts narrative, but the footnote is how a reader checks a figure Nanci worked out, so it stays as one line of small text at the foot of the panel.
+- **"vs" is allowed in a tile label.** It is not on the guide's abbreviation list. "Deposits vs Last Month" fits a tile where the long form does not.
+
 ## Panel pattern library
 
 Nine shapes already exist in the codebase. When building a new panel, match the shape to the data/intent below instead of defaulting to a plain table or inventing a tenth shape — if none fit, add the new one here so it becomes reusable rather than a one-off.

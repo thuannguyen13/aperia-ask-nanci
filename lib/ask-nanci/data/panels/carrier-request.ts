@@ -24,7 +24,7 @@ export interface CarrierRequestOption {
   sendPrompt: string
 }
 
-export const REQUEST_SENT_TITLE = `Request sent to ${CARRIER.business}`
+export const REQUEST_SENT_TITLE = `Request Sent to ${CARRIER.business}`
 export const REQUEST_HOLD_NOTE = "Nothing on your account changes until they confirm."
 // Under the request, before it is sent.
 export const REQUEST_DRAFT_NOTE = `Sending asks ${CARRIER.business} to make this change. ${REQUEST_HOLD_NOTE}`
@@ -61,7 +61,7 @@ export function buildRequestConversations(options: CarrierRequestOption[], panel
       { role: "user", content: option.sendPrompt },
       {
         role: "assistant",
-        content: `${REQUEST_SENT_TITLE} for ${option.title.toLowerCase()}, reference ${option.reference}. ${REQUEST_HOLD_NOTE}`,
+        content: `Sent to ${CARRIER.business} as a request for ${option.title.toLowerCase()}, reference ${option.reference}. ${REQUEST_HOLD_NOTE}`,
         sheetAction,
         panel,
         view: sentView(option.id),

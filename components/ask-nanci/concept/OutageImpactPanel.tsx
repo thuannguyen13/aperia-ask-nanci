@@ -8,7 +8,7 @@ import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import {
   OUTAGE_IMPACT_TITLE, OUTAGE_INSIGHT, OUTAGE_TILES, OUTAGE_EVENTS, OUTAGE_ESTIMATE_NOTE,
-  OUTAGE, OUTAGE_WINDOW, EVENING, EVENING_HOURS, EVENING_CHART, THURSDAY_ROW, INCIDENT_TITLE, INCIDENT_WHEN, formatClock,
+  OUTAGE, OUTAGE_WINDOW, EVENING, EVENING_HOURS, EVENING_CHART, THURSDAY_ROW, INCIDENT_TITLE, INCIDENT_WHEN, formatClock, formatStamp,
   OUTAGE_CREDIT_NOTE,
 } from "@/lib/ask-nanci/data/panels/outage-impact"
 import { PanelShell, PanelHeader, PanelBody, NanciInsight, StatCard, Callout, SectionHeader, formatWholeCurrency } from "@/components/shared"
@@ -133,7 +133,7 @@ function Events() {
         const last = i === OUTAGE_EVENTS.length - 1
         return (
           <li key={e.label} className="flex gap-3">
-            <span className="w-14 shrink-0 text-xs leading-6 tabular-nums text-muted-foreground">{formatClock(e.at, true)}</span>
+            <span className="w-16 shrink-0 text-xs leading-6 tabular-nums text-muted-foreground">{formatStamp(e.at, false)}</span>
             <div className="flex flex-col items-center">
               <span className="flex size-6 shrink-0 items-center justify-center rounded-full border bg-background">
                 <Icon className={cn("size-3.5", e.down ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400")} />

@@ -57,7 +57,7 @@ export const EXPANSION_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
     { role: "user", content: EXPANSION_PROMPT },
     {
       role: "assistant",
-      content: `Congratulations. Your first location is at:\n\n${FIRST_LOCATION.address}\n\nWhat's the address of the new one? Include the street, city, state and ZIP, and I'll check what service ${CARRIER.business} has there.`,
+      content: `Congratulations. Your first location is at:\n\n${FIRST_LOCATION.address}\n\nWhat is the address of the new one? Include the street, city, state and ZIP, and I will check what service ${CARRIER.business} has there.`,
       map: { address: FIRST_LOCATION.address, lat: FIRST_LOCATION.lat, lng: FIRST_LOCATION.lng },
     },
     { role: "user", content: NEW_LOCATION.address },
@@ -80,7 +80,7 @@ export const EXPANSION_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
     { role: "user", content: LOCATION_OPTION.sendPrompt },
     {
       role: "assistant",
-      content: `Sent to ${CARRIER.business}: ${SECOND_LOCATION_REQUEST.summary}. Reference ${SECOND_LOCATION_REQUEST.reference}. Nothing on your account changes until they confirm, and they'll be in touch to set an install date.`,
+      content: `Sent to ${CARRIER.business}: ${SECOND_LOCATION_REQUEST.summary}. Reference ${SECOND_LOCATION_REQUEST.reference}. Nothing on your account changes until they confirm, and they will be in touch to set an install date.`,
       panel: "location-request",
       view: sentView(LOCATION_OPTION.id),
       sheetAction: EXPANSION_SHEET,

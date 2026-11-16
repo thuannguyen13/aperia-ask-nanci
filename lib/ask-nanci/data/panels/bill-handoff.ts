@@ -6,13 +6,15 @@ export const BILL_CHARGE = {
   amount: 45,
   label: "One-time fee",
   added: "the 3rd",
+  /** The same day as a panel writes it. */
+  addedOn: "November 3, 2026",
   appliesTo: "The account, not a line",
   seenBefore: "First in 12 months",
 }
 
 export const HANDOFF_SUMMARY = {
-  noticed: "A fee on this month's bill that hasn't appeared before.",
-  found: `A ${BILL_CHARGE.label.toLowerCase()} of $${BILL_CHARGE.amount}, added on ${BILL_CHARGE.added}. It applies to the account, not a line, and is the first in 12 months.`,
+  noticed: "A fee on this month's bill that has not appeared before.",
+  found: `A ${BILL_CHARGE.label.toLowerCase()} of $${BILL_CHARGE.amount}, added on ${BILL_CHARGE.addedOn}. It applies to the account, not a line, and is the first in 12 months.`,
   open: "Why it was added, and whether it can be credited.",
 }
 

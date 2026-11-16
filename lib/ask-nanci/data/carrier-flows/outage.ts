@@ -52,7 +52,7 @@ export const OUTAGE_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
   [OUTAGE_KEY]: [
     {
       role: "assistant",
-      content: `Your internet at ${OUTAGE_STREET} went down at ${formatClock(OUTAGE.start, true)}. ${CARRIER.business} expects it back by ${formatClock(OUTAGE_ESTIMATED_FIX, true)}. Until then your register can't take cards. Cash still works.`,
+      content: `Your internet at ${OUTAGE_STREET} went down at ${formatClock(OUTAGE.start, true)}. ${CARRIER.business} expects it back by ${formatClock(OUTAGE_ESTIMATED_FIX, true)}. Until then your register cannot take cards. Cash still works.`,
       textFrom: CARRIER.business,
     },
     {

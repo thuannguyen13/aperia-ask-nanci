@@ -61,7 +61,7 @@ export const LOCATION_OPTION: CarrierRequestOption = {
   icon: MapPin,
   title: "The suggested setup",
   description: SECOND_LOCATION_REQUEST.summary,
-  requestLabel: "New location service request",
+  requestLabel: "New Location Service Request",
   fields: [
     { label: "Address", value: NEW_LOCATION.address },
     { label: "Lines", value: String(FIRST_LOCATION_USE.lines) },

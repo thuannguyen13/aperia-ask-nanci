@@ -22,7 +22,7 @@ const SEASONAL_CANCEL = "I would still rather cancel"
 
 // The answer the options wait on. The panel's Send button is live only while this is the
 // last thing in the chat.
-const SEASONAL_OPTIONS_ANSWER = `A pause stops your lines and internet while you're closed and keeps your number. Here are two ways to do it. Tap one and I will fill in the request to ${CARRIER.business}.`
+const SEASONAL_OPTIONS_ANSWER = `A pause stops your lines and internet while you are closed and keeps your number. Here are two ways to do it. Tap one and I will fill in the request to ${CARRIER.business}.`
 
 /** True while story 40 is parked on its options: idle, with the options answer as the last message. */
 export const isAwaitingPauseRequest = (messages: { role: string; content: string }[], chatState: string) => isAwaitingTurn(messages, chatState, SEASONAL_OPTIONS_ANSWER)
@@ -46,7 +46,7 @@ export const SEASONAL_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
     { role: "user", content: SEASONAL_PROMPT },
     {
       role: "assistant",
-      content: `Last year your register took no sales from ${CLOSURE_RANGE}, but your business line still took ${CALLS_WHILE_CLOSED} calls in those weeks. Keeping the plan as it is would cost about ${formatWholeCurrency(PLAN_WHILE_CLOSED)} for the time you're closed.\n\nCancelling stops that cost and releases your business number. A pause also stops most of the cost and keeps the number. Which you choose is up to you.`,
+      content: `Last year your register took no sales from ${CLOSURE_RANGE}, but your business line still took ${CALLS_WHILE_CLOSED} calls in those weeks. Keeping the plan as it is would cost about ${formatWholeCurrency(PLAN_WHILE_CLOSED)} for the time you are closed.\n\nCancelling stops that cost and releases your business number. A pause also stops most of the cost and keeps the number. Which you choose is up to you.`,
       panel: "seasonal-closure",
       source: CARRIER_CITES.withSales,
       suggestions: [SEASONAL_PAUSE_ASK, SEASONAL_CANCEL],

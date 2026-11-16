@@ -31,16 +31,16 @@ export function SecondLocationPanel() {
         </NanciInsight>
 
         <div>
-          <SectionHeader title={`What ${FIRST_LOCATION.name} uses`} />
+          <SectionHeader title={`What ${FIRST_LOCATION.name} Uses`} />
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 [&>:last-child]:col-span-2 sm:[&>:last-child]:col-span-1">
-            <StatCard label="Lines in daily use" value={FIRST_LOCATION_USE.lines} sublabel="calls and texts" emphasis />
-            <StatCard label="Internet" value={FIRST_LOCATION_USE.internet} sublabel="register and card payments" />
-            <StatCard label="Opened with" value={`${FIRST_LOCATION_USE.openedWithLines} lines`} sublabel={`added one in month ${FIRST_LOCATION_USE.addedInMonth}`} />
+            <StatCard label="Lines in Daily Use" value={FIRST_LOCATION_USE.lines} sublabel="Calls and texts" emphasis />
+            <StatCard label="Internet" value={FIRST_LOCATION_USE.internet} sublabel="Register and card payments" />
+            <StatCard label="Opened With" value={`${FIRST_LOCATION_USE.openedWithLines} lines`} sublabel={`Added one in month ${FIRST_LOCATION_USE.addedInMonth}`} />
           </div>
         </div>
 
         <div>
-          <SectionHeader title={`Suggested setup for ${NEW_LOCATION.short}`} />
+          <SectionHeader title={`Suggested Setup for ${NEW_LOCATION.short}`} />
           <div className="flex flex-col gap-2">
             <PanelItem icon={CheckCircle2} iconClassName="text-primary">
               <div className="min-w-0">

@@ -175,7 +175,7 @@ function FlowGrid({ flows, onTryIt, onSimulateLogin }: { flows: FlowDef[]; onTry
             <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
               <dt className="text-muted-foreground">Churn Cause</dt>
               <dd className="font-medium text-foreground">{flow.churn.cause}</dd>
-              <dt className="text-muted-foreground">Moves</dt>
+              <dt className="text-muted-foreground">Metric</dt>
               <dd className="font-medium text-foreground">{flow.churn.metric}</dd>
             </dl>
           )}
@@ -198,7 +198,7 @@ function FlowGrid({ flows, onTryIt, onSimulateLogin }: { flows: FlowDef[]; onTry
               onClick={() => onTryIt(flow.key)}
               className="rounded-lg border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted transition-colors"
             >
-              Try it
+              Try It
             </button>
           )}
         </div>

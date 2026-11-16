@@ -10,15 +10,15 @@ const PATH_ICONS = { call: Phone, message: MessageSquare } as const
 
 const CHARGE_ROWS: [string, string][] = [
   ["Label", BILL_CHARGE.label],
-  ["Added", `On ${BILL_CHARGE.added}`],
-  ["Applies to", BILL_CHARGE.appliesTo],
-  ["Seen before", BILL_CHARGE.seenBefore],
+  ["Added", BILL_CHARGE.addedOn],
+  ["Applies To", BILL_CHARGE.appliesTo],
+  ["Seen Before", BILL_CHARGE.seenBefore],
 ]
 
 const SUMMARY_ROWS: [string, string][] = [
-  ["I noticed", HANDOFF_SUMMARY.noticed],
-  ["I found", HANDOFF_SUMMARY.found],
-  ["Still open", HANDOFF_SUMMARY.open],
+  ["Flagged", HANDOFF_SUMMARY.noticed],
+  ["Found", HANDOFF_SUMMARY.found],
+  ["Still Open", HANDOFF_SUMMARY.open],
 ]
 
 // Carrier story 37, the Escalation panel (flow 17) for a bill charge. Three views, all
@@ -60,13 +60,13 @@ export function BillHandoffPanel() {
         </PanelTable>
 
         {view === "charge" ? (
-          <Callout variant="amber" title="What I can't see">
+          <Callout variant="amber" title="Needs a Specialist">
             <p>{HANDOFF_SUMMARY.open} Only a specialist at {HANDOFF_REQUEST.sentTo} can answer that.</p>
           </Callout>
         ) : (
           <>
             <div>
-              <SectionHeader title="Hand-off summary" description="What the specialist sees, so you don't explain it twice." />
+              <SectionHeader title="Hand-Off Summary" description="What the specialist sees, so you do not explain it twice." />
               <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 rounded-xl border px-3 py-2.5 text-xs">
                 {SUMMARY_ROWS.map(([label, value]) => (
                   <div key={label} className="contents">
@@ -78,7 +78,7 @@ export function BillHandoffPanel() {
             </div>
 
             <div>
-              <SectionHeader title="How they follow up" />
+              <SectionHeader title="How They Follow Up" />
               <div className="flex flex-col gap-2">
                 {HANDOFF_PATHS.map((path) => (
                   <PanelItem

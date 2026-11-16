@@ -44,7 +44,7 @@ export const HANDOFF_FLOW: FlowDef = {
   churn: { cause: "Bill shock", metric: "Churn" },
   // Unlimited comes first, so ?autoplay plays on into it.
   followups: [OVERAGE_UNLIMITED, OVERAGE_SLOW, ...OVERAGE_OPTIONS.map((o) => o.sendPrompt), OVERAGE_LEAVE],
-  description: "Nanci flags a new fee it can't explain and hands it to a specialist, then warns that a line is heading over its data before the charge lands.",
+  description: "Nanci flags a new fee it cannot explain and hands it to a specialist, then warns that a line is heading over its data before the charge lands.",
 }
 
 const HANDOFF_SHEET: SheetActionData = {
@@ -75,14 +75,14 @@ export const HANDOFF_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
   [HANDOFF_KEY]: [
     {
       role: "assistant",
-      content: `Your bill posted today with a $${BILL_CHARGE.amount} ${BILL_CHARGE.label.toLowerCase()} on it, added on ${BILL_CHARGE.added}. It's the first one in 12 months. I can see when it was added, but not why, and I can't remove it.`,
+      content: `Your bill posted today with a $${BILL_CHARGE.amount} ${BILL_CHARGE.label.toLowerCase()} on it, added on ${BILL_CHARGE.added}. It is the first one in 12 months. I can see when it was added, but not why, and I cannot remove it.`,
       panel: "bill-handoff",
       source: CARRIER_CITES.account,
     },
     { role: "user", content: "Who can sort it out?" },
     {
       role: "assistant",
-      content: `A specialist at ${CARRIER.business} can. I can pass this to one with the details attached, so you don't have to explain it again. They can call you back ${HANDOFF_REQUEST.callWindow}, after your lunch rush, or reply by message within one business day.`,
+      content: `A specialist at ${CARRIER.business} can. I can pass this to one with the details attached, so you do not have to explain it again. They can call you back ${HANDOFF_REQUEST.callWindow}, after your lunch rush, or reply by message within one business day.`,
       panel: "bill-handoff",
       view: "summary",
     },
@@ -137,7 +137,7 @@ export const HANDOFF_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
     { role: "user", content: OVERAGE_LEAVE },
     {
       role: "assistant",
-      content: `Okay. Nothing was sent to ${CARRIER.business}. I'll tell you if the kitchen line goes over.`,
+      content: `Okay. Nothing was sent to ${CARRIER.business}. I will tell you if the kitchen line goes over.`,
     },
   ],
 }

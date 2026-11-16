@@ -25,7 +25,7 @@ export const TOP_ITEMS = [
 const TIGHTEST = STOCK_ITEMS[0]
 export const WORTH_A_LOOK = {
   title: `${TIGHTEST.name} runs out ${TIGHTEST.runsOut === "Wed" ? "Wednesday" : TIGHTEST.runsOut}`,
-  body: `${TIGHTEST.onHand} on hand at about ${TIGHTEST.pace.replace("~", "")}. Your next delivery is Thursday.`,
+  body: `${TIGHTEST.onHand} on hand at about ${TIGHTEST.pace.replace("~", "").replace("/day", " a day")}. Your next delivery is Thursday.`,
 }
 
 // The line the briefing is shared to: the shift manager's, from story 36's account.
@@ -49,6 +49,6 @@ export const WORTH_A_LOOK_TITLE = "Worth a Look"
 export const BRIEFING_NOTE = `Sales and items are from your register. Deposits are from ${CHASE_ACCOUNT.name}. A usual ${YESTERDAY.day} is the average of the last four.`
 
 export const SHARED_NOTE = {
-  title: "Shared with your shift manager",
+  title: "Shared with Your Shift Manager",
   body: `From tomorrow, the line ending ${SHIFT_MANAGER.ending} gets this briefing at ${BRIEFING_TIME}. It shows sales and stock only, not your bank account or your bill.`,
 }

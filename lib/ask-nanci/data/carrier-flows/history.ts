@@ -42,7 +42,7 @@ export const HISTORY_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
     { role: "user", content: HISTORY_EXPORT },
     {
       role: "assistant",
-      content: `Yes, it's yours. I've sent a link to your email with ${YEARS_OF_HISTORY} years of sales by day, item and hour, as a spreadsheet. It works for 7 days, and you can ask for a new one any time.`,
+      content: `Yes, it is yours. I have sent a link to your email with ${YEARS_OF_HISTORY} years of sales by day, item and hour, as a spreadsheet. It works for 7 days, and you can ask for a new one any time.`,
       panel: "year-history",
       view: "exported",
     },

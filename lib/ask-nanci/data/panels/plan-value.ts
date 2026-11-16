@@ -23,6 +23,8 @@ const INTERNET_MONTHLY = 100
 export const PLAN_MONTHLY = CURRENT_PLAN.monthly + INTERNET_MONTHLY
 export const PLAN_YEARLY = PLAN_MONTHLY * 12
 export const RENEWS_ON = "January 14"
+/** The renewal date as a panel writes it, with the year. */
+export const RENEWS_ON_DATE = "January 14, 2027"
 
 // A year of Ask Nanci, counted from its own activity.
 export const YEAR_WITH_NANCI = {
@@ -45,7 +47,7 @@ export const RENEWAL_OPTIONS = [
   { title: "Renew as it is.", detail: "Same lines, same internet, another 12 months." },
   { title: "Renew with changes.", detail: `Fewer lines or a different internet speed, agreed before ${RENEWS_ON}.` },
   { title: "Talk it through.", detail: `A specialist at ${CARRIER.business} can walk you through other plans.` },
-  { title: "Let it end.", detail: `Tell ${CARRIER.business} before ${RENEWS_ON} that you won't renew.` },
+  { title: "Let it end.", detail: `Tell ${CARRIER.business} before ${RENEWS_ON} that you will not renew.` },
 ]
 
 // The request the renewal branch ends in. Nothing on the account changes until the carrier confirms.
@@ -64,23 +66,23 @@ export const MONTH_CATCHES = [
   {
     id: "calls",
     icon: PhoneMissed,
-    date: "Nov 6",
+    date: "11/06",
     title: "Missed lunch calls",
     detail: `${MISSED_IN_WINDOW} calls went unanswered between ${MISSED_WINDOW.from} and ${MISSED_WINDOW.to} on a Friday.`,
   },
   {
     id: "lines",
     icon: Smartphone,
-    date: "Nov 9",
+    date: "11/09",
     title: `${capitalize(spellCount(IDLE_LINES.length))} idle lines`,
     detail: `${capitalize(IDLE_LINE_NAMES)}, unused for 60 days.`,
     saving: MONTHLY_DIFFERENCE,
-    savingLabel: `${formatWholeCurrency(MONTHLY_DIFFERENCE)}/mo`,
+    savingLabel: `${formatWholeCurrency(MONTHLY_DIFFERENCE)}/month`,
   },
   {
     id: "outage",
     icon: WifiOff,
-    date: "Nov 12",
+    date: "11/12",
     title: "Thursday's internet outage",
     detail: `${OUTAGE_MINUTES} minutes during dinner, credited by ${CARRIER.business}.`,
     saving: OUTAGE_CREDIT,
@@ -89,7 +91,7 @@ export const MONTH_CATCHES = [
   {
     id: "payroll",
     icon: WalletCards,
-    date: "Nov 16",
+    date: "11/16",
     title: "Payroll shortfall",
     detail: `Warned four days ahead that ${PAYROLL.day}'s payroll was about ${formatWholeCurrency(SHORTFALL)} short.`,
   },
@@ -118,12 +120,12 @@ export const RENEWAL_OPTION: CarrierRequestOption = {
   icon: RefreshCw,
   title: "Renew as it is",
   description: "Same lines, same internet, another 12 months.",
-  requestLabel: "Renewal request",
+  requestLabel: "Renewal Request",
   fields: [
     { label: "Plan", value: "Same plan, 12 months" },
     { label: "Includes", value: `${LINES.length} lines and business internet` },
-    { label: "Monthly cost", value: formatWholeCurrency(PLAN_MONTHLY) },
-    { label: "Starts", value: RENEWS_ON },
+    { label: "Monthly Cost", value: formatWholeCurrency(PLAN_MONTHLY) },
+    { label: "Starts", value: RENEWS_ON_DATE },
   ],
   reference: RENEWAL_REQUEST.reference,
   sendPrompt: "Send the renewal request",

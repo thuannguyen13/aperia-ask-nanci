@@ -32,12 +32,12 @@ export const DEPOSIT_DROP_PCT = Math.round((1 - MONTH_TO_DATE / SAME_WEEKS_LAST_
 
 // Friday from today: the balance, deposits at this month's pace through Thursday, and
 // the payroll the bank paid two weeks ago.
-export const PAYROLL = { amount: 10800, day: "Friday", date: "Friday, November 20" }
+export const PAYROLL = { amount: 10800, day: "Friday", date: "Friday, November 20, 2026" }
 const BALANCE_TODAY = 3170
 const DAYS_TO_PAYROLL = 4
 const EXPECTED_DEPOSITS = roundTo100((MONTH_TO_DATE / 14) * DAYS_TO_PAYROLL)
 export const SHORTFALL = PAYROLL.amount - BALANCE_TODAY - EXPECTED_DEPOSITS
-const INVOICES = { amount: 6800, due: "Tuesday, November 24" }
+const INVOICES = { amount: 6800, due: "Tuesday, November 24, 2026" }
 
 export const CASH_FLOW_INSIGHT = `Deposits are running ${DEPOSIT_DROP_PCT}% below last month. With payroll on ${PAYROLL.day}, you are on track to be about ${formatWholeCurrency(SHORTFALL)} short.`
 
@@ -83,5 +83,5 @@ export const BRIDGE = {
   icon: Landmark,
   title: "Working capital",
   detail: "$4,500 over 12 monthly payments, from a lending partner.",
-  action: "See the Offer",
+  action: "View Offer",
 }

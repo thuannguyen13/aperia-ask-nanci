@@ -10,11 +10,15 @@ import { PLAN_MONTHLY } from "./plan-value"
 import { formatWholeCurrency } from "../../../../components/shared/format"
 
 export const SEASONAL_CLOSURE_TITLE = "Closed in January"
-export const SEASONAL_PAUSE_TITLE = "While You're Closed"
+export const SEASONAL_PAUSE_TITLE = "During Your Closure"
 
 // Last year's closure, read from the register: no sales on these days.
 export const CLOSURE = { from: "January 1", to: "21", reopen: "January 22", days: 21 }
+// "January 1 to 21" in a sentence after "from"; a range standing alone takes an en dash and
+// the year: last year's closure in the findings, next year's in the request.
 export const CLOSURE_RANGE = `${CLOSURE.from} to ${CLOSURE.to}`
+const LAST_CLOSURE = `${CLOSURE.from}–${CLOSURE.to}, 2026`
+const NEXT_CLOSURE = `${CLOSURE.from}–${CLOSURE.to}, 2027`
 
 // Calls to the business line last winter, by week. The three closed weeks are the closure.
 export const WEEKLY_CALLS = [
@@ -32,10 +36,10 @@ export const CALLS_WHILE_CLOSED = WEEKLY_CALLS.filter((w) => w.closed).reduce((t
 // What the plan costs for the closed days: the monthly cost for 21 of January's 31 days.
 export const PLAN_WHILE_CLOSED = Math.round((PLAN_MONTHLY * CLOSURE.days) / 31)
 
-export const CLOSURE_INSIGHT = `You closed ${CLOSURE_RANGE} last year, and your phone kept ringing. ${CALLS_WHILE_CLOSED} calls came in while you were closed.`
+export const CLOSURE_INSIGHT = `You closed ${CLOSURE.from} to ${CLOSURE.to} last year, and your phone kept ringing. ${CALLS_WHILE_CLOSED} calls came in while you were closed.`
 
 export const CLOSURE_TILES = [
-  { label: "Closed Last Year", value: `${CLOSURE.days} days`, sublabel: CLOSURE_RANGE },
+  { label: "Closed Last Year", value: `${CLOSURE.days} days`, sublabel: LAST_CLOSURE },
   { label: "Calls While Closed", value: String(CALLS_WHILE_CLOSED), sublabel: "On your business line" },
   { label: "Plan While Closed", value: formatWholeCurrency(PLAN_WHILE_CLOSED), sublabel: "Three weeks at your monthly cost", tone: "amber" as const, toneScope: "value" as const },
 ]
@@ -45,29 +49,29 @@ export const CALLS_CHART = {
   description: "Last winter, by week",
 }
 
-export const CLOSURE_NOTE = `Closure dates are from your register, which took no sales ${CLOSURE_RANGE} last year. Calls are from your business line's call records. Plan cost is your monthly cost for ${CLOSURE.days} of January's 31 days.`
+export const CLOSURE_NOTE = `Closure dates are from your register, which took no sales ${LAST_CLOSURE}. Calls are from your business line's call records. Plan cost is your monthly cost for ${CLOSURE.days} of January's 31 days.`
 
 export const PAUSE_REQUEST_TIMESTAMP = "Today, 2:15 PM"
 
 export const PAUSE_OPTIONS_HEADING = {
   title: "Pause Instead of Cancel",
-  description: `Two ways to keep your number from ${CLOSURE_RANGE}.`,
+  description: `Two ways to keep your number from ${CLOSURE.from} to ${CLOSURE.to}, 2027.`,
 }
 
-const PAUSE_REASON = `Closed ${CLOSURE_RANGE} last year, with ${CALLS_WHILE_CLOSED} calls in that time`
+const PAUSE_REASON = `Closed ${LAST_CLOSURE}, with ${CALLS_WHILE_CLOSED} calls in that time`
 
 export const PAUSE_OPTIONS: CarrierRequestOption[] = [
   {
     id: "pause",
     icon: PauseCircle,
     title: "Seasonal pause",
-    description: `Lines and internet stop while you're closed. Your number stays yours, and callers hear that you reopen ${CLOSURE.reopen}.`,
+    description: `Lines and internet stop while you are closed. Your number stays yours, and callers hear that you reopen ${CLOSURE.reopen}.`,
     monthlyCost: 15,
-    requestLabel: "Seasonal pause request",
+    requestLabel: "Seasonal Pause Request",
     fields: [
       { label: "Service", value: "Pause lines and internet" },
-      { label: "Dates", value: CLOSURE_RANGE },
-      { label: "Callers hear", value: `Closed until ${CLOSURE.reopen}` },
+      { label: "Dates", value: NEXT_CLOSURE },
+      { label: "Callers Hear", value: `Closed until ${CLOSURE.reopen}` },
       { label: "Number", value: "Kept" },
       { label: "Why", value: PAUSE_REASON },
     ],
@@ -80,11 +84,11 @@ export const PAUSE_OPTIONS: CarrierRequestOption[] = [
     title: "Pause, and forward your business line",
     description: "Everything pauses except your business line, which rings your mobile so you can still take calls.",
     monthlyCost: 35,
-    requestLabel: "Pause with forwarding request",
+    requestLabel: "Pause with Forwarding Request",
     fields: [
       { label: "Service", value: "Pause lines and internet" },
-      { label: "Dates", value: CLOSURE_RANGE },
-      { label: "Business line", value: "Forwards to your mobile" },
+      { label: "Dates", value: NEXT_CLOSURE },
+      { label: "Business Line", value: "Forwards to your mobile" },
       { label: "Number", value: "Kept" },
       { label: "Why", value: PAUSE_REASON },
     ],

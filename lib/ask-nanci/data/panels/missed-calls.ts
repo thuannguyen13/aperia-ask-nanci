@@ -34,10 +34,13 @@ export const NO_CALLBACK = 9
 
 export const MISSED_CALLS_INSIGHT = `Your busiest lunch hour is also when the phone goes unanswered. ${NO_CALLBACK} of the ${MISSED_IN_WINDOW} callers who could not get through last Friday did not try again.`
 
+// The window as a panel writes it: time stamps with the zone, joined by an en dash.
+const MISSED_STAMPS = "11:30 AM–01:00 PM CST"
+
 export const MISSED_CALLS_TILES = [
-  { label: "Lunch sales vs usual", value: `−${LUNCH_DROP_PCT}%`, sublabel: `${formatWholeCurrency(LAST_FRIDAY_LUNCH)} against a usual ${formatWholeCurrency(USUAL_FRIDAY_LUNCH)}`, emphasis: true },
-  { label: `Missed calls, ${MISSED_WINDOW.from} to ${MISSED_WINDOW.to}`, value: String(MISSED_IN_WINDOW), sublabel: "on your business line" },
-  { label: "Did not call back", value: String(NO_CALLBACK), sublabel: `of the ${MISSED_IN_WINDOW} callers` },
+  { label: "Lunch Sales vs Usual", value: `−${LUNCH_DROP_PCT}%`, sublabel: `${formatWholeCurrency(LAST_FRIDAY_LUNCH)} against a usual ${formatWholeCurrency(USUAL_FRIDAY_LUNCH)}`, emphasis: true },
+  { label: "Missed Calls at Lunch", value: String(MISSED_IN_WINDOW), sublabel: `${MISSED_STAMPS}, business line` },
+  { label: "Did Not Call Back", value: String(NO_CALLBACK), sublabel: `Of the ${MISSED_IN_WINDOW} callers` },
 ]
 
 export const MISSED_CALLS_NOTE = "Sales are averaged from your register over the last four weeks. Missed calls are from your business line's call records for last Friday."
@@ -45,11 +48,11 @@ export const MISSED_CALLS_NOTE = "Sales are averaged from your register over the
 export const CALLS_REQUEST_TIMESTAMP = "Today, 10:42 AM"
 
 export const CALLS_OPTIONS_HEADING = {
-  title: "Cover the lunch window",
-  description: `Two ways to answer more calls between ${MISSED_WINDOW.from} and ${MISSED_WINDOW.to}.`,
+  title: "Cover the Lunch Window",
+  description: "Two ways to answer more calls between 11:30 AM and 01:00 PM CST.",
 }
 
-const LUNCH_REASON = `${MISSED_IN_WINDOW} missed calls last Friday, ${MISSED_WINDOW.from} to ${MISSED_WINDOW.to}`
+const LUNCH_REASON = `${MISSED_IN_WINDOW} missed calls last Friday, ${MISSED_STAMPS}`
 
 export const CALLS_OPTIONS: CarrierRequestOption[] = [
   {
@@ -58,12 +61,12 @@ export const CALLS_OPTIONS: CarrierRequestOption[] = [
     title: "Call forwarding at lunch",
     description: "Calls nobody picks up ring through to a second phone you choose, such as your mobile.",
     monthlyCost: 5,
-    requestLabel: "Call forwarding request",
+    requestLabel: "Call Forwarding Request",
     fields: [
       { label: "Service", value: "Forward unanswered calls" },
       { label: "Line", value: "Your business line" },
-      { label: "Forward to", value: "Your mobile" },
-      { label: "When", value: "Every day, 11:30 AM to 1:00 PM" },
+      { label: "Forward To", value: "Your mobile" },
+      { label: "When", value: `Every day, ${MISSED_STAMPS}` },
       { label: "Why", value: LUNCH_REASON },
     ],
     reference: "CF-2041",
@@ -75,11 +78,11 @@ export const CALLS_OPTIONS: CarrierRequestOption[] = [
     title: "A second line",
     description: "Two calls can come in at once, so a second person can pick up during the rush.",
     monthlyCost: 30,
-    requestLabel: "Second line request",
+    requestLabel: "Second Line Request",
     fields: [
       { label: "Service", value: "Add a second line" },
       { label: "Number", value: "Same business number, two calls at once" },
-      { label: "Rings on", value: "A second phone at the counter" },
+      { label: "Rings On", value: "A second phone at the counter" },
       { label: "Why", value: LUNCH_REASON },
     ],
     reference: "SL-2042",

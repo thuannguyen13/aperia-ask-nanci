@@ -28,7 +28,10 @@ export function formatClock(minutes: number, withMeridiem = false) {
   return withMeridiem ? `${clock} ${h < 12 ? "AM" : "PM"}` : clock
 }
 
-export const OUTAGE_WINDOW = `${formatClock(OUTAGE.start)} to ${formatClock(OUTAGE.end, true)}`
+/** "06:10 PM CST": a time stamp as a panel writes it. Austin keeps Central time. */
+export const formatStamp = (minutes: number, withZone = true) => `${formatClock(minutes, true).padStart(8, "0")}${withZone ? " CST" : ""}`
+
+export const OUTAGE_WINDOW = `${formatStamp(OUTAGE.start, false)}–${formatStamp(OUTAGE.end)}`
 
 // The fix estimate in Nanci's text is later than the actual fix, as estimates usually
 // are. Nanci follows up in the chat two minutes after the connection is back.
@@ -63,12 +66,12 @@ export const EVENING = { start: 17 * 60, end: 21 * 60 }
 export const EVENING_HOURS = ["5p", "6p", "7p", "8p"]
 export const EVENING_CHART = {
   title: "Thursday Evening",
-  description: "How busy a usual Thursday is, 5 to 9 PM",
+  description: "How busy a usual Thursday is, 5–9 PM",
 }
 
 // The section breaks down what happened, so it is named for the incident and dated.
 export const INCIDENT_TITLE = "Incident Details"
-export const INCIDENT_WHEN = `Thursday, November 12, 2026, from ${formatClock(OUTAGE.start)} to ${formatClock(OUTAGE.end, true)}`
+export const INCIDENT_WHEN = `Thursday, November 12, 2026, from ${formatStamp(OUTAGE.start, false)} to ${formatStamp(OUTAGE.end)}`
 
 export const OUTAGE_EVENTS = [
   { at: OUTAGE.start, label: "Internet connection dropped", detail: `${CARRIER.business} service record`, down: true },
@@ -89,7 +92,7 @@ export const OUTAGE_ESTIMATE_NOTE = `Your register sends each card payment over 
 export const OUTAGE_REQUEST_TIMESTAMP = `Today, ${formatClock(OUTAGE_FOLLOWUP_AT + 6, true)}`
 
 export const OUTAGE_OPTIONS_HEADING = {
-  title: "Backup internet, ranked by fit",
+  title: "Backup Internet, Ranked by Fit",
   description: "For one location with a register and card readers.",
 }
 
@@ -103,11 +106,11 @@ export const OUTAGE_OPTIONS: CarrierRequestOption[] = [
     description: "Switches the register to a cellular connection by itself when the main line drops.",
     monthlyCost: 35,
     fit: "Best fit. Nobody has to notice the outage first.",
-    requestLabel: "Wireless backup internet request",
+    requestLabel: "Wireless Backup Internet Request",
     fields: [
       { label: "Service", value: "Wireless backup internet" },
       { label: "Covers", value: "Register and card readers" },
-      { label: "Switches over", value: "Automatically" },
+      { label: "Switches Over", value: "Automatically" },
       { label: "Why", value: OUTAGE_REASON },
     ],
     reference: "BI-3318",
@@ -141,7 +144,7 @@ export const OUTAGE_OPTIONS: CarrierRequestOption[] = [
     fields: [
       { label: "Service", value: "Second wired internet connection" },
       { label: "Covers", value: "Whole location" },
-      { label: "Switches over", value: "Automatically" },
+      { label: "Switches Over", value: "Automatically" },
       { label: "Why", value: OUTAGE_REASON },
     ],
     reference: "WL-3320",
