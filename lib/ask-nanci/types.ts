@@ -77,8 +77,8 @@ export interface ConceptScriptedTurn extends ScriptedTurn {
   /**
    * The turn is a text message from this sender, and nothing else. It plays as a phone
    * notification outside the app, then opens the chat as Nanci's first message, so the
-   * owner's first question reads as a reply to it. Its `source` is cited under that message;
-   * its panel fields are ignored.
+   * owner's first question reads as a reply to it. That message carries the turn's
+   * `source`, `panel` and `suggestions` like any answer.
    */
   textFrom?: string
   /** The link at the end of that text, which opens Ask Nanci on this conversation. */

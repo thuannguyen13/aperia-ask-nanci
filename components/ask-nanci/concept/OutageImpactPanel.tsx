@@ -67,12 +67,20 @@ function EveningChart() {
       </CardHeader>
       <CardContent>
         <div className="relative pt-6" onMouseLeave={() => setTip(null)}>
-            <div
-              className="absolute top-0 flex -translate-x-1/2 items-center gap-1 whitespace-nowrap text-xs font-medium text-red-600 tabular-nums dark:text-red-400"
-              style={{ left: pct((OUTAGE.start + OUTAGE.end) / 2) }}
+            {/* When it went down and when it came back, each over its own edge of the band:
+                the start reads into the band from the left, the end from the right. */}
+            <span
+              className="absolute top-0 -translate-x-full whitespace-nowrap pr-1 text-xs font-medium text-red-600 tabular-nums dark:text-red-400"
+              style={{ left: pct(OUTAGE.start) }}
             >
-              <WifiOff className="size-3.5" />Down {OUTAGE_WINDOW}
-            </div>
+              {formatStamp(OUTAGE.start, false)}
+            </span>
+            <span
+              className="absolute top-0 whitespace-nowrap pl-1 text-xs font-medium text-red-600 tabular-nums dark:text-red-400"
+              style={{ left: pct(OUTAGE.end) }}
+            >
+              {formatStamp(OUTAGE.end, false)}
+            </span>
             <div className="relative flex h-10 gap-px overflow-hidden rounded-md">
               {EVENING_HOURS.map((hour, i) => {
                 const lvl = THURSDAY_ROW.levels[HEATMAP_HOURS.indexOf(hour)]
