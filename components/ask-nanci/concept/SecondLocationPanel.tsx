@@ -42,7 +42,7 @@ export function SecondLocationPanel() {
         <div>
           <SectionHeader title={`Suggested setup for ${NEW_LOCATION.short}`} />
           <div className="flex flex-col gap-2">
-            <PanelItem icon={CheckCircle2} iconClassName="text-green-600 dark:text-green-400">
+            <PanelItem icon={CheckCircle2} iconClassName="text-primary">
               <div className="min-w-0">
                 <p className="text-sm font-medium text-foreground">{COVERAGE.status}</p>
                 <p className="text-xs text-muted-foreground">{COVERAGE.detail}</p>
