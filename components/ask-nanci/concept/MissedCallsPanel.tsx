@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { HEATMAP_HOURS, HEATMAP_ROWS, HEATMAP_APPROX } from "@/lib/ask-nanci/data/panels/busiest-times"
@@ -25,8 +26,42 @@ const MISSED_BADGE = "inline-flex h-4 min-w-4 items-center justify-center rounde
 
 const GRID = "grid grid-cols-[32px_repeat(11,1fr)] gap-[5px]"
 
+const DAY_NAMES: Record<string, string> = { Mon: "Monday", Tue: "Tuesday", Wed: "Wednesday", Thu: "Thursday", Fri: "Friday", Sat: "Saturday", Sun: "Sunday" }
+const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
+/** "12p" as "12 PM", "11a" as "11 AM". */
+const spellHour = (hour: string) => `${hour.slice(0, -1)} ${hour.endsWith("a") ? "AM" : "PM"}`
+
+// The hovered cell's details, as the design system's chart tooltip draws them: a light
+// card over the cell, held inside the grid near either end.
+function CellTip({ day, hourIndex, level, missed }: { day: string; hourIndex: number; level: number; missed: number }) {
+  const last = HEATMAP_HOURS.length - 1
+  return (
+    <div
+      className={cn(
+        "pointer-events-none absolute bottom-full z-10 mb-1.5 grid min-w-40 gap-1.5 whitespace-nowrap rounded-lg border bg-background px-2.5 py-1.5 text-xs shadow-xl",
+        hourIndex < 2 ? "left-0" : hourIndex > last - 2 ? "right-0" : "left-1/2 -translate-x-1/2",
+      )}
+    >
+      <p className="font-medium text-foreground">{DAY_NAMES[day]}, {spellHour(HEATMAP_HOURS[hourIndex])}</p>
+      <div className="flex items-center gap-2">
+        <span className={cn("size-2.5 shrink-0 rounded-[2px]", LEVEL_CLS[level], level === 0 && "ring-1 ring-border")} />
+        <span className="text-muted-foreground">Sales</span>
+        <span className="ml-auto pl-6 font-medium text-foreground">{capitalize(HEATMAP_APPROX[level])}</span>
+      </div>
+      {missed > 0 && (
+        <div className="flex items-center gap-2">
+          <span className="size-2.5 shrink-0 rounded-full bg-orange-500" />
+          <span className="text-muted-foreground">Missed calls, last Friday</span>
+          <span className="ml-auto pl-6 font-medium tabular-nums text-foreground">{missed}</span>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // Sales by day and hour, with last Friday's missed calls as badges on Friday's cells.
 function Heatmap() {
+  const [hover, setHover] = useState<{ day: string; hourIndex: number } | null>(null)
   return (
     <div>
       <p className="mb-2 text-base font-semibold text-foreground">Sales by day and hour, with last Friday's missed calls</p>
@@ -44,13 +79,15 @@ function Heatmap() {
               <span className={cn("text-[10px] font-semibold", isFriday ? "text-foreground" : "text-muted-foreground")}>{row.day}</span>
               {row.levels.map((lvl, i) => {
                 const missed = isFriday ? MISSED_BY_HOUR[i] : 0
+                const hovered = hover?.day === row.day && hover.hourIndex === i
                 return (
                   <span
                     key={i}
-                    title={`${row.day} ${HEATMAP_HOURS[i]} · ${HEATMAP_APPROX[lvl]}${missed ? ` · ${missed} missed` : ""}`}
-                    className={cn("flex h-6 items-center justify-center rounded-[4px]", LEVEL_CLS[lvl])}
+                    onMouseEnter={() => setHover({ day: row.day, hourIndex: i })}
+                    className={cn("relative flex h-6 items-center justify-center rounded-[4px]", LEVEL_CLS[lvl], hovered && "ring-2 ring-foreground/40")}
                   >
                     {missed > 0 && <span className={MISSED_BADGE}>{missed}</span>}
+                    {hovered && <CellTip day={row.day} hourIndex={i} level={lvl} missed={missed} />}
                   </span>
                 )
               })}
