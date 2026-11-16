@@ -26,17 +26,19 @@ describe("usePanelStack", () => {
     expect(result.current.stack).toEqual(["a", "b"])
   })
 
-  it("caps the stack at MAX_OPEN_PANELS, dropping the oldest entry", () => {
+  it("caps the stack at MAX_OPEN_PANELS, refreshing the last slot with the new panel", () => {
     const { result } = renderHook(() => usePanelStack())
     act(() => result.current.openDynamic(p("a")))
     act(() => result.current.openDynamic(p("b")))
     act(() => result.current.openDynamic(p("c")))
     act(() => result.current.openDynamic(p("d")))
-    expect(result.current.stack).toEqual(["b", "c", "d"])
+    expect(result.current.stack).toEqual(["a", "b", "d"])
+    act(() => result.current.openDynamic(p("e")))
+    expect(result.current.stack).toEqual(["a", "b", "e"])
     expect(MAX_OPEN_PANELS).toBe(3)
   })
 
-  it("warns when the cap evicts a panel, and stays quiet below it", () => {
+  it("warns when the cap replaces a panel, and stays quiet below it", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {})
     const { result } = renderHook(() => usePanelStack())
     act(() => result.current.openDynamic(p("a")))
@@ -48,7 +50,7 @@ describe("usePanelStack", () => {
     expect(warn).toHaveBeenCalledTimes(1)
     // The message has to name both panels to be actionable from a console line.
     expect(warn.mock.calls[0][0]).toContain('"d"')
-    expect(warn.mock.calls[0][0]).toContain('"a"')
+    expect(warn.mock.calls[0][0]).toContain('"c"')
     warn.mockRestore()
   })
 

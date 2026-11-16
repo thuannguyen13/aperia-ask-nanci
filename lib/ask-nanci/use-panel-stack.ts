@@ -25,15 +25,17 @@ export function usePanelStack() {
     const prev = stackRef.current
     if (prev.includes(id)) return
     if (prev.length >= MAX_OPEN_PANELS) {
-      // Dropping the oldest keeps the panel the flow just asked for on stage, which
-      // is the better of two bad outcomes. It is still an authoring mistake, so say
-      // so rather than losing a panel mid-demo with no explanation.
+      // The stack is full, so the newest panel gives way: the first ones stay put as the
+      // story's context, and the last slot refreshes with the panel just asked for. It is
+      // still worth a console line, since a flow that means to drop a panel should close
+      // it (closePanel) rather than lean on this.
       console.warn(
-        `[panel-stack] opening "${id}" exceeds MAX_OPEN_PANELS (${MAX_OPEN_PANELS}); dropping "${prev[0]}". ` +
-          "Close a panel earlier in the flow (closePanel) instead of relying on this.",
+        `[panel-stack] opening "${id}" with ${MAX_OPEN_PANELS} panels open; it replaces "${prev[prev.length - 1]}".`,
       )
+      write([...prev.slice(0, MAX_OPEN_PANELS - 1), id])
+      return
     }
-    write([...prev, id].slice(-MAX_OPEN_PANELS))
+    write([...prev, id])
   }, [write])
 
   const closeDynamic = useCallback((id: PanelId) => {
