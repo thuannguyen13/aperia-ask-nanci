@@ -67,7 +67,7 @@ export function BillHandoffPanel() {
           <>
             <div>
               <SectionHeader title="Hand-off summary" description="What the specialist sees, so you don't explain it twice." />
-              <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 rounded-lg border px-3 py-2.5 text-xs">
+              <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 rounded-xl border px-3 py-2.5 text-xs">
                 {SUMMARY_ROWS.map(([label, value]) => (
                   <div key={label} className="contents">
                     <dt className="text-muted-foreground">{label}</dt>

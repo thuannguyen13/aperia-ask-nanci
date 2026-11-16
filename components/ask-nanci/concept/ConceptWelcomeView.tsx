@@ -158,7 +158,7 @@ function FlowGrid({ flows, onTryIt, onSimulateLogin }: { flows: FlowDef[]; onTry
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
       {flows.map((flow) => (
-        <div key={flow.num} className="flex flex-col gap-3 rounded-2xl border bg-card p-4 [&>button]:mt-auto">
+        <div key={flow.num} className="flex flex-col gap-3 rounded-xl border bg-card p-4 [&>button]:mt-auto">
           <div className="flex items-start justify-between gap-2">
             <div className="flex items-center gap-2">
               <span className="flex size-6 items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground">

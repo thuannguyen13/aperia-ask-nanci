@@ -110,7 +110,7 @@ export function PanelTable({
           the table is wider than it, where a border on the table sits past the edge. */}
       <div
         ref={ref}
-        className={cn("relative overflow-hidden border", density === "comfortable" ? "rounded-xl" : "rounded-lg")}
+        className={cn("relative overflow-hidden border", "rounded-xl")}
       >
         <Table
           className={cn(
@@ -134,14 +134,14 @@ export function PanelTable({
         <div
           aria-hidden
           className={cn(
-            "pointer-events-none absolute inset-y-0 left-0 w-6 rounded-l-lg bg-gradient-to-r from-background to-transparent transition-opacity duration-150",
+            "pointer-events-none absolute inset-y-0 left-0 w-6 rounded-l-xl bg-gradient-to-r from-background to-transparent transition-opacity duration-150",
             more.left ? "opacity-100" : "opacity-0",
           )}
         />
         <div
           aria-hidden
           className={cn(
-            "pointer-events-none absolute inset-y-0 right-0 w-6 rounded-r-lg bg-gradient-to-l from-background to-transparent transition-opacity duration-150",
+            "pointer-events-none absolute inset-y-0 right-0 w-6 rounded-r-xl bg-gradient-to-l from-background to-transparent transition-opacity duration-150",
             more.right ? "opacity-100" : "opacity-0",
           )}
         />

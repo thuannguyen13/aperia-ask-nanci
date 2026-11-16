@@ -39,7 +39,7 @@ export function RequestOptions({ heading, options, ranked = false, onChoose }: {
       <ul className="space-y-2">
         {options.map((option, i) => (
           <li key={option.id}>
-            <button type="button" onClick={() => onChoose(option)} className="block w-full rounded-lg text-left hover:bg-muted/40">
+            <button type="button" onClick={() => onChoose(option)} className="block w-full rounded-xl text-left hover:bg-muted/40">
               <PanelItem
                 icon={option.icon}
                 iconClassName="text-primary"

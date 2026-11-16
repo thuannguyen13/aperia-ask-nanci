@@ -45,7 +45,7 @@ export function StatCard({ label, value, sublabel, emphasis, tone, toneScope = "
   }
   return (
     <div className={cn(
-      "rounded-lg border px-3 py-3",
+      "rounded-xl border px-3 py-3",
       amberCard
         ? "border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/20"
         : emphasis ? "border-primary/30 bg-primary/5" : "bg-background",

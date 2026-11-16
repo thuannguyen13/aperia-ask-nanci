@@ -51,7 +51,7 @@ export function ArtifactCard({
       onClick={onClick}
       aria-label={ariaLabel}
       className={cn(
-        "flex w-full items-center gap-3 overflow-hidden rounded-lg border bg-muted p-3 text-left transition-colors",
+        "flex w-full items-center gap-3 overflow-hidden rounded-xl border bg-muted p-3 text-left transition-colors",
         "hover:border-ring focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
         className,
       )}
