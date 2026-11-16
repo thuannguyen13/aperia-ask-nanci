@@ -43,8 +43,6 @@ export function UnusedLinesPanel() {
           <span className="font-bold">{formatWholeCurrency(MONTHLY_DIFFERENCE)} less a month</span>.
         </NanciInsight>
 
-        <Outcome view={view} />
-
         <div>
           <SectionHeader title="Your lines" description={`Marked lines have had no use in ${IDLE_DAYS} days.`} />
           <PanelTable>
@@ -87,6 +85,8 @@ export function UnusedLinesPanel() {
           </div>
         </div>
 
+        {/* What the owner did about it comes after what led to it. */}
+        <Outcome view={view} />
       </PanelBody>
     </PanelShell>
   )

@@ -18,11 +18,6 @@ export function DailyBriefingPanel() {
       <PanelHeader title={BRIEFING_TITLE} size="lg" onClose={() => closeDynamicPanel(PANEL_ID)} />
       <PanelBody className="flex flex-col gap-4">
         <NanciInsight>{BRIEFING_INSIGHT}</NanciInsight>
-        {view === "shared" && (
-          <Callout variant="green" icon={CheckCheck} title={SHARED_NOTE.title}>
-            <p>{SHARED_NOTE.body}</p>
-          </Callout>
-        )}
         {/* Three across cuts the labels off on a phone, so the first two share a row there. */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 [&>:last-child]:col-span-2 sm:[&>:last-child]:col-span-1">
           {BRIEFING_TILES.map((tile) => (
@@ -46,6 +41,11 @@ export function DailyBriefingPanel() {
             <p>{WORTH_A_LOOK.body}</p>
           </Callout>
         </div>
+        {view === "shared" && (
+          <Callout variant="green" icon={CheckCheck} title={SHARED_NOTE.title}>
+            <p>{SHARED_NOTE.body}</p>
+          </Callout>
+        )}
         <p className="text-xs leading-relaxed text-muted-foreground">{BRIEFING_NOTE}</p>
       </PanelBody>
     </PanelShell>

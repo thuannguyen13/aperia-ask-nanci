@@ -51,11 +51,6 @@ export function DataOveragePanel() {
       <PanelHeader title={DATA_OVERAGE_TITLE} size="lg" onClose={() => closeDynamicPanel(PANEL_ID)} />
       <PanelBody className="flex flex-col gap-4">
         <NanciInsight>{OVERAGE_INSIGHT}</NanciInsight>
-        {done && (
-          <Callout variant="green" icon={CheckCheck} title={done.title}>
-            <p>{done.body}</p>
-          </Callout>
-        )}
         {/* Three across cuts the labels off on a phone, so the first two share a row there. */}
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 [&>:last-child]:col-span-2 sm:[&>:last-child]:col-span-1">
           {OVERAGE_TILES.map((tile) => (
@@ -63,6 +58,11 @@ export function DataOveragePanel() {
           ))}
         </div>
         <UsageMeter />
+        {done && (
+          <Callout variant="green" icon={CheckCheck} title={done.title}>
+            <p>{done.body}</p>
+          </Callout>
+        )}
         <p className="text-xs leading-relaxed text-muted-foreground">{OVERAGE_NOTE}</p>
       </PanelBody>
     </PanelShell>

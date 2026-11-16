@@ -25,12 +25,6 @@ export function PlanValuePanel() {
           Here is the year I can measure, beside what your plan costs over the same 12 months.
         </NanciInsight>
 
-        {view === "renewal-requested" && (
-          <Callout variant="amber" icon={Clock} title={`Renewal request sent to ${CARRIER.business}`}>
-            <p>Reference {RENEWAL_REQUEST.reference}. Nothing on your account changes until they confirm.</p>
-          </Callout>
-        )}
-
         {/* The year and the plan side by side. Column flow on a four-row grid keeps the
             rows level across the two columns, so savings sit across from the yearly cost.
             On a phone the columns stack, the year first. */}
@@ -60,7 +54,11 @@ export function PlanValuePanel() {
             ))}
           </ul>
         </div>
-
+        {view === "renewal-requested" && (
+          <Callout variant="amber" icon={Clock} title={`Renewal request sent to ${CARRIER.business}`}>
+            <p>Reference {RENEWAL_REQUEST.reference}. Nothing on your account changes until they confirm.</p>
+          </Callout>
+        )}
       </PanelBody>
     </PanelShell>
   )
