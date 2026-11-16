@@ -7,7 +7,7 @@
 // panel cannot disagree.
 import type { ConceptScriptedTurn, SheetActionData } from "../../types"
 import type { FlowDef } from "../flows.concept"
-import { CARRIER } from "../carrier"
+import { CARRIER, nanciLink } from "../carrier"
 import { CARRIER_SOURCE } from "../sources"
 import { isAwaitingAny, requestView, sentView } from "../panels/carrier-request"
 import { formatWholeCurrency } from "../../../../components/shared/format"
@@ -19,6 +19,9 @@ import {
 const LINES_KEY = "__unused-lines__"
 const LINES_SEND = "Request the lower plan"
 const LINES_KEEP = `Keep all ${spellCount(LINES.length)}`
+
+// The owner opens the app on Nanci's text and asks which lines.
+const LINES_ASK = "Which lines aren't being used?"
 
 // The answer the request waits on. Its Send button is live only while this is the last
 // thing in the chat.
@@ -39,7 +42,7 @@ export const LINES_FLOW: FlowDef = {
   churn: { cause: "Plan mismatch", metric: "Churn" },
   // The request comes first, so ?autoplay plays on into it.
   followups: [LINES_SEND, LINES_OPTION.sendPrompt, LINES_KEEP],
-  description: "Before the bill posts, Nanci flags two lines with no use in 60 days and offers a request to move to a lower plan.",
+  description: "Before the bill posts, Nanci texts the owner about two lines with no use in 60 days and offers a request to move to a lower plan.",
 }
 
 const planLabel = (plan: { lines: number; monthly: number }) => `${plan.lines} lines, ${formatWholeCurrency(plan.monthly)} a month`
@@ -61,7 +64,14 @@ export const LINES_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
   [LINES_KEY]: [
     {
       role: "assistant",
-      content: `Your bill posts on Friday, and it covers ${spellCount(LINES.length)} lines. ${capitalize(spellCount(IDLE_LINES.length))} of them, ${IDLE_LINE_NAMES}, have had no calls, texts or data in the last ${IDLE_DAYS} days. A plan with ${spellCount(SUGGESTED_PLAN.lines)} lines would cost ${formatWholeCurrency(MONTHLY_DIFFERENCE)} less each month, or ${formatWholeCurrency(YEARLY_DIFFERENCE)} over a year.\n\nI can send ${CARRIER.business} a request to move you to the lower plan.`,
+      content: `${capitalize(spellCount(IDLE_LINES.length))} of your ${spellCount(LINES.length)} lines have had no use in ${IDLE_DAYS} days. Moving to a lower plan before your bill posts on Friday would save ${formatWholeCurrency(MONTHLY_DIFFERENCE)} a month.`,
+      textFrom: CARRIER.business,
+      textLink: nanciLink("l2Hm6"),
+    },
+    { role: "user", content: LINES_ASK },
+    {
+      role: "assistant",
+      content: `${capitalize(IDLE_LINE_NAMES)}. Neither has made a call, sent a text or used data in the last ${IDLE_DAYS} days. A plan with ${spellCount(SUGGESTED_PLAN.lines)} lines would cost ${formatWholeCurrency(MONTHLY_DIFFERENCE)} less each month, or ${formatWholeCurrency(YEARLY_DIFFERENCE)} over a year.\n\nI can send ${CARRIER.business} a request to move you to the lower plan.`,
       panel: "unused-lines",
       source: CARRIER_SOURCE.name,
       suggestions: [LINES_SEND, LINES_KEEP],

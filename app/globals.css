@@ -242,6 +242,22 @@ html.dark [data-logo="ask-nanci"] {
   }
 }
 
+/* The link in a text notification (TextNotice.tsx) being tapped: it takes the pressed
+   tint and stays pressed while the notification leaves. */
+@keyframes text-link-tap {
+  from {
+    background-color: transparent;
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(0.96);
+  }
+  to {
+    background-color: color-mix(in oklab, var(--color-blue-500) 18%, transparent);
+    transform: scale(1);
+  }
+}
+
 @keyframes panel-fade-in {
   from {
     opacity: 0;

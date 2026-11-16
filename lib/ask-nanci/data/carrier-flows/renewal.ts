@@ -10,7 +10,7 @@
 // from the panel's data, so the chat and the panel cannot disagree.
 import type { ConceptScriptedTurn, SheetActionData } from "../../types"
 import type { FlowDef } from "../flows.concept"
-import { CARRIER } from "../carrier"
+import { CARRIER, nanciLink } from "../carrier"
 import { CARRIER_SOURCE, CARRIER_CITES } from "../sources"
 import { formatWholeCurrency } from "../../../../components/shared/format"
 import {
@@ -20,6 +20,8 @@ import { isAwaitingAny, requestView, sentView } from "../panels/carrier-request"
 
 // Nanci opens the flow, so its key is an id rather than a prompt.
 const MONTH_KEY = "__plan-value__"
+// The owner opens the app on Nanci's text and asks for the month.
+const MONTH_ASK = "What did my plan do last month?"
 export const RENEWAL_PROMPT = "My plan renews next month. Is it worth keeping?"
 const RENEWAL_RENEW = "Renew my plan"
 const RENEWAL_OPTIONS_ASK = "Show me other options"
@@ -43,7 +45,7 @@ export const RENEWAL_FLOW: FlowDef = {
   churn: { cause: "Price shopping at renewal", metric: "Churn" },
   // The renewal comes first, so ?autoplay plays on into it.
   followups: [RENEWAL_PROMPT, RENEWAL_RENEW, RENEWAL_OPTION.sendPrompt, RENEWAL_OPTIONS_ASK],
-  description: "Nanci sends a monthly receipt of what it caught on the account, then a year beside the plan's cost when the owner asks about renewal.",
+  description: "Nanci texts a monthly receipt of what it caught on the account, then a year beside the plan's cost when the owner asks about renewal.",
 }
 
 const RENEWAL_SHEET: SheetActionData = {
@@ -61,7 +63,14 @@ export const RENEWAL_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
   [MONTH_KEY]: [
     {
       role: "assistant",
-      content: `Here is what your plan did for you in ${MONTH}. I caught ${spellCount(MONTH_CATCHES.length)} things on your account, and ${spellCount(MONTH_CATCHES.filter((c) => c.saving).length)} of them found ${formatWholeCurrency(MONTH_SAVINGS)} in savings. Your plan costs ${formatWholeCurrency(PLAN_MONTHLY)} a month.`,
+      content: `Your ${MONTH} summary is ready: ${MONTH_CATCHES.length} things caught on your account, ${formatWholeCurrency(MONTH_SAVINGS)} in savings found.`,
+      textFrom: CARRIER.business,
+      textLink: nanciLink("s3Jx7"),
+    },
+    { role: "user", content: MONTH_ASK },
+    {
+      role: "assistant",
+      content: `In ${MONTH} I caught ${spellCount(MONTH_CATCHES.length)} things on your account, and ${spellCount(MONTH_CATCHES.filter((c) => c.saving).length)} of them found ${formatWholeCurrency(MONTH_SAVINGS)} in savings. Your plan costs ${formatWholeCurrency(PLAN_MONTHLY)} a month.`,
       panel: "month-value",
       source: CARRIER_CITES.account,
       suggestions: [RENEWAL_PROMPT],

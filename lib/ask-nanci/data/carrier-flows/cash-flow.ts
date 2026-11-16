@@ -7,6 +7,7 @@
 // as it is) or keeps the changes. Keeping a business open is how the carrier keeps it.
 import type { ConceptScriptedTurn } from "../../types"
 import type { FlowDef } from "../flows.concept"
+import { CARRIER, nanciLink } from "../carrier"
 import { CARRIER_CITES } from "../sources"
 import { isAwaitingTurn } from "../../is-awaiting-turn"
 import { formatWholeCurrency } from "../../../../components/shared/format"
@@ -17,6 +18,8 @@ const CASH_KEY = "__cash-flow__"
 const CASH_ASK = `What can I do before ${PAYROLL.day}?`
 export const CASH_OFFER = "Show me the working capital offer"
 const CASH_CUT = "I will cut back instead"
+// The owner opens the app on Nanci's text and asks the question it raises.
+const CASH_WORRY = "Will I have enough for payroll?"
 const PLAN_READ_MS = 5000
 
 // The answer the plan waits on. The panel's offer button is live only while this is the
@@ -38,14 +41,21 @@ export const CASH_FLOW_FLOW: FlowDef = {
   churn: { cause: "Business closing", metric: "Churn" },
   // The offer comes first, so ?autoplay plays on into it.
   followups: [CASH_ASK, CASH_OFFER, CASH_CUT],
-  description: "Nanci warns before payroll that deposits are running low, lays out what cutting back covers, and offers working capital for the rest.",
+  description: "Nanci texts the owner before payroll that deposits are running low, lays out what cutting back covers, and offers working capital for the rest.",
 }
 
 export const CASH_FLOW_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
   [CASH_KEY]: [
     {
       role: "assistant",
-      content: `Your deposits are running ${DEPOSIT_DROP_PCT}% below last month, and payroll of ${formatWholeCurrency(PAYROLL.amount)} is due ${PAYROLL.day}. At this pace you will be about ${formatWholeCurrency(SHORTFALL)} short.`,
+      content: `Your deposits are running ${DEPOSIT_DROP_PCT}% below last month, and payroll of ${formatWholeCurrency(PAYROLL.amount)} is due ${PAYROLL.day}.`,
+      textFrom: CARRIER.business,
+      textLink: nanciLink("p5Vn1"),
+    },
+    { role: "user", content: CASH_WORRY },
+    {
+      role: "assistant",
+      content: `At this pace, not quite. You will be about ${formatWholeCurrency(SHORTFALL)} short when payroll of ${formatWholeCurrency(PAYROLL.amount)} goes out on ${PAYROLL.day}.`,
       panel: "cash-flow",
       source: CARRIER_CITES.cashFlow,
       suggestions: [CASH_ASK],

@@ -4,8 +4,8 @@ import { MessageSquare } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 
 // A text message from Nanci as the owner's phone shows it, over the whole app and
-// outside the chat. The chat opens once it goes, so the demo shows Nanci reaching the
-// owner before the owner opens anything.
+// outside the chat. Its link is tapped and the chat opens on the text, so the demo shows
+// Nanci reaching the owner before the owner opens anything.
 export function TextNotice() {
   const { textNotice } = useAskNanci()
   if (!textNotice) return null
@@ -24,6 +24,10 @@ export function TextNotice() {
         </div>
         <p className="mt-2 text-sm font-semibold text-foreground">{textNotice.from}</p>
         <p className="mt-0.5 text-sm text-foreground">{textNotice.body}</p>
+        {/* The owner taps the link near the end of the hold, which is what opens the chat. */}
+        {textNotice.link && (
+          <p className="-mx-1 mt-1 w-fit rounded-md px-1 text-sm text-blue-600 underline underline-offset-2 [animation:text-link-tap_500ms_ease-out_2800ms_both] dark:text-blue-400">{textNotice.link}</p>
+        )}
       </div>
     </div>
   )

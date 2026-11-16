@@ -31,12 +31,15 @@ The contract between a scripted flow and the panel stack. These are the real fie
 
 ## Nanci speaks first
 
-A flow that opens on a question cannot show Nanci reaching the owner unasked. Set `proactive: true` on the definition and start the script with an assistant turn, and give the flow an id for its `key` rather than a prompt.
+A flow that opens on a question cannot show Nanci reaching the owner unasked. Set `proactive: true` on the definition and start the script with a text turn, and give the flow an id for its `key` rather than a prompt.
+
+Follow the text with the owner's question, not with Nanci. A chat that opens on an answer nobody asked for reads as the app talking to itself. The text is Nanci starting the conversation, and the owner picks it up from there.
 
 | Field | Effect |
 |---|---|
-| `textFrom: "Sender"` | Plays the turn as a phone notification outside the app, and nothing more. It never lands in the chat. The next answer opens the chat. |
-| `pauseBefore` | On an assistant turn, holds the chat empty before it arrives, so time passing reads. |
+| `textFrom: "Sender"` | Plays the turn as a phone notification outside the app, then keeps it at the head of the chat as a text card naming the sender and "Sent by Ask Nanci". |
+| `textLink` | The link the text ends with. The notification shows it being tapped, and the chat card notes that the owner opened Ask Nanci from the text. Build it with `nanciLink(code)`. |
+| `pauseBefore` | Holds before the turn arrives, so time passing reads. Put it on the owner's question when time passes between the text and the reply. |
 
 ## Looping demos
 

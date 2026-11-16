@@ -48,7 +48,8 @@ const INTRO_HOLD_MS = 3000
 /** Matches the slide in HostIntro (AppShell). */
 const INTRO_SLIDE_MS = 550
 
-// A text message from Nanci: it shows on the phone as a notification, then lands in the chat.
+// A text message from Nanci: it shows on the phone as a notification, its link is tapped
+// near the end of the hold (TextNotice), and it lands at the head of the chat.
 const TEXT_NOTICE_HOLD_MS = 4000
 /** A beat between the notification leaving and the text landing in the chat. */
 const TEXT_NOTICE_GAP_MS = 300
@@ -643,12 +644,16 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   // differs per caller (manual falls back to the next question), so it's passed in.
   const playAssistantTurn = useCallback(async (turn: ConceptScriptedTurn, suggestions: string[] | undefined, shouldStop: () => boolean = () => scriptStopRef.current) => {
     if (turn.textFrom) {
-      // A text reaches the owner's phone, outside the app. It never lands in the chat.
+      // A text reaches the owner's phone, outside the app. When they open the app it is
+      // the first thing in the chat, as a text card rather than a reply, so what they ask
+      // next reads as a reply to it.
       setChatState("idle")
-      setTextNotice({ from: turn.textFrom, body: turn.content })
+      setTextNotice({ from: turn.textFrom, body: turn.content, link: turn.textLink })
       await sleep(TEXT_NOTICE_HOLD_MS)
       setTextNotice(null)
       await sleep(TEXT_NOTICE_GAP_MS)
+      setView("chat")
+      setMessages((prev) => [...prev, { id: newSessionId(), role: "assistant" as const, content: turn.content, textFrom: turn.textFrom, textLink: turn.textLink, ...(suggestions ? { suggestions } : {}) }])
       return
     }
     // A flow that opened on a text is still outside the chat. Its first answer opens it.

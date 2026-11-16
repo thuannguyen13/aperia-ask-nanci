@@ -5,3 +5,6 @@ export const CARRIER = {
   name: "ABC Carrier",
   business: "ABC Carrier",
 }
+
+/** The link a text from Nanci ends with. It opens Ask Nanci on that conversation. */
+export const nanciLink = (code: string) => `nanci.abccarrier.com/${code}`

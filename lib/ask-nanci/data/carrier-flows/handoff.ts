@@ -9,7 +9,7 @@
 // it up, then the hand-off with a reference. Short on purpose.
 import type { ConceptScriptedTurn, SheetActionData } from "../../types"
 import type { FlowDef } from "../flows.concept"
-import { CARRIER } from "../carrier"
+import { CARRIER, nanciLink } from "../carrier"
 import { CARRIER_CITES } from "../sources"
 import { formatWholeCurrency } from "../../../../components/shared/format"
 import { BILL_CHARGE, HANDOFF_REQUEST } from "../panels/bill-handoff"
@@ -18,6 +18,8 @@ import { isAwaitingAny, requestView, sentView } from "../panels/carrier-request"
 
 // Nanci opens the flow, so its key is an id rather than a prompt.
 const HANDOFF_KEY = "__bill-question__"
+// The owner opens the app on Nanci's text and asks about the fee.
+const HANDOFF_ASK = "What's this $45 fee?"
 // The hand-off is done before Nanci raises the next thing. The extra beat lets it land.
 const OVERAGE_PAUSE_MS = 2000
 const OVERAGE_UNLIMITED = "Move it to unlimited"
@@ -44,7 +46,7 @@ export const HANDOFF_FLOW: FlowDef = {
   churn: { cause: "Bill shock", metric: "Churn" },
   // Unlimited comes first, so ?autoplay plays on into it.
   followups: [OVERAGE_UNLIMITED, OVERAGE_SLOW, ...OVERAGE_OPTIONS.map((o) => o.sendPrompt), OVERAGE_LEAVE],
-  description: "Nanci flags a new fee it cannot explain and hands it to a specialist, then warns that a line is heading over its data before the charge lands.",
+  description: "Nanci texts the owner about a new fee it cannot explain and hands it to a specialist, then warns that a line is heading over its data before the charge lands.",
 }
 
 const HANDOFF_SHEET: SheetActionData = {
@@ -75,7 +77,14 @@ export const HANDOFF_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
   [HANDOFF_KEY]: [
     {
       role: "assistant",
-      content: `Your bill posted today with a $${BILL_CHARGE.amount} ${BILL_CHARGE.label.toLowerCase()} on it, added on ${BILL_CHARGE.added}. It is the first one in 12 months. I can see when it was added, but not why, and I cannot remove it.`,
+      content: `Your bill posted today with a new $${BILL_CHARGE.amount} ${BILL_CHARGE.label.toLowerCase()} on it, the first in 12 months.`,
+      textFrom: CARRIER.business,
+      textLink: nanciLink("f8Rw3"),
+    },
+    { role: "user", content: HANDOFF_ASK },
+    {
+      role: "assistant",
+      content: `It is labelled as a ${BILL_CHARGE.label.toLowerCase()}, added on ${BILL_CHARGE.added}, and applies to the account rather than a line. I can see when it was added, but not why, and I cannot remove it.`,
       panel: "bill-handoff",
       source: CARRIER_CITES.account,
     },

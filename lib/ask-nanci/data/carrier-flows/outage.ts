@@ -11,7 +11,7 @@
 // record. Under ?autoplay the panel picks and sends by itself (see carrier-request.tsx).
 import type { ConceptScriptedTurn } from "../../types"
 import type { FlowDef } from "../flows.concept"
-import { CARRIER } from "../carrier"
+import { CARRIER, nanciLink } from "../carrier"
 import { CARRIER_CITES } from "../sources"
 import { isAwaitingTurn } from "../../is-awaiting-turn"
 import { formatWholeCurrency } from "../../../../components/shared/format"
@@ -26,6 +26,8 @@ const OUTAGE_KEY = "__outage-text__"
 // Time passes between the text and the follow-up. The extra beat lets that read.
 const FOLLOWUP_PAUSE_MS = 2500
 const OUTAGE_BACKUP = "How do I keep taking cards if it happens again?"
+// Once the connection is back, the owner opens the app on Nanci's text.
+const OUTAGE_ASK = "Is my internet back?"
 
 // The answer the ranked options wait on. The panel's Send button is live only while this
 // is the last thing in the chat.
@@ -54,11 +56,12 @@ export const OUTAGE_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
       role: "assistant",
       content: `Your internet at ${OUTAGE_STREET} went down at ${formatClock(OUTAGE.start, true)}. ${CARRIER.business} expects it back by ${formatClock(OUTAGE_ESTIMATED_FIX, true)}. Until then your register cannot take cards. Cash still works.`,
       textFrom: CARRIER.business,
+      textLink: nanciLink("o4Tz9"),
     },
+    { role: "user", content: OUTAGE_ASK, pauseBefore: FOLLOWUP_PAUSE_MS },
     {
       role: "assistant",
-      content: `Your internet is back. It went down at ${formatClock(OUTAGE.start, true)}, when I texted you, and came back at ${formatClock(OUTAGE.end, true)}. In those ${OUTAGE_MINUTES} minutes, ${FAILED_PAYMENTS} card payments failed. Based on a usual Thursday dinner, that is about ${formatWholeCurrency(ESTIMATED_SALES_AFFECTED)} in card sales.\n\n${CARRIER.business} has applied a ${formatWholeCurrency(OUTAGE_CREDIT)} credit to your next bill for the outage.`,
-      pauseBefore: FOLLOWUP_PAUSE_MS,
+      content: `Yes, it came back at ${formatClock(OUTAGE.end, true)}, ${OUTAGE_MINUTES} minutes after it went down. In that time, ${FAILED_PAYMENTS} card payments failed. Based on a usual Thursday dinner, that is about ${formatWholeCurrency(ESTIMATED_SALES_AFFECTED)} in card sales.\n\n${CARRIER.business} has applied a ${formatWholeCurrency(OUTAGE_CREDIT)} credit to your next bill for the outage.`,
       panel: "outage-impact",
       source: CARRIER_CITES.withSales,
       suggestions: [OUTAGE_BACKUP],

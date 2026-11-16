@@ -1,7 +1,7 @@
 "use client"
 
 import { memo, useState } from "react"
-import { FileText } from "lucide-react"
+import { FileText, MessageSquare } from "lucide-react"
 import type { Message, SheetActionData } from "@/lib/ask-nanci/types"
 import { ChatCitedSources, ChatScriptedSources } from "./ChatCitedSources"
 import { SuggestedQuestions } from "./SuggestedQuestions"
@@ -150,6 +150,34 @@ function UserMessageBase({ message }: { message: Message }) {
   )
 }
 
+// A text Nanci sent through the carrier's messaging, as the chat keeps it: a card naming
+// the sender and that Ask Nanci sent it, with the text and its link in a phone-style
+// bubble. The chat is where that link lands, so it opens on the text and the owner's
+// first question follows it. It is not an answer, so it carries no sources or panels.
+function TextMessageCard({ message }: { message: Message }) {
+  return (
+    <div className="px-4 py-3">
+      <div className="max-w-[85%] rounded-xl border bg-muted/40 p-3">
+        <div className="flex items-center gap-2">
+          <span className="flex size-6 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground">
+            <MessageSquare className="size-3.5" />
+          </span>
+          <div className="min-w-0 text-xs leading-tight">
+            <p className="font-medium text-foreground">Text from {message.textFrom}</p>
+            <p className="text-muted-foreground">Sent by Ask Nanci</p>
+          </div>
+        </div>
+        <div className="mt-2.5 w-fit rounded-2xl rounded-tl-sm bg-background px-3 py-2 text-sm text-foreground shadow-xs">
+          <p>{message.content}</p>
+          {message.textLink && <p className="text-blue-600 underline underline-offset-2 dark:text-blue-400">{message.textLink}</p>}
+        </div>
+      </div>
+      {message.textLink && <p className="mt-2 text-xs text-muted-foreground">You opened Ask Nanci from this text.</p>}
+      {message.suggestions?.length ? <SuggestedQuestions suggestions={message.suggestions} /> : null}
+    </div>
+  )
+}
+
 function BotMessageBase({
   message,
   displayedContent,
@@ -163,6 +191,7 @@ function BotMessageBase({
   showPanelCard?: boolean
 }) {
   const [sheetOpen, setSheetOpen] = useState(false)
+  if (message.textFrom) return <TextMessageCard message={message} />
 
   return (
     <div className="flex items-start gap-3 px-4 py-3">

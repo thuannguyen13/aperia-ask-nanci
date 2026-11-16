@@ -76,15 +76,19 @@ export interface ConceptScriptedTurn extends ScriptedTurn {
   pauseBefore?: number
   /**
    * The turn is a text message from this sender, and nothing else. It plays as a phone
-   * notification outside the app and never lands in the chat. Its panel fields are ignored.
+   * notification outside the app, then stays at the head of the chat as a text card, so
+   * the owner's first question reads as a reply to it. Its panel fields are ignored.
    */
   textFrom?: string
+  /** The link at the end of that text, which opens Ask Nanci on this conversation. */
+  textLink?: string
 }
 
 /** A text message from Nanci as the phone shows it, while the turn that sent it arrives. */
 export interface TextNoticeData {
   from: string
   body: string
+  link?: string
 }
 
 // ─── API / user types ──────────────────────────────────────────────────────────
@@ -158,6 +162,10 @@ export interface Message {
    * it without asking Nanci for it again.
    */
   panel?: PanelId
+  /** A text Nanci sent through the carrier, kept in the chat as a card. Names the sender. */
+  textFrom?: string
+  /** The link at the end of that text, which the owner tapped to open the chat. */
+  textLink?: string
   /** True when the stream ended (user stopped or natural completion). Prevents re-appending a partial response on session resume. */
   stopped?: boolean
 }
