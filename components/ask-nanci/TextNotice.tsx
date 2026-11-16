@@ -26,7 +26,7 @@ export function TextNotice() {
         <p className="mt-0.5 text-sm text-foreground">{textNotice.body}</p>
         {/* The owner taps the link near the end of the hold, which is what opens the chat. */}
         {textNotice.link && (
-          <p className="-mx-1 mt-1 w-fit rounded-md px-1 text-sm text-blue-600 underline underline-offset-2 [animation:text-link-tap_500ms_ease-out_2800ms_both] dark:text-blue-400">{textNotice.link}</p>
+          <p className="-mx-1 mt-1 w-fit rounded-md px-1 text-sm text-blue-600 underline underline-offset-2 dark:text-blue-400" style={{ animation: "text-link-tap 500ms ease-out 2800ms both" }}>{textNotice.link}</p>
         )}
       </div>
     </div>

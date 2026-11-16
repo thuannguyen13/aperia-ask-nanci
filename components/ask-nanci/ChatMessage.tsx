@@ -12,6 +12,8 @@ import { MessageMap } from "./MessageMap"
 import { ChangeAuditDialog } from "./concept/ChangeAuditDialog"
 import { AiTriageSummaryWidget } from "./AiTriageSummaryWidget"
 import { ArtifactCard } from "@/components/shared"
+import { cn } from "aperia-ds5/utils"
+import { WORK_TRAIL_STEP_MS } from "@/lib/ask-nanci/work-trail"
 import { DashChartCard } from "@/components/risk/dashboard/DashChartCard"
 
 // The change-request block. Layout and styling live in ArtifactCard; this only supplies
@@ -151,6 +153,46 @@ function UserMessageBase({ message }: { message: Message }) {
   )
 }
 
+// A message Nanci sent unasked opens on the work it did first: what it checked, then what
+// it flagged. A scheduled send has no such trail. The steps land one after another, and a
+// line runs down from the logo and curves in to the last one, which is what it led to.
+// The sources it read are cited under the message.
+// The keyframes live in globals.css. Each element sets its own animation inline, delayed
+// by its place in the trail; reduced motion shows the trail at once.
+const TRAIL_STEP = "opacity-0 motion-reduce:!animate-none motion-reduce:!opacity-100"
+const trailStepStyle = (i: number) => ({ animation: `work-trail-step 300ms ease-out ${i * WORK_TRAIL_STEP_MS}ms forwards` })
+
+function WorkTrailView({ trail }: { trail: NonNullable<Message["workTrail"]> }) {
+  const last = trail.steps.length - 1
+  return (
+    <div className="mb-3 text-xs">
+      <p className={cn("flex items-center gap-1.5", TRAIL_STEP)} style={trailStepStyle(0)}>
+        <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={14} height={14} />
+        <span className="font-medium text-foreground">Ask Nanci</span>
+        <span className="text-muted-foreground">{trail.when}</span>
+      </p>
+      <ul className="mt-1">
+        {trail.steps.map((step, i) => (
+          <li
+            key={step.text}
+            className={cn("relative flex items-start gap-1.5 pt-1 pl-5", TRAIL_STEP)}
+            style={trailStepStyle(i + 1)}
+          >
+            {/* The connector: straight down past each check, then a curve in to the last step. */}
+            {i < last
+              ? <span aria-hidden className={cn("absolute bottom-0 left-[6px] border-l", i === 0 ? "-top-1" : "top-0")} />
+              : <span aria-hidden className={cn("absolute left-[6px] w-[9px] rounded-bl-md border-b border-l", i === 0 ? "-top-1 h-4" : "top-0 h-3")} />}
+            {step.flag
+              ? <CircleAlert className="mt-px size-3.5 shrink-0 text-amber-600 dark:text-amber-400" />
+              : <Check className="mt-px size-3.5 shrink-0 text-muted-foreground" />}
+            <span className={step.flag ? "font-medium text-foreground" : "text-muted-foreground"}>{step.text}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 function BotMessageBase({
   message,
   displayedContent,
@@ -171,28 +213,7 @@ function BotMessageBase({
         {/* 16px on every screen, with Tailwind's own 1.5 line height rather than the
             leading-relaxed this used to carry. Question and answer are one exchange and
             share both numbers. */}
-        {/* A message Nanci sent unasked opens on the work it did first: what it checked,
-            then what it flagged. A scheduled send has no such trail. The sources it read
-            are cited under the message. */}
-        {message.workTrail && (
-          <div className="mb-3 text-xs">
-            <p className="flex items-center gap-1.5">
-              <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={14} height={14} />
-              <span className="font-medium text-foreground">Ask Nanci</span>
-              <span className="text-muted-foreground">{message.workTrail.when}</span>
-            </p>
-            <ul className="mt-1.5 ml-[6px] space-y-1 border-l pl-3">
-              {message.workTrail.steps.map((step) => (
-                <li key={step.text} className="flex items-start gap-1.5">
-                  {step.flag
-                    ? <CircleAlert className="mt-px size-3.5 shrink-0 text-amber-600 dark:text-amber-400" />
-                    : <Check className="mt-px size-3.5 shrink-0 text-muted-foreground" />}
-                  <span className={step.flag ? "font-medium text-foreground" : "text-muted-foreground"}>{step.text}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+        {message.workTrail && <WorkTrailView trail={message.workTrail} />}
         <div className="text-base text-foreground">
           {displayedContent.includes("{{MAP}}") ? (() => {
             const [before, after] = displayedContent.split("{{MAP}}")

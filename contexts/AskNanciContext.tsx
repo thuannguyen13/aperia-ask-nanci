@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useCallback, useRef, useEffect, useMemo } from "react"
 import { SCOPE_ACCOUNTS, SCOPE_FOUNDATION, type FlowScope } from "@/lib/ask-nanci/data/flow-scopes"
 import type { Message, Session, Source, UsageData, ConceptScriptedTurn, PanelId, PanelAction, SheetActionData, TextNoticeData } from "@/lib/ask-nanci/types"
+import { workTrailDuration } from "@/lib/ask-nanci/work-trail"
 import { usePanelStack } from "@/lib/ask-nanci/use-panel-stack"
 import { turnToPanelActions } from "@/lib/ask-nanci/panel-actions"
 import { streamWords as streamWordChunks } from "@/lib/ask-nanci/stream-words"
@@ -505,9 +506,11 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   // The one place all three scripted playback paths do token-streaming.
   const streamWords = useCallback(async (
     text: string,
-    opts: { id?: string; extra?: Partial<Message>; shouldStop?: () => boolean; onDone?: () => void } = {},
+    opts: { id?: string; base?: Partial<Message>; extra?: Partial<Message>; shouldStop?: () => boolean; onDone?: () => void } = {},
   ) => {
-    const botMsg: Message = { id: opts.id ?? newSessionId(), role: "assistant", content: "" }
+    // `base` shows while the text streams (a work trail above it); `extra` lands with the
+    // finished message (its sources, panel card and pills).
+    const botMsg: Message = { id: opts.id ?? newSessionId(), role: "assistant", content: "", ...opts.base }
     setChatState("streaming")
     const done = await streamWordChunks(text, (partial) => setPendingBot({ ...botMsg, content: partial }), {
       shouldStop: opts.shouldStop,
@@ -653,7 +656,24 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       setTextNotice(null)
       await sleep(TEXT_NOTICE_GAP_MS)
       setView("chat")
-      setMessages((prev) => [...prev, { id: newSessionId(), role: "assistant" as const, content: turn.chatContent ?? turn.content, ...(turn.workTrail ? { workTrail: turn.workTrail } : {}), ...(turn.panel ? { panel: turn.panel } : {}), ...(turn.source ? { source: turn.source } : {}), ...(suggestions ? { suggestions } : {}) }])
+      // The trail plays in first, step by step, and the message streams under it once
+      // the last step has landed. One id throughout, so the chat keeps the same node and
+      // the trail's animation runs once.
+      const id = newSessionId()
+      const base: Partial<Message> = turn.workTrail ? { workTrail: turn.workTrail } : {}
+      if (turn.workTrail) {
+        setPendingBot({ id, role: "assistant", content: "", ...base })
+        setChatState("streaming")
+        await sleep(workTrailDuration(turn.workTrail))
+        if (shouldStop()) return
+      }
+      await streamWords(turn.chatContent ?? turn.content, {
+        id,
+        base,
+        shouldStop,
+        extra: { ...(turn.panel ? { panel: turn.panel } : {}), ...(turn.source ? { source: turn.source } : {}), ...(suggestions ? { suggestions } : {}) },
+      })
+      setChatState("idle")
       applyTurnEffects(turn)
       return
     }
