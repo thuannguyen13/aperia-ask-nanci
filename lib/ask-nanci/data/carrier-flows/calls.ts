@@ -29,7 +29,7 @@ export const CALLS_FLOW: FlowDef = {
   num: 33,
   section: "merchant",
   title: "Missed Calls",
-  badge: "Calls",
+  badge: "Engagement",
   key: CALLS_PROMPT,
   slug: "33",
   scope: "carrier",

@@ -22,7 +22,7 @@ export const LINES_FLOW: FlowDef = {
   num: 35,
   section: "merchant",
   title: "Unused Lines",
-  badge: "Lines",
+  badge: "Billing",
   key: LINES_PROMPT,
   slug: "35",
   scope: "carrier",

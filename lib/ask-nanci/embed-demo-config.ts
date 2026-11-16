@@ -87,12 +87,12 @@ export function parseMode(mode: string | null): ParsedMode {
     // Embeddable counterpart to `resy`, as talus-embed is to talus: the compact widget,
     // so &flow=<slug>&autoplay plays the same way.
     case "resy-embed":      return { ...base, isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true, catalog: true, scope: "resy", theme: "amex" }
-    // The concept demo narrowed to the carrier stories, for a conversation with AT&T's
+    // The concept demo narrowed to the carrier stories, for a conversation with any
     // business team: the six stories as cards, and the carrier account as the built-in
     // source.
-    case "att":             return { ...base, isConceptVersion: true, catalog: true, scope: "carrier", theme: "att" }
-    // Embeddable counterpart to `att`, as resy-embed is to resy.
-    case "att-embed":       return { ...base, isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true, catalog: true, scope: "carrier", theme: "att" }
+    case "carrier":         return { ...base, isConceptVersion: true, catalog: true, scope: "carrier", theme: "carrier" }
+    // Embeddable counterpart to `carrier`, as resy-embed is to resy.
+    case "carrier-embed":   return { ...base, isEmbed: true,  embedVariant: "concept-embed",  isConceptVersion: true, catalog: true, scope: "carrier", theme: "carrier" }
     // The default app wearing the AMEX brand, without the Resy scope or the catalog.
     // Runs the concept engine like the default app, so every &flow=<slug>&autoplay plays
     // with its panels. Onboarding stays closed so the dialog never covers the flow.

@@ -9,6 +9,7 @@ import { ChatView } from "@/components/ask-nanci/ChatView"
 import { ExplorePrompts } from "@/components/ask-nanci/ExplorePrompts"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { ConceptWelcomeView } from "@/components/ask-nanci/concept/ConceptWelcomeView"
+import { TextNotice } from "@/components/ask-nanci/TextNotice"
 import { useComposerInset } from "@/components/ask-nanci/use-composer-inset"
 import { useKeyboardInset } from "@/components/ask-nanci/use-keyboard-inset"
 
@@ -107,7 +108,17 @@ function WelcomeView() {
   )
 }
 
+// A text from Nanci shows over whichever view is up, since it plays before the chat opens.
 export default function AskNanciPage() {
+  return (
+    <>
+      <AskNanciView />
+      <TextNotice />
+    </>
+  )
+}
+
+function AskNanciView() {
   const { view, startNewChat, isEmbed, catalog, embedVariant } = useAskNanci()
   const composerRef = useComposerInset()
   // Mounted here rather than in the sheet: the composer is what has to clear the

@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useCallback, useRef, useEffect, useMemo } from "react"
 import { SCOPE_ACCOUNTS, SCOPE_FOUNDATION, type FlowScope } from "@/lib/ask-nanci/data/flow-scopes"
-import type { Message, Session, Source, UsageData, ConceptScriptedTurn, PanelId, PanelAction, SheetActionData } from "@/lib/ask-nanci/types"
+import type { Message, Session, Source, UsageData, ConceptScriptedTurn, PanelId, PanelAction, SheetActionData, TextNoticeData } from "@/lib/ask-nanci/types"
 import { usePanelStack } from "@/lib/ask-nanci/use-panel-stack"
 import { turnToPanelActions } from "@/lib/ask-nanci/panel-actions"
 import { streamWords as streamWordChunks } from "@/lib/ask-nanci/stream-words"
@@ -47,6 +47,11 @@ const LOOP_BLANK_MS = 400
 const INTRO_HOLD_MS = 3000
 /** Matches the slide in HostIntro (AppShell). */
 const INTRO_SLIDE_MS = 550
+
+// A text message from Nanci: it shows on the phone as a notification, then lands in the chat.
+const TEXT_NOTICE_HOLD_MS = 4000
+/** A beat between the notification leaving and the text landing in the chat. */
+const TEXT_NOTICE_GAP_MS = 300
 
 // Once the conversation moves past an assistant message (a new user turn is sent),
 // drop that message's suggestion pills so a clicked pill doesn't linger.
@@ -165,6 +170,11 @@ interface AskNanciCtx {
    * out of view. Only the ?autoplay flow plays the intro. HostIntro is the only reader.
    */
   introShowing: boolean
+  /**
+   * The text message on the phone's screen while a `textFrom` turn arrives, or null.
+   * TextNotice is the only reader.
+   */
+  textNotice: TextNoticeData | null
   /**
    * Would clicking this suggestion abandon the demo the URL pinned? Only ever true
    * in a `?flow=` embed, where the flow is the whole point of the page — elsewhere a
@@ -301,6 +311,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const [conversationFading, setConversationFading] = useState(false)
   // Up from the first paint, so the autoplay flow opens on the host's app, not a flash of chat.
   const [introShowing, setIntroShowing] = useState(intro && autoPlay)
+  const [textNotice, setTextNotice] = useState<TextNoticeData | null>(null)
   const [tourActive, setTourActive] = useState(false)
   const [tourRequest, setTourRequest] = useState(0)
   const requestTour = useCallback(() => setTourRequest((n) => n + 1), [])
@@ -631,6 +642,17 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   // apply panel effects, and stagger a closeAll if the turn asks for it. `suggestions`
   // differs per caller (manual falls back to the next question), so it's passed in.
   const playAssistantTurn = useCallback(async (turn: ConceptScriptedTurn, suggestions: string[] | undefined, shouldStop: () => boolean = () => scriptStopRef.current) => {
+    if (turn.textFrom) {
+      // A text reaches the owner's phone, outside the app. It never lands in the chat.
+      setChatState("idle")
+      setTextNotice({ from: turn.textFrom, body: turn.content })
+      await sleep(TEXT_NOTICE_HOLD_MS)
+      setTextNotice(null)
+      await sleep(TEXT_NOTICE_GAP_MS)
+      return
+    }
+    // A flow that opened on a text is still outside the chat. Its first answer opens it.
+    setView("chat")
     await streamWords(turn.content, { id: newSessionId(), shouldStop })
     if (turn.widgetDelay) await sleep(turn.widgetDelay)
     if (turn.sheetAction || suggestions || turn.widget || turn.dashChart || turn.chart || turn.map || turn.source || turn.panel) {
@@ -691,7 +713,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       // Stream the assistant turn(s) up to the next user turn (or end of script).
       while (i < script.length && script[i].role === "assistant") {
         const turn = script[i]
-        await sleep(turn.widget ? 1200 : 1000)
+        await sleep((turn.widget ? 1200 : 1000) + (turn.pauseBefore ?? 0))
         if (scriptStopRef.current) return
         const nextIsUser = script[i + 1]?.role === "user"
         // The pill is the authored suggestions if present, else the next user question.
@@ -813,14 +835,16 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setConversationFading(false)
     setFlowFinished(false)
     setThinking((prev) => ({ ...prev, label: "Thinking…" }))
-    setView("chat")
+    // A flow that opens on a text plays it outside the chat. Its first answer opens the chat.
+    const opensOnText = !!script[0]?.textFrom
+    if (!opensOnText) setView("chat")
     if (!CONCEPT_NO_RESET_PROMPTS.has(prompt)) {
       setMessages([])
     }
     setChatState("idle")
     setPendingBot(null)
     // If the script opens with an assistant turn, show the thinking indicator now.
-    if (script[0]?.role === "assistant") setChatState("thinking")
+    if (script[0]?.role === "assistant" && !opensOnText) setChatState("thinking")
 
     // Under ?autoplay nobody clicks the pills, so the flow being autoplayed walks its
     // whole script instead of stepping.
@@ -978,6 +1002,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   const startNewChat = useCallback(() => {
     stopRef.current = true
     scriptStopRef.current = true
+    setTextNotice(null)
     activeFlowRef.current = null
     setFlowFinished(false)
     setView("welcome")
@@ -1007,6 +1032,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
     setClosingPanels([])
     setDeclineReportFiltered(false)
     setProactiveNotificationActive(false)
+    setTextNotice(null)
     resetPanelViews()
     setTimeout(() => playConceptScripted(autoPlayFlow), 300)
   }, [autoPlayFlow])
@@ -1085,7 +1111,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       settingsOpen, openSettings, setSettingsOpen,
       mobileSidebarOpen, setMobileSidebarOpen,
       shownPanelId, setShownPanelId, panelSheetDismissed, dismissPanelSheet, reopenPanelSheet, panelSheetOpen,
-      onboardingOpen, setOnboardingOpen, forceOnboarding, genericBrand, tourActive, setTourActive, tourRequest, requestTour, flowFinished, autoplaying: autoPlay && !!autoPlayFlow, conversationFading, introShowing, leavesCurrentFlow,
+      onboardingOpen, setOnboardingOpen, forceOnboarding, genericBrand, tourActive, setTourActive, tourRequest, requestTour, flowFinished, autoplaying: autoPlay && !!autoPlayFlow, conversationFading, introShowing, textNotice, leavesCurrentFlow,
       isConceptVersion, catalog, scope, foundationSource, builtInSources,
       submitFormPanel, submitOfferApplication, submitStepUpPanel,
       triggerProactiveFlow, proactiveNotificationActive, activateProactiveNotification,

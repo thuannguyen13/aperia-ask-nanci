@@ -57,10 +57,10 @@ const THEME_LOGOS = {
   amex: {
     frame: { src: "/logos/amex.svg", alt: "American Express", width: 50, height: 50 },
   },
-  // The AT&T globe and wordmark, all white, as AT&T sets it on its own blue. No sidebar
-  // slots, so the Ask Nanci lockup shows there and Ask Nanci stays the product.
-  att: {
-    frame: { src: "/logos/att.svg", alt: "AT&T", width: 1000, height: 411 },
+  // The carrier modes: ABC Carrier, drawn from the ABC Bank wordmark, in ABC Bank's
+  // purple. The modes are shown to any carrier, so neither names a real one.
+  carrier: {
+    frame: { src: "/logos/abc-carrier.svg", alt: "ABC Carrier", width: 147, height: 24 },
   },
   // White-label placeholder — swap the asset and the [data-theme="placeholder"] block
   // to stand up a new brand without touching anything else.

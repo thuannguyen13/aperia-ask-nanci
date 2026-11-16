@@ -194,7 +194,7 @@ export interface FlowDef {
   description: string;
   section: "pattern" | "merchant";
   key: string; // conversation key (also the "Try it" prompt unless proactive)
-  proactive?: boolean; // card shows "Simulate login"; excluded from CONCEPT_ALL_PROMPTS
+  proactive?: boolean; // Nanci speaks first, so `key` is an id and not a prompt; excluded from CONCEPT_ALL_PROMPTS. The catalog card shows "Simulate login"; a scoped card plays the flow.
   slug?: string; // ?mode=concept-embed&flow=<slug>
   altEntries?: { slug: string; key: string }[]; // additional embed entries into this flow
   followups?: string[]; // continuation keys kept in-session (derive CONCEPT_NO_RESET_PROMPTS)
@@ -478,7 +478,7 @@ export const FLOW_DEFS: FlowDef[] = [
     scope: "resy",
     description: "Ask whether Nanci can see your Resy book. The Marketplace listing for Resy opens beside the chat, and Connect there links the account.",
   },
-  // The carrier stories, scoped to ?mode=att.
+  // The carrier stories, scoped to ?mode=carrier.
   ...CARRIER_FLOW_DEFS,
 ];
 
@@ -1459,7 +1459,7 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
       source: "Resy multi-location + card transactions",
     },
   ],
-  // ── Flows 33–38: the carrier stories (?mode=att) ─────────────────────────
+  // ── Flows 33–38: the carrier stories (?mode=carrier) ─────────────────────────
   ...CARRIER_CONVERSATIONS,
 };
 

@@ -143,7 +143,7 @@ function UserMessageBase({ message }: { message: Message }) {
     <div className="flex justify-end px-4 py-2">
       {/* Matches the answer at 16px: a question and its answer are one exchange, and a
           smaller question reads as a caption on the reply rather than half of a pair. */}
-      <div className="max-w-[75%] rounded-2xl rounded-tr-sm bg-primary px-4 py-2.5 text-base text-white">
+      <div className="max-w-[75%] rounded-2xl rounded-tr-sm bg-primary px-4 py-2.5 text-base text-primary-foreground">
         {message.content}
       </div>
     </div>

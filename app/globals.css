@@ -28,7 +28,9 @@
   --app-gradient: linear-gradient(180deg, #218800 0%, #bfcdc5 200px);
 }
 
-[data-theme="aperia"] {
+/* The carrier modes wear ABC Bank's purple under the ABC Carrier logo. */
+[data-theme="aperia"],
+[data-theme="carrier"] {
   --primary: #280086;
   --ring: #280086;
   --sidebar-primary: #280086;
@@ -111,30 +113,6 @@
   --ring: #006FCF;
   --sidebar-primary: #006FCF;
   --app-gradient: linear-gradient(180deg, #00175A 0%, #cfe0f5 200px);
-}
-
-/* AT&T Blue (#067AB4) for the frame bar and the controls, so the two read as one
-   brand. White on it is 4.7:1, so the white logo and --primary-foreground both hold.
-   AT&T Orange is the attention accent, with dark text: white on it is under 3:1. */
-[data-theme="att"] {
-  --primary: #067AB4;
-  --ring: #067AB4;
-  --sidebar-primary: #067AB4;
-  --app-gradient: linear-gradient(180deg, #067AB4 0%, #d3eaf6 200px);
-  --brand-accent: #FF7200;
-  /* Tailwind's blue scale rebuilt around AT&T Blue at 600. Every blue in the chrome
-     (card badges, insight callouts, charts, heatmaps) then reads as the same blue. */
-  --color-blue-50: #ebf5fb;
-  --color-blue-100: #d3eaf6;
-  --color-blue-200: #a8d4ec;
-  --color-blue-300: #72b8de;
-  --color-blue-400: #3d9bcd;
-  --color-blue-500: #1888c2;
-  --color-blue-600: #067ab4;
-  --color-blue-700: #05659a;
-  --color-blue-800: #04517c;
-  --color-blue-900: #033e5f;
-  --color-blue-950: #022a40;
 }
 
 [data-theme="access-one"] {

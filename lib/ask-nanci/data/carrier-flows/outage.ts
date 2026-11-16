@@ -1,6 +1,11 @@
 // Carrier story 34, Outage Impact. Its definition and its script, one file per story, so the
 // stories are written side by side without touching each other.
 //
+// Nanci speaks first. It texts the owner while the internet is down: the text travels over
+// the cellular network, and the app runs on the connection that is down. The chat opens
+// once the internet is back, on Nanci's follow-up. Nobody asks a question
+// until the owner wants to know how to keep taking cards next time.
+//
 // The owner picks an option in the panel, so the script stops on the options answer. The
 // panel's Send button then sends that option's turn, and its answer is the request on the
 // record. Under ?autoplay the panel picks and sends by itself (see carrier-request.tsx).
@@ -12,10 +17,14 @@ import { isAwaitingTurn } from "../../is-awaiting-turn"
 import { formatWholeCurrency } from "../../../../components/shared/format"
 import { buildRequestConversations } from "../panels/carrier-request"
 import {
-  OUTAGE_MINUTES, OUTAGE_WINDOW, FAILED_PAYMENTS, ESTIMATED_SALES_AFFECTED, OUTAGE_OPTIONS, OUTAGE_REQUEST_TIMESTAMP,
+  OUTAGE, OUTAGE_MINUTES, FAILED_PAYMENTS, ESTIMATED_SALES_AFFECTED, OUTAGE_OPTIONS, OUTAGE_REQUEST_TIMESTAMP,
+  OUTAGE_ESTIMATED_FIX, OUTAGE_STREET, OUTAGE_CREDIT, formatClock,
 } from "../panels/outage-impact"
 
-export const OUTAGE_PROMPT = "What happened Thursday evening?"
+// The flow opens on Nanci's text, so its key is an id rather than a prompt.
+const OUTAGE_KEY = "__outage-text__"
+// Time passes between the text and the follow-up. The extra beat lets that read.
+const FOLLOWUP_PAUSE_MS = 2500
 const OUTAGE_BACKUP = "How do I keep taking cards if it happens again?"
 
 // The answer the ranked options wait on. The panel's Send button is live only while this
@@ -29,20 +38,26 @@ export const OUTAGE_FLOW: FlowDef = {
   num: 34,
   section: "merchant",
   title: "Outage Impact",
-  badge: "Outage",
-  key: OUTAGE_PROMPT,
+  badge: "Trust",
+  key: OUTAGE_KEY,
+  proactive: true,
   slug: "34",
   scope: "carrier",
   followups: [OUTAGE_BACKUP, ...OUTAGE_OPTIONS.map((o) => o.sendPrompt)],
-  description: "An internet outage matched to the card payments that failed during it, then a request for backup internet.",
+  description: "Nanci texts the owner while the internet is down, reports the failed payments and the credit once it is back, then requests backup internet.",
 }
 
 export const OUTAGE_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
-  [OUTAGE_PROMPT]: [
-    { role: "user", content: OUTAGE_PROMPT },
+  [OUTAGE_KEY]: [
     {
       role: "assistant",
-      content: `Your internet was down for ${OUTAGE_MINUTES} minutes on Thursday, from ${OUTAGE_WINDOW}. Your register could not take cards in that window, and ${FAILED_PAYMENTS} card payments failed. Based on a usual Thursday dinner, that is about ${formatWholeCurrency(ESTIMATED_SALES_AFFECTED)} in card sales.`,
+      content: `Your internet at ${OUTAGE_STREET} went down at ${formatClock(OUTAGE.start, true)}. ${CARRIER.business} expects it back by ${formatClock(OUTAGE_ESTIMATED_FIX, true)}. Until then your register can't take cards. Cash still works.`,
+      textFrom: CARRIER.business,
+    },
+    {
+      role: "assistant",
+      content: `Your internet is back. It went down at ${formatClock(OUTAGE.start, true)}, when I texted you, and came back at ${formatClock(OUTAGE.end, true)}. In those ${OUTAGE_MINUTES} minutes, ${FAILED_PAYMENTS} card payments failed. Based on a usual Thursday dinner, that is about ${formatWholeCurrency(ESTIMATED_SALES_AFFECTED)} in card sales.\n\n${CARRIER.business} has applied a ${formatWholeCurrency(OUTAGE_CREDIT)} credit to your next bill for the outage.`,
+      pauseBefore: FOLLOWUP_PAUSE_MS,
       panel: "outage-impact",
       source: CARRIER_CITES.withSales,
       suggestions: [OUTAGE_BACKUP],

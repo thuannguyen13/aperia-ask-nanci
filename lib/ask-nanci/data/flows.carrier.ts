@@ -1,4 +1,4 @@
-// The carrier stories (?mode=att): a business question answered from the register and
+// The carrier stories (?mode=carrier): a business question answered from the register and
 // the carrier account together, ending in a request to the carrier. Nothing on the
 // carrier account changes directly. Each story is its own file in carrier-flows/.
 import type { ConceptScriptedTurn } from "../types"

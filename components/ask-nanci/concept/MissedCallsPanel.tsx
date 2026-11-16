@@ -14,7 +14,7 @@ import { RequestDraft, RequestOptions, RequestSent } from "./carrier-request"
 
 const PANEL_ID = "missed-calls"
 
-// Busiest Times levels in blue, which the AT&T theme turns into its cobalt scale.
+// Busiest Times levels in blue, as the Busiest Times heatmap draws them.
 const LEVEL_CLS = [
   "bg-muted",
   "bg-blue-100 dark:bg-blue-950/40",
@@ -25,7 +25,7 @@ const LEVEL_CLS = [
 
 // A missed-call count sits on its Friday cell as a badge, so the calls read against
 // the sales of the same hour without a second row. The theme's accent colours it.
-const MISSED_BADGE = "inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-[var(--brand-accent,var(--color-amber-500))] px-1 font-mono text-[10px] font-bold leading-none tabular-nums text-white shadow-sm"
+const MISSED_BADGE = "inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-orange-500 px-1 font-mono text-[10px] font-bold leading-none tabular-nums text-white shadow-sm"
 
 const GRID = "grid grid-cols-[32px_repeat(11,1fr)] gap-[5px]"
 

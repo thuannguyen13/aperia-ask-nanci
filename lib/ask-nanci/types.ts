@@ -74,6 +74,17 @@ export interface ConceptScriptedTurn extends ScriptedTurn {
    * before the next question covers it.
    */
   pauseBefore?: number
+  /**
+   * The turn is a text message from this sender, and nothing else. It plays as a phone
+   * notification outside the app and never lands in the chat. Its panel fields are ignored.
+   */
+  textFrom?: string
+}
+
+/** A text message from Nanci as the phone shows it, while the turn that sent it arrives. */
+export interface TextNoticeData {
+  from: string
+  body: string
 }
 
 // ─── API / user types ──────────────────────────────────────────────────────────

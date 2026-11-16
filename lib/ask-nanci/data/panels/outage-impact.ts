@@ -10,6 +10,7 @@ import { DAILY_SALES } from "./sales-snapshot"
 import { HEATMAP_HOURS, HEATMAP_ROWS } from "./busiest-times"
 import type { CarrierRequestOption } from "./carrier-request"
 import { CARRIER } from "../carrier"
+import { FIRST_LOCATION } from "./second-location"
 import { formatWholeCurrency } from "../../../../components/shared/format"
 
 export const OUTAGE_IMPACT_TITLE = "Outage Impact"
@@ -29,6 +30,15 @@ export function formatClock(minutes: number, withMeridiem = false) {
 }
 
 export const OUTAGE_WINDOW = `${formatClock(OUTAGE.start)} to ${formatClock(OUTAGE.end, true)}`
+
+// The fix estimate in Nanci's text is later than the actual fix, as estimates usually
+// are. Nanci follows up in the chat two minutes after the connection is back.
+export const OUTAGE_ESTIMATED_FIX = OUTAGE.start + 50
+const OUTAGE_FOLLOWUP_AT = OUTAGE.end + 2
+export const OUTAGE_STREET = FIRST_LOCATION.address.split(",")[0]
+
+/** Invented, as every carrier figure is: the credit the carrier applies for the outage. */
+export const OUTAGE_CREDIT = 25
 
 const THURSDAY = DAILY_SALES.find((d) => d.day === "Thursday")!
 export const THURSDAY_ROW = HEATMAP_ROWS.find((r) => r.day === "Thu")!
@@ -64,9 +74,14 @@ export const OUTAGE_EVENTS = [
   { at: OUTAGE.end + 2, label: "Card payments going through again", detail: "Register", down: false },
 ]
 
+export const OUTAGE_CREDIT_NOTE = {
+  title: `${formatWholeCurrency(OUTAGE_CREDIT)} credit on your next bill`,
+  body: `${CARRIER.business} applied it for the outage. You don't need to ask for it.`,
+}
+
 export const OUTAGE_ESTIMATE_NOTE = `How this was estimated: a usual Thursday 6 to 7 PM brings in about ${formatWholeCurrency(USUAL_DINNER_HOUR)} on your register. The connection was down for ${OUTAGE_MINUTES} of those 60 minutes, so about ${formatWholeCurrency(ESTIMATED_SALES_AFFECTED)}.`
 
-export const OUTAGE_REQUEST_TIMESTAMP = "Today, 9:15 AM"
+export const OUTAGE_REQUEST_TIMESTAMP = `Today, ${formatClock(OUTAGE_FOLLOWUP_AT + 6, true)}`
 
 export const OUTAGE_OPTIONS_HEADING = {
   title: "Backup internet, ranked by fit",

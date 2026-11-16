@@ -178,7 +178,7 @@ function FlowGrid({ flows, onTryIt, onSimulateLogin }: { flows: FlowDef[]; onTry
             >
               Open Marketplace
             </button>
-          ) : flow.proactive ? (
+          ) : flow.proactive && onSimulateLogin ? (
             <button
               onClick={onSimulateLogin}
               className="rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors"

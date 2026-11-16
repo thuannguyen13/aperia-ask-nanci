@@ -18,7 +18,7 @@ export const EXPANSION_FLOW: FlowDef = {
   num: 36,
   section: "merchant",
   title: "Second Location",
-  badge: "Expansion",
+  badge: "Life Events",
   key: EXPANSION_PROMPT,
   slug: "36",
   scope: "carrier",

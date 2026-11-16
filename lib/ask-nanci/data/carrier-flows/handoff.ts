@@ -15,7 +15,7 @@ export const HANDOFF_FLOW: FlowDef = {
   num: 38,
   section: "merchant",
   title: "Bill Question",
-  badge: "Handoff",
+  badge: "Support",
   key: HANDOFF_PROMPT,
   slug: "38",
   scope: "carrier",

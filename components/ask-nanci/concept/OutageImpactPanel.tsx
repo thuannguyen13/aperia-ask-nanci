@@ -1,12 +1,13 @@
 "use client"
 
-import { CircleAlert, Wifi, WifiOff } from "lucide-react"
+import { CircleAlert, ReceiptText, Wifi, WifiOff } from "lucide-react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci, usePanelView } from "@/contexts/AskNanciContext"
 import { HEATMAP_HOURS, HEATMAP_APPROX } from "@/lib/ask-nanci/data/panels/busiest-times"
 import {
   OUTAGE_IMPACT_TITLE, OUTAGE_INSIGHT, OUTAGE_TILES, OUTAGE_WHY, OUTAGE_EVENTS, OUTAGE_ESTIMATE_NOTE,
   OUTAGE, OUTAGE_WINDOW, EVENING, EVENING_HOURS, THURSDAY_ROW, OUTAGE_OPTIONS, OUTAGE_OPTIONS_HEADING, formatClock,
+  OUTAGE_CREDIT_NOTE,
 } from "@/lib/ask-nanci/data/panels/outage-impact"
 import { parseRequestView, requestView } from "@/lib/ask-nanci/data/panels/carrier-request"
 import { isAwaitingOutageRequest } from "@/lib/ask-nanci/data/carrier-flows/outage"
@@ -15,7 +16,7 @@ import { RequestDraft, RequestOptions, RequestSent } from "./carrier-request"
 
 const PANEL_ID = "outage-impact"
 
-// Busiest Times levels in blue, which the AT&T theme turns into its cobalt scale.
+// Busiest Times levels in blue, as the Busiest Times heatmap draws them.
 const LEVEL_CLS = [
   "bg-muted",
   "bg-blue-100 dark:bg-blue-950/40",
@@ -113,6 +114,9 @@ function Findings() {
           <StatCard key={tile.label} label={tile.label} value={tile.value} sublabel={tile.sublabel} tone={tile.tone} />
         ))}
       </div>
+      <Callout variant="green" icon={ReceiptText} title={OUTAGE_CREDIT_NOTE.title}>
+        <p>{OUTAGE_CREDIT_NOTE.body}</p>
+      </Callout>
       <EveningTrack />
       <Callout variant="amber" icon={CircleAlert} title={OUTAGE_WHY.title}>
         <p>{OUTAGE_WHY.body}</p>

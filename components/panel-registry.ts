@@ -126,7 +126,7 @@ export const PANELS = {
   "resy-report":         { component: ResyReportPanel,        label: WEEK_TITLE },
   "resy-surveys":        { component: ResySurveysPanel,       label: "Surveys" },
   "resy-locations":      { component: ResyLocationsPanel,     label: "Locations" },
-  // Carrier stories (?mode=att).
+  // Carrier stories (?mode=carrier).
   "missed-calls":        { component: MissedCallsPanel,       label: MISSED_CALLS_TITLE },
   "outage-impact":       { component: OutageImpactPanel,      label: OUTAGE_IMPACT_TITLE },
   "unused-lines":        { component: UnusedLinesPanel,       label: UNUSED_LINES_TITLE },

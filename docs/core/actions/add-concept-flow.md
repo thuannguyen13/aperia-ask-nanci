@@ -29,6 +29,15 @@ The contract between a scripted flow and the panel stack. These are the real fie
 | `filterDeclineReport: true` | Switches the decline-report panel into its filtered view. |
 | `closeAllPanels: true` | Resets all open panels (staggered close animation), plus panel views and the decline-report filter. |
 
+## Nanci speaks first
+
+A flow that opens on a question cannot show Nanci reaching the owner unasked. Set `proactive: true` on the definition and start the script with an assistant turn, and give the flow an id for its `key` rather than a prompt.
+
+| Field | Effect |
+|---|---|
+| `textFrom: "Sender"` | Plays the turn as a phone notification outside the app, and nothing more. It never lands in the chat. The next answer opens the chat. |
+| `pauseBefore` | On an assistant turn, holds the chat empty before it arrives, so time passing reads. |
+
 ## Looping demos
 
 Set `loop: true` on the flow def for a demo that runs unattended on a screen. It changes nothing about the script: the auto player reaches the last turn, holds on it, then rewinds and plays again.
