@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { Headset, Smartphone, Sparkles, Wifi } from "lucide-react"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { CARRIER } from "@/lib/ask-nanci/data/carrier"
@@ -42,7 +43,10 @@ export function PlanValuePanel() {
           <ul className="flex flex-col gap-2">
             {PLAN_INCLUDES.map((item) => (
               <li key={item.kind}>
-                <PanelItem icon={INCLUDE_ICONS[item.kind]}>
+                <PanelItem
+                  icon={INCLUDE_ICONS[item.kind]}
+                  media={item.kind === "assistant" ? <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={18} height={18} /> : undefined}
+                >
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-foreground">{item.title}</p>
                     <p className="text-xs text-muted-foreground">{item.detail}</p>

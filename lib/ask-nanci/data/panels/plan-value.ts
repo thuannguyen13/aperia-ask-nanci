@@ -31,10 +31,11 @@ export const YEAR_WITH_NANCI = {
 }
 
 // What the plan includes, in plain words. No real product names.
+// Ask Nanci first: it is what the rest of the year's value came from.
 export const PLAN_INCLUDES = [
+  { kind: "assistant", title: "Ask Nanci", detail: "Connected to your register, your bank and this account" },
   { kind: "lines", title: `${LINES.length} phone lines`, detail: "Calls, texts and data on each line" },
   { kind: "internet", title: "Business internet", detail: "One connection at the restaurant" },
-  { kind: "assistant", title: "Ask Nanci", detail: "Connected to your register, your bank and this account" },
   { kind: "support", title: "Business support", detail: `${CARRIER.business} specialists by phone and chat` },
 ] as const
 
