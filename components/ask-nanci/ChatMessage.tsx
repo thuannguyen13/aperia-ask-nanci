@@ -154,10 +154,13 @@ function BotMessageBase({
   message,
   displayedContent,
   showExtras,
+  showPanelCard = true,
 }: {
   message: Message
   displayedContent: string
   showExtras: boolean
+  /** False when an earlier answer already carries this panel's card. */
+  showPanelCard?: boolean
 }) {
   const [sheetOpen, setSheetOpen] = useState(false)
 
@@ -185,7 +188,7 @@ function BotMessageBase({
           <AiTriageSummaryWidget />
         )}
         {showExtras && message.dashChart && <DashChartCard id={message.dashChart} />}
-        {showExtras && message.panel && <PanelArtifactCard id={message.panel} />}
+        {showExtras && showPanelCard && message.panel && <PanelArtifactCard id={message.panel} />}
         {showExtras && message.sheetAction && (
           <>
             <ChangeRequestCard data={message.sheetAction} onClick={() => setSheetOpen(true)} />
