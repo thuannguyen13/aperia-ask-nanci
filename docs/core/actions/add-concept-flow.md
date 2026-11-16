@@ -37,8 +37,9 @@ Follow the text with the owner's question, not with Nanci. A chat that opens on 
 
 | Field | Effect |
 |---|---|
-| `textFrom: "Sender"` | Plays the turn as a phone notification outside the app, then keeps it at the head of the chat as a text card naming the sender and "Sent by Ask Nanci". |
-| `textLink` | The link the text ends with. The notification shows it being tapped, and the chat card notes that the owner opened Ask Nanci from the text. Build it with `nanciLink(code)`. |
+| `textFrom: "Sender"` | Plays the turn as a phone notification outside the app, then opens the chat with the same words as Nanci's first message. |
+| `textLabel` | What kind of automated message it is, such as "Daily Recap". It sits above Nanci's first message with "Sent automatically", so the chat reads as Nanci starting it. |
+| `textLink` | The link the text ends with, shown on the notification only. The notification shows it being tapped, which is what opens the chat. Build it with `nanciLink(code)`. |
 | `pauseBefore` | Holds before the turn arrives, so time passing reads. Put it on the owner's question when time passes between the text and the reply. |
 
 ## Looping demos

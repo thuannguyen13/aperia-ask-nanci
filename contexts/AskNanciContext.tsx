@@ -644,16 +644,16 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
   // differs per caller (manual falls back to the next question), so it's passed in.
   const playAssistantTurn = useCallback(async (turn: ConceptScriptedTurn, suggestions: string[] | undefined, shouldStop: () => boolean = () => scriptStopRef.current) => {
     if (turn.textFrom) {
-      // A text reaches the owner's phone, outside the app. When they open the app it is
-      // the first thing in the chat, as a text card rather than a reply, so what they ask
-      // next reads as a reply to it.
+      // A text reaches the owner's phone, outside the app. When they open the app, the
+      // same words are Nanci's first message in the chat, so what they ask next reads as
+      // a reply to it.
       setChatState("idle")
       setTextNotice({ from: turn.textFrom, body: turn.content, link: turn.textLink })
       await sleep(TEXT_NOTICE_HOLD_MS)
       setTextNotice(null)
       await sleep(TEXT_NOTICE_GAP_MS)
       setView("chat")
-      setMessages((prev) => [...prev, { id: newSessionId(), role: "assistant" as const, content: turn.content, textFrom: turn.textFrom, textLink: turn.textLink, ...(suggestions ? { suggestions } : {}) }])
+      setMessages((prev) => [...prev, { id: newSessionId(), role: "assistant" as const, content: turn.content, automatedLabel: turn.textLabel, ...(suggestions ? { suggestions } : {}) }])
       return
     }
     // A flow that opened on a text is still outside the chat. Its first answer opens it.
