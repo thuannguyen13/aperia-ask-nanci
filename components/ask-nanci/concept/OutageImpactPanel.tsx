@@ -3,7 +3,7 @@
 import { CheckCheck, Wifi, WifiOff } from "lucide-react"
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "aperia-ds5"
-import { HEATMAP_HOURS, HEATMAP_APPROX } from "@/lib/ask-nanci/data/panels/busiest-times"
+import { HEATMAP_HOURS, HEATMAP_APPROX, salesAt } from "@/lib/ask-nanci/data/panels/busiest-times"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import {
@@ -11,7 +11,7 @@ import {
   OUTAGE, OUTAGE_WINDOW, EVENING, EVENING_HOURS, EVENING_CHART, THURSDAY_ROW, INCIDENT_TITLE, INCIDENT_WHEN, formatClock,
   OUTAGE_CREDIT_NOTE,
 } from "@/lib/ask-nanci/data/panels/outage-impact"
-import { PanelShell, PanelHeader, PanelBody, NanciInsight, StatCard, Callout, SectionHeader } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody, NanciInsight, StatCard, Callout, SectionHeader, formatWholeCurrency } from "@/components/shared"
 
 const PANEL_ID = "outage-impact"
 
@@ -29,7 +29,6 @@ const LEVEL_FILL = [
 const DOWN_FILL = "var(--color-red-500)"
 
 const SPAN = EVENING.end - EVENING.start
-const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
 const pct = (minutes: number) => `${((minutes - EVENING.start) / SPAN) * 100}%`
 
 interface Tip { at: number; title: string; swatch: string; label: string; value: string }
@@ -83,7 +82,7 @@ function EveningChart() {
                     key={hour}
                     className="flex-1"
                     style={{ background: LEVEL_FILL[lvl] }}
-                    onMouseEnter={() => setTip({ at, title: `Thursday, ${hour.replace("p", " PM")}`, swatch: LEVEL_FILL[lvl], label: "Usual Thursday", value: capitalize(HEATMAP_APPROX[lvl]) })}
+                    onMouseEnter={() => setTip({ at, title: `Thursday, ${hour.replace("p", " PM")}`, swatch: LEVEL_FILL[lvl], label: `Usual Thursday, ${HEATMAP_APPROX[lvl]}`, value: formatWholeCurrency(salesAt("Thu", hour)) })}
                   />
                 )
               })}

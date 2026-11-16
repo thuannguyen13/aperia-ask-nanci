@@ -3,11 +3,11 @@
 import { useState } from "react"
 import { cn } from "aperia-ds5/utils"
 import { useAskNanci } from "@/contexts/AskNanciContext"
-import { HEATMAP_HOURS, HEATMAP_ROWS, HEATMAP_APPROX } from "@/lib/ask-nanci/data/panels/busiest-times"
+import { HEATMAP_HOURS, HEATMAP_ROWS, HEATMAP_APPROX, HOURLY_SALES } from "@/lib/ask-nanci/data/panels/busiest-times"
 import {
   MISSED_CALLS_TITLE, MISSED_CALLS_INSIGHT, MISSED_CALLS_TILES, MISSED_CALLS_NOTE, MISSED_BY_HOUR,
 } from "@/lib/ask-nanci/data/panels/missed-calls"
-import { PanelShell, PanelHeader, PanelBody, NanciInsight, StatCard } from "@/components/shared"
+import { PanelShell, PanelHeader, PanelBody, NanciInsight, StatCard, SectionHeader, formatWholeCurrency } from "@/components/shared"
 
 const PANEL_ID = "missed-calls"
 
@@ -20,20 +20,22 @@ const LEVEL_CLS = [
   "bg-blue-600 dark:bg-blue-500",
 ]
 
-// A missed-call count sits on its Friday cell as a badge, so the calls read against
-// the sales of the same hour without a second row. The theme's accent colours it.
-const MISSED_BADGE = "inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-orange-500 px-1 font-mono text-[10px] font-bold leading-none tabular-nums text-white shadow-sm"
+// The figure in each cell reads in white on the two darkest levels.
+const FIGURE_CLS = ["text-muted-foreground", "text-foreground/70", "text-foreground/80", "text-white", "text-white"]
+
+// A missed-call count sits on the corner of its Friday cell as a badge, so the calls read
+// against the sales of the same hour without a second row.
+const MISSED_BADGE = "inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-orange-500 px-1 font-mono text-[10px] font-bold leading-none tabular-nums text-white shadow-sm ring-2 ring-background"
 
 const GRID = "grid grid-cols-[32px_repeat(11,1fr)] gap-[5px]"
 
 const DAY_NAMES: Record<string, string> = { Mon: "Monday", Tue: "Tuesday", Wed: "Wednesday", Thu: "Thursday", Fri: "Friday", Sat: "Saturday", Sun: "Sunday" }
-const capitalize = (text: string) => text.charAt(0).toUpperCase() + text.slice(1)
 /** "12p" as "12 PM", "11a" as "11 AM". */
 const spellHour = (hour: string) => `${hour.slice(0, -1)} ${hour.endsWith("a") ? "AM" : "PM"}`
 
 // The hovered cell's details, as the design system's chart tooltip draws them: a light
 // card over the cell, held inside the grid near either end.
-function CellTip({ day, hourIndex, level, missed }: { day: string; hourIndex: number; level: number; missed: number }) {
+function CellTip({ day, hourIndex, level, sales, missed }: { day: string; hourIndex: number; level: number; sales: number; missed: number }) {
   const last = HEATMAP_HOURS.length - 1
   return (
     <div
@@ -45,8 +47,8 @@ function CellTip({ day, hourIndex, level, missed }: { day: string; hourIndex: nu
       <p className="font-medium text-foreground">{DAY_NAMES[day]}, {spellHour(HEATMAP_HOURS[hourIndex])}</p>
       <div className="flex items-center gap-2">
         <span className={cn("size-2.5 shrink-0 rounded-[2px]", LEVEL_CLS[level], level === 0 && "ring-1 ring-border")} />
-        <span className="text-muted-foreground">Sales</span>
-        <span className="ml-auto pl-6 font-medium text-foreground">{capitalize(HEATMAP_APPROX[level])}</span>
+        <span className="text-muted-foreground">Average sales, {HEATMAP_APPROX[level]}</span>
+        <span className="ml-auto pl-6 font-medium tabular-nums text-foreground">{formatWholeCurrency(sales)}</span>
       </div>
       {missed > 0 && (
         <div className="flex items-center gap-2">
@@ -64,7 +66,7 @@ function Heatmap() {
   const [hover, setHover] = useState<{ day: string; hourIndex: number } | null>(null)
   return (
     <div>
-      <p className="mb-2 text-base font-semibold text-foreground">Sales by day and hour, with last Friday's missed calls</p>
+      <SectionHeader title="Sales by Day and Hour" description="Average sales per hour over the last four weeks, with last Friday's missed calls." />
       <div className="flex flex-col gap-[5px]">
         <div className={GRID}>
           <span />
@@ -72,22 +74,25 @@ function Heatmap() {
             <span key={h} className="text-center text-[9px] font-semibold text-muted-foreground">{h}</span>
           ))}
         </div>
-        {HEATMAP_ROWS.map((row) => {
+        {HEATMAP_ROWS.map((row, r) => {
           const isFriday = row.day === "Fri"
           return (
             <div key={row.day} className={cn(GRID, "items-center")}>
               <span className={cn("text-[10px] font-semibold", isFriday ? "text-foreground" : "text-muted-foreground")}>{row.day}</span>
               {row.levels.map((lvl, i) => {
                 const missed = isFriday ? MISSED_BY_HOUR[i] : 0
+                const sales = HOURLY_SALES[r].sales[i]
                 const hovered = hover?.day === row.day && hover.hourIndex === i
                 return (
                   <span
                     key={i}
                     onMouseEnter={() => setHover({ day: row.day, hourIndex: i })}
-                    className={cn("relative flex h-6 items-center justify-center rounded-[4px]", LEVEL_CLS[lvl], hovered && "ring-2 ring-foreground/40")}
+                    className={cn("relative flex h-7 min-w-0 items-center justify-center rounded-[4px]", LEVEL_CLS[lvl], hovered && "ring-2 ring-foreground/40")}
                   >
-                    {missed > 0 && <span className={MISSED_BADGE}>{missed}</span>}
-                    {hovered && <CellTip day={row.day} hourIndex={i} level={lvl} missed={missed} />}
+                    {/* Eleven figures do not fit across a phone, so there the tooltip carries them. */}
+                    <span className={cn("hidden text-[10px] font-medium tabular-nums sm:inline", FIGURE_CLS[lvl])}>{formatWholeCurrency(sales)}</span>
+                    {missed > 0 && <span className={cn(MISSED_BADGE, "absolute -top-2 -right-1.5")}>{missed}</span>}
+                    {hovered && <CellTip day={row.day} hourIndex={i} level={lvl} sales={sales} missed={missed} />}
                   </span>
                 )
               })}
@@ -98,9 +103,9 @@ function Heatmap() {
 
       <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[10px] text-muted-foreground">
         <span className="flex items-center gap-1.5">
-          <span>Quiet</span>
+          <span>Under $100</span>
           {LEVEL_CLS.map((cls, i) => <span key={i} className={cn("size-3 rounded-sm", cls)} />)}
-          <span>Busy</span>
+          <span>$400 and over</span>
         </span>
         <span className="flex items-center gap-1.5">
           <span className={MISSED_BADGE}>9</span>

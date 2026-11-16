@@ -1,13 +1,11 @@
 // Data for carrier story 35, Outage Impact: Thursday evening's internet outage on the
 // carrier's service record, matched to the card payments the register could not take.
 //
-// The estimate is the same mock business as Busiest Times and the Sales Snapshot.
-// Thursday's sales and transactions (sales-snapshot.ts) are shared across the hours by
-// the Thursday row of the heatmap (busiest-times.ts), where 6 PM is "busy". The 40
-// minutes are then that share of the 6 PM hour.
+// The estimate is the same mock business as Busiest Times and the Sales Snapshot: a usual
+// Thursday 6 PM hour (busiest-times.ts), of which the 40 minutes are their share.
 import { Cable, Smartphone, Wifi } from "lucide-react"
 import { DAILY_SALES } from "./sales-snapshot"
-import { HEATMAP_HOURS, HEATMAP_ROWS } from "./busiest-times"
+import { HEATMAP_ROWS, salesAt } from "./busiest-times"
 import type { CarrierRequestOption } from "./carrier-request"
 import { CARRIER } from "../carrier"
 import { FIRST_LOCATION } from "./second-location"
@@ -43,13 +41,12 @@ export const OUTAGE_CREDIT = 25
 
 const THURSDAY = DAILY_SALES.find((d) => d.day === "Thursday")!
 export const THURSDAY_ROW = HEATMAP_ROWS.find((r) => r.day === "Thu")!
-const THURSDAY_LEVEL_TOTAL = THURSDAY_ROW.levels.reduce((sum, l) => sum + l, 0)
-const DINNER_SHARE = THURSDAY_ROW.levels[HEATMAP_HOURS.indexOf("6p")] / THURSDAY_LEVEL_TOTAL
 const OUTAGE_FRACTION = OUTAGE_MINUTES / 60
 
-export const USUAL_DINNER_HOUR = roundTo10(THURSDAY.sales * DINNER_SHARE)
-export const ESTIMATED_SALES_AFFECTED = roundTo10(THURSDAY.sales * DINNER_SHARE * OUTAGE_FRACTION)
-export const FAILED_PAYMENTS = Math.round(THURSDAY.transactions * DINNER_SHARE * OUTAGE_FRACTION)
+export const USUAL_DINNER_HOUR = salesAt("Thu", "6p")
+export const ESTIMATED_SALES_AFFECTED = roundTo10(USUAL_DINNER_HOUR * OUTAGE_FRACTION)
+// Payments at Thursday's usual ticket: the hour's share of the day's sales, in transactions.
+export const FAILED_PAYMENTS = Math.round(THURSDAY.transactions * (USUAL_DINNER_HOUR / THURSDAY.sales) * OUTAGE_FRACTION)
 
 // The conclusion in the owner's terms. The tiles, the timeline and the credit below break it down.
 export const OUTAGE_INSIGHT = `Your register went offline during your dinner rush. ${FAILED_PAYMENTS} card payments failed, about ${formatWholeCurrency(ESTIMATED_SALES_AFFECTED)} in sales.`

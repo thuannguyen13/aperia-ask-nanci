@@ -2,11 +2,10 @@
 // calls the business line missed in the same window, then two ways to cover it.
 //
 // The sales side is the same mock business as Busiest Times and the Sales Snapshot. The
-// usual Friday lunch is Friday's sales (sales-snapshot.ts) shared across the hours by the
-// Friday row of the heatmap (busiest-times.ts), so it cannot disagree with either.
+// usual Friday lunch adds up Friday's 11 AM, noon and 1 PM hours (busiest-times.ts), the
+// same figures the heatmap shows, so it cannot disagree with either.
 import { PhoneCall, PhoneForwarded } from "lucide-react"
-import { DAILY_SALES } from "./sales-snapshot"
-import { HEATMAP_HOURS, HEATMAP_ROWS } from "./busiest-times"
+import { HEATMAP_HOURS, HEATMAP_ROWS, salesAt } from "./busiest-times"
 import type { CarrierRequestOption } from "./carrier-request"
 import { formatWholeCurrency } from "../../../../components/shared/format"
 
@@ -15,18 +14,14 @@ export const CALLS_COVER_TITLE = "Lunch Calls"
 
 const roundTo10 = (n: number) => Math.round(n / 10) * 10
 
-const FRIDAY_SALES = DAILY_SALES.find((d) => d.day === "Friday")!
 export const FRIDAY_ROW = HEATMAP_ROWS.find((r) => r.day === "Fri")!
 
 // Lunch is 11 AM to 2 PM: the 11a, 12p and 1p cells.
 const LUNCH_HOURS = ["11a", "12p", "1p"]
-const levelOf = (hour: string) => FRIDAY_ROW.levels[HEATMAP_HOURS.indexOf(hour)]
-const FRIDAY_LEVEL_TOTAL = FRIDAY_ROW.levels.reduce((sum, l) => sum + l, 0)
-const LUNCH_SHARE = LUNCH_HOURS.reduce((sum, h) => sum + levelOf(h), 0) / FRIDAY_LEVEL_TOTAL
 
 // The one authored figure on the sales side: how far last Friday's lunch fell.
 export const LUNCH_DROP_PCT = 18
-export const USUAL_FRIDAY_LUNCH = roundTo10(FRIDAY_SALES.sales * LUNCH_SHARE)
+export const USUAL_FRIDAY_LUNCH = LUNCH_HOURS.reduce((sum, h) => sum + salesAt("Fri", h), 0)
 export const LAST_FRIDAY_LUNCH = roundTo10(USUAL_FRIDAY_LUNCH * (1 - LUNCH_DROP_PCT / 100))
 export const LUNCH_SHORTFALL = USUAL_FRIDAY_LUNCH - LAST_FRIDAY_LUNCH
 

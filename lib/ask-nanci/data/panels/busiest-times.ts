@@ -4,15 +4,27 @@
 
 export const HEATMAP_HOURS = ["10a", "11a", "12p", "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p"]
 
-export const HEATMAP_ROWS = [
-  { day: "Mon", levels: [1, 1, 3, 3, 1, 1, 1, 2, 2, 1, 0] },
-  { day: "Tue", levels: [1, 1, 2, 3, 1, 0, 0, 1, 2, 1, 0] },
-  { day: "Wed", levels: [1, 1, 2, 3, 1, 0, 0, 1, 2, 1, 0] },
-  { day: "Thu", levels: [1, 1, 3, 3, 1, 1, 1, 2, 3, 2, 1] },
-  { day: "Fri", levels: [1, 2, 4, 4, 2, 1, 2, 3, 4, 3, 1] },
-  { day: "Sat", levels: [1, 2, 3, 4, 3, 2, 3, 4, 4, 3, 2] },
-  { day: "Sun", levels: [1, 2, 3, 3, 2, 1, 2, 3, 3, 2, 1] },
+// Average sales per hour over the last four weeks, from the register. Each row adds up to
+// that day in the Sales Snapshot (sales-snapshot.ts), and the heatmap's levels are read
+// from these figures, so a colour and the dollars under it always agree.
+export const HOURLY_SALES = [
+  { day: "Mon", sales: [120, 160, 360, 380, 150, 110, 130, 210, 290, 180, 90] },
+  { day: "Tue", sales: [120, 190, 290, 370, 120, 80, 90, 190, 290, 160, 80] },
+  { day: "Wed", sales: [190, 190, 380, 390, 160, 80, 90, 290, 290, 190, 90] },
+  { day: "Thu", sales: [120, 170, 360, 380, 150, 125, 130, 240, 375, 250, 110] },
+  { day: "Fri", sales: [110, 220, 420, 360, 210, 120, 150, 260, 330, 250, 110] },
+  { day: "Sat", sales: [160, 290, 390, 590, 390, 260, 380, 480, 520, 390, 260] },
+  { day: "Sun", sales: [130, 230, 330, 370, 240, 150, 220, 310, 330, 240, 130] },
 ]
+
+// Where each level starts: under $100 is quiet, $400 and over is peak.
+const LEVEL_FLOORS = [0, 100, 200, 300, 400]
+export const levelFor = (sales: number) => LEVEL_FLOORS.findLastIndex((floor) => sales >= floor)
+
+export const HEATMAP_ROWS = HOURLY_SALES.map((row) => ({ day: row.day, levels: row.sales.map(levelFor) }))
+
+/** The average sales for one day and hour, such as ("Fri", "12p"). */
+export const salesAt = (day: string, hour: string) => HOURLY_SALES.find((r) => r.day === day)!.sales[HEATMAP_HOURS.indexOf(hour)]
 
 export const HEATMAP_APPROX = ["quiet", "light", "steady", "busy", "peak"]
 
