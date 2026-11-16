@@ -2,7 +2,7 @@
 
 import { memo, useState } from "react"
 import Image from "next/image"
-import { FileText } from "lucide-react"
+import { Check, CircleAlert, FileText } from "lucide-react"
 import type { Message, SheetActionData } from "@/lib/ask-nanci/types"
 import { ChatCitedSources, ChatScriptedSources } from "./ChatCitedSources"
 import { SuggestedQuestions } from "./SuggestedQuestions"
@@ -171,15 +171,26 @@ function BotMessageBase({
         {/* 16px on every screen, with Tailwind's own 1.5 line height rather than the
             leading-relaxed this used to carry. Question and answer are one exchange and
             share both numbers. */}
-        {/* A message Nanci sent unasked says so, and says why: the reason is what tells it
-            apart from a scheduled send. What it checked is cited under the message. */}
-        {message.reachedOut && (
-          <div className="mb-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs">
-            <span className="flex items-center gap-1.5 font-medium text-foreground">
+        {/* A message Nanci sent unasked opens on the work it did first: what it checked,
+            then what it flagged. A scheduled send has no such trail. The sources it read
+            are cited under the message. */}
+        {message.workTrail && (
+          <div className="mb-3 text-xs">
+            <p className="flex items-center gap-1.5">
               <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={14} height={14} />
-              Ask Nanci reached out
-            </span>
-            <span className="text-muted-foreground">{message.reachedOut}</span>
+              <span className="font-medium text-foreground">Ask Nanci</span>
+              <span className="text-muted-foreground">{message.workTrail.when}</span>
+            </p>
+            <ul className="mt-1.5 ml-[6px] space-y-1 border-l pl-3">
+              {message.workTrail.steps.map((step) => (
+                <li key={step.text} className="flex items-start gap-1.5">
+                  {step.flag
+                    ? <CircleAlert className="mt-px size-3.5 shrink-0 text-amber-600 dark:text-amber-400" />
+                    : <Check className="mt-px size-3.5 shrink-0 text-muted-foreground" />}
+                  <span className={step.flag ? "font-medium text-foreground" : "text-muted-foreground"}>{step.text}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
         <div className="text-base text-foreground">

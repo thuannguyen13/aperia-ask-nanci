@@ -20,7 +20,7 @@ const BRIEFING_KEY = "__daily-briefing__"
 const OPEN_PAUSE_MS = 2500
 const BRIEFING_SHARE = "Send this to my shift manager too"
 // The owner opens the app on the text and asks for the rest.
-const BRIEFING_ASK = "How did yesterday go?"
+const BRIEFING_ASK = "What else happened yesterday?"
 
 export const BRIEFING_FLOW: FlowDef = {
   num: 33,
@@ -43,13 +43,22 @@ export const BRIEFING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
       content: `Good morning. ${YESTERDAY.day}: ${formatWholeCurrency(YESTERDAY.sales)} in sales, ${YESTERDAY_CHANGE_PCT}% above a usual ${YESTERDAY.day}. ${WORTH_A_LOOK.title}.`,
       textFrom: CARRIER.business,
       textLink: nanciLink("b7Kq2"),
-      textReason: "Stock will run out before the next delivery",
+      chatContent: `While you were away I went through ${YESTERDAY.day}. Sales were ${formatWholeCurrency(YESTERDAY.sales)}, ${YESTERDAY_CHANGE_PCT}% above a usual ${YESTERDAY.day}. One thing needs you this week: ${lowerFirst(WORTH_A_LOOK.title)}, a day before your next delivery.`,
+      workTrail: {
+        when: "Overnight",
+        steps: [
+          { text: `Checked ${YESTERDAY.orders} orders on your register` },
+          { text: `Matched ${formatWholeCurrency(DEPOSITED)} in deposits to Thursday's card sales` },
+          { text: "Compared your stock with this week's pace" },
+          { flag: true, text: `Flagged: ${lowerFirst(WORTH_A_LOOK.title)}` },
+        ],
+      },
       source: CARRIER_CITES.cashFlow,
     },
     { role: "user", content: BRIEFING_ASK, pauseBefore: OPEN_PAUSE_MS },
     {
       role: "assistant",
-      content: `${YESTERDAY.day} came in at ${formatWholeCurrency(YESTERDAY.sales)} across ${YESTERDAY.orders} orders, ${YESTERDAY_CHANGE_PCT}% above a usual ${YESTERDAY.day}. The ${TOP_ITEMS[0].name} led again with ${TOP_ITEMS[0].sold} sold. ${formatWholeCurrency(DEPOSITED)} from Thursday's card sales landed in your bank overnight.\n\nOne thing for this week: ${lowerFirst(WORTH_A_LOOK.title)}. ${WORTH_A_LOOK.body}`,
+      content: `${YESTERDAY.orders} orders came through, and the ${TOP_ITEMS[0].name} led again with ${TOP_ITEMS[0].sold} sold. ${formatWholeCurrency(DEPOSITED)} from Thursday's card sales landed in your bank overnight.\n\nOn the mozzarella: ${WORTH_A_LOOK.body}`,
       panel: "daily-briefing",
       source: CARRIER_CITES.cashFlow,
       suggestions: [BRIEFING_SHARE],

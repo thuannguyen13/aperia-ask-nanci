@@ -83,12 +83,20 @@ export interface ConceptScriptedTurn extends ScriptedTurn {
   textFrom?: string
   /** The link at the end of that text, which opens Ask Nanci on this conversation. */
   textLink?: string
+  /** What Nanci's first chat message says, in its own voice. The text stays short. */
+  chatContent?: string
   /**
-   * Why Nanci reached out, shown above its first message in the chat. With the turn's
-   * `source`, which cites what it checked, it is what makes the text read as Nanci's
-   * own decision rather than a scheduled send.
+   * What Nanci did before it reached out, shown above its first chat message: the
+   * checks it ran and what it flagged. A scheduled send has no trail, so the trail is
+   * what shows Nanci found this on its own.
    */
-  textReason?: string
+  workTrail?: WorkTrail
+}
+
+/** The work Nanci did unasked before it reached out: when, then each step in order. */
+export interface WorkTrail {
+  when: string
+  steps: { flag?: true; text: string }[]
 }
 
 /** A text message from Nanci as the phone shows it, while the turn that sent it arrives. */
@@ -169,8 +177,8 @@ export interface Message {
    * it without asking Nanci for it again.
    */
   panel?: PanelId
-  /** Set on a message Nanci sent unasked: why it reached out, shown above it. */
-  reachedOut?: string
+  /** Set on a message Nanci sent unasked: the work it did first, shown above it. */
+  workTrail?: WorkTrail
   /** True when the stream ended (user stopped or natural completion). Prevents re-appending a partial response on session resume. */
   stopped?: boolean
 }

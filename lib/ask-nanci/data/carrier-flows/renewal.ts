@@ -21,7 +21,7 @@ import { isAwaitingAny, requestView, sentView } from "../panels/carrier-request"
 // Nanci opens the flow, so its key is an id rather than a prompt.
 const MONTH_KEY = "__plan-value__"
 // The owner opens the app on Nanci's text and asks for the month.
-const MONTH_ASK = "What did my plan do last month?"
+const MONTH_ASK = `Show me the ${spellCount(MONTH_CATCHES.length)} things`
 export const RENEWAL_PROMPT = "My plan renews next month. Is it worth keeping?"
 const RENEWAL_RENEW = "Renew my plan"
 const RENEWAL_OPTIONS_ASK = "Show me other options"
@@ -66,13 +66,21 @@ export const RENEWAL_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
       content: `Your ${MONTH} summary is ready: ${MONTH_CATCHES.length} things caught on your account, ${formatWholeCurrency(MONTH_SAVINGS)} in savings found.`,
       textFrom: CARRIER.business,
       textLink: nanciLink("s3Jx7"),
-      textReason: "Your November account review",
+      chatContent: `${MONTH} is done, so I put together what your plan did this month. I caught ${spellCount(MONTH_CATCHES.length)} things on your account, and ${spellCount(MONTH_CATCHES.filter((c) => c.saving).length)} of them found ${formatWholeCurrency(MONTH_SAVINGS)} in savings.`,
+      workTrail: {
+        when: `End of ${MONTH}`,
+        steps: [
+          { text: `Went back through ${MONTH} on your ${CARRIER.business} account` },
+          { text: "Counted savings only where there is a figure" },
+          { flag: true, text: `Ready: ${MONTH_CATCHES.length} things caught, ${formatWholeCurrency(MONTH_SAVINGS)} in savings` },
+        ],
+      },
       source: CARRIER_CITES.account,
     },
     { role: "user", content: MONTH_ASK },
     {
       role: "assistant",
-      content: `In ${MONTH} I caught ${spellCount(MONTH_CATCHES.length)} things on your account, and ${spellCount(MONTH_CATCHES.filter((c) => c.saving).length)} of them found ${formatWholeCurrency(MONTH_SAVINGS)} in savings. Your plan costs ${formatWholeCurrency(PLAN_MONTHLY)} a month.`,
+      content: `Here they are, in date order. Two came with a figure: the outage credit and the lower plan. Your plan costs ${formatWholeCurrency(PLAN_MONTHLY)} a month.`,
       panel: "month-value",
       source: CARRIER_CITES.account,
       suggestions: [RENEWAL_PROMPT],

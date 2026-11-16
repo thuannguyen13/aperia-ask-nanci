@@ -8,7 +8,7 @@
 import type { ConceptScriptedTurn } from "../../types"
 import type { FlowDef } from "../flows.concept"
 import { CARRIER, nanciLink } from "../carrier"
-import { CARRIER_CITES } from "../sources"
+import { CARRIER_CITES, CHASE_ACCOUNT } from "../sources"
 import { isAwaitingTurn } from "../../is-awaiting-turn"
 import { formatWholeCurrency } from "../../../../components/shared/format"
 import { DEPOSIT_DROP_PCT, PAYROLL, SHORTFALL, CUT_BACK_TOTAL, STILL_TO_FIND } from "../panels/cash-flow"
@@ -51,7 +51,16 @@ export const CASH_FLOW_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
       content: `Your deposits are running ${DEPOSIT_DROP_PCT}% below last month, and payroll of ${formatWholeCurrency(PAYROLL.amount)} is due ${PAYROLL.day}.`,
       textFrom: CARRIER.business,
       textLink: nanciLink("p5Vn1"),
-      textReason: "Payroll shortfall ahead",
+      chatContent: `I checked your deposits against last month and against ${PAYROLL.day}'s payroll. Deposits are running ${DEPOSIT_DROP_PCT}% lower, and at this pace payroll of ${formatWholeCurrency(PAYROLL.amount)} will come up short.`,
+      workTrail: {
+        when: "This morning",
+        steps: [
+          { text: `Checked deposits into ${CHASE_ACCOUNT.name}` },
+          { text: "Compared them with the same weeks last month" },
+          { text: `Projected your balance to ${PAYROLL.day}'s payroll` },
+          { flag: true, text: `Flagged: about ${formatWholeCurrency(SHORTFALL)} short for payroll` },
+        ],
+      },
       source: CARRIER_CITES.cashFlow,
     },
     { role: "user", content: CASH_WORRY },

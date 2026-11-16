@@ -80,7 +80,15 @@ export const HANDOFF_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
       content: `Your bill posted today with a new $${BILL_CHARGE.amount} ${BILL_CHARGE.label.toLowerCase()} on it, the first in 12 months.`,
       textFrom: CARRIER.business,
       textLink: nanciLink("f8Rw3"),
-      textReason: "New fee on your bill",
+      chatContent: `Your bill posted today, and I checked it against your last 12. One charge is new: a $${BILL_CHARGE.amount} ${BILL_CHARGE.label.toLowerCase()}.`,
+      workTrail: {
+        when: "When your bill posted",
+        steps: [
+          { text: "Read this month's bill" },
+          { text: "Compared it with your last 12 bills" },
+          { flag: true, text: `Flagged: a $${BILL_CHARGE.amount} fee that has not appeared before` },
+        ],
+      },
       source: CARRIER_CITES.account,
     },
     { role: "user", content: HANDOFF_ASK },
