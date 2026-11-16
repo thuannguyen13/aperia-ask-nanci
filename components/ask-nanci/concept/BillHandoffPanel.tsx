@@ -32,7 +32,7 @@ export function BillHandoffPanel() {
   return (
     <PanelShell>
       <PanelHeader
-        title="Bill Question"
+        title="Billing Question"
         subtitle="This month's bill"
         size="lg"
         actions={<PanelExportButton />}

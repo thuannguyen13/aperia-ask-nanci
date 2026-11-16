@@ -148,7 +148,7 @@ export const PANELS = {
   "second-location":     { component: SecondLocationPanel,    label: "Second Location" },
   "plan-value":          { component: PlanValuePanel,         label: PLAN_VALUE_TITLE },
   "month-value":         { component: MonthValuePanel,        label: MONTH_VALUE_TITLE },
-  "bill-handoff":        { component: BillHandoffPanel,       label: "Bill Question" },
+  "bill-handoff":        { component: BillHandoffPanel,       label: "Billing Question" },
   "cash-flow":           { component: CashFlowPanel,          label: CASH_FLOW_TITLE },
   "cash-plan":           { component: CashPlanPanel,          label: CASH_PLAN_TITLE },
   "seasonal-closure":    { component: SeasonalClosurePanel,   label: SEASONAL_CLOSURE_TITLE },

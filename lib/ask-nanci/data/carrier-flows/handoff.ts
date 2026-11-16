@@ -1,4 +1,4 @@
-// Carrier story 38, Bill Question. Its definition and its script, one file per story, so the
+// Carrier story 38, Billing Question. Its definition and its script, one file per story, so the
 // stories are written side by side without touching each other.
 //
 // Nanci speaks first, in the app, when the bill posts with a fee it has not seen before.
@@ -26,7 +26,7 @@ const OVERAGE_LEAVE = "Leave it as it is"
 export const HANDOFF_FLOW: FlowDef = {
   num: 38,
   section: "merchant",
-  title: "Bill Question",
+  title: "Billing Question",
   badge: "Support",
   key: HANDOFF_KEY,
   proactive: true,
@@ -39,7 +39,7 @@ export const HANDOFF_FLOW: FlowDef = {
 }
 
 const HANDOFF_SHEET: SheetActionData = {
-  field: "Bill question",
+  field: "Billing question",
   requestLabel: "Specialist hand-off",
   submittedTitle: "Hand-off Sent",
   product: `$${BILL_CHARGE.amount} ${BILL_CHARGE.label.toLowerCase()}, call back ${HANDOFF_REQUEST.callWindow}`,

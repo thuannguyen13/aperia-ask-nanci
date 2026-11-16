@@ -1,4 +1,4 @@
-// Data for carrier story 38, Bill Question. Ask Nanci can read the charge but not the
+// Data for carrier story 38, Billing Question. Ask Nanci can read the charge but not the
 // reason for it, so the panel is the summary a specialist picks up, not a bill lookup.
 import { CARRIER } from "../carrier"
 
