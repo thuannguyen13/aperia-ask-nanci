@@ -57,7 +57,8 @@ export const OUTAGE_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
       content: `Your internet at ${OUTAGE_STREET} went down at ${formatClock(OUTAGE.start, true)}. ${CARRIER.business} expects it back by ${formatClock(OUTAGE_ESTIMATED_FIX, true)}. Until then your register cannot take cards. Cash still works.`,
       textFrom: CARRIER.business,
       textLink: nanciLink("o4Tz9"),
-      textLabel: "Outage Alert",
+      textReason: "Internet outage during your dinner rush",
+      source: CARRIER_CITES.withSales,
     },
     { role: "user", content: OUTAGE_ASK, pauseBefore: FOLLOWUP_PAUSE_MS },
     {

@@ -80,7 +80,8 @@ export const HANDOFF_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
       content: `Your bill posted today with a new $${BILL_CHARGE.amount} ${BILL_CHARGE.label.toLowerCase()} on it, the first in 12 months.`,
       textFrom: CARRIER.business,
       textLink: nanciLink("f8Rw3"),
-      textLabel: "Bill Alert",
+      textReason: "New fee on your bill",
+      source: CARRIER_CITES.account,
     },
     { role: "user", content: HANDOFF_ASK },
     {

@@ -43,7 +43,8 @@ export const BRIEFING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
       content: `Good morning. ${YESTERDAY.day}: ${formatWholeCurrency(YESTERDAY.sales)} in sales, ${YESTERDAY_CHANGE_PCT}% above a usual ${YESTERDAY.day}. ${WORTH_A_LOOK.title}.`,
       textFrom: CARRIER.business,
       textLink: nanciLink("b7Kq2"),
-      textLabel: "Daily Recap",
+      textReason: "Stock will run out before the next delivery",
+      source: CARRIER_CITES.cashFlow,
     },
     { role: "user", content: BRIEFING_ASK, pauseBefore: OPEN_PAUSE_MS },
     {

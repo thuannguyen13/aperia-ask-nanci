@@ -67,7 +67,8 @@ export const LINES_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
       content: `${capitalize(spellCount(IDLE_LINES.length))} of your ${spellCount(LINES.length)} lines have had no use in ${IDLE_DAYS} days. Moving to a lower plan before your bill posts on Friday would save ${formatWholeCurrency(MONTHLY_DIFFERENCE)} a month.`,
       textFrom: CARRIER.business,
       textLink: nanciLink("l2Hm6"),
-      textLabel: "Before Your Bill",
+      textReason: "Unused lines found before your bill",
+      source: CARRIER_SOURCE.name,
     },
     { role: "user", content: LINES_ASK },
     {

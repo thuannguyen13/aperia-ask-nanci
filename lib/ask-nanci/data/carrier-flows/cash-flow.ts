@@ -51,7 +51,8 @@ export const CASH_FLOW_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
       content: `Your deposits are running ${DEPOSIT_DROP_PCT}% below last month, and payroll of ${formatWholeCurrency(PAYROLL.amount)} is due ${PAYROLL.day}.`,
       textFrom: CARRIER.business,
       textLink: nanciLink("p5Vn1"),
-      textLabel: "Payroll Alert",
+      textReason: "Payroll shortfall ahead",
+      source: CARRIER_CITES.cashFlow,
     },
     { role: "user", content: CASH_WORRY },
     {

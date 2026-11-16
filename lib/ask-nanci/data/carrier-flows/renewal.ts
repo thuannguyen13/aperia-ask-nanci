@@ -66,7 +66,8 @@ export const RENEWAL_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
       content: `Your ${MONTH} summary is ready: ${MONTH_CATCHES.length} things caught on your account, ${formatWholeCurrency(MONTH_SAVINGS)} in savings found.`,
       textFrom: CARRIER.business,
       textLink: nanciLink("s3Jx7"),
-      textLabel: "Monthly Summary",
+      textReason: "Your November account review",
+      source: CARRIER_CITES.account,
     },
     { role: "user", content: MONTH_ASK },
     {

@@ -653,7 +653,7 @@ export function AskNanciProvider({ children, isEmbed = false, embedVariant = nul
       setTextNotice(null)
       await sleep(TEXT_NOTICE_GAP_MS)
       setView("chat")
-      setMessages((prev) => [...prev, { id: newSessionId(), role: "assistant" as const, content: turn.content, automatedLabel: turn.textLabel, ...(suggestions ? { suggestions } : {}) }])
+      setMessages((prev) => [...prev, { id: newSessionId(), role: "assistant" as const, content: turn.content, reachedOut: turn.textReason, ...(turn.source ? { source: turn.source } : {}), ...(suggestions ? { suggestions } : {}) }])
       return
     }
     // A flow that opened on a text is still outside the chat. Its first answer opens it.

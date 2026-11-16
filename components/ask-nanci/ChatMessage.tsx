@@ -1,7 +1,8 @@
 "use client"
 
 import { memo, useState } from "react"
-import { BellRing, FileText } from "lucide-react"
+import Image from "next/image"
+import { FileText } from "lucide-react"
 import type { Message, SheetActionData } from "@/lib/ask-nanci/types"
 import { ChatCitedSources, ChatScriptedSources } from "./ChatCitedSources"
 import { SuggestedQuestions } from "./SuggestedQuestions"
@@ -170,12 +171,15 @@ function BotMessageBase({
         {/* 16px on every screen, with Tailwind's own 1.5 line height rather than the
             leading-relaxed this used to carry. Question and answer are one exchange and
             share both numbers. */}
-        {/* A message Nanci sent unasked says so, so the owner's reply reads as one. */}
-        {message.automatedLabel && (
-          <div className="mb-1.5 flex items-center gap-2 text-xs">
-            <BellRing className="size-3.5 text-primary" />
-            <span className="font-medium text-foreground">{message.automatedLabel}</span>
-            <span className="text-muted-foreground">Sent automatically</span>
+        {/* A message Nanci sent unasked says so, and says why: the reason is what tells it
+            apart from a scheduled send. What it checked is cited under the message. */}
+        {message.reachedOut && (
+          <div className="mb-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs">
+            <span className="flex items-center gap-1.5 font-medium text-foreground">
+              <Image src="/ask-nanci/ask-nanci-logomark.svg" alt="" width={14} height={14} />
+              Ask Nanci reached out
+            </span>
+            <span className="text-muted-foreground">{message.reachedOut}</span>
           </div>
         )}
         <div className="text-base text-foreground">
