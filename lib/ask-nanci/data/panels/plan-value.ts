@@ -1,15 +1,15 @@
 import { PhoneMissed, RefreshCw, Smartphone, WalletCards, WifiOff } from "lucide-react"
 import type { CarrierRequestOption } from "./carrier-request"
 import { CARRIER } from "../carrier"
-import { CURRENT_PLAN, LINES, IDLE_LINES, IDLE_LINE_NAMES, MONTHLY_DIFFERENCE, spellCount } from "./unused-lines"
-export { spellCount }
+import { LINES, IDLE_LINES, IDLE_LINE_NAMES, MONTHLY_DIFFERENCE, PLAN_MONTHLY, spellCount } from "./unused-lines"
+export { spellCount, PLAN_MONTHLY }
 import { MISSED_IN_WINDOW, MISSED_WINDOW } from "./missed-calls"
 import { OUTAGE_MINUTES, OUTAGE_CREDIT } from "./outage-impact"
 import { PAYROLL, SHORTFALL } from "./cash-flow"
 import { formatWholeCurrency } from "../../../../components/shared/format"
 
 // Carrier story 42, Plan Value. Every figure is example data. The plan is the same one
-// story 36 reads: its lines are priced there, and the internet is added here. The
+// story 36 reads, priced there with its internet. The
 // monthly and yearly costs are derived from those prices, so the chat and the panel
 // quote the same numbers.
 
@@ -17,10 +17,6 @@ export const PLAN_VALUE_TITLE = "Plan Value"
 export const MONTH_VALUE_TITLE = "November Value"
 export const MONTH = "November"
 
-// Invented price. No real plan or price is used.
-const INTERNET_MONTHLY = 100
-
-export const PLAN_MONTHLY = CURRENT_PLAN.monthly + INTERNET_MONTHLY
 export const PLAN_YEARLY = PLAN_MONTHLY * 12
 export const RENEWS_ON = "January 14"
 /** The renewal date as a panel writes it, with the year. */

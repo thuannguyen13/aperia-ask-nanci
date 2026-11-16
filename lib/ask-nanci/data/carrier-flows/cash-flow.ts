@@ -1,33 +1,43 @@
 // Carrier story 38, Cash Flow Warning. Its definition and its script, one file per story,
 // so the stories are written side by side without touching each other.
 //
-// Nanci speaks first, in the app: nothing is down and payroll is days away, so opening the
-// app is the honest channel. The owner asks what to do, sees what cutting back covers and
-// what working capital covers, and either takes the Business Loan Offer (flow 21's panel,
-// as it is) or keeps the changes. Keeping a business open is how the carrier keeps it.
+// Nanci texts first. The owner asks what to do and sees three ways through payroll, and
+// the first is the carrier's own: ABC Carrier moves this month's bill past payroll. Then
+// cutting back, or working capital for the rest (flow 21's Business Loan Offer panel, as
+// it is). Keeping a business open is how the carrier keeps it, and helping when money is
+// tight is what the owner remembers.
 import type { ConceptScriptedTurn } from "../../types"
 import type { FlowDef } from "../flows.concept"
 import { CARRIER, nanciLink } from "../carrier"
 import { CARRIER_CITES, CHASE_ACCOUNT } from "../sources"
-import { isAwaitingTurn } from "../../is-awaiting-turn"
+import { isAwaitingAny, requestView, sentView } from "../panels/carrier-request"
 import { formatWholeCurrency } from "../../../../components/shared/format"
-import { DEPOSIT_DROP_PCT, PAYROLL, SHORTFALL, CUT_BACK_TOTAL, STILL_TO_FIND } from "../panels/cash-flow"
+import {
+  DEPOSIT_DROP_PCT, PAYROLL, SHORTFALL, CUT_BACK_TOTAL, STILL_AFTER_CUTS, STILL_AFTER_BOTH, CARRIER_BILL, BILL_DATE_OPTION,
+} from "../panels/cash-flow"
 
 // Nanci opens the flow, so its key is an id rather than a prompt.
 const CASH_KEY = "__cash-flow__"
 const CASH_ASK = `What can I do before ${PAYROLL.day}?`
 export const CASH_OFFER = "Show me the working capital offer"
 const CASH_CUT = "I will cut back instead"
+export const CASH_BILL = `Ask ${CARRIER.business} to move my bill`
 // The owner opens the app on Nanci's text and asks the question it raises.
 const CASH_WORRY = "Will I have enough for payroll?"
 const PLAN_READ_MS = 5000
 
-// The answer the plan waits on. The panel's offer button is live only while this is the
-// last thing in the chat.
-const CASH_PLAN_ANSWER = `Cutting back this week could cover about ${formatWholeCurrency(CUT_BACK_TOTAL)} of it. Working capital could cover all of it. Both are under Before Payroll.`
+// The answers the plan's buttons wait on. Each button is live only while one of its
+// answers is the last thing in the chat.
+const CASH_PLAN_ANSWER = `${CARRIER.business} can move this month's ${formatWholeCurrency(CARRIER_BILL.amount)} bill to after payroll, and cutting back this week could cover about ${formatWholeCurrency(CUT_BACK_TOTAL)} more. Working capital could cover all of it. All three are under Before Payroll.`
+const BILL_REVIEW_ANSWER = `Here is the request to ${CARRIER.business}. Check it, then send it.`
+const BILL_SENT_ANSWER = `Sent to ${CARRIER.business} as a request to move this month's ${formatWholeCurrency(CARRIER_BILL.amount)} bill to ${CARRIER_BILL.movedTo}, reference ${BILL_DATE_OPTION.reference}. Nothing changes until they confirm. With the bill moved and the three cut-backs, you would be about ${formatWholeCurrency(STILL_AFTER_BOTH)} short, and working capital covers the rest.`
 
-/** True while story 38 is parked on its plan: idle, with the plan answer as the last message. */
-export const isAwaitingCashPlan = (messages: { role: string; content: string }[], chatState: string) => isAwaitingTurn(messages, chatState, CASH_PLAN_ANSWER)
+/** True while the plan's carrier button can be pressed: the plan answer is the last message. */
+export const isAwaitingCashPlan = (messages: { role: string; content: string }[], chatState: string) => isAwaitingAny(messages, chatState, [CASH_PLAN_ANSWER])
+/** True while the plan's offer button can be pressed: before or after the bill is moved. */
+export const isAwaitingCashOffer = (messages: { role: string; content: string }[], chatState: string) => isAwaitingAny(messages, chatState, [CASH_PLAN_ANSWER, BILL_SENT_ANSWER])
+/** True while the bill date request waits on its Send button. */
+export const isAwaitingBillDate = (messages: { role: string; content: string }[], chatState: string) => isAwaitingAny(messages, chatState, [BILL_REVIEW_ANSWER])
 
 export const CASH_FLOW_FLOW: FlowDef = {
   num: 38,
@@ -39,9 +49,9 @@ export const CASH_FLOW_FLOW: FlowDef = {
   slug: "38",
   scope: "carrier",
   churn: { cause: "Business closing", metric: "Churn" },
-  // The offer comes first, so ?autoplay plays on into it.
-  followups: [CASH_ASK, CASH_OFFER, CASH_CUT],
-  description: "Nanci texts the owner before payroll that deposits are running low, lays out what cutting back covers, and offers working capital for the rest.",
+  // The carrier's own lever comes first, so ?autoplay plays on into it, then the offer.
+  followups: [CASH_ASK, CASH_BILL, BILL_DATE_OPTION.sendPrompt, CASH_OFFER, CASH_CUT],
+  description: "Nanci texts the owner before payroll that deposits are running low. ABC Carrier moves its own bill past payroll, then cutting back or working capital covers the rest.",
 }
 
 export const CASH_FLOW_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
@@ -80,6 +90,30 @@ export const CASH_FLOW_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
       panel: "cash-plan",
       // The owner chooses in the panel, so on a phone it comes up with the answer.
       revealPanel: true,
+      suggestions: [CASH_BILL, CASH_OFFER, CASH_CUT],
+    },
+  ],
+  // The carrier's lever: the owner reviews the request before it goes.
+  [CASH_BILL]: [
+    { role: "user", content: CASH_BILL },
+    { role: "assistant", content: BILL_REVIEW_ANSWER, panel: "bill-date-request", view: requestView(BILL_DATE_OPTION.id), revealPanel: true },
+  ],
+  [BILL_DATE_OPTION.sendPrompt]: [
+    { role: "user", content: BILL_DATE_OPTION.sendPrompt },
+    {
+      role: "assistant",
+      content: BILL_SENT_ANSWER,
+      panel: "bill-date-request",
+      view: sentView(BILL_DATE_OPTION.id),
+      sheetAction: {
+        field: "Bill due date",
+        fromValue: CARRIER_BILL.dueDate,
+        toValue: CARRIER_BILL.movedToDate,
+        status: "submitted",
+        reference: BILL_DATE_OPTION.reference,
+        sentTo: CARRIER.business,
+        timestamp: "Today, 06:52 AM",
+      },
       suggestions: [CASH_OFFER, CASH_CUT],
     },
   ],
@@ -92,7 +126,7 @@ export const CASH_FLOW_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
     { role: "user", content: CASH_CUT },
     {
       role: "assistant",
-      content: `Okay. Those three changes keep about ${formatWholeCurrency(CUT_BACK_TOTAL)} before ${PAYROLL.day}, which leaves about ${formatWholeCurrency(STILL_TO_FIND)} to find. I will check your deposits again on Wednesday and tell you where you stand.`,
+      content: `Okay. Those three changes keep about ${formatWholeCurrency(CUT_BACK_TOTAL)} before ${PAYROLL.day}, which leaves about ${formatWholeCurrency(STILL_AFTER_CUTS)} to find, or ${formatWholeCurrency(STILL_AFTER_BOTH)} if ${CARRIER.business} moves your bill. I will check your deposits again on Wednesday and tell you where you stand.`,
     },
   ],
 }

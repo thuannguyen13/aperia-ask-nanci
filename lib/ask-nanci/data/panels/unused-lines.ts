@@ -47,6 +47,10 @@ export const lastUsed = (days: number) => (days === 0 ? "Today" : days === 1 ? "
 export const CURRENT_PLAN = { name: "Current Plan", lines: LINES.length, monthly: 289 }
 export const SUGGESTED_PLAN = { name: "Lower Plan", lines: ACTIVE_LINES.length, monthly: 219 }
 export const MONTHLY_DIFFERENCE = CURRENT_PLAN.monthly - SUGGESTED_PLAN.monthly
+
+// The whole monthly bill: the lines above plus the business internet. Invented price.
+const INTERNET_MONTHLY = 100
+export const PLAN_MONTHLY = CURRENT_PLAN.monthly + INTERNET_MONTHLY
 export const YEARLY_DIFFERENCE = MONTHLY_DIFFERENCE * 12
 
 // Small counts read as words in the chat, the way the owner would say them.

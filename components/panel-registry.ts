@@ -47,7 +47,7 @@ import { ResySurveysPanel } from "./ask-nanci/concept/ResySurveysPanel"
 import { ResyLocationsPanel } from "./ask-nanci/concept/ResyLocationsPanel"
 import { MissedCallsPanel } from "./ask-nanci/concept/MissedCallsPanel"
 import { OutageImpactPanel } from "./ask-nanci/concept/OutageImpactPanel"
-import { CallsCoverPanel, OutageBackupPanel, SeasonalPausePanel, LinesRequestPanel, OverageRequestPanel, LocationRequestPanel, RenewalRequestPanel } from "./ask-nanci/concept/carrier-request"
+import { CallsCoverPanel, OutageBackupPanel, SeasonalPausePanel, LinesRequestPanel, OverageRequestPanel, LocationRequestPanel, RenewalRequestPanel, BillDateRequestPanel } from "./ask-nanci/concept/carrier-request"
 import { SeasonalClosurePanel } from "./ask-nanci/concept/SeasonalClosurePanel"
 import { DailyBriefingPanel } from "./ask-nanci/concept/DailyBriefingPanel"
 import { YearHistoryPanel } from "./ask-nanci/concept/YearHistoryPanel"
@@ -74,7 +74,7 @@ import { FEE_TITLE } from "@/lib/ask-nanci/data/panels/resy-deposits"
 import { WEEK_TITLE } from "@/lib/ask-nanci/data/panels/resy-reports"
 import { MISSED_CALLS_TITLE, CALLS_COVER_TITLE } from "@/lib/ask-nanci/data/panels/missed-calls"
 import { OUTAGE_IMPACT_TITLE, OUTAGE_BACKUP_TITLE } from "@/lib/ask-nanci/data/panels/outage-impact"
-import { CASH_FLOW_TITLE, CASH_PLAN_TITLE } from "@/lib/ask-nanci/data/panels/cash-flow"
+import { CASH_FLOW_TITLE, CASH_PLAN_TITLE, BILL_DATE_TITLE } from "@/lib/ask-nanci/data/panels/cash-flow"
 import { SEASONAL_CLOSURE_TITLE, SEASONAL_PAUSE_TITLE } from "@/lib/ask-nanci/data/panels/seasonal-closure"
 import { BRIEFING_TITLE } from "@/lib/ask-nanci/data/panels/daily-briefing"
 import { HISTORY_TITLE } from "@/lib/ask-nanci/data/panels/year-history"
@@ -161,6 +161,7 @@ export const PANELS = {
   "overage-request":     { component: OverageRequestPanel,    label: OVERAGE_REQUEST_TITLE },
   "location-request":    { component: LocationRequestPanel,   label: LOCATION_REQUEST_TITLE },
   "renewal-request":     { component: RenewalRequestPanel,    label: RENEWAL_REQUEST_TITLE },
+  "bill-date-request":   { component: BillDateRequestPanel,   label: BILL_DATE_TITLE },
   "dashboard-insight":   { component: DashboardInsightPanel,  label: "Dashboard Insight" },
   "detection-queue-insight": { component: DetectionQueueInsightPanel, label: "Queue Insight" },
   // Aperia Risk destinations — every risk UI is a registered panel.

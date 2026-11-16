@@ -22,6 +22,8 @@ import { LOCATION_REQUEST_TITLE, LOCATION_OPTION } from "@/lib/ask-nanci/data/pa
 import { isAwaitingLocationRequest } from "@/lib/ask-nanci/data/carrier-flows/expansion"
 import { RENEWAL_REQUEST_TITLE, RENEWAL_OPTION } from "@/lib/ask-nanci/data/panels/plan-value"
 import { isAwaitingRenewalRequest } from "@/lib/ask-nanci/data/carrier-flows/renewal"
+import { BILL_DATE_TITLE, BILL_DATE_OPTION } from "@/lib/ask-nanci/data/panels/cash-flow"
+import { isAwaitingBillDate } from "@/lib/ask-nanci/data/carrier-flows/cash-flow"
 import { SEASONAL_PAUSE_TITLE, PAUSE_OPTIONS, PAUSE_OPTIONS_HEADING } from "@/lib/ask-nanci/data/panels/seasonal-closure"
 import { isAwaitingPauseRequest } from "@/lib/ask-nanci/data/carrier-flows/seasonal"
 import { usePanelAutoplay } from "./use-panel-autoplay"
@@ -182,4 +184,8 @@ export function LocationRequestPanel() {
 
 export function RenewalRequestPanel() {
   return <RequestPanel panelId="renewal-request" title={RENEWAL_REQUEST_TITLE} heading={SINGLE} options={[RENEWAL_OPTION]} isAwaiting={isAwaitingRenewalRequest} />
+}
+
+export function BillDateRequestPanel() {
+  return <RequestPanel panelId="bill-date-request" title={BILL_DATE_TITLE} heading={SINGLE} options={[BILL_DATE_OPTION]} isAwaiting={isAwaitingBillDate} />
 }
