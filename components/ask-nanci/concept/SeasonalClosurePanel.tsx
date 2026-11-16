@@ -21,7 +21,7 @@ const CHART_CONFIG = {
 // the calls that kept coming while the register took nothing.
 function CallsChart() {
   return (
-    <Card size="sm" className="shadow-xs">
+    <Card size="sm" className="shrink-0 shadow-xs">
       <CardHeader>
         <CardTitle>{CALLS_CHART.title}</CardTitle>
         <CardDescription>{CALLS_CHART.description}</CardDescription>

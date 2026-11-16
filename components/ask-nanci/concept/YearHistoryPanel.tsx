@@ -25,7 +25,7 @@ const HELD_ICONS = { sales: CalendarDays, records: Trophy, benchmarks: Store }
 // reference line, this year the coloured one above it.
 function SalesChart() {
   return (
-    <Card size="sm" className="shadow-xs">
+    <Card size="sm" className="shrink-0 shadow-xs">
       <CardHeader>
         <CardTitle>{SALES_CHART.title}</CardTitle>
         <CardDescription>{SALES_CHART.description}</CardDescription>

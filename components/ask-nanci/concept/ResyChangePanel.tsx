@@ -28,7 +28,7 @@ function BookingSlot({ label, time, table }: { label: string; time: string; tabl
 
 function BeforeAfter() {
   return (
-    <Card size="sm" className="shadow-xs">
+    <Card size="sm" className="shrink-0 shadow-xs">
       <CardHeader>
         <CardTitle className="text-base font-semibold group-data-[size=sm]/card:text-base">{MOVE.guest}</CardTitle>
         <CardDescription>Party of {MOVE.party}</CardDescription>

@@ -7,7 +7,7 @@ export function SectionHeader({ title, description, className }: { title: React.
   return (
     <div className={cn("mb-3", className)}>
       <p className="text-base font-semibold text-foreground">{title}</p>
-      {description && <p className="text-base text-muted-foreground">{description}</p>}
+      {description && <p className="mt-0.5 text-sm text-muted-foreground">{description}</p>}
     </div>
   )
 }

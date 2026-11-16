@@ -16,7 +16,7 @@ function UsageMeter() {
   const scale = PROJECTED_GB
   const pct = (gb: number) => `${(gb / scale) * 100}%`
   return (
-    <Card size="sm" className="shadow-xs">
+    <Card size="sm" className="shrink-0 shadow-xs">
       <CardHeader>
         <CardTitle>{USAGE_METER.title}</CardTitle>
         <CardDescription>{USAGE_METER.description}</CardDescription>

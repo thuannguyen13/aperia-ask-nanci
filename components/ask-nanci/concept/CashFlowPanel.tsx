@@ -23,7 +23,7 @@ const CHART_CONFIG = {
 // drop the panel is about.
 function DepositsChart() {
   return (
-    <Card size="sm" className="shadow-xs">
+    <Card size="sm" className="shrink-0 shadow-xs">
       <CardHeader>
         <CardTitle>{DEPOSITS_CHART.title}</CardTitle>
         <CardDescription>{DEPOSITS_CHART.description}</CardDescription>

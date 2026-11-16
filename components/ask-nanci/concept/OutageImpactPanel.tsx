@@ -61,7 +61,7 @@ function EveningChart() {
   const [tip, setTip] = useState<Tip | null>(null)
   const outageTip: Tip = { at: (OUTAGE.start + OUTAGE.end) / 2, title: OUTAGE_WINDOW, swatch: DOWN_FILL, label: "Internet down", value: `${OUTAGE.end - OUTAGE.start} min` }
   return (
-    <Card size="sm" className="shadow-xs">
+    <Card size="sm" className="shrink-0 shadow-xs">
       <CardHeader>
         <CardTitle>{EVENING_CHART.title}</CardTitle>
         <CardDescription>{EVENING_CHART.description}</CardDescription>
