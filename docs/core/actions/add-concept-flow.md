@@ -39,7 +39,7 @@ Follow the text with the owner's question, not with Nanci. A chat that opens on 
 |---|---|
 | `textFrom: "Sender"` | Plays the turn as a phone notification outside the app, then opens the chat with the same words as Nanci's first message. |
 | `chatContent` | Nanci's first chat message, in its own voice ("While you were away I went through Friday…"). The text itself stays short; without this the chat repeats it. |
-| `workTrail` | What Nanci did before it reached out, shown above that message: when, the checks it ran, and what it flagged (`flag: true`). A scheduled send has no trail, so this is what shows Nanci found it on its own. |
+| `workTrail` | What Nanci did before it reached out, shown above that message: the time it ran (05:56 AM CST), the checks it ran, and what it flagged (`flag: true`). A scheduled send has no trail, so this is what shows Nanci found it on its own. |
 | `source` | On the text turn, the sources those checks read, cited under Nanci's first message with the usual source pill. |
 | `textLink` | The link the text ends with, shown on the notification only. The notification shows it being tapped, which is what opens the chat. Build it with `nanciLink(code)`. |
 | `pauseBefore` | Holds before the turn arrives, so time passing reads. Put it on the owner's question when time passes between the text and the reply. |

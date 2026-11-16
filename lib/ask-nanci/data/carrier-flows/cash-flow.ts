@@ -53,7 +53,7 @@ export const CASH_FLOW_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
       textLink: nanciLink("p5Vn1"),
       chatContent: `I checked your deposits against last month and against ${PAYROLL.day}'s payroll. Deposits are running ${DEPOSIT_DROP_PCT}% lower, and at this pace payroll of ${formatWholeCurrency(PAYROLL.amount)} will come up short.`,
       workTrail: {
-        when: "This morning",
+        when: "06:45 AM CST",
         steps: [
           { text: `Checked deposits into ${CHASE_ACCOUNT.name}` },
           { text: "Compared them with the same weeks last month" },

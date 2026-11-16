@@ -82,7 +82,7 @@ export const HANDOFF_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
       textLink: nanciLink("f8Rw3"),
       chatContent: `Your bill posted today, and I checked it against your last 12. One charge is new: a $${BILL_CHARGE.amount} ${BILL_CHARGE.label.toLowerCase()}.`,
       workTrail: {
-        when: "When your bill posted",
+        when: "07:30 AM CST",
         steps: [
           { text: "Read this month's bill" },
           { text: "Compared it with your last 12 bills" },

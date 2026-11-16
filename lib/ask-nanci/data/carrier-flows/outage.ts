@@ -18,7 +18,7 @@ import { formatWholeCurrency } from "../../../../components/shared/format"
 import { buildRequestConversations } from "../panels/carrier-request"
 import {
   OUTAGE, OUTAGE_MINUTES, FAILED_PAYMENTS, ESTIMATED_SALES_AFFECTED, OUTAGE_OPTIONS, OUTAGE_REQUEST_TIMESTAMP,
-  OUTAGE_ESTIMATED_FIX, OUTAGE_STREET, OUTAGE_CREDIT, formatClock,
+  OUTAGE_ESTIMATED_FIX, OUTAGE_STREET, OUTAGE_CREDIT, formatClock, formatStamp,
 } from "../panels/outage-impact"
 
 // The flow opens on Nanci's text, so its key is an id rather than a prompt.
@@ -58,7 +58,7 @@ export const OUTAGE_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
       textFrom: CARRIER.business,
       textLink: nanciLink("o4Tz9"),
       workTrail: {
-        when: `${formatClock(OUTAGE.start, true)}, during your dinner rush`,
+        when: formatStamp(OUTAGE.start + 2),
         steps: [
           { text: `Saw your connection drop on ${CARRIER.business}'s service record` },
           { text: "Saw card payments start failing at your register" },

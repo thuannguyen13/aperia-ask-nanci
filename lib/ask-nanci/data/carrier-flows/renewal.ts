@@ -68,7 +68,7 @@ export const RENEWAL_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
       textLink: nanciLink("s3Jx7"),
       chatContent: `${MONTH} is done, so I put together what your plan did this month. I caught ${spellCount(MONTH_CATCHES.length)} things on your account, and ${spellCount(MONTH_CATCHES.filter((c) => c.saving).length)} of them found ${formatWholeCurrency(MONTH_SAVINGS)} in savings.`,
       workTrail: {
-        when: `End of ${MONTH}`,
+        when: "07:00 AM CST",
         steps: [
           { text: `Went back through ${MONTH} on your ${CARRIER.business} account` },
           { text: "Counted savings only where there is a figure" },

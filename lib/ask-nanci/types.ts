@@ -93,8 +93,9 @@ export interface ConceptScriptedTurn extends ScriptedTurn {
   workTrail?: WorkTrail
 }
 
-/** The work Nanci did unasked before it reached out: when, then each step in order. */
+/** The work Nanci did unasked before it reached out: when it ran, then each step in order. */
 export interface WorkTrail {
+  /** The time the checks ran, as a time stamp: 05:56 AM CST. */
   when: string
   steps: { flag?: true; text: string }[]
 }

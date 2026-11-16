@@ -45,7 +45,7 @@ export const BRIEFING_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
       textLink: nanciLink("b7Kq2"),
       chatContent: `While you were away I went through ${YESTERDAY.day}. Sales were ${formatWholeCurrency(YESTERDAY.sales)}, ${YESTERDAY_CHANGE_PCT}% above a usual ${YESTERDAY.day}. One thing needs you this week: ${lowerFirst(WORTH_A_LOOK.title)}, a day before your next delivery.`,
       workTrail: {
-        when: "Overnight",
+        when: "05:56 AM CST",
         steps: [
           { text: `Checked ${YESTERDAY.orders} orders on your register` },
           { text: `Matched ${formatWholeCurrency(DEPOSITED)} in deposits to Thursday's card sales` },
