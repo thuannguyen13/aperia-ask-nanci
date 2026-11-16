@@ -35,18 +35,18 @@ export function PlanValuePanel() {
             rows level across the two columns, so savings sit across from the yearly cost.
             On a phone the columns stack, the year first. */}
         <div className="grid gap-3 sm:grid-flow-col sm:grid-cols-2 sm:grid-rows-[auto_repeat(3,1fr)]">
-          <SectionHeader title="Your year with Ask Nanci" className="mb-0" />
-          <StatCard label="Supplier price increases caught" value={YEAR_WITH_NANCI.priceIncreasesCaught} sublabel="Flagged from your supplier spend" />
-          <StatCard label="Bill questions answered" value={YEAR_WITH_NANCI.billQuestionsAnswered} sublabel={`About your ${CARRIER.business} bill`} />
-          <StatCard label="Estimated savings" value={formatWholeCurrency(YEAR_WITH_NANCI.estimatedSavings)} sublabel="Only savings with a figure behind them" emphasis />
-          <SectionHeader title="Your plan" className="mb-0 max-sm:mt-2" />
+          <SectionHeader title="Your Year with Ask Nanci" className="mb-0" />
+          <StatCard label="Supplier Price Increases Caught" value={YEAR_WITH_NANCI.priceIncreasesCaught} sublabel="Flagged from your supplier spend" />
+          <StatCard label="Bill Questions Answered" value={YEAR_WITH_NANCI.billQuestionsAnswered} sublabel={`About your ${CARRIER.business} bill`} />
+          <StatCard label="Estimated Savings" value={formatWholeCurrency(YEAR_WITH_NANCI.estimatedSavings)} sublabel="Only savings with a figure behind them" emphasis />
+          <SectionHeader title="Your Plan" className="mb-0 max-sm:mt-2" />
           <StatCard label="Renews" value={`On ${RENEWS_ON}`} sublabel="Next month, for another 12 months" />
-          <StatCard label="Monthly cost" value={formatWholeCurrency(PLAN_MONTHLY)} sublabel="Lines and internet together" />
-          <StatCard label="Cost over a year" value={formatWholeCurrency(PLAN_YEARLY)} sublabel="12 months at the monthly cost" emphasis />
+          <StatCard label="Monthly Cost" value={formatWholeCurrency(PLAN_MONTHLY)} sublabel="Lines, internet and Ask Nanci" />
+          <StatCard label="Cost Over a Year" value={formatWholeCurrency(PLAN_YEARLY)} sublabel="12 months at the monthly cost" emphasis />
         </div>
 
         <div>
-          <SectionHeader title="What your plan includes" />
+          <SectionHeader title="What Your Plan Includes" />
           <ul className="flex flex-col gap-2">
             {PLAN_INCLUDES.map((item) => (
               <li key={item.kind}>

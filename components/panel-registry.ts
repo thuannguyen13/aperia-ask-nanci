@@ -53,6 +53,7 @@ import { CashPlanPanel } from "./ask-nanci/concept/CashPlanPanel"
 import { UnusedLinesPanel } from "./ask-nanci/concept/UnusedLinesPanel"
 import { SecondLocationPanel } from "./ask-nanci/concept/SecondLocationPanel"
 import { PlanValuePanel } from "./ask-nanci/concept/PlanValuePanel"
+import { MonthValuePanel } from "./ask-nanci/concept/MonthValuePanel"
 import { BillHandoffPanel } from "./ask-nanci/concept/BillHandoffPanel"
 import { DashboardInsightPanel } from "@/components/risk/dashboard/DashboardInsightPanel"
 import { Dashboard as RiskDashboard } from "@/components/risk/dashboard/Dashboard"
@@ -71,7 +72,7 @@ import { MISSED_CALLS_TITLE, CALLS_COVER_TITLE } from "@/lib/ask-nanci/data/pane
 import { OUTAGE_IMPACT_TITLE, OUTAGE_BACKUP_TITLE } from "@/lib/ask-nanci/data/panels/outage-impact"
 import { CASH_FLOW_TITLE, CASH_PLAN_TITLE } from "@/lib/ask-nanci/data/panels/cash-flow"
 import { UNUSED_LINES_TITLE } from "@/lib/ask-nanci/data/panels/unused-lines"
-import { PLAN_VALUE_TITLE } from "@/lib/ask-nanci/data/panels/plan-value"
+import { PLAN_VALUE_TITLE, MONTH_VALUE_TITLE } from "@/lib/ask-nanci/data/panels/plan-value"
 
 // The single registry of concept panels. Add a panel here (+ its component) and it
 // becomes renderable everywhere — `PanelId` is derived from these keys, so there is
@@ -138,6 +139,7 @@ export const PANELS = {
   "unused-lines":        { component: UnusedLinesPanel,       label: UNUSED_LINES_TITLE },
   "second-location":     { component: SecondLocationPanel,    label: "Second Location" },
   "plan-value":          { component: PlanValuePanel,         label: PLAN_VALUE_TITLE },
+  "month-value":         { component: MonthValuePanel,        label: MONTH_VALUE_TITLE },
   "bill-handoff":        { component: BillHandoffPanel,       label: "Bill Question" },
   "cash-flow":           { component: CashFlowPanel,          label: CASH_FLOW_TITLE },
   "cash-plan":           { component: CashPlanPanel,          label: CASH_PLAN_TITLE },
