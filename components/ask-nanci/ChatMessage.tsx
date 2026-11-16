@@ -13,7 +13,7 @@ import { ChangeAuditDialog } from "./concept/ChangeAuditDialog"
 import { AiTriageSummaryWidget } from "./AiTriageSummaryWidget"
 import { ArtifactCard } from "@/components/shared"
 import { cn } from "aperia-ds5/utils"
-import { WORK_TRAIL_STEP_MS } from "@/lib/ask-nanci/work-trail"
+import { WORK_TRAIL_STAGGER_MS, WORK_TRAIL_STEP_DURATION_MS } from "@/lib/ask-nanci/work-trail"
 import { DashChartCard } from "@/components/risk/dashboard/DashChartCard"
 
 // The change-request block. Layout and styling live in ArtifactCard; this only supplies
@@ -154,13 +154,13 @@ function UserMessageBase({ message }: { message: Message }) {
 }
 
 // A message Nanci sent unasked opens on the work it did first: what it checked, then what
-// it flagged. A scheduled send has no such trail. The steps land one after another, and a
+// it flagged. A scheduled send has no such trail. The steps rise in overlapping, and a
 // line runs down from the logo and curves in to the last one, which is what it led to.
 // The sources it read are cited under the message.
 // The keyframes live in globals.css. Each element sets its own animation inline, delayed
 // by its place in the trail; reduced motion shows the trail at once.
 const TRAIL_STEP = "opacity-0 motion-reduce:!animate-none motion-reduce:!opacity-100"
-const trailStepStyle = (i: number) => ({ animation: `work-trail-step 300ms ease-out ${i * WORK_TRAIL_STEP_MS}ms forwards` })
+const trailStepStyle = (i: number) => ({ animation: `work-trail-step ${WORK_TRAIL_STEP_DURATION_MS}ms ease-out ${i * WORK_TRAIL_STAGGER_MS}ms forwards` })
 
 function WorkTrailView({ trail }: { trail: NonNullable<Message["workTrail"]> }) {
   const last = trail.steps.length - 1
