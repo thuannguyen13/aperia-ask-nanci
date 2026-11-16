@@ -14,6 +14,8 @@ import { CALLS_COVER_TITLE, CALLS_OPTIONS, CALLS_OPTIONS_HEADING } from "@/lib/a
 import { OUTAGE_BACKUP_TITLE, OUTAGE_OPTIONS, OUTAGE_OPTIONS_HEADING } from "@/lib/ask-nanci/data/panels/outage-impact"
 import { isAwaitingCallsRequest } from "@/lib/ask-nanci/data/carrier-flows/calls"
 import { isAwaitingOutageRequest } from "@/lib/ask-nanci/data/carrier-flows/outage"
+import { SEASONAL_PAUSE_TITLE, PAUSE_OPTIONS, PAUSE_OPTIONS_HEADING } from "@/lib/ask-nanci/data/panels/seasonal-closure"
+import { isAwaitingPauseRequest } from "@/lib/ask-nanci/data/carrier-flows/seasonal"
 import { usePanelAutoplay } from "./use-panel-autoplay"
 
 // Under ?autoplay: a beat to read the options before the first is picked, and a beat
@@ -148,4 +150,8 @@ export function CallsCoverPanel() {
 
 export function OutageBackupPanel() {
   return <RequestPanel panelId="outage-backup" title={OUTAGE_BACKUP_TITLE} heading={OUTAGE_OPTIONS_HEADING} options={OUTAGE_OPTIONS} ranked isAwaiting={isAwaitingOutageRequest} />
+}
+
+export function SeasonalPausePanel() {
+  return <RequestPanel panelId="seasonal-pause" title={SEASONAL_PAUSE_TITLE} heading={PAUSE_OPTIONS_HEADING} options={PAUSE_OPTIONS} isAwaiting={isAwaitingPauseRequest} />
 }

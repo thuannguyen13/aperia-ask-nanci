@@ -10,8 +10,9 @@ import { EXPANSION_FLOW, EXPANSION_CONVERSATIONS } from "./carrier-flows/expansi
 import { RENEWAL_FLOW, RENEWAL_CONVERSATIONS } from "./carrier-flows/renewal"
 import { HANDOFF_FLOW, HANDOFF_CONVERSATIONS } from "./carrier-flows/handoff"
 import { CASH_FLOW_FLOW, CASH_FLOW_CONVERSATIONS } from "./carrier-flows/cash-flow"
+import { SEASONAL_FLOW, SEASONAL_CONVERSATIONS } from "./carrier-flows/seasonal"
 
-export const CARRIER_FLOW_DEFS: FlowDef[] = [CALLS_FLOW, OUTAGE_FLOW, LINES_FLOW, EXPANSION_FLOW, RENEWAL_FLOW, HANDOFF_FLOW, CASH_FLOW_FLOW]
+export const CARRIER_FLOW_DEFS: FlowDef[] = [CALLS_FLOW, OUTAGE_FLOW, LINES_FLOW, EXPANSION_FLOW, RENEWAL_FLOW, HANDOFF_FLOW, CASH_FLOW_FLOW, SEASONAL_FLOW]
 
 export const CARRIER_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
   ...CALLS_CONVERSATIONS,
@@ -21,4 +22,5 @@ export const CARRIER_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {
   ...RENEWAL_CONVERSATIONS,
   ...HANDOFF_CONVERSATIONS,
   ...CASH_FLOW_CONVERSATIONS,
+  ...SEASONAL_CONVERSATIONS,
 }

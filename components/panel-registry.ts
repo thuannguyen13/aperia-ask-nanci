@@ -47,7 +47,8 @@ import { ResySurveysPanel } from "./ask-nanci/concept/ResySurveysPanel"
 import { ResyLocationsPanel } from "./ask-nanci/concept/ResyLocationsPanel"
 import { MissedCallsPanel } from "./ask-nanci/concept/MissedCallsPanel"
 import { OutageImpactPanel } from "./ask-nanci/concept/OutageImpactPanel"
-import { CallsCoverPanel, OutageBackupPanel } from "./ask-nanci/concept/carrier-request"
+import { CallsCoverPanel, OutageBackupPanel, SeasonalPausePanel } from "./ask-nanci/concept/carrier-request"
+import { SeasonalClosurePanel } from "./ask-nanci/concept/SeasonalClosurePanel"
 import { CashFlowPanel } from "./ask-nanci/concept/CashFlowPanel"
 import { CashPlanPanel } from "./ask-nanci/concept/CashPlanPanel"
 import { UnusedLinesPanel } from "./ask-nanci/concept/UnusedLinesPanel"
@@ -71,6 +72,7 @@ import { WEEK_TITLE } from "@/lib/ask-nanci/data/panels/resy-reports"
 import { MISSED_CALLS_TITLE, CALLS_COVER_TITLE } from "@/lib/ask-nanci/data/panels/missed-calls"
 import { OUTAGE_IMPACT_TITLE, OUTAGE_BACKUP_TITLE } from "@/lib/ask-nanci/data/panels/outage-impact"
 import { CASH_FLOW_TITLE, CASH_PLAN_TITLE } from "@/lib/ask-nanci/data/panels/cash-flow"
+import { SEASONAL_CLOSURE_TITLE, SEASONAL_PAUSE_TITLE } from "@/lib/ask-nanci/data/panels/seasonal-closure"
 import { UNUSED_LINES_TITLE } from "@/lib/ask-nanci/data/panels/unused-lines"
 import { PLAN_VALUE_TITLE, MONTH_VALUE_TITLE } from "@/lib/ask-nanci/data/panels/plan-value"
 
@@ -143,6 +145,8 @@ export const PANELS = {
   "bill-handoff":        { component: BillHandoffPanel,       label: "Bill Question" },
   "cash-flow":           { component: CashFlowPanel,          label: CASH_FLOW_TITLE },
   "cash-plan":           { component: CashPlanPanel,          label: CASH_PLAN_TITLE },
+  "seasonal-closure":    { component: SeasonalClosurePanel,   label: SEASONAL_CLOSURE_TITLE },
+  "seasonal-pause":      { component: SeasonalPausePanel,     label: SEASONAL_PAUSE_TITLE },
   "dashboard-insight":   { component: DashboardInsightPanel,  label: "Dashboard Insight" },
   "detection-queue-insight": { component: DetectionQueueInsightPanel, label: "Queue Insight" },
   // Aperia Risk destinations — every risk UI is a registered panel.
