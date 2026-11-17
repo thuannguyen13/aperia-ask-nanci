@@ -6,6 +6,7 @@ import { useAskNanci } from "@/contexts/AskNanciContext"
 import { usePendingBot } from "@/contexts/ChatStreamContext"
 import { useChatScroll } from "@/hooks/use-chat-scroll"
 import { PanelHeader } from "@/components/shared"
+import { PANELS, type PanelDef } from "@/components/panel-registry"
 import { UserMessage, BotMessage } from "./ChatMessage"
 import { ThinkingIndicator } from "./ThinkingIndicator"
 
@@ -66,11 +67,14 @@ export function ChatView() {
             was torn down and rebuilt on commit, which flashed every answer once and
             reloaded the map iframe. In the list, the node survives the handoff. */}
         {/* A panel's card shows once, on the answer that first opened it. A later answer
-            that only moves the same panel on (to its sent view, say) would repeat a card
-            that opens the same thing. */}
+            that only moves the same panel on would repeat a card that opens the same thing. */}
         {rendered.map((msg, i) => {
           const isPending = msg === pending
-          const showPanelCard = !msg.panel || rendered.findIndex((m) => m.role !== "user" && m.panel === msg.panel) === i
+          // A later answer gets its own card only when it left the panel in a state with a
+          // name of its own (Place Order → Order Placed).
+          const showPanelCard = !msg.panel
+            || rendered.findIndex((m) => m.role !== "user" && m.panel === msg.panel) === i
+            || !!(msg.panelView && (PANELS[msg.panel] as PanelDef).viewLabels?.[msg.panelView])
           const isLastUser = !isPending && i === messages.length - 1 && msg.role === "user"
           return msg.role === "user" ? (
             <div key={msg.id} ref={isLastUser ? lastUserMsgRef : undefined}>

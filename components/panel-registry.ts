@@ -59,6 +59,7 @@ import { SecondLocationPanel } from "./ask-nanci/concept/SecondLocationPanel"
 import { PlanValuePanel } from "./ask-nanci/concept/PlanValuePanel"
 import { MonthValuePanel } from "./ask-nanci/concept/MonthValuePanel"
 import { BillHandoffPanel } from "./ask-nanci/concept/BillHandoffPanel"
+import { PlaceOrderPanel } from "./ask-nanci/concept/PlaceOrderPanel"
 import { DashboardInsightPanel } from "@/components/risk/dashboard/DashboardInsightPanel"
 import { Dashboard as RiskDashboard } from "@/components/risk/dashboard/Dashboard"
 import { DetectionQueue as RiskDetectionQueue } from "@/components/risk/DetectionQueue"
@@ -86,12 +87,16 @@ import { PLAN_VALUE_TITLE, MONTH_VALUE_TITLE, RENEWAL_REQUEST_TITLE } from "@/li
 // The single registry of concept panels. Add a panel here (+ its component) and it
 // becomes renderable everywhere — `PanelId` is derived from these keys, so there is
 // no separate union to keep in sync.
-interface PanelDef {
+export interface PanelDef {
   component: ComponentType
   // Short human name for the panel. Used as the caption under a thumbnail in the
   // mobile panel switcher, where the panel itself is too small to read — so keep it
   // to a couple of words that fit under a card.
   label: string
+  // A different name for some of the panel's views, where the panel's title changes with
+  // its state (Place Order → Order Placed). The chat card for an answer uses the name of
+  // the view that answer opened; views not listed fall back to `label`.
+  viewLabels?: Record<string, string>
 }
 
 export const PANELS = {
@@ -163,6 +168,7 @@ export const PANELS = {
   "location-request":    { component: LocationRequestPanel,   label: LOCATION_REQUEST_TITLE },
   "renewal-request":     { component: RenewalRequestPanel,    label: RENEWAL_REQUEST_TITLE },
   "bill-date-request":   { component: BillDateRequestPanel,   label: BILL_DATE_TITLE },
+  "place-order":         { component: PlaceOrderPanel,        label: "Place Order", viewLabels: { placed: "Order Placed", auto: "Order Placed" } },
   "dashboard-insight":   { component: DashboardInsightPanel,  label: "Dashboard Insight" },
   "detection-queue-insight": { component: DetectionQueueInsightPanel, label: "Queue Insight" },
   // Aperia Risk destinations — every risk UI is a registered panel.

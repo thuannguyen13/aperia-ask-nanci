@@ -1,4 +1,4 @@
-// Carrier story 38, Cash Flow Warning. Its definition and its script, one file per story,
+// Carrier story 45, Cash Flow Warning. Its definition and its script, one file per story,
 // so the stories are written side by side without touching each other.
 //
 // Nanci texts first. The owner asks what to do and sees three ways through payroll, and
@@ -40,13 +40,13 @@ export const isAwaitingCashOffer = (messages: { role: string; content: string }[
 export const isAwaitingBillDate = (messages: { role: string; content: string }[], chatState: string) => isAwaitingAny(messages, chatState, [BILL_REVIEW_ANSWER])
 
 export const CASH_FLOW_FLOW: FlowDef = {
-  num: 38,
+  num: 45,
   section: "merchant",
   title: "Cash Flow Warning",
   badge: "Involuntary Churn",
   key: CASH_KEY,
   proactive: true,
-  slug: "38",
+  slug: "45",
   scope: "carrier",
   churn: { cause: "Business closing", metric: "Churn" },
   // The carrier's own lever comes first, so ?autoplay plays on into it, then the offer.

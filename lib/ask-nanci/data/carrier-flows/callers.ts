@@ -1,4 +1,4 @@
-// Carrier story 41, Phone Customers. Its definition and its script, one file per story,
+// Carrier story 48, Phone Customers. Its definition and its script, one file per story,
 // so the stories are written side by side without touching each other.
 //
 // Value that builds up the longer the owner stays, and that only the carrier holds:
@@ -24,16 +24,16 @@ const CALLERS_EXPORT = "Can I download all of my history?"
 // thing in the chat.
 const WINBACK_REVIEW_ANSWER = `Here is the request to ${CARRIER.business}. Business texting sends from your own number, so they see it is you. Check it, then send it.`
 
-/** True while story 41 waits on its request: idle, with the review answer as the last message. */
+/** True while story 48 waits on its request: idle, with the review answer as the last message. */
 export const isAwaitingWinback = (messages: { role: string; content: string }[], chatState: string) => isAwaitingAny(messages, chatState, [WINBACK_REVIEW_ANSWER])
 
 export const CALLERS_FLOW: FlowDef = {
-  num: 41,
+  num: 48,
   section: "merchant",
   title: "Phone Customers",
   badge: "Accumulated Value",
   key: CALLERS_PROMPT,
-  slug: "41",
+  slug: "48",
   scope: "carrier",
   churn: { cause: "Short tenure", metric: "Churn, attach rate" },
   // Winning them back comes first, so ?autoplay plays on into it.

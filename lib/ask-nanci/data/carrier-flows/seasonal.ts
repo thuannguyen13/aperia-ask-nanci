@@ -1,4 +1,4 @@
-// Carrier story 40, Seasonal Pause. Its definition and its script, one file per story, so
+// Carrier story 47, Seasonal Pause. Its definition and its script, one file per story, so
 // the stories are written side by side without touching each other.
 //
 // The owner closes for three weeks every January and asks whether to cancel until they
@@ -24,16 +24,16 @@ const SEASONAL_CANCEL = "I would still rather cancel"
 // last thing in the chat.
 const SEASONAL_OPTIONS_ANSWER = `A pause stops your lines and internet while you are closed and keeps your number. Here are two ways to do it. Tap one and I will fill in the request to ${CARRIER.business}.`
 
-/** True while story 40 is parked on its options: idle, with the options answer as the last message. */
+/** True while story 47 is parked on its options: idle, with the options answer as the last message. */
 export const isAwaitingPauseRequest = (messages: { role: string; content: string }[], chatState: string) => isAwaitingTurn(messages, chatState, SEASONAL_OPTIONS_ANSWER)
 
 export const SEASONAL_FLOW: FlowDef = {
-  num: 40,
+  num: 47,
   section: "merchant",
   title: "Seasonal Pause",
   badge: "Life Events",
   key: SEASONAL_PROMPT,
-  slug: "40",
+  slug: "47",
   scope: "carrier",
   churn: { cause: "Seasonal cancellation", metric: "Churn" },
   // The pause comes first, so ?autoplay plays on into it.

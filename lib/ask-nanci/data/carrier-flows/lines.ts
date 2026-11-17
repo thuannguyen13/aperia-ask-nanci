@@ -1,4 +1,4 @@
-// Carrier story 36, Unused Lines. Its definition and its script, one file per story, so the
+// Carrier story 43, Unused Lines. Its definition and its script, one file per story, so the
 // stories are written side by side without touching each other.
 //
 // Nanci speaks first, in the app, before the bill posts: two idle lines and a smaller
@@ -27,17 +27,17 @@ const LINES_ASK = "Which lines aren't being used?"
 // thing in the chat.
 const LINES_REVIEW_ANSWER = `Here is the request to ${CARRIER.business}, filled in from your lines. Check it, then send it.`
 
-/** True while story 36 waits on its request: idle, with the review answer as the last message. */
+/** True while story 43 waits on its request: idle, with the review answer as the last message. */
 export const isAwaitingLinesRequest = (messages: { role: string; content: string }[], chatState: string) => isAwaitingAny(messages, chatState, [LINES_REVIEW_ANSWER])
 
 export const LINES_FLOW: FlowDef = {
-  num: 36,
+  num: 43,
   section: "merchant",
   title: "Unused Lines",
   badge: "Billing",
   key: LINES_KEY,
   proactive: true,
-  slug: "36",
+  slug: "43",
   scope: "carrier",
   churn: { cause: "Plan mismatch", metric: "Churn" },
   // The request comes first, so ?autoplay plays on into it.

@@ -1,4 +1,4 @@
-// Carrier story 39, Second Location. Its definition and its script, one file per story, so the
+// Carrier story 46, Second Location. Its definition and its script, one file per story, so the
 // stories are written side by side without touching each other.
 //
 // Address Change (flow 19) is the model: the current address on an inline map, the new
@@ -17,12 +17,12 @@ export const EXPANSION_PROMPT = "I'm opening a second location."
 const SETUP_REQUEST = "Request that setup"
 
 export const EXPANSION_FLOW: FlowDef = {
-  num: 39,
+  num: 46,
   section: "merchant",
   title: "Second Location",
   badge: "Life Events",
   key: EXPANSION_PROMPT,
-  slug: "39",
+  slug: "46",
   scope: "carrier",
   churn: { cause: "Growth", metric: "ARPU" },
   followups: [SETUP_REQUEST, LOCATION_OPTION.sendPrompt],
@@ -49,7 +49,7 @@ const EXPANSION_SHEET: SheetActionData = {
 // thing in the chat.
 const SETUP_REVIEW_ANSWER = `Here is the request to ${CARRIER.business}, filled in from what ${FIRST_LOCATION.name} uses. Check it, then send it.`
 
-/** True while story 39 waits on its request: idle, with the review answer as the last message. */
+/** True while story 46 waits on its request: idle, with the review answer as the last message. */
 export const isAwaitingLocationRequest = (messages: { role: string; content: string }[], chatState: string) => isAwaitingAny(messages, chatState, [SETUP_REVIEW_ANSWER])
 
 export const EXPANSION_CONVERSATIONS: Record<string, ConceptScriptedTurn[]> = {

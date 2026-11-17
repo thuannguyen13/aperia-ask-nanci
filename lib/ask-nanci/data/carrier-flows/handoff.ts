@@ -1,4 +1,4 @@
-// Carrier story 37, Billing Question. Its definition and its script, one file per story, so the
+// Carrier story 44, Billing Question. Its definition and its script, one file per story, so the
 // stories are written side by side without touching each other.
 //
 // Nanci speaks first, in the app, when the bill posts with a fee it has not seen before.
@@ -31,17 +31,17 @@ const [UNLIMITED_OPTION, SLOW_OPTION] = OVERAGE_OPTIONS
 // while one of them is the last thing in the chat.
 const OVERAGE_REVIEW_ANSWER = `Here is the request to ${CARRIER.business} for the kitchen line. Check it, then send it.`
 
-/** True while story 37 waits on a kitchen line request: idle, with the review answer last. */
+/** True while story 44 waits on a kitchen line request: idle, with the review answer last. */
 export const isAwaitingOverageRequest = (messages: { role: string; content: string }[], chatState: string) => isAwaitingAny(messages, chatState, [OVERAGE_REVIEW_ANSWER])
 
 export const HANDOFF_FLOW: FlowDef = {
-  num: 37,
+  num: 44,
   section: "merchant",
   title: "Billing Question",
   badge: "Support",
   key: HANDOFF_KEY,
   proactive: true,
-  slug: "37",
+  slug: "44",
   scope: "carrier",
   churn: { cause: "Bill shock", metric: "Churn" },
   // Unlimited comes first, so ?autoplay plays on into it.

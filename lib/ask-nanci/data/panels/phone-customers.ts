@@ -1,7 +1,7 @@
-// Data for carrier story 41, Phone Customers: three years of the business line's call
+// Data for carrier story 48, Phone Customers: three years of the business line's call
 // records matched to the register's phone orders. The value builds up the longer the
 // owner stays, and only the carrier holds it: which callers are regulars, what they
-// order, and which have gone quiet. Dana P. and Luis M. are the regulars story 33 flags.
+// order, and which have gone quiet. Dana P. and Luis M. are the regulars story 40 flags.
 // Every figure is invented, and customers are first names only.
 import { MessageSquareText } from "lucide-react"
 import type { CarrierRequestOption } from "./carrier-request"

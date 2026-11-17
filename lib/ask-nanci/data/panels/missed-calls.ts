@@ -1,4 +1,4 @@
-// Data for carrier story 34, Missed Calls: last Friday's lunch on the register against the
+// Data for carrier story 41, Missed Calls: last Friday's lunch on the register against the
 // calls the business line missed in the same window, then two ways to cover it.
 //
 // The sales side is the same mock business as Busiest Times and the Sales Snapshot. The

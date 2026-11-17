@@ -232,7 +232,7 @@ function BotMessageBase({
           <AiTriageSummaryWidget />
         )}
         {showExtras && message.dashChart && <DashChartCard id={message.dashChart} />}
-        {showExtras && showPanelCard && message.panel && <PanelArtifactCard id={message.panel} />}
+        {showExtras && showPanelCard && message.panel && <PanelArtifactCard id={message.panel} view={message.panelView} />}
         {showExtras && message.sheetAction && (
           <>
             <ChangeRequestCard data={message.sheetAction} onClick={() => setSheetOpen(true)} />

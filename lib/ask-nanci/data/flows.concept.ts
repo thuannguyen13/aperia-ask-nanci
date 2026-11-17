@@ -22,6 +22,8 @@ import { formatWholeCurrency } from "../../../components/shared/format";
 import { inScope, type FlowScope } from "./flow-scopes";
 import { CARRIER_FLOW_DEFS, CARRIER_CONVERSATIONS } from "./flows.carrier";
 import { isAwaitingTurn } from "../is-awaiting-turn";
+// Flow 39 quotes the order total, dates and days left that the Place Order panel shows.
+import { ORDER_APPROVE, ORDER_REPLIES } from "./panels/reorder";
 
 // ─── Flow-key constants ───────────────────────────────────────────────────────
 
@@ -94,6 +96,12 @@ export const CONCEPT_FLOW31_CHARGE = "Charge it.";
 const CONCEPT_FLOW32_PROMPT = "How did covers and turn times compare to last week?";
 const CONCEPT_FLOW32_SURVEYS = "Any bad feedback this week?";
 const CONCEPT_FLOW32_LOCATIONS = "Which location had the most no-shows in October?";
+// Flow 39: the merchant asks, so the key is a real prompt. Paying happens only through
+// the panel's button (ORDER_APPROVE), never a chat pill — see PlaceOrderPanel.
+const CONCEPT_ORDER_PROMPT = "Can you order what I'm running low on?";
+const CONCEPT_ORDER_WHY = "Why only those three?";
+const CONCEPT_ORDER_AUTO_YES = "Yes, turn on automatic ordering";
+const CONCEPT_ORDER_AUTO_NO = "No, keep approving each order";
 // Both offer flows share the same accept/decline pills (matched per-active-flow, so
 // reuse is safe). "No, ignore for now" is decorative — registered as a fake follow-up.
 const CONCEPT_OFFER_YES = "Yes, show me";
@@ -138,7 +146,10 @@ export const CONCEPT_PANEL_REPLIES = {
 // Deliberately empty: flows 20 and 21 were the only two with titles, which made them
 // the odd ones out against every other flow. The mechanism stays for when a Figma
 // frame calls for one — an entry here is all it takes.
-export const CONCEPT_CHAT_TITLES: Record<string, string> = {};
+export const CONCEPT_CHAT_TITLES: Record<string, string> = {
+  // Figma (Flow 24b, built as flow 39 on this branch) titles the chat from the merchant's question.
+  [CONCEPT_ORDER_PROMPT]: "Order Supplies Running Low",
+};
 
 // Fake end-of-flow follow-up questions — shown for realism only, with no scripted
 // conversation behind them. Clicking one is a no-op (see CONCEPT_FAKE_FOLLOWUPS).
@@ -169,6 +180,8 @@ const CONCEPT_FLOW6_FOLLOWUPS_FAKE = ["Show my statement", "Show me the transact
 
 export const CONCEPT_FAKE_FOLLOWUPS = new Set<string>([
   CONCEPT_OFFER_NO,
+  // Flow 39: the road not taken at the automatic-ordering offer.
+  CONCEPT_ORDER_AUTO_NO,
   ...CONCEPT_FLOW5_FOLLOWUPS,
   ...CONCEPT_FLOW6_FOLLOWUPS_FAKE,
   ...CONCEPT_FLOW13_FOLLOWUPS,
@@ -482,6 +495,15 @@ export const FLOW_DEFS: FlowDef[] = [
   },
   // The carrier stories, scoped to ?mode=carrier.
   ...CARRIER_FLOW_DEFS,
+  {
+    num: 39,
+    section: "merchant",
+    title: "Place Order",
+    badge: "Purchasing",
+    key: CONCEPT_ORDER_PROMPT,
+    slug: "39",
+    description: "The merchant asks Ask Nanci to order what is running low. Ask Nanci drafts an order for only the items that will not last until the next delivery, and pays only after the merchant approves.",
+  },
 ];
 
 // Derived — do not hand-maintain; add to FLOW_DEFS above instead.
@@ -1150,6 +1172,37 @@ export const CONCEPT_SCRIPTED_CONVERSATIONS: Record<string, ConceptScriptedTurn[
     },
     // "Yes, show me" opens the panel directly — no assistant bubble (per Figma).
     { role: "user", content: CONCEPT_OFFER_YES, panel: "business-loan-offer" },
+  ],
+
+  // ── Flow 39: Place Order ──────────────────────────────────────────────────
+  // The explain turn ends with no pills on purpose: the next user turn (ORDER_APPROVE)
+  // is sent by the panel's Approve button, the one place money can move.
+  [CONCEPT_ORDER_PROMPT]: [
+    { role: "user", content: CONCEPT_ORDER_PROMPT },
+    {
+      role: "assistant",
+      content: ORDER_REPLIES.answer,
+      source: "Inventory and Sales",
+      panel: "place-order",
+    },
+    { role: "user", content: CONCEPT_ORDER_WHY },
+    { role: "assistant", content: ORDER_REPLIES.explain, suggestions: [] },
+    { role: "user", content: ORDER_APPROVE },
+    {
+      role: "assistant",
+      content: ORDER_REPLIES.placed,
+      panel: "place-order",
+      view: "placed",
+      suggestions: [CONCEPT_ORDER_AUTO_YES, CONCEPT_ORDER_AUTO_NO],
+    },
+    { role: "user", content: CONCEPT_ORDER_AUTO_YES },
+    {
+      role: "assistant",
+      content: ORDER_REPLIES.auto,
+      panel: "place-order",
+      view: "auto",
+      suggestions: [CONCEPT_INVENTORY_PROMPT, CONCEPT_FLOW23_PROMPT],
+    },
   ],
 
   // ── Flow 23: Busiest Times ────────────────────────────────────────────────

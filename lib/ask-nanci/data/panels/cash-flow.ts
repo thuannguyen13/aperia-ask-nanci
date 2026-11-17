@@ -1,4 +1,4 @@
-// Data for carrier story 38, Cash Flow Warning: deposits running below last month with
+// Data for carrier story 45, Cash Flow Warning: deposits running below last month with
 // payroll due Friday, then what to cut back or how to bridge the gap.
 //
 // The shortfall, the payroll day and the catering invoices are the ones the Business Loan
@@ -36,7 +36,7 @@ export const DEPOSIT_DROP_PCT = Math.round((1 - MONTH_TO_DATE / SAME_WEEKS_LAST_
 // Friday from today: the balance, deposits at this month's pace through Thursday, the
 // carrier bill due the day before payroll, and the payroll the bank paid two weeks ago.
 export const PAYROLL = { amount: 10800, day: "Friday", date: "Friday, November 20, 2026" }
-// The ABC Carrier bill (the plan story 42 prices) falls due the day before payroll. Moving
+// The ABC Carrier bill (the plan story 49 prices) falls due the day before payroll. Moving
 // it past payroll is the one lever the carrier itself holds.
 export const CARRIER_BILL = { amount: PLAN_MONTHLY, due: "Thursday", dueDate: "Thursday, November 19, 2026", movedTo: "November 27", movedToDate: "Friday, November 27, 2026" }
 const BALANCE_TODAY = 3559

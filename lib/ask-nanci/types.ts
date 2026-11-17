@@ -180,6 +180,8 @@ export interface Message {
   panel?: PanelId
   /** Set on a message Nanci sent unasked: the work it did first, shown above it. */
   workTrail?: WorkTrail
+  /** The view that panel was in when this answer opened it, so the card can name that state. */
+  panelView?: string
   /** True when the stream ended (user stopped or natural completion). Prevents re-appending a partial response on session resume. */
   stopped?: boolean
 }

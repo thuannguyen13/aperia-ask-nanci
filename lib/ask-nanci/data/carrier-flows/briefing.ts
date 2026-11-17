@@ -1,4 +1,4 @@
-// Carrier story 33, Daily Briefing. Its definition and its script, one file per story, so
+// Carrier story 40, Daily Briefing. Its definition and its script, one file per story, so
 // the stories are written side by side without touching each other.
 //
 // The owner usually hears from the carrier only at bill time. Here Nanci sends a short
@@ -25,13 +25,13 @@ const BRIEFING_SHARE = "Send this to my shift manager too"
 const BRIEFING_ASK = "What else happened yesterday?"
 
 export const BRIEFING_FLOW: FlowDef = {
-  num: 33,
+  num: 40,
   section: "merchant",
   title: "Daily Briefing",
   badge: "Engagement",
   key: BRIEFING_KEY,
   proactive: true,
-  slug: "33",
+  slug: "40",
   scope: "carrier",
   churn: { cause: "Low engagement", metric: "Churn" },
   followups: [BRIEFING_SHARE],

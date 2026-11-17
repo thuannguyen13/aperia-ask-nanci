@@ -9,7 +9,7 @@ import { PanelShell, PanelHeader, PanelBody, PanelExportButton, NanciInsight, St
 
 const SETUP_ICONS = { lines: Phone, internet: Wifi } as const
 
-// Carrier story 39. The map sits in the conversation; the panel is what the first
+// Carrier story 46. The map sits in the conversation; the panel is what the first
 // location uses and the setup that follows from it. The request opens in its own panel
 // underneath, so there is nothing here to click.
 export function SecondLocationPanel() {

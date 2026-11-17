@@ -2,7 +2,7 @@
 
 import { FileText } from "lucide-react"
 import { ArtifactCard } from "@/components/shared"
-import { PANELS, type PanelId } from "@/components/panel-registry"
+import { PANELS, type PanelDef, type PanelId } from "@/components/panel-registry"
 import { useAskNanci } from "@/contexts/AskNanciContext"
 import { useIsMobile } from "@/hooks/use-is-mobile"
 
@@ -19,12 +19,14 @@ import { useIsMobile } from "@/hooks/use-is-mobile"
  * Layout and styling live in ArtifactCard; this file supplies the panel's copy and
  * click behaviour and nothing about how it looks.
  */
-export function PanelArtifactCard({ id }: { id: PanelId }) {
+export function PanelArtifactCard({ id, view }: { id: PanelId; view?: string }) {
   const { dynamicPanels, shownPanelId, panelSheetDismissed, openDynamic, setShownPanelId, reopenPanelSheet } = useAskNanci()
   const isMobile = useIsMobile()
 
-  const panel = PANELS[id]
+  const panel: PanelDef | undefined = PANELS[id]
   if (!panel) return null
+  // Named for the state this answer left the panel in, not the panel's resting name.
+  const label = (view && panel.viewLabels?.[view]) || panel.label
 
   // Three states, because "in the stack" and "on screen" stopped being the same thing
   // once a panel could be minimised: a minimised panel is still open, just parked.
@@ -54,14 +56,14 @@ export function PanelArtifactCard({ id }: { id: PanelId }) {
     <ArtifactCard
       className="mt-3"
       icon={FileText}
-      title={panel.label}
+      title={label}
       subtitle={status}
       action="Open"
       onClick={handleClick}
       // Deliberately not "Show X": that is the sheet handle's name, and two controls
       // sharing an accessible name is ambiguous to a screen reader before it is
       // ambiguous to a locator.
-      ariaLabel={inStack ? `Bring ${panel.label} to the front` : `Reopen ${panel.label}`}
+      ariaLabel={inStack ? `Bring ${label} to the front` : `Reopen ${label}`}
     />
   )
 }

@@ -1,4 +1,4 @@
-// Data for carrier story 33, Daily Briefing: Friday on the register and on the business
+// Data for carrier story 40, Daily Briefing: Friday on the register and on the business
 // line, sent each morning. The line is what makes it a carrier's briefing: its call
 // records, matched to the register's phone orders, show which callers were regulars.
 // The menu and the stock are the same mock business as Menu Margin and Inventory. Every
@@ -54,7 +54,7 @@ export const WORTH_A_LOOK = {
   body: `${TIGHTEST.onHand} on hand at about ${TIGHTEST.pace.replace("~", "").replace("/day", " a day")}. Your next delivery is Thursday.`,
 }
 
-// The line the briefing is shared to: the shift manager's, from story 36's account.
+// The line the briefing is shared to: the shift manager's, from story 43's account.
 export const SHIFT_MANAGER = LINES.find((line) => line.label === "Shift manager")!
 export const BRIEFING_TIME = "7 AM"
 

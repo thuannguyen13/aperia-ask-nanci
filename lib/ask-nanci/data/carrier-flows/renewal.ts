@@ -1,4 +1,4 @@
-// Carrier story 42, Plan Value. Its definition and its script, one file per story, so the
+// Carrier story 49, Plan Value. Its definition and its script, one file per story, so the
 // stories are written side by side without touching each other.
 //
 // Nanci speaks first, in the app, on the 1st: a receipt of what it caught on the account
@@ -30,17 +30,17 @@ const RENEWAL_OPTIONS_ASK = "Show me other options"
 // thing in the chat.
 const RENEWAL_REVIEW_ANSWER = `Here is the renewal request to ${CARRIER.business}. Check it, then send it.`
 
-/** True while story 42 waits on its request: idle, with the review answer as the last message. */
+/** True while story 49 waits on its request: idle, with the review answer as the last message. */
 export const isAwaitingRenewalRequest = (messages: { role: string; content: string }[], chatState: string) => isAwaitingAny(messages, chatState, [RENEWAL_REVIEW_ANSWER])
 
 export const RENEWAL_FLOW: FlowDef = {
-  num: 42,
+  num: 49,
   section: "merchant",
   title: "Plan Value",
   badge: "Renewal",
   key: MONTH_KEY,
   proactive: true,
-  slug: "42",
+  slug: "49",
   scope: "carrier",
   churn: { cause: "Price shopping at renewal", metric: "Churn" },
   // The renewal comes first, so ?autoplay plays on into it.

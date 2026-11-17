@@ -21,7 +21,7 @@ const SUMMARY_ROWS: [string, string][] = [
   ["Still Open", HANDOFF_SUMMARY.open],
 ]
 
-// Carrier story 37, the Escalation panel (flow 17) for a bill charge. Three views, all
+// Carrier story 44, the Escalation panel (flow 17) for a bill charge. Three views, all
 // set by the chat: the charge, then the summary a specialist picks up with the ways they
 // can follow up, then sent. Nothing here is clicked.
 export function BillHandoffPanel() {

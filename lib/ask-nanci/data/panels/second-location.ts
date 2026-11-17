@@ -1,6 +1,6 @@
-// Data for carrier story 39, Second Location. The first location is the address flow 19
+// Data for carrier story 46, Second Location. The first location is the address flow 19
 // has on file, so the two stories describe one business. "Lines in daily use" is four
-// because story 36 has six lines with two idle: the same account, read from two sides.
+// because story 43 has six lines with two idle: the same account, read from two sides.
 import { MapPin } from "lucide-react"
 import { CARRIER } from "../carrier"
 import type { CarrierRequestOption } from "./carrier-request"
